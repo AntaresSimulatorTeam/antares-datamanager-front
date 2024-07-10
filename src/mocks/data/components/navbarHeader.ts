@@ -4,3 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+export const fakeTwoLetters = 'PG';
+export const fakeAppName = 'Pegase';
+export const fakeAppVersion = 'v1.0';
+export const fakeHomeLink = '/';

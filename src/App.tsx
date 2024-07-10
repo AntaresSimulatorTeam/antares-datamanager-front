@@ -5,12 +5,14 @@
  */
 
 import './App.css'
+import Navbar from './components/pegase/navbar/Navbar'
+import { menuBottomData, menuTopData } from './mocks/data/features/menuData.mock'
 
 function App() {
 
   return (
       <div className="flex h-screen">
-
+        <Navbar id='navBar' bottomItems={menuBottomData} topItems={menuTopData} />
       </div>
   )
 }
