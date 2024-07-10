@@ -1,0 +1,40 @@
+#Check if branch match namming convention
+fileList=`git diff --name-only --cached`
+
+license=$(echo "/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+"
+)
+licenceAdded=0
+for file in $fileList;do
+  foundLicense=`grep -i 'License, v. 2.0' $file | wc -l`
+  extension=$(echo ${file##*\.} )
+  if [ $foundLicense = 0 ] && ( [ $extension = "ts" ] || [ $extension = "tsx" ] );then
+    printf '%s\n\n' "$license" | cat - $file | tee $file >/dev/null
+    licenceAdded=`expr $licenceAdded + 1`
+  fi
+done
+
+if [ $licenceAdded -ne 0 ];then
+  echo "////////////////////////////
+Add missing license ($licenceAdded)
+////////////////////////////
+"
+fi
+
+FILES=$(git diff --cached --name-only --diff-filter=ACMR | sed 's| |\\ |g')
+[ -z "$FILES" ] && exit 0
+
+# run test only on related changed file
+npm run test -- related $FILES --run
+# Prettify all selected files
+echo "$FILES" | xargs ./node_modules/.bin/prettier --ignore-unknown --write
+
+# Add back the modified/prettified files to staging
+echo "$FILES" | xargs git add
+
+exit 0

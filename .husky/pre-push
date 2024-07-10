@@ -1,0 +1,3 @@
+# run all test
+npm run test -- --run
+exit 0
