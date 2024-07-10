@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { fakeAppName, fakeAppVersion, fakeHomeLink, fakeTwoLetters } from '@/mocks/data/components/navbarHeader';
+import { fakeAppName, fakeAppVersion, fakeHomeLink } from '@/mocks/data/components/navbarHeader';
 import { renderWithRouter } from '@/shared/types';
 import { screen } from '@testing-library/react';
 import StdNavbarHeader from '../StdNavbarHeader';
@@ -15,7 +15,6 @@ describe('StdNavbarHeader component', () => {
   it('should render the wrapper and the common content', () => {
     renderWithRouter(
       <StdNavbarHeader
-        appTwoLetters={fakeTwoLetters}
         appName={fakeAppName}
         version={fakeAppVersion}
         target={fakeHomeLink}
@@ -24,12 +23,10 @@ describe('StdNavbarHeader component', () => {
     );
     expect(document.querySelector(`#${TEST_ID}`)).toBeInTheDocument();
     expect(screen.getByRole('link')).toBeInTheDocument();
-    expect(screen.getByText(fakeTwoLetters)).toBeInTheDocument();
   });
   it('should render appName and version if expanded', () => {
     renderWithRouter(
       <StdNavbarHeader
-        appTwoLetters={fakeTwoLetters}
         appName={fakeAppName}
         version={fakeAppVersion}
         target={fakeHomeLink}
@@ -43,7 +40,6 @@ describe('StdNavbarHeader component', () => {
   it('should not render appName and version if expanded is false', () => {
     renderWithRouter(
       <StdNavbarHeader
-        appTwoLetters={fakeTwoLetters}
         appName={fakeAppName}
         version={fakeAppVersion}
         target={fakeHomeLink}

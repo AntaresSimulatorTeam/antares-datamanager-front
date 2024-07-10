@@ -32,5 +32,5 @@
     "postcss.config.js",
     "tailwind.config.ts",
     "vite-env.d.ts"
-  ]
+, "src/testSetup.ts"  ]
 }
