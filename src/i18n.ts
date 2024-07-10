@@ -4,9 +4,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+import translationsEn from '@/shared/i18n/en.json';
+import translationsFr from '@/shared/i18n/fr.json';
 import i18n from 'i18next';
-import translationsEn from 'public/i18n/en.json' assert { type: 'json' };
-import translationsFr from 'public/i18n/fr.json' assert { type: 'json' };
 import { initReactI18next } from 'react-i18next';
 
 const resources = {
