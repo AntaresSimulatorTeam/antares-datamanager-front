@@ -4,6 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+import { APP_LOGO_ID } from '@/shared/constants';
 import { classMerger } from '@/shared/utils/common/classes/classMerger';
 import { Link } from 'react-router-dom';
 
@@ -22,11 +23,11 @@ const WRAPPER_FOCUS_CLASSES =
 const StdNavbarHeader = ({ appName, version, id, target, expanded = true }: StdNavbarHeaderProps) => (
   <Link to={target} className={classMerger(WRAPPER_COMMON_CLASSES, WRAPPER_FOCUS_CLASSES)} id={id}>
     <div className="h-[34px] py-0.25">
-      <img src="/brand/app-icon.svg" id="app-logo-square" alt={appName} />
+      <img src="/brand/app-icon.svg" id={APP_LOGO_ID} alt={appName} />
     </div>
     {expanded && (
       <>
-        <div className="text-heading-xs font-semibold">{appName}</div>
+        <div className="text-heading-xs font-semibold text-gray-900 dark:text-gray-100">{appName}</div>
         <div className="text-heading-xs text-gray-600">{version}</div>
       </>
     )}

@@ -18,21 +18,12 @@ export type StdNavbarProps = {
   topItems: MenuNavItem[];
   bottomItems: MenuNavItem[];
   appName: string;
-  appTwoLetters: string;
   appVersion: string;
   headerLink: string;
   id?: string;
 };
 
-const StdNavbar = ({
-  topItems,
-  bottomItems,
-  appName,
-  appTwoLetters,
-  appVersion,
-  headerLink,
-  id: propsId,
-}: StdNavbarProps) => {
+const StdNavbar = ({ topItems, bottomItems, appName, appVersion, headerLink, id: propsId }: StdNavbarProps) => {
   const [expanded, setExpanded] = useState(true);
   const { t } = useTranslation();
 
@@ -48,14 +39,7 @@ const StdNavbar = ({
 
   return (
     <nav className={navbarClasses} id={id} aria-label={appName}>
-      <StdNavbarHeader
-        id={headerId}
-        appName={appName}
-        appTwoLetters={appTwoLetters}
-        version={appVersion}
-        target={headerLink}
-        expanded={expanded}
-      />
+      <StdNavbarHeader id={headerId} appName={appName} version={appVersion} target={headerLink} expanded={expanded} />
       <StdNavbarMenu menuItems={topItems} expanded={expanded} />
       <StdDivider extraClasses="mt-auto" />
       <StdNavbarMenu menuItems={bottomItems} expanded={expanded} />

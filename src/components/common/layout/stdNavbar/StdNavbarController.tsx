@@ -22,7 +22,7 @@ const StdNavbarController = ({ label, id, action, expanded = true }: StdNavbarCo
 
   return (
     <div>
-      <StdTextTooltip text={label} enabled={!expanded} placement="right" disableArrow>
+      <StdTextTooltip text={label} enabled={!expanded} placement="right" disableArrow id={`${id}-floating`}>
         <div className={navbarControllerClasses} id={id} onClick={action} role="button" tabIndex={0}>
           <StdIcon name={iconId} isExplicit={expanded} alt={!expanded ? label : undefined} />
           {expanded && <>{label}</>}

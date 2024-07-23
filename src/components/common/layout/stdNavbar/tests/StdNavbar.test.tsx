@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { fakeAppName, fakeAppVersion, fakeHomeLink, fakeTwoLetters } from '@/mocks/data/components/navbarHeader';
+import { fakeAppName, fakeAppVersion, fakeHomeLink } from '@/mocks/data/components/navbarHeader';
 import { menuBottomData, menuTopData } from '@/mocks/data/features/menuData.mock';
 import { renderWithRouter } from '@/shared/types';
 import { screen } from '@testing-library/react';
@@ -18,7 +18,6 @@ describe('StdNavbar component', () => {
     renderWithRouter(
       <StdNavbar
         appName={fakeAppName}
-        appTwoLetters={fakeTwoLetters}
         appVersion={fakeAppVersion}
         headerLink={fakeHomeLink}
         topItems={menuTopData}
