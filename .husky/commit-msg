@@ -1,0 +1,4 @@
+#!/bin/bash
+INPUT_FILE=$1
+COMMIT_MSG=`head -n1 $INPUT_FILE`
+node .husky/commit-msg.js $COMMIT_MSG

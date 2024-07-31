@@ -1,0 +1,2 @@
+#!/bin/bash
+node .husky/pre-commit.js
