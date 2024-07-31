@@ -10,10 +10,12 @@ import { useTranslation } from 'react-i18next';
 const Hearder = () => {
   const { t } = useTranslation();
   return (
-    <div className="w-full">
-      <h1>{t('Pegase.@homePageHeader')}</h1>
+    <>
+      <div className="flex h-9 w-full items-center justify-around px-3 py-2">
+        <span className="p-0.125 text-button-m">{t('Pegase.@homePageHeader')}</span>
+      </div>
       <StdDivider />
-    </div>
+    </>
   );
 };
 
