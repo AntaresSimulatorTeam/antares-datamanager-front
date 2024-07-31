@@ -3,7 +3,6 @@
 import { execSync } from 'child_process';
 // Récupérer le paramètre passé en ligne de commande
 const commitMsg = process.argv[2];
-console.log('🚀 QCA :  ~ commitMsg:', commitMsg);
 
 const CONSOLE_RED_COLOR = '\x1b[31m%s\x1b[0m';
 
