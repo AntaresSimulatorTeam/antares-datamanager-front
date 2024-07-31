@@ -1,8 +1,12 @@
 {
-  "components":{
+  "components": {
     "navbar": {
       "@expand": "Agrandir le menu",
       "@minimize": "Minimize menu"
     }
+  },
+  "Pegase": {
+    "@title": "Pégase",
+    "@homePageHeader": "Welcome to the study generator for Antares"
   }
 }

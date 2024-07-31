@@ -1,8 +1,12 @@
 {
-  "components":{
+  "components": {
     "navbar": {
       "@expand": "Agrandir le menu",
       "@minimize": "Réduire le menu"
     }
+  },
+  "Pegase": {
+    "@title": "Pégase",
+    "@homePageHeader": "Bienvenue sur le générateur d’études pour Antarès"
   }
 }
