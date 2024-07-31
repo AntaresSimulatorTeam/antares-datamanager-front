@@ -8,7 +8,9 @@
 import { lazy } from 'react';
 
 const Settings = lazy(() => import('./pages/pegase/settings/Settings'));
+const HomePage = lazy(() => import('./pages/pegase/home/HomePage'));
 
 export const routes = {
-  home: { path: '/settings', component: Settings },
+  home: { path: '/', component: HomePage },
+  settings: { path: '/settings', component: Settings },
 } as const;
