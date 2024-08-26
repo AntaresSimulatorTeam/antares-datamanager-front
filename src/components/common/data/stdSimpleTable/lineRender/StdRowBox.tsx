@@ -4,14 +4,10 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import Hearder from '@/components/pegase/header/Hearder';
-import StudyTable from './components/StudyTable';
+import { PropsWithChildren } from 'react';
 
-const HomePage = () => (
-  <>
-    <Hearder />
-    <StudyTable />
-  </>
+const StdRowBox = ({ children }: PropsWithChildren) => (
+  <div className="grid h-4 w-4 items-center justify-center">{children}</div>
 );
 
-export default HomePage;
+export default StdRowBox;

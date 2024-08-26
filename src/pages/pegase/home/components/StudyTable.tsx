@@ -4,9 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import StdButton from '@/components/common/base/stdButton/StdButton';
 import StdSearchInput from '@/components/common/forms/stdSearchInput/StdSearchInput';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import StudyTableDisplay from './StudyTableDisplay';
 
 const StudyTable = () => {
@@ -15,12 +13,11 @@ const StudyTable = () => {
   };
 
   return (
-    <div className="flex w-full flex-col gap-3">
+    <div className="flex w-full flex-col gap-3 p-9">
       <div className="flex w-full flex-row justify-between">
         <div>
           <StdSearchInput onSearch={searchStudy} placeHolder="Search" variant="outlined" />
         </div>
-        <StdButton label="create" icon={StdIconId.Add} variant="outlined" />
       </div>
       <StudyTableDisplay />
     </div>

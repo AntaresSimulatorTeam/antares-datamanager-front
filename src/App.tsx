@@ -25,7 +25,6 @@ function App() {
         <Navbar id={PEGASE_NAVBAR_ID} bottomItems={menuBottomData} topItems={menuTopData} />
         <div className="flex h-full w-full flex-col">
           <PegaseStar />
-          <Hearder />
           <Suspense>
             <Routes>
               {Object.entries(routes).map(([key, route]) => (

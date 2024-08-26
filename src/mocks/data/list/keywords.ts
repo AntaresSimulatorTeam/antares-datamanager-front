@@ -5,7 +5,7 @@
  */
 
 export const generateKeywords = (count: number, seed = 1): string[] =>
-  Array.from({ length: count }, (_, idx) => KEYWORDS[(idx * seed) % KEYWORDS.length]);
+  Array.from({ length: count }, (_, idx) => KEYWORDS[Math.floor(idx * seed) % KEYWORDS.length]);
 
 const KEYWORDS: string[] = [
   'énergie renouvelable',
@@ -41,24 +41,24 @@ const KEYWORDS: string[] = [
   'énergie biomasse',
   'énergie solaire concentrée',
   'réseau de microgrids',
-  'énergie solaire passive',
-  'énergie solaire portable',
-  'énergie solaire résidentielle',
-  'énergie solaire commerciale',
-  'énergie solaire industrielle',
-  'énergie solaire communautaire',
-  'énergie solaire agricole',
-  'énergie solaire flottante',
-  'énergie solaire mobile',
-  'énergie solaire hybride',
-  'énergie solaire autonome',
-  'énergie solaire décentralisée',
-  'énergie solaire urbaine',
-  'énergie solaire rurale',
-  'énergie solaire éducative',
-  'énergie solaire hospitalière',
-  'énergie solaire gouvernementale',
-  'énergie solaire militaire',
+  'passive',
+  'portable',
+  'résidentielle',
+  'commerciale',
+  'industrielle',
+  'communautaire',
+  'agricole',
+  'flottante',
+  'mobile',
+  'hybride',
+  'autonome',
+  'décentralisée',
+  'urbaine',
+  'rurale',
+  'éducative',
+  'hospitalière',
+  'gouvernementale',
+  'militaire',
 ];
 
 export default KEYWORDS;
