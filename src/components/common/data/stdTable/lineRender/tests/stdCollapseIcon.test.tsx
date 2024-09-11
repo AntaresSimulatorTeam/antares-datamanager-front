@@ -4,10 +4,10 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { noop } from '@/shared/utils/defaultUtils';
-import { StdIconId } from '@/shared/utils/mappings/common/iconMaps';
 import { render, screen } from '@testing-library/react';
 import StdCollapseIcon from '../StdCollapseIcon';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
+import { noop } from '@/shared/utils/common/defaultUtils';
 
 describe('StdCollapseIcon', () => {
   it('renders the StdCollapseIcon component with isOpen to true', () => {

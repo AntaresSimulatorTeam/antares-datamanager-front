@@ -4,8 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+import { generateFixedUsers } from '@/mocks/data/list/user.mocks';
 import { splitUserList, getUserInitials, getInitials } from '../avatarTools';
-import { generateFixedUsers } from '@/mocks/data/back/user.mocks';
 
 const TEST_ONE_USER_LIST = generateFixedUsers(1, 1);
 const TEST_USER = TEST_ONE_USER_LIST[0];

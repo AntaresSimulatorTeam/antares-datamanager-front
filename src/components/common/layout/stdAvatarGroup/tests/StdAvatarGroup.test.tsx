@@ -7,7 +7,7 @@
 import { render, screen } from '@testing-library/react';
 
 import StdAvatarGroup from '../StdAvatarGroup';
-import { generateFixedUsers } from '@/mocks/data/back/user.mocks';
+import { generateFixedUsers } from '@/mocks/data/list/user.mocks';
 
 const TEST_USER_UNIQUE = generateFixedUsers(1);
 const TEST_USER_MULTIPLE = generateFixedUsers(5);
