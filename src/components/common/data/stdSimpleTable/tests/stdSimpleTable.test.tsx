@@ -4,9 +4,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+import { ColumnDef } from '@tanstack/react-table';
 import { render, screen } from '@testing-library/react';
 import StdSimpleTable from '../StdSimpleTable';
-import { HeaderConfig } from '../type/tableType';
 
 type User = {
   firstName: string;
@@ -16,53 +16,49 @@ type User = {
 
 const TEST_DATA = [
   {
-    key: 'John',
-    data: {
-      firstName: 'John',
-      lastName: 'Doe',
-      age: 34,
-    },
+    firstName: 'John',
+    lastName: 'Doe',
+    age: 34,
   },
   {
-    key: 'Keanu',
-    data: {
-      firstName: 'Keanu',
-      lastName: 'Reeves',
-      age: 59,
-    },
+    firstName: 'Keanu',
+    lastName: 'Reeves',
+    age: 59,
   },
   {
-    key: 'Anya',
-    data: {
-      firstName: 'Anya',
-      lastName: 'Taylor-Joy',
-      age: 27,
-    },
+    firstName: 'Anya',
+    lastName: 'Taylor-Joy',
+    age: 27,
   },
-];
+] as User[];
 
-const TEST_HEADERS: HeaderConfig<User>[] = [
+const TEST_HEADERS = [
   {
-    label: 'Prénom',
-    dataKey: 'firstName',
-    key: 'firstName',
+    header: 'Prénom',
+    accessorKey: 'firstName',
   },
   {
-    label: 'Nom',
-    dataKey: 'lastName',
-    key: 'lastName',
+    header: 'Nom',
+    accessorKey: 'lastName',
   },
   {
-    label: 'Âge',
-    key: 'age',
-    formatter: (row: User) => <>{row.age} ans</>,
+    header: 'Âge',
+    accessorKey: 'age',
   },
-];
+] as ColumnDef<User>[];
 
 describe('StdSimpleTable', () => {
   it('should render the table', () => {
-    render(<StdSimpleTable rows={TEST_DATA} headers={TEST_HEADERS} />);
+    render(<StdSimpleTable data={TEST_DATA} columns={TEST_HEADERS} />);
     const table = screen.getByRole('table');
     expect(table).toBeInTheDocument();
+  });
+  it('should render the table with all its rows and cells', () => {
+    render(<StdSimpleTable data={TEST_DATA} columns={TEST_HEADERS} />);
+    const rows = document.querySelectorAll('tbody > tr');
+    expect(rows).toHaveLength(3);
+
+    const cells = document.querySelectorAll('tbody > tr > td');
+    expect(cells).toHaveLength(9);
   });
 });

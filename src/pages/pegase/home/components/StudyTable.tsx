@@ -13,7 +13,7 @@ const StudyTable = () => {
   };
 
   return (
-    <div className="flex w-full flex-col gap-3 p-9">
+    <div className="flex w-full flex-col gap-3 overflow-auto p-9">
       <div className="flex w-full flex-row justify-between">
         <div>
           <StdSearchInput onSearch={searchStudy} placeHolder="Search" variant="outlined" />

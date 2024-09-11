@@ -16,7 +16,9 @@
   "dependencies": {
     "@floating-ui/react": "^0.26.19",
     "@fontsource-variable/nunito-sans": "^5.0.14",
+    "@tanstack/react-table": "^8.20.5",
     "@testing-library/user-event": "^14.5.2",
+    "clsx": "^2.1.1",
     "i18next": "^23.14.0",
     "mutative": "^1.0.6",
     "postcss": "^8.4.39",

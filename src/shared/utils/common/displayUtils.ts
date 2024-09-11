@@ -50,5 +50,5 @@ export const countMaxItemsToFitInContainer = (
     { numberOfItemDisplay: 0, currentLineWidth: 0, currentLineHeight: 0, oversize: false },
   );
 
-  return itemData.numberOfItemDisplay - (itemData.oversize ? 1 : 0);
+  return itemData.numberOfItemDisplay - (itemData.oversize ? 1 : 0) || 1;
 };

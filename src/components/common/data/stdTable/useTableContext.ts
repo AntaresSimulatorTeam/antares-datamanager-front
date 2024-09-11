@@ -4,10 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { PropsWithChildren } from 'react';
+import { useContext } from 'react';
+import { TableContext, TableContextType } from './TableContext';
 
-const StdRowBox = ({ children }: PropsWithChildren) => (
-  <div className="grid h-4 w-4 items-center justify-center">{children}</div>
-);
-
-export default StdRowBox;
+export const useTableContext = <TData>() => useContext(TableContext) as TableContextType<TData>;

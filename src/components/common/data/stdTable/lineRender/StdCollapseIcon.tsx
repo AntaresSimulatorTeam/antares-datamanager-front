@@ -5,8 +5,7 @@
  */
 
 import StdButton, { StdButtonProps } from '@/components/common/base/stdButton/StdButton';
-import StdRowBox from './StdRowBox';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
+import { StdIconId } from '@/shared/utils/mappings/common/iconMaps';
 
 type StdCollapseIconProps = {
   onClick: StdButtonProps['onClick'];
@@ -14,14 +13,12 @@ type StdCollapseIconProps = {
 };
 
 const StdCollapseIcon = ({ onClick, isOpen }: StdCollapseIconProps) => (
-  <StdRowBox>
-    <StdButton
-      onClick={onClick}
-      icon={isOpen ? StdIconId.KeyboardArrowDown : StdIconId.KeyboardArrowRight}
-      size="extraSmall"
-      variant="text"
-    />
-  </StdRowBox>
+  <StdButton
+    onClick={onClick}
+    icon={isOpen ? StdIconId.KeyboardArrowDown : StdIconId.KeyboardArrowRight}
+    size="extraSmall"
+    variant="text"
+  />
 );
 
 export default StdCollapseIcon;
