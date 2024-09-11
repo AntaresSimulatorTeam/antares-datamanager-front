@@ -56,7 +56,6 @@ const StdTagList = ({ tags, icon, tooltipText, id: propsId, onDelete, autoExpend
       <div className={tagListClasses} ref={containerRef} role="list">
         {tags.map((tag, idx) => (
           <span
-            role="listitem"
             ref={(r) => (tagsRef.current[idx] = r)}
             className={idx >= tagsNumber ? 'hidden' : ''}
             key={tag.toLowerCase()}
