@@ -1,0 +1,16 @@
+{
+  "components": {
+    "navbar": {
+      "@expand": "Agrandir le menu",
+      "@minimize": "Réduire le menu"
+    },
+    "popover": {
+      "@close": "Fermer"
+    }
+  },
+  "Pegase": {
+    "@title": "Pégase",
+    "@homePageHeader": "Bienvenue sur le générateur d’études pour Antarès",
+    "@pagesHeader": "BP 2070 > BPToto_v1"
+  }
+}

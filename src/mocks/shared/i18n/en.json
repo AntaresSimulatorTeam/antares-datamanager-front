@@ -1,0 +1,16 @@
+{
+  "components": {
+    "navbar": {
+      "@expand": "Agrandir le menu",
+      "@minimize": "Minimize menu"
+    },
+    "popover": {
+      "@close": "Close"
+    }
+  },
+  "Pegase": {
+    "@title": "Pégase",
+    "@homePageHeader": "Welcome to the study generator for Antares",
+    "@pagesHeader": "BP 2070               >                     BPToto_v1"
+  }
+}

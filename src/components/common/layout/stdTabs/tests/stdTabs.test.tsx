@@ -4,9 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-/* import { generateFakeTabItems } from '@/mocks/data/components/tabs.mock';
-import { noop } from '@/shared/utils/defaultUtils';
-import { tabsGenerator } from '@/shared/utils/generator/TabsGenerator/tabsGenerator';
+import { generateFakeTabItems } from '@/mocks/data/components/tabs.mock';
+import { tabsGenerator } from '@/shared/utils/common/generator/tabsGenerator';
 import { render, screen } from '@testing-library/react';
 import StdTabItem from '../StdTabItem';
 import StdTabs from '../StdTabs';
@@ -19,6 +18,7 @@ const TEST_ID = 'tab-group';
 const TAB_LABEL = 'tab-label';
 const TAB_ID = 'tab-id';
 const TAB_ID_SECONDARY = 'tab-id-secondary';
+const noop = () => {};
 
 describe('StdTabs', () => {
   it('renders StdTabs component with primary tablist only', () => {
@@ -237,4 +237,3 @@ describe('buildSecondaryTabsState function', () => {
     expect(result).toEqual({ Tab1: 'SubTab1', Tab2: undefined });
   });
 });
- */
