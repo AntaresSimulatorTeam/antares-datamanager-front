@@ -12,3 +12,9 @@ type StudyDTO = {
   keywords: string[];
   project: string;
 };
+
+type AreaDTO = {
+  id: number;
+  area_hypothesis: string;
+  trajectory: string;
+};

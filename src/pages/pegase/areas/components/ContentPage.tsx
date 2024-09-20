@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import TabDisplayArea from './TabDisplayArea';
+import TabDisplayArea from './AreaDisplayTab';
 import TabSelection from './TabSelection';
 
 const menuItems = [

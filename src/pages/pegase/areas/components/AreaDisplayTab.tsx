@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-const TabDisplayArea = () => {
+const AreaDisplayTab = () => {
   return (
     <div className="p-4">
       <h2 className="text-xl mb-4 font-bold">Area Information</h2>
@@ -13,4 +13,4 @@ const TabDisplayArea = () => {
   );
 };
 
-export default TabDisplayArea;
+export default AreaDisplayTab;
