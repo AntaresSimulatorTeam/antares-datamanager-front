@@ -4,11 +4,5 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-export type StudyDTO = {
-  id: number;
-  study_name: string;
-  user_name: string;
-  creation_date: Date;
-  keywords: string[];
-  project: string;
-};
+declare const _default: import('vite').UserConfig;
+export default _default;

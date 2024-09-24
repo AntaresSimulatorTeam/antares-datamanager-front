@@ -5,8 +5,8 @@
  */
 
 import { fakeAppName, fakeAppVersion, fakeHomeLink } from '@/mocks/data/components/navbarHeader';
-import { renderWithRouter } from '@/shared/types';
 import { screen } from '@testing-library/react';
+import { renderWithRouter } from '@/shared/types/common/tests/testUtils';
 import StdNavbarHeader from '../StdNavbarHeader';
 
 const TEST_ID = 'navbar-header';
@@ -14,25 +14,14 @@ const TEST_ID = 'navbar-header';
 describe('StdNavbarHeader component', () => {
   it('should render the wrapper and the common content', () => {
     renderWithRouter(
-      <StdNavbarHeader
-        appName={fakeAppName}
-        version={fakeAppVersion}
-        target={fakeHomeLink}
-        id={TEST_ID}
-      />,
+      <StdNavbarHeader appName={fakeAppName} version={fakeAppVersion} target={fakeHomeLink} id={TEST_ID} />,
     );
     expect(document.querySelector(`#${TEST_ID}`)).toBeInTheDocument();
     expect(screen.getByRole('link')).toBeInTheDocument();
   });
   it('should render appName and version if expanded', () => {
     renderWithRouter(
-      <StdNavbarHeader
-        appName={fakeAppName}
-        version={fakeAppVersion}
-        target={fakeHomeLink}
-        id={TEST_ID}
-        expanded
-      />,
+      <StdNavbarHeader appName={fakeAppName} version={fakeAppVersion} target={fakeHomeLink} id={TEST_ID} expanded />,
     );
     expect(screen.getByText(fakeAppName)).toBeInTheDocument();
     expect(screen.getByText(fakeAppVersion)).toBeInTheDocument();

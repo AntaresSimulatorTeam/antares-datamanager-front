@@ -8,6 +8,7 @@ import StdTagList from '@/components/common/base/StdTagList/StdTagList';
 import StdSimpleTable from '@/components/common/data/stdSimpleTable/StdSimpleTable';
 import StdAvatar from '@/components/common/layout/stdAvatar/StdAvatar';
 import { generateStudyRandomData } from '@/mocks/data/features/study.mock';
+import { StudyDTO } from '@/shared/types';
 import { createColumnHelper } from '@tanstack/react-table';
 import { useEffect, useState } from 'react';
 const columnHelper = createColumnHelper<StudyDTO>();

@@ -4,9 +4,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-export const generateKeywords = (count: number, seed = 1): string[] =>
-  Array.from({ length: count }, (_, idx) => KEYWORDS[Math.floor(idx * seed) % KEYWORDS.length]);
-
 const KEYWORDS: string[] = [
   'énergie renouvelable',
   'panneaux solaires',
@@ -60,5 +57,8 @@ const KEYWORDS: string[] = [
   'gouvernementale',
   'militaire',
 ];
+
+export const generateKeywords = (count: number, seed = 1): string[] =>
+  Array.from({ length: count }, (_, idx) => KEYWORDS[Math.floor(idx * seed) % KEYWORDS.length]);
 
 export default KEYWORDS;

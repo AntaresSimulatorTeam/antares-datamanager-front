@@ -31,7 +31,7 @@ describe('useInputFormState', () => {
       result.current.setValue('newValue');
     });
 
-    waitFor(() => expect(result.current.value).toBe('newValue'));
+    await waitFor(() => expect(result.current.value).toBe('newValue'));
   });
 
   test('should call onChange when the value changes', async () => {
@@ -42,6 +42,6 @@ describe('useInputFormState', () => {
       result.current.setValue('newValue');
     });
 
-    waitFor(() => expect(onChange).toHaveBeenCalledWith('newValue'));
+    await waitFor(() => expect(onChange).toHaveBeenCalledWith('newValue'));
   });
 });

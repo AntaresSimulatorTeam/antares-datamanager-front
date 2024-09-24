@@ -103,13 +103,11 @@ export default function createFastContext<Store extends Record<string, unknown>>
   }
 
   function useSetStore(): (value: Updater<Store>, option?: StoreOption) => void {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const { set } = useContext(StoreContext)!;
     return set;
   }
 
   const useClearOnDestroy = (value: string | string[]) => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const { clear } = useContext(StoreContext)!;
     useEffect(
       () => () => {
@@ -120,7 +118,6 @@ export default function createFastContext<Store extends Record<string, unknown>>
   };
 
   const useResetContext = () => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const { clear } = useContext(StoreContext)!;
     return clear;
   };

@@ -29,7 +29,7 @@ describe('usePrevious', () => {
 
     expect(result.current).toBe('initial');
 
-    waitFor(() => expect(result.current).not.toBe('updated'));
+    await waitFor(() => expect(result.current).not.toBe('updated'));
   });
 
   it('should return updated previous value when a new value is provided', async () => {
@@ -44,6 +44,6 @@ describe('usePrevious', () => {
     act(() => {
       rerender('updated 2');
     });
-    waitFor(() => expect(result.current).toBe('updated'));
+    await waitFor(() => expect(result.current).toBe('updated'));
   });
 });

@@ -9,6 +9,8 @@ import StudyTableDisplay from './StudyTableDisplay';
 
 const StudyTable = () => {
   const searchStudy = (value?: string) => {
+    //TODO: Implement search
+    // eslint-disable-next-line no-console
     console.log(value);
   };
 

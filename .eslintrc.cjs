@@ -9,8 +9,6 @@ module.exports = {
     'plugin:react/recommended',
     'plugin:react/jsx-runtime',
     'plugin:react-hooks/recommended',
-    'plugin:storybook/recommended',
-    'plugin:@tanstack/eslint-plugin-query/recommended',
     'plugin:import/typescript',
   ],
   parser: '@typescript-eslint/parser',
@@ -19,8 +17,8 @@ module.exports = {
     sourceType: 'module',
     project: './tsconfig.json',
   },
-  ignorePatterns: ['.eslintrc.cjs', '**/scripts/*.js', 'cypress.config.ts'],
-  plugins: ['react-refresh', '@amarant/react-i18next', 'import'],
+  ignorePatterns: ['.eslintrc.cjs', '**/scripts/*.js', 'cypress.config.ts', 'vite.config.ts', 'vite.config.d.ts'],
+  plugins: ['react-refresh', 'import'],
   rules: {
     'arrow-body-style': ['error', 'as-needed'],
     camelcase: 'error',
@@ -45,32 +43,12 @@ module.exports = {
         caughtErrorsIgnorePattern: '^_',
       },
     ],
-    '@amarant/react-i18next/valid-key': 'error',
-    'import/no-restricted-paths': [
-      'error',
-      {
-        zones: [
-          // forbid to import *.test.* files from other src files
-          {
-            target: 'src/**/!(*.test.*)',
-            from: ['**/*.test.*'],
-            except: ['**/*.test.*'],
-          },
-        ],
-      },
-    ],
   },
   settings: {
     react: {
       version: 'detect',
     },
-    '@amarant/react-i18next': {
-      translationFiles: {
-        location: 'src/shared/i18n/*.json',
-        format: 'nested',
-      },
-      translationFunctions: ['t', 'i18n.t', 'tv'],
-    },
+
     'import/resolver': {
       typescript: true,
     },
