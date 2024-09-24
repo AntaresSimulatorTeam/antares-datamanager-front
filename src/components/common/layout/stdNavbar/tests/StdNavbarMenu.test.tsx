@@ -5,7 +5,7 @@
  */
 
 import { menuTopData } from '@/mocks/data/features/menuData.mock';
-import { renderWithRouter } from '@/shared/types';
+import { renderWithRouter } from '@/shared/types/common/tests/testUtils';
 import { screen } from '@testing-library/react';
 import StdNavbarMenu from '../StdNavbarMenu';
 

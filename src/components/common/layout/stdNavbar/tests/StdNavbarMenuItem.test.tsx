@@ -5,8 +5,8 @@
  */
 
 import { menuItemSample } from '@/mocks/data/features/menuItemData.mock';
-import { renderWithRouter } from '@/shared/types';
 import { screen } from '@testing-library/react';
+import { renderWithRouter } from '@/shared/types/common/tests/testUtils';
 import StdNavbarMenuItem from '../StdNavbarMenuItem';
 
 describe('StdNavbarMenuItem component', () => {

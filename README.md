@@ -26,7 +26,7 @@ npm run dev
 
 ### Git
 
-Branch name: `<type>/<description>` where type is one of the following: feature|fix|test
+Branch name: `<type>/<description>` where type is one of the following: feature | fix | test
 
 Commit message: `<type>[optional scope]: <description>` see https://www.conventionalcommits.org/en/v1.0.0/ for more information.
 

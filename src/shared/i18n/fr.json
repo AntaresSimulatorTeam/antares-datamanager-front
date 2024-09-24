@@ -3,6 +3,9 @@
     "navbar": {
       "@expand": "Agrandir le menu",
       "@minimize": "Réduire le menu"
+    },
+    "popover": {
+      "@close": "Fermer"
     }
   },
   "Pegase": {

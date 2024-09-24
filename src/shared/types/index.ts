@@ -7,5 +7,6 @@
 export * from './common/MenuNavItem.type';
 export * from './common/StdBase.type';
 export * from './common/Tailwind.type';
-export * from './common/tests/testUtils';
+export * from './common/User.type';
 export * from './common/UserSettings.type';
+export * from './pegase/study';
