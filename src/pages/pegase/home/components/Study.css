@@ -1,0 +1,11 @@
+.button-spacing {
+  margin-right: 50px;
+  margin-top: 50px;
+  color: black;
+  font-size: large;
+  bold: true;
+}
+
+.hide-button {
+  display: none;
+}

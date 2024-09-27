@@ -6,20 +6,19 @@
 
 import StdSearchInput from '@/components/common/forms/stdSearchInput/StdSearchInput';
 import StudyTableDisplay from './StudyTableDisplay';
+import { useState } from 'react';
 
 const StudyTable = () => {
-  const searchStudy = (value?: string) => {
-    console.log(value);
-  };
+  const [searchTerm, setSearchTerm] = useState('');
 
   return (
     <div className="flex w-full flex-col gap-3 overflow-auto p-9">
       <div className="flex w-full flex-row justify-between">
         <div>
-          <StdSearchInput onSearch={searchStudy} placeHolder="Search" variant="outlined" />
+          <StdSearchInput onSearch={setSearchTerm} placeHolder="Search" variant="outlined" />
         </div>
       </div>
-      <StudyTableDisplay />
+      <StudyTableDisplay searchStudy={searchTerm} />
     </div>
   );
 };
