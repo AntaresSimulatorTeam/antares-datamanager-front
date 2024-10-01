@@ -21,7 +21,7 @@ const COMMON_HEADER_CLASSES = 'px-1 py-0.5 text-left font-semibold';
 const headerClassBuilder = <TData,>({ table, header, columnSize }: TableHeaderProps<TData>) =>
   clsx(
     COMMON_HEADER_CLASSES,
-    columnSize === 'meta' ? header.column.columnDef.meta?.sizeClassNames ?? '' : '',
+    columnSize === 'meta' ? (header.column.columnDef.meta?.sizeClassNames ?? '') : '',
     table.options.columnResizeMode ? 'group relative' : '',
   );
 
@@ -98,7 +98,7 @@ const tableStyleBuilder = <TData,>(table: Table<TData>, columnSize: ColumnSizeTy
 const TableCore = <TData,>({ table, id: propId, striped, trClassName, columnSize = 'meta' }: TableCoreProps<TData>) => {
   const id = useStdId('table-', propId);
   const trClasses = clsx(trClassName, striped && 'even:bg-primary-200');
-
+  console.log('Rowsssssssssssssssssssssssssss:', table.getRowModel().rows);
   return (
     <table className={tableClassBuilder(table)} id={id} style={tableStyleBuilder(table, columnSize)}>
       <thead>

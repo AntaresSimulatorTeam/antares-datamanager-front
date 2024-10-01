@@ -6,15 +6,11 @@
 
 import HeaderPage from '@/components/pegase/header/HeaderPage';
 import ContentPage from './components/ContentPage';
-import TabDisplayArea from './components/AreaDisplayTab';
-import TabSelection from './components/TabSelection';
-import AreaDisplayTab from './components/AreaDisplayTab';
 
 const AreasPage = () => (
   <>
     <HeaderPage />
     <ContentPage />
-    <AreaDisplayTab />
   </>
 );
 

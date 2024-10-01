@@ -10,7 +10,7 @@ import { MenuNavItem } from '@/shared/types/index';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import { useLocation, Routes, Route } from 'react-router-dom';
 
-import TabDisplayArea from './AreaDisplayTab'; // Tab content components
+import TabDisplayArea from './AreaTableDisplay'; // Tab content components
 
 const TabSelection = () => {
   const location = useLocation();

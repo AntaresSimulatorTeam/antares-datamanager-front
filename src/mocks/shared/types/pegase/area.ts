@@ -4,11 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-type StudyDTO = {
+type AreaDTO = {
   id: number;
-  study_name: string;
-  user_name: string;
-  creation_date: Date;
-  keywords: string[];
-  project: string;
+  area_hypothesis: string;
+  trajectory: string;
 };

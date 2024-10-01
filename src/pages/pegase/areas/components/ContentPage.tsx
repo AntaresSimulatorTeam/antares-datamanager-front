@@ -4,7 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import TabDisplayArea from './AreaDisplayTab';
+import AreaTableDisplay from './AreaTableDisplay';
+import TabDisplayArea from './AreaTableDisplay';
 import TabSelection from './TabSelection';
 
 const menuItems = [
@@ -18,6 +19,7 @@ const ContentPage = () => {
     <div className="flex w-full flex-col gap-3 overflow-auto p-9 text-left">
       <span>2069-2070</span>
       <TabSelection menuItems={menuItems} expanded={true} />
+      <AreaTableDisplay />
     </div>
   );
 };

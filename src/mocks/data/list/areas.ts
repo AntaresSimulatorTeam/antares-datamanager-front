@@ -4,11 +4,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-type StudyDTO = {
-  id: number;
-  study_name: string;
-  user_name: string;
-  creation_date: Date;
-  keywords: string[];
-  project: string;
-};
+const AREA_NAMES: string[] = ['AT', 'BE', 'CH', 'CZ', 'DE', 'ES', 'FR', 'IE', 'LU', 'NL', 'PL', 'PT', 'UK'];
+
+export default AREA_NAMES;
