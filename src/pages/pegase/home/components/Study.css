@@ -9,3 +9,7 @@
 .hide-button {
   display: none;
 }
+
+.pagination-button {
+  color: aliceblue;
+}

@@ -5,7 +5,6 @@
  */
 import StdAvatar from '@/components/common/layout/stdAvatar/StdAvatar';
 
-import StdTagList from '@/components/common/base/StdTagList/StdTagList';
 import StdSimpleTable from '@/components/common/data/stdSimpleTable/StdSimpleTable';
 import './Study.css';
 import { createColumnHelper } from '@tanstack/react-table';
@@ -17,13 +16,14 @@ interface StudyTableDisplayProps {
 
 const StudyTableDisplay: React.FC<StudyTableDisplayProps> = ({ searchStudy }) => {
   const [rows, setRows] = useState<StudyDTO[]>([]);
-  const [currentPage, setCurrentPage] = useState(0);
+  let [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
-  const itemsPerPage = 3;
+  const itemsPerPage = 5;
+
   const headers = [
     columnHelper.accessor('study_name', { header: 'Nom Étude' }),
     columnHelper.accessor('user_name', {
-      header: 'user_name',
+      header: 'Créateur',
       cell: ({ getValue }) => (
         <StdAvatar size="s" backgroundColor="gray" fullname={getValue()} initials={getValue().substring(0, 2)} />
       ),
@@ -34,8 +34,13 @@ const StudyTableDisplay: React.FC<StudyTableDisplayProps> = ({ searchStudy }) =>
     columnHelper.accessor('keywords', { header: 'mots clés' }),
     columnHelper.accessor('creation_date', { header: 'Date de création' }),
   ];
+  useEffect(() => {
+    setCurrentPage(0);
+    setTotalPages(1);
+  }, [searchStudy]);
 
   useEffect(() => {
+    console.log('searchStudy : ', searchStudy);
     fetch(`http://localhost:8093/v1/study/search?page=${currentPage}&size=${itemsPerPage}&search=${searchStudy}`)
       .then((response) => response.json())
       .then((json) => {
@@ -60,14 +65,14 @@ const StudyTableDisplay: React.FC<StudyTableDisplayProps> = ({ searchStudy }) =>
   return (
     <div className="h-60vh overflow-auto">
       <StdSimpleTable columns={headers} data={rows} />
-      <button className={`button-spacing ${currentPage === 0 ? 'hide-button' : ''}`} onClick={handlePrevious}>
+      <button className={`button-spacing ${currentPage === 0 ? 'pagination-button' : ''}`} onClick={handlePrevious}>
         {' '}
         Précédent
       </button>
       <button
         onClick={handleNext}
         disabled={currentPage === totalPages - 1}
-        className={`button-spacing ${currentPage === totalPages - 1 ? 'hide-button' : ''}`}
+        className={`button-spacing ${currentPage === totalPages - 1 ? 'pagination-button' : ''}`}
       >
         Suivant
       </button>
