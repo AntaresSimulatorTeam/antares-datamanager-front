@@ -9,13 +9,15 @@ import StudyTableDisplay from './StudyTableDisplay';
 import { useState } from 'react';
 
 const StudyTable = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-
+  const [searchTerm, setSearchTerm] = useState<string | undefined>('');
+  const searchStudy = (value?: string | undefined) => {
+    setSearchTerm(value);
+  };
   return (
     <div className="flex w-full flex-col gap-3 overflow-auto p-9">
       <div className="flex w-full flex-row justify-between">
         <div>
-          <StdSearchInput onSearch={setSearchTerm} placeHolder="Search" variant="outlined" />
+          <StdSearchInput onSearch={searchStudy} placeHolder="Search" variant="outlined" />
         </div>
       </div>
       <StudyTableDisplay searchStudy={searchTerm} />

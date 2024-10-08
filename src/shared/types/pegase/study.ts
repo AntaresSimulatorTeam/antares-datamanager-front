@@ -11,4 +11,6 @@ type StudyDTO = {
   creation_date: Date;
   keywords: string[];
   project: string;
+  status: string;
+  horizon: string;
 };

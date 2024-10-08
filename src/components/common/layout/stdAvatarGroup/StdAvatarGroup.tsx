@@ -4,9 +4,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+import { User } from '@/shared/types/common/User.type';
 import StdAvatar from '../stdAvatar/StdAvatar';
 import { AvatarSize } from '../stdAvatar/StdAvatar';
-import { User } from '@/shared/types';
 import { classBuilder as groupContainerClassBuilder } from './avatarGroupClassBuilder';
 import { getColor, getUserFullname, getUserInitials, splitUserList } from './avatarTools';
 import { useStdId } from '@/hooks/common/useStdId';

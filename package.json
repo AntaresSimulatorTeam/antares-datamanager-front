@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --mode dev",
+    "integ": "vite --mode integ",
     "start": "vite",
     "test": "vitest",
     "build": "tsc -b && vite build",

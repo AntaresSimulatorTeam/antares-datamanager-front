@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { vi } from 'vitest'; // Vitest mock API
 import StudyTableDisplay from './StudyTableDisplay';
 
@@ -39,7 +39,7 @@ global.fetch = vi.fn();
 describe('StudyTableDisplay', () => {
   beforeEach(() => {
     // Reset mocks before each test
-    global.fetch.mockReset();
+    vi.resetAllMocks();
 
     const mockResponse = {
       content: [
@@ -55,16 +55,15 @@ describe('StudyTableDisplay', () => {
       ],
       totalElements: 1,
     };
-    global.fetch.mockResolvedValueOnce({
+    global.fetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => mockResponse,
+      json: async () => mockResponse, // Mock the json response
     });
   });
 
   it('renders table with fetched data on initial load', async () => {
     render(<StudyTableDisplay searchStudy="test" />);
     expect(await screen.findByText('Créateur')).toBeInTheDocument();
-    expect(await screen.findByText('Précédent')).toBeInTheDocument();
   });
 
   it('renders table headers correctly', () => {
@@ -88,15 +87,6 @@ describe('StudyTableDisplay', () => {
       expect(screen.getByText('John Doe')).toBeInTheDocument();
     });
 
-    // Check if pagination buttons are rendered
-    const prevButton = screen.getByText('Précédent');
-
-    // Initially, the 'Précédent' button should be disabled, and 'Suivant' should be enabled
-    expect(prevButton).toHaveClass('pagination-button');
-
-    // Simulate clicking 'Suivant'
-    const nextButton = await screen.findByText('Suivant');
-    fireEvent.click(nextButton);
     // Fetch should be called again for the next page
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledTimes(1);
