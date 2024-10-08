@@ -5,20 +5,13 @@
  */
 
 import AreaTableDisplay from './AreaTableDisplay';
-import TabDisplayArea from './AreaTableDisplay';
 import TabSelection from './TabSelection';
-
-const menuItems = [
-  { id: 'area', path: '/area', key: 'area', icon: 'area', label: 'Area', component: TabDisplayArea },
-  //{ id: 'load', path: '/load', key: 'load', icon: 'load', label: 'Load', component: TabDisplayLoad },
-  //{ id: 'thermal', path: '/thermal', key: 'thermal', icon: 'thermal', label: 'Thermal', component: TabDisplayThermal },
-];
 
 const ContentPage = () => {
   return (
     <div className="flex w-full flex-col gap-3 overflow-auto p-9 text-left">
       <span>2069-2070</span>
-      <TabSelection menuItems={menuItems} expanded={true} />
+      <TabSelection expanded={true} />
       <AreaTableDisplay />
     </div>
   );

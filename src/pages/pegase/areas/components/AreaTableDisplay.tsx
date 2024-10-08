@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import StdSimpleTable from '@/components/common/data/stdSimpleTable/StdSimpleTable';
+import StdInputText from '@/components/common/forms/stdInputText/StdInputText';
 import { generateAreaRandomData } from '@/mocks/data/features/area.mock';
 import { AreaDTO } from '@/shared/types/pegase/area';
 import { createColumnHelper } from '@tanstack/react-table';
@@ -12,25 +12,36 @@ import { useEffect, useState } from 'react';
 const columnHelper = createColumnHelper<AreaDTO>();
 const AreaTableDisplay = () => {
   const [rows, setRows] = useState<AreaDTO[]>([]);
+  const [inputValuesLoad, setInputLoadValues] = useState<string[]>([]);
 
   const headers = [
     columnHelper.accessor('id', { header: 'id' }),
     columnHelper.accessor('area_hypothesis', { header: 'Area Hyphotesis' }),
     columnHelper.accessor('trajectory', { header: 'Trajectory to use' }),
-    columnHelper.accessor('status', { header: 'Status' }),
   ];
 
   useEffect(() => {
     setTimeout(() => {
-      const areas = generateAreaRandomData(10);
+      const areas = generateAreaRandomData(5);
       setRows(areas);
-    }, 10);
+    }, 5);
   }, []);
 
-  console.log('Rows passed to StdSimpleTable:', rows);
   return (
     <div className="h-60vh overflow-auto">
-      <StdSimpleTable columns={headers} data={rows} />
+      <div className="space-y-4">
+        {rows.map((row, index) => (
+          <div key={index} className="flex space-x-4">
+            <StdInputText
+              id={'id-input*load'}
+              label={`Load Hypothesis`}
+              value={inputValuesLoad[index]}
+              onChange={(e) => setInputLoadValues(e.target.value)}
+            />
+            <StdInputText label={`Trajectory to use`} value={row.trajectory} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

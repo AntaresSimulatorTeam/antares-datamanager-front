@@ -10,7 +10,7 @@ import { MenuNavItem } from '@/shared/types/index';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import { useLocation, Routes, Route } from 'react-router-dom';
 
-import TabDisplayArea from './AreaTableDisplay'; // Tab content components
+import TabDisplayArea from './AreaTableDisplay';
 
 const TabSelection = () => {
   const location = useLocation();
@@ -47,9 +47,9 @@ const TabSelection = () => {
 
       <div className="flex-grow p-4">
         <Routes>
-          <Route path="/areas" element={<TabDisplayArea />} />
-          {/*  <Route path="/load" element={<TabDisplayLoad />} />
-          <Route path="/thermal" element={<TabDisplayThermal />} /> */}
+          <Route path="/areas/*" element={<TabDisplayArea />} />
+          {/*  <Route path="/load/" element={<TabDisplayLoad />} />
+          <Route path="/thermal/" element={<TabDisplayThermal />} /> */}
         </Routes>
       </div>
     </div>
