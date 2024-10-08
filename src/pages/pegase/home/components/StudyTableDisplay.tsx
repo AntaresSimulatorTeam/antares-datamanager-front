@@ -4,81 +4,76 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 import StdAvatar from '@/components/common/layout/stdAvatar/StdAvatar';
-
 import StdSimpleTable from '@/components/common/data/stdSimpleTable/StdSimpleTable';
-import './Study.css';
 import { createColumnHelper } from '@tanstack/react-table';
 import { useEffect, useState } from 'react';
+import StdPagination from '@common/data/stdPagination/StdPagination';
+
+const itemsPerPage = 6;
+const BASE_URL = import.meta.env.VITE_BACK_END_BASE_URL;
 const columnHelper = createColumnHelper<StudyDTO>();
+
+//header
+const headers = [
+  columnHelper.accessor('study_name', { header: '@study_name' }),
+  columnHelper.accessor('user_name', {
+    header: '@user_name',
+    cell: ({ getValue }) => (
+      <StdAvatar size="s" backgroundColor="gray" fullname={getValue()} initials={getValue().substring(0, 2)} />
+    ),
+  }),
+  columnHelper.accessor('project', { header: '@project' }),
+  columnHelper.accessor('status', { header: '@status' }),
+  columnHelper.accessor('horizon', { header: '@horizon' }),
+  columnHelper.accessor('keywords', { header: '@keywords' }),
+  columnHelper.accessor('creation_date', { header: '@creation_date' }),
+];
+
+//table raws hook
 interface StudyTableDisplayProps {
-  searchStudy: (value?: string) => void;
+  searchStudy: string | undefined;
 }
 
-const StudyTableDisplay: React.FC<StudyTableDisplayProps> = ({ searchStudy }) => {
-  const [rows, setRows] = useState<StudyDTO[]>([]);
-  let [currentPage, setCurrentPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
-  const itemsPerPage = 5;
+interface UseStudyTableDisplayProps {
+  searchStudy: string | undefined;
+}
 
-  const headers = [
-    columnHelper.accessor('study_name', { header: 'Nom Étude' }),
-    columnHelper.accessor('user_name', {
-      header: 'Créateur',
-      cell: ({ getValue }) => (
-        <StdAvatar size="s" backgroundColor="gray" fullname={getValue()} initials={getValue().substring(0, 2)} />
-      ),
-    }),
-    columnHelper.accessor('project', { header: 'Projet' }),
-    columnHelper.accessor('status', { header: 'Status' }),
-    columnHelper.accessor('horizon', { header: 'Horizon ' }),
-    columnHelper.accessor('keywords', { header: 'mots clés' }),
-    columnHelper.accessor('creation_date', { header: 'Date de création' }),
-  ];
+interface UseStudyTableDisplayReturn {
+  rows: StudyDTO[];
+  lastPage: number;
+  page: number;
+  setPage: React.Dispatch<React.SetStateAction<number>>;
+}
+
+export const useStudyTableDisplay = ({ searchStudy }: UseStudyTableDisplayProps): UseStudyTableDisplayReturn => {
+  const [rows, setRows] = useState<StudyDTO[]>([]);
+  const [lastPage, setLastPage] = useState(0);
+  const [page, setPage] = useState(1);
+
   useEffect(() => {
-    setCurrentPage(0);
-    setTotalPages(1);
+    setPage(1);
+    setLastPage(0);
   }, [searchStudy]);
 
   useEffect(() => {
-    console.log('searchStudy : ', searchStudy);
-    fetch(`http://localhost:8093/v1/study/search?page=${currentPage}&size=${itemsPerPage}&search=${searchStudy}`)
+    fetch(BASE_URL + `/v1/study/search?page=${page}&size=${itemsPerPage}&search=${searchStudy}`)
       .then((response) => response.json())
       .then((json) => {
         setRows(json.content);
-        setTotalPages(Math.ceil(json.totalElements / itemsPerPage));
+        setLastPage(Math.ceil(json.totalElements / itemsPerPage));
       })
       .catch((error) => console.error(error));
-  }, [currentPage, searchStudy]);
+  }, [page, searchStudy]);
 
-  const handlePrevious = () => {
-    if (currentPage > 0) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
+  return { rows, lastPage, page, setPage };
+};
 
-  const handleNext = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
+const StudyTableDisplay: React.FC<StudyTableDisplayProps> = ({ searchStudy }) => {
+  const { rows, lastPage, page, setPage } = useStudyTableDisplay({ searchStudy });
   return (
     <div className="h-60vh overflow-auto">
       <StdSimpleTable columns={headers} data={rows} />
-      <button className={`button-spacing ${currentPage === 0 ? 'pagination-button' : ''}`} onClick={handlePrevious}>
-        {' '}
-        Précédent
-      </button>
-      <button
-        onClick={handleNext}
-        disabled={currentPage === totalPages - 1}
-        className={`button-spacing ${currentPage === totalPages - 1 ? 'pagination-button' : ''}`}
-      >
-        Suivant
-      </button>
-      <span className="button-spacing">
-        Page {currentPage + 1} of {totalPages}
-      </span>
+      <StdPagination lastPage={lastPage} currentPage={page} onChange={setPage} />
     </div>
   );
 };

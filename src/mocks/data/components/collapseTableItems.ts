@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { RowData } from '@/components/common/data/stdSimpleTable/type/tableType';
+import { RowData } from '@tanstack/react-table';
 
 export type RowDataTest = {
   col1: string;
@@ -29,7 +29,7 @@ export const fakeChildSubRows = [
   },
 ];
 
-export const fakeChildRows: RowData<RowDataTest>[] = [
+export const fakeChildRows: RowData[] = [
   {
     data: { col1: 'test 1.1', col2: 'test 1.2', col3: 'test 1.3' },
     key: 'row1',

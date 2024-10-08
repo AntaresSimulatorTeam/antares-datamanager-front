@@ -17,6 +17,8 @@ export const generateStudy = (count: number, seed = 1): StudyDTO[] =>
     creation_date: new Date(),
     keywords: generateKeywords(Math.floor(Math.random() * idx) % 5, idx * seed),
     project: PROJECT_NAME[Math.floor(idx * seed) % PROJECT_NAME.length],
+    status: 'In progress',
+    horizon: 'Short-term',
   }));
 
 export const generateStudyRandomData = (count: number): StudyDTO[] => generateStudy(count, Math.random() * 100);

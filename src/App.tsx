@@ -8,7 +8,6 @@ import { Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import './App.css';
 import ThemeHandler from './components/common/handler/ThemeHandler';
-import Hearder from './components/pegase/header/Hearder';
 import Navbar from './components/pegase/navbar/Navbar';
 import PegaseStar from './components/pegase/star/PegaseStar';
 import { UserContext } from './contexts/UserContext';
