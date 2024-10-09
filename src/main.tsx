@@ -4,17 +4,17 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
-import App from './App.tsx';
 import './i18n.ts';
 import './index.css';
+import { RouterProvider } from 'react-router-dom';
+import { browserRouter } from './routes.tsx';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <Suspense>
+      <RouterProvider router={browserRouter} />
+    </Suspense>
   </React.StrictMode>,
-)
+);

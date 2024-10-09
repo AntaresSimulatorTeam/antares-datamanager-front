@@ -25,8 +25,8 @@ export const menuTopData: MenuNavItem[] = [
   {
     id: 'favorites-link',
     key: 'favorites',
-    label: "Favoris",
-    path: '/',
+    label: 'Favoris',
+    path: '/tabs',
     icon: StdIconId.PushPin,
   },
   {
