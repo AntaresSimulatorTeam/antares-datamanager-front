@@ -4,14 +4,14 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import AreaTableDisplay from './AreaTableDisplay';
+import { Outlet } from 'react-router-dom';
 import TabSelection from './TabSelection';
 
 const ContentPage = () => (
   <div className="flex w-full flex-col gap-3 overflow-auto p-2 text-left">
     <span>2069-2070</span>
     <TabSelection />
-    <AreaTableDisplay />
+    <Outlet />
   </div>
 );
 

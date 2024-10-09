@@ -8,23 +8,24 @@ import StdTabItem from '@/components/common/layout/stdTabs/StdTabItem';
 import StdTabList from '@/components/common/layout/stdTabs/StdTabList';
 import { MenuNavItem } from '@/shared/types/index';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
-import { useLocation, Routes, Route } from 'react-router-dom';
+import { useLocation, Routes, Route, useNavigate } from 'react-router-dom';
 
 import TabDisplayArea from './AreaTableDisplay';
 
 const TabSelection = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const tabItems: MenuNavItem[] = [
-    { key: 'area', label: 'Area', path: '/areas', icon: StdIconId.Palette },
-    { key: 'load', label: 'Load', path: '/load', icon: StdIconId.Tune },
-    { key: 'thermal', label: 'Thermal', path: '/thermal', icon: StdIconId.Tune },
+    { key: 'area', label: 'Area', path: '/tabs/areas', icon: StdIconId.Palette },
+    { key: 'load', label: 'Load', path: '/tabs/load', icon: StdIconId.Tune },
+    { key: 'thermal', label: 'Thermal', path: '/tabs/thermal', icon: StdIconId.Tune },
   ];
 
   const handleTabClick = (selectedItemName: string) => {
     const selectedTab = tabItems.find((item) => item.key === selectedItemName);
     if (selectedTab) {
-      window.history.pushState({}, '', selectedTab.path);
+      navigate(selectedTab.path);
     }
   };
 
