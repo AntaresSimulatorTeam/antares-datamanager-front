@@ -63,19 +63,19 @@ describe('StudyTableDisplay', () => {
 
   it('renders table with fetched data on initial load', async () => {
     render(<StudyTableDisplay searchStudy="test" />);
-    expect(await screen.findByText('Créateur')).toBeInTheDocument();
+    expect(await screen.findByText('@user_name')).toBeInTheDocument();
   });
 
   it('renders table headers correctly', () => {
     render(<StudyTableDisplay searchStudy="test" />);
     // Check if table headers are rendered
-    expect(screen.getByText('Nom Étude')).toBeInTheDocument();
-    expect(screen.getByText('Créateur')).toBeInTheDocument();
-    expect(screen.getByText('Projet')).toBeInTheDocument();
-    expect(screen.getByText('Status')).toBeInTheDocument();
+    expect(screen.getByText('@study_name')).toBeInTheDocument();
+    expect(screen.getByText('@user_name')).toBeInTheDocument();
+    expect(screen.getByText('@project')).toBeInTheDocument();
+    expect(screen.getByText('@status')).toBeInTheDocument();
     // expect(screen.getByText('Horizon ')).toBeInTheDocument();
-    expect(screen.getByText('mots clés')).toBeInTheDocument();
-    expect(screen.getByText('Date de création')).toBeInTheDocument();
+    expect(screen.getByText('@keywords')).toBeInTheDocument();
+    expect(screen.getByText('@creation_date')).toBeInTheDocument();
   });
 
   it('fetches and renders rows correctly', async () => {
