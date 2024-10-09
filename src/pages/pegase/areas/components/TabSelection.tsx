@@ -17,9 +17,9 @@ const TabSelection = () => {
   const navigate = useNavigate();
 
   const tabItems: MenuNavItem[] = [
-    { key: 'area', label: 'Area', path: '/tabs/areas', icon: StdIconId.Palette },
-    { key: 'load', label: 'Load', path: '/tabs/load', icon: StdIconId.Tune },
-    { key: 'thermal', label: 'Thermal', path: '/tabs/thermal', icon: StdIconId.Tune },
+    { key: 'area', label: 'Area', path: '/input/areas', icon: StdIconId.Palette },
+    { key: 'load', label: 'Load', path: '/input/load', icon: StdIconId.Tune },
+    { key: 'thermal', label: 'Thermal', path: '/input/thermal', icon: StdIconId.Tune },
   ];
 
   const handleTabClick = (selectedItemName: string) => {
@@ -42,7 +42,7 @@ const TabSelection = () => {
 
   return (
     <div className="flex h-full w-full flex-col">
-      <div className="flex justify-center gap-6 p-4">
+      <div className="flex justify-center gap-6 p-15">
         <StdTabList tabType="primary" items={tabItems} renderItem={renderTabItem} />
       </div>
 

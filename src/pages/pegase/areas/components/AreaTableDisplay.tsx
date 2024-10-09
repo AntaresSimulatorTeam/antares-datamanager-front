@@ -7,9 +7,7 @@
 import StdInputText from '@/components/common/forms/stdInputText/StdInputText';
 import { generateAreaRandomData } from '@/mocks/data/features/area.mock';
 import { AreaDTO } from '@/shared/types/pegase/area';
-import { createColumnHelper } from '@tanstack/react-table';
 import { useEffect, useState } from 'react';
-const columnHelper = createColumnHelper<AreaDTO>();
 
 const AreaLine = ({ area, updateArea }: { area: AreaDTO; updateArea: (area: AreaDTO) => void }) => {
   const [hypothesis, setHypothesis] = useState<string>(area.areaHypothesis);
@@ -22,7 +20,7 @@ const AreaLine = ({ area, updateArea }: { area: AreaDTO; updateArea: (area: Area
     <div className="flex space-x-4">
       <StdInputText
         id={`areas-hypothesis-input-${area.id}`}
-        label={`Load Hypothesis`}
+        label={`Area Hypothesis`}
         value={hypothesis}
         onChange={setHypothesis}
       />
@@ -39,12 +37,6 @@ const AreaLine = ({ area, updateArea }: { area: AreaDTO; updateArea: (area: Area
 
 const AreaTableDisplay = () => {
   const [rows, setRows] = useState<AreaDTO[]>([]);
-
-  // const headers = [
-  //   columnHelper.accessor('id', { header: 'id' }),
-  //   columnHelper.accessor('area_hypothesis', { header: 'Area Hyphotesis' }),
-  //   columnHelper.accessor('trajectory', { header: 'Trajectory to use' }),
-  // ];
 
   useEffect(() => {
     setTimeout(() => {

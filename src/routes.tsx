@@ -32,7 +32,7 @@ export const browserRouter = createBrowserRouter([
       },
       {
         id: 'tabs',
-        path: '/tabs',
+        path: '/input',
         Component: AreasPage,
         children: [
           {
