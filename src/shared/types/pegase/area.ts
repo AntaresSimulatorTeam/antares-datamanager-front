@@ -6,6 +6,6 @@
 
 export type AreaDTO = {
   id: number;
-  area_hypothesis: string;
+  areaHypothesis: string;
   trajectory: string;
 };

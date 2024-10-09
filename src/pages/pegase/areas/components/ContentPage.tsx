@@ -7,14 +7,12 @@
 import AreaTableDisplay from './AreaTableDisplay';
 import TabSelection from './TabSelection';
 
-const ContentPage = () => {
-  return (
-    <div className="flex w-full flex-col gap-3 overflow-auto p-9 text-left">
-      <span>2069-2070</span>
-      <TabSelection expanded={true} />
-      <AreaTableDisplay />
-    </div>
-  );
-};
+const ContentPage = () => (
+  <div className="flex w-full flex-col gap-3 overflow-auto p-2 text-left">
+    <span>2069-2070</span>
+    <TabSelection />
+    <AreaTableDisplay />
+  </div>
+);
 
 export default ContentPage;

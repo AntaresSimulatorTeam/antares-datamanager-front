@@ -10,15 +10,41 @@ import { AreaDTO } from '@/shared/types/pegase/area';
 import { createColumnHelper } from '@tanstack/react-table';
 import { useEffect, useState } from 'react';
 const columnHelper = createColumnHelper<AreaDTO>();
+
+const AreaLine = ({ area, updateArea }: { area: AreaDTO; updateArea: (area: AreaDTO) => void }) => {
+  const [hypothesis, setHypothesis] = useState<string>(area.areaHypothesis);
+  const [trajectory, setTrajectory] = useState<string>(area.trajectory);
+
+  const handleInputBlur = () => {
+    updateArea({ id: area.id, areaHypothesis: hypothesis, trajectory });
+  };
+  return (
+    <div className="flex space-x-4">
+      <StdInputText
+        id={`areas-hypothesis-input-${area.id}`}
+        label={`Load Hypothesis`}
+        value={hypothesis}
+        onChange={setHypothesis}
+      />
+      <StdInputText
+        id={`areas-trajectory-input-${area.id}`}
+        label={`Trajectory to use`}
+        value={trajectory}
+        onBlur={handleInputBlur}
+        onChange={setTrajectory}
+      />
+    </div>
+  );
+};
+
 const AreaTableDisplay = () => {
   const [rows, setRows] = useState<AreaDTO[]>([]);
-  const [inputValuesLoad, setInputLoadValues] = useState<string[]>([]);
 
-  const headers = [
-    columnHelper.accessor('id', { header: 'id' }),
-    columnHelper.accessor('area_hypothesis', { header: 'Area Hyphotesis' }),
-    columnHelper.accessor('trajectory', { header: 'Trajectory to use' }),
-  ];
+  // const headers = [
+  //   columnHelper.accessor('id', { header: 'id' }),
+  //   columnHelper.accessor('area_hypothesis', { header: 'Area Hyphotesis' }),
+  //   columnHelper.accessor('trajectory', { header: 'Trajectory to use' }),
+  // ];
 
   useEffect(() => {
     setTimeout(() => {
@@ -27,19 +53,18 @@ const AreaTableDisplay = () => {
     }, 5);
   }, []);
 
+  const handleAreaChange = (area: AreaDTO) => {
+    setRows((prev) => {
+      const newRows = [...prev];
+      newRows[0] = area;
+      return newRows;
+    });
+  };
   return (
     <div className="h-60vh overflow-auto">
       <div className="space-y-4">
-        {rows.map((row, index) => (
-          <div key={index} className="flex space-x-4">
-            <StdInputText
-              id={'id-input*load'}
-              label={`Load Hypothesis`}
-              value={inputValuesLoad[index]}
-              onChange={(e) => setInputLoadValues(e.target.value)}
-            />
-            <StdInputText label={`Trajectory to use`} value={row.trajectory} />
-          </div>
+        {rows.map((row) => (
+          <AreaLine key={row.id} area={row} updateArea={handleAreaChange} />
         ))}
       </div>
     </div>
