@@ -4,43 +4,16 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { render, screen, waitFor } from '@testing-library/react';
-import { vi } from 'vitest'; // Vitest mock API
-import StudyTableDisplay from './StudyTableDisplay';
+import { useStudyTableDisplay } from '@/pages/pegase/home/components/StudyTableDisplay';
+import { renderHook, waitFor } from '@testing-library/react';
 
-vi.mock('@/components/common/data/stdSimpleTable/StdSimpleTable', () => ({
-  default: ({ columns, data }: any) => (
-    <table>
-      <thead>
-        {columns.map((col: any) => (
-          <th key={col.header}>{col.header}</th>
-        ))}
-      </thead>
-      <tbody>
-        {data.map((row: any, index: number) => (
-          <tr key={index}>
-            <td>{row.study_name}</td>
-            <td>{row.user_name}</td>
-            <td>{row.project}</td>
-            <td>{row.status}</td>
-            <td>{row.horizon}</td>
-            <td>{row.keywords}</td>
-            <td>{row.creation_date}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  ),
-}));
-
-// Mock global fetch
-global.fetch = vi.fn();
-
-describe('StudyTableDisplay', () => {
+describe('useStudyTableDisplay', () => {
   beforeEach(() => {
-    // Reset mocks before each test
-    vi.resetAllMocks();
+    // Reset fetch mock before each test
+    global.fetch = vi.fn();
+  });
 
+  it('fetches data and updates state correctly', async () => {
     const mockResponse = {
       content: [
         {
@@ -52,6 +25,15 @@ describe('StudyTableDisplay', () => {
           keywords: 'keyword1',
           creation_date: '2023-01-01',
         },
+        {
+          study_name: 'Study 2',
+          user_name: 'Jane pierre',
+          project: 'Project B',
+          status: 'Inactive',
+          horizon: '2024',
+          keywords: 'keyword2',
+          creation_date: '2023-01-01',
+        },
       ],
       totalElements: 1,
     };
@@ -59,37 +41,25 @@ describe('StudyTableDisplay', () => {
       ok: true,
       json: async () => mockResponse, // Mock the json response
     });
-  });
 
-  it('renders table with fetched data on initial load', async () => {
-    render(<StudyTableDisplay searchStudy="test" />);
-    expect(await screen.findByText('@user_name')).toBeInTheDocument();
-  });
+    const { result } = renderHook(() => useStudyTableDisplay({ searchStudy: 'test' }));
 
-  it('renders table headers correctly', () => {
-    render(<StudyTableDisplay searchStudy="test" />);
-    // Check if table headers are rendered
-    expect(screen.getByText('@study_name')).toBeInTheDocument();
-    expect(screen.getByText('@user_name')).toBeInTheDocument();
-    expect(screen.getByText('@project')).toBeInTheDocument();
-    expect(screen.getByText('@status')).toBeInTheDocument();
-    // expect(screen.getByText('Horizon ')).toBeInTheDocument();
-    expect(screen.getByText('@keywords')).toBeInTheDocument();
-    expect(screen.getByText('@creation_date')).toBeInTheDocument();
-  });
-
-  it('fetches and renders rows correctly', async () => {
-    render(<StudyTableDisplay searchStudy="test" />);
-
-    // Wait for the rows to be updated in the table
     await waitFor(() => {
-      expect(screen.getByText('Study 1')).toBeInTheDocument();
-      expect(screen.getByText('John Doe')).toBeInTheDocument();
+      expect(result.current.rows.length).toEqual(2),
+        expect(result.current.lastPage).toBe(1),
+        expect(global.fetch).toHaveBeenCalledTimes(1);
     });
+  });
 
-    // Fetch should be called again for the next page
+  it('handles fetch error correctly', async () => {
+    global.fetch = vi.fn().mockRejectedValue(new Error('Fetch error'));
+
+    const { result } = renderHook(() => useStudyTableDisplay({ searchStudy: 'test' }));
+
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(result.current.rows).toEqual([]),
+        expect(result.current.lastPage).toBe(0),
+        expect(global.fetch).toHaveBeenCalledTimes(1);
     });
   });
 });

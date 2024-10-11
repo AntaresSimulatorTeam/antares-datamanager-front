@@ -8,6 +8,8 @@ import { generateKeywords } from '../list/keywords';
 import PROJECT_NAME from '../list/projectName';
 import STUDY_NAME from '../list/studyName';
 import USER_NAMES from '../list/user';
+import HORIZON_NAMES from '@/mocks/data/list/horizon';
+import STATUS_NAMES from '@/mocks/data/list/status';
 
 export const generateStudy = (count: number, seed = 1): StudyDTO[] =>
   Array.from({ length: count }, (_, idx) => ({
@@ -17,8 +19,8 @@ export const generateStudy = (count: number, seed = 1): StudyDTO[] =>
     creation_date: new Date(),
     keywords: generateKeywords(Math.floor(Math.random() * idx) % 5, idx * seed),
     project: PROJECT_NAME[Math.floor(idx * seed) % PROJECT_NAME.length],
-    status: 'In progress',
-    horizon: 'Short-term',
+    status: STATUS_NAMES[Math.floor(idx * seed) % PROJECT_NAME.length],
+    horizon: HORIZON_NAMES[Math.floor(idx * seed) % PROJECT_NAME.length],
   }));
 
 export const generateStudyRandomData = (count: number): StudyDTO[] => generateStudy(count, Math.random() * 100);

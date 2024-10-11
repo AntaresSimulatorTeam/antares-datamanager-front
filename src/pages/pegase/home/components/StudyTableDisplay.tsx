@@ -8,26 +8,12 @@ import StdSimpleTable from '@/components/common/data/stdSimpleTable/StdSimpleTab
 import { createColumnHelper } from '@tanstack/react-table';
 import { useEffect, useState } from 'react';
 import StdPagination from '@common/data/stdPagination/StdPagination';
+import { useTranslation } from 'react-i18next';
+import StdRadioButton from '@/components/common/forms/stdRadioButton/StdRadioButton';
 
-const itemsPerPage = 6;
+const itemsPerPage = 4;
 const BASE_URL = import.meta.env.VITE_BACK_END_BASE_URL;
 const columnHelper = createColumnHelper<StudyDTO>();
-
-//header
-const headers = [
-  columnHelper.accessor('study_name', { header: '@study_name' }),
-  columnHelper.accessor('user_name', {
-    header: '@user_name',
-    cell: ({ getValue }) => (
-      <StdAvatar size="s" backgroundColor="gray" fullname={getValue()} initials={getValue().substring(0, 2)} />
-    ),
-  }),
-  columnHelper.accessor('project', { header: '@project' }),
-  columnHelper.accessor('status', { header: '@status' }),
-  columnHelper.accessor('horizon', { header: '@horizon' }),
-  columnHelper.accessor('keywords', { header: '@keywords' }),
-  columnHelper.accessor('creation_date', { header: '@creation_date' }),
-];
 
 //table raws hook
 interface StudyTableDisplayProps {
@@ -69,7 +55,39 @@ export const useStudyTableDisplay = ({ searchStudy }: UseStudyTableDisplayProps)
 };
 
 const StudyTableDisplay: React.FC<StudyTableDisplayProps> = ({ searchStudy }) => {
+  const { t } = useTranslation();
+  const [selectedRow, setSelectedRow] = useState(1);
+
+  //header
+
+  const headers = [
+    columnHelper.accessor('id', {
+      header: t('Pegase.@use'),
+      cell: ({ row }) => (
+        <StdRadioButton
+          label=""
+          value={row.original.id.toString()}
+          checked={selectedRow === row.original.id}
+          onChange={() => setSelectedRow(row.original.id)}
+          key={row.original.id}
+        />
+      ),
+    }),
+    columnHelper.accessor('study_name', { header: t('Pegase.@study_name') }),
+    columnHelper.accessor('user_name', {
+      header: t('Pegase.@user_name'),
+      cell: ({ getValue }) => (
+        <StdAvatar size="s" backgroundColor="gray" fullname={getValue()} initials={getValue().substring(0, 2)} />
+      ),
+    }),
+    columnHelper.accessor('project', { header: t('Pegase.@project') }),
+    columnHelper.accessor('status', { header: t('Pegase.@status') }),
+    columnHelper.accessor('horizon', { header: t('Pegase.@horizon') }),
+    columnHelper.accessor('keywords', { header: t('Pegase.@keywords') }),
+    columnHelper.accessor('creation_date', { header: t('Pegase.@creation_date') }),
+  ];
   const { rows, lastPage, page, setPage } = useStudyTableDisplay({ searchStudy });
+
   return (
     <div className="h-60vh overflow-auto">
       <StdSimpleTable columns={headers} data={rows} />

@@ -10,6 +10,14 @@
   },
   "Pegase": {
     "@title": "Pégase",
-    "@homePageHeader": "Welcome to the study generator for Antares"
+    "@homePageHeader": "Welcome to the study generator for Antares",
+    "@study_name": "Study name",
+    "@user_name": "User name",
+    "@status": "Status",
+    "@horizon": "Horizon",
+    "@creation_date": "Creation date",
+    "@keywords": "Keywords",
+    "@project": "Project",
+    "@use": ""
   }
 }

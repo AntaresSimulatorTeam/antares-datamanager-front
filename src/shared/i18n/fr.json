@@ -10,6 +10,14 @@
   },
   "Pegase": {
     "@title": "Pégase",
-    "@homePageHeader": "Bienvenue sur le générateur d’études pour Antarès"
+    "@homePageHeader": "Bienvenue sur le générateur d’études pour Antarès",
+    "@study_name": "Étude",
+    "@user_name": "Créateur",
+    "@status": "Status",
+    "@horizon": "Horizon",
+    "@creation_date": "Date de création",
+    "@keywords": "Mots-clés",
+    "@project": "Projet",
+    "@use": ""
   }
 }

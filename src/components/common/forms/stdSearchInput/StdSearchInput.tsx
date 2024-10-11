@@ -68,6 +68,7 @@ const StdSearchInput = ({
   const clearValue = () => {
     setValue('');
     inputRef?.current?.focus();
+    onSearch('');
   };
 
   return (
