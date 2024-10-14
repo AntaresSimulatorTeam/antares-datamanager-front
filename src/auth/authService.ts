@@ -18,10 +18,10 @@ interface AuthConfig {
 const config: AuthConfig = {
   authority: 'http://localhost:8090/auth/realms/PEGASE', // Remplacez par l'URL de votre serveur OIDC
   client_id: 'pegase-front',
-  redirect_uri: 'http://localhost:3000/callback',
+  redirect_uri: 'http://localhost:8080/home',
   response_type: 'code',
   scope: 'openid profile',
-  post_logout_redirect_uri: 'http://localhost:3000/',
+  post_logout_redirect_uri: 'http://localhost:8080/logout',
 };
 
 const userManager = new UserManager(config);
