@@ -10,7 +10,9 @@ import { describe, it, expect } from 'vitest';
 
 describe('StudyTable Component', () => {
   const mockSelectedRow = 1;
-  const mockSetSelectedRow = jest.fn();
+  const mockSetSelectedRow = (id: number) => {
+    console.log(`mockSetSelectedRow called with id: ${id}`);
+  };
   it('renders the search input and table display', async () => {
     render(<StudyTable selectedRow={mockSelectedRow} setSelectedRow={mockSetSelectedRow} />);
 

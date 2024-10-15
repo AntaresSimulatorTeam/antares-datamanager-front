@@ -9,8 +9,8 @@ import StudyTableDisplay from './StudyTableDisplay';
 import { useState } from 'react';
 
 interface StudyTableProps {
-  selectedRow: number; // The selected row should be a number
-  setSelectedRow: (id: number) => void; // Function to set the selected row
+  selectedRow: number;
+  setSelectedRow: (id: number) => void;
 }
 
 const StudyTable: React.FC<StudyTableProps> = ({ setSelectedRow, selectedRow }) => {
