@@ -6,9 +6,7 @@
 
 import { THEME_COLOR } from '@/shared/types';
 import createFastContext from './createFastContext';
+import { User } from 'oidc-client-ts';
+import * as React from 'react';
 
-export type UserContextStore = {
-  theme: THEME_COLOR;
-};
-
-export const UserContext = createFastContext<UserContextStore>();
+export const UserContext = React.createContext<User | null>(null);

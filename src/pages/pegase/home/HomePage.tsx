@@ -4,12 +4,12 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import Hearder from '@/components/pegase/header/Hearder';
+import Header from '@/components/pegase/header/Hearder';
 import StudyTable from './components/StudyTable';
 
 const HomePage = () => (
   <>
-    <Hearder />
+    <Header />
     <StudyTable />
   </>
 );
