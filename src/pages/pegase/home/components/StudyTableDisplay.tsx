@@ -18,6 +18,8 @@ const columnHelper = createColumnHelper<StudyDTO>();
 //table raws hook
 interface StudyTableDisplayProps {
   searchStudy: string | undefined;
+  selectedRow: number | null;
+  setSelectedRow: (id: number | null) => void;
 }
 
 interface UseStudyTableDisplayProps {
@@ -54,9 +56,8 @@ export const useStudyTableDisplay = ({ searchStudy }: UseStudyTableDisplayProps)
   return { rows, lastPage, page, setPage };
 };
 
-const StudyTableDisplay: React.FC<StudyTableDisplayProps> = ({ searchStudy }) => {
+const StudyTableDisplay: React.FC<StudyTableDisplayProps> = ({ searchStudy, selectedRow, setSelectedRow }) => {
   const { t } = useTranslation();
-  const [selectedRow, setSelectedRow] = useState(1);
 
   //header
 
@@ -68,7 +69,16 @@ const StudyTableDisplay: React.FC<StudyTableDisplayProps> = ({ searchStudy }) =>
           label=""
           value={row.original.id.toString()}
           checked={selectedRow === row.original.id}
-          onChange={() => setSelectedRow(row.original.id)}
+          onChange={() => {
+            console.log('Selected Row:', selectedRow, 'Current Row:', row.original.id);
+            if (selectedRow === row.original.id) {
+              console.log('Unselecting row:', row.original.id);
+              setSelectedRow(null);
+            } else {
+              console.log('Selecting row:', row.original.id);
+              setSelectedRow(row.original.id);
+            }
+          }}
           key={row.original.id}
         />
       ),

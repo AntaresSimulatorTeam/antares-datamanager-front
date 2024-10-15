@@ -4,12 +4,10 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import React, { Children, FunctionComponent, ReactElement } from 'react';
+import * as React from 'react';
+import { ReactElement, FunctionComponent, Children } from 'react';
 
-export const findSlotOfType = <T>(
-  children: ReactElement | ReactElement[],
-  slotType: FunctionComponent<T>,
-): ReactElement | null =>
+export const findSlotOfType = <T>(children: React.ReactNode, slotType: FunctionComponent<T>): ReactElement | null =>
   Children.toArray(children).find(
     (child) => React.isValidElement(child) && child.type === slotType,
   ) as ReactElement | null;

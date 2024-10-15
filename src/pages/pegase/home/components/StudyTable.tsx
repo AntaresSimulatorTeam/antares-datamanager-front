@@ -8,7 +8,12 @@ import StdSearchInput from '@/components/common/forms/stdSearchInput/StdSearchIn
 import StudyTableDisplay from './StudyTableDisplay';
 import { useState } from 'react';
 
-const StudyTable = () => {
+interface StudyTableProps {
+  selectedRow: number; // The selected row should be a number
+  setSelectedRow: (id: number) => void; // Function to set the selected row
+}
+
+const StudyTable: React.FC<StudyTableProps> = ({ setSelectedRow, selectedRow }) => {
   const [searchTerm, setSearchTerm] = useState<string | undefined>('');
   const searchStudy = (value?: string | undefined) => {
     setSearchTerm(value);
@@ -20,7 +25,7 @@ const StudyTable = () => {
           <StdSearchInput onSearch={searchStudy} placeHolder="Search" variant="outlined" />
         </div>
       </div>
-      <StudyTableDisplay searchStudy={searchTerm} />
+      <StudyTableDisplay searchStudy={searchTerm} selectedRow={selectedRow} setSelectedRow={setSelectedRow} />
     </div>
   );
 };
