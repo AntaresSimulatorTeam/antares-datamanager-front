@@ -19,7 +19,7 @@ const columnHelper = createColumnHelper<StudyDTO>();
 interface StudyTableDisplayProps {
   searchStudy: string | undefined;
   selectedRow: number | null;
-  setSelectedRow: (id: number | null) => void;
+  setSelectedRow: (id: number) => void;
 }
 
 interface UseStudyTableDisplayProps {
@@ -71,13 +71,14 @@ const StudyTableDisplay: React.FC<StudyTableDisplayProps> = ({ searchStudy, sele
           checked={selectedRow === row.original.id}
           onChange={() => {
             console.log('Selected Row:', selectedRow, 'Current Row:', row.original.id);
-            if (selectedRow === row.original.id) {
+            setSelectedRow(row.original.id);
+            /*  if (selectedRow === row.original.id) {
               console.log('Unselecting row:', row.original.id);
               setSelectedRow(null);
             } else {
               console.log('Selecting row:', row.original.id);
               setSelectedRow(row.original.id);
-            }
+            } */
           }}
           key={row.original.id}
         />

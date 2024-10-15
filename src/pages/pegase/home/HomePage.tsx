@@ -4,6 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+import StdInputText from '@/components/common/forms/stdInputText/StdInputText';
+import StdModalContent from '@/components/common/layout/stdModal/slots/stdModalContents/StdModalContent';
 import StdModal from '@/components/common/layout/stdModal/StdModal';
 import Hearder from '@/components/pegase/header/Hearder';
 import { useState } from 'react';
@@ -12,6 +14,7 @@ import StudyTable from './components/StudyTable';
 const HomePage = () => {
   const [selectedRow, setSelectedRow] = useState<number | null>(null);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [inputValue, setInputValue] = useState('');
 
   const handleButtonClick = () => {
     if (selectedRow) {
@@ -31,9 +34,17 @@ const HomePage = () => {
           <StdModal.Title onClose={handleCloseModal}>
             <h2>Duplicate Study</h2>
           </StdModal.Title>
-          <StdModal.Content>
-            <p>You are about to duplicate the selected item. Are you sure?</p>
-          </StdModal.Content>
+          <StdModalContent>
+            <p>Please provide new study name:</p>
+
+            <StdInputText
+              value={inputValue}
+              onChange={setInputValue}
+              label="Study Name"
+              placeHolder="Enter text here"
+              required
+            />
+          </StdModalContent>
           <StdModal.Footer>
             <button onClick={() => setModalVisible(false)}>Cancel</button>
             <button onClick={() => {}}>Confirm</button>
