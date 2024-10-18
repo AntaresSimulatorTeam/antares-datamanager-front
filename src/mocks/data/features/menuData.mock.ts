@@ -25,7 +25,7 @@ export const menuTopData: MenuNavItem[] = [
   {
     id: 'favorites-link',
     key: 'favorites',
-    label: "Favoris",
+    label: 'Favoris',
     path: '/',
     icon: StdIconId.PushPin,
   },
@@ -67,7 +67,7 @@ export const menuBottomData: MenuNavItem[] = [
   {
     key: 'logout',
     label: 'Se déconnecter',
-    path: '/',
+    path: '/logout',
     icon: StdIconId.Logout,
   },
 ];

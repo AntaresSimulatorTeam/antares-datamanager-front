@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import StdPagination from '@common/data/stdPagination/StdPagination';
 import { useTranslation } from 'react-i18next';
 import StdRadioButton from '@/components/common/forms/stdRadioButton/StdRadioButton';
+import { AuthService } from '@/auth/authService';
 
 const itemsPerPage = 4;
 const BASE_URL = import.meta.env.VITE_BACK_END_BASE_URL;
@@ -42,7 +43,7 @@ export const useStudyTableDisplay = ({ searchStudy }: UseStudyTableDisplayProps)
   }, [searchStudy]);
 
   useEffect(() => {
-    fetch(BASE_URL + `/v1/study/search?page=${page}&size=${itemsPerPage}&search=${searchStudy}`)
+    AuthService.authFetch(BASE_URL + `/v1/study/search?page=${page}&size=${itemsPerPage}&search=${searchStudy}`)
       .then((response) => response.json())
       .then((json) => {
         setRows(json.content);

@@ -16,7 +16,6 @@ import { AuthService } from '@/auth/authService';
 const Header: React.FC = () => {
   const user = useContext(UserContext);
   const { t } = useTranslation();
-
   return (
     <>
       <div className="flex h-9 w-full items-center justify-between px-3 py-2">
@@ -24,7 +23,7 @@ const Header: React.FC = () => {
           {t('Pegase.@homePageHeader')}
           <strong>{user?.profile.name} </strong>
         </span>
-        <StdButton label="Se Déconnecter" icon={StdIconId.Logout} onClick={AuthService.logout} />
+        {AuthService.hasPegaseUserRole('pegase-user', user) && <StdButton label="Create" icon={StdIconId.Add} />}
       </div>
       <StdDivider />
     </>

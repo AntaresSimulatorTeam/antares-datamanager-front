@@ -6,6 +6,7 @@
 
 /* eslint-disable react-refresh/only-export-components */
 import { lazy } from 'react';
+import { Logout } from '@/components/pegase/logout/Logout';
 
 const Settings = lazy(() => import('./pages/pegase/settings/Settings'));
 const HomePage = lazy(() => import('./pages/pegase/home/HomePage'));
@@ -13,4 +14,5 @@ const HomePage = lazy(() => import('./pages/pegase/home/HomePage'));
 export const routes = {
   home: { path: '/', component: HomePage },
   settings: { path: '/settings', component: Settings },
+  logout: { path: '/logout', component: Logout },
 } as const;

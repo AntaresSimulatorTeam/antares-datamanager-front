@@ -4,14 +4,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import Header from '@/components/pegase/header/Header';
-import StudyTable from './components/StudyTable';
+import { AuthService } from '@/auth/authService';
+import * as React from 'react';
 
-const HomePage = () => (
-  <>
-    <Header />
-    <StudyTable />
-  </>
-);
-
-export default HomePage;
+export function Logout() {
+  AuthService.logout();
+}
