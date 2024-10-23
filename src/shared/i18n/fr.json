@@ -11,5 +11,13 @@
   "Pegase": {
     "@title": "Pégase",
     "@homePageHeader": "Bienvenue sur le générateur d’études pour Antarès"
+  },
+  "page": {
+    "@logs": "Logs",
+    "@home": "Home",
+    "@projet": "Projet",
+    "@logout": "Se déconecter",
+    "@parameters": "Paramètres",
+    "@antares": "Antares"
   }
 }
