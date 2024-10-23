@@ -11,14 +11,13 @@ import ThemeHandler from './components/common/handler/ThemeHandler';
 import Navbar from './components/pegase/navbar/Navbar';
 import PegaseStar from './components/pegase/star/PegaseStar';
 import { UserContext } from './contexts/UserContext';
-import { menuBottomData, menuTopData } from './mocks/data/features/menuData.mock';
-import { routes } from './routes';
 import { PEGASE_NAVBAR_ID } from './shared/constants';
 import { THEME_COLOR } from './shared/types';
+import { menuBottomData, menuTopData } from './routes';
 
 function App() {
   return (
-    <div className="flex h-screen w-screen dark:bg-acc2-950 dark:text-gray-200">
+    <div className="flex h-screen w-screen dark:bg-gray-900 dark:text-gray-200">
       <UserContext.Provider initialState={{ theme: THEME_COLOR.LIGHT }}>
         <ThemeHandler />
         <Navbar id={PEGASE_NAVBAR_ID} bottomItems={menuBottomData} topItems={menuTopData} />
@@ -26,7 +25,7 @@ function App() {
           <PegaseStar />
           <Suspense>
             <Routes>
-              {Object.entries(routes).map(([key, route]) => (
+              {Object.entries([...menuBottomData, ...menuTopData]).map(([key, route]) => (
                 <Route key={key} path={route.path} Component={route.component} />
               ))}
             </Routes>

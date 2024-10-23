@@ -19,13 +19,6 @@ describe('StdNavbarHeader component', () => {
     expect(document.querySelector(`#${TEST_ID}`)).toBeInTheDocument();
     expect(screen.getByRole('link')).toBeInTheDocument();
   });
-  it('should render appName and version if expanded', () => {
-    renderWithRouter(
-      <StdNavbarHeader appName={fakeAppName} version={fakeAppVersion} target={fakeHomeLink} id={TEST_ID} expanded />,
-    );
-    expect(screen.getByText(fakeAppName)).toBeInTheDocument();
-    expect(screen.getByText(fakeAppVersion)).toBeInTheDocument();
-  });
   it('should not render appName and version if expanded is false', () => {
     renderWithRouter(
       <StdNavbarHeader

@@ -11,5 +11,13 @@
   "Pegase": {
     "@title": "Pégase",
     "@homePageHeader": "Welcome to the study generator for Antares"
+  },
+  "page": {
+    "@logs": "Logs",
+    "@home": "Home",
+    "@projet": "Project",
+    "@logout": "Log out",
+    "@parameters": "Parameters",
+    "@antares": "Antares"
   }
 }

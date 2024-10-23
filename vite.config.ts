@@ -5,9 +5,9 @@
  */
 
 /// <reference types="vitest/config" />
-import react from "@vitejs/plugin-react";
+import react from '@vitejs/plugin-react';
 import path from 'path';
-import { defineConfig } from "vite";
+import { defineConfig } from 'vite';
 
 const DEFAULT_PORT = 8080;
 
@@ -15,29 +15,29 @@ const DEFAULT_PORT = 8080;
 export default defineConfig({
   plugins: [react()],
   build: {
-    target: "esnext",
+    target: 'esnext',
   },
   test: {
     globals: true,
-    environment: "jsdom",
-    setupFiles: "./src/testSetup.ts",
+    environment: 'jsdom',
+    setupFiles: './src/testSetup.ts',
   },
   server: {
     port: DEFAULT_PORT,
   },
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      '@': path.resolve(__dirname, './src'),
       '@common': path.resolve(__dirname, './src/components/common'),
     },
   },
   esbuild: {
     supported: {
-      "top-level-await": true,
+      'top-level-await': true,
     },
   },
   define: {
-    APP_VERSION: JSON.stringify(process.env.npm_package_version),
+    APP_VERSION: JSON.stringify(process.env.APP_VERSION),
   },
-  publicDir:"./public"
+  publicDir: './public',
 });
