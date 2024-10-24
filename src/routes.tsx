@@ -20,7 +20,7 @@ export const menuTopData: MenuNavItem[] = [
   {
     id: 'home-link',
     key: 'home',
-    label: 'page.@home',
+    label: 'home.@label',
     path: '/',
     icon: StdIconId.Home,
     component: HomePage,
