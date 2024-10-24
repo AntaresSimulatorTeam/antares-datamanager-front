@@ -37,11 +37,14 @@ const Navbar = ({ id, topItems, bottomItems }: StdNavbarProps) => {
         version={`v${import.meta.env.VITE_APP_VERSION}`}
         expanded={expanded}
       />
+
       <StdNavbarMenu menuItems={topItems} expanded={expanded} />
-      <StdDivider extraClasses="mt-auto" />
-      <StdNavbarMenu menuItems={bottomItems} expanded={expanded} />
-      <StdDivider />
-      <StdNavbarController action={toggleExpanded} id={controllerId} label={controllerLabel} expanded={expanded} />
+
+      <div className="mt-auto">
+        <StdNavbarMenu menuItems={bottomItems} expanded={expanded} />
+        <StdDivider />
+        <StdNavbarController action={toggleExpanded} id={controllerId} label={controllerLabel} expanded={expanded} />
+      </div>
     </nav>
   );
 };
