@@ -1,8 +1,8 @@
 {
   "components": {
     "navbar": {
-      "@expand": "Agrandir le menu",
-      "@minimize": "Minimize menu"
+      "@expand": "Maximize",
+      "@minimize": "Minimize"
     },
     "popover": {
       "@close": "Close"

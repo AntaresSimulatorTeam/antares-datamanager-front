@@ -20,7 +20,7 @@ const resources = {
 
 await i18n.use(initReactI18next).init({
   resources,
-  lng: 'fr',
+  lng: 'en',
   interpolation: {
     escapeValue: false,
   },

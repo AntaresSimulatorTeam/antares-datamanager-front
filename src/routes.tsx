@@ -12,7 +12,7 @@ import { StdIconId } from './shared/utils/common/mappings/iconMaps';
 const Settings = lazy(() => import('./pages/pegase/settings/Settings'));
 const HomePage = lazy(() => import('./pages/pegase/home/HomePage'));
 const ProjectsPage = lazy(() => import('./pages/pegase/projects/Projects'));
-const LogsPage = lazy(() => import('./pages/pegase/logs/Logs'));
+const LogsPage = lazy(() => import('./pages/pegase/reports/LogsPage'));
 const AntaresPage = lazy(() => import('./pages/pegase/antares/Antares'));
 const LogoutPage = lazy(() => import('./pages/pegase/logout/Logout'));
 
@@ -38,7 +38,7 @@ export const menuTopData: MenuNavItem[] = [
     key: 'logs',
     label: 'page.@logs',
     path: '/logs',
-    icon: StdIconId.Settings,
+    icon: StdIconId.ReceiptLong,
     component: LogsPage,
   },
   {
