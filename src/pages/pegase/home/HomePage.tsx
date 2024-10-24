@@ -4,13 +4,15 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import Hearder from '@/components/pegase/header/Hearder';
+import Header from '@/components/pegase/header/Header';
 import StudyTable from './components/StudyTable';
 
 const HomePage = () => (
   <>
-    <Hearder />
-    <StudyTable />
+    <div className="p- inline-flex h-[800px] flex-col items-start justify-start gap-6">
+      <Header />
+      <StudyTable />
+    </div>
   </>
 );
 

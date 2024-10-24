@@ -9,15 +9,17 @@
     }
   },
   "Pegase": {
-    "@title": "Pégase",
-    "@homePageHeader": "Welcome to the study generator for Antares"
+    "@title": "Pégase"
   },
   "page": {
     "@logs": "Logs",
-    "@home": "Home",
     "@projet": "Project",
     "@logout": "Log out",
     "@parameters": "Parameters",
     "@antares": "Antares"
+  },
+  "home": {
+    "@label": "Home",
+    "@buttonNewProject": "New Project"
   }
 }
