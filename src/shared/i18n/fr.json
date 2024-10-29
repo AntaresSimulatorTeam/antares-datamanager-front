@@ -20,6 +20,7 @@
   },
   "home": {
     "@label": "Home",
-    "@buttonNewProject": "Nouveau Projet"
+    "@buttonNewProject": "Nouveau Projet",
+    "@searchBar": "Rechercher un projet, étude,... "
   }
 }
