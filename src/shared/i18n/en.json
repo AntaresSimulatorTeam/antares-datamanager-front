@@ -21,6 +21,14 @@
   "home": {
     "@label": "Home",
     "@buttonNewProject": "New Project",
-    "@searchBar": "Search for a project, study, tag... "
+    "@searchBar": "Search for a project, study, tag... ",
+    "@study_name": "Study",
+    "@user_name": "Created by",
+    "@status": "Status",
+    "@horizon": "Horizon",
+    "@creation_date": "Creation date",
+    "@keywords": "Keywords",
+    "@project": "Project",
+    "@use": ""
   }
 }

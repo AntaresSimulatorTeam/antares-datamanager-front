@@ -21,6 +21,14 @@
   "home": {
     "@label": "Home",
     "@buttonNewProject": "Nouveau Projet",
-    "@searchBar": "Rechercher un projet, étude,... "
+    "@searchBar": "Rechercher un projet, étude,... ",
+    "@study_name": "Étude",
+    "@user_name": "Créateur",
+    "@status": "Status",
+    "@horizon": "Horizon",
+    "@creation_date": "Date de création",
+    "@keywords": "Mots-clés",
+    "@project": "Projet",
+    "@use": ""
   }
 }

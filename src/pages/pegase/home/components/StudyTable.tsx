@@ -6,16 +6,18 @@
 
 import StdChip from '@/components/common/base/stdChip/StdChip';
 import StdSearchInput from '@/components/common/forms/stdSearchInput/StdSearchInput';
+import { useState } from 'react';
+
 import { useTranslation } from 'react-i18next';
 import StudyTableDisplay from './StudyTableDisplay';
 
 const StudyTable = () => {
   const { t } = useTranslation();
   const chipLabels = ['Chip', 'Chip', 'Chip'];
-  const searchStudy = (value?: string) => {
-    //TODO: Implement search
-    // eslint-disable-next-line no-console
-    console.log(value);
+  const [searchTerm, setSearchTerm] = useState<string | undefined>('');
+
+  const searchStudy = (value?: string | undefined) => {
+    setSearchTerm(value);
   };
 
   return (
@@ -33,7 +35,7 @@ const StudyTable = () => {
           </div>
         </div>
       </div>
-      <StudyTableDisplay />
+      <StudyTableDisplay searchStudy={searchTerm} />
     </div>
   );
 };
