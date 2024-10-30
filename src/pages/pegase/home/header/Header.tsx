@@ -4,19 +4,18 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import ProjectCreator from './ProjectCreator';
-import CardHeader from './CardHeader';
+import PinnedProjectCards from '@/pages/pegase/home/header/PinnedProjectCard';
+import ProjectCreator from '@/pages/pegase/home/header/ProjectCreator';
 
-const cards = ['card1', 'card2', 'card3'];
-const Header = () => (
-  <>
-    <div className="flex h-18 w-full gap-3">
-      <ProjectCreator />
-      {cards.map((card) => (
-        <CardHeader key={card} label={card} />
-      ))}
-    </div>
-  </>
-);
+const Header = () => {
+  return (
+    <>
+      <div className="flex h-18 w-full gap-3">
+        <ProjectCreator />
+        <PinnedProjectCards />
+      </div>
+    </>
+  );
+};
 
 export default Header;
