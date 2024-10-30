@@ -58,13 +58,11 @@ const StudyTableDisplay = ({ searchStudy }: StudyTableDisplayProps) => {
   const { t } = useTranslation();
 
   const headers = [
-    columnHelper.accessor('id', { header: t('') }),
-
     columnHelper.accessor('study_name', { header: t('home.@study_name') }),
     columnHelper.accessor('user_name', {
       header: t('home.@user_name'),
       cell: ({ getValue }) => (
-        <StdAvatar size="s" backgroundColor="blue" fullname={getValue()} initials={getValue().substring(0, 2)} />
+        <StdAvatar size="s" backgroundColor="gray" fullname={getValue()} initials={getValue().substring(0, 2)} />
       ),
     }),
     columnHelper.accessor('project', { header: t('home.@project') }),

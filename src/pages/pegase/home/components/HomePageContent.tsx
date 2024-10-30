@@ -8,11 +8,10 @@ import StdChip from '@/components/common/base/stdChip/StdChip';
 import StdSearchInput from '@/components/common/forms/stdSearchInput/StdSearchInput';
 import { useState } from 'react';
 
-import { useTranslation } from 'react-i18next';
+import SearchBar from './SearchBar';
 import StudyTableDisplay from './StudyTableDisplay';
 
-const StudyTable = () => {
-  const { t } = useTranslation();
+const HomePageContent = () => {
   const chipLabels = ['Chip', 'Chip', 'Chip'];
   const [searchTerm, setSearchTerm] = useState<string | undefined>('');
 
@@ -21,23 +20,16 @@ const StudyTable = () => {
   };
 
   return (
-    <div className="w-full flex-col overflow-auto p-3">
+    <div className="self-stretch">
       <div className="text-white font-['Nunito Sans'] pb-3 text-left text-[28px] font-normal leading-[33.60px]">
         Studies in progress
       </div>
-      <div className="flex w-full flex-row justify-between pb-3">
-        <div className="inline-flex h-[68px] items-center justify-start gap-8 py-4">
-          <StdSearchInput onSearch={searchStudy} placeHolder={t('home.@searchBar')} variant="outlined" />
-          <div className="ml-8 flex gap-4">
-            {chipLabels.map((label, index) => (
-              <StdChip key={index} label={label} />
-            ))}
-          </div>
-        </div>
+      <div className="flex w-full flex-row items-center justify-between pb-3">
+        <SearchBar onSearch={searchStudy} chipLabels={chipLabels} />
       </div>
       <StudyTableDisplay searchStudy={searchTerm} />
     </div>
   );
 };
 
-export default StudyTable;
+export default HomePageContent;

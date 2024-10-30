@@ -5,13 +5,13 @@
  */
 
 import Header from '@/pages/pegase/home/header/Header';
-import StudyTable from './components/StudyTable';
+import HomePageContent from './components/HomePageContent';
 
 const HomePage = () => (
   <>
     <div className="flex flex-auto flex-col items-center gap-6 p-3">
       <Header />
-      <StudyTable />
+      <HomePageContent />
     </div>
   </>
 );

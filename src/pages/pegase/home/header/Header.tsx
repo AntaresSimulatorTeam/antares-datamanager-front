@@ -16,23 +16,6 @@ const Header = () => (
         <CardHeader key={card} label={card} />
       ))}
     </div>
-    <div className="grid w-full grid-cols-3 gap-3">
-      {cards.map((card) => (
-        <CardHeader key={card} label={card} />
-      ))}
-      {cards.map((card) => (
-        <CardHeader key={card} label={card} />
-      ))}
-      {cards.map((card) => (
-        <CardHeader key={card} label={card} />
-      ))}
-      {cards.map((card) => (
-        <CardHeader key={card} label={card} />
-      ))}
-      {cards.map((card) => (
-        <CardHeader key={card} label={card} />
-      ))}
-    </div>
   </>
 );
 

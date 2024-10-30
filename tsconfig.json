@@ -12,7 +12,7 @@
       "@imagrid/*": ["src/components/imagrid/*"]
     },
     /* Bundler mode */
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
