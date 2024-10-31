@@ -15,7 +15,6 @@ const itemsPerPage = 4;
 const BASE_URL = import.meta.env.VITE_BACK_END_BASE_URL;
 const columnHelper = createColumnHelper<StudyDTO>();
 
-//table raws hook
 interface StudyTableDisplayProps {
   searchStudy: string | undefined;
 }
@@ -61,7 +60,7 @@ const StudyTableDisplay = ({ searchStudy }: StudyTableDisplayProps) => {
     columnHelper.accessor('study_name', { header: t('home.@study_name') }),
     columnHelper.accessor('user_name', {
       header: t('home.@user_name'),
-      cell: ({ getValue }) => (
+      cell: ({ getValue }: { getValue: () => string }) => (
         <StdAvatar size="s" backgroundColor="gray" fullname={getValue()} initials={getValue().substring(0, 2)} />
       ),
     }),
@@ -76,6 +75,7 @@ const StudyTableDisplay = ({ searchStudy }: StudyTableDisplayProps) => {
   return (
     <div className="h-60vh overflow-auto">
       <StdSimpleTable columns={headers} data={rows} />
+
       <StdPagination lastPage={lastPage} currentPage={page} onChange={setPage} />
     </div>
   );

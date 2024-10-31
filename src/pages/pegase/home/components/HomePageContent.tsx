@@ -4,8 +4,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import StdChip from '@/components/common/base/stdChip/StdChip';
-import StdSearchInput from '@/components/common/forms/stdSearchInput/StdSearchInput';
 import { useState } from 'react';
 
 import SearchBar from './SearchBar';
@@ -24,7 +22,7 @@ const HomePageContent = () => {
       <div className="text-white font-['Nunito Sans'] pb-3 text-left text-[28px] font-normal leading-[33.60px]">
         Studies in progress
       </div>
-      <div className="flex w-full flex-row items-center justify-between pb-3">
+      <div className="flex items-center gap-4 self-stretch py-2">
         <SearchBar onSearch={searchStudy} chipLabels={chipLabels} />
       </div>
       <StudyTableDisplay searchStudy={searchTerm} />

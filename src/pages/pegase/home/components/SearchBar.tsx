@@ -13,7 +13,7 @@ interface SearchBarProps {
   chipLabels: string[];
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ onSearch, chipLabels }) => {
+const SearchBar = ({ onSearch, chipLabels }: SearchBarProps) => {
   const { t } = useTranslation();
   return (
     <div className="inline-flex h-[68px] items-center justify-start gap-8 py-4">
