@@ -30,7 +30,7 @@ const Navbar = ({ id, topItems, bottomItems }: StdNavbarProps) => {
   const controllerId = `${id}-controller`;
   return (
     <nav id={id} className={navbarClasses} aria-label={APP_NAME}>
-      <StdNavbarHeader appName={APP_NAME} id={id} target="/" version="" expanded={expanded} />
+      <StdNavbarHeader appName={APP_NAME} id={id} target="/" version={import.meta.env.VITE_TEST} expanded={expanded} />
       <StdNavbarMenu menuItems={topItems} expanded={expanded} />
       <StdDivider extraClasses="mt-auto" />
       <StdNavbarMenu menuItems={bottomItems} expanded={expanded} />

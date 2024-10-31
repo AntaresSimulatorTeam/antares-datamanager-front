@@ -15,8 +15,10 @@ import { menuBottomData, menuTopData } from './mocks/data/features/menuData.mock
 import { routes } from './routes';
 import { PEGASE_NAVBAR_ID } from './shared/constants';
 import { THEME_COLOR } from './shared/types';
+import { getEnvVariables } from './envVariable';
 
 function App() {
+  const { SHADOW_URL } = getEnvVariables();
   return (
     <div className="flex h-screen w-screen dark:bg-acc2-950 dark:text-gray-200">
       <UserContext.Provider initialState={{ theme: THEME_COLOR.LIGHT }}>
@@ -24,6 +26,7 @@ function App() {
         <Navbar id={PEGASE_NAVBAR_ID} bottomItems={menuBottomData} topItems={menuTopData} />
         <div className="flex h-full w-full flex-col">
           <PegaseStar />
+          {SHADOW_URL}
           <Suspense>
             <Routes>
               {Object.entries(routes).map(([key, route]) => (
