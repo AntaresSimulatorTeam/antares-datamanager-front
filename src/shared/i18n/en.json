@@ -6,6 +6,9 @@
     },
     "popover": {
       "@close": "Close"
+    },
+    "tablePagination": {
+      "@of": "over"
     }
   },
   "Pegase": {
@@ -29,6 +32,7 @@
     "@creation_date": "Creation date",
     "@keywords": "Keywords",
     "@project": "Project",
-    "@use": ""
+    "@use": "",
+    "@pagination": "over"
   }
 }

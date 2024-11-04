@@ -34,8 +34,9 @@ describe('useStudyTableDisplay', () => {
           creation_date: '2023-01-01',
         },
       ],
-      totalElements: 1,
+      totalElements: 2,
     };
+
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => mockResponse,
@@ -44,9 +45,10 @@ describe('useStudyTableDisplay', () => {
     const { result } = renderHook(() => useStudyTableDisplay({ searchStudy: 'test' }));
 
     await waitFor(() => {
-      expect(result.current.rows.length).toEqual(2),
-        expect(result.current.lastPage).toBe(1),
-        expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(result.current.rows).toHaveLength(2);
+      expect(result.current.rows).toEqual(mockResponse.content);
+      expect(result.current.count).toEqual(2);
+      expect(global.fetch).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -56,9 +58,45 @@ describe('useStudyTableDisplay', () => {
     const { result } = renderHook(() => useStudyTableDisplay({ searchStudy: 'test' }));
 
     await waitFor(() => {
-      expect(result.current.rows).toEqual([]),
-        expect(result.current.lastPage).toBe(0),
-        expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(result.current.rows).toEqual([]);
+      expect(result.current.count).toEqual(0);
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it('updates the page correctly when setPage is called', async () => {
+    const mockResponse = {
+      content: [
+        {
+          study_name: 'study1',
+          user_name: 'Luis Perez',
+          project: 'Project FE2050',
+          status: 'Closed',
+          horizon: '2050',
+          keywords: 'keyword1',
+          creation_date: '2023-01-01',
+        },
+      ],
+      totalElements: 1,
+    };
+
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => mockResponse,
+    });
+
+    const { result } = renderHook(() => useStudyTableDisplay({ searchStudy: 'study1' }));
+
+    await waitFor(() => {
+      expect(result.current.rows).toHaveLength(1);
+      expect(result.current.current).toEqual(0);
+    });
+
+    result.current.setPage(1);
+
+    await waitFor(() => {
+      expect(result.current.current).toEqual(1);
+      expect(global.fetch).toHaveBeenCalledTimes(2);
     });
   });
 });
