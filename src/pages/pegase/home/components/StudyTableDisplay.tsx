@@ -11,7 +11,7 @@ import StdPagination from '@common/data/stdPagination/StdPagination';
 import { useTranslation } from 'react-i18next';
 import { StudyDTO } from '@/shared/types/index';
 
-const itemsPerPage = 4;
+const ITEMS_PER_PAGE = 4;
 const BASE_URL = import.meta.env.VITE_BACK_END_BASE_URL;
 const columnHelper = createColumnHelper<StudyDTO>();
 
@@ -41,11 +41,11 @@ export const useStudyTableDisplay = ({ searchStudy }: UseStudyTableDisplayProps)
   }, [searchStudy]);
 
   useEffect(() => {
-    fetch(BASE_URL + `/v1/study/search?page=${page}&size=${itemsPerPage}&search=${searchStudy}`)
+    fetch(BASE_URL + `/v1/study/search?page=${page}&size=${ITEMS_PER_PAGE}&search=${searchStudy}`)
       .then((response) => response.json())
       .then((json) => {
         setRows(json.content);
-        setLastPage(Math.ceil(json.totalElements / itemsPerPage));
+        setLastPage(Math.ceil(json.totalElements / ITEMS_PER_PAGE));
       })
       .catch((error) => console.error(error));
   }, [page, searchStudy]);

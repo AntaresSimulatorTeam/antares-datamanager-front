@@ -4,6 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+import StdHeading from '@/components/common/layout/stdHeading/StdHeading';
 import { useState } from 'react';
 
 import SearchBar from './SearchBar';
