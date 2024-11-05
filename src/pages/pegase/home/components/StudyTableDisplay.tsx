@@ -73,11 +73,12 @@ const StudyTableDisplay = ({ searchStudy }: StudyTableDisplayProps) => {
   const { rows, lastPage, page, setPage } = useStudyTableDisplay({ searchStudy });
 
   return (
-    <div className="h-60vh overflow-auto">
-      <StdSimpleTable columns={headers} data={rows} />
-
+    <>
+      <div className="flex-1">
+        <StdSimpleTable columns={headers} data={rows} />
+      </div>
       <StdPagination lastPage={lastPage} currentPage={page} onChange={setPage} />
-    </div>
+    </>
   );
 };
 
