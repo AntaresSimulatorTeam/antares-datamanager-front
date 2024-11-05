@@ -35,6 +35,7 @@ export const useStudyTableDisplay = ({ searchStudy }: UseStudyTableDisplayProps)
   const [rows, setRows] = useState<StudyDTO[]>([]);
   const [count, setCount] = useState(0);
   const [current, setCurrent] = useState(0);
+
   const intervalSize = ITEMS_PER_PAGE;
 
   useEffect(() => {
