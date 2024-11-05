@@ -16,14 +16,16 @@ interface SearchBarProps {
 const SearchBar = ({ onSearch, chipLabels }: SearchBarProps) => {
   const { t } = useTranslation();
   return (
-    <div className="inline-flex h-[68px] items-center justify-start gap-8 py-4">
-      <StdSearchInput onSearch={onSearch} placeHolder={t('home.@searchBar')} variant="outlined" />
-      <div className="ml-8 flex gap-4">
+    <>
+      <div>
+        <StdSearchInput onSearch={onSearch} placeHolder={t('home.@searchBar')} variant="outlined" />
+      </div>
+      <div className="flex items-center gap-2">
         {chipLabels.map((label, index) => (
           <StdChip key={index} label={label} />
         ))}
       </div>
-    </div>
+    </>
   );
 };
 
