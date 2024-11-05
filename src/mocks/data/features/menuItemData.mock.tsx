@@ -13,4 +13,5 @@ export const menuItemSample: MenuNavItem = {
   label: 'Téléchargements',
   path: '/',
   icon: StdIconId.Download,
+  component: () => <></>,
 };

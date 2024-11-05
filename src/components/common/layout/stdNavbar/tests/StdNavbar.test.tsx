@@ -5,10 +5,10 @@
  */
 
 import { fakeAppName, fakeAppVersion, fakeHomeLink } from '@/mocks/data/components/navbarHeader';
-import { menuBottomData, menuTopData } from '@/mocks/data/features/menuData.mock';
 import { renderWithRouter } from '@/shared/types/common/tests/testUtils';
 import { screen } from '@testing-library/react';
 import StdNavbar from '../StdNavbar';
+import { menuBottomData, menuTopData } from '@/routes';
 
 const TEST_ID = 'navbar';
 const TOTAL_LENGTH = menuTopData.length + menuBottomData.length + 1; // Add one for the Header link

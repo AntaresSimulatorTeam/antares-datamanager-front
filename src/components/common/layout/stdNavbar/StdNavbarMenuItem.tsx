@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 import StdIcon from '../../base/stdIcon/StdIcon';
 import StdTextTooltip from '../stdTextTooltip/StdTextTooltip';
 import { navbarItemClassBuilder } from './navbarClassBuilder';
+import { useTranslation } from 'react-i18next';
 
 type StdNavbarMenuItemProps = {
   item: MenuNavItem;
@@ -19,6 +20,7 @@ type StdNavbarMenuItemProps = {
 
 const StdNavbarMenuItem = ({ item, expanded = true, selected = false }: StdNavbarMenuItemProps) => {
   const id = useStdId('navbar-item', item.id);
+  const { t } = useTranslation();
   const { path, key, icon, label } = item;
   const navbarMenuItemClasses = navbarItemClassBuilder(selected, expanded);
 
@@ -26,7 +28,7 @@ const StdNavbarMenuItem = ({ item, expanded = true, selected = false }: StdNavba
     <StdTextTooltip text={label} placement="right" enabled={!expanded} disableArrow>
       <Link to={path} className={navbarMenuItemClasses} key={key} id={id}>
         <StdIcon name={icon} />
-        {expanded && label}
+        {expanded && t(label)}
       </Link>
     </StdTextTooltip>
   );

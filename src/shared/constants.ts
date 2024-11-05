@@ -4,6 +4,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-export const APP_NAME = 'Pégase';
+export const APP_NAME = 'Antares';
 export const PEGASE_NAVBAR_ID = 'pegase-navbar';
 export const APP_LOGO_ID = 'app-logo-square';

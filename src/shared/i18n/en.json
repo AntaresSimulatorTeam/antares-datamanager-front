@@ -1,15 +1,34 @@
 {
   "components": {
     "navbar": {
-      "@expand": "Agrandir le menu",
-      "@minimize": "Minimize menu"
+      "@expand": "Maximize",
+      "@minimize": "Minimize"
     },
     "popover": {
       "@close": "Close"
     }
   },
   "Pegase": {
-    "@title": "Pégase",
-    "@homePageHeader": "Welcome to the study generator for Antares"
+    "@title": "Pégase"
+  },
+  "page": {
+    "@logs": "Logs",
+    "@projet": "Project",
+    "@logout": "Log out",
+    "@parameters": "Parameters",
+    "@antares": "Antares"
+  },
+  "home": {
+    "@label": "Home",
+    "@buttonNewProject": "New Project",
+    "@searchBar": "Search for a project, study, tag... ",
+    "@study_name": "Study",
+    "@user_name": "Created by",
+    "@status": "Status",
+    "@horizon": "Horizon",
+    "@creation_date": "Creation date",
+    "@keywords": "Keywords",
+    "@project": "Project",
+    "@use": ""
   }
 }
