@@ -76,7 +76,7 @@ const StudyTableDisplay = ({ searchStudy }: StudyTableDisplayProps) => {
 
   return (
     <div>
-      <div className="h-60vh overflow-auto">
+      <div>
         <StdSimpleTable columns={headers} data={rows} />
       </div>
       <div className="flex h-[60px] w-[1168px] flex-shrink-0 items-center justify-between bg-gray-200 px-[32px]">
