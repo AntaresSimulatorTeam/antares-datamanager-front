@@ -4,6 +4,14 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-export const Projects = () => <div>Projects</div>;
+import PegaseHeader from './components/PegaseHeader';
+import ProjectPageContent from './components/ProjectPageContent';
+
+export const Projects = () => (
+  <div className="flex flex-col">
+    <PegaseHeader />
+    <ProjectPageContent />
+  </div>
+);
 
 export default Projects;
