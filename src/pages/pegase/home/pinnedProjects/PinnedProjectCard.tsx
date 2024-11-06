@@ -46,7 +46,7 @@ export const PinnedProjectCards = () => {
         <div className="flex flex-col items-start justify-between">
           <div className="flex items-center gap-1">
             {project.tags && (
-              <div className="flex h-3 w-32">
+              <div className="flex h-3 w-full">
                 <StdTagList id={`${project.projectId}-tag-list`} tags={project.tags} />
               </div>
             )}
