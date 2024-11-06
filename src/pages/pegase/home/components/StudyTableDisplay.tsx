@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { StudyDTO } from '@/shared/types/index';
 import StudiesPagination from './StudiesPagination';
 
-const ITEMS_PER_PAGE = 4;
+const ITEMS_PER_PAGE = 6;
 const BASE_URL = import.meta.env.VITE_BACK_END_BASE_URL;
 const columnHelper = createColumnHelper<StudyDTO>();
 
@@ -77,10 +77,10 @@ const StudyTableDisplay = ({ searchStudy }: StudyTableDisplayProps) => {
 
   return (
     <div>
-      <div>
+      <div className="flex-1">
         <StdSimpleTable columns={headers} data={rows} />
       </div>
-      <div className="flex h-[60px] w-[1168px] flex-shrink-0 items-center justify-between bg-gray-200 px-[32px]">
+      <div className="flex h-[60px] items-center justify-between bg-gray-200 px-[32px]">
         <StudiesPagination count={count} intervalSize={intervalSize} current={current} onChange={setPage} />
       </div>
     </div>
