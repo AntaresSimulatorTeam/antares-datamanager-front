@@ -4,10 +4,10 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { fireEvent, render, screen } from '@testing-library/react';
-import StdSearchInput from '../StdSearchInput';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import { noop } from '@/shared/utils/common/defaultUtils';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
+import StdSearchInput from '../StdSearchInput';
+import { fireEvent, render, screen } from '@testing-library/react';
 
 const TEST_ICON = StdIconId.Search;
 
@@ -20,7 +20,7 @@ const COMMON_ROLE = 'searchbox';
 
 describe('Search Input', () => {
   it('renders SearchInput Component', () => {
-    render(<StdSearchInput label="" placeHolder="" onSearch={noop} />);
+    render(<StdSearchInput onSearch={noop} />);
     expect(screen.getByTitle(TEST_ICON)).toBeInTheDocument();
   });
 

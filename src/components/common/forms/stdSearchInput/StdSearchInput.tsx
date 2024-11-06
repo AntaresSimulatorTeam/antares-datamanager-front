@@ -4,36 +4,32 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { useRef } from 'react';
+import { useStdId } from '@/hooks/common/useStdId';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
+import { useRef, useState } from 'react';
 import StdButton from '../../base/stdButton/StdButton';
 import { clearClassBuilder, searchClassBuilder } from './SearchInputClassBuilder';
-import { useStdId } from '@/hooks/common/useStdId';
-import { useInputFormState } from '@/hooks/common/useInputFormState';
-import useDebounce from '@/hooks/common/useDebounce';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 
 export type SearchVariant = 'outlined' | 'filled';
 export type SearchInputSize = 'small' | 'medium';
 
-export interface StdSearchInputProps {
+export type StdSearchInputProps = {
   onSearch: (input: string | undefined) => void;
   placeHolder?: string;
   label?: string;
-  value?: string;
   onChange?: (input: string | undefined) => void;
   id?: string;
-  defaultValue?: string;
   disabled?: boolean;
   variant?: SearchVariant;
   name?: string;
   size?: SearchInputSize;
-}
+  defaultValue?: string;
+};
 
 const ENTER_KEY_CODE = 'Enter';
 
 const StdSearchInput = ({
   onSearch,
-  defaultValue,
   disabled = false,
   id: propsId,
   label,
@@ -41,32 +37,30 @@ const StdSearchInput = ({
   variant = 'filled',
   name,
   size = 'medium',
-  value: propsValue = '',
+  defaultValue = '',
   onChange,
 }: StdSearchInputProps) => {
   const { inputWrapperClass, inputClasses, labelClass } = searchClassBuilder(variant, disabled, size);
   const id = useStdId('search', propsId);
   const inputRef = useRef<HTMLInputElement>(null);
-  const { value: stateValue, setValue } = useInputFormState(propsValue, defaultValue, (value) => {
-    if (inputRef.current && value) {
-      inputRef.current.value = value;
-    }
-  });
 
-  useDebounce(() => onChange?.(stateValue), stateValue);
+  const [internalValue, setInternalValue] = useState(defaultValue);
 
   const handleChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
-    setValue(event.target.value);
+    void onChange?.(event.target.value);
+    setInternalValue(event.target.value);
   };
 
   const handleEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.code == ENTER_KEY_CODE) {
-      onSearch(stateValue);
+      onSearch(internalValue);
     }
   };
 
   const clearValue = () => {
-    setValue('');
+    void onChange?.('');
+    onSearch('');
+    setInternalValue('');
     inputRef?.current?.focus();
   };
 
@@ -85,20 +79,20 @@ const StdSearchInput = ({
           className={inputClasses}
           placeholder={placeHolder}
           disabled={disabled}
-          value={stateValue}
+          value={internalValue}
           onChange={handleChange}
           onKeyUp={handleEnter}
           ref={inputRef}
           role="searchbox"
         />
-        <span className={clearClassBuilder(!stateValue || disabled)}>
+        <span className={clearClassBuilder(!internalValue || disabled)}>
           <StdButton icon={StdIconId.Close} size="extraSmall" variant="text" onClick={clearValue} color="secondary" />
         </span>
         <StdButton
           icon={StdIconId.Search}
           size="extraSmall"
           variant="text"
-          onClick={() => onSearch(stateValue)}
+          onClick={() => onSearch(internalValue)}
           color="secondary"
           disabled={disabled}
         />

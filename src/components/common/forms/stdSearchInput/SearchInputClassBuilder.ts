@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { classMerger } from '@/shared/utils/common/classes/classMerger';
+import { clsx } from 'clsx';
 import { SearchInputSize, SearchVariant } from './StdSearchInput';
 
 export const INPUT_WRAPPER =
@@ -27,19 +27,16 @@ export const SIZE_CLASSES = {
   medium: 'px-1.5 py-0.75',
 };
 
-export const searchClassBuilder = (variant: SearchVariant, disabled: boolean, size: SearchInputSize) => {
-  const classes = {
-    inputClasses: INPUT_CLASSES,
-    inputWrapperClass: classMerger(INPUT_WRAPPER, VARIANT_CLASSES[variant], SIZE_CLASSES[size]),
-    labelClass: LABEL_CLASSES,
-  };
-  if (disabled) {
-    classes.inputClasses = classMerger(classes.inputClasses, VARIANT_DISABLED_CLASSES);
-    classes.inputWrapperClass = classMerger(INPUT_WRAPPER, VARIANT_DISABLED_CLASSES, SIZE_CLASSES[size]);
-  }
-
-  return classes;
-};
+export const searchClassBuilder = (variant: SearchVariant, disabled: boolean, size: SearchInputSize) => ({
+  inputClasses: clsx(INPUT_CLASSES, disabled && VARIANT_DISABLED_CLASSES),
+  inputWrapperClass: clsx(
+    INPUT_WRAPPER,
+    VARIANT_CLASSES[variant],
+    SIZE_CLASSES[size],
+    disabled && VARIANT_DISABLED_CLASSES,
+  ),
+  labelClass: clsx(LABEL_CLASSES),
+});
 
 export const clearClassBuilder = (shouldHideClearButton: boolean) =>
   shouldHideClearButton ? INVISIBLE_CLEAR_BUTTON_CLASSES : DEFAULT_CLEAR_BUTTON_CLASS;
