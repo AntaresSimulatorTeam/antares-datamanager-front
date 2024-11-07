@@ -30,5 +30,15 @@
     "@keywords": "Keywords",
     "@project": "Project",
     "@use": ""
+  },
+  "project": {
+    "@setting": "Setting",
+    "@duplicate": "Duplicate",
+    "@delete": "Delete",
+    "@pin": "Pin",
+    "@unpin": "Unpin",
+    "@close": "Close",
+    "@created": "Created",
+    "@by": "By"
   }
 }

@@ -4,6 +4,4 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-export const CardHeader = ({ label }: { label: string }) => <div className="flex-auto">{label}</div>;
-
-export default CardHeader;
+export const tabIndex = (val: boolean) => (val ? 0 : undefined);
