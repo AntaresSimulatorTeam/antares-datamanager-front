@@ -37,10 +37,14 @@ export const PinnedProjectCards = () => {
         title={project.name}
         dropdownOptions={dropdownItems}
         id="1"
-        icons={<StdIcon name={StdIconId.PushPin} color="gray-700" />}
+        icons={
+          <div className="text-primary-600">
+            <StdIcon name={StdIconId.PushPin} />{' '}
+          </div>
+        }
       >
-        <div className="flex flex-1 flex-col items-start justify-between self-stretch">
-          <div className="flex items-center gap-3 self-stretch">
+        <div className="flex flex-col items-start justify-between">
+          <div className="flex items-center gap-1">
             {project.tags && (
               <div className="flex h-3 w-32">
                 <StdTagList id={`${project.projectId}-tag-list`} tags={project.tags} />

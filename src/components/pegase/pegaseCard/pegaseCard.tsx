@@ -40,7 +40,7 @@ const PegaseCard = ({
     cardClassBuilder(secondaryButtonPosition);
   return (
     <StdCard id={id} onClick={buttons ? undefined : onClick}>
-      <div className="flex h-full w-full flex-col gap-1 p-1.5">
+      <div className="flex h-full w-full flex-col gap-2 p-2">
         <PegaseCardTitle
           id={`${id}-title`}
           title={title}

@@ -10,7 +10,7 @@ import ProjectCreator from '@/pages/pegase/home/header/ProjectCreator';
 const Header = () => {
   return (
     <>
-      <div className="flex h-18 w-full gap-3">
+      <div className="flex w-full gap-3">
         <ProjectCreator />
         <PinnedProjectCards />
       </div>
