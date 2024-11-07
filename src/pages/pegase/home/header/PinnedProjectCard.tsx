@@ -53,9 +53,9 @@ export const PinnedProjectCards = () => {
           </div>
 
           <div className="flex items-center gap-x-0.5 pt-2.5">
-            <div className="font-nunito text-[12px] font-light leading-[1.2]">
+            <div className="font-sans text-body-xs font-light">
               {t('project.@created')} :{' '}
-              <span className="text-lg font-bold">{formatDateToDDMMYYYY(project.creationDate)} </span>{' '}
+              <span className="text-body-xs font-bold">{formatDateToDDMMYYYY(project.creationDate)} </span>{' '}
               {t('project.@by')} :
             </div>
 
@@ -65,7 +65,7 @@ export const PinnedProjectCards = () => {
               fullname={project.createdBy}
               initials={project.createdBy.substring(0, 2)}
             />
-            <span className="font-nunito text-[12px] font-light leading-[1.2]">{project.createdBy}</span>
+            <span className="font-sans text-body-xs font-light">{project.createdBy}</span>
           </div>
         </div>
       </PegaseCard>
