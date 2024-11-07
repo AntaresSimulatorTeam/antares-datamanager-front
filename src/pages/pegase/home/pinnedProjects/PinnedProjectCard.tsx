@@ -29,10 +29,10 @@ export const PinnedProjectCards = () => {
         setProjects(json);
       })
       .catch((error) => console.error(error));
-  }, []);
+  }, [BASE_URL]);
 
   return projects.map((project) => (
-    <div className="flex w-1/3">
+    <div key={project.projectId} className="flex w-1/3">
       <PegaseCard
         title={project.name}
         dropdownOptions={dropdownItems}

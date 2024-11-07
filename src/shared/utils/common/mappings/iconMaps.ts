@@ -13,6 +13,7 @@ export enum StdIconId {
   Apps = 'apps',
   Archive = 'archive',
   ArrowDownwardAlt = 'arrow-downward-alt',
+  ArrowUpwardAlt = 'arrow-upward-alt',
   Badge = 'badge',
   BrandAwareness = 'brand-awareness',
   Build = 'build',
