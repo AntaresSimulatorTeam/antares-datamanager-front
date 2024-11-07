@@ -4,10 +4,11 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+import StdButton from '@/components/common/base/stdButton/StdButton';
 import { useStdId } from '@/hooks/common/useStdId';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import { useRef, useState } from 'react';
-import StdButton from '../../base/stdButton/StdButton';
+
 import { clearClassBuilder, searchClassBuilder } from './SearchInputClassBuilder';
 
 export type SearchVariant = 'outlined' | 'filled';

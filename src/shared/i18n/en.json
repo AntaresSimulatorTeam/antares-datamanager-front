@@ -6,6 +6,9 @@
     },
     "popover": {
       "@close": "Close"
+    },
+    "tablePagination": {
+      "@of": "of"
     }
   },
   "Pegase": {

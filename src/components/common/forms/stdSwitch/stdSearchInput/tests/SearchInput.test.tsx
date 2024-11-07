@@ -6,8 +6,8 @@
 
 import { noop } from '@/shared/utils/common/defaultUtils';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
-import StdSearchInput from '../StdSearchInput';
 import { fireEvent, render, screen } from '@testing-library/react';
+import StdSearchInput from '../StdSearchInput';
 
 const TEST_ICON = StdIconId.Search;
 

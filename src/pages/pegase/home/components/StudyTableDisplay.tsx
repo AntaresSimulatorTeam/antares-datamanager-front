@@ -7,11 +7,11 @@ import StdAvatar from '@/components/common/layout/stdAvatar/StdAvatar';
 import StdSimpleTable from '@/components/common/data/stdSimpleTable/StdSimpleTable';
 import { createColumnHelper } from '@tanstack/react-table';
 import { useEffect, useState } from 'react';
-import StdPagination from '@common/data/stdPagination/StdPagination';
 import { useTranslation } from 'react-i18next';
 import { StudyDTO } from '@/shared/types/index';
+import StudiesPagination from './StudiesPagination';
 
-const ITEMS_PER_PAGE = 4;
+const ITEMS_PER_PAGE = 6;
 const BASE_URL = import.meta.env.VITE_BACK_END_BASE_URL;
 const columnHelper = createColumnHelper<StudyDTO>();
 
@@ -25,32 +25,35 @@ interface UseStudyTableDisplayProps {
 
 interface UseStudyTableDisplayReturn {
   rows: StudyDTO[];
-  lastPage: number;
-  page: number;
+  count: number;
+  intervalSize: number;
+  current: number;
   setPage: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export const useStudyTableDisplay = ({ searchStudy }: UseStudyTableDisplayProps): UseStudyTableDisplayReturn => {
   const [rows, setRows] = useState<StudyDTO[]>([]);
-  const [lastPage, setLastPage] = useState(0);
-  const [page, setPage] = useState(1);
+  const [count, setCount] = useState(0);
+  const [current, setCurrent] = useState(0);
+
+  const intervalSize = ITEMS_PER_PAGE;
 
   useEffect(() => {
-    setPage(1);
-    setLastPage(0);
+    setCurrent(0);
+    setCount(0);
   }, [searchStudy]);
 
   useEffect(() => {
-    fetch(BASE_URL + `/v1/study/search?page=${page}&size=${ITEMS_PER_PAGE}&search=${searchStudy}`)
+    fetch(BASE_URL + `/v1/study/search?page=${current + 1}&size=${intervalSize}&search=${searchStudy}`)
       .then((response) => response.json())
       .then((json) => {
         setRows(json.content);
-        setLastPage(Math.ceil(json.totalElements / ITEMS_PER_PAGE));
+        setCount(json.totalElements);
       })
       .catch((error) => console.error(error));
-  }, [page, searchStudy]);
+  }, [current, searchStudy]);
 
-  return { rows, lastPage, page, setPage };
+  return { rows, count, intervalSize, current, setPage: setCurrent };
 };
 
 const StudyTableDisplay = ({ searchStudy }: StudyTableDisplayProps) => {
@@ -70,15 +73,17 @@ const StudyTableDisplay = ({ searchStudy }: StudyTableDisplayProps) => {
     columnHelper.accessor('keywords', { header: t('home.@keywords') }),
     columnHelper.accessor('creation_date', { header: t('home.@creation_date') }),
   ];
-  const { rows, lastPage, page, setPage } = useStudyTableDisplay({ searchStudy });
+  const { rows, count, intervalSize, current, setPage } = useStudyTableDisplay({ searchStudy });
 
   return (
-    <>
+    <div>
       <div className="flex-1">
         <StdSimpleTable columns={headers} data={rows} />
       </div>
-      <StdPagination lastPage={lastPage} currentPage={page} onChange={setPage} />
-    </>
+      <div className="flex h-[60px] items-center justify-between bg-gray-200 px-[32px]">
+        <StudiesPagination count={count} intervalSize={intervalSize} current={current} onChange={setPage} />
+      </div>
+    </div>
   );
 };
 

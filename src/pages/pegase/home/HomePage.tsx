@@ -9,7 +9,7 @@ import HomePageContent from './components/HomePageContent';
 
 const HomePage = () => (
   <>
-    <div className="flex flex-1 flex-col items-center gap-6 self-stretch p-3">
+    <div className="flex flex-col items-center gap-6 p-3">
       <Header />
       <HomePageContent />
     </div>
