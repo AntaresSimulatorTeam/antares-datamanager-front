@@ -14,7 +14,7 @@ import { UserContext } from './contexts/UserContext';
 import { PEGASE_NAVBAR_ID } from './shared/constants';
 import { THEME_COLOR } from './shared/types';
 import { menuBottomData, menuTopData } from './routes';
-import { envVariables } from './envVariables';
+import { getEnvVariables } from './envVariables';
 
 function App() {
   return (
@@ -25,7 +25,7 @@ function App() {
         <div className="flex h-full w-full flex-col">
           <p>
             {'URL => '}
-            {envVariables.URL_BACKEND}
+            {getEnvVariables('VITE_BACK_END_BASE_URL')}
           </p>
           <PegaseStar />
           <Suspense>
