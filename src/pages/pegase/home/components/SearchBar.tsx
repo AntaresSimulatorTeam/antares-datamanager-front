@@ -5,7 +5,6 @@
  */
 
 import StdSearchInput from '@/components/common/forms/stdSearchInput/StdSearchInput';
-import StdChip from '@/components/common/base/stdChip/StdChip';
 import { useTranslation } from 'react-i18next';
 
 interface SearchBarProps {
@@ -13,17 +12,12 @@ interface SearchBarProps {
   chipLabels: string[];
 }
 
-const SearchBar = ({ onSearch, chipLabels }: SearchBarProps) => {
+const SearchBar = ({ onSearch }: SearchBarProps) => {
   const { t } = useTranslation();
   return (
     <>
       <div>
         <StdSearchInput onSearch={onSearch} placeHolder={t('home.@searchBar')} variant="outlined" />
-      </div>
-      <div className="flex items-center gap-2">
-        {chipLabels.map((label, index) => (
-          <StdChip key={index} label={label} />
-        ))}
       </div>
     </>
   );
