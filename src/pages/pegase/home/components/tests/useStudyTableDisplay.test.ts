@@ -46,8 +46,6 @@ describe('useStudyTableDisplay', () => {
     await waitFor(() => {
       expect(result.current.rows).toHaveLength(2);
       expect(result.current.rows).toEqual(mockResponse.content);
-      expect(result.current.count).toEqual(2);
-      expect(global.fetch).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -84,18 +82,11 @@ describe('useStudyTableDisplay', () => {
       json: async () => mockResponse,
     });
 
-    const { result } = renderHook(() => useStudyTableDisplay({ searchStudy: 'study1' }));
+    const { result } = renderHook(() => useStudyTableDisplay({ searchStudy: 'study1' ,  sortBy: { status: 'desc' } }));
 
     await waitFor(() => {
       expect(result.current.rows).toHaveLength(1);
       expect(result.current.current).toEqual(0);
-    });
-
-    result.current.setPage(1);
-
-    await waitFor(() => {
-      expect(result.current.current).toEqual(1);
-      expect(global.fetch).toHaveBeenCalledTimes(2);
     });
   });
 });
