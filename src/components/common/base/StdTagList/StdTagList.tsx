@@ -6,6 +6,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import StdPopover from '../../layout/stdPopover/StdPopover';
 import StdTextTooltip from '../../layout/stdTextTooltip/StdTextTooltip';
 import StdButton from '../stdButton/StdButton';
 import StdIcon from '../stdIcon/StdIcon';
@@ -13,7 +14,6 @@ import StdTag from '../stdTag/StdTag';
 import { tagListClassBuilder } from './tagListClassBuilder';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import { useStdId } from '@/hooks/common/useStdId';
-import StdPopover from '../../layout/stdPopover/StdPopover';
 import { useCallOnResize } from '@/hooks/common/useCallOnResize';
 import { countMaxItemsToFitInContainer } from '@/shared/utils/common/displayUtils';
 
@@ -39,10 +39,13 @@ const StdTagList = ({ tags, icon, tooltipText, id: propsId, onDelete, autoExpend
   const [showPopover, setShowPopover] = useState<boolean>(false);
   const id = useStdId('tag-list', propsId);
 
-  useCallOnResize(() => setTagsNumber(countMaxItemsToFitInContainer(containerRef, tagsRef, autoExpends)), id);
+  useCallOnResize(
+    () => setTagsNumber(Math.min(countMaxItemsToFitInContainer(containerRef, tagsRef, autoExpends), 3)),
+    id,
+  );
 
   useEffect(() => {
-    setTagsNumber(countMaxItemsToFitInContainer(containerRef, tagsRef, autoExpends));
+    setTagsNumber(Math.min(countMaxItemsToFitInContainer(containerRef, tagsRef, autoExpends), 3));
     setIsReady(true);
   }, [tags, autoExpends]);
 
@@ -50,7 +53,7 @@ const StdTagList = ({ tags, icon, tooltipText, id: propsId, onDelete, autoExpend
     <div id={id} className="flex h-full w-full gap-1">
       {icon && (
         <StdTextTooltip text={tooltipText ?? t('components.tags.@tags')}>
-          <StdIcon name={icon} width={ICON_SIZE} height={ICON_SIZE} color="text-gray-700" />
+          <StdIcon name={icon} width={ICON_SIZE} height={ICON_SIZE} color="gray-700" />
         </StdTextTooltip>
       )}
       <div className={tagListClasses} ref={containerRef} role="list">
@@ -65,7 +68,13 @@ const StdTagList = ({ tags, icon, tooltipText, id: propsId, onDelete, autoExpend
         ))}
         <span className="flex">
           {(!isReady || tags.length - tagsNumber > 0) && (
-            <StdPopover offset={POPOVER_OFFSET} show={showPopover} setShow={setShowPopover} id={`${id}-popover`}>
+            <StdPopover
+              offset={POPOVER_OFFSET}
+              show={showPopover}
+              setShow={setShowPopover}
+              placement="bottom"
+              id={`${id}-popover`}
+            >
               <StdPopover.Trigger>
                 <StdButton
                   color="secondary"

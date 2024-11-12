@@ -12,6 +12,7 @@ import { StudyDTO } from '@/shared/types/index';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import StdIcon from '@common/base/stdIcon/StdIcon';
 import StudiesPagination from './StudiesPagination';
+import StdTagList from '@common/base/StdTagList/StdTagList';
 
 const ITEMS_PER_PAGE = 5;
 const BASE_URL = import.meta.env.VITE_BACK_END_BASE_URL;
@@ -53,7 +54,9 @@ export const useStudyTableDisplay = ({
     const sortParams = Object.entries(sortBy)
       .map(([key, order]) => `${key},${order}`)
       .join('&sort=');
-    fetch(`${BASE_URL}/v1/study/search?page=${current + 1 }&size=${intervalSize}&search=${searchStudy}&sort=${sortParams}`)
+    fetch(
+      `${BASE_URL}/v1/study/search?page=${current + 1}&size=${intervalSize}&search=${searchStudy}&sort=${sortParams}`,
+    )
       .then((response) => response.json())
       .then((json) => {
         setRows(json.content);
@@ -87,7 +90,16 @@ const StudyTableDisplay = ({ searchStudy }: StudyTableDisplayProps) => {
     columnHelper.accessor('project', { header: t('home.@project') }),
     columnHelper.accessor('status', { header: t('home.@status') }),
     columnHelper.accessor('horizon', { header: t('home.@horizon') }),
-    columnHelper.accessor('keywords', { header: t('home.@keywords') }),
+    columnHelper.accessor('keywords', {
+      header: 'keywords',
+      minSize: 500,
+      size: 500,
+      cell: ({ getValue, row }) => (
+        <div className="flex h-3 w-32">
+          <StdTagList id={`pegase-tags-${row.id}`} tags={getValue()} />
+        </div>
+      ),
+    }),
     columnHelper.accessor('creation_date', { header: t('home.@creation_date') }),
   ];
   // Add state to track if any header is hovered
@@ -121,18 +133,18 @@ const StudyTableDisplay = ({ searchStudy }: StudyTableDisplayProps) => {
                 {sortBy[column.accessorKey as string] && sortedColumn === column.accessorKey ? (
                   sortBy[column.accessorKey as string] === 'asc' ? (
                     <span className="font-bold text-primary-600">
-                      <StdIcon name={StdIconId.KeyboardArrowUp} />
+                      <StdIcon name={StdIconId.ArrowUpwardAlt} />
                     </span>
                   ) : (
                     <span className="font-bold text-primary-600">
-                      <StdIcon name={StdIconId.KeyboardArrowDown} />
+                      <StdIcon name={StdIconId.ArrowDownwardAlt} />
                     </span>
                   )
                 ) : (
                   <span
                     className={`text-primary-900 ${isHeaderHovered ? 'opacity-100' : 'opacity-0'} transition-opacity duration-100`}
                   >
-                    <StdIcon name={StdIconId.KeyboardArrowUp} />
+                    <StdIcon name={StdIconId.ArrowUpwardAlt} />
                   </span>
                 )}
               </div>

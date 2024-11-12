@@ -16,7 +16,7 @@ const HomePageContent = () => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState<string | undefined>('');
   const [activeChip, setActiveChip] = useState<boolean | null>(false);
-  const userName = 'me00247'; // Replace with actual user name
+  const userName = 'mouad'; // Replace with actual user name
 
   const searchStudy = (value?: string | undefined) => {
     setSearchTerm(value);
