@@ -13,6 +13,20 @@ export default defineConfig({
   plugins: [react()],
   build: {
     target: 'esnext',
+    rollupOptions: {
+      output: {
+        format: 'es',
+        globals: {
+          react: 'React',
+          'react-dom': 'ReactDOM',
+        },
+        manualChunks: function (id) {
+          if (/envVariables.ts/.test(id)) {
+            return 'envVariables';
+          }
+        },
+      },
+    },
   },
   test: {
     globals: true,
