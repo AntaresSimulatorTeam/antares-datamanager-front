@@ -13,9 +13,10 @@ import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import StdIcon from '@common/base/stdIcon/StdIcon';
 import StudiesPagination from './StudiesPagination';
 import StdTagList from '@common/base/StdTagList/StdTagList';
+import { getEnvVariables } from '@/envVariables';
 
 const ITEMS_PER_PAGE = 5;
-const BASE_URL = import.meta.env.VITE_BACK_END_BASE_URL;
+const BASE_URL = getEnvVariables('VITE_BACK_END_BASE_URL');
 const columnHelper = createColumnHelper<StudyDTO>();
 
 interface StudyTableDisplayProps {
