@@ -4,10 +4,10 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import PinnedProjectCards from '@/pages/pegase/home/header/PinnedProjectCard';
-import ProjectCreator from '@/pages/pegase/home/header/ProjectCreator';
+import PinnedProjectCards from '@/pages/pegase/home/pinnedProjects/PinnedProjectCard';
+import ProjectCreator from '@/pages/pegase/home/pinnedProjects/ProjectCreator';
 
-const Header = () => {
+const PinnedProject = () => {
   return (
     <>
       <div className="flex w-full gap-3">
@@ -18,4 +18,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default PinnedProject;

@@ -9,10 +9,14 @@ import { createColumnHelper } from '@tanstack/react-table';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StudyDTO } from '@/shared/types/index';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
+import StdIcon from '@common/base/stdIcon/StdIcon';
 import StudiesPagination from './StudiesPagination';
+import StdTagList from '@common/base/StdTagList/StdTagList';
+import { getEnvVariables } from '@/envVariables';
 
-const ITEMS_PER_PAGE = 6;
-const BASE_URL = import.meta.env.VITE_BACK_END_BASE_URL;
+const ITEMS_PER_PAGE = 5;
+const BASE_URL = getEnvVariables('VITE_BACK_END_BASE_URL');
 const columnHelper = createColumnHelper<StudyDTO>();
 
 interface StudyTableDisplayProps {
@@ -21,6 +25,7 @@ interface StudyTableDisplayProps {
 
 interface UseStudyTableDisplayProps {
   searchStudy: string | undefined;
+  sortBy: { [key: string]: 'asc' | 'desc' };
 }
 
 interface UseStudyTableDisplayReturn {
@@ -31,7 +36,10 @@ interface UseStudyTableDisplayReturn {
   setPage: React.Dispatch<React.SetStateAction<number>>;
 }
 
-export const useStudyTableDisplay = ({ searchStudy }: UseStudyTableDisplayProps): UseStudyTableDisplayReturn => {
+export const useStudyTableDisplay = ({
+  searchStudy,
+  sortBy,
+}: UseStudyTableDisplayProps): UseStudyTableDisplayReturn => {
   const [rows, setRows] = useState<StudyDTO[]>([]);
   const [count, setCount] = useState(0);
   const [current, setCurrent] = useState(0);
@@ -41,23 +49,36 @@ export const useStudyTableDisplay = ({ searchStudy }: UseStudyTableDisplayProps)
   useEffect(() => {
     setCurrent(0);
     setCount(0);
-  }, [searchStudy]);
+  }, [searchStudy, sortBy]);
 
   useEffect(() => {
-    fetch(BASE_URL + `/v1/study/search?page=${current + 1}&size=${intervalSize}&search=${searchStudy}`)
+    const sortParams = Object.entries(sortBy)
+      .map(([key, order]) => `${key},${order}`)
+      .join('&sort=');
+    fetch(
+      `${BASE_URL}/v1/study/search?page=${current + 1}&size=${intervalSize}&search=${searchStudy}&sort=${sortParams}`,
+    )
       .then((response) => response.json())
       .then((json) => {
         setRows(json.content);
         setCount(json.totalElements);
       })
       .catch((error) => console.error(error));
-  }, [current, searchStudy]);
+  }, [current, searchStudy, sortBy]);
 
   return { rows, count, intervalSize, current, setPage: setCurrent };
 };
 
 const StudyTableDisplay = ({ searchStudy }: StudyTableDisplayProps) => {
   const { t } = useTranslation();
+  const [sortBy, setSortBy] = useState<{ [key: string]: 'asc' | 'desc' }>({});
+
+  const handleSort = (column: string) => {
+    const newSortOrder = sortBy[column] === 'asc' ? 'desc' : 'asc';
+    setSortBy({ [column]: newSortOrder });
+    setSortedColumn(column);
+  };
+  const [sortedColumn, setSortedColumn] = useState<string | null>('status');
 
   const headers = [
     columnHelper.accessor('study_name', { header: t('home.@study_name') }),
@@ -70,15 +91,76 @@ const StudyTableDisplay = ({ searchStudy }: StudyTableDisplayProps) => {
     columnHelper.accessor('project', { header: t('home.@project') }),
     columnHelper.accessor('status', { header: t('home.@status') }),
     columnHelper.accessor('horizon', { header: t('home.@horizon') }),
-    columnHelper.accessor('keywords', { header: t('home.@keywords') }),
+    columnHelper.accessor('keywords', {
+      header: 'keywords',
+      minSize: 500,
+      size: 500,
+      cell: ({ getValue, row }) => (
+        <div className="flex h-3 w-32">
+          <StdTagList id={`pegase-tags-${row.id}`} tags={getValue()} />
+        </div>
+      ),
+    }),
     columnHelper.accessor('creation_date', { header: t('home.@creation_date') }),
   ];
-  const { rows, count, intervalSize, current, setPage } = useStudyTableDisplay({ searchStudy });
+  // Add state to track if any header is hovered
+  const [isHeaderHovered, setIsHeaderHovered] = useState<boolean>(false);
+
+  // Update the state when any header is hovered
+  const handleHeaderHover = (hovered: boolean) => {
+    setIsHeaderHovered(hovered);
+  };
+
+  function addSortColumn(headers: any[]) {
+    return headers.map((column) => {
+      const isSortable = column.accessorKey !== 'keywords';
+      return {
+        ...column,
+        header: (
+          <div
+            className={`flex items-center ${isSortable ? 'cursor-pointer' : ''} header-container group`}
+            onMouseEnter={() => isSortable && handleHeaderHover(true)}
+            onMouseLeave={() => isSortable && handleHeaderHover(false)}
+            onClick={() => {
+              if (isSortable) {
+                handleHeaderHover(false);
+                handleSort(column.accessorKey as string);
+              }
+            }}
+          >
+            <div>{column.header}</div>
+            {isSortable && (
+              <div>
+                {sortBy[column.accessorKey as string] && sortedColumn === column.accessorKey ? (
+                  sortBy[column.accessorKey as string] === 'asc' ? (
+                    <span className="font-bold text-primary-600">
+                      <StdIcon name={StdIconId.ArrowUpwardAlt} />
+                    </span>
+                  ) : (
+                    <span className="font-bold text-primary-600">
+                      <StdIcon name={StdIconId.ArrowDownwardAlt} />
+                    </span>
+                  )
+                ) : (
+                  <span
+                    className={`text-primary-900 ${isHeaderHovered ? 'opacity-100' : 'opacity-0'} transition-opacity duration-100`}
+                  >
+                    <StdIcon name={StdIconId.ArrowUpwardAlt} />
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+        ),
+      };
+    });
+  }
+  const { rows, count, intervalSize, current, setPage } = useStudyTableDisplay({ searchStudy, sortBy });
 
   return (
     <div>
       <div className="flex-1">
-        <StdSimpleTable columns={headers} data={rows} />
+        <StdSimpleTable columns={addSortColumn(headers)} data={rows as StudyDTO[]} />
       </div>
       <div className="flex h-[60px] items-center justify-between bg-gray-200 px-[32px]">
         <StudiesPagination count={count} intervalSize={intervalSize} current={current} onChange={setPage} />

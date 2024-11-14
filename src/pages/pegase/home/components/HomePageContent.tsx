@@ -9,20 +9,39 @@ import { useState } from 'react';
 
 import SearchBar from './SearchBar';
 import StudyTableDisplay from './StudyTableDisplay';
+import { useTranslation } from 'react-i18next';
+import StdChip from '@common/base/stdChip/StdChip';
 
 const HomePageContent = () => {
-  const chipLabels = ['Chip', 'Chip', 'Chip'];
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState<string | undefined>('');
+  const [activeChip, setActiveChip] = useState<boolean | null>(false);
+  const userName = 'mouad'; // Replace with actual user name
 
   const searchStudy = (value?: string | undefined) => {
     setSearchTerm(value);
+  };
+
+  const handleChipClick = () => {
+    if (activeChip) {
+      setActiveChip(false);
+      searchStudy('');
+    } else {
+      setActiveChip(true);
+      searchStudy(userName);
+    }
   };
 
   return (
     <div className="flex w-full flex-1 flex-col gap-3">
       <StdHeading title="Studies in progress" />
       <div className="flex gap-4 py-2">
-        <SearchBar onSearch={searchStudy} chipLabels={chipLabels} />
+        <SearchBar onSearch={searchStudy} chipLabels={['']} />
+        <StdChip
+          label={t('home.@my_studies')}
+          onClick={handleChipClick}
+          status={activeChip ? 'secondary' : 'primary'}
+        />
       </div>
       <StudyTableDisplay searchStudy={searchTerm} />
     </div>

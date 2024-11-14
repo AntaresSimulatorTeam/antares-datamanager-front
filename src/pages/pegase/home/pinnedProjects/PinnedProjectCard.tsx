@@ -14,9 +14,10 @@ import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter';
 import { useProjectDropdown } from '@/components/pegase/pegaseCard/useProjectDropdown';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { getEnvVariables } from '@/envVariables';
 
 export const PinnedProjectCards = () => {
-  const BASE_URL = import.meta.env.VITE_BACK_END_BASE_URL;
+  const BASE_URL = getEnvVariables('VITE_BACK_END_BASE_URL');
   const [projects, setProjects] = useState<ProjectInfo[]>([]);
   const dropdownItems = useProjectDropdown();
   const { t } = useTranslation();
@@ -29,10 +30,10 @@ export const PinnedProjectCards = () => {
         setProjects(json);
       })
       .catch((error) => console.error(error));
-  }, []);
+  }, [BASE_URL]);
 
   return projects.map((project) => (
-    <div className="flex w-1/3">
+    <div key={project.projectId} className="flex w-1/3">
       <PegaseCard
         title={project.name}
         dropdownOptions={dropdownItems}
