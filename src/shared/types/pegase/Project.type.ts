@@ -11,7 +11,7 @@ export interface ProjectInfo {
   createdBy: string;
   creationDate: Date;
   archived?: boolean;
-  bookmarked?: boolean;
+  pinned?: boolean;
   path: string;
   tags: string[];
 }

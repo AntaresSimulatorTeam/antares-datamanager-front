@@ -6,34 +6,35 @@
 
 import { StdDropdownOption } from '@common/layout/stdDropdown/StdDropdown';
 
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { NO_WRAP_CLASS, useDropdownOptions } from './useDropdownOptions';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
+import { useDropdownOptions } from './useDropdownOptions';
 
-export const useProjectDropdown = () => {
+export const useProjectDropdown = (initialPinned: boolean, projectId: string, onUnpin: (projectId: string) => void) => {
   const { t } = useTranslation();
-  const { settingOption, duplicateOption, deleteOption } = useDropdownOptions();
+  const { settingOption, duplicateOption, deleteOption, pinOption } = useDropdownOptions();
 
-  const handleDropdownPin = () => {};
+  const [isPinned, setIsPinned] = useState(initialPinned);
 
   const handleDropdownSetting = () => {};
 
-  const pinOption = useCallback(
-    (pinned: boolean, onClick: () => void): StdDropdownOption => ({
-      key: 'pin',
-      label: pinned ? t('project.@unpin') : t('project.@pin'),
-      value: 'pin',
-      icon: pinned ? StdIconId.KeepOff : StdIconId.PushPin,
-      onItemClick: onClick,
-      extraClasses: NO_WRAP_CLASS,
-    }),
-    [t],
-  );
+  const handleDropdownPin = useCallback(() => {
+    setIsPinned((prevPinned) => {
+      const newPinnedStatus = !prevPinned;
 
-  const dropdownItems: StdDropdownOption[] = [pinOption(true, handleDropdownPin)];
+      // Trigger `onUnpin` if we are unpinning (i.e., changing to `false`)
+      if (!newPinnedStatus) {
+        onUnpin(projectId); // Call the unpin function passed from parent
+      }
+
+      return newPinnedStatus;
+    });
+  }, [onUnpin, projectId]);
+
+  const dropdownItems: StdDropdownOption[] = [];
 
   dropdownItems.push(
+    pinOption(isPinned, handleDropdownPin),
     settingOption(handleDropdownSetting),
     duplicateOption(() => t('project.@duplicate')),
     deleteOption(() => t('project.@delete')),

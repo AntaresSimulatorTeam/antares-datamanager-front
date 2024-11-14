@@ -51,9 +51,22 @@ export const useDropdownOptions = () => {
     [t],
   );
 
+  const pinOption = useCallback(
+    (pinned: boolean, onClick: () => void): StdDropdownOption => ({
+      key: 'pin',
+      label: pinned ? t('project.@unpin') : t('project.@pin'),
+      value: 'pin',
+      icon: pinned ? StdIconId.KeepOff : StdIconId.PushPin,
+      onItemClick: onClick,
+      extraClasses: NO_WRAP_CLASS,
+    }),
+    [t],
+  );
+
   return {
     settingOption,
     duplicateOption,
     deleteOption,
+    pinOption,
   };
 };
