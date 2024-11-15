@@ -15,6 +15,8 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getEnvVariables } from '@/envVariables';
 import { useDropdownOptions } from '@/components/pegase/pegaseCard/useDropdownOptions';
+import { dismissToast, notifyToast } from '@/shared/notification/notification';
+import { v4 as uuidv4 } from 'uuid';
 
 export const PinnedProjectCards = () => {
   const BASE_URL = getEnvVariables('VITE_BACK_END_BASE_URL');
@@ -24,7 +26,28 @@ export const PinnedProjectCards = () => {
   //const userId = user?.profile.nni ? user.profile.nni : 'mo0023';
 
   const handleUnpin = (projectId: string) => {
+    // Save the current state of projects for potential undo
+    const oldProjects = [...projects];
+
+    // Remove the unpinned project
     setProjects((prevProjects) => prevProjects.filter((project) => project.projectId !== projectId));
+
+    // Show a toast notification with an undo option
+    const toastId = uuidv4();
+    notifyToast({
+      id: toastId,
+      type: 'info',
+      message: t('components.quickAccess.@confirmUnpin', { name: projectId }),
+      action: {
+        label: t('components.quickAccess.@cancel'),
+        onClick: () => {
+          dismissToast(toastId);
+
+          // Restore the old projects state
+          setProjects(oldProjects);
+        },
+      },
+    });
   };
 
   const fetchPinnedProjects = async (baseUrl: string): Promise<ProjectInfo[]> => {
