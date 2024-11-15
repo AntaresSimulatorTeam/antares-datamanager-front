@@ -27,7 +27,7 @@ export const PinnedProjectCards = () => {
     setProjects((prevProjects) => prevProjects.filter((project) => project.projectId !== projectId));
   };
 
-  useEffect(() => {
+  /*   useEffect(() => {
     fetch(BASE_URL + `/v1/project/pinned?userId=me00247`)
       .then((response) => response.json())
       .then((json) => {
@@ -39,6 +39,36 @@ export const PinnedProjectCards = () => {
         setProjects(projectsWithPinned);
       })
       .catch((error) => console.error(error));
+  }, [BASE_URL]); */
+
+  const fetchPinnedProjects = async (baseUrl: string): Promise<ProjectInfo[]> => {
+    try {
+      const response = await fetch(`${baseUrl}/v1/project/pinned?userId=me00247`);
+      const json = await response.json();
+
+      return json.map((project: any) => ({
+        ...project,
+        projectId: project.id.toString(),
+        //Projects in homepage should have pinned to TRUE
+        pinned: project.pinned ?? true,
+      }));
+    } catch (error) {
+      console.error('Failed to fetch pinned projects:', error);
+      throw error;
+    }
+  };
+
+  useEffect(() => {
+    const loadPinnedProjects = async () => {
+      try {
+        const projects = await fetchPinnedProjects(BASE_URL);
+        setProjects(projects);
+      } catch (error) {
+        console.error('Error loading pinned projects:', error);
+      }
+    };
+
+    loadPinnedProjects();
   }, [BASE_URL]);
 
   const { settingOption, duplicateOption, deleteOption, pinOption } = useDropdownOptions();
