@@ -22,9 +22,8 @@ export const useProjectDropdown = (initialPinned: boolean, projectId: string, on
     setIsPinned((prevPinned) => {
       const newPinnedStatus = !prevPinned;
 
-      // Trigger `onUnpin` if we are unpinning (i.e., changing to `false`)
       if (!newPinnedStatus) {
-        onUnpin(projectId); // Call the unpin function passed from parent
+        onUnpin(projectId);
       }
 
       return newPinnedStatus;
