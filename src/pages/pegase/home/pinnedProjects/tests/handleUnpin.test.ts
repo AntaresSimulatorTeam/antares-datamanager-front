@@ -28,7 +28,7 @@ describe('handleUnpin test', () => {
           createdBy: 'Maria Perez',
           creationDate: new Date(),
           path: '',
-          tags: ['tag3', 'tag24'],
+          tags: ['tag3', 'tag4'],
         },
       ];
       updatedProjects = callback(prevProjects);
@@ -47,11 +47,11 @@ describe('handleUnpin test', () => {
       {
         projectId: '2',
         name: 'Project 2',
-        description: '',
-        createdBy: '',
+        description: 'project2',
+        createdBy: 'Maria Perez',
         creationDate: new Date(),
         path: '',
-        tags: [],
+        tags: ['tag3', 'tag4'],
       },
     ]);
   });
