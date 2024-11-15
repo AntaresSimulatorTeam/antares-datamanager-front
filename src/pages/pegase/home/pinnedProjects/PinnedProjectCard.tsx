@@ -27,20 +27,6 @@ export const PinnedProjectCards = () => {
     setProjects((prevProjects) => prevProjects.filter((project) => project.projectId !== projectId));
   };
 
-  /*   useEffect(() => {
-    fetch(BASE_URL + `/v1/project/pinned?userId=me00247`)
-      .then((response) => response.json())
-      .then((json) => {
-        const projectsWithPinned = json.map((project: any) => ({
-          ...project,
-          projectId: project.id.toString(),
-          pinned: project.pinned ?? true,
-        }));
-        setProjects(projectsWithPinned);
-      })
-      .catch((error) => console.error(error));
-  }, [BASE_URL]); */
-
   const fetchPinnedProjects = async (baseUrl: string): Promise<ProjectInfo[]> => {
     try {
       const response = await fetch(`${baseUrl}/v1/project/pinned?userId=me00247`);
