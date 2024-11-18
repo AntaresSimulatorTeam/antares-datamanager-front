@@ -36,7 +36,6 @@
   },
   "project": {
     "@setting": "Setting",
-    "@duplicate": "Dupliquer",
     "@delete": "Supprimer",
     "@pin": "Épingler",
     "@unpin": "Désépingler",

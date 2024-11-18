@@ -12,7 +12,7 @@ import { useDropdownOptions } from './useDropdownOptions';
 
 export const useProjectDropdown = (initialPinned: boolean, projectId: string, onUnpin: (projectId: string) => void) => {
   const { t } = useTranslation();
-  const { settingOption, duplicateOption, deleteOption, pinOption } = useDropdownOptions();
+  const { settingOption, deleteOption, pinOption } = useDropdownOptions();
 
   const [isPinned, setIsPinned] = useState(initialPinned);
 
@@ -35,7 +35,6 @@ export const useProjectDropdown = (initialPinned: boolean, projectId: string, on
   dropdownItems.push(
     pinOption(isPinned, handleDropdownPin),
     settingOption(handleDropdownSetting),
-    duplicateOption(() => t('project.@duplicate')),
     deleteOption(() => t('project.@delete')),
   );
 

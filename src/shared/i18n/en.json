@@ -36,7 +36,6 @@
   },
   "project": {
     "@setting": "Setting",
-    "@duplicate": "Duplicate",
     "@delete": "Delete",
     "@pin": "Pin",
     "@unpin": "Unpin",

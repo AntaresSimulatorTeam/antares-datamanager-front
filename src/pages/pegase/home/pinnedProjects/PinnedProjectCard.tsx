@@ -80,13 +80,12 @@ export const PinnedProjectCards = () => {
     loadPinnedProjects();
   }, [BASE_URL]);
 
-  const { settingOption, duplicateOption, deleteOption, pinOption } = useDropdownOptions();
+  const { settingOption, deleteOption, pinOption } = useDropdownOptions();
 
   return projects.map((project, index) => {
     const dropdownItems = [
       pinOption(project.pinned ?? false, () => handleUnpin(project.projectId)), // Toggle pin/unpin
       settingOption(() => {}, t('project.@setting')),
-      duplicateOption(() => {}, t('project.@duplicate')),
       deleteOption(() => {}, t('project.@delete')), // Empty function for delete - does nothing
     ];
 
