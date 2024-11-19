@@ -24,16 +24,35 @@ export const PinnedProjectCards = () => {
   const { t } = useTranslation();
   // const user = useContext(UserContext);
   //const userId = user?.profile.nni ? user.profile.nni : 'mo0023';
+  const userId = 'mo00247';
 
+  /**
+   * Handles the unpin action. Displays a toast if the API call is successful.
+   * The API call to the /unpin endpoint is made only if the "Cancel" button
+   * on the toast is not clicked.
+   */
   const handleUnpin = (projectId: string) => {
-    // Save the current state of projects for potential undo
     const oldProjects = [...projects];
+    const abortController = new AbortController();
+    let apiCallTimeout: number | null = null;
+    const toastId = uuidv4();
 
-    // Remove the unpinned project
     setProjects((prevProjects) => prevProjects.filter((project) => project.projectId !== projectId));
 
-    // Show a toast notification with an undo option
-    const toastId = uuidv4();
+    const unpinApiCall = async () => {
+      try {
+        await fetch(`${BASE_URL}/v1/project/unpin?userId=${userId}&projectId=${projectId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          signal: abortController.signal,
+        });
+      } catch (error) {
+        console.error(`Error unpinning project ${projectId}:`, error);
+      }
+    };
+
     notifyToast({
       id: toastId,
       type: 'info',
@@ -42,12 +61,15 @@ export const PinnedProjectCards = () => {
         label: t('components.quickAccess.@cancel'),
         onClick: () => {
           dismissToast(toastId);
-
-          // Restore the old projects state
+          abortController.abort();
+          clearTimeout(apiCallTimeout!);
           setProjects(oldProjects);
         },
       },
     });
+    apiCallTimeout = setTimeout(() => {
+      unpinApiCall();
+    }, 5000) as unknown as number;
   };
 
   const fetchPinnedProjects = async (baseUrl: string): Promise<ProjectInfo[]> => {

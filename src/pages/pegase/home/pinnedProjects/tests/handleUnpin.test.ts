@@ -49,7 +49,7 @@ describe('handleUnpin test', () => {
         name: 'Project 2',
         description: 'project2',
         createdBy: 'Maria Perez',
-        creationDate: new Date(),
+        creationDate: expect.any(Date),
         path: '',
         tags: ['tag3', 'tag4'],
       },

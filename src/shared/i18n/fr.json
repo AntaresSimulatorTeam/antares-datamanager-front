@@ -9,6 +9,10 @@
     },
     "tablePagination": {
       "@of": "sur"
+    },
+    "quickAccess": {
+      "confirmUnpin": "Projet détaché avec succes",
+      "@cancel": "Annuler"
     }
   },
   "Pegase": {
