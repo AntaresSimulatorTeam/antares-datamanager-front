@@ -27,18 +27,6 @@ export const useDropdownOptions = () => {
     [t],
   );
 
-  const duplicateOption = useCallback(
-    (onClick: () => void, label?: string): StdDropdownOption => ({
-      key: 'duplicate',
-      label: label ?? t('project.@duplicate'),
-      value: 'duplicate',
-      icon: StdIconId.ContentCopy,
-      onItemClick: onClick,
-      extraClasses: NO_WRAP_CLASS,
-    }),
-    [t],
-  );
-
   const deleteOption = useCallback(
     (onClick: () => void, label?: string): StdDropdownOption => ({
       key: 'delete',
@@ -51,9 +39,21 @@ export const useDropdownOptions = () => {
     [t],
   );
 
+  const pinOption = useCallback(
+    (pinned: boolean, onClick: () => void): StdDropdownOption => ({
+      key: 'pin',
+      label: pinned ? t('project.@unpin') : t('project.@pin'),
+      value: 'pin',
+      icon: pinned ? StdIconId.KeepOff : StdIconId.PushPin,
+      onItemClick: onClick,
+      extraClasses: NO_WRAP_CLASS,
+    }),
+    [t],
+  );
+
   return {
     settingOption,
-    duplicateOption,
     deleteOption,
+    pinOption,
   };
 };

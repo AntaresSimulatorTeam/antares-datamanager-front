@@ -9,6 +9,10 @@
     },
     "tablePagination": {
       "@of": "sur"
+    },
+    "quickAccess": {
+      "confirmUnpin": "Projet détaché avec succes",
+      "@cancel": "Annuler"
     }
   },
   "Pegase": {
@@ -36,7 +40,6 @@
   },
   "project": {
     "@setting": "Setting",
-    "@duplicate": "Dupliquer",
     "@delete": "Supprimer",
     "@pin": "Épingler",
     "@unpin": "Désépingler",
