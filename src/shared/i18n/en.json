@@ -36,7 +36,8 @@
     "@creation_date": "Creation date",
     "@keywords": "Keywords",
     "@project": "Project",
-    "@my_studies": "My studies"
+    "@my_studies": "My studies",
+    "@my_projects": "My projects"
   },
   "project": {
     "@setting": "Setting",

@@ -4,6 +4,15 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-export const Projects = () => <div>Projects</div>;
+import PinnedProject from '@/pages/pegase/home/pinnedProjects/PinnedProject';
+import ProjectContent from '@/pages/pegase/projects/ProjectContent';
 
+export const Projects = () => (
+  <>
+    <div className="flex flex-col items-center gap-6 p-3">
+      <PinnedProject />
+      <ProjectContent />
+    </div>
+  </>
+);
 export default Projects;
