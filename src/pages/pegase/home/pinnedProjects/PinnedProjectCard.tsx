@@ -24,7 +24,7 @@ export const PinnedProjectCards = () => {
   const { t } = useTranslation();
   // const user = useContext(UserContext);
   //const userId = user?.profile.nni ? user.profile.nni : 'mo0023';
-  const userId = 'mo00247';
+  const userId = 'me00247';
 
   /**
    * Handles the unpin action. Displays a toast if the API call is successful.
@@ -33,7 +33,6 @@ export const PinnedProjectCards = () => {
    */
   const handleUnpin = (projectId: string) => {
     const oldProjects = [...projects];
-    const abortController = new AbortController();
     let apiCallTimeout: number | null = null;
     const toastId = uuidv4();
 
@@ -46,7 +45,6 @@ export const PinnedProjectCards = () => {
           headers: {
             'Content-Type': 'application/json',
           },
-          signal: abortController.signal,
         });
       } catch (error) {
         console.error(`Error unpinning project ${projectId}:`, error);
@@ -61,7 +59,6 @@ export const PinnedProjectCards = () => {
         label: t('components.quickAccess.@cancel'),
         onClick: () => {
           dismissToast(toastId);
-          abortController.abort();
           clearTimeout(apiCallTimeout!);
           setProjects(oldProjects);
         },
