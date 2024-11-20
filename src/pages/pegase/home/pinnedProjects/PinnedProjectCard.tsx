@@ -33,7 +33,6 @@ export const PinnedProjectCards = () => {
    */
   const handleUnpin = (projectId: string) => {
     const oldProjects = [...projects];
-    const abortController = new AbortController();
     let apiCallTimeout: number | null = null;
     const toastId = uuidv4();
 
@@ -46,7 +45,6 @@ export const PinnedProjectCards = () => {
           headers: {
             'Content-Type': 'application/json',
           },
-          signal: abortController.signal,
         });
       } catch (error) {
         console.error(`Error unpinning project ${projectId}:`, error);
@@ -61,7 +59,6 @@ export const PinnedProjectCards = () => {
         label: t('components.quickAccess.@cancel'),
         onClick: () => {
           dismissToast(toastId);
-          abortController.abort();
           clearTimeout(apiCallTimeout!);
           setProjects(oldProjects);
         },
