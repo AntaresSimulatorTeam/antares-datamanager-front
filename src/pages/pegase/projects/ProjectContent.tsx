@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import StdChip from '@common/base/stdChip/StdChip';
 import SearchBar from '@/pages/pegase/home/components/SearchBar';
@@ -12,36 +12,19 @@ import PegaseCard from '@/components/pegase/pegaseCard/pegaseCard';
 import StdTagList from '@common/base/StdTagList/StdTagList';
 import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter';
 import StdAvatar from '@common/layout/stdAvatar/StdAvatar';
-import { getEnvVariables } from '@/envVariables';
-import { ProjectInfo } from '@/shared/types/pegase/Project.type';
 import { useProjectDropdown } from '@/components/pegase/pegaseCard/useProjectDropdown';
 import StudiesPagination from '@/pages/pegase/home/components/StudiesPagination';
+import useFetchProjects from '@/pages/pegase/projects/ProjectSearch';
 
 const ProjectContent = () => {
   const intervalSize = 9;
   const [searchTerm, setSearchTerm] = useState<string | undefined>('');
   const [activeChip, setActiveChip] = useState<boolean | null>(false);
   const userName = 'mouad'; // Replace with actual user name
-  const BASE_URL = getEnvVariables('VITE_BACK_END_BASE_URL');
-  const [projects, setProjects] = useState<ProjectInfo[]>([]);
+  const [current, setCurrent] = useState(0);
+  const { projects, count } = useFetchProjects(searchTerm || '', current, intervalSize);
   const dropdownItems = useProjectDropdown();
   const { t } = useTranslation();
-  const [count, setCount] = useState(0);
-  const [current, setCurrent] = useState(0);
-
-  useEffect(() => {
-    const fetchProjects = () => {
-      const url = `${BASE_URL}/v1/project/search?page=${current + 1}&size=${intervalSize}&search=${searchTerm || ''}`;
-      fetch(url)
-        .then((response) => response.json())
-        .then((json) => {
-          setProjects(json.content);
-          setCount(json.totalElements);
-        })
-        .catch((error) => console.error(error));
-    };
-    fetchProjects();
-  }, [BASE_URL, current, searchTerm]);
 
   const searchProject = (value?: string | undefined) => {
     setSearchTerm(value);
