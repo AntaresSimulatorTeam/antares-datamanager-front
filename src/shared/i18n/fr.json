@@ -6,18 +6,46 @@
     },
     "popover": {
       "@close": "Fermer"
+    },
+    "tablePagination": {
+      "@of": "sur"
+    },
+    "quickAccess": {
+      "confirmUnpin": "Projet détaché avec succes",
+      "@cancel": "Annuler"
     }
   },
   "Pegase": {
-    "@title": "Pégase",
-    "@homePageHeader": "Bienvenue sur le générateur d’études pour Antarès"
+    "@title": "Pégase"
   },
   "page": {
     "@logs": "Logs",
-    "@home": "Home",
     "@projet": "Projet",
     "@logout": "Se déconecter",
     "@parameters": "Paramètres",
     "@antares": "Antares"
+  },
+  "home": {
+    "@label": "Home",
+    "@buttonNewProject": "Nouveau Projet",
+    "@searchBar": "Rechercher un projet, étude,... ",
+    "@study_name": "Étude",
+    "@user_name": "Créateur",
+    "@status": "Status",
+    "@horizon": "Horizon",
+    "@creation_date": "Date de création",
+    "@keywords": "Mots-clés",
+    "@project": "Projet",
+    "@my_studies": "Mes études",
+    "@my_projects": "Mes projets"
+  },
+  "project": {
+    "@setting": "Setting",
+    "@delete": "Supprimer",
+    "@pin": "Épingler",
+    "@unpin": "Désépingler",
+    "@close": "Fermer",
+    "@created": "Crée le",
+    "@by": "Par"
   }
 }

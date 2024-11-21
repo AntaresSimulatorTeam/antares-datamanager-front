@@ -11,7 +11,7 @@ import StdNavbar from '../StdNavbar';
 import { menuBottomData, menuTopData } from '@/routes';
 
 const TEST_ID = 'navbar';
-const TOTAL_LENGTH = menuTopData.length + menuBottomData.length + 1; // Add one for the Header link
+const TOTAL_LENGTH = menuTopData.length + menuBottomData.length + 1; // Add one for the PinnedProject link
 
 describe('StdNavbar component', () => {
   it('should render the navbar component with proper role and id, with the correct amount of sub items', () => {

@@ -6,18 +6,46 @@
     },
     "popover": {
       "@close": "Close"
+    },
+    "tablePagination": {
+      "@of": "of"
+    },
+    "quickAccess": {
+      "@confirmUnpin": "Project unppined",
+      "@cancel": "Cancel"
     }
   },
   "Pegase": {
-    "@title": "Pégase",
-    "@homePageHeader": "Welcome to the study generator for Antares"
+    "@title": "Pégase"
   },
   "page": {
     "@logs": "Logs",
-    "@home": "Home",
     "@projet": "Project",
     "@logout": "Log out",
     "@parameters": "Parameters",
     "@antares": "Antares"
+  },
+  "home": {
+    "@label": "Home",
+    "@buttonNewProject": "New Project",
+    "@searchBar": "Search for a project, study, tag... ",
+    "@study_name": "Study",
+    "@user_name": "Created by",
+    "@status": "Status",
+    "@horizon": "Horizon",
+    "@creation_date": "Creation date",
+    "@keywords": "Keywords",
+    "@project": "Project",
+    "@my_studies": "My studies",
+    "@my_projects": "My projects"
+  },
+  "project": {
+    "@setting": "Setting",
+    "@delete": "Delete",
+    "@pin": "Pin",
+    "@unpin": "Unpin",
+    "@close": "Close",
+    "@created": "Created",
+    "@by": "By"
   }
 }

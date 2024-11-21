@@ -14,12 +14,14 @@ import { UserContext } from './contexts/UserContext';
 import { PEGASE_NAVBAR_ID } from './shared/constants';
 import { THEME_COLOR } from './shared/types';
 import { menuBottomData, menuTopData } from './routes';
+import { PegaseToastContainer } from './shared/notification/containers';
 
 function App() {
   return (
     <div className="flex h-screen w-screen dark:bg-gray-900 dark:text-gray-200">
       <UserContext.Provider initialState={{ theme: THEME_COLOR.LIGHT }}>
         <ThemeHandler />
+        <PegaseToastContainer />
         <Navbar id={PEGASE_NAVBAR_ID} bottomItems={menuBottomData} topItems={menuTopData} />
         <div className="flex h-full w-full flex-col">
           <PegaseStar />

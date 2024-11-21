@@ -5,18 +5,12 @@
  */
 
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
-import Icon, { IconProps } from './Icon';
+import Icon, { ExplicitIconProps, NonExplicitIconProps, PlainIconProps } from './Icon';
 
-export type StdIconProps = {
+export type StdIconProps = (ExplicitIconProps | NonExplicitIconProps) & {
   name: StdIconId;
-} & Omit<IconProps, 'url'>;
+} & Omit<PlainIconProps, 'url'>;
 
-// Must explicit 'isExplicit' to fix TypeScript error
-const StdIcon = ({ isExplicit, alt, ...otherProps }: StdIconProps) =>
-  isExplicit === false ? (
-    <Icon isExplicit={false} alt={alt as string} {...otherProps} url={`/icons/common/${otherProps.name}.svg#icon`} />
-  ) : (
-    <Icon isExplicit={true} {...otherProps} url={`/icons/common/${otherProps.name}.svg#icon`} />
-  );
+const StdIcon = (props: StdIconProps) => <Icon {...props} url={`/icons/common/${props.name}.svg#icon`} />;
 
 export default StdIcon;
