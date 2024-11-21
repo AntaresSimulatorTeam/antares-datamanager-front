@@ -17,7 +17,7 @@ describe('TableCore', () => {
     expect(document.querySelector(`#${TEST_ID}`)).toBeInTheDocument();
     expect(screen.getByRole('table')).toBeInTheDocument();
   });
-  it('renders the Table with all its rows', () => {
+  it('renders the TableCore component with all its rows', () => {
     const table = getTable();
     const { rerender } = render(<TableCore table={table} />);
 
@@ -28,5 +28,13 @@ describe('TableCore', () => {
     rerender(<TableCore table={table} />);
     const rowsExpanded = document.querySelectorAll('tbody > tr');
     expect(rowsExpanded).toHaveLength(3);
+  });
+
+  it('renders the TableCore component with a readonly row', () => {
+    const table = getTable(true);
+    render(<TableCore table={table} />);
+
+    const rows = document.querySelectorAll("[aria-readonly='true']");
+    expect(rows).toHaveLength(1);
   });
 });

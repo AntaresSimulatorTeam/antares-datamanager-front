@@ -14,6 +14,7 @@ import StdIcon from '@common/base/stdIcon/StdIcon';
 import StudiesPagination from './StudiesPagination';
 import StdTagList from '@common/base/StdTagList/StdTagList';
 import { getEnvVariables } from '@/envVariables';
+import StdCheckbox from '@/components/common/forms/stdCheckbox/StdCheckbox';
 
 const ITEMS_PER_PAGE = 5;
 const BASE_URL = getEnvVariables('VITE_BACK_END_BASE_URL');
@@ -81,6 +82,18 @@ const StudyTableDisplay = ({ searchStudy }: StudyTableDisplayProps) => {
   const [sortedColumn, setSortedColumn] = useState<string | null>('status');
 
   const headers = [
+    columnHelper.display({
+      id: 'checkboxColumn',
+      header: ({ table }) => (
+        <StdCheckbox
+          checked={table.getIsAllRowsSelected()}
+          onChange={table.toggleAllRowsSelected}
+          name="headerCheckbox"
+        />
+      ),
+      cell: ({ row }) =>
+        row.getIsSelected() ? <StdCheckbox checked={row.getIsSelected()} onChange={row.toggleSelected} /> : null, // No checkbox is displayed if the row is not selected
+    }),
     columnHelper.accessor('study_name', { header: t('home.@study_name') }),
     columnHelper.accessor('user_name', {
       header: t('home.@user_name'),
@@ -160,7 +173,7 @@ const StudyTableDisplay = ({ searchStudy }: StudyTableDisplayProps) => {
   return (
     <div>
       <div className="flex-1">
-        <StdSimpleTable columns={addSortColumn(headers)} data={rows as StudyDTO[]} />
+        <StdSimpleTable columns={addSortColumn(headers)} data={rows as StudyDTO[]} enableRowSelection={true} />
       </div>
       <div className="flex h-[60px] items-center justify-between bg-gray-200 px-[32px]">
         <StudiesPagination count={count} intervalSize={intervalSize} current={current} onChange={setPage} />

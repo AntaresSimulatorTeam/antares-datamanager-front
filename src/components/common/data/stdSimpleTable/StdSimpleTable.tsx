@@ -31,6 +31,8 @@ const StdSimpleTable = <TData,>({
   trClassName,
   columnSize = 'meta',
   columnResizeMode = undefined,
+  enableRowSelection = false,
+  enableMultiRowSelection = false,
   ...tableOptions
 }: StdSimpleTableProps<TData>) => {
   const table = useReactTable<TData>({
@@ -38,6 +40,8 @@ const StdSimpleTable = <TData,>({
     data,
     getCoreRowModel: getCustomCoreRowModel ?? getTstCoreRowModel<TData>(),
     columnResizeMode,
+    enableRowSelection,
+    enableMultiRowSelection,
     ...tableOptions,
   });
 
