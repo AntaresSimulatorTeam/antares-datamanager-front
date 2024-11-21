@@ -6,34 +6,21 @@
 
 import { StdDropdownOption } from '@common/layout/stdDropdown/StdDropdown';
 
-import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDropdownOptions } from './useDropdownOptions';
 
-export const useProjectDropdown = (initialPinned: boolean, projectId: string, onUnpin: (projectId: string) => void) => {
+export const useProjectDropdown = () => {
   const { t } = useTranslation();
-  const { settingOption, deleteOption, pinOption } = useDropdownOptions();
+  const { settingOption, pinOption, deleteOption } = useDropdownOptions();
 
-  const [isPinned, setIsPinned] = useState(initialPinned);
+  const handleDropdownPin = () => {};
 
   const handleDropdownSetting = () => {};
-
-  const handleDropdownPin = useCallback(() => {
-    setIsPinned((prevPinned) => {
-      const newPinnedStatus = !prevPinned;
-
-      if (!newPinnedStatus) {
-        onUnpin(projectId);
-      }
-
-      return newPinnedStatus;
-    });
-  }, [onUnpin, projectId]);
 
   const dropdownItems: StdDropdownOption[] = [];
 
   dropdownItems.push(
-    pinOption(isPinned, handleDropdownPin),
+    pinOption(false, handleDropdownPin),
     settingOption(handleDropdownSetting),
     deleteOption(() => t('project.@delete')),
   );

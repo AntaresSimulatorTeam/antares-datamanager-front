@@ -24,7 +24,7 @@ export const PinnedProjectCards = () => {
   const { t } = useTranslation();
   // const user = useContext(UserContext);
   //const userId = user?.profile.nni ? user.profile.nni : 'mo0023';
-  const userId = 'mo00247';
+  const userId = 'me00247';
 
   /**
    * Handles the unpin action. Displays a toast if the API call is successful.
