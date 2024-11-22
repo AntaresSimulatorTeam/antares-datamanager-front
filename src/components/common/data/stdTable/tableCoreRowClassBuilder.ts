@@ -18,9 +18,11 @@ export const tableCoreRowClassBuilder = (
 ) =>
   clsx(
     {
+      group: true,
       [STRIPED_CLASSSES]: isStriped,
       [SELECTED_ROW_CLASSSES]: isSelected,
       [READONLY_ROW_CLASSSES]: isReadOnly,
+      'hover:bg-gray-100': !isReadOnly && !isSelected,
     },
     trClassNames,
   );

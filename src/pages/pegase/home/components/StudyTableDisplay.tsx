@@ -91,8 +91,19 @@ const StudyTableDisplay = ({ searchStudy }: StudyTableDisplayProps) => {
           name="headerCheckbox"
         />
       ),
-      cell: ({ row }) =>
-        row.getIsSelected() ? <StdCheckbox checked={row.getIsSelected()} onChange={row.toggleSelected} /> : null, // No checkbox is displayed if the row is not selected
+      cell: ({ row }) => (
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className={`${row.getIsSelected() ? 'block' : 'hidden group-hover:block'}`}
+        >
+          <StdCheckbox
+            disabled={!row.getCanSelect()}
+            checked={row.getIsSelected()}
+            onChange={row.toggleSelected}
+            name={`checkbox-${row.original.id}`}
+          />
+        </div>
+      ),
     }),
     columnHelper.accessor('study_name', { header: t('home.@study_name') }),
     columnHelper.accessor('user_name', {
@@ -173,7 +184,12 @@ const StudyTableDisplay = ({ searchStudy }: StudyTableDisplayProps) => {
   return (
     <div>
       <div className="flex-1">
-        <StdSimpleTable columns={addSortColumn(headers)} data={rows as StudyDTO[]} enableRowSelection={true} />
+        <StdSimpleTable
+          columns={addSortColumn(headers)}
+          data={rows as StudyDTO[]}
+          enableRowSelection={true}
+          enableHover={true}
+        />
       </div>
       <div className="flex h-[60px] items-center justify-between bg-gray-200 px-[32px]">
         <StudiesPagination count={count} intervalSize={intervalSize} current={current} onChange={setPage} />
