@@ -5,7 +5,7 @@
  */
 
 import StdButton, { StdButtonProps } from '@/components/common/base/stdButton/StdButton';
-import { StdIconId } from '@/shared/utils/mappings/common/iconMaps';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 
 type StdCollapseIconProps = {
   onClick: StdButtonProps['onClick'];
