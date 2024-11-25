@@ -4,9 +4,10 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { useStdId } from '@/hooks/common/useStdId';
-import { Cell, flexRender, Header, Table } from '@tanstack/react-table';
+import { useStdId } from '@/hooks/useStdId';
+import { Cell, flexRender, Header, Row, Table } from '@tanstack/react-table';
 import { clsx } from 'clsx';
+import { tableCoreRowClassBuilder } from './tableCoreRowClassBuilder';
 
 export type ColumnSizeType = 'pixels' | 'meta';
 export type ColumnResizeMode = 'onChange' | 'onEnd';
@@ -21,7 +22,7 @@ const COMMON_HEADER_CLASSES = 'px-1 py-0.5 text-left font-semibold';
 const headerClassBuilder = <TData,>({ table, header, columnSize }: TableHeaderProps<TData>) =>
   clsx(
     COMMON_HEADER_CLASSES,
-    columnSize === 'meta' ? header.column.columnDef.meta?.sizeClassNames ?? '' : '',
+    columnSize === 'meta' ? (header.column.columnDef.meta?.sizeClassNames ?? '') : '',
     table.options.columnResizeMode ? 'group relative' : '',
   );
 
@@ -97,7 +98,12 @@ const tableStyleBuilder = <TData,>(table: Table<TData>, columnSize: ColumnSizeTy
 
 const TableCore = <TData,>({ table, id: propId, striped, trClassName, columnSize = 'meta' }: TableCoreProps<TData>) => {
   const id = useStdId('table-', propId);
-  const trClasses = clsx(trClassName, striped && 'even:bg-primary-200');
+
+  const handleToggleRow = (row: Row<unknown>) => () => {
+    if (row.getCanSelect()) {
+      row.toggleSelected();
+    }
+  };
 
   return (
     <table className={tableClassBuilder(table)} id={id} style={tableStyleBuilder(table, columnSize)}>
@@ -114,7 +120,12 @@ const TableCore = <TData,>({ table, id: propId, striped, trClassName, columnSize
       </thead>
       <tbody>
         {table.getRowModel().rows.map((row) => (
-          <tr key={row.id} className={trClasses}>
+          <tr
+            key={row.id}
+            className={tableCoreRowClassBuilder(striped, row.getIsSelected(), row.getReadOnly?.(), trClassName)}
+            onClick={handleToggleRow(row)}
+            aria-readonly={row.getReadOnly?.()}
+          >
             {row.getVisibleCells().map((cell) => (
               <TableDataCell key={cell.id} cell={cell} />
             ))}

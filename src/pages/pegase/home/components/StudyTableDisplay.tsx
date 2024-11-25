@@ -6,68 +6,21 @@
 import StdAvatar from '@/components/common/layout/stdAvatar/StdAvatar';
 import StdSimpleTable from '@/components/common/data/stdSimpleTable/StdSimpleTable';
 import { createColumnHelper } from '@tanstack/react-table';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StudyDTO } from '@/shared/types/index';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import StdIcon from '@common/base/stdIcon/StdIcon';
 import StudiesPagination from './StudiesPagination';
 import StdTagList from '@common/base/StdTagList/StdTagList';
-import { getEnvVariables } from '@/envVariables';
+import StdRadioButton from '@/components/common/forms/stdRadioButton/StdRadioButton';
+import { useStudyTableDisplay } from './useStudyTableDisplay';
 
-const ITEMS_PER_PAGE = 5;
-const BASE_URL = getEnvVariables('VITE_BACK_END_BASE_URL');
 const columnHelper = createColumnHelper<StudyDTO>();
 
 interface StudyTableDisplayProps {
   searchStudy: string | undefined;
 }
-
-interface UseStudyTableDisplayProps {
-  searchStudy: string | undefined;
-  sortBy: { [key: string]: 'asc' | 'desc' };
-}
-
-interface UseStudyTableDisplayReturn {
-  rows: StudyDTO[];
-  count: number;
-  intervalSize: number;
-  current: number;
-  setPage: React.Dispatch<React.SetStateAction<number>>;
-}
-
-export const useStudyTableDisplay = ({
-  searchStudy,
-  sortBy,
-}: UseStudyTableDisplayProps): UseStudyTableDisplayReturn => {
-  const [rows, setRows] = useState<StudyDTO[]>([]);
-  const [count, setCount] = useState(0);
-  const [current, setCurrent] = useState(0);
-
-  const intervalSize = ITEMS_PER_PAGE;
-
-  useEffect(() => {
-    setCurrent(0);
-    setCount(0);
-  }, [searchStudy, sortBy]);
-
-  useEffect(() => {
-    const sortParams = Object.entries(sortBy)
-      .map(([key, order]) => `${key},${order}`)
-      .join('&sort=');
-    fetch(
-      `${BASE_URL}/v1/study/search?page=${current + 1}&size=${intervalSize}&search=${searchStudy}&sort=${sortParams}`,
-    )
-      .then((response) => response.json())
-      .then((json) => {
-        setRows(json.content);
-        setCount(json.totalElements);
-      })
-      .catch((error) => console.error(error));
-  }, [current, searchStudy, sortBy]);
-
-  return { rows, count, intervalSize, current, setPage: setCurrent };
-};
 
 const StudyTableDisplay = ({ searchStudy }: StudyTableDisplayProps) => {
   const { t } = useTranslation();
@@ -81,7 +34,43 @@ const StudyTableDisplay = ({ searchStudy }: StudyTableDisplayProps) => {
   const [sortedColumn, setSortedColumn] = useState<string | null>('status');
 
   const headers = [
-    columnHelper.accessor('study_name', { header: t('home.@study_name') }),
+    columnHelper.display({
+      id: 'radioColumn',
+      header: ({ table }) => (
+        <StdRadioButton
+          value="headerRadio"
+          label="Select All"
+          checked={table.getIsAllRowsSelected()}
+          onChange={() => table.toggleAllRowsSelected()}
+          name="headerRadio"
+        />
+      ),
+      cell: ({ row }) => (
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className={`${row.getIsSelected() ? 'block' : 'hidden group-hover:block'}`}
+        >
+          <StdRadioButton
+            value={row.original.id.toString()}
+            label=""
+            disabled={!row.getCanSelect()}
+            checked={row.getIsSelected()}
+            name={`radio-${row.original.id}`}
+          />
+        </div>
+      ),
+    }),
+
+    columnHelper.accessor('study_name', {
+      header: t('home.@study_name'),
+      cell: ({ getValue, row }) => {
+        const status = row.original.status;
+        const textClass = status === 'GENERATED' ? 'text-primary-900' : 'group-hover:text-green-500';
+
+        return <span className={`transition-colors ${textClass}`}>{getValue()}</span>;
+      },
+    }),
+
     columnHelper.accessor('user_name', {
       header: t('home.@user_name'),
       cell: ({ getValue }: { getValue: () => string }) => (
@@ -103,10 +92,9 @@ const StudyTableDisplay = ({ searchStudy }: StudyTableDisplayProps) => {
     }),
     columnHelper.accessor('creation_date', { header: t('home.@creation_date') }),
   ];
-  // Add state to track if any header is hovered
+
   const [isHeaderHovered, setIsHeaderHovered] = useState<boolean>(false);
 
-  // Update the state when any header is hovered
   const handleHeaderHover = (hovered: boolean) => {
     setIsHeaderHovered(hovered);
   };
@@ -160,7 +148,7 @@ const StudyTableDisplay = ({ searchStudy }: StudyTableDisplayProps) => {
   return (
     <div>
       <div className="flex-1">
-        <StdSimpleTable columns={addSortColumn(headers)} data={rows as StudyDTO[]} />
+        <StdSimpleTable columns={addSortColumn(headers)} data={rows as StudyDTO[]} enableRowSelection={true} />
       </div>
       <div className="flex h-[60px] items-center justify-between bg-gray-200 px-[32px]">
         <StudiesPagination count={count} intervalSize={intervalSize} current={current} onChange={setPage} />
