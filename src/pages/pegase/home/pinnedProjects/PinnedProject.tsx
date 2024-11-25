@@ -7,14 +7,17 @@
 import PinnedProjectCards from '@/pages/pegase/home/pinnedProjects/PinnedProjectCard';
 import ProjectCreator from '@/pages/pegase/home/pinnedProjects/ProjectCreator';
 
-const PinnedProject = () => {
+interface PinnedProjectProps {
+  reloadPinnedProject: boolean;
+  isReloadPinnedProject: (value: boolean) => void;
+}
+
+const PinnedProject: React.FC<PinnedProjectProps> = ({ reloadPinnedProject, isReloadPinnedProject }) => {
   return (
-    <>
-      <div className="flex w-full gap-3">
-        <ProjectCreator />
-        <PinnedProjectCards />
-      </div>
-    </>
+    <div className="flex w-full gap-3">
+      <ProjectCreator />
+      <PinnedProjectCards reloadPinnedProject={reloadPinnedProject} isReloadPinnedProject={isReloadPinnedProject} />
+    </div>
   );
 };
 

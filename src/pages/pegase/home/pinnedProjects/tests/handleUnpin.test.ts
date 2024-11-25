@@ -13,7 +13,7 @@ describe('handleUnpin test', () => {
     const mockSetProjects = (callback: (prevProjects: ProjectInfo[]) => ProjectInfo[]) => {
       const prevProjects: ProjectInfo[] = [
         {
-          projectId: '1',
+          id: '1',
           name: 'Project 1',
           description: 'project1',
           createdBy: 'Luis Rodriguez',
@@ -22,7 +22,7 @@ describe('handleUnpin test', () => {
           tags: ['tag1', 'tag2'],
         },
         {
-          projectId: '2',
+          id: '2',
           name: 'Project 2',
           description: 'project2',
           createdBy: 'Maria Perez',
@@ -38,14 +38,14 @@ describe('handleUnpin test', () => {
       projectId: string,
       setProjects: (callback: (prevProjects: ProjectInfo[]) => ProjectInfo[]) => void,
     ) => {
-      setProjects((prevProjects) => prevProjects.filter((project) => project.projectId !== projectId));
+      setProjects((prevProjects) => prevProjects.filter((project) => project.id !== projectId));
     };
 
     handleUnpin('1', mockSetProjects);
 
     expect(updatedProjects).toEqual([
       {
-        projectId: '2',
+        id: '2',
         name: 'Project 2',
         description: 'project2',
         createdBy: 'Maria Perez',

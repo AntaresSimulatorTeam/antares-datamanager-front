@@ -18,13 +18,19 @@ import { useDropdownOptions } from '@/components/pegase/pegaseCard/useDropdownOp
 import { dismissToast, notifyToast } from '@/shared/notification/notification';
 import { v4 as uuidv4 } from 'uuid';
 
-export const PinnedProjectCards = () => {
+export const PinnedProjectCards = ({
+  reloadPinnedProject,
+  isReloadPinnedProject,
+}: {
+  reloadPinnedProject: boolean;
+  isReloadPinnedProject: (value: boolean) => void;
+}) => {
   const BASE_URL = getEnvVariables('VITE_BACK_END_BASE_URL');
   const [projects, setProjects] = useState<ProjectInfo[]>([]);
   const { t } = useTranslation();
   // const user = useContext(UserContext);
   //const userId = user?.profile.nni ? user.profile.nni : 'mo0023';
-  const userId = 'me00247';
+  const userId = 'me00274T';
 
   /**
    * Handles the unpin action. Displays a toast if the API call is successful.
@@ -36,7 +42,7 @@ export const PinnedProjectCards = () => {
     let apiCallTimeout: number | null = null;
     const toastId = uuidv4();
 
-    setProjects((prevProjects) => prevProjects.filter((project) => project.projectId !== projectId));
+    setProjects((prevProjects) => prevProjects.filter((project) => project.id !== projectId));
 
     const unpinApiCall = async () => {
       try {
@@ -71,7 +77,7 @@ export const PinnedProjectCards = () => {
 
   const fetchPinnedProjects = async (baseUrl: string): Promise<ProjectInfo[]> => {
     try {
-      const response = await fetch(`${baseUrl}/v1/project/pinned?userId=me00247`);
+      const response = await fetch(`${baseUrl}/v1/project/pinned?userId=${userId}`);
       const json = await response.json();
 
       return json.map((project: any) => ({
@@ -86,34 +92,37 @@ export const PinnedProjectCards = () => {
     }
   };
 
-  useEffect(() => {
-    const loadPinnedProjects = async () => {
-      try {
-        const projects = await fetchPinnedProjects(BASE_URL);
-        setProjects(projects);
-      } catch (error) {
-        console.error('Error loading pinned projects:', error);
-      }
-    };
+  const loadPinnedProjects = async () => {
+    try {
+      const projects = await fetchPinnedProjects(BASE_URL);
+      setProjects(projects);
+      isReloadPinnedProject(false);
+    } catch (error) {
+      console.error('Error loading pinned projects:', error);
+    }
+  };
 
-    loadPinnedProjects();
-  }, [BASE_URL]);
+  useEffect(() => {
+    if (reloadPinnedProject) {
+      loadPinnedProjects();
+    }
+  }, [BASE_URL, reloadPinnedProject]);
 
   const { settingOption, deleteOption, pinOption } = useDropdownOptions();
 
   return projects.map((project, index) => {
     const dropdownItems = [
-      pinOption(project.pinned ?? false, () => handleUnpin(project.projectId)), // Toggle pin/unpin
+      pinOption(project.pinned ?? false, () => handleUnpin(project.id)), // Toggle pin/unpin
       settingOption(() => {}, t('project.@setting')),
       deleteOption(() => {}, t('project.@delete')), // Empty function for delete - does nothing
     ];
 
     return (
-      <div key={`${project.projectId}-${index}`} className="flex w-1/3">
+      <div key={`${project.id}-${index}`} className="flex w-1/3">
         <PegaseCard
           title={project.name}
           dropdownOptions={dropdownItems}
-          id={project.projectId}
+          id={project.id}
           icons={
             <div className="text-primary-600">
               <StdIcon name={StdIconId.PushPin} />{' '}
@@ -124,7 +133,7 @@ export const PinnedProjectCards = () => {
             <div className="flex items-center gap-1">
               {project.tags && (
                 <div className="flex h-3 w-32">
-                  <StdTagList id={`${project.projectId}-tag-list`} tags={project.tags} />
+                  <StdTagList id={`${project.id}-tag-list`} tags={project.tags} />
                 </div>
               )}
             </div>
