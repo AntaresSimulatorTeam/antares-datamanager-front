@@ -5,7 +5,7 @@
  */
 
 export interface ProjectInfo {
-  projectId: string;
+  id: string;
   name: string;
   description: string;
   createdBy: string;

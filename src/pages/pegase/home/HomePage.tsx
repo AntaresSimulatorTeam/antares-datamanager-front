@@ -5,15 +5,20 @@
  */
 
 import HomePageContent from './components/HomePageContent';
-import PinnedProject from "@/pages/pegase/home/pinnedProjects/PinnedProject";
+import PinnedProject from '@/pages/pegase/home/pinnedProjects/PinnedProject';
+import { useState } from 'react';
 
-const HomePage = () => (
-  <>
-    <div className="flex flex-col items-center gap-6 p-3">
-      <PinnedProject />
-      <HomePageContent />
-    </div>
-  </>
-);
+const HomePage = () => {
+  const [reloadPinnedProject, isReloadPinnedProject] = useState<boolean>(true);
+
+  return (
+    <>
+      <div className="flex flex-col items-center gap-6 p-3">
+        <PinnedProject reloadPinnedProject={reloadPinnedProject} isReloadPinnedProject={isReloadPinnedProject} />
+        <HomePageContent />
+      </div>
+    </>
+  );
+};
 
 export default HomePage;
