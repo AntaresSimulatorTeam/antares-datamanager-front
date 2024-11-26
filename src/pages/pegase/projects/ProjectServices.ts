@@ -10,7 +10,7 @@ import { ProjectInfo } from '@/shared/types/pegase/Project.type';
 import { getEnvVariables } from '@/envVariables';
 
 export const pinProject = async (projectId: string, isReloadPinnedProject: (value: boolean) => void) => {
-  const userId = 'me00274T';
+  const userId = 'me00247';
   const BASE_URL = getEnvVariables('VITE_BACK_END_BASE_URL');
 
   try {
