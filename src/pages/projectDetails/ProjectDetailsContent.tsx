@@ -6,7 +6,6 @@
 
 import StdIconButton from '@/components/common/base/stdIconButton/StdIconButton';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
-import { useTranslation } from 'react-i18next';
 
 type ProjectDetailsContentProps = {
   description: string;
@@ -15,9 +14,11 @@ type ProjectDetailsContentProps = {
 };
 
 export const ProjectDetailsContent = ({ description, creationDate, createdBy }: ProjectDetailsContentProps) => {
-  const { t } = useTranslation();
-  const formattedDate = t('date.format', { date: creationDate });
-
+  const formattedDate = new Date(creationDate).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
   const handleEditClick = () => {
     console.log('TO BE DONE');
   };

@@ -95,7 +95,7 @@ describe('pinProject', () => {
     await pinProject(projectId, mockIsReloadPinnedProject);
 
     // Check fetch call
-    expect(fetch).toHaveBeenCalledWith('https://mockapi.com/v1/project/pin?userId=me00274T&projectId=test-project-id', {
+    expect(fetch).toHaveBeenCalledWith('https://mockapi.com/v1/project/pin?userId=me00247&projectId=test-project-id', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
     });
