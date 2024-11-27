@@ -4,11 +4,11 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+import { noop } from '@/shared/utils/common/defaultUtils';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import { render, screen } from '@testing-library/react';
 
 import StdIconButton from '../StdIconButton';
-import { noop } from '@/shared/utils/common/defaultUtils';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 
 const TEST_ICON = StdIconId.Add;
 const TEST_ID = 'my-button';

@@ -4,13 +4,15 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+import { useStdId } from '@/hooks/useStdId';
+import { TailwindColorClass } from '@/shared/types/common/TailwindColorClass.type';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
+
 import StdIcon from '@common/base/stdIcon/StdIcon';
 import { RotationOptionsType } from '../stdIcon/Icon';
 import { iconButtonClassBuilder } from './iconButtonClassBuilder';
-import { useStdId } from '@/hooks/common/useStdId';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 
-export type IconButtonVariant = 'default' | 'danger';
+export type IconButtonVariant = 'default' | 'danger' | 'white'; // White is temporary. Will be removed once the good one is designed
 export type IconButtonSize = 'extraSmall' | 'small' | 'medium';
 
 export interface StdIconButtonProps {
@@ -19,10 +21,11 @@ export interface StdIconButtonProps {
   variant?: IconButtonVariant;
   disabled?: boolean;
   id?: string;
-  color?: string;
-  onClick: () => void;
+  color?: TailwindColorClass;
+  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
   rotationOptions?: RotationOptionsType;
   rotate?: boolean;
+  appearEffect?: boolean;
 }
 
 const ICON_SIZE: Record<IconButtonSize, number> = {
@@ -41,19 +44,13 @@ const StdIconButton = ({
   onClick,
   rotationOptions,
   rotate,
+  appearEffect = true,
 }: StdIconButtonProps) => {
-  const iconButtonClasses = iconButtonClassBuilder(variant, disabled);
+  const iconButtonClasses = iconButtonClassBuilder(variant, disabled, appearEffect);
   const id = useStdId('icon-btn', propsId);
 
   return (
-    <button
-      className={iconButtonClasses}
-      disabled={disabled}
-      onClick={onClick}
-      onMouseDown={(e) => e.preventDefault()}
-      id={id}
-      aria-label={icon}
-    >
+    <button className={iconButtonClasses} disabled={disabled} onClick={onClick} id={id} aria-label={icon}>
       <StdIcon
         name={icon}
         width={ICON_SIZE[size]}

@@ -10,15 +10,17 @@ import { ProjectInfo } from '@/shared/types/pegase/Project.type';
 import { getEnvVariables } from '@/envVariables';
 import ProjectDetailsHeader from './ProjectDetailsHeader';
 import StdDivider from '@/components/common/layout/stdDivider/StdDivider';
+import ProjectDetailsContent from './ProjectDetailsContent';
 
 const ProjectDetails = () => {
   const BASE_URL = getEnvVariables('VITE_BACK_END_BASE_URL');
-  const [projectDetails, setProjectDetails] = useState<ProjectInfo>({} as ProjectInfo);
+  const [projectInfo, setProjectDetails] = useState<ProjectInfo>({} as ProjectInfo);
   const location = useLocation();
   const { projectId } = location.state || {};
 
   useEffect(() => {
-    if (projectId) {
+    console.log('Running useEffect for projectId:', projectId);
+    if (projectId && !projectInfo.id) {
       const fetchProjectDetails = async () => {
         try {
           const response = await fetch(`${BASE_URL}/v1/project/findProjectById?projectId=${projectId}`);
@@ -28,7 +30,19 @@ const ProjectDetails = () => {
           }
 
           const data = await response.json();
-          setProjectDetails(data);
+          console.log('Fetched Data:', data);
+
+          setProjectDetails({
+            id: data.id,
+            name: data.name,
+            description: data.description,
+            createdBy: data.createdBy,
+            creationDate: data.creationDate,
+            archived: false,
+            pinned: false,
+            path: '',
+            tags: data.tags,
+          });
         } catch (error) {
           console.error(`Error retrieving project details: ${projectId}`, error);
         }
@@ -36,12 +50,26 @@ const ProjectDetails = () => {
 
       fetchProjectDetails();
     }
-  }, [projectId]);
+  }, [projectId, projectInfo.id]);
 
-  return (
-    <div className="flex flex-col px-3 py-2">
-      <ProjectDetailsHeader name={projectDetails.name} createdBy={projectDetails.createdBy} />
+  /**
+   * Check if projectInfo is available before rendering the page
+   */
+  return !projectInfo.id ? (
+    <div className="flex h-screen items-center justify-center">
+      <p>Loading project details...</p>
+    </div>
+  ) : (
+    <div className="flex flex-col">
+      <ProjectDetailsHeader projectName={projectInfo.name} createdBy={projectInfo.createdBy} />
       <StdDivider />
+      <div className="flex flex-col">
+        <ProjectDetailsContent
+          description={projectInfo.description}
+          createdBy={projectInfo.createdBy}
+          creationDate={projectInfo.creationDate}
+        />
+      </div>
     </div>
   );
 };

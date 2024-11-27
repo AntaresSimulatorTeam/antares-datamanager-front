@@ -114,7 +114,7 @@ export const PinnedProjectCards = ({
 
   const handleCardClick = (projectId: string, projectName: string) => {
     navigate(`/project/${encodeURIComponent(projectName)}`, {
-      state: { projectId, projectName },
+      state: { projectId },
     });
   };
 
