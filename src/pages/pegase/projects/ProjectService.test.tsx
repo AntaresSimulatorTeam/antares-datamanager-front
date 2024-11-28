@@ -6,8 +6,9 @@
 
 import { vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
-import { pinProject, useFetchProjects } from '@/pages/pegase/projects/ProjectServices';
+
 import { notifyToast } from '@/shared/notification/notification';
+import { pinProject, useFetchProjects } from './projectService';
 
 const mockFetch = vi.fn();
 global.fetch = mockFetch;

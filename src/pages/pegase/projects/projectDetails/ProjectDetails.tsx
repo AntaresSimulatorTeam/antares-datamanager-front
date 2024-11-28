@@ -23,7 +23,7 @@ const ProjectDetails = () => {
     if (projectId && !projectInfo.id) {
       const fetchProjectDetails = async () => {
         try {
-          const response = await fetch(`${BASE_URL}/v1/project/findProjectById?projectId=${projectId}`);
+          const response = await fetch(`${BASE_URL}/v1/project/${projectId}`);
 
           if (!response.ok) {
             throw new Error('Failed to fetch project details');

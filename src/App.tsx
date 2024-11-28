@@ -15,7 +15,7 @@ import { PEGASE_NAVBAR_ID } from './shared/constants';
 import { THEME_COLOR } from './shared/types';
 import { menuBottomData, menuTopData } from './routes';
 import { PegaseToastContainer } from './shared/notification/containers';
-import ProjectDetails from './pages/projectDetails/ProjectDetails';
+import ProjectDetails from './pages/pegase/projects/projectDetails/ProjectDetails';
 
 function App() {
   return (

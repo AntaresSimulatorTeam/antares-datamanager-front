@@ -6,6 +6,7 @@
 
 import StdIconButton from '@/components/common/base/stdIconButton/StdIconButton';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
+import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter';
 
 type ProjectDetailsContentProps = {
   description: string;
@@ -14,11 +15,6 @@ type ProjectDetailsContentProps = {
 };
 
 export const ProjectDetailsContent = ({ description, creationDate, createdBy }: ProjectDetailsContentProps) => {
-  const formattedDate = new Date(creationDate).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
   const handleEditClick = () => {
     console.log('TO BE DONE');
   };
@@ -26,11 +22,11 @@ export const ProjectDetailsContent = ({ description, creationDate, createdBy }: 
   return (
     <div className="flex flex-col gap-3 p-3">
       <div className="group flex flex-col gap-3 rounded bg-primary-100 p-2" role="banner">
-        <div className="text-sm justify-between text-left text-gray-700">{description}</div>
+        <div className="text-base justify-between text-left font-sans font-normal text-gray-900">{description}</div>
 
-        <div className="text-sm flex items-center justify-between text-gray-600">
+        <div className="flex items-center justify-between font-sans font-light text-gray-500">
           <div className="flex items-center gap-3">
-            <span>{formattedDate}</span>
+            <span>{formatDateToDDMMYYYY(creationDate)}</span>
             <span>{createdBy}</span>
           </div>
 

@@ -17,7 +17,7 @@ import { getEnvVariables } from '@/envVariables';
 import { useDropdownOptions } from '@/components/pegase/pegaseCard/useDropdownOptions';
 import { dismissToast, notifyToast } from '@/shared/notification/notification';
 import { v4 as uuidv4 } from 'uuid';
-import { useNavigate } from 'react-router-dom';
+import { useProjectNavigation } from '@/hooks/useProjectNavigation';
 
 export const PinnedProjectCards = ({
   reloadPinnedProject,
@@ -29,8 +29,7 @@ export const PinnedProjectCards = ({
   const BASE_URL = getEnvVariables('VITE_BACK_END_BASE_URL');
   const [projects, setProjects] = useState<ProjectInfo[]>([]);
   const { t } = useTranslation();
-
-  const navigate = useNavigate();
+  const { navigateToProject } = useProjectNavigation();
 
   const userId = 'me00247';
 
@@ -113,9 +112,7 @@ export const PinnedProjectCards = ({
   const { settingOption, deleteOption, pinOption } = useDropdownOptions();
 
   const handleCardClick = (projectId: string, projectName: string) => {
-    navigate(`/project/${encodeURIComponent(projectName)}`, {
-      state: { projectId },
-    });
+    navigateToProject(projectId, projectName);
   };
 
   return projects.map((project, index) => {
