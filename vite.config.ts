@@ -38,6 +38,12 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['lcov', 'text'],
+      exclude: [
+        '**/node_modules/**',
+        '**/*.test.ts',
+        'src/shared/types/common/TailwindColorClass.type.ts',
+        'src/components/common/forms/**',
+      ],
     },
   },
   server: {
