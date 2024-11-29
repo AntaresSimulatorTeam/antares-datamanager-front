@@ -19,7 +19,6 @@ const ProjectDetails = () => {
   const { projectId } = location.state || {};
 
   useEffect(() => {
-    console.log('Running useEffect for projectId:', projectId);
     if (projectId && !projectInfo.id) {
       const fetchProjectDetails = async () => {
         try {
