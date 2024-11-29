@@ -3,7 +3,7 @@ name: Build
 on:
   push:
     branches:
-      - develop
+      - fix/sonar_testCoverage
   pull_request:
     types: [opened, synchronize, reopened]
 
