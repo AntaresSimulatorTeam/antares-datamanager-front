@@ -11,8 +11,30 @@ import { getEnvVariables } from '@/envVariables';
 import ProjectDetailsHeader from './ProjectDetailsHeader';
 import StdDivider from '@/components/common/layout/stdDivider/StdDivider';
 import ProjectDetailsContent from './ProjectDetailsContent';
+import StudyTableDisplay from '@/pages/pegase/home/components/StudyTableDisplay';
+import SearchBar from '@/pages/pegase/home/components/SearchBar';
+import StdChip from '@common/base/stdChip/StdChip';
+import { useTranslation } from 'react-i18next';
 
 const ProjectDetails = () => {
+  const { t } = useTranslation();
+  const [searchTerm, setSearchTerm] = useState<string | undefined>('');
+  const [activeChip, setActiveChip] = useState<boolean | null>(false);
+  const userName = 'mouad'; // Replace with actual user name
+
+  const searchStudy = (value?: string | undefined) => {
+    setSearchTerm(value);
+  };
+
+  const handleChipClick = () => {
+    if (activeChip) {
+      setActiveChip(false);
+      searchStudy('');
+    } else {
+      setActiveChip(true);
+      searchStudy(userName);
+    }
+  };
   const BASE_URL = getEnvVariables('VITE_BACK_END_BASE_URL');
   const [projectInfo, setProjectDetails] = useState<ProjectInfo>({} as ProjectInfo);
   const location = useLocation();
@@ -69,6 +91,15 @@ const ProjectDetails = () => {
           creationDate={projectInfo.creationDate}
         />
       </div>
+      <div className="flex gap-4 px-3 py-2">
+        <SearchBar onSearch={searchStudy} chipLabels={['']} />
+        <StdChip
+          label={t('home.@my_studies')}
+          onClick={handleChipClick}
+          status={activeChip ? 'secondary' : 'primary'}
+        />
+      </div>
+      <StudyTableDisplay searchStudy={searchTerm} projectId={projectInfo.id} />
     </div>
   );
 };

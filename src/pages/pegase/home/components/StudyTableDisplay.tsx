@@ -20,9 +20,10 @@ const columnHelper = createColumnHelper<StudyDTO>();
 
 interface StudyTableDisplayProps {
   searchStudy: string | undefined;
+  projectId?: string;
 }
 
-const StudyTableDisplay = ({ searchStudy }: StudyTableDisplayProps) => {
+const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) => {
   const { t } = useTranslation();
   const [sortBy, setSortBy] = useState<{ [key: string]: 'asc' | 'desc' }>({});
 
@@ -143,7 +144,7 @@ const StudyTableDisplay = ({ searchStudy }: StudyTableDisplayProps) => {
       };
     });
   }
-  const { rows, count, intervalSize, current, setPage } = useStudyTableDisplay({ searchStudy, sortBy });
+  const { rows, count, intervalSize, current, setPage } = useStudyTableDisplay({ searchStudy, projectId, sortBy });
 
   return (
     <div>
