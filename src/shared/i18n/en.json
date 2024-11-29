@@ -47,5 +47,8 @@
     "@close": "Close",
     "@created": "Created",
     "@by": "By"
+  },
+  "projectDetails": {
+    "@buttonEdit": "Edit"
   }
 }

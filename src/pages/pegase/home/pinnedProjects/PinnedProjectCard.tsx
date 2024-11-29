@@ -17,6 +17,7 @@ import { getEnvVariables } from '@/envVariables';
 import { useDropdownOptions } from '@/components/pegase/pegaseCard/useDropdownOptions';
 import { dismissToast, notifyToast } from '@/shared/notification/notification';
 import { v4 as uuidv4 } from 'uuid';
+import { useProjectNavigation } from '@/hooks/useProjectNavigation';
 
 export const PinnedProjectCards = ({
   reloadPinnedProject,
@@ -28,9 +29,9 @@ export const PinnedProjectCards = ({
   const BASE_URL = getEnvVariables('VITE_BACK_END_BASE_URL');
   const [projects, setProjects] = useState<ProjectInfo[]>([]);
   const { t } = useTranslation();
-  // const user = useContext(UserContext);
-  //const userId = user?.profile.nni ? user.profile.nni : 'mo0023';
-  const userId = 'me00274T';
+  const { navigateToProject } = useProjectNavigation();
+
+  const userId = 'me00247';
 
   /**
    * Handles the unpin action. Displays a toast if the API call is successful.
@@ -110,6 +111,10 @@ export const PinnedProjectCards = ({
 
   const { settingOption, deleteOption, pinOption } = useDropdownOptions();
 
+  const handleCardClick = (projectId: string, projectName: string) => {
+    navigateToProject(projectId, projectName);
+  };
+
   return projects.map((project, index) => {
     const dropdownItems = [
       pinOption(project.pinned ?? false, () => handleUnpin(project.id)), // Toggle pin/unpin
@@ -123,6 +128,7 @@ export const PinnedProjectCards = ({
           title={project.name}
           dropdownOptions={dropdownItems}
           id={project.id}
+          onClick={() => handleCardClick(project.id, project.name)}
           icons={
             <div className="text-primary-600">
               <StdIcon name={StdIconId.PushPin} />{' '}

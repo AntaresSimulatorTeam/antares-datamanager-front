@@ -6,8 +6,9 @@
 
 import { vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
-import { pinProject, useFetchProjects } from '@/pages/pegase/projects/ProjectServices';
+
 import { notifyToast } from '@/shared/notification/notification';
+import { pinProject, useFetchProjects } from './projectService';
 
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
@@ -95,7 +96,7 @@ describe('pinProject', () => {
     await pinProject(projectId, mockIsReloadPinnedProject);
 
     // Check fetch call
-    expect(fetch).toHaveBeenCalledWith('https://mockapi.com/v1/project/pin?userId=me00274T&projectId=test-project-id', {
+    expect(fetch).toHaveBeenCalledWith('https://mockapi.com/v1/project/pin?userId=me00247&projectId=test-project-id', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
     });

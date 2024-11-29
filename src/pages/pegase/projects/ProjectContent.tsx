@@ -15,20 +15,24 @@ import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter';
 import StdAvatar from '@common/layout/stdAvatar/StdAvatar';
 import StudiesPagination from '@/pages/pegase/home/components/StudiesPagination';
 import { useDropdownOptions } from '@/components/pegase/pegaseCard/useDropdownOptions';
-import { pinProject, useFetchProjects } from '@/pages/pegase/projects/ProjectServices';
+
+import { useProjectNavigation } from '@/hooks/useProjectNavigation';
+import { pinProject, useFetchProjects } from './projectService';
 
 interface ProjectContentProps {
   isReloadPinnedProject: (value: boolean) => void;
 }
 
-const ProjectContent: React.FC<ProjectContentProps> = ({ isReloadPinnedProject }) => {
+const ProjectContent = ({ isReloadPinnedProject }: ProjectContentProps) => {
+  const { t } = useTranslation();
   const intervalSize = 9;
   const [searchTerm, setSearchTerm] = useState<string | undefined>('');
   const [activeChip, setActiveChip] = useState<boolean | null>(false);
   const userName = 'mouad'; // Replace with actual user name
   const [current, setCurrent] = useState(0);
   const { projects, count } = useFetchProjects(searchTerm || '', current, intervalSize);
-  const { t } = useTranslation();
+
+  const { navigateToProject } = useProjectNavigation();
 
   const searchProject = (value?: string | undefined) => {
     setSearchTerm(value);
@@ -46,6 +50,10 @@ const ProjectContent: React.FC<ProjectContentProps> = ({ isReloadPinnedProject }
 
   const handlePinProject = (projectId: string) => {
     pinProject(projectId, isReloadPinnedProject);
+  };
+
+  const handleCardClick = (projectId: string, projectName: string) => {
+    navigateToProject(projectId, projectName);
   };
 
   const { settingOption, deleteOption, pinOption } = useDropdownOptions();
@@ -69,7 +77,13 @@ const ProjectContent: React.FC<ProjectContentProps> = ({ isReloadPinnedProject }
           ];
 
           return (
-            <PegaseCard key={project.id} title={project.name} dropdownOptions={dropdownItems} id="1">
+            <PegaseCard
+              key={project.id}
+              title={project.name}
+              dropdownOptions={dropdownItems}
+              onClick={() => handleCardClick(project.id, project.name)}
+              id={project.id}
+            >
               <div className="flex flex-col items-start justify-between">
                 <div className="flex items-center gap-1">
                   {project.tags && (

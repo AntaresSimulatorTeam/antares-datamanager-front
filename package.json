@@ -14,7 +14,7 @@
     "prepare": "husky && husky install"
   },
   "dependencies": {
-    "@floating-ui/react": "^0.26.19",
+    "@floating-ui/react": "^0.26.28",
     "@fontsource-variable/nunito-sans": "^5.0.14",
     "@tanstack/react-table": "^8.20.5",
     "@testing-library/user-event": "^14.5.2",
