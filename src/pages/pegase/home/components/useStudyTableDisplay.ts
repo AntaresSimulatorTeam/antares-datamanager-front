@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { StudyDTO } from '@/shared/types/index';
 import { getEnvVariables } from '@/envVariables';
 
@@ -15,6 +15,7 @@ const PAGINATION_COUNT = 0;
 
 interface UseStudyTableDisplayProps {
   searchStudy: string | undefined;
+  projectId?: string;
   sortBy: { [key: string]: 'asc' | 'desc' };
 }
 
@@ -28,6 +29,7 @@ interface UseStudyTableDisplayReturn {
 
 export const useStudyTableDisplay = ({
   searchStudy,
+  projectId,
   sortBy,
 }: UseStudyTableDisplayProps): UseStudyTableDisplayReturn => {
   const [rows, setRows] = useState<StudyDTO[]>([]);
@@ -39,7 +41,7 @@ export const useStudyTableDisplay = ({
   useEffect(() => {
     setCurrent(PAGINATION_CURRENT);
     setCount(PAGINATION_COUNT);
-  }, [searchStudy, sortBy]);
+  }, [searchStudy, projectId, sortBy]);
 
   useEffect(() => {
     const sortParams = Object.entries(sortBy)
@@ -47,7 +49,7 @@ export const useStudyTableDisplay = ({
       .join('&sort=');
 
     fetch(
-      `${BASE_URL}/v1/study/search?page=${current + 1}&size=${intervalSize}&search=${searchStudy}&sort=${sortParams}`,
+      `${BASE_URL}/v1/study/search?page=${current + 1}&size=${intervalSize}&projectId=${projectId}&search=${searchStudy}&sort=${sortParams}`,
     )
       .then((response) => response.json())
       .then((json) => {
@@ -55,7 +57,7 @@ export const useStudyTableDisplay = ({
         setCount(json.totalElements);
       })
       .catch((error) => console.error(error));
-  }, [current, searchStudy, sortBy]);
+  }, [current, searchStudy, projectId, sortBy]);
 
   return { rows, count, intervalSize, current, setPage: setCurrent };
 };
