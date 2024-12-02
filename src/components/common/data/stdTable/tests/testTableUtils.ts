@@ -6,6 +6,7 @@
 
 import { ColumnDef, getCoreRowModel, getExpandedRowModel, useReactTable } from '@tanstack/react-table';
 import { renderHook } from '@testing-library/react';
+import { ReadOnlyFeature } from '../features/readOnly';
 
 const data = [
   {
@@ -28,17 +29,21 @@ const columns = [
   },
 ] as ColumnDef<TableRowType>[];
 
-export const getTable = () => {
+export const getTable = (withReadOnly?: boolean) => {
   const {
     result: { current: table },
   } = renderHook(() =>
     useReactTable({
+      _features: withReadOnly ? [ReadOnlyFeature] : [],
       data,
       columns,
       getCoreRowModel: getCoreRowModel<TableRowType>(),
       getExpandedRowModel: getExpandedRowModel(),
       getRowId: (row: TableRowType) => row.name,
       getSubRows: (row) => row.childRows,
+      state: {
+        readOnly: withReadOnly ? { [data[0].name]: true } : undefined,
+      },
     }),
   );
   return table;

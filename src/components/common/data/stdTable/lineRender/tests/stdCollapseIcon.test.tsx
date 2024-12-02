@@ -4,10 +4,10 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
+import { noop } from '@tanstack/react-table';
 import { render, screen } from '@testing-library/react';
 import StdCollapseIcon from '../StdCollapseIcon';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
-import { noop } from '@/shared/utils/common/defaultUtils';
 
 describe('StdCollapseIcon', () => {
   it('renders the StdCollapseIcon component with isOpen to true', () => {

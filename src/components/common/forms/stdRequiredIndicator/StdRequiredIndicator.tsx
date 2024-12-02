@@ -4,14 +4,5 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-export interface ProjectInfo {
-  id: string;
-  name: string;
-  description: string;
-  createdBy: string;
-  creationDate: Date;
-  archived?: boolean;
-  pinned?: boolean;
-  path: string;
-  tags: string[];
-}
+const StdRequiredIndicator = () => <span className="text-error-600">*</span>;
+export default StdRequiredIndicator;

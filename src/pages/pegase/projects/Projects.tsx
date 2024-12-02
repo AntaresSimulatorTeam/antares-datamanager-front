@@ -4,15 +4,19 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+import { useState } from 'react';
 import PinnedProject from '@/pages/pegase/home/pinnedProjects/PinnedProject';
 import ProjectContent from '@/pages/pegase/projects/ProjectContent';
 
-export const Projects = () => (
-  <>
+export const Projects = () => {
+  const [reloadPinnedProject, isReloadPinnedProject] = useState<boolean>(true);
+
+  return (
     <div className="flex flex-col items-center gap-6 p-3">
-      <PinnedProject />
-      <ProjectContent />
+      <PinnedProject reloadPinnedProject={reloadPinnedProject} isReloadPinnedProject={isReloadPinnedProject} />
+      <ProjectContent isReloadPinnedProject={isReloadPinnedProject} />
     </div>
-  </>
-);
+  );
+};
+
 export default Projects;

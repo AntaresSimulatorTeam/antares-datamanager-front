@@ -47,5 +47,8 @@
     "@close": "Fermer",
     "@created": "Crée le",
     "@by": "Par"
+  },
+  "projectDetails": {
+    "@buttonEdit": "Editer"
   }
 }

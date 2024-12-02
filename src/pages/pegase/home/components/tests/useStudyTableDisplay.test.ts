@@ -4,8 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { useStudyTableDisplay } from '@/pages/pegase/home/components/StudyTableDisplay';
 import { renderHook, waitFor } from '@testing-library/react';
+import { useStudyTableDisplay } from '../useStudyTableDisplay';
 
 describe('useStudyTableDisplay', () => {
   beforeEach(() => {
@@ -82,7 +82,7 @@ describe('useStudyTableDisplay', () => {
       json: async () => mockResponse,
     });
 
-    const { result } = renderHook(() => useStudyTableDisplay({ searchStudy: 'study1' ,  sortBy: { status: 'desc' } }));
+    const { result } = renderHook(() => useStudyTableDisplay({ searchStudy: 'study1', sortBy: { status: 'desc' } }));
 
     await waitFor(() => {
       expect(result.current.rows).toHaveLength(1);
