@@ -38,7 +38,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['lcov', 'text'],
-      exclude: ['src/*.test.ts', 'src/shared/**', 'src/components/**'],
+      /*  exclude: ['src/*.test.ts', 'src/shared/**', 'src/components/**'], */
     },
   },
   server: {
