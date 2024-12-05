@@ -11,7 +11,8 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "cy:open": "cypress open",
-    "prepare": "husky && husky install"
+    "prepare": "husky && husky install",
+    "coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@floating-ui/react": "^0.26.28",
@@ -38,6 +39,7 @@
     "@typescript-eslint/eslint-plugin": "^7.13.1",
     "@typescript-eslint/parser": "^7.13.1",
     "@vitejs/plugin-react": "^4.3.1",
+    "@vitest/coverage-v8": "^2.1.6",
     "cypress": "^13.13.1",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
@@ -54,6 +56,6 @@
     "tailwindcss": "^3.4.4",
     "typescript": "^5.2.2",
     "vite": "^5.3.1",
-    "vitest": "^1.6.0"
+    "vitest": "^2.1.6"
   }
 }
