@@ -13,6 +13,7 @@ type StudiesPaginationProps = StdTablePaginationProps;
 const ProjectsPagination = ({ count, intervalSize, current, onChange }: StudiesPaginationProps) => {
   return (
     <div className="flex h-9 flex-[1_0_0] items-center justify-end px-4 py-3">
+      {/* pas de valeur custom */}
       <StdTablePagination count={count} intervalSize={intervalSize} current={current} onChange={onChange} />
     </div>
   );

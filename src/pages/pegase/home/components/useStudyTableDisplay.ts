@@ -27,6 +27,7 @@ interface UseStudyTableDisplayReturn {
   setPage: React.Dispatch<React.SetStateAction<number>>;
 }
 
+const intervalSize = ITEMS_PER_PAGE; // pas dans la fontion
 export const useStudyTableDisplay = ({
   searchStudy,
   projectId,
@@ -44,19 +45,13 @@ export const useStudyTableDisplay = ({
   }, [searchStudy, projectId, sortBy]);
 
   useEffect(() => {
-    const sortParams = Object.entries(sortBy)
-      .map(([key, order]) => `${key},${order}`)
-      .join('&sort=');
+          searchStudy(...)
+      .then((response) =>{
+        setRows(response.rows);
+        setCount(response.totalElements);
 
-    fetch(
-      `${BASE_URL}/v1/study/search?page=${current + 1}&size=${intervalSize}&projectId=${projectId}&search=${searchStudy}&sort=${sortParams}`,
-    )
-      .then((response) => response.json())
-      .then((json) => {
-        setRows(json.content);
-        setCount(json.totalElements);
-      })
-      .catch((error) => console.error(error));
+      }).catch((error) => console.error(error));
+   
   }, [current, searchStudy, projectId, sortBy]);
 
   return { rows, count, intervalSize, current, setPage: setCurrent };

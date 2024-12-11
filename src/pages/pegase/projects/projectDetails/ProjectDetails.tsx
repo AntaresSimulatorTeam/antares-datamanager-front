@@ -38,9 +38,10 @@ const ProjectDetails = () => {
   const BASE_URL = getEnvVariables('VITE_BACK_END_BASE_URL');
   const [projectInfo, setProjectDetails] = useState<ProjectInfo>({} as ProjectInfo);
   const location = useLocation();
-  const { projectId } = location.state || {};
+  const { projectId } = location.state || {}; // pas de projetId dans {}
 
   useEffect(() => {
+    // a mettre dnas un hook
     if (projectId && !projectInfo.id) {
       const fetchProjectDetails = async () => {
         try {
@@ -71,7 +72,7 @@ const ProjectDetails = () => {
 
       fetchProjectDetails();
     }
-  }, [projectId, projectInfo.id]);
+  }, [projectId, projectInfo.id]); // il manque des dependances
 
   /**
    * Check if projectInfo is available before rendering the page

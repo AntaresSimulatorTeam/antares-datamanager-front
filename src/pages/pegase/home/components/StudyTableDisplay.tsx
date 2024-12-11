@@ -23,17 +23,20 @@ interface StudyTableDisplayProps {
   projectId?: string;
 }
 
-const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) => {
-  const { t } = useTranslation();
+const useSorter = () => {
   const [sortBy, setSortBy] = useState<{ [key: string]: 'asc' | 'desc' }>({});
+  const [sortedColumn, setSortedColumn] = useState<string | null>('status');
 
   const handleSort = (column: string) => {
     const newSortOrder = sortBy[column] === 'asc' ? 'desc' : 'asc';
     setSortBy({ [column]: newSortOrder });
     setSortedColumn(column);
   };
-  const [sortedColumn, setSortedColumn] = useState<string | null>('status');
-
+  return { sortBy, sortedColumn, handleSort };
+};
+const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) => {
+  const { t } = useTranslation();
+  const { sortBy, sortedColumn, handleSort } = useSorter();
   const headers = [
     columnHelper.display({
       id: 'radioColumn',
@@ -152,6 +155,7 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
         <StdSimpleTable columns={addSortColumn(headers)} data={rows as StudyDTO[]} enableRowSelection={true} />
       </div>
       <div className="flex h-[60px] items-center justify-between bg-gray-200 px-[32px]">
+        {/* pas de valeur custom */}
         <StudiesPagination count={count} intervalSize={intervalSize} current={current} onChange={setPage} />
       </div>
     </div>

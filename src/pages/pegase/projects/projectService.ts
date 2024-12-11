@@ -31,11 +31,14 @@ export const pinProject = async (projectId: string, isReloadPinnedProject: (valu
       message: 'Project pinned successfully',
     });
     isReloadPinnedProject(true);
-  } catch (error: any) {
-    notifyToast({
-      type: 'error',
-      message: `${error.message}`,
-    });
+  } catch (error: unknown) {
+    // eviter les any
+    if (error instanceof Error) {
+      notifyToast({
+        type: 'error',
+        message: `${error.message}`,
+      });
+    }
   }
 };
 
@@ -60,3 +63,7 @@ export const useFetchProjects = (searchTerm: string, current: number, intervalSi
 
   return { projects, count };
 };
+
+// develop ?
+// couverture sonarCloud ?
+// maquettes couleurs ?

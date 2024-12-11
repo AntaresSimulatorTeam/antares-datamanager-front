@@ -11,7 +11,7 @@ import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import StdTagList from '@common/base/StdTagList/StdTagList';
 import StdAvatar from '@common/layout/stdAvatar/StdAvatar';
 import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getEnvVariables } from '@/envVariables';
 import { useDropdownOptions } from '@/components/pegase/pegaseCard/useDropdownOptions';
@@ -19,19 +19,44 @@ import { dismissToast, notifyToast } from '@/shared/notification/notification';
 import { v4 as uuidv4 } from 'uuid';
 import { useProjectNavigation } from '@/hooks/useProjectNavigation';
 
-export const PinnedProjectCards = ({
-  reloadPinnedProject,
-  isReloadPinnedProject,
-}: {
-  reloadPinnedProject: boolean;
-  isReloadPinnedProject: (value: boolean) => void;
-}) => {
-  const BASE_URL = getEnvVariables('VITE_BACK_END_BASE_URL');
-  const [projects, setProjects] = useState<ProjectInfo[]>([]);
-  const { t } = useTranslation();
-  const { navigateToProject } = useProjectNavigation();
+const useGetProjectList = () => {
+  const [projects, setProjects] = useState<ProjectInfo[]>([]); // mettre dans un hook pour permettre de tester
 
+  const BASE_URL = getEnvVariables('VITE_BACK_END_BASE_URL');
   const userId = 'me00247';
+
+  const fetchPinnedProjects = async (baseUrl: string): Promise<ProjectInfo[]> => {
+    try {
+      const response = await fetch(`${baseUrl}/v1/project/pinned?userId=${userId}`);
+      const json = await response.json();
+
+      return json.map((project: any) => ({
+        ...project,
+        projectId: project.id.toString(),
+        //Projects in homepage should have pinned to TRUE
+        pinned: project.pinned ?? true,
+      }));
+    } catch (error) {
+      console.error('Failed to fetch pinned projects:', error);
+      throw error;
+    }
+  };
+
+  const loadPinnedProjects = async () => {
+    try {
+      const projects = await fetchPinnedProjects(BASE_URL); //duplicate name projets
+      setProjects(projects);
+      isReloadPinnedProject(false);
+    } catch (error) {
+      console.error('Error loading pinned projects:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (reloadPinnedProject) {
+      void loadPinnedProjects();
+    }
+  }, [BASE_URL, reloadPinnedProject]); // il manque une dependance
 
   /**
    * Handles the unpin action. Displays a toast if the API call is successful.
@@ -72,42 +97,22 @@ export const PinnedProjectCards = ({
       },
     });
     apiCallTimeout = setTimeout(() => {
-      unpinApiCall();
+      void unpinApiCall();
     }, 5000) as unknown as number;
   };
+  return { projects, handleUnpin };
+};
 
-  const fetchPinnedProjects = async (baseUrl: string): Promise<ProjectInfo[]> => {
-    try {
-      const response = await fetch(`${baseUrl}/v1/project/pinned?userId=${userId}`);
-      const json = await response.json();
-
-      return json.map((project: any) => ({
-        ...project,
-        projectId: project.id.toString(),
-        //Projects in homepage should have pinned to TRUE
-        pinned: project.pinned ?? true,
-      }));
-    } catch (error) {
-      console.error('Failed to fetch pinned projects:', error);
-      throw error;
-    }
-  };
-
-  const loadPinnedProjects = async () => {
-    try {
-      const projects = await fetchPinnedProjects(BASE_URL);
-      setProjects(projects);
-      isReloadPinnedProject(false);
-    } catch (error) {
-      console.error('Error loading pinned projects:', error);
-    }
-  };
-
-  useEffect(() => {
-    if (reloadPinnedProject) {
-      loadPinnedProjects();
-    }
-  }, [BASE_URL, reloadPinnedProject]);
+export const PinnedProjectCards = ({
+  reloadPinnedProject,
+  isReloadPinnedProject,
+}: {
+  reloadPinnedProject: boolean;
+  isReloadPinnedProject: (value: boolean) => void;
+}) => {
+  const { t } = useTranslation();
+  const { navigateToProject } = useProjectNavigation();
+  const { projects, handleUnpin } = useGetProjectList();
 
   const { settingOption, deleteOption, pinOption } = useDropdownOptions();
 
@@ -166,4 +171,4 @@ export const PinnedProjectCards = ({
   });
 };
 
-export default PinnedProjectCards;
+export default PinnedProjectCards; // plus de 100 lignes

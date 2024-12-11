@@ -14,6 +14,7 @@ vi.mock('@/envVariables', () => ({
 }));
 
 async function fetchProjectDetails(projectId: string, setProjectDetails: (details: any) => void) {
+  // je ne comprends pas cette fonction ni ce fichier de test
   try {
     const response = await fetch(`https://mockapi.com/v1/project/${projectId}`);
     if (!response.ok) {

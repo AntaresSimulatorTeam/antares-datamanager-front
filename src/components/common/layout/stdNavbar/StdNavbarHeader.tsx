@@ -24,6 +24,7 @@ const WRAPPER_FOCUS_CLASSES =
 const StdNavbarHeader = ({ appName, version, id, target, expanded = true }: StdNavbarHeaderProps) => (
   <Link to={target} className={classMerger(WRAPPER_COMMON_CLASSES, WRAPPER_BG_CLASSES, WRAPPER_FOCUS_CLASSES)} id={id}>
     <div className="h-[34px] py-0.25">
+      {/* pas de valeur custom */}
       <img src="/brand/appIcon.svg" id={APP_LOGO_ID} alt={appName} height={34} className="dark:hidden" />
       <img src="/brand/appIconDark.svg" id={APP_LOGO_ID} alt={appName} height={34} className="hidden dark:block" />
     </div>

@@ -4,6 +4,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-export const LogsPage = () => <div>LogsPage</div>;
+export const LogsPage = () => <div>LogsPage</div>; // 2x la log Page
 
 export default LogsPage;

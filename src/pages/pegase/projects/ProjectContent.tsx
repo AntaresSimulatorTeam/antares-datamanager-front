@@ -49,10 +49,11 @@ const ProjectContent = ({ isReloadPinnedProject }: ProjectContentProps) => {
   };
 
   const handlePinProject = (projectId: string) => {
-    pinProject(projectId, isReloadPinnedProject);
+    void pinProject(projectId, isReloadPinnedProject);
   };
 
   const handleCardClick = (projectId: string, projectName: string) => {
+    // pourquoi faire une fonction pour ça ?
     navigateToProject(projectId, projectName);
   };
 
@@ -84,6 +85,7 @@ const ProjectContent = ({ isReloadPinnedProject }: ProjectContentProps) => {
               onClick={() => handleCardClick(project.id, project.name)}
               id={project.id}
             >
+              {/* projectCardContent */}
               <div className="flex flex-col items-start justify-between">
                 <div className="flex items-center gap-1">
                   {project.tags && (
@@ -94,9 +96,9 @@ const ProjectContent = ({ isReloadPinnedProject }: ProjectContentProps) => {
                 </div>
                 <div className="flex items-center gap-x-0.5 pt-2.5">
                   <div className="font-sans text-body-xs font-light">
-                    {t('project.created')} :{' '}
+                    {t('project.@created')} : {/* n'existe pas  */}
                     <span className="text-body-xs font-bold">{formatDateToDDMMYYYY(project.creationDate)} </span>{' '}
-                    {t('project.by')} :
+                    {t('project.by')} :{/* n'existe pas  */}
                   </div>
                   <StdAvatar
                     size="es"
@@ -112,6 +114,7 @@ const ProjectContent = ({ isReloadPinnedProject }: ProjectContentProps) => {
         })}
       </div>
       <div className="flex h-[60px] items-center justify-between bg-gray-200 px-[32px]">
+        {/* // pas de valeure custom */}
         <StudiesPagination count={count} intervalSize={intervalSize} current={current} onChange={setCurrent} />
       </div>
     </div>

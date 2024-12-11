@@ -35,6 +35,7 @@ const HomePageContent = () => {
   return (
     <div className="flex w-full flex-1 flex-col gap-3">
       <StdHeading title="Studies in progress" />
+      {/* trad */}
       <div className="flex gap-4 py-2">
         <SearchBar onSearch={searchStudy} chipLabels={['']} />
         <StdChip
