@@ -62,7 +62,7 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
       ),
     }),
 
-    columnHelper.accessor('study_name', {
+    columnHelper.accessor('name', {
       header: t('home.@study_name'),
       cell: ({ getValue, row }) => {
         const status = row.original.status;
@@ -72,7 +72,7 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
       },
     }),
 
-    columnHelper.accessor('user_name', {
+    columnHelper.accessor('createdBy', {
       header: t('home.@user_name'),
       cell: ({ getValue }: { getValue: () => string }) => (
         <StdAvatar size="s" backgroundColor="gray" fullname={getValue()} initials={getValue().substring(0, 2)} />
@@ -91,7 +91,7 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
         </div>
       ),
     }),
-    columnHelper.accessor('creation_date', { header: t('home.@creation_date') }),
+    columnHelper.accessor('creationDate', { header: t('home.@creation_date') }),
   ];
 
   const [isHeaderHovered, setIsHeaderHovered] = useState<boolean>(false);
@@ -102,7 +102,7 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
 
   function addSortColumn(headers: any[]) {
     return headers.map((column) => {
-      const isSortable = column.accessorKey !== 'keywords';
+      const isSortable = column.accessorKey !== 'keywords' && column.id !== 'radioColumn';
       return {
         ...column,
         header: (
