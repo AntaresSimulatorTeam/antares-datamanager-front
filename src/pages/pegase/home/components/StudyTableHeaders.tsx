@@ -62,7 +62,7 @@ const getStudyTableHeaders = () => {
     }),
 
     columnHelper.accessor('keywords', {
-      header: 'keywords',
+      header: t('home.@keywords'),
       minSize: 500,
       size: 500,
       cell: ({ getValue, row }) => (

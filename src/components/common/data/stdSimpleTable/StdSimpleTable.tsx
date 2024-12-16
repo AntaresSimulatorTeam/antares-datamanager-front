@@ -33,10 +33,8 @@ const StdSimpleTable = <TData,>({
   columnResizeMode = undefined,
   enableRowSelection = false,
   enableMultiRowSelection = false,
-  hasMainColumnGroup = false,
   ...tableOptions
 }: StdSimpleTableProps<TData>) => {
-  'use no memo';
   const table = useReactTable<TData>({
     columns,
     data,
@@ -55,7 +53,6 @@ const StdSimpleTable = <TData,>({
       columnSize={columnSize}
       columnResizeMode={columnResizeMode}
       trClassName={trClassName}
-      hasMainColumnGroup={hasMainColumnGroup}
     />
   );
 };

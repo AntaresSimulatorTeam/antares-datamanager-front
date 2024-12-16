@@ -34,13 +34,8 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
     setIsHeaderHovered(hovered);
   };
 
-  const { rows, count, intervalSize, current, setPage } = useStudyTableDisplay({
-    searchStudy,
-    projectId,
-    sortBy: sortByState,
-  });
-
   const headers = getStudyTableHeaders();
+  console.log('Original Headers:', headers);
 
   const sortedHeaders = addSortColumn(
     headers,
@@ -50,6 +45,14 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
     handleHeaderHover,
     isHeaderHovered,
   );
+
+  console.log('Sorted Headers:', sortedHeaders);
+
+  const { rows, count, intervalSize, current, setPage } = useStudyTableDisplay({
+    searchStudy,
+    projectId,
+    sortBy: sortByState,
+  });
 
   const selectedRowId = Object.keys(rowSelection)[0];
 
@@ -65,7 +68,6 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
           columns={sortedHeaders}
           data={rows as StudyDTO[]}
           enableRowSelection={true}
-          hasMainColumnGroup
           state={{
             rowSelection,
           }}

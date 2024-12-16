@@ -83,7 +83,6 @@ export type TableCoreProps<TData> = {
   columnSize?: ColumnSizeType;
   columnResizeMode?: ColumnResizeMode;
   table: Table<TData>;
-  hasMainColumnGroup?: boolean;
 };
 
 const ROW_CLASSES = '[&_tr]:border-b [&_tr]:border-gray-400 [&_tr]:text-body-s';
@@ -97,15 +96,7 @@ const tableStyleBuilder = <TData,>(table: Table<TData>, columnSize: ColumnSizeTy
       }
     : undefined;
 
-const TableCore = <TData,>({
-  table,
-  id: propId,
-  striped,
-  trClassName,
-  columnSize = 'meta',
-  hasMainColumnGroup = false,
-}: TableCoreProps<TData>) => {
-  'use no memo';
+const TableCore = <TData,>({ table, id: propId, striped, trClassName, columnSize = 'meta' }: TableCoreProps<TData>) => {
   const id = useStdId('table-', propId);
 
   const handleToggleRow = (row: Row<unknown>) => () => {
@@ -120,7 +111,6 @@ const TableCore = <TData,>({
         <tr>
           {table
             .getHeaderGroups()
-            .slice(hasMainColumnGroup ? 1 : 0)
             .map((headerGroup) =>
               headerGroup.headers.map((header) => (
                 <TableHeader key={header.id} table={table} header={header} columnSize={columnSize} />
@@ -142,20 +132,6 @@ const TableCore = <TData,>({
           </tr>
         ))}
       </tbody>
-      <tfoot>
-        {table
-          .getFooterGroups()
-          .slice(1)
-          .map((footerGroup) => (
-            <tr key={footerGroup.id}>
-              {footerGroup.headers.map((header) => (
-                <th key={header.id} colSpan={header.colSpan}>
-                  {header.isPlaceholder ? null : flexRender(header.column.columnDef.footer, header.getContext())}
-                </th>
-              ))}
-            </tr>
-          ))}
-      </tfoot>
     </table>
   );
 };
