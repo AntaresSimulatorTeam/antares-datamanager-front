@@ -6,9 +6,9 @@
 
 export type StudyDTO = {
   id: number;
-  study_name: string;
-  user_name: string;
-  creation_date: Date;
+  name: string;
+  createdBy: string;
+  creationDate: Date;
   keywords: string[];
   project: string;
   status: string;

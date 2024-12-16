@@ -44,12 +44,11 @@ export const useStudyTableDisplay = ({
   }, [searchStudy, projectId, sortBy]);
 
   useEffect(() => {
-    const sortParams = Object.entries(sortBy)
-      .map(([key, order]) => `${key},${order}`)
-      .join('&sort=');
+    const [sortColumn, sortDirection] = Object.entries(sortBy)[0] || ['', ''];
 
     fetch(
-      `${BASE_URL}/v1/study/search?page=${current + 1}&size=${intervalSize}&projectId=${projectId}&search=${searchStudy}&sort=${sortParams}`,
+      `${BASE_URL}/v1/study/search?page=${current + 1}&size=${intervalSize}&projectId=${projectId}&search=${searchStudy}
+      &sortColumn=${sortColumn}&sortDirection=${sortDirection}`,
     )
       .then((response) => response.json())
       .then((json) => {

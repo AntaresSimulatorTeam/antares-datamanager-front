@@ -7,6 +7,7 @@
 import StdTagList from '@/components/common/base/StdTagList/StdTagList';
 import StdRadioButton from '@/components/common/forms/stdRadioButton/StdRadioButton';
 import StdAvatar from '@/components/common/layout/stdAvatar/StdAvatar';
+import { StudyStatus } from '@/shared/types/common/StudyStatus.type';
 import { StudyDTO } from '@/shared/types/pegase/study';
 import { createColumnHelper } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
@@ -32,16 +33,16 @@ const getStudyTableHeaders = () => {
       ),
     }),
 
-    columnHelper.accessor('study_name', {
+    columnHelper.accessor('name', {
       header: t('home.@study_name'),
       cell: ({ getValue, row }) => {
         const status = row.original.status;
-        const textClass = status === 'GENERATED' ? 'text-primary-900' : 'group-hover:text-green-500';
+        const textClass = status === StudyStatus.GENERATED ? 'text-primary-900' : 'group-hover:text-green-500';
         return <span className={`transition-colors ${textClass}`}>{getValue()}</span>;
       },
     }),
 
-    columnHelper.accessor('user_name', {
+    columnHelper.accessor('createdBy', {
       header: t('home.@user_name'),
       cell: ({ getValue }) => (
         <StdAvatar size="s" backgroundColor="gray" fullname={getValue()} initials={getValue().substring(0, 2)} />
@@ -71,7 +72,7 @@ const getStudyTableHeaders = () => {
       ),
     }),
 
-    columnHelper.accessor('creation_date', {
+    columnHelper.accessor('creationDate', {
       header: t('home.@creation_date'),
     }),
   ];

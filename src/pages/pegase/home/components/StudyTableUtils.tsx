@@ -16,7 +16,7 @@ export function addSortColumn(
   isHeaderHovered: boolean,
 ) {
   return headers.map((column) => {
-    const isSortable = column.accessorKey !== 'keywords';
+    const isSortable = column.accessorKey !== 'keywords' && column.id !== 'radioColumn';
     return {
       ...column,
       header: (
