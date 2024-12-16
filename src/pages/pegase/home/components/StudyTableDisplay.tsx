@@ -6,10 +6,13 @@
 import StdSimpleTable from '@/components/common/data/stdSimpleTable/StdSimpleTable';
 import { useState } from 'react';
 import { StudyDTO } from '@/shared/types/index';
-import StudiesPagination from './StudiesPagination';
 import { useStudyTableDisplay } from './useStudyTableDisplay';
 import getStudyTableHeaders from './StudyTableHeaders';
-import { addSortColumn, renderButtons } from './StudyTableUtils';
+import { addSortColumn } from './StudyTableUtils';
+import StudiesPagination from './StudiesPagination';
+import { RowSelectionState } from '@tanstack/react-table';
+import StdButton from '@/components/common/base/stdButton/StdButton';
+import { StudyStatus } from '@/shared/types/common/StudyStatus.type';
 
 interface StudyTableDisplayProps {
   searchStudy: string | undefined;
@@ -17,45 +20,80 @@ interface StudyTableDisplayProps {
 }
 
 const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) => {
-  const [sortBy, setSortBy] = useState<{ [key: string]: 'asc' | 'desc' }>({});
-  const [selectedRows, setSelectedRows] = useState<StudyDTO[]>([]);
-
-  const handleSort = (column: string) => {
-    const newSortOrder = sortBy[column] === 'asc' ? 'desc' : 'asc';
-    setSortBy({ [column]: newSortOrder });
-    setSortedColumn(column);
-  };
+  const [sortByState, setSortByState] = useState<{ [key: string]: 'asc' | 'desc' }>({});
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [sortedColumn, setSortedColumn] = useState<string | null>('status');
-
-  const headers = getStudyTableHeaders();
-
   const [isHeaderHovered, setIsHeaderHovered] = useState<boolean>(false);
 
+  const handleSort = (column: string) => {
+    const newSortOrder = sortByState[column] === 'asc' ? 'desc' : 'asc';
+    setSortByState({ [column]: newSortOrder });
+    setSortedColumn(column);
+  };
   const handleHeaderHover = (hovered: boolean) => {
     setIsHeaderHovered(hovered);
   };
 
-  const handleRowSelectionChange = (selectedIds: any) => {
-    console.log('Selected IDs:', selectedIds); // Log to check the value of selectedIds
-    if (Array.isArray(selectedIds)) {
-      const newSelectedRows = rows.filter((row) => selectedIds.includes(row.id.toString()));
-      console.log('Selected Rows:', newSelectedRows);
-      setSelectedRows(newSelectedRows);
-    } else {
-      console.error('Expected selectedIds to be an array');
-    }
-  };
+  const { rows, count, intervalSize, current, setPage } = useStudyTableDisplay({
+    searchStudy,
+    projectId,
+    sortBy: sortByState,
+  });
 
-  const { rows, count, intervalSize, current, setPage } = useStudyTableDisplay({ searchStudy, projectId, sortBy });
-  const sortedHeaders = addSortColumn(headers, handleSort, sortBy, sortedColumn, handleHeaderHover, isHeaderHovered);
+  const headers = getStudyTableHeaders();
+
+  const sortedHeaders = addSortColumn(
+    headers,
+    handleSort,
+    sortByState,
+    sortedColumn,
+    handleHeaderHover,
+    isHeaderHovered,
+  );
+
+  const selectedRowId = Object.keys(rowSelection)[0];
+
+  const selectedStatus = rows[Number.parseInt(selectedRowId || '-1')]?.status?.toUpperCase();
+
+  const isDuplicateActive = selectedStatus === StudyStatus.GENERATED;
+  const isDeleteActive = selectedStatus === StudyStatus.ERROR || selectedStatus === StudyStatus.IN_PROGRESS;
 
   return (
     <div>
       <div className="flex-1">
-        <StdSimpleTable columns={sortedHeaders} data={rows as StudyDTO[]} enableRowSelection={true} />
+        <StdSimpleTable
+          columns={sortedHeaders}
+          data={rows as StudyDTO[]}
+          enableRowSelection={true}
+          hasMainColumnGroup
+          state={{
+            rowSelection,
+          }}
+          onRowSelectionChange={(rowsSelected: Record<string, boolean>) => setRowSelection(rowsSelected)}
+        />
       </div>
-      <div className="flex h-[60px] items-center justify-between bg-gray-200 px-[32px]">
-        {renderButtons(selectedRows)}
+      <div className="flex h-8 items-center justify-between bg-gray-200 px-4">
+        <div className="flex gap-2">
+          {selectedRowId !== undefined ? (
+            <>
+              <StdButton
+                label="Duplicate"
+                onClick={() => console.log('duplicate')}
+                variant="outlined"
+                disabled={!isDuplicateActive}
+              />
+              <StdButton
+                label="Delete"
+                onClick={() => console.log('Delete')}
+                variant="outlined"
+                color="danger"
+                disabled={!isDeleteActive}
+              />
+            </>
+          ) : (
+            <StdButton label="NewStudy" onClick={() => console.log('NewStudy')} />
+          )}
+        </div>
         <StudiesPagination count={count} intervalSize={intervalSize} current={current} onChange={setPage} />
       </div>
     </div>

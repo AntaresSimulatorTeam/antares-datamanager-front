@@ -4,9 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import StdButton from '@/components/common/base/stdButton/StdButton';
 import StdIcon from '@/components/common/base/stdIcon/StdIcon';
-import { StudyDTO } from '@/shared/types/index';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 
 export function addSortColumn(
@@ -62,22 +60,3 @@ export function addSortColumn(
     };
   });
 }
-
-export const renderButtons = (selectedRows: StudyDTO[]) => {
-  if (selectedRows.length === 0) {
-    return <StdButton label="New Study" onClick={() => console.log('Create new study')} />;
-  }
-
-  const hasInProgress = selectedRows.some((row) => row.status === 'IN_PROGRESS');
-
-  if (hasInProgress) {
-    return (
-      <>
-        <StdButton label="Duplicate" onClick={() => console.log('Duplicate study')} />
-        <StdButton label="Delete" onClick={() => console.log('Delete study')} />
-      </>
-    );
-  }
-
-  return null;
-};

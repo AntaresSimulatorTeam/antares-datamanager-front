@@ -15,24 +15,12 @@ const columnHelper = createColumnHelper<StudyDTO>();
 
 const getStudyTableHeaders = () => {
   const { t } = useTranslation();
-
   return [
     columnHelper.display({
       id: 'radioColumn',
-      header: ({ table }) => (
-        <StdRadioButton
-          value="headerRadio"
-          label="Select All"
-          checked={table.getIsAllRowsSelected()}
-          onChange={() => table.toggleAllRowsSelected()}
-          name="headerRadio"
-        />
-      ),
+      header: ({ table }) => <></>,
       cell: ({ row }) => (
-        <div
-          onClick={(e) => e.stopPropagation()}
-          className={`${row.getIsSelected() ? 'block' : 'hidden group-hover:block'}`}
-        >
+        <div className={`${row.getIsSelected() ? 'block' : 'hidden group-hover:block'}`}>
           <StdRadioButton
             value={row.original.id.toString()}
             label=""
