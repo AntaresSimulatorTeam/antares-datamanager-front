@@ -19,7 +19,7 @@ const getStudyTableHeaders = () => {
   return [
     columnHelper.display({
       id: 'radioColumn',
-      header: ({ table }) => <></>,
+      header: () => <></>,
       cell: ({ row }) => (
         <div className={`${row.getIsSelected() ? 'block' : 'hidden group-hover:block'}`}>
           <StdRadioButton

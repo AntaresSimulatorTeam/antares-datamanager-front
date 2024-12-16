@@ -16,22 +16,22 @@ describe('useStudyTableDisplay', () => {
     const mockResponse = {
       content: [
         {
-          study_name: 'study1',
-          user_name: 'Luis Perez',
+          name: 'study1',
+          createdBy: 'Luis Perez',
           project: 'Project FE2050',
           status: 'Closed',
           horizon: '2050',
           keywords: 'keyword1',
-          creation_date: '2023-01-01',
+          creationDate: '2023-01-01',
         },
         {
-          study_name: 'study2',
-          user_name: 'Maria Rojas',
+          name: 'study2',
+          createdBy: 'Maria Rojas',
           project: 'Project PDH27',
           status: 'Inactive',
           horizon: '2027',
           keywords: 'keyword2',
-          creation_date: '2023-01-01',
+          creationDate: '2023-01-01',
         },
       ],
       totalElements: 2,
@@ -65,13 +65,13 @@ describe('useStudyTableDisplay', () => {
     const mockResponse = {
       content: [
         {
-          study_name: 'study1',
-          user_name: 'Luis Perez',
+          name: 'study1',
+          createdBy: 'Luis Perez',
           project: 'Project FE2050',
           status: 'Closed',
           horizon: '2050',
           keywords: 'keyword1',
-          creation_date: '2023-01-01',
+          creationDate: '2023-01-01',
         },
       ],
       totalElements: 1,

@@ -6,13 +6,13 @@
 import StdSimpleTable from '@/components/common/data/stdSimpleTable/StdSimpleTable';
 import { useState } from 'react';
 import { StudyDTO } from '@/shared/types/index';
-import { useStudyTableDisplay } from './useStudyTableDisplay';
 import getStudyTableHeaders from './StudyTableHeaders';
 import { addSortColumn } from './StudyTableUtils';
 import StudiesPagination from './StudiesPagination';
 import { RowSelectionState } from '@tanstack/react-table';
 import StdButton from '@/components/common/base/stdButton/StdButton';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type';
+import { useStudyTableDisplay } from './useStudyTableDisplay';
 
 interface StudyTableDisplayProps {
   searchStudy: string | undefined;
@@ -69,7 +69,17 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
           state={{
             rowSelection,
           }}
-          onRowSelectionChange={(rowsSelected: Record<string, boolean>) => setRowSelection(rowsSelected)}
+          onRowSelectionChange={(
+            updaterOrValue: RowSelectionState | ((oldState: RowSelectionState) => RowSelectionState),
+          ) => {
+            if (typeof updaterOrValue === 'function') {
+              // Handle updater function
+              setRowSelection((prev: RowSelectionState) => updaterOrValue(prev));
+            } else {
+              // Handle direct value
+              setRowSelection(updaterOrValue);
+            }
+          }}
         />
       </div>
       <div className="flex h-8 items-center justify-between bg-gray-200 px-4">
