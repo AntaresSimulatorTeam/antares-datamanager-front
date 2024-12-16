@@ -73,10 +73,8 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
             updaterOrValue: RowSelectionState | ((oldState: RowSelectionState) => RowSelectionState),
           ) => {
             if (typeof updaterOrValue === 'function') {
-              // Handle updater function
               setRowSelection((prev: RowSelectionState) => updaterOrValue(prev));
             } else {
-              // Handle direct value
               setRowSelection(updaterOrValue);
             }
           }}
