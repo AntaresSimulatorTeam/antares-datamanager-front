@@ -6,12 +6,14 @@
 
 import StdButton from '@/components/common/base/stdButton/StdButton';
 import { useTranslation } from 'react-i18next';
+import { RdsButton } from 'rte-design-system-react';
 
 export const ProjectCreator = () => {
   const { t } = useTranslation();
   return (
     <div className="flex items-center justify-center border border-dashed border-primary-700 p-4">
       <StdButton label={t('home.@buttonNewProject')} variant="outlined" color="primary" />
+      <RdsButton label={t('home.@buttonNewProject')} variant="contained" color="primary" />
     </div>
   );
 };
