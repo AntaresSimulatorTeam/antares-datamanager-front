@@ -7,12 +7,14 @@ import StdSimpleTable from '@/components/common/data/stdSimpleTable/StdSimpleTab
 import { useState } from 'react';
 import { StudyDTO } from '@/shared/types/index';
 import getStudyTableHeaders from './StudyTableHeaders';
-import { addSortColumn } from './StudyTableUtils';
+import { addSortColumn, useNewStudyModal } from './StudyTableUtils';
 import StudiesPagination from './StudiesPagination';
 import { RowSelectionState } from '@tanstack/react-table';
 import StdButton from '@/components/common/base/stdButton/StdButton';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type';
 import { useStudyTableDisplay } from './useStudyTableDisplay';
+import StdModal from '@/components/common/layout/stdModal/StdModal';
+import { useTranslation } from 'react-i18next';
 
 interface StudyTableDisplayProps {
   searchStudy: string | undefined;
@@ -24,6 +26,8 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [sortedColumn, setSortedColumn] = useState<string | null>('status');
   const [isHeaderHovered, setIsHeaderHovered] = useState<boolean>(false);
+  const { isModalOpen, toggleModal } = useNewStudyModal();
+  const { t } = useTranslation();
 
   const handleSort = (column: string) => {
     const newSortOrder = sortByState[column] === 'asc' ? 'desc' : 'asc';
@@ -35,7 +39,6 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
   };
 
   const headers = getStudyTableHeaders();
-  console.log('Original Headers:', headers);
 
   const sortedHeaders = addSortColumn(
     headers,
@@ -45,8 +48,6 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
     handleHeaderHover,
     isHeaderHovered,
   );
-
-  console.log('Sorted Headers:', sortedHeaders);
 
   const { rows, count, intervalSize, current, setPage } = useStudyTableDisplay({
     searchStudy,
@@ -101,7 +102,18 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
               />
             </>
           ) : (
-            <StdButton label="NewStudy" onClick={() => console.log('NewStudy')} />
+            <StdButton label={t('home.@new_study')} onClick={toggleModal} />
+          )}
+          {isModalOpen && (
+            <StdModal size="medium" onClose={toggleModal}>
+              <StdModal.Title>{t('home.@new_study')}</StdModal.Title>
+              <StdModal.Content>
+                <p>Here you can create a new study. Add your content here.</p>
+              </StdModal.Content>
+              <StdModal.Footer>
+                <StdButton label="Close" onClick={toggleModal} />
+              </StdModal.Footer>
+            </StdModal>
           )}
         </div>
         <StudiesPagination count={count} intervalSize={intervalSize} current={current} onChange={setPage} />

@@ -5,11 +5,11 @@
  */
 
 import useModal from '@/hooks/useModal';
-import { StdIconId } from '@/shared/utils/mappings/common/iconMaps';
 import StdButton from '@common/base/stdButton/StdButton';
 import StdIcon from '@common/base/stdIcon/StdIcon';
 import { PropsWithChildren, ReactNode, useEffect, useRef } from 'react';
 import modalTitleClassBuilder from './modalTitleClassBuilder';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 export type StdModalTitleStatus = 'default' | 'danger';
 
 type StdModalTitleProps = {

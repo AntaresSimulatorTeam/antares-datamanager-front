@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -6,6 +8,7 @@
 
 import StdIcon from '@/components/common/base/stdIcon/StdIcon';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
+import { useState } from 'react';
 
 export function addSortColumn(
   headers: any[],
@@ -59,4 +62,17 @@ export function addSortColumn(
       ),
     };
   });
+}
+
+export function useNewStudyModal() {
+  const [isModalOpen, setModalOpen] = useState(false);
+
+  const toggleModal = () => {
+    setModalOpen((prev) => !prev);
+  };
+
+  return {
+    isModalOpen,
+    toggleModal,
+  };
 }
