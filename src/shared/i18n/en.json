@@ -37,7 +37,8 @@
     "@keywords": "Keywords",
     "@project": "Project",
     "@my_studies": "My studies",
-    "@my_projects": "My projects"
+    "@my_projects": "My projects",
+    "@new_study": "New Study"
   },
   "project": {
     "@setting": "Setting",

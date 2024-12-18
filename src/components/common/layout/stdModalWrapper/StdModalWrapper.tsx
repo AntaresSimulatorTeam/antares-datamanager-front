@@ -4,11 +4,11 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import useFocusTrapping from '@/hooks/useFocusTrapping';
 import useModal from '@/hooks/useModal';
 import { MouseEventHandler, PropsWithChildren, useEffect, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import modalWrapperClassBuilder from './modalClassBuilder';
+import useFocusTrapping from '@/hooks/useFocusTrapping';
 
 export type StdModalProps = {
   onClose?: () => void;
