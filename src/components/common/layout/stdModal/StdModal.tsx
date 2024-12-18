@@ -12,7 +12,7 @@ import StdModalTitle from './slots/StdModalTitle/StdModalTitle';
 import StdModalContent from './slots/stdModalContents/StdModalContent';
 import StdModalLateralContent from './slots/stdModalContents/StdModalLateralContent';
 import StdModalFooter from './slots/stdModalFooter/StdModalFooter';
-import StdModalWrapper, { StdModalProps } from './stdModalWrapper/StdModalWrapper';
+import StdModalWrapper, { StdModalProps } from '../stdModalWrapper/StdModalWrapper';
 
 export type ModalSize = 'extraSmall' | 'small' | 'medium' | 'large' | 'extraLarge';
 
