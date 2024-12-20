@@ -63,6 +63,7 @@ const ProjectDetails = () => {
             pinned: false,
             path: '',
             tags: data.tags,
+            studies: [],
           });
         } catch (error) {
           console.error(`Error retrieving project details: ${projectId}`, error);
