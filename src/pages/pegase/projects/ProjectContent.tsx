@@ -17,7 +17,7 @@ import StudiesPagination from '@/pages/pegase/home/components/StudiesPagination'
 import { useDropdownOptions } from '@/components/pegase/pegaseCard/useDropdownOptions';
 
 import { useProjectNavigation } from '@/hooks/useProjectNavigation';
-import { pinProject, useFetchProjects } from './projectService';
+import { deleteProjectById, pinProject, useFetchProjects } from './projectService';
 
 interface ProjectContentProps {
   isReloadPinnedProject: (value: boolean) => void;
@@ -30,7 +30,7 @@ const ProjectContent = ({ isReloadPinnedProject }: ProjectContentProps) => {
   const [activeChip, setActiveChip] = useState<boolean | null>(false);
   const userName = 'mouad'; // Replace with actual user name
   const [current, setCurrent] = useState(0);
-  const { projects, count } = useFetchProjects(searchTerm || '', current, intervalSize);
+  const { projects, count, refetch } = useFetchProjects(searchTerm || '', current, intervalSize);
 
   const { navigateToProject } = useProjectNavigation();
 
@@ -50,6 +50,11 @@ const ProjectContent = ({ isReloadPinnedProject }: ProjectContentProps) => {
 
   const handlePinProject = (projectId: string) => {
     pinProject(projectId, isReloadPinnedProject);
+  };
+
+  const deleteProject = async (projectId: string) => {
+    await deleteProjectById(projectId, isReloadPinnedProject);
+    refetch(); // Actualiser les projets après suppression
   };
 
   const handleCardClick = (projectId: string, projectName: string) => {
@@ -73,9 +78,8 @@ const ProjectContent = ({ isReloadPinnedProject }: ProjectContentProps) => {
           const dropdownItems = [
             pinOption(false, () => handlePinProject(project.id)),
             settingOption(() => {}, t('project.@setting')),
-            deleteOption(() => {}, t('project.@delete')),
+            deleteOption(() => deleteProject(project.id), t('project.@delete'), project.studies?.length > 0),
           ];
-
           return (
             <PegaseCard
               key={project.id}
@@ -94,9 +98,9 @@ const ProjectContent = ({ isReloadPinnedProject }: ProjectContentProps) => {
                 </div>
                 <div className="flex items-center gap-x-0.5 pt-2.5">
                   <div className="font-sans text-body-xs font-light">
-                    {t('project.created')} :{' '}
+                    {t('project.@created')} :{' '}
                     <span className="text-body-xs font-bold">{formatDateToDDMMYYYY(project.creationDate)} </span>{' '}
-                    {t('project.by')} :
+                    {t('project.@by')} :
                   </div>
                   <StdAvatar
                     size="es"

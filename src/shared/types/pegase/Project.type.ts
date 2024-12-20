@@ -14,4 +14,5 @@ export interface ProjectInfo {
   pinned?: boolean;
   path: string;
   tags: string[];
+  studies: number[];
 }
