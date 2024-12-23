@@ -4,9 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import StdIconButton from '@/components/common/base/stdIconButton/StdIconButton';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter';
+import { RdsIconButton, RdsIconId } from 'rte-design-system-react';
 
 type ProjectDetailsContentProps = {
   description: string;
@@ -30,7 +29,7 @@ export const ProjectDetailsContent = ({ description, creationDate, createdBy }: 
             <span>{createdBy}</span>
           </div>
 
-          <StdIconButton icon={StdIconId.Edit} size="small" onClick={handleEditClick} />
+          <RdsIconButton icon={RdsIconId.Edit} size="small" onClick={handleEditClick} />
         </div>
       </div>
     </div>

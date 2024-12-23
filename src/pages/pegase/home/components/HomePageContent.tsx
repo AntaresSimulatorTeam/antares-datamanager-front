@@ -4,13 +4,12 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import StdHeading from '@/components/common/layout/stdHeading/StdHeading';
 import { useState } from 'react';
 
 import SearchBar from './SearchBar';
 import StudyTableDisplay from './StudyTableDisplay';
 import { useTranslation } from 'react-i18next';
-import StdChip from '@common/base/stdChip/StdChip';
+import { RdsChip, RdsHeading } from 'rte-design-system-react';
 
 const HomePageContent = () => {
   const { t } = useTranslation();
@@ -34,10 +33,10 @@ const HomePageContent = () => {
 
   return (
     <div className="flex w-full flex-1 flex-col gap-3">
-      <StdHeading title="Studies in progress" />
+      <RdsHeading title="Studies in progress" />
       <div className="flex gap-4 py-2">
         <SearchBar onSearch={searchStudy} chipLabels={['']} />
-        <StdChip
+        <RdsChip
           label={t('home.@my_studies')}
           onClick={handleChipClick}
           status={activeChip ? 'secondary' : 'primary'}

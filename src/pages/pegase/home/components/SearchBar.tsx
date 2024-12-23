@@ -4,8 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import StdSearchInput from '@/components/common/forms/stdSearchInput/StdSearchInput';
 import { useTranslation } from 'react-i18next';
+import { RdsSearchInput } from 'rte-design-system-react';
 
 interface SearchBarProps {
   onSearch: (value?: string) => void;
@@ -17,7 +17,7 @@ const SearchBar = ({ onSearch }: SearchBarProps) => {
   return (
     <>
       <div>
-        <StdSearchInput onSearch={onSearch} placeHolder={t('home.@searchBar')} variant="outlined" />
+        <RdsSearchInput onSearch={onSearch} placeHolder={t('home.@searchBar')} variant="outlined" />
       </div>
     </>
   );

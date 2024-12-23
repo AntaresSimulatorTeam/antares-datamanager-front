@@ -4,18 +4,14 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import StdTablePagination, {
-  StdTablePaginationProps,
-} from '@/components/common/data/stdTablePagination/StdTablePagination';
+import { RdsTablePagination, RdsTablePaginationProps } from 'rte-design-system-react';
 
-type StudiesPaginationProps = StdTablePaginationProps;
+type StudiesPaginationProps = RdsTablePaginationProps;
 
-const ProjectsPagination = ({ count, intervalSize, current, onChange }: StudiesPaginationProps) => {
-  return (
-    <div className="flex h-9 flex-[1_0_0] items-center justify-end px-4 py-3">
-      <StdTablePagination count={count} intervalSize={intervalSize} current={current} onChange={onChange} />
-    </div>
-  );
-};
+const ProjectsPagination = ({ count, intervalSize, current, onChange }: StudiesPaginationProps) => (
+  <div className="flex h-9 flex-[1_0_0] items-center justify-end px-4 py-3">
+    <RdsTablePagination count={count} intervalSize={intervalSize} current={current} onChange={onChange} />
+  </div>
+);
 
 export default ProjectsPagination;

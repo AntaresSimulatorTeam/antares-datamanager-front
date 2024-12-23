@@ -4,10 +4,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import StdButton from '@/components/common/base/stdButton/StdButton';
 import StdAvatar from '@/components/common/layout/stdAvatar/StdAvatar';
-import StdHeading from '@/components/common/layout/stdHeading/StdHeading';
 import { useTranslation } from 'react-i18next';
+import { RdsButton, RdsHeading } from 'rte-design-system-react';
 
 type ProjectDetailsHeaderProps = {
   projectName: string;
@@ -18,9 +17,9 @@ const ProjectDetailsHeader = ({ projectName, createdBy }: ProjectDetailsHeaderPr
   const { t } = useTranslation();
   return (
     <div className="flex items-center justify-between px-3 py-2">
-      <StdHeading title={projectName} />
+      <RdsHeading title={projectName} />
       <div className="ml-auto flex items-center gap-4">
-        <StdButton label={t('home.@buttonNewProject')} variant="contained" color="primary" />
+        <RdsButton label={t('home.@buttonNewProject')} variant="contained" color="primary" />
         <StdAvatar
           size="s"
           backgroundColor="green"

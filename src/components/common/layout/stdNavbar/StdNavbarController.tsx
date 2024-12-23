@@ -5,9 +5,9 @@
  */
 
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
-import StdIcon from '../../base/stdIcon/StdIcon';
 import StdTextTooltip from '../stdTextTooltip/StdTextTooltip';
 import { navbarControllerClassBuilder } from './navbarClassBuilder';
+import { RdsIcon } from 'rte-design-system-react';
 
 type StdNavbarControllerProps = {
   id: string;
@@ -24,7 +24,7 @@ const StdNavbarController = ({ label, id, action, expanded = true }: StdNavbarCo
     <div>
       <StdTextTooltip text={label} enabled={!expanded} placement="right" disableArrow>
         <div className={navbarControllerClasses} id={id} onClick={action} role="button" tabIndex={0}>
-          {expanded ? <StdIcon name={iconId} isExplicit /> : <StdIcon name={iconId} isExplicit={false} alt={label} />}
+          {expanded ? <RdsIcon name={iconId} isExplicit /> : <RdsIcon name={iconId} isExplicit={false} alt={label} />}
           {expanded && <>{label}</>}
         </div>
       </StdTextTooltip>

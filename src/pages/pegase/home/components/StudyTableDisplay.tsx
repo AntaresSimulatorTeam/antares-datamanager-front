@@ -4,17 +4,13 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 import StdAvatar from '@/components/common/layout/stdAvatar/StdAvatar';
-import StdSimpleTable from '@/components/common/data/stdSimpleTable/StdSimpleTable';
 import { createColumnHelper } from '@tanstack/react-table';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StudyDTO } from '@/shared/types/index';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
-import StdIcon from '@common/base/stdIcon/StdIcon';
 import StudiesPagination from './StudiesPagination';
-import StdTagList from '@common/base/StdTagList/StdTagList';
-import StdRadioButton from '@/components/common/forms/stdRadioButton/StdRadioButton';
 import { useStudyTableDisplay } from './useStudyTableDisplay';
+import { RdsIcon, RdsIconId, RdsRadioButton, RdsSimpleTable, RdsTagList } from 'rte-design-system-react';
 
 const columnHelper = createColumnHelper<StudyDTO>();
 
@@ -26,19 +22,19 @@ interface StudyTableDisplayProps {
 const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) => {
   const { t } = useTranslation();
   const [sortBy, setSortBy] = useState<{ [key: string]: 'asc' | 'desc' }>({});
+  const [sortedColumn, setSortedColumn] = useState<string | null>('status');
 
   const handleSort = (column: string) => {
     const newSortOrder = sortBy[column] === 'asc' ? 'desc' : 'asc';
     setSortBy({ [column]: newSortOrder });
     setSortedColumn(column);
   };
-  const [sortedColumn, setSortedColumn] = useState<string | null>('status');
 
   const headers = [
     columnHelper.display({
       id: 'radioColumn',
       header: ({ table }) => (
-        <StdRadioButton
+        <RdsRadioButton
           value="headerRadio"
           label="Select All"
           checked={table.getIsAllRowsSelected()}
@@ -51,7 +47,7 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
           onClick={(e) => e.stopPropagation()}
           className={`${row.getIsSelected() ? 'block' : 'hidden group-hover:block'}`}
         >
-          <StdRadioButton
+          <RdsRadioButton
             value={row.original.id.toString()}
             label=""
             disabled={!row.getCanSelect()}
@@ -75,7 +71,7 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
     columnHelper.accessor('createdBy', {
       header: t('home.@user_name'),
       cell: ({ getValue }: { getValue: () => string }) => (
-        <StdAvatar size="s" backgroundColor="gray" fullname={getValue()} initials={getValue().substring(0, 2)} />
+        <StdAvatar size="s" backgroundColor="gray" fullname={getValue()} initials={getValue()?.substring(0, 2)} />
       ),
     }),
     columnHelper.accessor('project', { header: t('home.@project') }),
@@ -87,7 +83,7 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
       size: 500,
       cell: ({ getValue, row }) => (
         <div className="flex h-3 w-32">
-          <StdTagList id={`pegase-tags-${row.id}`} tags={getValue()} />
+          <RdsTagList id={`pegase-tags-${row.id}`} tags={getValue()} />
         </div>
       ),
     }),
@@ -101,7 +97,7 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
   };
 
   function addSortColumn(headers: any[]) {
-    return headers.map((column) => {
+    return headers.map((column: any) => {
       const isSortable = column.accessorKey !== 'keywords' && column.id !== 'radioColumn';
       return {
         ...column,
@@ -123,18 +119,18 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
                 {sortBy[column.accessorKey as string] && sortedColumn === column.accessorKey ? (
                   sortBy[column.accessorKey as string] === 'asc' ? (
                     <span className="font-bold text-primary-600">
-                      <StdIcon name={StdIconId.ArrowUpwardAlt} />
+                      <RdsIcon name={RdsIconId.ArrowUpward} />
                     </span>
                   ) : (
                     <span className="font-bold text-primary-600">
-                      <StdIcon name={StdIconId.ArrowDownwardAlt} />
+                      <RdsIcon name={RdsIconId.ArrowDownwardAlt} />
                     </span>
                   )
                 ) : (
                   <span
                     className={`text-primary-900 ${isHeaderHovered ? 'opacity-100' : 'opacity-0'} transition-opacity duration-100`}
                   >
-                    <StdIcon name={StdIconId.ArrowUpwardAlt} />
+                    <RdsIcon name={RdsIconId.ArrowUpward} />
                   </span>
                 )}
               </div>
@@ -149,7 +145,7 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
   return (
     <div>
       <div className="flex-1">
-        <StdSimpleTable columns={addSortColumn(headers)} data={rows as StudyDTO[]} enableRowSelection={true} />
+        <RdsSimpleTable columns={addSortColumn(headers)} data={rows as StudyDTO[]} enableRowSelection={true} />
       </div>
       <div className="flex h-[60px] items-center justify-between bg-gray-200 px-[32px]">
         <StudiesPagination count={count} intervalSize={intervalSize} current={current} onChange={setPage} />

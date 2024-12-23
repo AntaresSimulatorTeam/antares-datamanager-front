@@ -6,21 +6,18 @@
 
 import { render, screen, within } from '@testing-library/react';
 
-import StdIconButton from '@/components/common/base/stdIconButton/StdIconButton';
-import { StdTagProps } from '@/components/common/base/stdTag/StdTag';
-import { StdDropdownOption } from '@/components/common/layout/stdDropdown/StdDropdown';
 import { noop } from '@/shared/utils/common/defaultUtils';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import PegaseCardTitle from '../pegaseCardTitle';
+import { RdsDropdownOption, RdsIconButton, RdsIconId, RdsTagProps } from 'rte-design-system-react';
 
 const TEST_TITLE = 'Card Title';
-const TEST_LEFT_ICON = StdIconId.StarFilled;
+const TEST_LEFT_ICON = RdsIconId.StarFilled;
 const TEST_LABEL = 'Test Tag';
 const TEST_ID = 'card-title-id';
-const TEST_TAG: Omit<StdTagProps, 'onClose'> = {
+const TEST_TAG: Omit<RdsTagProps, 'onClose'> = {
   label: TEST_LABEL,
 };
-const TEST_DROPDOWN_ITEMS: StdDropdownOption[] = [
+const TEST_DROPDOWN_ITEMS: RdsDropdownOption[] = [
   { key: 'op1', label: 'Option 1', value: 'op1', onItemClick: noop },
   { key: 'op2', label: 'Option 2', value: 'op2', onItemClick: noop },
   { key: 'op3', label: 'Option 3', value: 'op3', onItemClick: noop },
@@ -38,7 +35,7 @@ describe('PegaseCardTitle', () => {
       <PegaseCardTitle
         id={TEST_ID}
         title={TEST_TITLE}
-        icons={<StdIconButton icon={TEST_LEFT_ICON} onClick={noop} />}
+        icons={<RdsIconButton icon={TEST_LEFT_ICON} onClick={noop} />}
         dropdownOptions={TEST_DROPDOWN_ITEMS}
       />,
     );
