@@ -3,6 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
+/// <reference types="vitest/config" />
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import { defineConfig } from 'vite';
@@ -47,6 +48,7 @@ export default defineConfig({
       reporter: ['lcov', 'text'],
       exclude: ['src/*.test.ts', 'src/shared/**', 'src/components/common/**'],
     },
+    server: { deps: { inline: ['rte-design-system'] } },
   },
   server: {
     port: DEFAULT_PORT,

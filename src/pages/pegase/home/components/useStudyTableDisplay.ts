@@ -51,7 +51,6 @@ export const useStudyTableDisplay = ({
     )
       .then((response) => response.json())
       .then((json) => {
-        console.log('🚀 QCA :  ~ .then ~ json:', json);
         setRows(json.content);
         setCount(json.totalElements);
       })

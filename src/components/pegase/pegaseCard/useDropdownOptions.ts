@@ -4,11 +4,10 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { StdDropdownOption } from '@common/layout/stdDropdown/StdDropdown';
 import { clsx } from 'clsx';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
+import { RdsDropdownOption, RdsIconId } from 'rte-design-system-react';
 
 export const NO_WRAP_CLASS = 'whitespace-nowrap';
 
@@ -16,11 +15,11 @@ export const useDropdownOptions = () => {
   const { t } = useTranslation();
 
   const settingOption = useCallback(
-    (onClick: () => void, label?: string): StdDropdownOption => ({
+    (onClick: () => void, label?: string): RdsDropdownOption => ({
       key: 'setting',
       label: label || t('project.@setting'),
       value: 'setting',
-      icon: StdIconId.Settings,
+      icon: RdsIconId.Settings,
       onItemClick: onClick,
       extraClasses: NO_WRAP_CLASS,
     }),
@@ -28,11 +27,11 @@ export const useDropdownOptions = () => {
   );
 
   const deleteOption = useCallback(
-    (onClick: () => void, label?: string): StdDropdownOption => ({
+    (onClick: () => void, label?: string): RdsDropdownOption => ({
       key: 'delete',
       label: label ?? t('project.@delete'),
       value: 'delete',
-      icon: StdIconId.Delete,
+      icon: RdsIconId.Delete,
       onItemClick: onClick,
       extraClasses: clsx(NO_WRAP_CLASS, '[&]:text-error-600 [&]:hover:text-error-600'),
     }),
@@ -40,11 +39,11 @@ export const useDropdownOptions = () => {
   );
 
   const pinOption = useCallback(
-    (pinned: boolean, onClick: () => void): StdDropdownOption => ({
+    (pinned: boolean, onClick: () => void): RdsDropdownOption => ({
       key: 'pin',
       label: pinned ? t('project.@unpin') : t('project.@pin'),
       value: 'pin',
-      icon: pinned ? StdIconId.KeepOff : StdIconId.PushPin,
+      icon: pinned ? RdsIconId.KeepOff : RdsIconId.PushPin,
       onItemClick: onClick,
       extraClasses: NO_WRAP_CLASS,
     }),

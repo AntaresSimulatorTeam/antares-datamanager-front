@@ -6,10 +6,9 @@
 
 import { render, screen } from '@testing-library/react';
 
-import { StdDropdownOption } from '@/components/common/layout/stdDropdown/StdDropdown';
 import { noop } from '@/shared/utils/common/defaultUtils';
 import PegaseCard from '../pegaseCard';
-import { RdsButtonProps } from 'rte-design-system-react';
+import { RdsButtonProps, RdsDropdownOption } from 'rte-design-system-react';
 
 const TEST_TITLE = 'Card Title';
 const TEST_PRIMARY_BUTTON: Omit<RdsButtonProps, 'type' | 'size' | 'variant'> = {
@@ -20,7 +19,7 @@ const TEST_SECONDARY_BUTTON: Omit<RdsButtonProps, 'type' | 'size' | 'variant'> =
 };
 const TEST_CHILDREN = <div role="article"></div>;
 const TEST_ID = 'card-triple-action-id';
-const TEST_DROPDOWN_DROPDOWN: StdDropdownOption[] = [
+const TEST_DROPDOWN_DROPDOWN: RdsDropdownOption[] = [
   { key: 'op1', label: 'Option 1', value: 'op1', onItemClick: noop },
   { key: 'op2', label: 'Option 2', value: 'op2', onItemClick: noop },
   { key: 'op3', label: 'Option 3', value: 'op3', onItemClick: noop },

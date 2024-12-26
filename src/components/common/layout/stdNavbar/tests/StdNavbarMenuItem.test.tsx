@@ -14,7 +14,7 @@ describe('StdNavbarMenuItem component', () => {
     renderWithRouter(<StdNavbarMenuItem item={menuItemSample} />);
     expect(document.querySelector(`#${menuItemSample.id}`)).toBeInTheDocument();
     expect(screen.getByRole('link')).toBeInTheDocument();
-    expect(screen.getByTitle(menuItemSample.icon)).toBeInTheDocument();
+    expect(document.querySelector(`#${menuItemSample.icon}`)).toBeInTheDocument();
   });
   it('should render the item label if expanded is true', () => {
     renderWithRouter(<StdNavbarMenuItem item={menuItemSample} expanded />);

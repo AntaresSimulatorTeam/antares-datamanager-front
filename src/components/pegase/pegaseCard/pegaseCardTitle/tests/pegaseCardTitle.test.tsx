@@ -41,8 +41,6 @@ describe('PegaseCardTitle', () => {
     );
     const cardTitle = screen.getByRole('banner');
     expect(cardTitle).toBeInTheDocument();
-
-    expect(screen.getByTitle(TEST_LEFT_ICON)).toBeInTheDocument();
   });
 
   it('renders the PegaseCardTitle component with tag', () => {

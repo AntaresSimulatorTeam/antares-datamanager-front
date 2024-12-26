@@ -8,11 +8,11 @@ import { useStdId } from '@/hooks/common/useStdId';
 import { MenuNavItem } from '@/shared/types';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import StdDivider from '../stdDivider/StdDivider';
 import StdNavbarController from './StdNavbarController';
 import StdNavbarHeader from './StdNavbarHeader';
 import StdNavbarMenu from './StdNavbarMenu';
 import { navbarClassBuilder } from './navbarClassBuilder';
+import { RdsDivider } from 'rte-design-system-react';
 
 export type StdNavbarProps = {
   topItems: MenuNavItem[];
@@ -41,9 +41,9 @@ const StdNavbar = ({ topItems, bottomItems, appName, appVersion, headerLink, id:
     <nav className={navbarClasses} id={id} aria-label={appName}>
       <StdNavbarHeader id={headerId} appName={appName} version={appVersion} target={headerLink} expanded={expanded} />
       <StdNavbarMenu menuItems={topItems} expanded={expanded} />
-      <StdDivider extraClasses="mt-auto" />
+      <RdsDivider extraClasses="mt-auto" />
       <StdNavbarMenu menuItems={bottomItems} expanded={expanded} />
-      <StdDivider />
+      <RdsDivider />
       <StdNavbarController action={toggleExpanded} id={controllerId} label={controllerLabel} expanded={expanded} />
     </nav>
   );

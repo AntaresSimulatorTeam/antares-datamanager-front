@@ -48,6 +48,7 @@ export default defineConfig({
       reporter: ['lcov', 'text'],
       exclude: ['src/*.test.ts', 'src/shared/**', 'src/components/common/**'],
     },
+    server: { deps: { inline: ['rte-design-system'] } },
   },
   server: {
     port: DEFAULT_PORT,

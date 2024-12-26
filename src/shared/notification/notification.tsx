@@ -5,11 +5,11 @@
  */
 
 import { Id, toast } from 'react-toastify';
+import { RdsAlert, RdsBanner, RdsToast, ToastAction } from 'rte-design-system-react';
 import { v4 as uuidv4 } from 'uuid';
 import { DisplayStatus } from '../types/common/DisplayStatus.type';
 
 import { AlertContainerId, BannerContainerId, ToastContainerId } from './containers';
-import { RdsAlert, RdsBanner, RdsToast, ToastAction } from 'rte-design-system-react';
 
 export type NotifyProps = {
   id?: string | number;
