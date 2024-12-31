@@ -13,4 +13,5 @@ export type StudyDTO = {
   project: string;
   status: string;
   horizon: string;
+  trajectoryIds: number[];
 };

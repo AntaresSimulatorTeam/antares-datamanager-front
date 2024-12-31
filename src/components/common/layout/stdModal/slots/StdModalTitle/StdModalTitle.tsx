@@ -52,13 +52,7 @@ export default function StdModalTitle({
         )
       )}
       <div className={childrenClasses}>{children}</div>
-      <StdButton
-        icon={StdIconId.Close}
-        color="secondary"
-        variant="transparent"
-        onClick={onClose ?? closeModal}
-        ref={buttonRef}
-      />
+      <StdButton icon={StdIconId.Close} color="secondary" variant="transparent" onClick={onClose ?? closeModal} />
     </header>
   );
 }

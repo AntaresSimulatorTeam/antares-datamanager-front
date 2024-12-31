@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import { StudyDTO } from '@/shared/types/index';
 import { getEnvVariables } from '@/envVariables';
 
-const ITEMS_PER_PAGE = 5;
+const ITEMS_PER_PAGE = 10;
 const BASE_URL = getEnvVariables('VITE_BACK_END_BASE_URL');
 const PAGINATION_CURRENT = 0;
 const PAGINATION_COUNT = 0;
