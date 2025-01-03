@@ -17,6 +17,7 @@ interface UseStudyTableDisplayProps {
   searchStudy: string | undefined;
   projectId?: string;
   sortBy: { [key: string]: 'asc' | 'desc' };
+  reloadStudies: boolean;
 }
 
 interface UseStudyTableDisplayReturn {
@@ -31,6 +32,7 @@ export const useStudyTableDisplay = ({
   searchStudy,
   projectId,
   sortBy,
+  reloadStudies,
 }: UseStudyTableDisplayProps): UseStudyTableDisplayReturn => {
   const [rows, setRows] = useState<StudyDTO[]>([]);
   const [count, setCount] = useState(0);
@@ -41,7 +43,7 @@ export const useStudyTableDisplay = ({
   useEffect(() => {
     setCurrent(PAGINATION_CURRENT);
     setCount(PAGINATION_COUNT);
-  }, [searchStudy, projectId, sortBy]);
+  }, [searchStudy, projectId, sortBy, reloadStudies]);
 
   useEffect(() => {
     const [sortColumn, sortDirection] = Object.entries(sortBy)[0] || ['', ''];
@@ -55,7 +57,7 @@ export const useStudyTableDisplay = ({
         setCount(json.totalElements);
       })
       .catch((error) => console.error(error));
-  }, [current, searchStudy, projectId, sortBy]);
+  }, [current, searchStudy, projectId, sortBy, reloadStudies]);
 
   return { rows, count, intervalSize, current, setPage: setCurrent };
 };

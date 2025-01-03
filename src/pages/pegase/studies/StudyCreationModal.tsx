@@ -17,9 +17,10 @@ interface StudyCreationModalProps {
   isOpen: boolean;
   onClose: () => void;
   study?: StudyDTO | null;
+  setReloadStudies: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const StudyCreationModal: React.FC<StudyCreationModalProps> = ({ onClose, study }) => {
+const StudyCreationModal: React.FC<StudyCreationModalProps> = ({ onClose, study, setReloadStudies }) => {
   const { t } = useTranslation();
   const [studyName, setStudyName] = useState<string>('');
   const [horizon, setHorizon] = useState<string>('');
@@ -41,6 +42,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({ onClose, study 
 
     await saveStudy(studyData, onClose);
     // Clear form fields
+    setReloadStudies((prev) => !prev); // Trigger reload after successful save
     setStudyName('');
     setProjectName('');
     setHorizon('');

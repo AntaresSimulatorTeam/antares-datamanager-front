@@ -42,7 +42,9 @@ describe('useStudyTableDisplay', () => {
       json: async () => mockResponse,
     });
 
-    const { result } = renderHook(() => useStudyTableDisplay({ searchStudy: 'test', sortBy: { status: 'desc' } }));
+    const { result } = renderHook(() =>
+      useStudyTableDisplay({ searchStudy: 'test', sortBy: { status: 'desc' }, reloadStudies: true }),
+    );
     await waitFor(() => {
       expect(result.current.rows).toHaveLength(2);
       expect(result.current.rows).toEqual(mockResponse.content);
@@ -52,7 +54,9 @@ describe('useStudyTableDisplay', () => {
   it('handles fetch error correctly', async () => {
     global.fetch = vi.fn().mockRejectedValue(new Error('Fetch error'));
 
-    const { result } = renderHook(() => useStudyTableDisplay({ searchStudy: 'test', sortBy: { status: 'desc' } }));
+    const { result } = renderHook(() =>
+      useStudyTableDisplay({ searchStudy: 'test', sortBy: { status: 'desc' }, reloadStudies: true }),
+    );
 
     await waitFor(() => {
       expect(result.current.rows).toEqual([]);
@@ -82,7 +86,9 @@ describe('useStudyTableDisplay', () => {
       json: async () => mockResponse,
     });
 
-    const { result } = renderHook(() => useStudyTableDisplay({ searchStudy: 'study1', sortBy: { status: 'desc' } }));
+    const { result } = renderHook(() =>
+      useStudyTableDisplay({ searchStudy: 'study1', sortBy: { status: 'desc' }, reloadStudies: true }),
+    );
 
     await waitFor(() => {
       expect(result.current.rows).toHaveLength(1);
