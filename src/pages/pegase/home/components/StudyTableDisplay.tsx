@@ -17,6 +17,8 @@ import { useTranslation } from 'react-i18next';
 import StudyCreationModal from '../../studies/StudyCreationModal';
 import { handleDelete } from '@/pages/pegase/home/components/studyService';
 import {RdsButton} from "rte-design-system-react";
+import { useStudyNavigation } from '@/pages/pegase/studies/useStudyNavigation';
+
 
 interface StudyTableDisplayProps {
   searchStudy: string | undefined;
@@ -34,6 +36,7 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
 
   // Reload trigger for re-fetching data
   const [reloadStudies, setReloadStudies] = useState<boolean>(false);
+  const { navigateToStudy } = useStudyNavigation();
 
   const handleSort = (column: string) => {
     const newSortOrder = sortByState[column] === 'asc' ? 'desc' : 'asc';
@@ -56,7 +59,6 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
     isHeaderHovered,
   );
 
-  // Pass reloadTrigger to refresh data
   const { rows, count, intervalSize, current, setPage } = useStudyTableDisplay({
     searchStudy,
     projectId,
@@ -86,7 +88,14 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
       });
     }
   };
+  const handleStudyClick = (study: StudyDTO) => {
+    navigateToStudy(study);
+  };
 
+  const handleRowClick = () => {
+    const selectedStudy = rows[Number.parseInt(selectedRowId || '-1')];
+    handleStudyClick(selectedStudy);
+  };
   return (
     <div>
       <div className="flex-1">
@@ -112,6 +121,8 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
         <div className="flex gap-2">
           {selectedRowId !== undefined ? (
             <>
+              <RdsButton label="Open" onClick={handleRowClick} variant="outlined" />
+
               <RdsButton label="Duplicate" onClick={handleDuplicate} variant="outlined" disabled={!isDuplicateActive} />
               <RdsButton
                 label="Delete"
