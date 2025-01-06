@@ -44,19 +44,49 @@ export const useFetchProjects = (searchTerm: string, current: number, intervalSi
   const [count, setCount] = useState(0);
   const BASE_URL = getEnvVariables('VITE_BACK_END_BASE_URL');
 
+  const fetchProjects = () => {
+    const url = `${BASE_URL}/v1/project/search?page=${current + 1}&size=${intervalSize}&search=${searchTerm || ''}`;
+    fetch(url)
+      .then((response) => response.json())
+      .then((json) => {
+        setProjects(json.content);
+        setCount(json.totalElements);
+      })
+      .catch((error) => console.error(error));
+  };
+
   useEffect(() => {
-    const fetchProjects = () => {
-      const url = `${BASE_URL}/v1/project/search?page=${current + 1}&size=${intervalSize}&search=${searchTerm || ''}`;
-      fetch(url)
-        .then((response) => response.json())
-        .then((json) => {
-          setProjects(json.content);
-          setCount(json.totalElements);
-        })
-        .catch((error) => console.error(error));
-    };
     fetchProjects();
   }, [BASE_URL, current, searchTerm, intervalSize]);
 
-  return { projects, count };
+  return { projects, count, refetch: fetchProjects };
+};
+
+export const deleteProjectById = async (projectId: string, isReloadProjects: (value: boolean) => void) => {
+  const BASE_URL = getEnvVariables('VITE_BACK_END_BASE_URL');
+
+  try {
+    const response = await fetch(`${BASE_URL}/v1/project/${projectId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      const errorData = JSON.parse(errorText);
+      throw new Error(`${errorData.message || errorText}`);
+    }
+    notifyToast({
+      type: 'success',
+      message: 'Project deleted successfully',
+    });
+    isReloadProjects(true);
+  } catch (error: any) {
+    notifyToast({
+      type: 'error',
+      message: `${error.message}`,
+    });
+  }
 };

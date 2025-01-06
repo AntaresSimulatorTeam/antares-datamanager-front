@@ -8,10 +8,12 @@ import { RdsTablePagination, RdsTablePaginationProps } from 'rte-design-system-r
 
 type StudiesPaginationProps = RdsTablePaginationProps;
 
-const StudiesPagination = ({ count, intervalSize, current, onChange }: StudiesPaginationProps) => (
-  <div className="flex h-9 flex-[1_0_0] items-center justify-end px-4 py-3">
-    <RdsTablePagination count={count} intervalSize={intervalSize} current={current} onChange={onChange} />
-  </div>
-);
+const StudiesPagination = ({ count, intervalSize, current, onChange }: StudiesPaginationProps) => {
+  return (
+    <div className="flex h-9 shrink-0 grow basis-0 items-center justify-end px-4 py-3">
+      <RdsTablePagination count={count} intervalSize={intervalSize} current={current} onChange={onChange} />
+    </div>
+  );
+};
 
 export default StudiesPagination;

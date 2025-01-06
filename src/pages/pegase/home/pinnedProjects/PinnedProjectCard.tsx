@@ -16,6 +16,7 @@ import { dismissToast, notifyToast } from '@/shared/notification/notification';
 import { v4 as uuidv4 } from 'uuid';
 import { useProjectNavigation } from '@/hooks/useProjectNavigation';
 import { RdsIcon, RdsIconId, RdsTagList } from 'rte-design-system-react';
+import { deleteProjectById } from '@/pages/pegase/projects/projectService';
 
 export const PinnedProjectCards = ({
   reloadPinnedProject,
@@ -112,12 +113,16 @@ export const PinnedProjectCards = ({
   const handleCardClick = (projectId: string, projectName: string) => {
     navigateToProject(projectId, projectName);
   };
+  const deleteProject = async (projectId: string) => {
+    await deleteProjectById(projectId, isReloadPinnedProject);
+    await loadPinnedProjects();
+  };
 
   return projects.map((project, index) => {
     const dropdownItems = [
       pinOption(project.pinned ?? false, () => handleUnpin(project.id)), // Toggle pin/unpin
       settingOption(() => {}, t('project.@setting')),
-      deleteOption(() => {}, t('project.@delete')), // Empty function for delete - does nothing
+      deleteOption(() => deleteProject(project.id), t('project.@delete'), project.studies?.length > 0),
     ];
 
     return (

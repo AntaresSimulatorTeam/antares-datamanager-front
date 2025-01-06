@@ -4,5 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-declare const _default: import('vite').UserConfig;
-export default _default;
+import { useContext } from 'react';
+import { TableContext, TableContextType } from './TableContext';
+
+export const useTableContext = <TData>() => useContext(TableContext) as TableContextType<TData>;

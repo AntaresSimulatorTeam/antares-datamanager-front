@@ -4,5 +4,10 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-declare const _default: import('vite').UserConfig;
-export default _default;
+export enum StudyStatus {
+  IN_PROGRESS = 'IN_PROGRESS',
+  GENERATED = 'GENERATED',
+  ERROR = 'ERROR',
+  CLOSED = 'CLOSED',
+  DELETED = 'DELETED',
+}

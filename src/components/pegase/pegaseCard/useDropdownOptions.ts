@@ -15,25 +15,27 @@ export const useDropdownOptions = () => {
   const { t } = useTranslation();
 
   const settingOption = useCallback(
-    (onClick: () => void, label?: string): RdsDropdownOption => ({
+    (onClick: () => void, label?: string, disabled?: boolean): RdsDropdownOption => ({
       key: 'setting',
       label: label || t('project.@setting'),
       value: 'setting',
       icon: RdsIconId.Settings,
       onItemClick: onClick,
       extraClasses: NO_WRAP_CLASS,
+      disabled: disabled,
     }),
     [t],
   );
 
   const deleteOption = useCallback(
-    (onClick: () => void, label?: string): RdsDropdownOption => ({
+    (onClick: () => void, label?: string, disabled?: boolean): RdsDropdownOption => ({
       key: 'delete',
       label: label ?? t('project.@delete'),
       value: 'delete',
       icon: RdsIconId.Delete,
       onItemClick: onClick,
       extraClasses: clsx(NO_WRAP_CLASS, '[&]:text-error-600 [&]:hover:text-error-600'),
+      disabled: disabled,
     }),
     [t],
   );

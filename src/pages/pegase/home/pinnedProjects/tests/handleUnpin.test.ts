@@ -20,6 +20,7 @@ describe('handleUnpin test', () => {
           creationDate: new Date(),
           path: '',
           tags: ['tag1', 'tag2'],
+          studies: [],
         },
         {
           id: '2',
@@ -29,6 +30,7 @@ describe('handleUnpin test', () => {
           creationDate: new Date(),
           path: '',
           tags: ['tag3', 'tag4'],
+          studies: [],
         },
       ];
       updatedProjects = callback(prevProjects);
@@ -52,6 +54,7 @@ describe('handleUnpin test', () => {
         creationDate: expect.any(Date),
         path: '',
         tags: ['tag3', 'tag4'],
+        studies: [],
       },
     ]);
   });
