@@ -6,9 +6,6 @@
 
 import { ProjectInfo } from '@/shared/types/pegase/Project.type';
 import PegaseCard from '@/components/pegase/pegaseCard/pegaseCard';
-import StdIcon from '@common/base/stdIcon/StdIcon';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
-import StdTagList from '@common/base/StdTagList/StdTagList';
 import StdAvatar from '@common/layout/stdAvatar/StdAvatar';
 import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter';
 import { useEffect, useState } from 'react';
@@ -18,6 +15,7 @@ import { useDropdownOptions } from '@/components/pegase/pegaseCard/useDropdownOp
 import { dismissToast, notifyToast } from '@/shared/notification/notification';
 import { v4 as uuidv4 } from 'uuid';
 import { useProjectNavigation } from '@/hooks/useProjectNavigation';
+import { RdsIcon, RdsIconId, RdsTagList } from 'rte-design-system-react';
 import { deleteProjectById } from '@/pages/pegase/projects/projectService';
 
 export const PinnedProjectCards = ({
@@ -136,7 +134,7 @@ export const PinnedProjectCards = ({
           onClick={() => handleCardClick(project.id, project.name)}
           icons={
             <div className="text-primary-600">
-              <StdIcon name={StdIconId.PushPin} />{' '}
+              <RdsIcon name={RdsIconId.PushPin} />{' '}
             </div>
           }
         >
@@ -144,7 +142,7 @@ export const PinnedProjectCards = ({
             <div className="flex items-center gap-1">
               {project.tags && (
                 <div className="flex h-3 w-32">
-                  <StdTagList id={`${project.id}-tag-list`} tags={project.tags} />
+                  <RdsTagList id={`${project.id}-tag-list`} tags={project.tags} />
                 </div>
               )}
             </div>

@@ -4,11 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import StdAlert from '@/components/common/layout/stdAlert/StdAlert';
-import StdBanner from '@/components/common/layout/stdBanner/StdBanner';
-
-import StdToast, { ToastAction } from '@/components/common/layout/stdToast/StdToast';
 import { Id, toast } from 'react-toastify';
+import { RdsAlert, RdsBanner, RdsToast, ToastAction } from 'rte-design-system-react';
 import { v4 as uuidv4 } from 'uuid';
 import { DisplayStatus } from '../types/common/DisplayStatus.type';
 
@@ -32,7 +29,7 @@ export const notifyToast = ({ message, type, action, id }: NotifyWithActionProps
   toast.clearWaitingQueue({ containerId: ToastContainerId });
   toast.dismiss({ containerId: ToastContainerId });
   const toastId = id ?? uuidv4();
-  return toast(<StdToast message={message} status={type} action={action} progressBarPlaceholder />, {
+  return toast(<RdsToast message={message} status={type} action={action} progressBarPlaceholder />, {
     toastId,
     containerId: ToastContainerId,
     type,
@@ -50,7 +47,7 @@ export const dismissToast = (id?: Id) => toast.dismiss({ containerId: ToastConta
  */
 export const notifyAlert = ({ message, type, action, id }: NotifyWithActionProps) => {
   const toastId = id ?? uuidv4();
-  return toast(<StdAlert message={message} status={type} action={action} onClose={() => toast.dismiss(toastId)} />, {
+  return toast(<RdsAlert message={message} status={type} action={action} onClose={() => toast.dismiss(toastId)} />, {
     toastId,
     containerId: AlertContainerId,
     type,
@@ -74,7 +71,7 @@ export const notifyBanner = ({ message, type }: NotifyProps) => {
   toast.clearWaitingQueue({ containerId: BannerContainerId });
   toast.dismiss({ containerId: BannerContainerId });
   const toastId = uuidv4();
-  return toast(<StdBanner message={message} status={type} onClose={() => dismissBanner(toastId)} />, {
+  return toast(<RdsBanner message={message} status={type} onClose={() => dismissBanner(toastId)} />, {
     containerId: BannerContainerId,
     toastId,
     type,

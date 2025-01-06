@@ -4,18 +4,17 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import StdButton, { StdButtonProps } from '@/components/common/base/stdButton/StdButton';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
+import { RdsButton, RdsButtonProps, RdsIconId } from 'rte-design-system-react';
 
-type StdCollapseIconProps = {
-  onClick: StdButtonProps['onClick'];
+type RdsCollapseIconProps = {
+  onClick: RdsButtonProps['onClick'];
   isOpen: boolean;
 };
 
-const StdCollapseIcon = ({ onClick, isOpen }: StdCollapseIconProps) => (
-  <StdButton
+const StdCollapseIcon = ({ onClick, isOpen }: RdsCollapseIconProps) => (
+  <RdsButton
     onClick={onClick}
-    icon={isOpen ? StdIconId.KeyboardArrowDown : StdIconId.KeyboardArrowRight}
+    icon={isOpen ? RdsIconId.KeyboardArrowDown : RdsIconId.KeyboardArrowRight}
     size="extraSmall"
     variant="text"
   />

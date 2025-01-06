@@ -4,8 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import StdIcon from '@/components/common/base/stdIcon/StdIcon';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
+import StdIcon from '@common/base/stdIcon/StdIcon';
 
 export function addSortColumn(
   headers: any[],
@@ -41,7 +41,7 @@ export function addSortColumn(
                   </span>
                 ) : (
                   <span className="font-bold text-primary-600">
-                    <StdIcon name={StdIconId.ArrowDownwardAlt} />
+                    <StdIcon name={StdIconId.ArrowUpwardAlt} />
                   </span>
                 )
               ) : (

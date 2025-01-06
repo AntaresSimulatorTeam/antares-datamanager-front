@@ -4,11 +4,11 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import StdSwitch from '@/components/common/forms/stdSwitch/StdSwitch';
 import { UserContext } from '@/contexts/UserContext';
 import { THEME_COLOR } from '@/shared/types';
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';
+import { RdsSwitch } from 'rte-design-system-react';
 
 const Settings = () => {
   const themeColor = UserContext.useStore((store) => store.theme);
@@ -20,7 +20,7 @@ const Settings = () => {
   return (
     <div className="grid gap-3 p-2">
       <div className="flex gap-1">
-        <StdSwitch
+        <RdsSwitch
           label="Theme"
           name="theme"
           value="theme"
@@ -32,7 +32,7 @@ const Settings = () => {
         <p>Select Theme</p>
       </div>
       <div className="flex gap-1">
-        <StdSwitch
+        <RdsSwitch
           label="trad"
           name="trad"
           value="trad"

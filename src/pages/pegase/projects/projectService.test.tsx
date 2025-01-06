@@ -4,9 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
-
 import { notifyToast } from '@/shared/notification/notification';
 import { pinProject, useFetchProjects } from './projectService';
 

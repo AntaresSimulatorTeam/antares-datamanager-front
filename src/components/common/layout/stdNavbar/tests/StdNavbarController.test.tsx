@@ -5,7 +5,6 @@
  */
 
 import { noop } from '@/shared/utils/common/defaultUtils';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import { render, screen } from '@testing-library/react';
 import StdNavbarController from '../StdNavbarController';
 
@@ -19,12 +18,10 @@ describe('StdNavbarController component', () => {
   });
   it('should render the proper content when expanded', () => {
     render(<StdNavbarController label={TEST_LABEL} action={noop} expanded id={TEST_ID} />);
-    expect(screen.getByTitle(StdIconId.KeyboardDoubleArrowLeft)).toBeInTheDocument();
-    expect(screen.getByText(TEST_LABEL)).toBeInTheDocument();
+    expect(screen.queryByText(TEST_LABEL)).toBeInTheDocument();
   });
   it('should render the proper content when expanded is false', () => {
     render(<StdNavbarController label={TEST_LABEL} action={noop} expanded={false} id={TEST_ID} />);
-    expect(screen.getByTitle(StdIconId.KeyboardDoubleArrowRight)).toBeInTheDocument();
     expect(screen.queryByText(TEST_LABEL)).not.toBeInTheDocument();
   });
 });

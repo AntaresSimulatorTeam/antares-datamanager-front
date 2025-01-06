@@ -4,13 +4,12 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import StdTagList from '@/components/common/base/StdTagList/StdTagList';
-import StdRadioButton from '@/components/common/forms/stdRadioButton/StdRadioButton';
 import StdAvatar from '@/components/common/layout/stdAvatar/StdAvatar';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type';
 import { StudyDTO } from '@/shared/types/pegase/study';
 import { createColumnHelper } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
+import { RdsRadioButton, RdsTagList } from 'rte-design-system-react';
 
 const columnHelper = createColumnHelper<StudyDTO>();
 
@@ -22,7 +21,7 @@ const getStudyTableHeaders = () => {
       header: () => <></>,
       cell: ({ row }) => (
         <div className={`${row.getIsSelected() ? 'block' : 'hidden group-hover:block'}`}>
-          <StdRadioButton
+          <RdsRadioButton
             value={row.original.id.toString()}
             label=""
             disabled={!row.getCanSelect()}
@@ -67,7 +66,7 @@ const getStudyTableHeaders = () => {
       size: 500,
       cell: ({ getValue, row }) => (
         <div className="flex h-3 w-32">
-          <StdTagList id={`pegase-tags-${row.id}`} tags={getValue()} />
+          <RdsTagList id={`pegase-tags-${row.id}`} tags={getValue()} />
         </div>
       ),
     }),

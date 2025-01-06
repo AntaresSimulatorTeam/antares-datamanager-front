@@ -7,10 +7,10 @@
 import { useStdId } from '@/hooks/common/useStdId';
 import { MenuNavItem } from '@/shared/types';
 import { Link } from 'react-router-dom';
-import StdIcon from '../../base/stdIcon/StdIcon';
 import StdTextTooltip from '../stdTextTooltip/StdTextTooltip';
 import { navbarItemClassBuilder } from './navbarClassBuilder';
 import { useTranslation } from 'react-i18next';
+import { RdsIcon } from 'rte-design-system-react';
 
 type StdNavbarMenuItemProps = {
   item: MenuNavItem;
@@ -27,7 +27,7 @@ const StdNavbarMenuItem = ({ item, expanded = true, selected = false }: StdNavba
   return (
     <StdTextTooltip text={label} placement="right" enabled={!expanded} disableArrow>
       <Link to={path} className={navbarMenuItemClasses} key={key} id={id}>
-        <StdIcon name={icon} />
+        <RdsIcon name={icon} />
         {expanded && t(label)}
       </Link>
     </StdTextTooltip>

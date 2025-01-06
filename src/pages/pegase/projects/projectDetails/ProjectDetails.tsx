@@ -9,12 +9,11 @@ import { useLocation } from 'react-router-dom';
 import { ProjectInfo } from '@/shared/types/pegase/Project.type';
 import { getEnvVariables } from '@/envVariables';
 import ProjectDetailsHeader from './ProjectDetailsHeader';
-import StdDivider from '@/components/common/layout/stdDivider/StdDivider';
 import ProjectDetailsContent from './ProjectDetailsContent';
 import StudyTableDisplay from '@/pages/pegase/home/components/StudyTableDisplay';
 import SearchBar from '@/pages/pegase/home/components/SearchBar';
-import StdChip from '@common/base/stdChip/StdChip';
 import { useTranslation } from 'react-i18next';
+import { RdsChip, RdsDivider } from 'rte-design-system-react';
 
 const ProjectDetails = () => {
   const { t } = useTranslation();
@@ -84,7 +83,7 @@ const ProjectDetails = () => {
   ) : (
     <div className="flex flex-col">
       <ProjectDetailsHeader projectName={projectInfo.name} createdBy={projectInfo.createdBy} />
-      <StdDivider />
+      <RdsDivider />
       <div className="flex flex-col">
         <ProjectDetailsContent
           description={projectInfo.description}
@@ -94,7 +93,7 @@ const ProjectDetails = () => {
       </div>
       <div className="flex gap-4 px-3 py-2">
         <SearchBar onSearch={searchStudy} chipLabels={['']} />
-        <StdChip
+        <RdsChip
           label={t('home.@my_studies')}
           onClick={handleChipClick}
           status={activeChip ? 'secondary' : 'primary'}

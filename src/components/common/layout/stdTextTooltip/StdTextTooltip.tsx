@@ -6,10 +6,9 @@
 
 import { Placement } from '@floating-ui/react';
 import { Dispatch, PropsWithChildren, SetStateAction } from 'react';
-import StdFloatingWrapper from '../stdFloatingWrapper/StdFloatingWrapper';
-import StdTooltip from '../stdTooltip/StdTooltip';
+import { RdsFloatingWrapper, RdsTooltip } from 'rte-design-system-react';
 
-const { Trigger, Element } = StdFloatingWrapper;
+const { Trigger, Element } = RdsFloatingWrapper;
 
 export type StdTextTooltipProps = {
   text: string;
@@ -35,7 +34,7 @@ const StdTextTooltip = ({
   children,
   id,
 }: PropsWithChildren<StdTextTooltipProps>) => (
-  <StdFloatingWrapper
+  <RdsFloatingWrapper
     show={show}
     setShow={setShow}
     interactiveMode="hover"
@@ -47,12 +46,12 @@ const StdTextTooltip = ({
     <Trigger>{children}</Trigger>
     {enabled ? (
       <Element>
-        <StdTooltip id={id}>{text}</StdTooltip>
+        <RdsTooltip id={id}>{text}</RdsTooltip>
       </Element>
     ) : (
       <></>
     )}
-  </StdFloatingWrapper>
+  </RdsFloatingWrapper>
 );
 
 export default StdTextTooltip;

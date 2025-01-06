@@ -4,7 +4,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import StdDivider from '@/components/common/layout/stdDivider/StdDivider';
 import StdNavbarController from '@/components/common/layout/stdNavbar/StdNavbarController';
 import StdNavbarHeader from '@/components/common/layout/stdNavbar/StdNavbarHeader';
 import StdNavbarMenu from '@/components/common/layout/stdNavbar/StdNavbarMenu';
@@ -13,6 +12,7 @@ import { APP_NAME } from '@/shared/constants';
 import { MenuNavItem } from '@/shared/types';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { RdsDivider } from 'rte-design-system-react';
 
 type StdNavbarProps = {
   topItems: MenuNavItem[];
@@ -42,7 +42,7 @@ const Navbar = ({ id, topItems, bottomItems }: StdNavbarProps) => {
 
       <div className="mt-auto">
         <StdNavbarMenu menuItems={bottomItems} expanded={expanded} />
-        <StdDivider />
+        <RdsDivider />
         <StdNavbarController action={toggleExpanded} id={controllerId} label={controllerLabel} expanded={expanded} />
       </div>
     </nav>

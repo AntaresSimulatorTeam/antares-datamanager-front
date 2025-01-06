@@ -7,10 +7,8 @@
 // src/pages/pegase/projects/ProjectContent.tsx
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import StdChip from '@common/base/stdChip/StdChip';
 import SearchBar from '@/pages/pegase/home/components/SearchBar';
 import PegaseCard from '@/components/pegase/pegaseCard/pegaseCard';
-import StdTagList from '@common/base/StdTagList/StdTagList';
 import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter';
 import StdAvatar from '@common/layout/stdAvatar/StdAvatar';
 import StudiesPagination from '@/pages/pegase/home/components/StudiesPagination';
@@ -18,6 +16,7 @@ import { useDropdownOptions } from '@/components/pegase/pegaseCard/useDropdownOp
 
 import { useProjectNavigation } from '@/hooks/useProjectNavigation';
 import { deleteProjectById, pinProject, useFetchProjects } from './projectService';
+import { RdsChip, RdsTagList } from 'rte-design-system-react';
 
 interface ProjectContentProps {
   isReloadPinnedProject: (value: boolean) => void;
@@ -67,7 +66,7 @@ const ProjectContent = ({ isReloadPinnedProject }: ProjectContentProps) => {
     <div className="flex w-full flex-1 flex-col gap-3">
       <div className="flex gap-4 py-2">
         <SearchBar onSearch={searchProject} chipLabels={['']} />
-        <StdChip
+        <RdsChip
           label={t('home.@my_projects')}
           onClick={handleChipClick}
           status={activeChip ? 'secondary' : 'primary'}
@@ -92,7 +91,7 @@ const ProjectContent = ({ isReloadPinnedProject }: ProjectContentProps) => {
                 <div className="flex items-center gap-1">
                   {project.tags && (
                     <div className="flex h-3 w-32">
-                      <StdTagList id={`${project.id}-tag-list`} tags={project.tags} />
+                      <RdsTagList id={`${project.id}-tag-list`} tags={project.tags} />
                     </div>
                   )}
                 </div>

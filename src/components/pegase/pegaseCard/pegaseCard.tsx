@@ -4,20 +4,19 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import StdButton, { StdButtonProps } from '@/components/common/base/stdButton/StdButton';
-import StdCard, { StdCardProps } from '@/components/common/layout/stdCard/StdCard';
 import { PropsWithChildren } from 'react';
 import cardClassBuilder from './cardClassBuilder';
 import PegaseCardTitle, { PegaseCardTitleProps } from './pegaseCardTitle/pegaseCardTitle';
+import { RdsButton, RdsButtonProps, RdsCard, RdsCardProps } from 'rte-design-system-react';
 
 export type PegaseCardSecondaryButtonPosition = 'default' | 'center';
 
 export type PegaseCardTripleActionButtonProps = {
-  primary?: Omit<StdButtonProps, 'type' | 'size' | 'variant'>;
-  secondary?: Omit<StdButtonProps, 'type' | 'size' | 'variant'>;
+  primary?: Omit<RdsButtonProps, 'type' | 'size' | 'variant'>;
+  secondary?: Omit<RdsButtonProps, 'type' | 'size' | 'variant'>;
 };
 
-type PegaseCardTripleActionProps = Omit<StdCardProps, 'disabled'> &
+type PegaseCardTripleActionProps = Omit<RdsCardProps, 'disabled'> &
   Omit<PegaseCardTitleProps, 'onClick'> & {
     title: string;
     buttons?: PegaseCardTripleActionButtonProps;
@@ -39,7 +38,7 @@ const PegaseCard = ({
   const { buttonContainerClasses, primaryButtonContainerClasses, secondaryButtonContainerClasses } =
     cardClassBuilder(secondaryButtonPosition);
   return (
-    <StdCard id={id} onClick={buttons ? undefined : onClick}>
+    <RdsCard id={id} onClick={buttons ? undefined : onClick}>
       <div className="flex h-full w-full cursor-pointer flex-col gap-2 p-2">
         <PegaseCardTitle
           id={`${id}-title`}
@@ -55,7 +54,7 @@ const PegaseCard = ({
           <div className={buttonContainerClasses}>
             {buttons.secondary && (
               <div className={secondaryButtonContainerClasses}>
-                <StdButton
+                <RdsButton
                   id={id && `${id}-secondary-button`}
                   size="small"
                   color="secondary"
@@ -66,13 +65,13 @@ const PegaseCard = ({
             )}
             {buttons.primary && (
               <div className={primaryButtonContainerClasses}>
-                <StdButton id={id && `${id}-primary-button`} size="small" {...buttons.primary} />
+                <RdsButton id={id && `${id}-primary-button`} size="small" {...buttons.primary} />
               </div>
             )}
           </div>
         )}
       </div>
-    </StdCard>
+    </RdsCard>
   );
 };
 

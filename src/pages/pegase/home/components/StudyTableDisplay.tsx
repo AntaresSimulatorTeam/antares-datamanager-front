@@ -3,16 +3,18 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-import StdSimpleTable from '@/components/common/data/stdSimpleTable/StdSimpleTable';
+
 import { useState } from 'react';
 import { StudyDTO } from '@/shared/types/index';
-import getStudyTableHeaders from './StudyTableHeaders';
-import { addSortColumn } from './StudyTableUtils';
 import StudiesPagination from './StudiesPagination';
 import { RowSelectionState } from '@tanstack/react-table';
-import StdButton from '@/components/common/base/stdButton/StdButton';
-import { StudyStatus } from '@/shared/types/common/StudyStatus.type';
 import { useStudyTableDisplay } from './useStudyTableDisplay';
+import { RdsButton } from 'rte-design-system-react';
+
+import getStudyTableHeaders from './StudyTableHeaders';
+import { addSortColumn } from './StudyTableUtils';
+import { StudyStatus } from '@/shared/types/common/StudyStatus.type';
+import StdSimpleTable from '@/components/common/data/stdSimpleTable/StdSimpleTable';
 
 interface StudyTableDisplayProps {
   searchStudy: string | undefined;
@@ -86,13 +88,13 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
         <div className="flex gap-2">
           {selectedRowId !== undefined ? (
             <>
-              <StdButton
+              <RdsButton
                 label="Duplicate"
                 onClick={() => console.log('duplicate')}
                 variant="outlined"
                 disabled={!isDuplicateActive}
               />
-              <StdButton
+              <RdsButton
                 label="Delete"
                 onClick={() => console.log('Delete')}
                 variant="outlined"
@@ -101,7 +103,7 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
               />
             </>
           ) : (
-            <StdButton label="NewStudy" onClick={() => console.log('NewStudy')} />
+            <RdsButton label="NewStudy" onClick={() => console.log('NewStudy')} />
           )}
         </div>
         <StudiesPagination count={count} intervalSize={intervalSize} current={current} onChange={setPage} />

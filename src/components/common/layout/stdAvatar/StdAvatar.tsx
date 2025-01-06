@@ -4,10 +4,10 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import StdTextTooltip from '../stdTextTooltip/StdTextTooltip';
 import { avatarClassBuilder } from './avatarClassBuilder';
 import { AVATAR_COLORS } from '../stdAvatarGroup/avatarTools';
 import { useStdId } from '@/hooks/common/useStdId';
+import { RdsTextTooltip } from 'rte-design-system-react';
 
 type StdAvatarProps = {
   initials: string;
@@ -28,9 +28,9 @@ const StdAvatar = ({ initials, size, backgroundColor, fullname, id: propsId }: S
 
   return (
     <div role="figure" id={id} className={'avatar overflow-visible'}>
-      <StdTextTooltip text={fullname} offset={OFFSET_HOVER_HEIGHT} placement="top">
+      <RdsTextTooltip text={fullname} offset={OFFSET_HOVER_HEIGHT} placement="top">
         <p className={avatarClasses}>{initials}</p>
-      </StdTextTooltip>
+      </RdsTextTooltip>
     </div>
   );
 };
