@@ -19,7 +19,6 @@ import { handleDelete } from '@/pages/pegase/home/components/studyService';
 import {RdsButton} from "rte-design-system-react";
 import { useStudyNavigation } from '@/pages/pegase/studies/useStudyNavigation';
 
-
 interface StudyTableDisplayProps {
   searchStudy: string | undefined;
   projectId?: string;
@@ -67,9 +66,7 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
   });
 
   const selectedRowId = Object.keys(rowSelection)[0];
-
   const selectedStatus = rows[Number.parseInt(selectedRowId || '-1')]?.status?.toUpperCase();
-
   const isDuplicateActive = selectedStatus === StudyStatus.GENERATED;
   const isDeleteActive = selectedStatus === StudyStatus.ERROR || selectedStatus === StudyStatus.IN_PROGRESS;
 
@@ -122,7 +119,6 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
           {selectedRowId !== undefined ? (
             <>
               <RdsButton label="Open" onClick={handleRowClick} variant="outlined" />
-
               <RdsButton label="Duplicate" onClick={handleDuplicate} variant="outlined" disabled={!isDuplicateActive} />
               <RdsButton
                 label="Delete"
