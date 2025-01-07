@@ -10,7 +10,7 @@ type EnvVariableType = {
 
 // Environment Variable Template to Be Replaced at Runtime
 export const envVariables: EnvVariableType = {
-  VITE_BACK_END_BASE_URL: 'http://pegase-integration.rte-france.com:8080',
+  VITE_BACK_END_BASE_URL: '${URL_BACKEND}',
 };
 export const getEnvVariables = (key: keyof EnvVariableType) =>
   envVariables[key].startsWith('$') ? (import.meta.env[key] as string) : envVariables[key];
