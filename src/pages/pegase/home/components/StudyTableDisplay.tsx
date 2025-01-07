@@ -15,6 +15,7 @@ import { StudyStatus } from '@/shared/types/common/StudyStatus.type';
 import { useStudyTableDisplay } from './useStudyTableDisplay';
 import { useTranslation } from 'react-i18next';
 import StudyCreationModal from '../../studies/StudyCreationModal';
+import { handleDelete } from '@/pages/pegase/home/components/studyService';
 import {RdsButton} from "rte-design-system-react";
 
 interface StudyTableDisplayProps {
@@ -30,6 +31,9 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const { t } = useTranslation();
   const [selectedStudy, setSelectedStudy] = useState<StudyDTO | null>(null);
+
+  // Reload trigger for re-fetching data
+  const [reloadStudies, setReloadStudies] = useState<boolean>(false);
 
   const handleSort = (column: string) => {
     const newSortOrder = sortByState[column] === 'asc' ? 'desc' : 'asc';
@@ -52,10 +56,12 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
     isHeaderHovered,
   );
 
+  // Pass reloadTrigger to refresh data
   const { rows, count, intervalSize, current, setPage } = useStudyTableDisplay({
     searchStudy,
     projectId,
     sortBy: sortByState,
+    reloadStudies, // Key change here
   });
 
   const selectedRowId = Object.keys(rowSelection)[0];
@@ -69,6 +75,16 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
     const selectedStudy = rows[Number.parseInt(selectedRowId || '-1')];
     setSelectedStudy(selectedStudy);
     toggleModal();
+    setReloadStudies(!reloadStudies); // Trigger reload after deleting
+  };
+
+  const handleDeleteClick = () => {
+    const selectedStudyId = rows[Number.parseInt(selectedRowId || '-1')]?.id;
+    if (selectedStudyId) {
+      handleDelete(selectedStudyId).then(() => {
+        setReloadStudies(!reloadStudies); // Trigger reload after deleting
+      });
+    }
   };
 
   return (
@@ -99,7 +115,7 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
               <RdsButton label="Duplicate" onClick={handleDuplicate} variant="outlined" disabled={!isDuplicateActive} />
               <RdsButton
                 label="Delete"
-                onClick={() => console.log('Delete')}
+                onClick={handleDeleteClick}
                 variant="outlined"
                 color="danger"
                 disabled={!isDeleteActive}
@@ -108,7 +124,14 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
           ) : (
             <RdsButton label={t('home.@new_study')} onClick={toggleModal} />
           )}
-          {isModalOpen && <StudyCreationModal isOpen={isModalOpen} onClose={toggleModal} study={selectedStudy} />}
+          {isModalOpen && (
+            <StudyCreationModal
+              isOpen={isModalOpen}
+              onClose={toggleModal}
+              study={selectedStudy}
+              setReloadStudies={setReloadStudies} // Pass setReloadStudies
+            />
+          )}
         </div>
         <StudiesPagination count={count} intervalSize={intervalSize} current={current} onChange={setPage} />
       </div>

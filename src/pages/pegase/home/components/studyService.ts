@@ -49,3 +49,24 @@ export const fetchSuggestedKeywords = async (query: string): Promise<string[]> =
   const data = await response.json();
   return data;
 };
+
+export const handleDelete = async (id: number) => {
+  try {
+    const response = await fetch(`http://localhost:8093/v1/study/${id}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText);
+    }
+    notifyToast({
+      type: 'success',
+      message: 'Study deleted successfully',
+    });
+  } catch (error: any) {
+    notifyToast({
+      type: 'error',
+      message: `${error.message}`,
+    });
+  }
+};
