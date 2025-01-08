@@ -44,7 +44,7 @@ const getStudyTableHeaders = () => {
     columnHelper.accessor('createdBy', {
       header: t('home.@user_name'),
       cell: ({ getValue }) => (
-        <StdAvatar size="s" backgroundColor="gray" fullname={getValue()} initials={getValue().substring(0, 2)} />
+        <StdAvatar size="es" backgroundColor="gray" fullname={getValue()} initials={getValue().substring(0, 2)} />
       ),
     }),
 
