@@ -16,6 +16,7 @@ import { THEME_COLOR } from './shared/types';
 import { menuBottomData, menuTopData } from './routes';
 import { PegaseToastContainer } from './shared/notification/containers';
 import ProjectDetails from './pages/pegase/projects/projectDetails/ProjectDetails';
+import StudyDetails from '@/pages/pegase/studies/studyDetails/studyDetails';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
           <PegaseStar />
           <Suspense>
             <Routes>
+              <Route path="/study/:studyName" element={<StudyDetails />} />
               <Route path="/project/:projectName" element={<ProjectDetails />} />
               {Object.entries([...menuBottomData, ...menuTopData]).map(([key, route]) => (
                 <Route key={key} path={route.path} Component={route.component} />
