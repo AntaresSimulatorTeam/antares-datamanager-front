@@ -20,7 +20,7 @@ const getStudyTableHeaders = () => {
       id: 'radioColumn',
       header: () => <></>,
       cell: ({ row }) => (
-        <div className={`${row.getIsSelected() ? 'block' : 'hidden group-hover:block'}`}>
+        <div className={`${row.getIsSelected() ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
           <RdsRadioButton
             value={row.original.id.toString()}
             label=""
