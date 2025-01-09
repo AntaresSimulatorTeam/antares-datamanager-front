@@ -4,13 +4,10 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
-import StdButton from '@common/base/stdButton/StdButton';
 import StdSimpleTable from '@common/data/stdSimpleTable/StdSimpleTable';
-import StdIcon from '@common/base/stdIcon/StdIcon';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
-import StdIconButton from '@common/base/stdIconButton/StdIconButton';
+import { RdsButton, RdsIconId } from 'rte-design-system-react';
 
 type RowStatus = 'Missing' | 'OK' | 'Error';
 
@@ -53,7 +50,7 @@ const AreaLinkTable = () => {
         return trajectory ? (
           <div>
             <span>{trajectory}</span>
-            <StdIconButton icon={StdIconId.Delete} onClick={() => handleDelete(index)} />
+            <RdsButton icon={RdsIconId.Delete} onClick={() => handleDelete(index)} />
           </div>
         ) : (
           <div>
@@ -63,7 +60,7 @@ const AreaLinkTable = () => {
               <option>BP_24_ref</option>
             </select>
             or
-            <StdButton label="Import" onClick={() => handleImport(index)} size="meduim" />
+            <RdsButton label="Import" onClick={() => handleImport(index)} size="medium" />
           </div>
         );
       },

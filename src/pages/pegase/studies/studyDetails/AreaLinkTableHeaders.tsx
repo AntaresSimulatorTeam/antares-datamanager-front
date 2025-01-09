@@ -4,10 +4,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { StudyDTO } from '@/shared/types/pegase/study';
 import { createColumnHelper } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
-import StdButton from '@common/base/stdButton/StdButton';
+import { RdsButton } from 'rte-design-system-react';
 
 const columnHelper = createColumnHelper<any>();
 
@@ -20,7 +19,7 @@ const getAreaLinkTableHeaders = () => {
 
     columnHelper.accessor('trajectroy', {
       header: t('home.@trajectory'),
-      cell: ({ getValue }) => <StdButton label="import" />,
+      cell: () => <RdsButton label="import" />,
     }),
 
     columnHelper.accessor('status', {
