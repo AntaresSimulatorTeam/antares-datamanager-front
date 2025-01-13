@@ -18,7 +18,7 @@ const getStudyTableHeaders = () => {
   return [
     columnHelper.display({
       id: 'radioColumn',
-      header: () => <></>,
+      header: '',
       cell: ({ row }) => (
         <div className={`${row.getIsSelected() ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
           <RdsRadioButton
