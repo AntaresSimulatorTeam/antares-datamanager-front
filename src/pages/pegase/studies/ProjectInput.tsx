@@ -7,14 +7,16 @@
 // src/components/ProjectInput.tsx
 import React, { useState, useEffect } from 'react';
 import { RdsInputText } from 'rte-design-system-react';
+import { getEnvVariables } from '@/envVariables';
 
 interface ProjectManagerProps {
   value: string;
   onChange: (value: string) => void;
 }
+const BASE_URL = getEnvVariables('VITE_BACK_END_BASE_URL');
 
 const fetchProjects = async (query: string): Promise<string[]> => {
-  const response = await fetch(`http://localhost:8093/v1/project/autocomplete?partialName=${query}`);
+  const response = await fetch(`${BASE_URL}/v1/project/autocomplete?partialName=${query}`);
   if (!response.ok) {
     throw new Error('Failed to fetch projects');
   }

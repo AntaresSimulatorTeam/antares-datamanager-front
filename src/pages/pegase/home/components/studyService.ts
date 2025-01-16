@@ -5,6 +5,7 @@
  */
 
 import { notifyToast } from '@/shared/notification/notification';
+import { getEnvVariables } from '@/envVariables';
 
 interface StudyData {
   name: string;
@@ -14,10 +15,11 @@ interface StudyData {
   horizon: string;
   trajectoryIds: number[];
 }
+const BASE_URL = getEnvVariables('VITE_BACK_END_BASE_URL');
 
 export const saveStudy = async (studyData: StudyData, toggleModal: () => void) => {
   try {
-    const response = await fetch('http://localhost:8093/v1/study', {
+    const response = await fetch(`${BASE_URL}/v1/study`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -42,7 +44,7 @@ export const saveStudy = async (studyData: StudyData, toggleModal: () => void) =
   }
 };
 export const fetchSuggestedKeywords = async (query: string): Promise<string[]> => {
-  const response = await fetch(`http://localhost:8093/v1/study/keywords/search?partialName=${query}`);
+  const response = await fetch(`${BASE_URL}/v1/study/keywords/search?partialName=${query}`);
   if (!response.ok) {
     throw new Error('Failed to fetch suggested keywords');
   }
@@ -52,7 +54,7 @@ export const fetchSuggestedKeywords = async (query: string): Promise<string[]> =
 
 export const handleDelete = async (id: number) => {
   try {
-    const response = await fetch(`http://localhost:8093/v1/study/${id}`, {
+    const response = await fetch(`${BASE_URL}/v1/study/${id}`, {
       method: 'DELETE',
     });
     if (!response.ok) {
