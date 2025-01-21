@@ -16,7 +16,6 @@ const removeItem = (currentState, payload) => {
 
 const pinnedProjectReducer = (prevState: PinnedProjectState, action?: PinnedProjectActionType): PinnedProjectState => {
   const { pinnedProjects } = prevState;
-  console.log('================ pinnedProjects', pinnedProjects);
   let newState;
   switch (action?.type) {
     case PINNED_PROJECT_ACTION.ADD_ITEM:
