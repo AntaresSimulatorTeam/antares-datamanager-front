@@ -5,15 +5,14 @@
  */
 
 import React, { useRef, useState } from 'react';
-import StdTextTooltip from '../stdTextTooltip/StdTextTooltip';
-import { useCallOnResize } from '@/hooks/common/useCallOnResize';
+import { RdsTextTooltip, useCallOnResize } from 'rte-design-system-react';
 
 type StdTextTooltipProps = { text: string; id: string | undefined } & React.HTMLProps<HTMLSpanElement>;
 
 const DEFAULT_OFFSET = 8;
 
 const StdTextWithTooltip = ({ text, id, ...props }: StdTextTooltipProps) => {
-  const spanRef = useRef<HTMLSpanElement>(null);
+  const spanRef = useRef<HTMLSpanElement | null>(null);
   const [enabled, setEnabled] = useState<boolean>(false);
 
   useCallOnResize(() => {
@@ -24,11 +23,11 @@ const StdTextWithTooltip = ({ text, id, ...props }: StdTextTooltipProps) => {
   }, spanRef.current?.id);
 
   return (
-    <StdTextTooltip text={text} enabled={enabled} offset={DEFAULT_OFFSET}>
+    <RdsTextTooltip text={text} enabled={enabled} offset={DEFAULT_OFFSET}>
       <span ref={spanRef} {...props} id={id}>
         {text}
       </span>
-    </StdTextTooltip>
+    </RdsTextTooltip>
   );
 };
 

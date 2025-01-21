@@ -4,12 +4,16 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { renderHook, waitFor } from '@testing-library/react';
-import { useStudyTableDisplay } from '../useStudyTableDisplay';
+import { act, renderHook, waitFor } from '@testing-library/react';
+import { useStudyTableDisplay } from '@/hooks/useStudyTableDisplay';
 
 describe('useStudyTableDisplay', () => {
   beforeEach(() => {
     global.fetch = vi.fn();
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
   });
 
   it('fetches data and updates state correctly', async () => {
@@ -43,7 +47,7 @@ describe('useStudyTableDisplay', () => {
     });
 
     const { result } = renderHook(() =>
-      useStudyTableDisplay({ searchStudy: 'test', sortBy: { status: 'desc' }, reloadStudies: true }),
+      useStudyTableDisplay({ searchTerm: 'test', sortBy: { status: 'desc' }, reloadStudies: true }),
     );
     await waitFor(() => {
       expect(result.current.rows).toHaveLength(2);
@@ -55,7 +59,7 @@ describe('useStudyTableDisplay', () => {
     global.fetch = vi.fn().mockRejectedValue(new Error('Fetch error'));
 
     const { result } = renderHook(() =>
-      useStudyTableDisplay({ searchStudy: 'test', sortBy: { status: 'desc' }, reloadStudies: true }),
+      useStudyTableDisplay({ searchTerm: 'test', sortBy: { status: 'desc' }, reloadStudies: true }),
     );
 
     await waitFor(() => {
@@ -87,12 +91,22 @@ describe('useStudyTableDisplay', () => {
     });
 
     const { result } = renderHook(() =>
-      useStudyTableDisplay({ searchStudy: 'study1', sortBy: { status: 'desc' }, reloadStudies: true }),
+      useStudyTableDisplay({
+        searchTerm: 'study1',
+        projectId: 'projectId',
+        sortBy: { status: 'desc' },
+        reloadStudies: true,
+      }),
     );
+
+    act(() => {
+      result.current.setPage(3);
+    });
 
     await waitFor(() => {
       expect(result.current.rows).toHaveLength(1);
-      expect(result.current.current).toEqual(0);
+      expect(result.current.count).toEqual(1);
+      expect(result.current.currentPage).toEqual(3);
     });
   });
 });

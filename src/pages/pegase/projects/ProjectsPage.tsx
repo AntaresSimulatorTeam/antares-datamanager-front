@@ -4,19 +4,19 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import HomePageContent from './components/HomePageContent';
 import PinnedProject from '@/pages/pegase/home/pinnedProjects/PinnedProject';
+import ProjectContent from '@/pages/pegase/projects/ProjectContent';
 import { PinnedProjectProvider } from '@/store/contexts/ProjectContext.tsx';
 
-const HomePage = () => {
+const ProjectsPage = () => {
   return (
     <PinnedProjectProvider initialValue={{ pinnedProjects: [] }}>
       <div className="flex flex-col items-center gap-6 p-3">
         <PinnedProject />
-        <HomePageContent />
+        <ProjectContent />
       </div>
     </PinnedProjectProvider>
   );
 };
 
-export default HomePage;
+export default ProjectsPage;

@@ -5,16 +5,20 @@
  */
 
 import { useNavigate } from 'react-router-dom';
-import {StudyDTO} from "@/shared/types";
+import { StudyDTO } from '@/shared/types';
+import { useCallback } from 'react';
 
 export const useStudyNavigation = () => {
   const navigate = useNavigate();
 
-  const navigateToStudy = (study: StudyDTO) => {
-    navigate(`/study/${encodeURIComponent(study.name)}`, {
-      state: { study },
-    });
-  };
+  const navigateToStudy = useCallback(
+    (study: StudyDTO) => {
+      navigate(`/study/${encodeURIComponent(study.study_name)}`, {
+        state: { study },
+      });
+    },
+    [navigate],
+  );
 
   return { navigateToStudy };
 };

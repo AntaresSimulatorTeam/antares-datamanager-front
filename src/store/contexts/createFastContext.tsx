@@ -4,8 +4,16 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { Draft, create } from 'mutative';
-import React, { createContext, useCallback, useContext, useEffect, useRef, useSyncExternalStore } from 'react';
+import { create, Draft } from 'mutative';
+import React, {
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useSyncExternalStore,
+} from 'react';
 
 export type StoreOption = {
   addOnlyIfAbsent?: boolean;
@@ -91,7 +99,7 @@ export default function createFastContext<Store extends Record<string, unknown>>
 
   const StoreContext = createContext<UseStoreDataReturnType | null>(null);
 
-  function Provider({ initialState, children }: { initialState: Store; children: React.ReactNode }) {
+  function Provider({ initialState, children }: { initialState: Store; children: ReactNode }) {
     return <StoreContext.Provider value={useStoreData(initialState)}>{children}</StoreContext.Provider>;
   }
 

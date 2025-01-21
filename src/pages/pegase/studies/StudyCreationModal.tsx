@@ -20,7 +20,7 @@ interface StudyCreationModalProps {
   setReloadStudies: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const StudyCreationModal: React.FC<StudyCreationModalProps> = ({ onClose, study, setReloadStudies }) => {
+const StudyCreationModal: React.FC<StudyCreationModalProps> = ({ onClose, study, setReloadStudies, isOpen }) => {
   const { t } = useTranslation();
   const [studyName, setStudyName] = useState<string>('');
   const [horizon, setHorizon] = useState<string>('');

@@ -5,14 +5,14 @@
  */
 
 import { render } from '@testing-library/react';
-import { describe, it, expect, vi, Mock } from 'vitest';
-import { UserContext } from '@/contexts/UserContext';
-import usePrevious from '@/hooks/common/usePrevious';
+import { describe, expect, it, Mock, vi } from 'vitest';
 import { THEME_COLOR } from '@/shared/types';
 import ThemeHandler from '../ThemeHandler';
+import { UserContext } from '@/store/contexts/UserContext';
+import usePrevious from '@/hooks/common/usePrevious';
 
 // Mocking the UserContext and usePrevious hook
-vi.mock('@/contexts/UserContext', () => ({
+vi.mock('@/store/contexts/UserContext', () => ({
   UserContext: {
     useStore: vi.fn(),
   },

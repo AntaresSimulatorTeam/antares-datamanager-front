@@ -4,10 +4,10 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { useStdId } from '@/hooks/useStdId';
 import { Cell, flexRender, Header, Row, Table } from '@tanstack/react-table';
 import { clsx } from 'clsx';
 import { tableCoreRowClassBuilder } from './tableCoreRowClassBuilder';
+import { useRdsId } from 'rte-design-system-react';
 
 export type ColumnSizeType = 'pixels' | 'meta';
 export type ColumnResizeMode = 'onChange' | 'onEnd';
@@ -97,7 +97,7 @@ const tableStyleBuilder = <TData,>(table: Table<TData>, columnSize: ColumnSizeTy
     : undefined;
 
 const TableCore = <TData,>({ table, id: propId, striped, trClassName, columnSize = 'meta' }: TableCoreProps<TData>) => {
-  const id = useStdId('table-', propId);
+  const id = useRdsId('table-', propId);
 
   const handleToggleRow = (row: Row<unknown>) => () => {
     if (row.getCanSelect()) {

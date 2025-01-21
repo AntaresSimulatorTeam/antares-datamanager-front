@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { act, renderHook, waitFor } from '@testing-library/react';
+import { act, Queries, renderHook, RenderHookOptions, waitFor } from '@testing-library/react';
 import usePrevious from '../usePrevious';
 
 describe('usePrevious', () => {
@@ -21,7 +21,7 @@ describe('usePrevious', () => {
   it('should return previous value when a new value is provided', async () => {
     const { result, rerender } = renderHook((value) => usePrevious(value, 'initial'), {
       initialProps: 'initial',
-    });
+    } as RenderHookOptions<HTMLElement, Queries>);
 
     act(() => {
       rerender('updated');
@@ -35,7 +35,7 @@ describe('usePrevious', () => {
   it('should return updated previous value when a new value is provided', async () => {
     const { result, rerender } = renderHook((value) => usePrevious(value, 'initial'), {
       initialProps: 'initial',
-    });
+    } as RenderHookOptions<HTMLElement, Queries>);
 
     act(() => {
       rerender('updated');

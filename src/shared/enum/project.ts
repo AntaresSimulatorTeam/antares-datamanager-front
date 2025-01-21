@@ -4,14 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-export type StudyDTO = {
-  id: number;
-  name: string;
-  createdBy: string;
-  creationDate: Date;
-  keywords: string[];
-  project: string;
-  status: string;
-  horizon: string;
-  trajectoryIds: number[];
-};
+export enum PINNED_PROJECT_ACTION {
+  ADD_ITEM = 'ADD_ITEM',
+  REMOVE_ITEM = 'REMOVE_ITEM',
+  INIT_LIST = 'INIT_LIST',
+}

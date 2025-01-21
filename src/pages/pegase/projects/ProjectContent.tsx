@@ -4,7 +4,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-// src/pages/pegase/projects/ProjectContent.tsx
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import SearchBar from '@/pages/pegase/home/components/SearchBar';
@@ -12,24 +11,22 @@ import PegaseCard from '@/components/pegase/pegaseCard/pegaseCard';
 import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter';
 import StdAvatar from '@common/layout/stdAvatar/StdAvatar';
 import StudiesPagination from '@/pages/pegase/home/components/StudiesPagination';
-import { useDropdownOptions } from '@/components/pegase/pegaseCard/useDropdownOptions';
-
+import { useDropdownOptions } from '@/hooks/useDropdownOptions';
 import { useProjectNavigation } from '@/hooks/useProjectNavigation';
-import { deleteProjectById, pinProject, useFetchProjects } from './projectService';
+import { deleteProjectById } from '../../../shared/services/projectService.ts';
 import { RdsChip, RdsTagList } from 'rte-design-system-react';
+import { useFetchProjects } from '@/hooks/useFetchProjectList';
+import { useHandlePinnedProjectList } from '@/hooks/useHandlePinnedProjectList.ts';
 
-interface ProjectContentProps {
-  isReloadPinnedProject: (value: boolean) => void;
-}
-
-const ProjectContent = ({ isReloadPinnedProject }: ProjectContentProps) => {
+const ProjectContent = () => {
   const { t } = useTranslation();
   const intervalSize = 9;
+  const userName = 'me00247'; // Replace with actual user name
   const [searchTerm, setSearchTerm] = useState<string | undefined>('');
   const [activeChip, setActiveChip] = useState<boolean | null>(false);
-  const userName = 'mouad'; // Replace with actual user name
   const [current, setCurrent] = useState(0);
   const { projects, count, refetch } = useFetchProjects(searchTerm || '', current, intervalSize);
+  const { handlePinProject } = useHandlePinnedProjectList();
 
   const { navigateToProject } = useProjectNavigation();
 
@@ -47,13 +44,9 @@ const ProjectContent = ({ isReloadPinnedProject }: ProjectContentProps) => {
     }
   };
 
-  const handlePinProject = (projectId: string) => {
-    pinProject(projectId, isReloadPinnedProject);
-  };
-
   const deleteProject = async (projectId: string) => {
-    await deleteProjectById(projectId, isReloadPinnedProject);
-    refetch(); // Actualiser les projets après suppression
+    await deleteProjectById(projectId);
+    await refetch(); // Actualiser les projets après suppression
   };
 
   const handleCardClick = (projectId: string, projectName: string) => {
@@ -75,7 +68,7 @@ const ProjectContent = ({ isReloadPinnedProject }: ProjectContentProps) => {
       <div className="grid w-full grid-cols-3 gap-3">
         {projects.map((project) => {
           const dropdownItems = [
-            pinOption(false, () => handlePinProject(project.id)),
+            pinOption(false, async () => handlePinProject(project.id)),
             settingOption(() => {}, t('project.@setting')),
             deleteOption(() => deleteProject(project.id), t('project.@delete'), project.studies?.length > 0),
           ];

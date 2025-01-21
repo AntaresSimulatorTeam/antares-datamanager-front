@@ -4,7 +4,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { useStdId } from '@/hooks/common/useStdId';
 import { MenuNavItem } from '@/shared/types';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,7 +11,7 @@ import StdNavbarController from './StdNavbarController';
 import StdNavbarHeader from './StdNavbarHeader';
 import StdNavbarMenu from './StdNavbarMenu';
 import { navbarClassBuilder } from './navbarClassBuilder';
-import { RdsDivider } from 'rte-design-system-react';
+import { RdsDivider, useRdsId } from 'rte-design-system-react';
 
 export type StdNavbarProps = {
   topItems: MenuNavItem[];
@@ -32,7 +31,7 @@ const StdNavbar = ({ topItems, bottomItems, appName, appVersion, headerLink, id:
   };
 
   const navbarClasses = navbarClassBuilder(expanded);
-  const id = useStdId('navbar', propsId);
+  const id = useRdsId('navbar', propsId);
   const controllerId = `${id}-controller`;
   const headerId = `${id}-header`;
   const controllerLabel = expanded ? t('components.navbar.@minimize') : t('components.navbar.@expand');

@@ -5,11 +5,11 @@
  */
 
 import { notifyToast } from '@/shared/notification/notification';
-import { useEffect, useState } from 'react';
-import { ProjectInfo } from '@/shared/types/pegase/Project.type';
 import { getEnvVariables } from '@/envVariables';
+import { ProjectInfo } from '@/shared/types/pegase/Project.type';
+import { PROJECT_PINNED_ENDPOINT, PROJECT_UNPIN_ENDPOINT } from '@/shared/const/apiEndPoint';
 
-export const pinProject = async (projectId: string, isReloadPinnedProject: (value: boolean) => void) => {
+export const pinProject = async (projectId: string): Promise<ProjectInfo | Error> => {
   const userId = 'me00247';
   const BASE_URL = getEnvVariables('VITE_BACK_END_BASE_URL');
 
@@ -30,7 +30,8 @@ export const pinProject = async (projectId: string, isReloadPinnedProject: (valu
       type: 'success',
       message: 'Project pinned successfully',
     });
-    isReloadPinnedProject(true);
+
+    return await response.json();
   } catch (error: any) {
     notifyToast({
       type: 'error',
@@ -39,30 +40,7 @@ export const pinProject = async (projectId: string, isReloadPinnedProject: (valu
   }
 };
 
-export const useFetchProjects = (searchTerm: string, current: number, intervalSize: number) => {
-  const [projects, setProjects] = useState<ProjectInfo[]>([]);
-  const [count, setCount] = useState(0);
-  const BASE_URL = getEnvVariables('VITE_BACK_END_BASE_URL');
-
-  const fetchProjects = () => {
-    const url = `${BASE_URL}/v1/project/search?page=${current + 1}&size=${intervalSize}&search=${searchTerm || ''}`;
-    fetch(url)
-      .then((response) => response.json())
-      .then((json) => {
-        setProjects(json.content);
-        setCount(json.totalElements);
-      })
-      .catch((error) => console.error(error));
-  };
-
-  useEffect(() => {
-    fetchProjects();
-  }, [BASE_URL, current, searchTerm, intervalSize]);
-
-  return { projects, count, refetch: fetchProjects };
-};
-
-export const deleteProjectById = async (projectId: string, isReloadProjects: (value: boolean) => void) => {
+export const deleteProjectById = async (projectId: string) => {
   const BASE_URL = getEnvVariables('VITE_BACK_END_BASE_URL');
 
   try {
@@ -82,11 +60,57 @@ export const deleteProjectById = async (projectId: string, isReloadProjects: (va
       type: 'success',
       message: 'Project deleted successfully',
     });
-    isReloadProjects(true);
   } catch (error: any) {
     notifyToast({
       type: 'error',
       message: `${error.message}`,
     });
   }
+};
+
+/**
+ * Retrieve pinned projects list by user id
+ *
+ * @param {string} userId - User id
+ *
+ * @returns {Promise<ProjectInfo[]>} - Promise object that represents a list of projects
+ */
+export const fetchPinnedProjects = async (userId: string): Promise<ProjectInfo[]> => {
+  const apiUrl = `${PROJECT_PINNED_ENDPOINT}?userId=${userId}`;
+
+  const response = await fetch(apiUrl);
+  const json = await response.json();
+  return json.map((project: any) => ({
+    ...project,
+    projectId: project.id.toString(),
+    pinned: project.pinned ?? true,
+  }));
+};
+
+/**
+ * Remove pinned project from the pinned project list
+ *
+ * @param {string} userId
+ * @param {string} projectId
+ */
+export const removeProjectFromPinnedList = async (userId: string, projectId: string) => {
+  const apiUrl = `${PROJECT_UNPIN_ENDPOINT}?userId=${userId}&projectId=${projectId}`;
+  await fetch(apiUrl, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+};
+
+export const fetchProjectDetails = async (projectId: string) => {
+  const BASE_URL = getEnvVariables('VITE_BACK_END_BASE_URL');
+  // try {
+  const response = await fetch(`${BASE_URL}/v1/project/${projectId}`);
+
+  if (!response || !response.ok) {
+    throw new Error('Failed to fetch project details');
+  }
+
+  return await response.json();
 };

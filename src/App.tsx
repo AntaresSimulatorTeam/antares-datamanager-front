@@ -10,7 +10,7 @@ import './App.css';
 import ThemeHandler from './components/common/handler/ThemeHandler';
 import Navbar from './components/pegase/navbar/Navbar';
 import PegaseStar from './components/pegase/star/PegaseStar';
-import { UserContext } from './contexts/UserContext';
+import { UserContext } from '@/store/contexts/UserContext';
 import { PEGASE_NAVBAR_ID } from './shared/constants';
 import { THEME_COLOR } from './shared/types';
 import { menuBottomData, menuTopData } from './routes';

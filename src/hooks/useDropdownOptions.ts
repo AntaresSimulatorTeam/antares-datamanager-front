@@ -7,7 +7,7 @@
 import { clsx } from 'clsx';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RdsDropdownOption, RdsIconId } from 'rte-design-system-react';
+import { RdsDropdownOption, RdsIconId, RdsIconProps } from 'rte-design-system-react';
 
 export const NO_WRAP_CLASS = 'whitespace-nowrap';
 
@@ -19,10 +19,10 @@ export const useDropdownOptions = () => {
       key: 'setting',
       label: label || t('project.@setting'),
       value: 'setting',
-      icon: RdsIconId.Settings,
       onItemClick: onClick,
-      extraClasses: NO_WRAP_CLASS,
       disabled: disabled,
+      icon: RdsIconId.Settings,
+      extraClasses: NO_WRAP_CLASS,
     }),
     [t],
   );

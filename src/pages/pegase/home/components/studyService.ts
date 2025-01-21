@@ -52,7 +52,7 @@ export const fetchSuggestedKeywords = async (query: string): Promise<string[]> =
   return data;
 };
 
-export const handleDelete = async (id: number) => {
+export const deleteStudy = async (id: number) => {
   try {
     const response = await fetch(`${BASE_URL}/v1/study/${id}`, {
       method: 'DELETE',
