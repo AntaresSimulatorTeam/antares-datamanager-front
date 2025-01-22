@@ -45,7 +45,7 @@ describe('useDropdownOptions', () => {
       icon: RdsIconId.Settings,
       extraClasses: NO_WRAP_CLASS,
     });
-    expect(result.current.settingOption(mockOnClick, undefined)).toEqual({
+    expect(result.current.settingOption(mockOnClick)).toEqual({
       key: 'setting',
       label: 'Setting',
       value: 'setting',

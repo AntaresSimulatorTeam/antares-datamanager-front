@@ -16,7 +16,6 @@ import { useProjectNavigation } from '@/hooks/useProjectNavigation';
 import { deleteProjectById } from '@/shared/services/projectService.ts';
 import { RdsChip, RdsTagList } from 'rte-design-system-react';
 import { useFetchProjects } from '@/hooks/useFetchProjectList';
-import { usePinnedProjectDispatch } from '@/store/contexts/ProjectContext.tsx';
 import { pinProject } from '@/shared/services/pinnedProjectService.ts';
 
 const ProjectContent = () => {
@@ -28,7 +27,6 @@ const ProjectContent = () => {
   const [current, setCurrent] = useState(0);
   const { projects, count, refetch } = useFetchProjects(searchTerm || '', current, intervalSize);
   const { navigateToProject } = useProjectNavigation();
-  const dispatch = usePinnedProjectDispatch();
 
   const searchProject = (value?: string | undefined) => {
     setSearchTerm(value);
