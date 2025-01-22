@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { StudyDTO, PaginatedResponse } from '@/shared/types';
+import { PaginatedResponse, StudyDTO } from '@/shared/types';
 import { STUDY_SEARCH_ENDPOINT } from '@/shared/const/apiEndPoint';
 
 /**
@@ -25,22 +25,18 @@ export const fetchSearchStudies = async (
   intervalSize,
   sortBy: { [key: string]: 'asc' | 'desc' },
 ): Promise<PaginatedResponse<StudyDTO>> => {
-  try {
-    let entries = [];
-    if (JSON.stringify(sortBy) !== '{}') {
-      entries = Object.entries(sortBy)[0];
-    }
+  let entries = [];
+  if (JSON.stringify(sortBy) !== '{}') {
+    entries = Object.entries(sortBy)[0];
+  }
 
-    const apiUrl = `${STUDY_SEARCH_ENDPOINT}?page=${currentPage + 1}&size=${intervalSize}&projectId=${projectId}&search=${searchTerm}&sortColumn=${entries?.[0] ?? ''}&sortDirection=${entries?.[1] ?? ''}`;
+  const apiUrl = `${STUDY_SEARCH_ENDPOINT}?page=${currentPage + 1}&size=${intervalSize}&projectId=${projectId}&search=${searchTerm}&sortColumn=${entries?.[0] ?? ''}&sortDirection=${entries?.[1] ?? ''}`;
 
-    const response = await fetch(apiUrl);
-    if (!response.ok) {
-      throw new Error('Failed to fetch user studies');
-    }
-    const json: PaginatedResponse<StudyDTO> = await response.json();
-
-    return { content: json.content, totalElements: json.totalElements };
-  } catch (error) {
+  const response = await fetch(apiUrl);
+  if (!response.ok) {
     throw new Error('Failed to fetch user studies');
   }
+  const json: PaginatedResponse<StudyDTO> = await response.json();
+
+  return { content: json.content, totalElements: json.totalElements };
 };
