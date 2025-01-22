@@ -7,7 +7,7 @@
 import { clsx } from 'clsx';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RdsDropdownOption, RdsIconId, RdsIconProps } from 'rte-design-system-react';
+import { RdsDropdownOption, RdsIconId } from 'rte-design-system-react';
 
 export const NO_WRAP_CLASS = 'whitespace-nowrap';
 
@@ -15,40 +15,46 @@ export const useDropdownOptions = () => {
   const { t } = useTranslation();
 
   const settingOption = useCallback(
-    (onClick: () => void, label?: string, disabled?: boolean): RdsDropdownOption => ({
-      key: 'setting',
-      label: label || t('project.@setting'),
-      value: 'setting',
-      onItemClick: onClick,
-      disabled: disabled,
-      icon: RdsIconId.Settings,
-      extraClasses: NO_WRAP_CLASS,
-    }),
+    (onClick: () => void, label?: string, disabled?: boolean): RdsDropdownOption => {
+      return {
+        key: 'setting',
+        label: label || t('project.@setting'),
+        value: 'setting',
+        onItemClick: onClick,
+        disabled: disabled,
+        icon: RdsIconId.Settings,
+        extraClasses: NO_WRAP_CLASS,
+      } as RdsDropdownOption;
+    },
     [t],
   );
 
   const deleteOption = useCallback(
-    (onClick: () => void, label?: string, disabled?: boolean): RdsDropdownOption => ({
-      key: 'delete',
-      label: label ?? t('project.@delete'),
-      value: 'delete',
-      icon: RdsIconId.Delete,
-      onItemClick: onClick,
-      extraClasses: clsx(NO_WRAP_CLASS, '[&]:text-error-600 [&]:hover:text-error-600'),
-      disabled: disabled,
-    }),
+    (onClick: () => void, label?: string, disabled?: boolean): RdsDropdownOption => {
+      return {
+        key: 'delete',
+        label: label ?? t('project.@delete'),
+        value: 'delete',
+        icon: RdsIconId.Delete,
+        onItemClick: onClick,
+        extraClasses: clsx(NO_WRAP_CLASS, '[&]:text-error-600 [&]:hover:text-error-600'),
+        disabled: disabled,
+      } as RdsDropdownOption;
+    },
     [t],
   );
 
   const pinOption = useCallback(
-    (pinned: boolean, onClick: () => void): RdsDropdownOption => ({
-      key: 'pin',
-      label: pinned ? t('project.@unpin') : t('project.@pin'),
-      value: 'pin',
-      icon: pinned ? RdsIconId.KeepOff : RdsIconId.PushPin,
-      onItemClick: onClick,
-      extraClasses: NO_WRAP_CLASS,
-    }),
+    (pinned: boolean, onClick: () => void): RdsDropdownOption => {
+      return {
+        key: 'pin',
+        label: pinned ? t('project.@unpin') : t('project.@pin'),
+        value: 'pin',
+        icon: pinned ? RdsIconId.KeepOff : RdsIconId.PushPin,
+        onItemClick: onClick,
+        extraClasses: NO_WRAP_CLASS,
+      } as RdsDropdownOption;
+    },
     [t],
   );
 
