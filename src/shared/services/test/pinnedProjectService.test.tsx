@@ -140,7 +140,6 @@ describe('unpinProject', () => {
   it('should unpin project from pinned project list', async () => {
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: true,
-      json: async () => mockResponse,
     });
 
     await unpinProject(userId, projectId);
