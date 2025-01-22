@@ -11,14 +11,11 @@ import { useCallback } from 'react';
 export const useStudyNavigation = () => {
   const navigate = useNavigate();
 
-  const navigateToStudy = useCallback(
-    (study: StudyDTO) => {
-      navigate(`/study/${encodeURIComponent(study.study_name)}`, {
-        state: { study },
-      });
-    },
-    [navigate],
-  );
+  const navigateToStudy = useCallback((study: StudyDTO) => {
+    navigate(`/study/${encodeURIComponent(study.study_name)}`, {
+      state: { study },
+    });
+  }, []);
 
   return { navigateToStudy };
 };

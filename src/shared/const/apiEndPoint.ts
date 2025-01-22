@@ -11,6 +11,10 @@ const BASE_URL = getEnvVariables('VITE_BACK_END_BASE_URL');
 // STUDY
 export const STUDY_SEARCH_ENDPOINT = `${BASE_URL}/v1/study/search`;
 
-// PROJECT
+// PINNED PROJECT
 export const PROJECT_PINNED_ENDPOINT = `${BASE_URL}/v1/project/pinned`;
 export const PROJECT_UNPIN_ENDPOINT = `${BASE_URL}/v1/project/unpin`;
+export const PROJECT_PIN_PROJECT = `${BASE_URL}/v1/project/pin`;
+
+// PROJECT
+export const PROJECT_ENDPOINT = `${BASE_URL}/v1/project`;

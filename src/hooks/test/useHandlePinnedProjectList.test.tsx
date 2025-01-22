@@ -54,7 +54,6 @@ vi.mock('@/store/contexts/ProjectContext', async (importOriginal) => {
   const mockDispatch = vi.fn();
   return {
     ...actual,
-    usePinnedProject: vi.fn().mockReturnValue({ pinnedProjects: [] }),
     usePinnedProjectDispatch: vi.fn(() => mockDispatch),
   };
 });

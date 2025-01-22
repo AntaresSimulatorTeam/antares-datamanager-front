@@ -4,10 +4,10 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { notifyToast } from '@/shared/notification/notification.tsx';
-import { fetchProjectDetails, pinProject } from '../projectService.ts';
+import { deleteProjectById, fetchProjectDetails } from '../projectService.ts';
 import { vi } from 'vitest';
 import { waitFor } from '@testing-library/react';
+import { notifyToast } from '@/shared/notification/notification.tsx';
 
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
@@ -16,8 +16,8 @@ vi.mock('@/envVariables', () => ({
   getEnvVariables: vi.fn(() => 'https://mockapi.com'),
 }));
 
-describe('pinProject', () => {
-  const projectId = 'test-project-id';
+describe('deleteProjectById', () => {
+  const projectId = '123';
 
   beforeEach(() => {
     global.fetch = vi.fn();
@@ -28,35 +28,51 @@ describe('pinProject', () => {
     vi.restoreAllMocks();
   });
 
-  it('should successfully pin a project and call notifyToast with success', async () => {
-    const mockResponse = { ok: true }; // Simulate successful fetch response
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockResponse);
-
-    await pinProject(projectId);
-
-    // Check fetch call
-    expect(fetch).toHaveBeenCalledWith('https://mockapi.com/v1/project/pin?userId=me00247&projectId=test-project-id', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+  it('should delete a pinned project from pinned project list', async () => {
+    global.fetch = vi.fn().mockResolvedValueOnce({
+      ok: true,
     });
 
-    // Verify notifyToast was called with success
-    expect(notifyToast).toHaveBeenCalledWith({
-      type: 'success',
-      message: 'Project pinned successfully',
+    await deleteProjectById(projectId);
+
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(global.fetch).toHaveBeenCalledWith(`https://mockapi.com/v1/project/${projectId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      // Verify notifyToast was called with success
+      expect(notifyToast).toHaveBeenCalledWith({
+        type: 'success',
+        message: 'Project deleted successfully',
+      });
     });
   });
 
-  it('should handle fetch-level errors and call notifyToast with error', async () => {
-    const networkErrorMessage = 'Network error';
-    (global.fetch as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error(networkErrorMessage));
+  it('should handle delete failure gracefully', async () => {
+    // Failed fetch response moc
+    global.fetch = vi.fn().mockResolvedValueOnce({
+      ok: false,
+      text: async () => 'Error',
+    });
 
-    await pinProject(projectId);
+    const result = await deleteProjectById(projectId);
 
-    // Verify notifyToast was called with the network error
+    expect(result).toEqual(undefined);
+  });
+
+  it('should handle exceptions during delete', async () => {
+    //Fetch throwing an error mock
+    global.fetch = vi.fn().mockRejectedValueOnce(new Error('Network error'));
+
+    await deleteProjectById(projectId);
+
+    // Verify notifyToast was called with error
     expect(notifyToast).toHaveBeenCalledWith({
       type: 'error',
-      message: networkErrorMessage,
+      message: 'Network error',
     });
   });
 });
