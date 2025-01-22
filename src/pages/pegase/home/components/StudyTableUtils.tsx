@@ -6,7 +6,6 @@
 
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import StdIcon from '@common/base/stdIcon/StdIcon';
-import { useState } from 'react';
 
 export function addSortColumn(
   headers: any[],

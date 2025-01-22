@@ -7,7 +7,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ProjectInfo } from '@/shared/types/pegase/Project.type';
-import { getEnvVariables } from '@/envVariables';
 import ProjectDetailsHeader from './ProjectDetailsHeader';
 import ProjectDetailsContent from './ProjectDetailsContent';
 import StudyTableDisplay from '@/pages/pegase/home/components/StudyTableDisplay';
@@ -35,7 +34,7 @@ const ProjectDetails = () => {
       searchStudy(userName);
     }
   };
-  const BASE_URL = getEnvVariables('VITE_BACK_END_BASE_URL');
+
   const [projectInfo, setProjectDetails] = useState<ProjectInfo>({} as ProjectInfo);
   const location = useLocation();
   const { projectId } = location.state || {};

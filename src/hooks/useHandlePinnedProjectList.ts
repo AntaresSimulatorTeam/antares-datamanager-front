@@ -21,7 +21,7 @@ export const useHandlePinnedProjectList = () => {
   const getPinnedProjects = useCallback(async () => {
     try {
       const projects = await fetchPinnedProjects(userId);
-      if (!!projects?.length) {
+      if (projects?.length) {
         dispatch?.({
           type: PINNED_PROJECT_ACTION.INIT_LIST,
           payload: projects,
@@ -72,12 +72,12 @@ export const useHandlePinnedProjectList = () => {
       } as NotifyWithActionProps);
 
       apiCallTimeout = setTimeout(() => {
-        try {
-          void removeProjectFromPinnedList(userId, projectId);
-        } catch (error) {
-          console.error(`Error unpinning project ${projectId}:`, error);
-          throw new Error(`Failed to unpin projects ${projectId}:`);
-        }
+        removeProjectFromPinnedList(userId, projectId).catch(() => {
+          dispatch?.({
+            type: PINNED_PROJECT_ACTION.INIT_LIST,
+            payload: currentPinnedProjects,
+          } as PinnedProjectActionType);
+        });
       }, 4000) as unknown as number;
     },
     [userId],

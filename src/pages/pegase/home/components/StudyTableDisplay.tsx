@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StudyDTO } from '@/shared/types';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type';
@@ -19,7 +19,6 @@ import { RdsButton } from 'rte-design-system-react';
 import { useStudyTableDisplay } from '@/hooks/useStudyTableDisplay';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal';
 import { useStudyNavigation } from '@/hooks/useStudyNavigation';
-import { useSorter } from '@/hooks/useSorter';
 
 interface StudyTableDisplayProps {
   searchStudy: string | undefined;

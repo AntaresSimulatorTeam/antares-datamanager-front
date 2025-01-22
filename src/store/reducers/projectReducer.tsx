@@ -25,7 +25,7 @@ const pinnedProjectReducer = (prevState: PinnedProjectState, action?: PinnedProj
       newState = removeItem(pinnedProjects, action?.payload);
       break;
     case PINNED_PROJECT_ACTION.INIT_LIST:
-      newState = { pinnedProjects: [...action?.payload] };
+      newState = { pinnedProjects: action?.payload ? [...action.payload] : [] };
       break;
     default:
       newState = prevState;

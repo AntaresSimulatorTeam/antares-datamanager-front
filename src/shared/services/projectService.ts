@@ -105,10 +105,10 @@ export const removeProjectFromPinnedList = async (userId: string, projectId: str
 
 export const fetchProjectDetails = async (projectId: string) => {
   const BASE_URL = getEnvVariables('VITE_BACK_END_BASE_URL');
-  // try {
+
   const response = await fetch(`${BASE_URL}/v1/project/${projectId}`);
 
-  if (!response || !response.ok) {
+  if (!response?.ok) {
     throw new Error('Failed to fetch project details');
   }
 

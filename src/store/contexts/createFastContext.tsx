@@ -99,7 +99,7 @@ export default function createFastContext<Store extends Record<string, unknown>>
 
   const StoreContext = createContext<UseStoreDataReturnType | null>(null);
 
-  function Provider({ initialState, children }: { initialState: Store; children: ReactNode }) {
+  function Provider({ initialState, children }: Readonly<{ initialState: Store; children: ReactNode }>) {
     return <StoreContext.Provider value={useStoreData(initialState)}>{children}</StoreContext.Provider>;
   }
 

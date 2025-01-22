@@ -18,7 +18,7 @@ export const useDropdownOptions = () => {
     (onClick: () => void, label?: string, disabled?: boolean): RdsDropdownOption => {
       return {
         key: 'setting',
-        label: label || t('project.@setting'),
+        label: label ?? t('project.@setting'),
         value: 'setting',
         onItemClick: onClick,
         disabled: disabled,
