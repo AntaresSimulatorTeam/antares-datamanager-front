@@ -57,7 +57,7 @@ export const useHandlePinnedProjectList = () => {
       notifyToast({
         id: toastId,
         type: 'error',
-        message: `${error.message}`,
+        message: 'Project already pinned',
       });
     }
   }, []);
