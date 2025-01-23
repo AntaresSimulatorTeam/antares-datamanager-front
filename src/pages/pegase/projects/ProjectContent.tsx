@@ -16,7 +16,7 @@ import { useProjectNavigation } from '@/hooks/useProjectNavigation';
 import { deleteProjectById } from '@/shared/services/projectService.ts';
 import { RdsChip, RdsTagList } from 'rte-design-system-react';
 import { useFetchProjects } from '@/hooks/useFetchProjectList';
-import { pinProject } from '@/shared/services/pinnedProjectService.ts';
+import { useHandlePinnedProjectList } from '@/hooks/useHandlePinnedProjectList.ts';
 
 const ProjectContent = () => {
   const { t } = useTranslation();
@@ -27,6 +27,7 @@ const ProjectContent = () => {
   const [current, setCurrent] = useState(0);
   const { projects, count, refetch } = useFetchProjects(searchTerm || '', current, intervalSize);
   const { navigateToProject } = useProjectNavigation();
+  const { handlePinProject } = useHandlePinnedProjectList();
 
   const searchProject = (value?: string | undefined) => {
     setSearchTerm(value);
@@ -66,7 +67,7 @@ const ProjectContent = () => {
       <div className="grid w-full grid-cols-3 gap-3">
         {projects.map((project) => {
           const dropdownItems = [
-            pinOption(false, async () => pinProject(project.id)),
+            pinOption(false, async () => handlePinProject(project.id)),
             settingOption(() => {}, t('project.@setting')),
             deleteOption(() => deleteProject(project.id), t('project.@delete'), project.studies?.length > 0),
           ];

@@ -17,7 +17,7 @@ export type PegaseCardTripleActionButtonProps = {
 };
 
 type PegaseCardTripleActionProps = Omit<RdsCardProps, 'disabled'> &
-  Omit<PegaseCardTitleProps, 'onClick'> & {
+  PegaseCardTitleProps & {
     title: string;
     buttons?: PegaseCardTripleActionButtonProps;
     secondaryButtonPosition?: PegaseCardSecondaryButtonPosition;

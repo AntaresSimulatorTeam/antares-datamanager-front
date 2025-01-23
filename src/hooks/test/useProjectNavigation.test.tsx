@@ -6,9 +6,8 @@
 
 import { afterEach, beforeEach, describe, expectTypeOf, it, Mock, vi } from 'vitest';
 import { act, Queries, renderHook, RenderHookOptions } from '@testing-library/react';
-import { useStudyNavigation } from '@/hooks/useStudyNavigation.ts';
-import { StudyDTO } from '@/shared/types';
 import { Router, useNavigate } from 'react-router-dom';
+import { useProjectNavigation } from '@/hooks/useProjectNavigation';
 
 const mockNavigator = {
   createHref: vi.fn(),
@@ -16,17 +15,6 @@ const mockNavigator = {
   push: vi.fn(),
   replace: vi.fn(),
 };
-
-const mockStudy = {
-  id: 1,
-  study_name: 'BP_ref_1',
-  user_name: 'isaac_asimov',
-  creation_date: '2020-04-08',
-  keywords: ['covid', 'silence'],
-  project: 'project123',
-  status: 'missing',
-  horizon: '2020_2024',
-} as StudyDTO;
 
 vi.mock('react-router-dom', async (importOriginal) => {
   const actual = await importOriginal();
@@ -36,7 +24,7 @@ vi.mock('react-router-dom', async (importOriginal) => {
   };
 });
 
-describe('useStudyNavigation', () => {
+describe('useProjectNavigation', () => {
   const mockUseNavigation = useNavigate as Mock<typeof useNavigate>;
 
   beforeEach(() => {
@@ -48,8 +36,8 @@ describe('useStudyNavigation', () => {
     vi.clearAllMocks();
   });
 
-  it('should return navigateToStudy function and call navigate with the right parameters value', () => {
-    const mockNavigate = vi.fn().mockImplementation(vi.fn());
+  it('should return navigateToProject function and call navigate with the right parameters value', () => {
+    const mockNavigate = vi.fn().mockImplementation((to) => to);
     mockUseNavigation.mockImplementationOnce(() => mockNavigate);
 
     const wrapper = ({ children }) => (
@@ -57,18 +45,18 @@ describe('useStudyNavigation', () => {
         {children}
       </Router>
     );
-    const { result } = renderHook(() => useStudyNavigation(), {
+    const { result } = renderHook(() => useProjectNavigation(), {
       wrapper,
     } as RenderHookOptions<HTMLElement, Queries>);
 
-    expectTypeOf(result.current.navigateToStudy).toBeFunction();
+    expectTypeOf(result.current.navigateToProject).toBeFunction();
 
     act(() => {
-      result.current.navigateToStudy(mockStudy);
+      result.current.navigateToProject('project123', 'projectName');
     });
 
-    expect(mockNavigate).toHaveBeenCalledWith(`/study/${encodeURIComponent(mockStudy.study_name)}`, {
-      state: { study: mockStudy },
+    expect(mockNavigate).toHaveBeenCalledWith(`/project/${encodeURIComponent('projectName')}`, {
+      state: { projectId: 'project123' },
     });
   });
 });

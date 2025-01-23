@@ -4,14 +4,14 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { PROJECT_PIN_PROJECT, PROJECT_PINNED_ENDPOINT, PROJECT_UNPIN_ENDPOINT } from '@/shared/const/apiEndPoint.ts';
-import { ProjectInfo } from '@/shared/types/pegase/Project.type.ts';
+import { PROJECT_PIN_PROJECT, PROJECT_PINNED_ENDPOINT, PROJECT_UNPIN_ENDPOINT } from '@/shared/const/apiEndPoint';
+import { ProjectInfo } from '@/shared/types/pegase/Project.type';
 
 /**
  * Retrieve pinned projects list by user id
  *
  * @param {string} userId - User id
- * @returns {Promise<ProjectInfo[]>} - Promise object that represents a list of projects
+ * @returns {Promise<ProjectInfo[] | Error>} - Promise object that represents a list of projects
  */
 export const fetchPinnedProjects = async (userId) => {
   const apiUrl = `${PROJECT_PINNED_ENDPOINT}?userId=${userId}`;

@@ -6,8 +6,12 @@
 
 import { Queries, renderHook, RenderHookOptions, waitFor } from '@testing-library/react';
 import { useHandlePinnedProjectList } from '@/hooks/useHandlePinnedProjectList';
-import { afterEach, beforeEach, describe, expectTypeOf, it, vi } from 'vitest';
-import { PinnedProjectProvider, PinnedProjectProviderProps } from '@/store/contexts/ProjectContext';
+import { afterEach, beforeEach, describe, expectTypeOf, it, Mock, vi } from 'vitest';
+import {
+  PinnedProjectProvider,
+  PinnedProjectProviderProps,
+  usePinnedProjectDispatch,
+} from '@/store/contexts/ProjectContext';
 
 const mockProjectsApiResponse = [
   {
@@ -59,15 +63,18 @@ vi.mock('@/store/contexts/ProjectContext', async (importOriginal) => {
 });
 
 describe('useHandlePinnedProjectList', () => {
+  const mockUsePinnedProjectDispatch = usePinnedProjectDispatch as Mock;
+
   beforeEach(() => {
     global.fetch = vi.fn();
-  });
-
-  afterEach(() => {
     vi.resetAllMocks();
   });
 
-  it('should trigger getPinnedProject method on init and update pinned project list correctly', async () => {
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should trigger getPinnedProject method on init and call dispatch to update pinned project list correctly', async () => {
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: true,
       json: async () => mockProjectsApiResponse,
@@ -83,11 +90,12 @@ describe('useHandlePinnedProjectList', () => {
     } as RenderHookOptions<HTMLElement & { initialProps: Omit<PinnedProjectProviderProps, 'children'> }, Queries>);
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-      expect(global.fetch).toHaveBeenCalledWith('https://mockapi.com/v1/project/pinned?userId=me00247');
       expectTypeOf(result.current.getPinnedProjects).toBeFunction();
       expectTypeOf(result.current.handleUnpinProject).toBeFunction();
       expectTypeOf(result.current.handlePinProject).toBeFunction();
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(global.fetch).toHaveBeenCalledWith('https://mockapi.com/v1/project/pinned?userId=me00247');
+      expect(mockUsePinnedProjectDispatch).toHaveBeenCalledTimes(1);
     });
   });
 });

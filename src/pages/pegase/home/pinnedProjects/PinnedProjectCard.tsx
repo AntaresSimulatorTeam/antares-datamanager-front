@@ -12,15 +12,15 @@ import { useDropdownOptions } from '@/hooks/useDropdownOptions';
 import { useProjectNavigation } from '@/hooks/useProjectNavigation';
 import { RdsIcon, RdsIconId, RdsTagList } from 'rte-design-system-react';
 import { deleteProjectById } from '@/shared/services/projectService';
-import { unpinProject } from '@/shared/services/pinnedProjectService';
-import { usePinnedProject, usePinnedProjectDispatch } from '@/store/contexts/ProjectContext';
+import { usePinnedProject } from '@/store/contexts/ProjectContext';
+import { useHandlePinnedProjectList } from '@/hooks/useHandlePinnedProjectList.ts';
 
 const PinnedProjectCards = () => {
   const { t } = useTranslation();
   const { navigateToProject } = useProjectNavigation();
   const { settingOption, deleteOption, pinOption } = useDropdownOptions();
   const { pinnedProjects } = usePinnedProject();
-  const dispatch = usePinnedProjectDispatch();
+  const { handleUnpinProject } = useHandlePinnedProjectList();
 
   const handleCardClick = (projectId: string, projectName: string) => {
     navigateToProject(projectId, projectName);
@@ -37,7 +37,7 @@ const PinnedProjectCards = () => {
           <PegaseCard
             title={project.name}
             dropdownOptions={[
-              pinOption(project.pinned ?? false, () => unpinProject(project.id, pinnedProjects, t, dispatch)), // Toggle pin/unpin
+              pinOption(project.pinned ?? false, () => handleUnpinProject(project.id)), // Toggle pin/unpin
               settingOption(() => {}, t('project.@setting')),
               deleteOption(() => deleteProject(project.id), t('project.@delete'), project.studies?.length > 0),
             ]}

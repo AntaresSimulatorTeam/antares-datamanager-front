@@ -26,10 +26,12 @@ export const deleteProjectById = async (projectId: string) => {
       message: 'Project deleted successfully',
     });
   } catch (error: unknown) {
-    notifyToast({
-      type: 'error',
-      message: `${error.message}`,
-    });
+    if (error instanceof Error) {
+      notifyToast({
+        type: 'error',
+        message: `${error.message}`,
+      });
+    }
   }
 };
 

@@ -28,7 +28,7 @@ export const useHandlePinnedProjectList = () => {
         } as PinnedProjectActionType);
       }
     } catch (error) {
-      console.error('Error loading pinned projects:', error);
+      // silent handler
     }
   }, []);
 
@@ -68,12 +68,12 @@ export const useHandlePinnedProjectList = () => {
    * on the toast is not clicked.
    *
    * @param {string} projectId - Project id
-   * @param {ProjectInfo[]} pinnedProjects - Pinned project currently in BDD
    */
-  const handleUnpinProject = useCallback(async (projectId, pinnedProjects) => {
+  const handleUnpinProject = useCallback(async (projectId) => {
     let apiCallTimeout: number | null = null;
     const toastId = uuidv4();
     const userId = 'me00247';
+    const currentPinnedProjects = await fetchPinnedProjects(userId);
 
     dispatch?.({
       type: PINNED_PROJECT_ACTION.REMOVE_ITEM,
@@ -91,7 +91,7 @@ export const useHandlePinnedProjectList = () => {
           clearTimeout(apiCallTimeout!);
           dispatch?.({
             type: PINNED_PROJECT_ACTION.INIT_LIST,
-            payload: pinnedProjects,
+            payload: currentPinnedProjects,
           } as PinnedProjectActionType);
         },
       },
@@ -101,7 +101,7 @@ export const useHandlePinnedProjectList = () => {
       unpinProject(userId, projectId).catch((error) => {
         dispatch?.({
           type: PINNED_PROJECT_ACTION.INIT_LIST,
-          payload: pinnedProjects,
+          payload: currentPinnedProjects,
         } as PinnedProjectActionType);
 
         notifyToast({
