@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { deleteProjectById, fetchProjectDetails } from '../projectService.ts';
+import { deleteProjectById, fetchProjectDetails, fetchProjectsFromPartialName } from '../projectService.ts';
 import { vi } from 'vitest';
 import { waitFor } from '@testing-library/react';
 import { notifyToast } from '@/shared/notification/notification.tsx';
@@ -126,5 +126,60 @@ describe('fetchProjectDetails', () => {
     global.fetch = vi.fn().mockRejectedValueOnce(new Error('Network error'));
 
     await expect(async () => fetchProjectDetails(projectId)).rejects.toThrowError('Network error');
+  });
+});
+
+describe('fetchProjectsFromPartialName', () => {
+  beforeEach(() => {
+    global.fetch = vi.fn();
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('should delete a pinned project from pinned project list', async () => {
+    global.fetch = vi.fn().mockResolvedValueOnce({
+      ok: true,
+      json: async () => {
+        return [
+          {
+            id: '123',
+            name: 'Bilan prévisionnel 2023',
+            description: 'Project Description',
+            createdBy: 'User A',
+            creationDate: '2024-01-01',
+            tags: ['tag1', 'tag2'],
+          },
+          {
+            id: '123',
+            name: 'Bilan prévisionnel 2019',
+            description: 'Project Description',
+            createdBy: 'User B',
+            creationDate: '2013-08-01',
+            tags: ['tag3', 'tag4'],
+          },
+        ];
+      },
+    });
+
+    const result = await fetchProjectsFromPartialName('name');
+
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(global.fetch).toHaveBeenCalledWith('https://mockapi.com/v1/project/autocomplete?partialName=name');
+      expect(result).toEqual(['Bilan prévisionnel 2023', 'Bilan prévisionnel 2019']);
+    });
+  });
+
+  it('should handle delete failure gracefully', async () => {
+    // Failed fetch response moc
+    global.fetch = vi.fn().mockResolvedValueOnce({
+      ok: false,
+      text: async () => 'Error',
+    });
+
+    await expect(async () => fetchProjectsFromPartialName('name')).rejects.toThrowError('Failed to fetch projects');
   });
 });

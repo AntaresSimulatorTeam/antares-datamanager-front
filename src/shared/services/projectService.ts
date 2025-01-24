@@ -5,7 +5,7 @@
  */
 
 import { notifyToast } from '@/shared/notification/notification';
-import { PROJECT_ENDPOINT } from '@/shared/const/apiEndPoint';
+import { PROJECT_AUTOCOMPLETE_ENDPOINT, PROJECT_ENDPOINT } from '@/shared/const/apiEndPoint';
 
 export const deleteProjectById = async (projectId: string) => {
   try {
@@ -49,4 +49,19 @@ export const fetchProjectDetails = async (projectId: string) => {
   }
 
   return await response.json();
+};
+
+/**
+ * Retrieve a project from a partial name of project
+ *
+ * @param {string} query - Partial name of a project
+ * @return {Promise<string[]>} - List of project name
+ */
+export const fetchProjectsFromPartialName = async (query: string): Promise<string[]> => {
+  const response = await fetch(`${PROJECT_AUTOCOMPLETE_ENDPOINT}?partialName=${query}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch projects');
+  }
+  const data = await response.json();
+  return data.map((project: { name: string }) => project.name);
 };

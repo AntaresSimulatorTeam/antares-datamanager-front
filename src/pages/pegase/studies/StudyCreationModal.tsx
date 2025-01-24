@@ -10,8 +10,8 @@ import { useTranslation } from 'react-i18next';
 import KeywordsInput from '@/pages/pegase/studies/KeywordsInput';
 import HorizonInput from '@/pages/pegase/studies/HorizonInput';
 import ProjectInput from '@/pages/pegase/studies/ProjectInput';
-import { saveStudy } from '@/pages/pegase/home/components/studyService';
-import { StudyDTO } from '@/shared/types/index';
+import { saveStudy } from '@/shared/services/studyService';
+import { StudyDTO } from '@/shared/types';
 
 interface StudyCreationModalProps {
   isOpen?: boolean;

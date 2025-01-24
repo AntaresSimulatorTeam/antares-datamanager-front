@@ -5,24 +5,14 @@
  */
 
 // src/components/ProjectInput.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { RdsInputText } from 'rte-design-system-react';
-import { getEnvVariables } from '@/envVariables';
+import { fetchProjectsFromPartialName } from '@/shared/services/projectService';
 
 interface ProjectManagerProps {
   value: string;
   onChange: (value: string) => void;
 }
-const BASE_URL = getEnvVariables('VITE_BACK_END_BASE_URL');
-
-const fetchProjects = async (query: string): Promise<string[]> => {
-  const response = await fetch(`${BASE_URL}/v1/project/autocomplete?partialName=${query}`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch projects');
-  }
-  const data = await response.json();
-  return data.map((project: { name: string }) => project.name); // Extract and return only the 'name' property
-};
 
 const ProjectInput: React.FC<ProjectManagerProps> = ({ value, onChange }) => {
   const [projects, setProjects] = useState<string[]>([]);
@@ -32,7 +22,7 @@ const ProjectInput: React.FC<ProjectManagerProps> = ({ value, onChange }) => {
   useEffect(() => {
     const loadProjects = async () => {
       try {
-        const projectList = await fetchProjects(value);
+        const projectList = await fetchProjectsFromPartialName(value);
         setProjects(projectList);
       } catch (error) {
         setErrorMessage('Failed to fetch projects');
