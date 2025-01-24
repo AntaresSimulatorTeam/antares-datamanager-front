@@ -13,7 +13,7 @@ import { ProjectInfo } from '@/shared/types/pegase/Project.type';
  * @param {string} userId - User id
  * @returns {Promise<ProjectInfo[] | Error>} - Promise object that represents a list of projects
  */
-export const fetchPinnedProjects = async (userId) => {
+export const fetchPinnedProjects = async (userId: string) => {
   const apiUrl = `${PROJECT_PINNED_ENDPOINT}?userId=${userId}`;
 
   const response = await fetch(apiUrl);
@@ -39,7 +39,7 @@ export const fetchPinnedProjects = async (userId) => {
  * @return {Promise<ProjectInfo | Error>} - Object that describes a project
  */
 
-export const pinProject = async (projectId) => {
+export const pinProject = async (projectId: string) => {
   const userId = 'me00247';
   const apiUrl = `${PROJECT_PIN_PROJECT}?userId=${userId}&projectId=${projectId}`;
 
@@ -64,7 +64,7 @@ export const pinProject = async (projectId) => {
  * @param {string} userId
  * @param {string} projectId
  */
-export const unpinProject = async (userId, projectId) => {
+export const unpinProject = async (userId: string, projectId: string) => {
   const apiUrl = `${PROJECT_UNPIN_ENDPOINT}?userId=${userId}&projectId=${projectId}`;
 
   const response = await fetch(apiUrl, {

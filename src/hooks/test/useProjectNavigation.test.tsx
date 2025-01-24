@@ -8,6 +8,7 @@ import { afterEach, beforeEach, describe, expectTypeOf, it, Mock, vi } from 'vit
 import { act, Queries, renderHook, RenderHookOptions } from '@testing-library/react';
 import { Router, useNavigate } from 'react-router-dom';
 import { useProjectNavigation } from '@/hooks/useProjectNavigation';
+import { ReactNode } from 'react';
 
 const mockNavigator = {
   createHref: vi.fn(),
@@ -17,7 +18,7 @@ const mockNavigator = {
 };
 
 vi.mock('react-router-dom', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual: Mock = await importOriginal();
   return {
     ...actual,
     useNavigate: vi.fn(),
@@ -40,8 +41,8 @@ describe('useProjectNavigation', () => {
     const mockNavigate = vi.fn().mockImplementation((to) => to);
     mockUseNavigation.mockImplementationOnce(() => mockNavigate);
 
-    const wrapper = ({ children }) => (
-      <Router pathname={'/'} history={['/']} location={'/'} navigator={mockNavigator}>
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <Router location={'/'} navigator={mockNavigator}>
         {children}
       </Router>
     );

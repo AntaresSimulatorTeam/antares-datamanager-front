@@ -19,14 +19,14 @@ import { STUDY_SEARCH_ENDPOINT } from '@/shared/const/apiEndPoint';
  * @returns {Promise<PaginatedResponse<StudyDTO>>} - Promise object that represents a list of studies
  */
 export const fetchSearchStudies = async (
-  searchTerm,
-  projectId,
-  currentPage,
-  intervalSize,
-  sortBy: { [key: string]: 'asc' | 'desc' },
+  searchTerm = '',
+  projectId = '',
+  currentPage = 0,
+  intervalSize = 0,
+  sortBy?: { [key: string]: 'asc' | 'desc' },
 ): Promise<PaginatedResponse<StudyDTO>> => {
-  let entries = [];
-  if (JSON.stringify(sortBy) !== '{}') {
+  let entries: [string, 'asc' | 'desc'] | null = null;
+  if (sortBy && JSON.stringify(sortBy) !== '{}') {
     entries = Object.entries(sortBy)[0];
   }
 

@@ -12,8 +12,8 @@ import { RdsIcon, RdsTextTooltip, useRdsId } from 'rte-design-system-react';
 
 type StdNavbarMenuItemProps = {
   item: MenuNavItem;
-  expanded: boolean;
-  selected: boolean;
+  expanded?: boolean;
+  selected?: boolean;
 };
 
 const StdNavbarMenuItem = ({ item, expanded = true, selected = false }: StdNavbarMenuItemProps) => {

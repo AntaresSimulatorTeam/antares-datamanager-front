@@ -70,7 +70,7 @@ export const useStudyTableDisplay = ({
         setCount(totalElements);
       })
       .catch((error) => setError(error));
-  }, [currentPage, searchTermRef, projectIdRef, sortByRef, reloadStudiesRef]);
+  }, [currentPage, searchTermRef.current, projectIdRef.current, sortByRef.current, reloadStudiesRef.current]);
 
   return { rows, count, intervalSize, currentPage, setPage: setCurrentPage, error };
 };

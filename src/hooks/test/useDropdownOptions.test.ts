@@ -16,11 +16,11 @@ describe('useDropdownOptions', () => {
     const { result } = renderHook(() => useDropdownOptions());
 
     expectTypeOf(result.current.settingOption).toBeFunction();
-    expectTypeOf(result.current.settingOption).returns.toEqualTypeOf(RdsDropdownOption);
+    expectTypeOf(result.current.settingOption).returns.toEqualTypeOf<RdsDropdownOption>();
     expectTypeOf(result.current.deleteOption).toBeFunction();
-    expectTypeOf(result.current.deleteOption).returns.toEqualTypeOf(RdsDropdownOption);
+    expectTypeOf(result.current.deleteOption).returns.toEqualTypeOf<RdsDropdownOption>();
     expectTypeOf(result.current.pinOption).toBeFunction();
-    expectTypeOf(result.current.pinOption).returns.toEqualTypeOf(RdsDropdownOption);
+    expectTypeOf(result.current.pinOption).returns.toEqualTypeOf<RdsDropdownOption>();
   });
 
   it('should call settingOption and return the right set of options', () => {

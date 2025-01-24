@@ -40,7 +40,7 @@ const ProjectDetails = () => {
   const { projectId } = location.state || {};
 
   useEffect(() => {
-    const getProjectDetails = async (projectId) => {
+    const getProjectDetails = async (projectId: string) => {
       try {
         const data = await fetchProjectDetails(projectId);
 

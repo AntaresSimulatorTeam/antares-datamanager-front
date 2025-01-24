@@ -5,15 +5,7 @@
  */
 
 import { create, Draft } from 'mutative';
-import React, {
-  createContext,
-  ReactNode,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useSyncExternalStore,
-} from 'react';
+import { createContext, ReactNode, useCallback, useContext, useEffect, useRef, useSyncExternalStore } from 'react';
 
 export type StoreOption = {
   addOnlyIfAbsent?: boolean;

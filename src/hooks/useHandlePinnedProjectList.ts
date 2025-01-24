@@ -36,7 +36,12 @@ export const useHandlePinnedProjectList = () => {
     void getPinnedProjects();
   }, []);
 
-  const handlePinProject = useCallback(async (projectId) => {
+  /**
+   * Handles the pin action. Displays a toast if the API call is successful.
+   *
+   * @param {string} projectId - Project id
+   */
+  const handlePinProject = useCallback(async (projectId: string) => {
     const toastId = uuidv4();
     try {
       const newProject = await pinProject(projectId);
@@ -69,7 +74,7 @@ export const useHandlePinnedProjectList = () => {
    *
    * @param {string} projectId - Project id
    */
-  const handleUnpinProject = useCallback(async (projectId) => {
+  const handleUnpinProject = useCallback(async (projectId: string) => {
     let apiCallTimeout: number | null = null;
     const toastId = uuidv4();
     const userId = 'me00247';

@@ -54,7 +54,7 @@ vi.mock('@/envVariables', () => ({
 }));
 
 vi.mock('@/store/contexts/ProjectContext', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual: Mock = await importOriginal();
   const mockDispatch = vi.fn();
   return {
     ...actual,
@@ -80,14 +80,14 @@ describe('useHandlePinnedProjectList', () => {
       json: async () => mockProjectsApiResponse,
     });
 
-    const wrapper = ({ children, initialValue }) => (
+    const wrapper = ({ children, initialValue }: PinnedProjectProviderProps) => (
       <PinnedProjectProvider children={children} initialValue={initialValue}></PinnedProjectProvider>
     );
 
     const { result } = renderHook(() => useHandlePinnedProjectList(), {
       wrapper,
       initialProps: { initialValue: { pinnedProject: [] } },
-    } as RenderHookOptions<HTMLElement & { initialProps: Omit<PinnedProjectProviderProps, 'children'> }, Queries>);
+    } as RenderHookOptions<{ initialValue: { pinnedProject: never[] } }, Queries>);
 
     await waitFor(() => {
       expectTypeOf(result.current.getPinnedProjects).toBeFunction();

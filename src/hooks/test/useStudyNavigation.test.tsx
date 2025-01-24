@@ -7,8 +7,8 @@
 import { afterEach, beforeEach, describe, expectTypeOf, it, Mock, vi } from 'vitest';
 import { act, Queries, renderHook, RenderHookOptions } from '@testing-library/react';
 import { useStudyNavigation } from '@/hooks/useStudyNavigation.ts';
-import { StudyDTO } from '@/shared/types';
 import { Router, useNavigate } from 'react-router-dom';
+import { ReactNode } from 'react';
 
 const mockNavigator = {
   createHref: vi.fn(),
@@ -19,17 +19,18 @@ const mockNavigator = {
 
 const mockStudy = {
   id: 1,
-  study_name: 'BP_ref_1',
-  user_name: 'isaac_asimov',
-  creation_date: '2020-04-08',
+  name: 'BP_ref_1',
+  createdBy: 'Isaac Asimov',
+  creationDate: new Date('Janvier 18'),
   keywords: ['covid', 'silence'],
-  project: 'project123',
+  project: 'Bilan previsionnel 2027',
   status: 'missing',
   horizon: '2020_2024',
-} as StudyDTO;
+  trajectoryIds: [2],
+};
 
 vi.mock('react-router-dom', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual: Mock = await importOriginal();
   return {
     ...actual,
     useNavigate: vi.fn(),
@@ -52,8 +53,8 @@ describe('useStudyNavigation', () => {
     const mockNavigate = vi.fn().mockImplementation(vi.fn());
     mockUseNavigation.mockImplementationOnce(() => mockNavigate);
 
-    const wrapper = ({ children }) => (
-      <Router pathname={'/'} history={['/']} location={'/'} navigator={mockNavigator}>
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <Router location={'/'} navigator={mockNavigator}>
         {children}
       </Router>
     );
@@ -67,7 +68,7 @@ describe('useStudyNavigation', () => {
       result.current.navigateToStudy(mockStudy);
     });
 
-    expect(mockNavigate).toHaveBeenCalledWith(`/study/${encodeURIComponent(mockStudy.study_name)}`, {
+    expect(mockNavigate).toHaveBeenCalledWith(`/study/${encodeURIComponent(mockStudy.name)}`, {
       state: { study: mockStudy },
     });
   });
