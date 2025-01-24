@@ -43,6 +43,13 @@ export const fetchSearchStudies = async (
   return { content: json.content, totalElements: json.totalElements };
 };
 
+/**
+ * Retrieve a list of suggested keywords from a partial name of a study
+ *
+ * @param {string} query - Partial name of a study
+ *
+ * @returns {Promise<string[]>} - Promise object that represents a list of keywords
+ */
 export const fetchSuggestedKeywords = async (query: string): Promise<string[]> => {
   const response = await fetch(`${STUDY_KEYWORDS_SEARCH_ENDPOINT}?partialName=${query}`);
   if (!response.ok) {
@@ -51,7 +58,17 @@ export const fetchSuggestedKeywords = async (query: string): Promise<string[]> =
   return await response.json();
 };
 
-export const saveStudy = async (studyData: Omit<StudyDTO, 'status' | 'creationDate'>, toggleModal: () => void) => {
+/**
+ * Create a study
+ * Display toast if creation succeeds or fails
+ *
+ * @param {Omit<StudyDTO, 'id' | 'status' | 'creationDate'>} studyData - Partial study data
+ * @param {function} toggleModal - Handle toggle of opening modal boolean
+ */
+export const saveStudy = async (
+  studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate'>,
+  toggleModal: () => void,
+) => {
   try {
     const response = await fetch(`${STUDY_ENDPOINT}`, {
       method: 'POST',
@@ -71,13 +88,21 @@ export const saveStudy = async (studyData: Omit<StudyDTO, 'status' | 'creationDa
     });
     toggleModal();
   } catch (error: unknown) {
-    notifyToast({
-      type: 'error',
-      message: `${error.message}`,
-    });
+    if (error instanceof Error) {
+      notifyToast({
+        type: 'error',
+        message: `${error.message}`,
+      });
+    }
   }
 };
 
+/**
+ * Delete a study
+ * Display toast if deletion succeeds or fails
+ *
+ * @param {number} id - Study id
+ */
 export const deleteStudy = async (id: number) => {
   try {
     const response = await fetch(`${STUDY_ENDPOINT}/${id}`, {
