@@ -12,7 +12,6 @@ import { usePinnedProjectDispatch } from '@/store/contexts/ProjectContext.tsx';
 import { v4 as uuidv4 } from 'uuid';
 import { dismissToast, notifyToast, NotifyWithActionProps } from '@/shared/notification/notification.tsx';
 import { useTranslation } from 'react-i18next';
-import { PROJECT_PINNED_ENDPOINT } from '@/shared/const/apiEndPoint.ts';
 
 export const useHandlePinnedProjectList = () => {
   const userId = 'me00247';
@@ -95,7 +94,6 @@ export const useHandlePinnedProjectList = () => {
         onClick: () => {
           dismissToast(toastId);
           clearTimeout(apiCallTimeout!);
-          PROJECT_PINNED_ENDPOINT;
           dispatch?.({
             type: PINNED_PROJECT_ACTION.INIT_LIST,
             payload: currentPinnedProjects,
