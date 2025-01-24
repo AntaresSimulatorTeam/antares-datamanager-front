@@ -19,7 +19,6 @@ const pinnedProjectReducer = (prevState: PinnedProjectState, action?: PinnedProj
   if (action) {
     switch (action.type) {
       case PINNED_PROJECT_ACTION.ADD_ITEM:
-        console.log('==============ADD_ITEM ');
         return addItem(pinnedProjects, action.payload);
       case PINNED_PROJECT_ACTION.REMOVE_ITEM:
         return removeItem(pinnedProjects, action.payload);
