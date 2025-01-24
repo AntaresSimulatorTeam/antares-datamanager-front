@@ -161,7 +161,7 @@ describe('saveStudy', () => {
 
   it('should handle fetch failure and display a notification', async () => {
     // Failed fetch response moc
-    global.fetch = vi.fn().mockRejectedValueOnce({ message: 'Failed to create study' });
+    global.fetch = vi.fn().mockRejectedValueOnce(new Error('Failed to create study'));
 
     await saveStudy(mockStudy, vi.fn());
 
