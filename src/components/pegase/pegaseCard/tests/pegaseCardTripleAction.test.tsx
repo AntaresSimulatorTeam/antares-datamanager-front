@@ -19,11 +19,11 @@ const TEST_SECONDARY_BUTTON: Omit<RdsButtonProps, 'type' | 'size' | 'variant'> =
 };
 const TEST_CHILDREN = <div role="article"></div>;
 const TEST_ID = 'card-triple-action-id';
-const TEST_DROPDOWN_DROPDOWN: RdsDropdownOption[] = [
+const TEST_DROPDOWN_DROPDOWN = [
   { key: 'op1', label: 'Option 1', value: 'op1', onItemClick: noop },
   { key: 'op2', label: 'Option 2', value: 'op2', onItemClick: noop },
   { key: 'op3', label: 'Option 3', value: 'op3', onItemClick: noop },
-];
+] as RdsDropdownOption[];
 
 describe('PegaseCard', () => {
   it('renders the default PegaseCard component', () => {

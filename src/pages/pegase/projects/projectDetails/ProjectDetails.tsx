@@ -4,16 +4,16 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ProjectInfo } from '@/shared/types/pegase/Project.type';
-import { getEnvVariables } from '@/envVariables';
 import ProjectDetailsHeader from './ProjectDetailsHeader';
 import ProjectDetailsContent from './ProjectDetailsContent';
 import StudyTableDisplay from '@/pages/pegase/home/components/StudyTableDisplay';
 import SearchBar from '@/pages/pegase/home/components/SearchBar';
 import { useTranslation } from 'react-i18next';
 import { RdsChip, RdsDivider } from 'rte-design-system-react';
+import { fetchProjectDetails } from '@/shared/services/projectService.ts';
 
 const ProjectDetails = () => {
   const { t } = useTranslation();
@@ -34,42 +34,34 @@ const ProjectDetails = () => {
       searchStudy(userName);
     }
   };
-  const BASE_URL = getEnvVariables('VITE_BACK_END_BASE_URL');
+
   const [projectInfo, setProjectDetails] = useState<ProjectInfo>({} as ProjectInfo);
   const location = useLocation();
   const { projectId } = location.state || {};
 
   useEffect(() => {
+    const getProjectDetails = async (projectId: string) => {
+      try {
+        const data = await fetchProjectDetails(projectId);
+
+        setProjectDetails({
+          id: data.id,
+          name: data.name,
+          description: data.description,
+          createdBy: data.createdBy,
+          creationDate: data.creationDate,
+          archived: false,
+          pinned: false,
+          path: '',
+          tags: data.tags,
+          studies: [],
+        });
+      } catch (error) {
+        console.error(`Error retrieving project details: ${projectId}`, error);
+      }
+    };
     if (projectId && !projectInfo.id) {
-      const fetchProjectDetails = async () => {
-        try {
-          const response = await fetch(`${BASE_URL}/v1/project/${projectId}`);
-
-          if (!response.ok) {
-            throw new Error('Failed to fetch project details');
-          }
-
-          const data = await response.json();
-          console.log('Fetched Data:', data);
-
-          setProjectDetails({
-            id: data.id,
-            name: data.name,
-            description: data.description,
-            createdBy: data.createdBy,
-            creationDate: data.creationDate,
-            archived: false,
-            pinned: false,
-            path: '',
-            tags: data.tags,
-            studies: [],
-          });
-        } catch (error) {
-          console.error(`Error retrieving project details: ${projectId}`, error);
-        }
-      };
-
-      fetchProjectDetails();
+      void getProjectDetails(projectId);
     }
   }, [projectId, projectInfo.id]);
 

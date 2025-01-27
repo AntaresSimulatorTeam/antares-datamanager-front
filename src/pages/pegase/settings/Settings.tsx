@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { UserContext } from '@/contexts/UserContext';
+import { UserContext } from '@/store/contexts/UserContext';
 import { THEME_COLOR } from '@/shared/types';
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';

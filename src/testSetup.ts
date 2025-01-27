@@ -13,7 +13,7 @@ beforeEach(async () => {
   await i18n.init();
 });
 
-// runs a cleanup adter each test case (e.g. clearing jsdom)
+// runs a cleanup after each test case (e.g. clearing jsdom)
 afterEach(() => {
   cleanup();
 });

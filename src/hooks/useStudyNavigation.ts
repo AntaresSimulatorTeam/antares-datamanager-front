@@ -5,16 +5,17 @@
  */
 
 import { useNavigate } from 'react-router-dom';
+import { StudyDTO } from '@/shared/types';
 import { useCallback } from 'react';
 
-export const useProjectNavigation = () => {
+export const useStudyNavigation = () => {
   const navigate = useNavigate();
 
-  const navigateToProject = useCallback((projectId: string, projectName: string) => {
-    navigate(`/project/${encodeURIComponent(projectName)}`, {
-      state: { projectId },
+  const navigateToStudy = useCallback((study: StudyDTO) => {
+    navigate(`/study/${encodeURIComponent(study.name)}`, {
+      state: { study },
     });
   }, []);
 
-  return { navigateToProject };
+  return { navigateToStudy };
 };

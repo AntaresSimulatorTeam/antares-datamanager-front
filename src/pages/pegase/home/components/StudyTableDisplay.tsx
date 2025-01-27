@@ -5,19 +5,20 @@
  */
 
 import { useState } from 'react';
-import StdSimpleTable from '@/components/common/data/stdSimpleTable/StdSimpleTable';
-import { StudyDTO } from '@/shared/types/index';
+import { useTranslation } from 'react-i18next';
+import { StudyDTO } from '@/shared/types';
+import { StudyStatus } from '@/shared/types/common/StudyStatus.type';
 import getStudyTableHeaders from './StudyTableHeaders';
-import { addSortColumn, useNewStudyModal } from './StudyTableUtils';
+import { addSortColumn } from './StudyTableUtils';
 import StudiesPagination from './StudiesPagination';
 import { RowSelectionState } from '@tanstack/react-table';
-import { StudyStatus } from '@/shared/types/common/StudyStatus.type';
-import { useStudyTableDisplay } from './useStudyTableDisplay';
-import { useTranslation } from 'react-i18next';
 import StudyCreationModal from '../../studies/StudyCreationModal';
-import { handleDelete } from '@/pages/pegase/home/components/studyService';
-import {RdsButton} from "rte-design-system-react";
-import { useStudyNavigation } from '@/pages/pegase/studies/useStudyNavigation';
+import { deleteStudy } from '@/pages/pegase/home/components/studyService';
+import StdSimpleTable from '@/components/common/data/stdSimpleTable/StdSimpleTable';
+import { RdsButton } from 'rte-design-system-react';
+import { useStudyTableDisplay } from '@/hooks/useStudyTableDisplay';
+import { useNewStudyModal } from '@/hooks/useNewStudyModal';
+import { useStudyNavigation } from '@/hooks/useStudyNavigation';
 
 interface StudyTableDisplayProps {
   searchStudy: string | undefined;
@@ -25,23 +26,23 @@ interface StudyTableDisplayProps {
 }
 
 const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) => {
-  const [sortByState, setSortByState] = useState<{ [key: string]: 'asc' | 'desc' }>({});
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-  const [sortedColumn, setSortedColumn] = useState<string | null>('status');
-  const [isHeaderHovered, setIsHeaderHovered] = useState<boolean>(false);
-  const { isModalOpen, toggleModal } = useNewStudyModal();
   const { t } = useTranslation();
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [isHeaderHovered, setIsHeaderHovered] = useState<boolean>(false);
   const [selectedStudy, setSelectedStudy] = useState<StudyDTO | null>(null);
-
   // Reload trigger for re-fetching data
   const [reloadStudies, setReloadStudies] = useState<boolean>(false);
-  const { navigateToStudy } = useStudyNavigation();
+  const [sortBy, setSortBy] = useState<{ [key: string]: 'asc' | 'desc' }>({});
+  const [sortedColumn, setSortedColumn] = useState<string | null>('status');
 
-  const handleSort = (column: string) => {
-    const newSortOrder = sortByState[column] === 'asc' ? 'desc' : 'asc';
-    setSortByState({ [column]: newSortOrder });
-    setSortedColumn(column);
-  };
+  const { isModalOpen, toggleModal } = useNewStudyModal();
+  const { navigateToStudy } = useStudyNavigation();
+  const { rows, count, intervalSize, currentPage, setPage } = useStudyTableDisplay({
+    searchTerm: searchStudy,
+    projectId,
+    sortBy,
+    reloadStudies, // Key change here
+  });
 
   const handleHeaderHover = (hovered: boolean) => {
     setIsHeaderHovered(hovered);
@@ -49,21 +50,11 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
 
   const headers = getStudyTableHeaders();
 
-  const sortedHeaders = addSortColumn(
-    headers,
-    handleSort,
-    sortByState,
-    sortedColumn,
-    handleHeaderHover,
-    isHeaderHovered,
-  );
-
-  const { rows, count, intervalSize, current, setPage } = useStudyTableDisplay({
-    searchStudy,
-    projectId,
-    sortBy: sortByState,
-    reloadStudies, // Key change here
-  });
+  const handleSort = (column: string) => {
+    const newSortOrder = sortBy[column] === 'asc' ? 'desc' : 'asc';
+    setSortBy({ [column]: newSortOrder });
+    setSortedColumn(column);
+  };
 
   const selectedRowId = Object.keys(rowSelection)[0];
   const selectedStatus = rows[Number.parseInt(selectedRowId || '-1')]?.status?.toUpperCase();
@@ -80,11 +71,12 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
   const handleDeleteClick = () => {
     const selectedStudyId = rows[Number.parseInt(selectedRowId || '-1')]?.id;
     if (selectedStudyId) {
-      handleDelete(selectedStudyId).then(() => {
+      deleteStudy(selectedStudyId).then(() => {
         setReloadStudies(!reloadStudies); // Trigger reload after deleting
       });
     }
   };
+
   const handleStudyClick = (study: StudyDTO) => {
     navigateToStudy(study);
   };
@@ -93,6 +85,9 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
     const selectedStudy = rows[Number.parseInt(selectedRowId || '-1')];
     handleStudyClick(selectedStudy);
   };
+
+  const sortedHeaders = addSortColumn(headers, handleSort, sortBy, sortedColumn, handleHeaderHover, isHeaderHovered);
+
   return (
     <div>
       <div className="flex-1">
@@ -140,7 +135,7 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
             />
           )}
         </div>
-        <StudiesPagination count={count} intervalSize={intervalSize} current={current} onChange={setPage} />
+        <StudiesPagination count={count} intervalSize={intervalSize} current={currentPage} onChange={setPage} />
       </div>
     </div>
   );

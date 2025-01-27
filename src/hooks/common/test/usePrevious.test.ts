@@ -4,10 +4,12 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { act, renderHook, waitFor } from '@testing-library/react';
+import { act, Queries, renderHook, RenderHookOptions, waitFor } from '@testing-library/react';
 import usePrevious from '../usePrevious';
 
 describe('usePrevious', () => {
+  const mockHTMLElement = document.createElement('div');
+
   it('should return undefined as previous value when no value is provided', () => {
     const { result } = renderHook(() => usePrevious(undefined, undefined));
     expect(result.current).toBeUndefined();
@@ -19,31 +21,35 @@ describe('usePrevious', () => {
   });
 
   it('should return previous value when a new value is provided', async () => {
-    const { result, rerender } = renderHook((value) => usePrevious(value, 'initial'), {
-      initialProps: 'initial',
-    });
+    const { result, rerender } = renderHook((value) => usePrevious(value, mockHTMLElement), {
+      initialProps: mockHTMLElement,
+    } as RenderHookOptions<HTMLElement, Queries>);
 
     act(() => {
-      rerender('updated');
+      rerender(document.createElement('div'));
     });
 
-    expect(result.current).toBe('initial');
+    expect(result.current).toBe(mockHTMLElement);
 
-    await waitFor(() => expect(result.current).not.toBe('updated'));
+    await waitFor(() => expect(result.current).not.toBe(document.createElement('div')));
   });
 
   it('should return updated previous value when a new value is provided', async () => {
-    const { result, rerender } = renderHook((value) => usePrevious(value, 'initial'), {
-      initialProps: 'initial',
-    });
+    const { result, rerender } = renderHook((value) => usePrevious(value, mockHTMLElement), {
+      initialProps: mockHTMLElement,
+    } as RenderHookOptions<HTMLElement, Queries>);
+
+    const mockHTMLElementUpdate = document.createElement('div');
 
     act(() => {
-      rerender('updated');
+      rerender(mockHTMLElementUpdate);
     });
 
+    const mockHTMLElementUpdate2 = document.createElement('div');
+
     act(() => {
-      rerender('updated 2');
+      rerender(mockHTMLElementUpdate2);
     });
-    await waitFor(() => expect(result.current).toBe('updated'));
+    await waitFor(() => expect(result.current).toBe(mockHTMLElementUpdate));
   });
 });

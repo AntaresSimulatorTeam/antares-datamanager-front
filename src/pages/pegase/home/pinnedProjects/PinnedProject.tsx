@@ -6,17 +6,17 @@
 
 import PinnedProjectCards from '@/pages/pegase/home/pinnedProjects/PinnedProjectCard';
 import ProjectCreator from '@/pages/pegase/home/pinnedProjects/ProjectCreator';
+import { Dispatch, SetStateAction } from 'react';
 
 interface PinnedProjectProps {
-  reloadPinnedProject: boolean;
-  isReloadPinnedProject: (value: boolean) => void;
+  setShouldRefetchProjectList?: Dispatch<SetStateAction<boolean>>;
 }
 
-const PinnedProject: React.FC<PinnedProjectProps> = ({ reloadPinnedProject, isReloadPinnedProject }) => {
+const PinnedProject = ({ setShouldRefetchProjectList }: PinnedProjectProps) => {
   return (
     <div className="flex w-full gap-3">
       <ProjectCreator />
-      <PinnedProjectCards reloadPinnedProject={reloadPinnedProject} isReloadPinnedProject={isReloadPinnedProject} />
+      <PinnedProjectCards setShouldRefetchProjectList={setShouldRefetchProjectList} />
     </div>
   );
 };

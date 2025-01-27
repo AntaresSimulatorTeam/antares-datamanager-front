@@ -4,19 +4,21 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import HomePageContent from './components/HomePageContent';
 import PinnedProject from '@/pages/pegase/home/pinnedProjects/PinnedProject';
+import ProjectContent from '@/pages/pegase/projects/ProjectContent';
 import { PinnedProjectProvider } from '@/store/contexts/ProjectContext.tsx';
+import { useState } from 'react';
 
-const HomePage = () => {
+const ProjectsPage = () => {
+  const [shouldRefetchProjectList, setShouldRefetchProjectList] = useState(false);
   return (
     <PinnedProjectProvider initialValue={{ pinnedProjects: [] }}>
       <div className="flex flex-col items-center gap-6 p-3">
-        <PinnedProject />
-        <HomePageContent />
+        <PinnedProject setShouldRefetchProjectList={setShouldRefetchProjectList} />
+        <ProjectContent shouldRefetchProjectList={shouldRefetchProjectList} />
       </div>
     </PinnedProjectProvider>
   );
 };
 
-export default HomePage;
+export default ProjectsPage;

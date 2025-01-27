@@ -4,9 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import StdTextTooltip from '../stdTextTooltip/StdTextTooltip';
 import { navbarControllerClassBuilder } from './navbarClassBuilder';
-import { RdsIcon, RdsIconId } from 'rte-design-system-react';
+import { RdsIcon, RdsIconId, RdsTextTooltip } from 'rte-design-system-react';
 
 type StdNavbarControllerProps = {
   id: string;
@@ -17,16 +16,16 @@ type StdNavbarControllerProps = {
 
 const StdNavbarController = ({ label, id, action, expanded = true }: StdNavbarControllerProps) => {
   const iconId = expanded ? RdsIconId.KeyboardDoubleArrowLeft : RdsIconId.KeyboardDoubleArrowRight;
-  const navbarControllerClasses = navbarControllerClassBuilder(expanded);
+  const navbarControllerClasses = expanded ? navbarControllerClassBuilder(expanded) : undefined;
 
   return (
     <div>
-      <StdTextTooltip text={label} enabled={!expanded} placement="right" disableArrow>
+      <RdsTextTooltip text={label} enabled={!expanded} placement="right" disableArrow>
         <div className={navbarControllerClasses} id={id} onClick={action} role="button" tabIndex={0}>
           {expanded ? <RdsIcon name={iconId} isExplicit /> : <RdsIcon name={iconId} isExplicit={false} alt={label} />}
           {expanded && <>{label}</>}
         </div>
-      </StdTextTooltip>
+      </RdsTextTooltip>
     </div>
   );
 };

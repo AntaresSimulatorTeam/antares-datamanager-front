@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { RdsButton, RdsIconId, RdsInputText, RdsModal } from 'rte-design-system-react';
 import { useTranslation } from 'react-i18next';
 import KeywordsInput from '@/pages/pegase/studies/KeywordsInput';
@@ -14,7 +14,7 @@ import { saveStudy } from '@/pages/pegase/home/components/studyService';
 import { StudyDTO } from '@/shared/types/index';
 
 interface StudyCreationModalProps {
-  isOpen: boolean;
+  isOpen?: boolean;
   onClose: () => void;
   study?: StudyDTO | null;
   setReloadStudies: React.Dispatch<React.SetStateAction<boolean>>;

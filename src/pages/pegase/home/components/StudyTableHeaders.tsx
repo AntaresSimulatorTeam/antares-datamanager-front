@@ -6,7 +6,7 @@
 
 import StdAvatar from '@/components/common/layout/stdAvatar/StdAvatar';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type';
-import { StudyDTO } from '@/shared/types/pegase/study';
+import { StudyDTO } from '@/shared/types/pegase/Study.type.ts';
 import { createColumnHelper } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 import { RdsRadioButton, RdsTagList } from 'rte-design-system-react';

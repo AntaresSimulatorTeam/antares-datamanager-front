@@ -6,7 +6,6 @@
 
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import StdIcon from '@common/base/stdIcon/StdIcon';
-import { useState } from 'react';
 
 export function addSortColumn(
   headers: any[],
@@ -60,17 +59,4 @@ export function addSortColumn(
       ),
     };
   });
-}
-
-export function useNewStudyModal() {
-  const [isModalOpen, setModalOpen] = useState(false);
-
-  const toggleModal = () => {
-    setModalOpen((prev) => !prev);
-  };
-
-  return {
-    isModalOpen,
-    toggleModal,
-  };
 }

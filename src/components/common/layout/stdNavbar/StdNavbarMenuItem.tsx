@@ -4,13 +4,11 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { useStdId } from '@/hooks/common/useStdId';
 import { MenuNavItem } from '@/shared/types';
 import { Link } from 'react-router-dom';
-import StdTextTooltip from '../stdTextTooltip/StdTextTooltip';
 import { navbarItemClassBuilder } from './navbarClassBuilder';
 import { useTranslation } from 'react-i18next';
-import { RdsIcon } from 'rte-design-system-react';
+import { RdsIcon, RdsTextTooltip, useRdsId } from 'rte-design-system-react';
 
 type StdNavbarMenuItemProps = {
   item: MenuNavItem;
@@ -19,18 +17,18 @@ type StdNavbarMenuItemProps = {
 };
 
 const StdNavbarMenuItem = ({ item, expanded = true, selected = false }: StdNavbarMenuItemProps) => {
-  const id = useStdId('navbar-item', item.id);
+  const id = useRdsId('navbar-item', item.id);
   const { t } = useTranslation();
   const { path, key, icon, label } = item;
   const navbarMenuItemClasses = navbarItemClassBuilder(selected, expanded);
 
   return (
-    <StdTextTooltip text={label} placement="right" enabled={!expanded} disableArrow>
+    <RdsTextTooltip text={label} placement="right" enabled={!expanded} disableArrow>
       <Link to={path} className={navbarMenuItemClasses} key={key} id={id}>
         <RdsIcon name={icon} />
         {expanded && t(label)}
       </Link>
-    </StdTextTooltip>
+    </RdsTextTooltip>
   );
 };
 

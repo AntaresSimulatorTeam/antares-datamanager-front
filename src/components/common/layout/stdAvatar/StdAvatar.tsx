@@ -6,8 +6,7 @@
 
 import { avatarClassBuilder } from './avatarClassBuilder';
 import { AVATAR_COLORS } from '../stdAvatarGroup/avatarTools';
-import { useStdId } from '@/hooks/common/useStdId';
-import { RdsTextTooltip } from 'rte-design-system-react';
+import { RdsTextTooltip, useRdsId } from 'rte-design-system-react';
 
 type StdAvatarProps = {
   initials: string;
@@ -24,7 +23,7 @@ const OFFSET_HOVER_HEIGHT = 5;
 
 const StdAvatar = ({ initials, size, backgroundColor, fullname, id: propsId }: StdAvatarProps) => {
   const avatarClasses = avatarClassBuilder(size, backgroundColor);
-  const id = useStdId('avatar', propsId);
+  const id = useRdsId('avatar', propsId);
 
   return (
     <div role="figure" id={id} className={'avatar overflow-visible'}>
