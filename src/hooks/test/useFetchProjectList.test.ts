@@ -5,7 +5,7 @@
  */
 
 import { renderHook, waitFor } from '@testing-library/react';
-import { useFetchProjects } from '@/hooks/useFetchProjectList.ts';
+import { useFetchProjectList } from '@/hooks/useFetchProjectList.ts';
 
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
@@ -14,7 +14,7 @@ vi.mock('@/envVariables', () => ({
   getEnvVariables: vi.fn(() => 'https://mockapi.com'),
 }));
 
-describe('useFetchProjects', () => {
+describe('useFetchProjectList', () => {
   beforeEach(() => {
     global.fetch = vi.fn(() =>
       Promise.resolve({
@@ -40,7 +40,7 @@ describe('useFetchProjects', () => {
   });
 
   it('fetches projects on mount', async () => {
-    const { result } = renderHook(() => useFetchProjects('', 0, 9));
+    const { result } = renderHook(() => useFetchProjectList('', 0, 9, false));
 
     await waitFor(() => {
       expect(result.current.projects).toEqual([
@@ -57,7 +57,7 @@ describe('useFetchProjects', () => {
   });
 
   it('fetches projects with search term', async () => {
-    renderHook(() => useFetchProjects('test', 0, 9));
+    renderHook(() => useFetchProjectList('test', 0, 9, false));
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith('https://mockapi.com/v1/project/search?page=1&size=9&search=test');
@@ -65,7 +65,7 @@ describe('useFetchProjects', () => {
   });
 
   it('fetches projects with pagination', async () => {
-    renderHook(() => useFetchProjects('', 1, 9));
+    renderHook(() => useFetchProjectList('', 1, 9, false));
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith('https://mockapi.com/v1/project/search?page=2&size=9&search=');

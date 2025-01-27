@@ -15,19 +15,32 @@ import { useDropdownOptions } from '@/hooks/useDropdownOptions';
 import { useProjectNavigation } from '@/hooks/useProjectNavigation';
 import { deleteProjectById } from '@/shared/services/projectService.ts';
 import { RdsChip, RdsTagList } from 'rte-design-system-react';
-import { useFetchProjects } from '@/hooks/useFetchProjectList';
+import { useFetchProjectList } from '@/hooks/useFetchProjectList';
 import { useHandlePinnedProjectList } from '@/hooks/useHandlePinnedProjectList.ts';
+import { PINNED_PROJECT_ACTION } from '@/shared/enum/project.ts';
+import { PinnedProjectActionType } from '@/shared/types/pegase/Project.type.ts';
+import { usePinnedProjectDispatch } from '@/store/contexts/ProjectContext.tsx';
 
-const ProjectContent = () => {
+interface ProjectContentProps {
+  shouldRefetchProjectList: boolean;
+}
+
+const ProjectContent = ({ shouldRefetchProjectList }: ProjectContentProps) => {
   const { t } = useTranslation();
   const intervalSize = 9;
-  const userName = 'me00247'; // Replace with actual user name
+  const userName = 'mouad'; // Replace with actual user name
   const [searchTerm, setSearchTerm] = useState<string | undefined>('');
   const [activeChip, setActiveChip] = useState<boolean | null>(false);
   const [current, setCurrent] = useState(0);
-  const { projects, count, refetch } = useFetchProjects(searchTerm || '', current, intervalSize);
+  const { projects, count, refetch } = useFetchProjectList(
+    searchTerm || '',
+    current,
+    intervalSize,
+    shouldRefetchProjectList,
+  );
   const { navigateToProject } = useProjectNavigation();
   const { handlePinProject } = useHandlePinnedProjectList();
+  const dispatch = usePinnedProjectDispatch();
 
   const searchProject = (value?: string | undefined) => {
     setSearchTerm(value);
@@ -45,6 +58,10 @@ const ProjectContent = () => {
 
   const deleteProject = async (projectId: string) => {
     await deleteProjectById(projectId);
+    dispatch?.({
+      type: PINNED_PROJECT_ACTION.REMOVE_ITEM,
+      payload: projectId,
+    } as PinnedProjectActionType);
     await refetch(); // Actualiser les projets après suppression
   };
 

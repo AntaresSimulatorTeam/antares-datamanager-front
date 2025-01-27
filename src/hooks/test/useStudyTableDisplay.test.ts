@@ -6,6 +6,11 @@
 
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { useStudyTableDisplay } from '@/hooks/useStudyTableDisplay';
+import { vi } from 'vitest';
+
+vi.mock('@/envVariables', () => ({
+  getEnvVariables: vi.fn(() => 'https://mockapi.com'),
+}));
 
 describe('useStudyTableDisplay', () => {
   beforeEach(() => {
@@ -52,7 +57,21 @@ describe('useStudyTableDisplay', () => {
     await waitFor(() => {
       expect(result.current.rows).toHaveLength(2);
       expect(result.current.rows).toEqual(mockResponse.content);
+      expect(result.current.count).toEqual(2);
+      //expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(global.fetch).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/study/search?page=1&size=9&projectId=&search=test&sortColumn=status&sortDirection=desc',
+      );
     });
+
+    await act(async () => {
+      renderHook(() => useStudyTableDisplay({ searchTerm: 'mouad', sortBy: { project: 'asc' }, reloadStudies: true }));
+    });
+
+    //expect(global.fetch).toHaveBeenCalledTimes(1);
+    expect(global.fetch).toHaveBeenCalledWith(
+      'https://mockapi.com/v1/study/search?page=1&size=9&projectId=&search=mouad&sortColumn=project&sortDirection=asc',
+    );
   });
 
   it('handles fetch error correctly', async () => {

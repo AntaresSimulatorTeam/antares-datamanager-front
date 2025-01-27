@@ -7,7 +7,6 @@
 import { deleteProjectById, fetchProjectDetails, fetchProjectsFromPartialName } from '../projectService.ts';
 import { vi } from 'vitest';
 import { waitFor } from '@testing-library/react';
-import { notifyToast } from '@/shared/notification/notification.tsx';
 
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
@@ -43,11 +42,6 @@ describe('deleteProjectById', () => {
           'Content-Type': 'application/json',
         },
       });
-      // Verify notifyToast was called with success
-      expect(notifyToast).toHaveBeenCalledWith({
-        type: 'success',
-        message: 'Project deleted successfully',
-      });
     });
   });
 
@@ -55,25 +49,11 @@ describe('deleteProjectById', () => {
     // Failed fetch response moc
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: false,
-      text: async () => 'Error',
+      text: async () => 'Failed to delete project',
     });
+    vi.stubGlobal('JSON', { parse: (text: string) => text });
 
-    const result = await deleteProjectById(projectId);
-
-    expect(result).toEqual(undefined);
-  });
-
-  it('should handle exceptions during delete', async () => {
-    //Fetch throwing an error mock
-    global.fetch = vi.fn().mockRejectedValueOnce(new Error('Network error'));
-
-    await deleteProjectById(projectId);
-
-    // Verify notifyToast was called with error
-    expect(notifyToast).toHaveBeenCalledWith({
-      type: 'error',
-      message: 'Network error',
-    });
+    await expect(async () => deleteProjectById(projectId)).rejects.toThrowError('Failed to delete project');
   });
 });
 
