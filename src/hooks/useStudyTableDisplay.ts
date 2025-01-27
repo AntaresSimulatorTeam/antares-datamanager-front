@@ -40,28 +40,20 @@ export const useStudyTableDisplay = ({
   const [error, setError] = useState(null);
 
   const searchTermRef = useRef(searchTerm);
-  useEffect(() => {
-    searchTermRef.current = searchTerm;
-  }, [searchTerm]);
-
   const projectIdRef = useRef(projectId);
-  useEffect(() => {
-    projectIdRef.current = projectId;
-  }, [projectId]);
-
   const sortByRef = useRef(sortBy);
-  useEffect(() => {
-    sortByRef.current = sortBy;
-  }, [sortBy]);
-
   const reloadStudiesRef = useRef(reloadStudies);
-  useEffect(() => {
-    reloadStudiesRef.current = reloadStudies;
-  }, [reloadStudies]);
 
   useEffect(() => {
     setCurrentPage(PAGINATION_CURRENT);
   }, []);
+
+  useEffect(() => {
+    searchTermRef.current = searchTerm;
+    projectIdRef.current = projectId;
+    sortByRef.current = sortBy;
+    reloadStudiesRef.current = reloadStudies;
+  }, [searchTerm, projectId, sortBy, reloadStudies]);
 
   useEffect(() => {
     fetchSearchStudies(searchTermRef.current, projectIdRef.current, currentPage, intervalSize, sortByRef.current)
@@ -70,7 +62,7 @@ export const useStudyTableDisplay = ({
         setCount(totalElements);
       })
       .catch((error) => setError(error));
-  }, [currentPage, searchTermRef.current, projectIdRef.current, sortByRef.current, reloadStudiesRef.current]);
+  }, [currentPage, searchTerm, projectId, sortBy, reloadStudies]);
 
   return { rows, count, intervalSize, currentPage, setPage: setCurrentPage, error };
 };

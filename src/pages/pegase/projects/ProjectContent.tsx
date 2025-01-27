@@ -34,7 +34,6 @@ const ProjectContent = () => {
   };
 
   const handleChipClick = () => {
-    console.log('========================== activeChip', activeChip);
     if (activeChip) {
       setActiveChip(false);
       setSearchTerm('');
