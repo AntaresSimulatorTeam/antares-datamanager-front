@@ -7,13 +7,15 @@
 import PinnedProject from '@/pages/pegase/home/pinnedProjects/PinnedProject';
 import ProjectContent from '@/pages/pegase/projects/ProjectContent';
 import { PinnedProjectProvider } from '@/store/contexts/ProjectContext.tsx';
+import { useState } from 'react';
 
 const ProjectsPage = () => {
+  const [shouldRefetchProjectList, setShouldRefetchProjectList] = useState(false);
   return (
     <PinnedProjectProvider initialValue={{ pinnedProjects: [] }}>
       <div className="flex flex-col items-center gap-6 p-3">
-        <PinnedProject />
-        <ProjectContent />
+        <PinnedProject setShouldRefetchProjectList={setShouldRefetchProjectList} />
+        <ProjectContent shouldRefetchProjectList={shouldRefetchProjectList} />
       </div>
     </PinnedProjectProvider>
   );

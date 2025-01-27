@@ -18,7 +18,7 @@ import { PINNED_PROJECT_ACTION } from '@/shared/enum/project.ts';
 import { PinnedProjectActionType } from '@/shared/types/pegase/Project.type.ts';
 import { notifyToast } from '@/shared/notification/notification.tsx';
 
-const PinnedProjectCards = () => {
+const PinnedProjectCards = ({ setShouldRefetchProjectList }) => {
   const { t } = useTranslation();
   const { navigateToProject } = useProjectNavigation();
   const { settingOption, deleteOption, pinOption } = useDropdownOptions();
@@ -33,6 +33,7 @@ const PinnedProjectCards = () => {
   const deleteProject = async (projectId: string) => {
     try {
       await deleteProjectById(projectId);
+      setShouldRefetchProjectList(true);
       dispatch?.({
         type: PINNED_PROJECT_ACTION.REMOVE_ITEM,
         payload: projectId,

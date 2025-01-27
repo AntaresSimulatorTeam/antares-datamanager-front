@@ -7,11 +7,15 @@
 import PinnedProjectCards from '@/pages/pegase/home/pinnedProjects/PinnedProjectCard';
 import ProjectCreator from '@/pages/pegase/home/pinnedProjects/ProjectCreator';
 
-const PinnedProject: React.FC = () => {
+interface PinnedProjectProps {
+  setShouldRefetchProjectList?: (value: ((prevState: boolean) => boolean) | boolean) => void;
+}
+
+const PinnedProject: React.FC = ({ setShouldRefetchProjectList }: PinnedProjectProps) => {
   return (
     <div className="flex w-full gap-3">
       <ProjectCreator />
-      <PinnedProjectCards />
+      <PinnedProjectCards setShouldRefetchProjectList={setShouldRefetchProjectList} />
     </div>
   );
 };
