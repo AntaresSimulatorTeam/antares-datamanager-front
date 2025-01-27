@@ -4,34 +4,20 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { notifyToast } from '@/shared/notification/notification';
 import { PROJECT_ENDPOINT } from '@/shared/const/apiEndPoint';
 
 export const deleteProjectById = async (projectId: string) => {
-  try {
-    const response = await fetch(`${PROJECT_ENDPOINT}/${projectId}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+  const response = await fetch(`${PROJECT_ENDPOINT}/${projectId}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      const errorData = JSON.parse(errorText);
-      throw new Error(`${errorData.message || errorText}`);
-    }
-    notifyToast({
-      type: 'success',
-      message: 'Project deleted successfully',
-    });
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      notifyToast({
-        type: 'error',
-        message: `${error.message}`,
-      });
-    }
+  if (!response.ok) {
+    const errorText = await response.text();
+    const errorData = JSON.parse(errorText);
+    throw new Error(`${errorData.message || errorText}`);
   }
 };
 

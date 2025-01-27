@@ -8,7 +8,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { ProjectInfo } from '@/shared/types/pegase/Project.type.ts';
 import { getEnvVariables } from '@/envVariables.ts';
 
-export const useFetchProjects = (searchTerm: string, current: number, intervalSize: number) => {
+export const useFetchProjectList = (searchTerm: string, current: number, intervalSize: number) => {
   const [projects, setProjects] = useState<ProjectInfo[]>([]);
   const [count, setCount] = useState(0);
   const BASE_URL = getEnvVariables('VITE_BACK_END_BASE_URL');
@@ -22,7 +22,7 @@ export const useFetchProjects = (searchTerm: string, current: number, intervalSi
         setCount(json.totalElements);
       })
       .catch((error) => console.error(error));
-  }, []);
+  }, [current, intervalSize, searchTerm]);
 
   useEffect(() => {
     void fetchProjects();

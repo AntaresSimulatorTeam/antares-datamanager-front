@@ -15,7 +15,7 @@ import { useDropdownOptions } from '@/hooks/useDropdownOptions';
 import { useProjectNavigation } from '@/hooks/useProjectNavigation';
 import { deleteProjectById } from '@/shared/services/projectService.ts';
 import { RdsChip, RdsTagList } from 'rte-design-system-react';
-import { useFetchProjects } from '@/hooks/useFetchProjectList';
+import { useFetchProjectList } from '@/hooks/useFetchProjectList';
 import { useHandlePinnedProjectList } from '@/hooks/useHandlePinnedProjectList.ts';
 
 const ProjectContent = () => {
@@ -25,7 +25,7 @@ const ProjectContent = () => {
   const [searchTerm, setSearchTerm] = useState<string | undefined>('');
   const [activeChip, setActiveChip] = useState<boolean | null>(false);
   const [current, setCurrent] = useState(0);
-  const { projects, count, refetch } = useFetchProjects(searchTerm || '', current, intervalSize);
+  const { projects, count, refetch } = useFetchProjectList(searchTerm || '', current, intervalSize);
   const { navigateToProject } = useProjectNavigation();
   const { handlePinProject } = useHandlePinnedProjectList();
 
@@ -34,6 +34,7 @@ const ProjectContent = () => {
   };
 
   const handleChipClick = () => {
+    console.log('========================== activeChip', activeChip);
     if (activeChip) {
       setActiveChip(false);
       setSearchTerm('');

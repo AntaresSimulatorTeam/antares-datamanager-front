@@ -12,14 +12,18 @@ import { useDropdownOptions } from '@/hooks/useDropdownOptions';
 import { useProjectNavigation } from '@/hooks/useProjectNavigation';
 import { RdsIcon, RdsIconId, RdsTagList } from 'rte-design-system-react';
 import { deleteProjectById } from '@/shared/services/projectService';
-import { usePinnedProject } from '@/store/contexts/ProjectContext';
+import { usePinnedProject, usePinnedProjectDispatch } from '@/store/contexts/ProjectContext';
 import { useHandlePinnedProjectList } from '@/hooks/useHandlePinnedProjectList.ts';
+import { PINNED_PROJECT_ACTION } from '@/shared/enum/project.ts';
+import { PinnedProjectActionType } from '@/shared/types/pegase/Project.type.ts';
+import { notifyToast } from '@/shared/notification/notification.tsx';
 
 const PinnedProjectCards = () => {
   const { t } = useTranslation();
   const { navigateToProject } = useProjectNavigation();
   const { settingOption, deleteOption, pinOption } = useDropdownOptions();
   const { pinnedProjects } = usePinnedProject();
+  const dispatch = usePinnedProjectDispatch();
   const { handleUnpinProject } = useHandlePinnedProjectList();
 
   const handleCardClick = (projectId: string, projectName: string) => {
@@ -27,7 +31,24 @@ const PinnedProjectCards = () => {
   };
 
   const deleteProject = async (projectId: string) => {
-    await deleteProjectById(projectId);
+    try {
+      await deleteProjectById(projectId);
+      dispatch?.({
+        type: PINNED_PROJECT_ACTION.REMOVE_ITEM,
+        payload: projectId,
+      } as PinnedProjectActionType);
+      notifyToast({
+        type: 'success',
+        message: 'Project deleted successfully',
+      });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        notifyToast({
+          type: 'error',
+          message: `${error.message}`,
+        });
+      }
+    }
   };
 
   return (
