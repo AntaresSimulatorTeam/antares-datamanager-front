@@ -21,7 +21,7 @@ import { useHandlePinnedProjectList } from '@/hooks/useHandlePinnedProjectList.t
 const ProjectContent = () => {
   const { t } = useTranslation();
   const intervalSize = 9;
-  const userName = 'me00247'; // Replace with actual user name
+  const userName = 'mouad'; // Replace with actual user name
   const [searchTerm, setSearchTerm] = useState<string | undefined>('');
   const [activeChip, setActiveChip] = useState<boolean | null>(false);
   const [current, setCurrent] = useState(0);
