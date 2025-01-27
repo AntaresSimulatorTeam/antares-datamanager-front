@@ -40,7 +40,7 @@ describe('useFetchProjectList', () => {
   });
 
   it('fetches projects on mount', async () => {
-    const { result } = renderHook(() => useFetchProjectList('', 0, 9));
+    const { result } = renderHook(() => useFetchProjectList('', 0, 9, false));
 
     await waitFor(() => {
       expect(result.current.projects).toEqual([
@@ -57,7 +57,7 @@ describe('useFetchProjectList', () => {
   });
 
   it('fetches projects with search term', async () => {
-    renderHook(() => useFetchProjectList('test', 0, 9));
+    renderHook(() => useFetchProjectList('test', 0, 9, false));
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith('https://mockapi.com/v1/project/search?page=1&size=9&search=test');
@@ -65,7 +65,7 @@ describe('useFetchProjectList', () => {
   });
 
   it('fetches projects with pagination', async () => {
-    renderHook(() => useFetchProjectList('', 1, 9));
+    renderHook(() => useFetchProjectList('', 1, 9, false));
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith('https://mockapi.com/v1/project/search?page=2&size=9&search=');
