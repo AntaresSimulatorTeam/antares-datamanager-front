@@ -108,7 +108,7 @@ const ProjectContent = ({ shouldRefetchProjectList }: ProjectContentProps) => {
                   <div className="font-sans text-body-xs font-light">
                     {t('project.@created')} :{' '}
                     <span className="text-body-xs font-bold">{formatDateToDDMMYYYY(project.creationDate)} </span>{' '}
-                    {t('project.@by')} :
+                    <span className="ml-2">{t('project.@by')}</span> :
                   </div>
                   <StdAvatar
                     size="es"
