@@ -40,7 +40,7 @@ describe('useFetchProjectList', () => {
   });
 
   it('fetches projects on mount', async () => {
-    const { result } = renderHook(() => useFetchProjectList('', 0, 9, false));
+    const { result } = renderHook(() => useFetchProjectList('mouad', 0, 9, false));
 
     await waitFor(() => {
       expect(result.current.projects).toEqual([

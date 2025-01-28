@@ -21,3 +21,4 @@ export const PROJECT_PIN_ENDPOINT = `${BASE_URL}/v1/project/pin`;
 // PROJECT
 export const PROJECT_ENDPOINT = `${BASE_URL}/v1/project`;
 export const PROJECT_AUTOCOMPLETE_ENDPOINT = `${BASE_URL}/v1/project/autocomplete`;
+export const PROJECT_SEARCH_ENDPOINT = `${BASE_URL}/v1/project/search`;

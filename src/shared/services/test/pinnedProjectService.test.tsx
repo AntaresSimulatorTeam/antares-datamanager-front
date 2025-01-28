@@ -8,8 +8,6 @@ import { fetchPinnedProjects, pinProject, unpinProject } from '../pinnedProjectS
 import { vi } from 'vitest';
 import { waitFor } from '@testing-library/react';
 
-const mockFetch = vi.fn();
-global.fetch = mockFetch;
 vi.mock('@/shared/notification/notification');
 vi.mock('@/envVariables', () => ({
   getEnvVariables: vi.fn(() => 'https://mockapi.com'),

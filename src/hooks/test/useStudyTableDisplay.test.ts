@@ -58,7 +58,7 @@ describe('useStudyTableDisplay', () => {
       expect(result.current.rows).toHaveLength(2);
       expect(result.current.rows).toEqual(mockResponse.content);
       expect(result.current.count).toEqual(2);
-      //expect(global.fetch).toHaveBeenCalledTimes(1);
+      //expect(global.fetch).toHaveBeenCalledTimes(1); TODO: ANT-2719
       expect(global.fetch).toHaveBeenCalledWith(
         'https://mockapi.com/v1/study/search?page=1&size=9&projectId=&search=test&sortColumn=status&sortDirection=desc',
       );
@@ -68,7 +68,7 @@ describe('useStudyTableDisplay', () => {
       renderHook(() => useStudyTableDisplay({ searchTerm: 'mouad', sortBy: { project: 'asc' }, reloadStudies: true }));
     });
 
-    //expect(global.fetch).toHaveBeenCalledTimes(1);
+    //expect(global.fetch).toHaveBeenCalledTimes(1);  TODO: ANT-2719
     expect(global.fetch).toHaveBeenCalledWith(
       'https://mockapi.com/v1/study/search?page=1&size=9&projectId=&search=mouad&sortColumn=project&sortDirection=asc',
     );

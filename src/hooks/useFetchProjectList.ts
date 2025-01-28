@@ -6,7 +6,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { ProjectInfo } from '@/shared/types/pegase/Project.type.ts';
-import { getEnvVariables } from '@/envVariables.ts';
+import { fetchProjectFromSearchTerm } from '@/shared/services/projectService.ts';
 
 export const useFetchProjectList = (
   searchTerm: string,
@@ -16,22 +16,22 @@ export const useFetchProjectList = (
 ) => {
   const [projects, setProjects] = useState<ProjectInfo[]>([]);
   const [count, setCount] = useState(0);
-  const BASE_URL = getEnvVariables('VITE_BACK_END_BASE_URL');
 
-  const fetchProjects = useCallback(async () => {
-    const url = `${BASE_URL}/v1/project/search?page=${current + 1}&size=${intervalSize}&search=${searchTerm || ''}`;
-    fetch(url)
-      .then((response) => response.json())
-      .then((json) => {
-        setProjects(json.content);
-        setCount(json.totalElements);
-      })
-      .catch((error) => console.error(error));
-  }, [current, intervalSize, searchTerm]);
+  const fetchProjects = useCallback(
+    async (searchTerm, current, intervalSize) => {
+      fetchProjectFromSearchTerm(searchTerm, current, intervalSize)
+        .then((json) => {
+          setProjects(json.content);
+          setCount(json.totalElements);
+        })
+        .catch((error) => console.error(error));
+    },
+    [current, intervalSize, searchTerm],
+  );
 
   useEffect(() => {
-    void fetchProjects();
-  }, [BASE_URL, current, searchTerm, intervalSize, shouldRefetch]);
+    void fetchProjects(searchTerm, current, intervalSize);
+  }, [current, searchTerm, intervalSize, shouldRefetch]);
 
   return { projects, count, refetch: fetchProjects };
 };
