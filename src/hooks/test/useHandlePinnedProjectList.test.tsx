@@ -58,7 +58,6 @@ vi.mock('@/envVariables', () => ({
   getEnvVariables: vi.fn(() => 'https://mockapi.com'),
 }));
 vi.mock('@/shared/notification/notification');
-vi.mock('@/uuid');
 vi.mock('uuid', () => ({
   v4: vi.fn(() => 'mocked-uuid'),
 }));
