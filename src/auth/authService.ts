@@ -39,7 +39,7 @@ export const AuthService = {
     const user = await userManager.getUser();
     console.log('user id token : ', user?.id_token);
     console.log('user id token : ', user?.profile?.name);
-    return user?.access_token || null;
+    return user?.id_token || null;
   },
 
   authFetch: async (url: string, options: RequestInit = {}) => {
