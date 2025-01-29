@@ -52,7 +52,7 @@ const KeywordsInput: React.FC<KeywordsInputProps> = ({
         setErrorMessage(`Keyword must be at least ${minNbCharacters} characters`);
       } else if (!minNbCharacters && maxNbCharacters && suggestedKeyword.trim().length > maxNbCharacters) {
         setErrorMessage(`Keyword must not exceed ${maxNbCharacters} characters`);
-      } else if (keywords.length >= maxNbKeywords) {
+      } else if (maxNbKeywords && keywords.length >= maxNbKeywords) {
         setErrorMessage(`Cannot add more than ${maxNbKeywords} keywords`);
       } else {
         setKeywords((prevKeywords) => [...prevKeywords, suggestedKeyword.trim()]);

@@ -66,6 +66,9 @@ export const fetchProjectsFromPartialName = async (query: string): Promise<strin
  * @param {string} searchTerm
  * @param {number} current
  * @param {number} intervalSize
+ * @param {string} searchTerm
+ * @param {number} current
+ * @param {number} intervalSize
  * @retuns{Promise<ProjectInfo[] | Error>}
  */
 export const fetchProjectFromSearchTerm = async (
@@ -86,7 +89,9 @@ export const fetchProjectFromSearchTerm = async (
  * @param {Pick<ProjectInfo, 'name' | 'description' | 'tags'>} projectData - Body data request
  * @return {Promise<ProjectResponse | Error>}
  */
-export const createProject = async (projectData): Promise<ProjectResponse | Error> => {
+export const createProject = async (
+  projectData: Pick<ProjectInfo, 'name' | 'description' | 'tags'>,
+): Promise<ProjectResponse | Error> => {
   const apiUrl = `${PROJECT_ENDPOINT}`;
 
   const response = await fetch(apiUrl, {
@@ -101,4 +106,5 @@ export const createProject = async (projectData): Promise<ProjectResponse | Erro
     const errorText = await response.text();
     throw new Error(`${errorText}`);
   }
+  return await response.json();
 };

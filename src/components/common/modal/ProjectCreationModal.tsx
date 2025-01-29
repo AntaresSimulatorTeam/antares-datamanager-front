@@ -5,13 +5,17 @@
  */
 
 import { RdsButton, RdsIconId, RdsInputText, RdsInputTextArea, RdsModal } from 'rte-design-system-react';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import KeywordsInput from '@/pages/pegase/studies/KeywordsInput';
 import { createProject } from '@/shared/services/projectService';
 import { notifyToast } from '@/shared/notification/notification.tsx';
 
-export const ProjectCreationModal = ({ isOpen, onClose }) => {
+interface ProjectCreationModalProps {
+  onClose: () => void;
+}
+
+export const ProjectCreationModal = ({ onClose }: ProjectCreationModalProps) => {
   const { t } = useTranslation();
   const [name, setName] = useState<string>('');
   const [description, setDescription] = useState<string>('');

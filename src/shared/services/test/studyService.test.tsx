@@ -129,7 +129,6 @@ describe('saveStudy', () => {
       ok: true,
       json: () => Promise.resolve(),
     });
-    const toggleModal = vi.fn();
 
     await saveStudy(mockStudy);
 

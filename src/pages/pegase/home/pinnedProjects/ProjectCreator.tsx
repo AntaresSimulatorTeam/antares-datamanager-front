@@ -18,7 +18,6 @@ export const ProjectCreator = () => {
       <RdsButton label={t('home.@buttonNewProject')} variant="outlined" color="primary" onClick={toggleModal} />
       {isModalOpen && (
         <ProjectCreationModal
-          isOpen={isModalOpen}
           onClose={toggleModal}
           //setReloadStudies={setReloadStudies} // Pass setReloadStudies
         />
