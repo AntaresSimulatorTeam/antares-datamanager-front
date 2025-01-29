@@ -8,6 +8,7 @@ import { PaginatedResponse, StudyDTO } from '@/shared/types';
 import { STUDY_SEARCH_ENDPOINT } from '@/shared/const/apiEndPoint';
 import { STUDY_ENDPOINT, STUDY_KEYWORDS_SEARCH_ENDPOINT } from '@/shared/const/apiEndPoint.ts';
 import { notifyToast } from '@/shared/notification/notification.tsx';
+import { AuthService } from '@/auth/authService';
 
 /**
  * Retrieve a list of studies from a term
@@ -51,7 +52,7 @@ export const fetchSearchStudies = async (
  * @returns {Promise<string[]>} - Promise object that represents a list of keywords
  */
 export const fetchSuggestedKeywords = async (query: string): Promise<string[]> => {
-  const response = await fetch(`${STUDY_KEYWORDS_SEARCH_ENDPOINT}?partialName=${query}`);
+  const response = await AuthService.authFetch(`${STUDY_KEYWORDS_SEARCH_ENDPOINT}?partialName=${query}`);
   if (!response.ok) {
     throw new Error('Failed to fetch suggested keywords');
   }

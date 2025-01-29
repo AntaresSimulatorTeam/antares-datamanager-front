@@ -5,6 +5,7 @@
  */
 
 import { PROJECT_AUTOCOMPLETE_ENDPOINT, PROJECT_ENDPOINT, PROJECT_SEARCH_ENDPOINT } from '@/shared/const/apiEndPoint';
+import { AuthService } from '@/auth/authService';
 
 export const deleteProjectById = async (projectId: string) => {
   const response = await fetch(`${PROJECT_ENDPOINT}/${projectId}`, {
@@ -60,7 +61,7 @@ export const fetchProjectsFromPartialName = async (query: string): Promise<strin
  * @param {number} intervalSize
  */
 export const fetchProjectFromSearchTerm = async (searchTerm: string, current: number, intervalSize: number) => {
-  const response = await fetch(
+  const response = await AuthService.authFetch(
     `${PROJECT_SEARCH_ENDPOINT}?page=${current + 1}&size=${intervalSize}&search=${searchTerm || ''}`,
   );
 

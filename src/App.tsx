@@ -4,42 +4,72 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { Suspense } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import './App.css';
-import ThemeHandler from './components/common/handler/ThemeHandler';
+import { User } from 'oidc-client-ts';
 import Navbar from './components/pegase/navbar/Navbar';
 import PegaseStar from './components/pegase/star/PegaseStar';
-import { UserContext } from '@/store/contexts/UserContext';
 import { PEGASE_NAVBAR_ID } from './shared/constants';
-import { THEME_COLOR } from './shared/types';
 import { menuBottomData, menuTopData } from './routes';
-import { PegaseToastContainer } from './shared/notification/containers';
 import ProjectDetails from './pages/pegase/projects/projectDetails/ProjectDetails';
 import StudyDetails from '@/pages/pegase/studies/studyDetails/studyDetails';
+import { AuthService } from '@/auth/authService';
+import { GenericUserContext } from '@/store/contexts/GenericUserContext';
 
-function App() {
+const App: React.FC = () => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const handleAuth = async () => {
+      if (window.location.href.includes('code=')) {
+        await AuthService.handleCallback();
+        window.location.replace('/'); // Redirige vers la page d'accueil après la connexion
+      }
+    };
+    handleAuth();
+  }, []);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const user = await AuthService.getUser();
+      if (!user) {
+        // Redirection automatique vers Keycloak pour l'authentification
+        AuthService.login();
+      } else {
+        setLoading(false); // Arrêter le chargement seulement si authentifié
+      }
+      setUser(user);
+    };
+    getUser();
+  }, []);
+  if (loading) {
+    return <div>Loading...</div>; // Affiche un message de chargement pendant la vérification
+  }
   return (
-    <div className="flex h-screen w-screen dark:bg-gray-900 dark:text-gray-200">
-      <UserContext.Provider initialState={{ theme: THEME_COLOR.LIGHT }}>
-        <ThemeHandler />
-        <PegaseToastContainer />
-        <Navbar id={PEGASE_NAVBAR_ID} bottomItems={menuBottomData} topItems={menuTopData} />
-        <div className="flex h-full w-full flex-col">
-          <PegaseStar />
-          <Suspense>
-            <Routes>
-              <Route path="/study/:studyName" element={<StudyDetails />} />
-              <Route path="/project/:projectName" element={<ProjectDetails />} />
-              {Object.entries([...menuBottomData, ...menuTopData]).map(([key, route]) => (
-                <Route key={key} path={route.path} Component={route.component} />
-              ))}
-            </Routes>
-          </Suspense>
-        </div>
-      </UserContext.Provider>
-    </div>
+    <GenericUserContext.Provider value={user}>
+      <div>
+        {user ? (
+          <div className="flex h-screen w-screen dark:bg-acc2-950 dark:text-gray-200">
+            <Navbar id={PEGASE_NAVBAR_ID} bottomItems={menuBottomData} topItems={menuTopData} />
+            <div className="flex h-full w-full flex-col">
+              <PegaseStar />
+              <Suspense>
+                <Routes>
+                  <Route path="/study/:studyName" element={<StudyDetails />} />
+                  <Route path="/project/:projectName" element={<ProjectDetails />} />
+                  {Object.entries([...menuBottomData, ...menuTopData]).map(([key, route]) => (
+                    <Route key={key} path={route.path} Component={route.component} />
+                  ))}
+                </Routes>
+              </Suspense>
+            </div>
+          </div>
+        ) : null}
+      </div>
+    </GenericUserContext.Provider>
   );
-}
+};
 
 export default App;
