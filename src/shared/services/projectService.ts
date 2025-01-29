@@ -66,9 +66,6 @@ export const fetchProjectsFromPartialName = async (query: string): Promise<strin
  * @param {string} searchTerm
  * @param {number} current
  * @param {number} intervalSize
- * @param {string} searchTerm
- * @param {number} current
- * @param {number} intervalSize
  * @retuns{Promise<ProjectInfo[] | Error>}
  */
 export const fetchProjectFromSearchTerm = async (

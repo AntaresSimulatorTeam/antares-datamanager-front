@@ -8,8 +8,11 @@ import { Suspense, useEffect, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import './App.css';
 import { User } from 'oidc-client-ts';
+import { User } from 'oidc-client-ts';
+import Navbar from './components/pegase/navbar/Navbar';
 import ThemeHandler from './components/common/handler/ThemeHandler';
 import PegaseStar from './components/pegase/star/PegaseStar';
+import { PEGASE_NAVBAR_ID } from './shared/constants';
 import { UserContext } from '@/store/contexts/UserContext';
 import { THEME_COLOR } from '@/shared/types';
 import { menuBottomData, menuTopData } from './routes';
@@ -23,6 +26,8 @@ import { useTranslation } from 'react-i18next';
 import { translateMenuItemLabel } from '@/shared/utils/textUtils.ts';
 import { PEGASE_NAVBAR_ID } from '@/shared/constants.ts';
 import { PegaseToastContainer } from '@/shared/notification/containers.tsx';
+import { AuthService } from '@/auth/authService';
+import { GenericUserContext } from '@/store/contexts/GenericUserContext';
 
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
