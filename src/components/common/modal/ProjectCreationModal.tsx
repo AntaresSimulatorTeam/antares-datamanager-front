@@ -10,6 +10,9 @@ import { useTranslation } from 'react-i18next';
 import KeywordsInput from '@/pages/pegase/studies/KeywordsInput';
 import { createProject } from '@/shared/services/projectService';
 import { notifyToast } from '@/shared/notification/notification.tsx';
+import { PROJECT_ACTION } from '@/shared/enum/project.ts';
+import { ProjectActionType } from '@/shared/types/pegase/Project.type.ts';
+import { useProjectDispatch } from '@/store/contexts/ProjectContext.tsx';
 
 interface ProjectCreationModalProps {
   onClose: () => void;
@@ -21,6 +24,7 @@ export const ProjectCreationModal = ({ onClose }: ProjectCreationModalProps) => 
   const [description, setDescription] = useState<string>('');
   const [keywords, setKeywords] = useState<string[]>([]);
   const [isFormValid, setIsFormValid] = useState(false);
+  const dispatch = useProjectDispatch();
 
   const validateForm = () => {
     if (name) {
@@ -42,7 +46,13 @@ export const ProjectCreationModal = ({ onClose }: ProjectCreationModalProps) => 
         description: description,
       };
 
-      await createProject(projectData);
+      const newProject = await createProject(projectData);
+      if (newProject) {
+        dispatch?.({
+          type: PROJECT_ACTION.ADD_PROJECT,
+          payload: newProject,
+        } as ProjectActionType);
+      }
       notifyToast({
         type: 'success',
         message: 'Successful project save',
