@@ -44,19 +44,25 @@ export const AuthService = {
 
   authFetch: async (url: string, options: RequestInit = {}) => {
     const token = await AuthService.getAccessToken();
+    console.log('token : ', token);
     if (token) {
       if (options.headers instanceof Headers) {
+        console.log('options.headers instanceof Headers');
+
         options.headers.append('Authorization', `Bearer ${token}`);
       } else if (Array.isArray(options.headers)) {
+        console.log('Array.isArray(options.headers');
         options.headers.push(['Authorization', `Bearer ${token}`]);
       } else {
+        console.log('else');
         options.headers = {
           ...options.headers,
           Authorization: `Bearer ${token}`,
         };
       }
-      options.mode = 'no-cors';
     }
+    console.log('options : ', options);
+    console.log('url : ', url);
     return fetch(url, options);
   },
 
