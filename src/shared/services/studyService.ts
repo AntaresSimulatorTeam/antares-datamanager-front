@@ -64,12 +64,8 @@ export const fetchSuggestedKeywords = async (query: string): Promise<string[]> =
  * Display toast if creation succeeds or fails
  *
  * @param {Omit<StudyDTO, 'id' | 'status' | 'creationDate'>} studyData - Partial study data
- * @param {function} toggleModal - Handle toggle of opening modal boolean
  */
-export const saveStudy = async (
-  studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate'>,
-  toggleModal: () => void,
-): Promise<void | Error> => {
+export const saveStudy = async (studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate'>) => {
   try {
     const response = await AuthService.authFetch(`${STUDY_ENDPOINT}`, {
       method: 'POST',
@@ -87,7 +83,6 @@ export const saveStudy = async (
       type: 'success',
       message: 'Study created successfully',
     });
-    toggleModal();
   } catch (error: unknown) {
     if (error instanceof Error) {
       notifyToast({

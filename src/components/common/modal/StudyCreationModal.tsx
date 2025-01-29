@@ -40,13 +40,14 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({ onClose, study,
       trajectoryIds: trajectoryIds,
     };
 
-    await saveStudy(studyData, onClose);
+    await saveStudy(studyData);
     // Clear form fields
     setReloadStudies((prev) => !prev); // Trigger reload after successful save
     setStudyName('');
     setProjectName('');
     setHorizon('');
     setKeywords([]);
+    onClose();
   };
 
   const validateForm = () => {
@@ -103,7 +104,13 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({ onClose, study,
           </div>
         </div>
         <HorizonInput value={horizon} onChange={handleHorizonChange} />
-        <KeywordsInput keywords={keywords} setKeywords={setKeywords} />
+        <KeywordsInput
+          keywords={keywords}
+          setKeywords={setKeywords}
+          maxNbKeywords={6}
+          maxNbCharacters={10}
+          minNbCharacters={3}
+        />
       </RdsModal.Content>
       <RdsModal.Footer>
         <RdsButton label="Cancel" onClick={onClose} color="secondary" />

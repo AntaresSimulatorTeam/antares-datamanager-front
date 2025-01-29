@@ -12,7 +12,7 @@ import getStudyTableHeaders from './StudyTableHeaders';
 import { addSortColumn } from './StudyTableUtils';
 import StudiesPagination from './StudiesPagination';
 import { RowSelectionState } from '@tanstack/react-table';
-import StudyCreationModal from '../../studies/StudyCreationModal';
+import StudyCreationModal from '@common/modal/StudyCreationModal';
 import { deleteStudy } from '@/shared/services/studyService';
 import StdSimpleTable from '@/components/common/data/stdSimpleTable/StdSimpleTable';
 import { RdsButton } from 'rte-design-system-react';
