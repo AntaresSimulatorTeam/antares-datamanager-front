@@ -5,7 +5,7 @@
  */
 
 import { PROJECT_AUTOCOMPLETE_ENDPOINT, PROJECT_ENDPOINT, PROJECT_SEARCH_ENDPOINT } from '@/shared/const/apiEndPoint';
-import { ProjectResponse } from '@/shared/types/pegase/Project.type';
+import { ProjectInfo, ProjectResponse } from '@/shared/types/pegase/Project.type';
 
 export const deleteProjectById = async (projectId: string) => {
   const response = await fetch(`${PROJECT_ENDPOINT}/${projectId}`, {
@@ -56,11 +56,11 @@ export const fetchProjectsFromPartialName = async (query: string): Promise<strin
 /**
  * Retrieve a list of project from a user name
  *
- * @param searchTerm
- * @param current
- * @param intervalSize
+ * @param {string} searchTerm
+ * @param {number} current
+ * @param {number} intervalSize
  */
-export const fetchProjectFromSearchTerm = async (searchTerm, current, intervalSize) => {
+export const fetchProjectFromSearchTerm = async (searchTerm: string, current: number, intervalSize: number) => {
   const response = await fetch(
     `${PROJECT_SEARCH_ENDPOINT}?page=${current + 1}&size=${intervalSize}&search=${searchTerm || ''}`,
   );
@@ -74,7 +74,9 @@ export const fetchProjectFromSearchTerm = async (searchTerm, current, intervalSi
  * @param {Pick<ProjectInfo, 'name' | 'description' | 'tags'>} projectData - Body data request
  * @return {Promise<ProjectResponse | Error>}
  */
-export const createProject = async (projectData): Promise<ProjectResponse | Error> => {
+export const createProject = async (
+  projectData: Pick<ProjectInfo, 'name' | 'description' | 'tags'>,
+): Promise<ProjectResponse | Error> => {
   const apiUrl = `${PROJECT_ENDPOINT}`;
 
   const response = await fetch(apiUrl, {
@@ -89,4 +91,5 @@ export const createProject = async (projectData): Promise<ProjectResponse | Erro
     const errorText = await response.text();
     throw new Error(`${errorText}`);
   }
+  return await response.json();
 };
