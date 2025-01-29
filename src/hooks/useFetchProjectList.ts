@@ -18,7 +18,7 @@ export const useFetchProjectList = (
   const [count, setCount] = useState(0);
 
   const fetchProjects = useCallback(
-    async (searchTerm, current, intervalSize) => {
+    async (searchTerm: string, current: number, intervalSize: number) => {
       fetchProjectFromSearchTerm(searchTerm, current, intervalSize)
         .then((json) => {
           setProjects(json.content);

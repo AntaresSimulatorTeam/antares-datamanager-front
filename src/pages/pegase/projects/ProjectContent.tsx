@@ -29,7 +29,7 @@ const ProjectContent = ({ shouldRefetchProjectList }: ProjectContentProps) => {
   const { t } = useTranslation();
   const intervalSize = 9;
   const userName = 'mouad'; // Replace with actual user name
-  const [searchTerm, setSearchTerm] = useState<string | undefined>('');
+  const [searchTerm, setSearchTerm] = useState<string>('');
   const [activeChip, setActiveChip] = useState<boolean | null>(false);
   const [current, setCurrent] = useState(0);
   const { projects, count, refetch } = useFetchProjectList(
@@ -43,7 +43,7 @@ const ProjectContent = ({ shouldRefetchProjectList }: ProjectContentProps) => {
   const dispatch = usePinnedProjectDispatch();
 
   const searchProject = (value?: string | undefined) => {
-    setSearchTerm(value);
+    value && setSearchTerm(value);
   };
 
   const handleChipClick = () => {
@@ -62,7 +62,7 @@ const ProjectContent = ({ shouldRefetchProjectList }: ProjectContentProps) => {
       type: PINNED_PROJECT_ACTION.REMOVE_ITEM,
       payload: projectId,
     } as PinnedProjectActionType);
-    await refetch(); // Actualiser les projets après suppression
+    await refetch(searchTerm, current, intervalSize); // Actualiser les projets après suppression
   };
 
   const handleCardClick = (projectId: string, projectName: string) => {

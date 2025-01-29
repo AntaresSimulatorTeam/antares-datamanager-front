@@ -55,11 +55,11 @@ export const fetchProjectsFromPartialName = async (query: string): Promise<strin
 /**
  * Retrieve a list of project from a user name
  *
- * @param searchTerm
- * @param current
- * @param intervalSize
+ * @param {string} searchTerm
+ * @param {number} current
+ * @param {number} intervalSize
  */
-export const fetchProjectFromSearchTerm = async (searchTerm, current, intervalSize) => {
+export const fetchProjectFromSearchTerm = async (searchTerm: string, current: number, intervalSize: number) => {
   const response = await fetch(
     `${PROJECT_SEARCH_ENDPOINT}?page=${current + 1}&size=${intervalSize}&search=${searchTerm || ''}`,
   );

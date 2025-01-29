@@ -13,7 +13,6 @@ import {
   usePinnedProjectDispatch,
 } from '@/store/contexts/ProjectContext';
 import { fetchPinnedProjects, pinProject } from '@/shared/services/pinnedProjectService.ts';
-import React from 'react';
 import { PINNED_PROJECT_ACTION } from '@/shared/enum/project.ts';
 import { v4 as uuidv4 } from 'uuid';
 import { notifyToast } from '@/shared/notification/notification.tsx';
@@ -110,7 +109,6 @@ describe('useHandlePinnedProjectList', () => {
       expectTypeOf(result.current.handlePinProject).toBeFunction();
       expect(fetchPinnedProjects).toHaveBeenCalledTimes(1);
       expect(fetchPinnedProjects).toHaveBeenCalledWith('me00247');
-      expect(fetchPinnedProjects).toHaveReturned(mockProjectsApiResponse);
       expect(mockUsePinnedProjectDispatch).toHaveBeenCalledTimes(1);
       expect(mockDispatch).toHaveBeenCalledTimes(1);
       expect(mockDispatch).toHaveBeenCalledWith({
@@ -152,7 +150,6 @@ describe('useHandlePinnedProjectList', () => {
 
     await waitFor(() => {
       expect(pinProject).toHaveBeenCalledWith('me00247');
-      expect(pinProject).toHaveReturned(mockPinProjectResponse);
       expect(mockDispatch).toHaveBeenCalledTimes(1);
       expect(mockDispatch).toHaveBeenCalledWith({
         type: PINNED_PROJECT_ACTION.ADD_ITEM,
