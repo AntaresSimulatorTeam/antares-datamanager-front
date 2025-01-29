@@ -37,6 +37,8 @@ export const AuthService = {
 
   getAccessToken: async (): Promise<string | null> => {
     const user = await userManager.getUser();
+    console.log('user id token : ', user?.id_token);
+    console.log('user id token : ', user?.profile?.name);
     return user?.access_token || null;
   },
 
