@@ -39,6 +39,7 @@
     "@my_studies": "My studies",
     "@my_projects": "My projects",
     "@new_study": "Create a study",
+    "@new_project": "Create a project",
     "@duplicate_study": "Duplicate a study"
   },
   "project": {

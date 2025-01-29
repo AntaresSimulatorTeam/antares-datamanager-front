@@ -6,17 +6,21 @@
 
 import { PINNED_PROJECT_ACTION } from '@/shared/enum/project.ts';
 
-export interface ProjectInfo {
+export interface ProjectResponse {
   id: string;
   name: string;
   description: string;
   createdBy: string;
   creationDate: Date;
+  tags: string[];
+  studies: number[];
+}
+
+export interface ProjectInfo extends ProjectResponse {
+  description: string;
   archived?: boolean;
   pinned?: boolean;
   path: string;
-  tags: string[];
-  studies: number[];
 }
 
 export type PinnedProjectActionType =
