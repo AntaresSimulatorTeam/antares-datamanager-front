@@ -88,8 +88,8 @@ const PinnedProjectCards = ({ setShouldRefetchProjectList }: PinnedProjectCardsP
               <div className="flex items-center gap-x-0.5 pt-2.5">
                 <div className="font-sans text-body-xs font-light">
                   {t('project.@created')} :{' '}
-                  <span className="text-body-xs font-bold">{formatDateToDDMMYYYY(project.creationDate)} </span>{' '}
-                  {t('project.@by')} :
+                  <span className="text-body-xs font-bold">{formatDateToDDMMYYYY(project.creationDate, false)} </span>{' '}
+                  <span className="ml-2">{t('project.@by')}</span> :
                 </div>
 
                 <StdAvatar
