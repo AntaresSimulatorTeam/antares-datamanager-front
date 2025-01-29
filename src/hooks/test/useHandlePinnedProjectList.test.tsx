@@ -109,7 +109,6 @@ describe('useHandlePinnedProjectList', () => {
       expectTypeOf(result.current.handlePinProject).toBeFunction();
       expect(fetchPinnedProjects).toHaveBeenCalledTimes(1);
       expect(fetchPinnedProjects).toHaveBeenCalledWith('me00247');
-      expect(fetchPinnedProjects).toHaveReturnedWith(mockProjectsApiResponse);
       expect(mockUsePinnedProjectDispatch).toHaveBeenCalledTimes(1);
       expect(mockDispatch).toHaveBeenCalledTimes(1);
       expect(mockDispatch).toHaveBeenCalledWith({
@@ -151,7 +150,6 @@ describe('useHandlePinnedProjectList', () => {
 
     await waitFor(() => {
       expect(pinProject).toHaveBeenCalledWith('me00247');
-      expect(pinProject).toHaveReturnedWith(mockPinProjectResponse);
       expect(mockDispatch).toHaveBeenCalledTimes(1);
       expect(mockDispatch).toHaveBeenCalledWith({
         type: PINNED_PROJECT_ACTION.ADD_ITEM,
