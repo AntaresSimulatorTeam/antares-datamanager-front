@@ -6,7 +6,7 @@
 
 import { useState } from 'react';
 import { RdsButton, RdsIcon, RdsIconId, RdsInputText } from 'rte-design-system-react';
-import { fetchSuggestedKeywords } from '@/pages/pegase/home/components/studyService';
+import { fetchSuggestedKeywords } from '@/shared/services/studyService';
 
 const MAX_KEYWORDS = 6;
 

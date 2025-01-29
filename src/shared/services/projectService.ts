@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { PROJECT_ENDPOINT } from '@/shared/const/apiEndPoint';
+import { PROJECT_AUTOCOMPLETE_ENDPOINT, PROJECT_ENDPOINT, PROJECT_SEARCH_ENDPOINT } from '@/shared/const/apiEndPoint';
 
 export const deleteProjectById = async (projectId: string) => {
   const response = await fetch(`${PROJECT_ENDPOINT}/${projectId}`, {
@@ -33,6 +33,36 @@ export const fetchProjectDetails = async (projectId: string) => {
   if (!response?.ok) {
     throw new Error('Failed to fetch project details');
   }
+
+  return await response.json();
+};
+
+/**
+ * Retrieve a project from a partial name of project
+ *
+ * @param {string} query - Partial name of a project
+ * @return {Promise<string[]>} - List of project name
+ */
+export const fetchProjectsFromPartialName = async (query: string): Promise<string[]> => {
+  const response = await fetch(`${PROJECT_AUTOCOMPLETE_ENDPOINT}?partialName=${query}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch projects');
+  }
+  const data = await response.json();
+  return data.map((project: { name: string }) => project.name);
+};
+
+/**
+ * Retrieve a list of project from a user name
+ *
+ * @param searchTerm
+ * @param current
+ * @param intervalSize
+ */
+export const fetchProjectFromSearchTerm = async (searchTerm, current, intervalSize) => {
+  const response = await fetch(
+    `${PROJECT_SEARCH_ENDPOINT}?page=${current + 1}&size=${intervalSize}&search=${searchTerm || ''}`,
+  );
 
   return await response.json();
 };

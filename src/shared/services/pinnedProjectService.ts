@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { PROJECT_PIN_PROJECT, PROJECT_PINNED_ENDPOINT, PROJECT_UNPIN_ENDPOINT } from '@/shared/const/apiEndPoint';
+import { PROJECT_PIN_ENDPOINT, PROJECT_PINNED_ENDPOINT, PROJECT_UNPIN_ENDPOINT } from '@/shared/const/apiEndPoint';
 import { ProjectInfo } from '@/shared/types/pegase/Project.type';
 
 /**
@@ -41,7 +41,7 @@ export const fetchPinnedProjects = async (userId: string) => {
 
 export const pinProject = async (projectId: string) => {
   const userId = 'me00247';
-  const apiUrl = `${PROJECT_PIN_PROJECT}?userId=${userId}&projectId=${projectId}`;
+  const apiUrl = `${PROJECT_PIN_ENDPOINT}?userId=${userId}&projectId=${projectId}`;
 
   const response = await fetch(apiUrl, {
     method: 'POST',

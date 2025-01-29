@@ -9,12 +9,16 @@ import { getEnvVariables } from '@/envVariables.ts';
 const BASE_URL = getEnvVariables('VITE_BACK_END_BASE_URL');
 
 // STUDY
+export const STUDY_ENDPOINT = `${BASE_URL}/v1/study`;
 export const STUDY_SEARCH_ENDPOINT = `${BASE_URL}/v1/study/search`;
+export const STUDY_KEYWORDS_SEARCH_ENDPOINT = `${BASE_URL}/v1/study/keywords/search`;
 
 // PINNED PROJECT
 export const PROJECT_PINNED_ENDPOINT = `${BASE_URL}/v1/project/pinned`;
 export const PROJECT_UNPIN_ENDPOINT = `${BASE_URL}/v1/project/unpin`;
-export const PROJECT_PIN_PROJECT = `${BASE_URL}/v1/project/pin`;
+export const PROJECT_PIN_ENDPOINT = `${BASE_URL}/v1/project/pin`;
 
 // PROJECT
 export const PROJECT_ENDPOINT = `${BASE_URL}/v1/project`;
+export const PROJECT_AUTOCOMPLETE_ENDPOINT = `${BASE_URL}/v1/project/autocomplete`;
+export const PROJECT_SEARCH_ENDPOINT = `${BASE_URL}/v1/project/search`;

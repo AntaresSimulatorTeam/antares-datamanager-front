@@ -45,7 +45,6 @@ export const useHandlePinnedProjectList = () => {
     const toastId = uuidv4();
     try {
       const newProject = await pinProject(projectId);
-
       if (newProject) {
         dispatch?.({
           type: PINNED_PROJECT_ACTION.ADD_ITEM,
