@@ -5,17 +5,17 @@
  */
 
 import { useCallback, useEffect } from 'react';
-import { PinnedProjectActionType } from '@/shared/types/pegase/Project.type';
+import { ProjectActionType } from '@/shared/types/pegase/Project.type';
 import { fetchPinnedProjects, pinProject, unpinProject } from '@/shared/services/pinnedProjectService';
-import { PINNED_PROJECT_ACTION } from '@/shared/enum/project';
-import { usePinnedProjectDispatch } from '@/store/contexts/ProjectContext.tsx';
 import { v4 as uuidv4 } from 'uuid';
 import { dismissToast, notifyToast, NotifyWithActionProps } from '@/shared/notification/notification.tsx';
 import { useTranslation } from 'react-i18next';
+import { useProjectDispatch } from '@/store/contexts/ProjectContext.tsx';
+import { PROJECT_ACTION } from '@/shared/enum/project.ts';
 
 export const useHandlePinnedProjectList = () => {
   const userId = 'me00247';
-  const dispatch = usePinnedProjectDispatch();
+  const dispatch = useProjectDispatch();
   const { t } = useTranslation();
 
   const getPinnedProjects = useCallback(async () => {
@@ -23,9 +23,9 @@ export const useHandlePinnedProjectList = () => {
       const projects = await fetchPinnedProjects(userId);
       if (projects?.length) {
         dispatch?.({
-          type: PINNED_PROJECT_ACTION.INIT_LIST,
+          type: PROJECT_ACTION.INIT_PINNED_PROJECT_LIST,
           payload: projects,
-        } as PinnedProjectActionType);
+        } as ProjectActionType);
       }
     } catch (error) {
       // silent handler
@@ -47,9 +47,9 @@ export const useHandlePinnedProjectList = () => {
       const newProject = await pinProject(projectId);
       if (newProject) {
         dispatch?.({
-          type: PINNED_PROJECT_ACTION.ADD_ITEM,
+          type: PROJECT_ACTION.ADD_PINNED_PROJECT,
           payload: newProject,
-        } as PinnedProjectActionType);
+        } as ProjectActionType);
       }
 
       notifyToast({
@@ -80,9 +80,9 @@ export const useHandlePinnedProjectList = () => {
     const currentPinnedProjects = await fetchPinnedProjects(userId);
 
     dispatch?.({
-      type: PINNED_PROJECT_ACTION.REMOVE_ITEM,
+      type: PROJECT_ACTION.UNPIN_PINNED_PROJECT,
       payload: projectId,
-    } as PinnedProjectActionType);
+    } as ProjectActionType);
 
     notifyToast({
       id: toastId,
@@ -94,9 +94,9 @@ export const useHandlePinnedProjectList = () => {
           dismissToast(toastId);
           clearTimeout(apiCallTimeout!);
           dispatch?.({
-            type: PINNED_PROJECT_ACTION.INIT_LIST,
+            type: PROJECT_ACTION.INIT_PINNED_PROJECT_LIST,
             payload: currentPinnedProjects,
-          } as PinnedProjectActionType);
+          } as ProjectActionType);
         },
       },
     } as NotifyWithActionProps);
@@ -104,9 +104,9 @@ export const useHandlePinnedProjectList = () => {
     apiCallTimeout = setTimeout(() => {
       unpinProject(userId, projectId).catch((error) => {
         dispatch?.({
-          type: PINNED_PROJECT_ACTION.INIT_LIST,
+          type: PROJECT_ACTION.INIT_PINNED_PROJECT_LIST,
           payload: currentPinnedProjects,
-        } as PinnedProjectActionType);
+        } as ProjectActionType);
 
         notifyToast({
           id: toastId,

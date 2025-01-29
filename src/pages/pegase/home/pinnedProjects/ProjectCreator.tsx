@@ -16,12 +16,7 @@ export const ProjectCreator = () => {
   return (
     <div className="flex items-center justify-center border border-dashed border-primary-700 p-4">
       <RdsButton label={t('home.@buttonNewProject')} variant="outlined" color="primary" onClick={toggleModal} />
-      {isModalOpen && (
-        <ProjectCreationModal
-          onClose={toggleModal}
-          //setReloadStudies={setReloadStudies} // Pass setReloadStudies
-        />
-      )}
+      {isModalOpen && <ProjectCreationModal onClose={toggleModal} />}
     </div>
   );
 };

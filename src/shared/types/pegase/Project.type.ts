@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { PINNED_PROJECT_ACTION } from '@/shared/enum/project.ts';
+import { PROJECT_ACTION } from '@/shared/enum/project.ts';
 
 export interface ProjectResponse {
   id: string;
@@ -23,17 +23,27 @@ export interface ProjectInfo extends ProjectResponse {
   path: string;
 }
 
-export type PinnedProjectActionType =
-  | { type: PINNED_PROJECT_ACTION.ADD_ITEM; payload: ProjectInfo }
+export type ProjectActionType =
+  | { type: PROJECT_ACTION.ADD_PINNED_PROJECT; payload: ProjectInfo }
+  | { type: PROJECT_ACTION.ADD_PROJECT; payload: ProjectInfo }
   | {
-      type: PINNED_PROJECT_ACTION.REMOVE_ITEM;
+      type: PROJECT_ACTION.REMOVE_PROJECT;
       payload: string;
     }
   | {
-      type: PINNED_PROJECT_ACTION.INIT_LIST;
+      type: PROJECT_ACTION.UNPIN_PINNED_PROJECT;
+      payload: string;
+    }
+  | {
+      type: PROJECT_ACTION.INIT_PINNED_PROJECT_LIST;
+      payload: ProjectInfo[];
+    }
+  | {
+      type: PROJECT_ACTION.INIT_PROJECT_LIST;
       payload: ProjectInfo[];
     };
 
-export interface PinnedProjectState {
+export interface ProjectState {
+  projects: ProjectInfo[];
   pinnedProjects: ProjectInfo[];
 }
