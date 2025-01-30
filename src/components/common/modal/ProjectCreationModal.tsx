@@ -80,7 +80,7 @@ export const ProjectCreationModal = ({ onClose }: ProjectCreationModalProps) => 
             label="Name"
             value={name}
             onChange={(t) => {
-              if (t.length < 40) setName(t || '');
+              if (t.length <= 40) setName(t || '');
             }}
             variant="outlined"
             placeHolder="Name your project..."
@@ -92,7 +92,7 @@ export const ProjectCreationModal = ({ onClose }: ProjectCreationModalProps) => 
             label="Description"
             value={description}
             onChange={(t) => {
-              if (t.length < 500) setDescription(t || '');
+              if (t.length <= 500) setDescription(t || '');
             }}
             maxLength={500}
             placeHolder="Add a few lines to describe your project..."
