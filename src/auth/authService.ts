@@ -40,7 +40,7 @@ export const AuthService = {
     console.log('user id token : ', user?.id_token);
     console.log('user access token : ', user?.access_token);
     console.log('user name : ', user?.profile?.name);
-    return user?.id_token || null;
+    return user?.access_token || null;
   },
 
   authFetch: async (url: string, options: RequestInit = {}) => {
