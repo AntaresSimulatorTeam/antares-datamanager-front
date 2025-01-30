@@ -23,7 +23,7 @@ const StdNavbarController = ({ label, id, action, expanded = true }: StdNavbarCo
       <RdsTextTooltip text={label} enabled={!expanded} placement="right" disableArrow>
         <div className={navbarControllerClasses} id={id} onClick={action} role="button" tabIndex={0}>
           {expanded ? <RdsIcon name={iconId} isExplicit /> : <RdsIcon name={iconId} isExplicit={false} alt={label} />}
-          {expanded && <>{label}</>}
+          {!expanded && <>{label}</>}
         </div>
       </RdsTextTooltip>
     </div>

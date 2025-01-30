@@ -12,7 +12,7 @@ import { APP_NAME } from '@/shared/constants';
 import { MenuNavItem } from '@/shared/types';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RdsDivider } from 'rte-design-system-react';
+import { RdsDivider, RdsNavbarLogoHeader, RdsNavbarMenu, RdsNavbarTextHeader } from 'rte-design-system-react';
 
 type StdNavbarProps = {
   topItems: MenuNavItem[];
@@ -37,9 +37,7 @@ const Navbar = ({ id, topItems, bottomItems }: StdNavbarProps) => {
         version={`v${import.meta.env.VITE_APP_VERSION}`}
         expanded={expanded}
       />
-
       <StdNavbarMenu menuItems={topItems} expanded={expanded} />
-
       <div className="mt-auto">
         <StdNavbarMenu menuItems={bottomItems} expanded={expanded} />
         <RdsDivider />
