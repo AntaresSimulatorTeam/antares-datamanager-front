@@ -57,6 +57,9 @@ export const ProjectCreationModal = ({ onClose }: ProjectCreationModalProps) => 
         type: 'success',
         message: 'Successful project save',
       });
+      setName('');
+      setDescription('');
+      setKeywords([]);
       onClose();
     } catch (error: unknown) {
       if (error instanceof Error) {

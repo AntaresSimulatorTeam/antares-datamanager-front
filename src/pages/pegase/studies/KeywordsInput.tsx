@@ -81,7 +81,7 @@ const KeywordsInput: React.FC<KeywordsInputProps> = ({
             placeHolder="Add a keyword"
             variant="outlined"
           />
-          {keywordInput && keywordInput.length >= 3 && (
+          {keywordInput && (minNbCharacters ? keywordInput.length >= minNbCharacters : true) && (
             <RdsButton
               onClick={() => handleAddKeyword()}
               icon={RdsIconId.Add}

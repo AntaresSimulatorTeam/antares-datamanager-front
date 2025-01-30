@@ -89,7 +89,8 @@ export const createProject = async (
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`${errorText}`);
+    const errorData = JSON.parse(errorText);
+    throw new Error(`${errorData.message}`);
   }
   return await response.json();
 };
