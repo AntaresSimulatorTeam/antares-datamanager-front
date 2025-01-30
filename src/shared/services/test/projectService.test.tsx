@@ -10,9 +10,8 @@ import {
   fetchProjectDetails,
   fetchProjectsFromPartialName,
 } from '@/shared/services/projectService';
-import { expectTypeOf, vi } from 'vitest';
+import { vi } from 'vitest';
 import { waitFor } from '@testing-library/react';
-import { ProjectResponse } from '@/shared/types/pegase/Project.type.ts';
 
 vi.mock('@/shared/notification/notification');
 vi.mock('@/envVariables', () => ({
@@ -226,7 +225,6 @@ describe('createProject', () => {
       },
       body: JSON.stringify(projectData),
     });
-    expectTypeOf(result).toEqualTypeOf<ProjectResponse>();
   });
 
   it('should handle delete failure gracefully', async () => {

@@ -96,8 +96,8 @@ describe('useHandlePinnedProjectList', () => {
 
     const { result } = renderHook(() => useHandlePinnedProjectList(), {
       wrapper,
-      initialProps: { initialValue: { pinnedProject: [], projects: [] } },
-    } as RenderHookOptions<{ initialValue: { pinnedProject: never[] } }, Queries>);
+      initialProps: { initialValue: { projects: [], pinnedProject: [] } },
+    } as RenderHookOptions<{ initialValue: { projects: never[]; pinnedProject: never[] } }, Queries>);
 
     await waitFor(() => {
       expectTypeOf(result.current.getPinnedProjects).toBeFunction();
