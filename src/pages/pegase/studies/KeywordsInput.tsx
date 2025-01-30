@@ -7,6 +7,7 @@
 import { useState } from 'react';
 import { RdsButton, RdsIcon, RdsIconId, RdsInputText } from 'rte-design-system-react';
 import { fetchSuggestedKeywords } from '@/shared/services/studyService';
+import { clsx } from 'clsx';
 
 interface KeywordsInputProps {
   keywords: string[];
@@ -14,6 +15,7 @@ interface KeywordsInputProps {
   maxNbKeywords?: number;
   maxNbCharacters?: number;
   minNbCharacters?: number;
+  width?: string;
 }
 
 const KeywordsInput: React.FC<KeywordsInputProps> = ({
@@ -22,6 +24,7 @@ const KeywordsInput: React.FC<KeywordsInputProps> = ({
   maxNbKeywords,
   maxNbCharacters,
   minNbCharacters,
+  width,
 }) => {
   const [keywordInput, setKeywordInput] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
@@ -71,9 +74,9 @@ const KeywordsInput: React.FC<KeywordsInputProps> = ({
   };
 
   return (
-    <div className="flex min-h-18 w-[300px] flex-col items-start justify-start">
+    <div className={clsx(width ?? 'w-full', 'flex min-h-18 flex-col items-start justify-start')}>
       <div className="relative flex w-full">
-        <div className="flex items-center gap-4">
+        <div className="flex w-full items-center gap-4">
           <RdsInputText
             label="Keywords"
             value={keywordInput}
@@ -119,7 +122,7 @@ const KeywordsInput: React.FC<KeywordsInputProps> = ({
       </div>
 
       {/* Error Message */}
-      {errorMessage && <div className="text-red-500 my-2">{errorMessage}</div>}
+      {errorMessage && <div className="my-2 text-error-500">{errorMessage}</div>}
 
       {/* Keywords Display and Clear All Button */}
       <div className="flex flex-wrap gap-2">

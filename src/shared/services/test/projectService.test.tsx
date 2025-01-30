@@ -215,7 +215,7 @@ describe('createProject', () => {
       json: () => Promise.resolve(mockProjectResponse),
     });
 
-    const result = await createProject(projectData);
+    await createProject(projectData);
 
     expect(global.fetch).toHaveBeenCalledTimes(1);
     expect(global.fetch).toHaveBeenCalledWith(`https://mockapi.com/v1/project`, {
