@@ -4,12 +4,15 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { deleteProjectById, fetchProjectDetails, fetchProjectsFromPartialName } from '../projectService.ts';
+import {
+  createProject,
+  deleteProjectById,
+  fetchProjectDetails,
+  fetchProjectsFromPartialName,
+} from '@/shared/services/projectService';
 import { vi } from 'vitest';
 import { waitFor } from '@testing-library/react';
 
-const mockFetch = vi.fn();
-global.fetch = mockFetch;
 vi.mock('@/shared/notification/notification');
 vi.mock('@/envVariables', () => ({
   getEnvVariables: vi.fn(() => 'https://mockapi.com'),
@@ -21,10 +24,17 @@ describe('deleteProjectById', () => {
   beforeEach(() => {
     global.fetch = vi.fn();
     vi.clearAllMocks();
+    vi.stubGlobal('JSON', {
+      parse: (text: string) => {
+        return { message: text };
+      },
+      stringify: (text: string) => text,
+    });
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.unstubAllGlobals();
   });
 
   it('should delete a pinned project from pinned project list', async () => {
@@ -49,9 +59,8 @@ describe('deleteProjectById', () => {
     // Failed fetch response moc
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: false,
-      text: async () => 'Failed to delete project',
+      text: () => 'Failed to delete project',
     });
-    vi.stubGlobal('JSON', { parse: (text: string) => text });
 
     await expect(async () => deleteProjectById(projectId)).rejects.toThrowError('Failed to delete project');
   });
@@ -81,7 +90,7 @@ describe('fetchProjectDetails', () => {
     //Successful fetch response mock
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: true,
-      json: async () => mockResponse,
+      json: async () => Promise.resolve(mockResponse),
     });
 
     await fetchProjectDetails(projectId);
@@ -113,17 +122,24 @@ describe('fetchProjectsFromPartialName', () => {
   beforeEach(() => {
     global.fetch = vi.fn();
     vi.clearAllMocks();
+    vi.stubGlobal('JSON', {
+      parse: (text: string) => {
+        return { message: text };
+      },
+      stringify: (text: string) => text,
+    });
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.unstubAllGlobals();
   });
 
   it('should delete a pinned project from pinned project list', async () => {
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: true,
-      json: async () => {
-        return [
+      json: () => {
+        return Promise.resolve([
           {
             id: '123',
             name: 'Bilan prévisionnel 2023',
@@ -140,7 +156,7 @@ describe('fetchProjectsFromPartialName', () => {
             creationDate: '2013-08-01',
             tags: ['tag3', 'tag4'],
           },
-        ];
+        ]);
       },
     });
 
@@ -155,11 +171,69 @@ describe('fetchProjectsFromPartialName', () => {
 
   it('should handle delete failure gracefully', async () => {
     // Failed fetch response moc
+    vi.stubGlobal('JSON', { parse: (text: string) => text });
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: false,
-      text: async () => 'Error',
+      text: () => 'Error',
     });
 
     await expect(async () => fetchProjectsFromPartialName('name')).rejects.toThrowError('Failed to fetch projects');
+  });
+});
+
+describe('createProject', () => {
+  const projectData = { name: 'Bilan prévisionnel 2050', description: '', tags: ['tag1'] };
+
+  beforeEach(() => {
+    global.fetch = vi.fn();
+    vi.clearAllMocks();
+    vi.stubGlobal('JSON', {
+      parse: (text: string) => {
+        return { message: text };
+      },
+      stringify: (text: string) => text,
+    });
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
+
+  it('should create de project', async () => {
+    const mockProjectResponse = {
+      id: 107,
+      name: 'Bilan prévisionnel 2050',
+      createdBy: 'pegase',
+      creationDate: '2025-01-30T10:32:10.631003175',
+      studies: [],
+      tags: [],
+      description: '',
+    };
+    global.fetch = vi.fn().mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(mockProjectResponse),
+    });
+
+    await createProject(projectData);
+
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+    expect(global.fetch).toHaveBeenCalledWith(`https://mockapi.com/v1/project`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(projectData),
+    });
+  });
+
+  it('should handle delete failure gracefully', async () => {
+    // Failed fetch response moc
+    global.fetch = vi.fn().mockResolvedValueOnce({
+      ok: false,
+      text: () => 'Failed to create project',
+    });
+
+    await expect(async () => createProject(projectData)).rejects.toThrowError('Failed to create project');
   });
 });

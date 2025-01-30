@@ -7,15 +7,11 @@
 import { act, Queries, renderHook, RenderHookOptions, waitFor } from '@testing-library/react';
 import { useHandlePinnedProjectList } from '@/hooks/useHandlePinnedProjectList';
 import { afterEach, beforeEach, describe, expectTypeOf, it, Mock, vi } from 'vitest';
-import {
-  PinnedProjectProvider,
-  PinnedProjectProviderProps,
-  usePinnedProjectDispatch,
-} from '@/store/contexts/ProjectContext';
+import { ProjectProvider, ProjectProviderProps, useProjectDispatch } from '@/store/contexts/ProjectContext';
 import { fetchPinnedProjects, pinProject } from '@/shared/services/pinnedProjectService.ts';
-import { PINNED_PROJECT_ACTION } from '@/shared/enum/project.ts';
 import { v4 as uuidv4 } from 'uuid';
 import { notifyToast } from '@/shared/notification/notification.tsx';
+import { PROJECT_ACTION } from '@/shared/enum/project.ts';
 
 const mockProjectsApiResponse = [
   {
@@ -66,8 +62,8 @@ vi.mock('@/store/contexts/ProjectContext', async (importOriginal) => {
   const actual: Mock = await importOriginal();
   return {
     ...actual,
-    usePinnedProject: vi.fn(),
-    usePinnedProjectDispatch: vi.fn(() => {
+    useProject: vi.fn(),
+    useProjectDispatch: vi.fn(() => {
       return {
         dispatch: vi.fn(),
       };
@@ -76,7 +72,7 @@ vi.mock('@/store/contexts/ProjectContext', async (importOriginal) => {
 });
 
 describe('useHandlePinnedProjectList', () => {
-  const mockUsePinnedProjectDispatch = usePinnedProjectDispatch as Mock<typeof usePinnedProjectDispatch>;
+  const mockUsePinnedProjectDispatch = useProjectDispatch as Mock<typeof useProjectDispatch>;
   const mockDispatch = vi.fn().mockImplementation(vi.fn());
 
   beforeEach(() => {
@@ -94,14 +90,14 @@ describe('useHandlePinnedProjectList', () => {
 
     mockUsePinnedProjectDispatch.mockReturnValue(mockDispatch);
 
-    const wrapper = ({ children, initialValue }: PinnedProjectProviderProps) => (
-      <PinnedProjectProvider children={children} initialValue={initialValue}></PinnedProjectProvider>
+    const wrapper = ({ children, initialValue }: ProjectProviderProps) => (
+      <ProjectProvider children={children} initialValue={initialValue}></ProjectProvider>
     );
 
     const { result } = renderHook(() => useHandlePinnedProjectList(), {
       wrapper,
-      initialProps: { initialValue: { pinnedProject: [] } },
-    } as RenderHookOptions<{ initialValue: { pinnedProject: never[] } }, Queries>);
+      initialProps: { initialValue: { projects: [], pinnedProject: [] } },
+    } as RenderHookOptions<{ initialValue: { projects: never[]; pinnedProject: never[] } }, Queries>);
 
     await waitFor(() => {
       expectTypeOf(result.current.getPinnedProjects).toBeFunction();
@@ -112,7 +108,7 @@ describe('useHandlePinnedProjectList', () => {
       expect(mockUsePinnedProjectDispatch).toHaveBeenCalledTimes(1);
       expect(mockDispatch).toHaveBeenCalledTimes(1);
       expect(mockDispatch).toHaveBeenCalledWith({
-        type: PINNED_PROJECT_ACTION.INIT_LIST,
+        type: PROJECT_ACTION.INIT_PINNED_PROJECT_LIST,
         payload: mockProjectsApiResponse,
       });
     });
@@ -137,14 +133,14 @@ describe('useHandlePinnedProjectList', () => {
 
     const id = uuidv4();
 
-    const wrapper = ({ children, initialValue }: PinnedProjectProviderProps) => (
-      <PinnedProjectProvider children={children} initialValue={initialValue}></PinnedProjectProvider>
+    const wrapper = ({ children, initialValue }: ProjectProviderProps) => (
+      <ProjectProvider children={children} initialValue={initialValue}></ProjectProvider>
     );
 
     const { result } = renderHook(() => useHandlePinnedProjectList(), {
       wrapper,
       initialProps: { initialValue: { pinnedProject: [] } },
-    } as RenderHookOptions<{ initialValue: { pinnedProject: never[] } }, Queries>);
+    } as RenderHookOptions<{ initialValue: { pinnedProject: never[]; projects: [] } }, Queries>);
 
     await act(async () => result.current.handlePinProject('me00247'));
 
@@ -152,7 +148,7 @@ describe('useHandlePinnedProjectList', () => {
       expect(pinProject).toHaveBeenCalledWith('me00247');
       expect(mockDispatch).toHaveBeenCalledTimes(1);
       expect(mockDispatch).toHaveBeenCalledWith({
-        type: PINNED_PROJECT_ACTION.ADD_ITEM,
+        type: PROJECT_ACTION.ADD_PINNED_PROJECT,
         payload: mockPinProjectResponse,
       });
       expect(notifyToast).toHaveBeenCalledWith({
@@ -171,8 +167,8 @@ describe('useHandlePinnedProjectList', () => {
 
     const id = uuidv4();
 
-    const wrapper = ({ children, initialValue }: PinnedProjectProviderProps) => (
-      <PinnedProjectProvider children={children} initialValue={initialValue}></PinnedProjectProvider>
+    const wrapper = ({ children, initialValue }: ProjectProviderProps) => (
+      <ProjectProvider children={children} initialValue={initialValue}></ProjectProvider>
     );
 
     const { result } = renderHook(() => useHandlePinnedProjectList(), {
