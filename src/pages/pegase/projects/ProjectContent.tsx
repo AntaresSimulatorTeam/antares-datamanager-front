@@ -74,7 +74,7 @@ const ProjectContent = () => {
         />
       </div>
       <div className="grid w-full grid-cols-3 gap-3">
-        {projects.map((project) => {
+        {(projects || []).map((project) => {
           const dropdownItems = [
             pinOption(false, async () => handlePinProject(project.id)),
             settingOption(() => {}, t('project.@setting')),
