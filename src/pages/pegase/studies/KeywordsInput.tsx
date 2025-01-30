@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { RdsButton, RdsIcon, RdsIconId, RdsInputText } from 'rte-design-system-react';
 import { fetchSuggestedKeywords } from '@/shared/services/studyService';
 import { clsx } from 'clsx';
+import { useTranslation } from 'react-i18next';
 
 interface KeywordsInputProps {
   keywords: string[];
@@ -26,6 +27,7 @@ const KeywordsInput: React.FC<KeywordsInputProps> = ({
   minNbCharacters,
   width,
 }) => {
+  const { t } = useTranslation();
   const [keywordInput, setKeywordInput] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [suggestedKeywords, setSuggestedKeywords] = useState<string[]>([]);
@@ -44,19 +46,19 @@ const KeywordsInput: React.FC<KeywordsInputProps> = ({
   const handleAddKeyword = (suggestedKeyword = keywordInput) => {
     if (suggestedKeyword.trim()) {
       if (keywords.includes(suggestedKeyword.trim())) {
-        setErrorMessage('Keyword already exists');
+        setErrorMessage(t('projectModal.@keyword_already_exists'));
       } else if (
         minNbCharacters &&
         maxNbCharacters &&
         (suggestedKeyword.trim().length < minNbCharacters || suggestedKeyword.trim().length > maxNbCharacters)
       ) {
-        setErrorMessage(`Keyword must be between ${minNbCharacters} and ${maxNbCharacters} characters`);
+        setErrorMessage(t('projectModal.@keyword_length_error', { min: minNbCharacters, max: maxNbCharacters }));
       } else if (minNbCharacters && !maxNbCharacters && suggestedKeyword.trim().length < minNbCharacters) {
-        setErrorMessage(`Keyword must be at least ${minNbCharacters} characters`);
+        setErrorMessage(t('projectModal.@keyword_minimum_error', { min: minNbCharacters }));
       } else if (!minNbCharacters && maxNbCharacters && suggestedKeyword.trim().length > maxNbCharacters) {
-        setErrorMessage(`Keyword must not exceed ${maxNbCharacters} characters`);
+        setErrorMessage(t('projectModal.@keyword_maximum_error', { max: maxNbCharacters }));
       } else if (maxNbKeywords && keywords.length >= maxNbKeywords) {
-        setErrorMessage(`Cannot add more than ${maxNbKeywords} keywords`);
+        setErrorMessage(t('projectModal.@keyword_max_keys_errors', { maxNbKey: maxNbKeywords }));
       } else {
         setKeywords((prevKeywords) => [...prevKeywords, suggestedKeyword.trim()]);
         setKeywordInput('');

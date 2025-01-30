@@ -33,7 +33,7 @@ const PinnedProjectCards = () => {
   const deleteProject = async (projectId: string) => {
     try {
       await deleteProjectById(projectId);
-      // Met à jour la liste des projets (et les projets épinglés)
+      // Update pinned project list
       dispatch?.({
         type: PROJECT_ACTION.REMOVE_PROJECT,
         payload: projectId,
