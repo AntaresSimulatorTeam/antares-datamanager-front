@@ -8,7 +8,7 @@ import { PROJECT_AUTOCOMPLETE_ENDPOINT, PROJECT_ENDPOINT, PROJECT_SEARCH_ENDPOIN
 import { AuthService } from '@/auth/authService';
 
 export const deleteProjectById = async (projectId: string) => {
-  const response = await fetch(`${PROJECT_ENDPOINT}/${projectId}`, {
+  const response = await AuthService.authFetch(`${PROJECT_ENDPOINT}/${projectId}`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
@@ -29,7 +29,7 @@ export const deleteProjectById = async (projectId: string) => {
  * @return {Promise<ProjectInfo>} - Project details
  */
 export const fetchProjectDetails = async (projectId: string) => {
-  const response = await fetch(`${PROJECT_ENDPOINT}/${projectId}`);
+  const response = await AuthService.authFetch(`${PROJECT_ENDPOINT}/${projectId}`);
 
   if (!response?.ok) {
     throw new Error('Failed to fetch project details');
@@ -45,7 +45,7 @@ export const fetchProjectDetails = async (projectId: string) => {
  * @return {Promise<string[]>} - List of project name
  */
 export const fetchProjectsFromPartialName = async (query: string): Promise<string[]> => {
-  const response = await fetch(`${PROJECT_AUTOCOMPLETE_ENDPOINT}?partialName=${query}`);
+  const response = await AuthService.authFetch(`${PROJECT_AUTOCOMPLETE_ENDPOINT}?partialName=${query}`);
   if (!response.ok) {
     throw new Error('Failed to fetch projects');
   }

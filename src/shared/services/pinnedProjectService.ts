@@ -6,6 +6,7 @@
 
 import { PROJECT_PIN_ENDPOINT, PROJECT_PINNED_ENDPOINT, PROJECT_UNPIN_ENDPOINT } from '@/shared/const/apiEndPoint';
 import { ProjectInfo } from '@/shared/types/pegase/Project.type';
+import {AuthService} from "@/auth/authService";
 
 /**
  * Retrieve pinned projects list by user id
@@ -16,7 +17,7 @@ import { ProjectInfo } from '@/shared/types/pegase/Project.type';
 export const fetchPinnedProjects = async (userId: string) => {
   const apiUrl = `${PROJECT_PINNED_ENDPOINT}?userId=${userId}`;
 
-  const response = await fetch(apiUrl);
+  const response = await AuthService.authFetch(apiUrl);
 
   if (!response?.ok) {
     throw new Error('Failed to fetch project details');
@@ -43,7 +44,7 @@ export const pinProject = async (projectId: string) => {
   const userId = 'me00247';
   const apiUrl = `${PROJECT_PIN_ENDPOINT}?userId=${userId}&projectId=${projectId}`;
 
-  const response = await fetch(apiUrl, {
+  const response = await AuthService.authFetch(apiUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -67,7 +68,7 @@ export const pinProject = async (projectId: string) => {
 export const unpinProject = async (userId: string, projectId: string) => {
   const apiUrl = `${PROJECT_UNPIN_ENDPOINT}?userId=${userId}&projectId=${projectId}`;
 
-  const response = await fetch(apiUrl, {
+  const response = await AuthService.authFetch(apiUrl, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',

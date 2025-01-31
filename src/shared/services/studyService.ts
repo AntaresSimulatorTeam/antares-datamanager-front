@@ -35,7 +35,7 @@ export const fetchSearchStudies = async (
 
   const apiUrl = `${STUDY_SEARCH_ENDPOINT}?page=${currentPage + 1}&size=${intervalSize}&projectId=${projectId}&search=${searchTerm}&sortColumn=${entries?.[0] ?? ''}&sortDirection=${entries?.[1] ?? ''}`;
 
-  const response = await fetch(apiUrl);
+  const response = await AuthService.authFetch(apiUrl);
   if (!response.ok) {
     throw new Error('Failed to fetch user studies');
   }
@@ -71,7 +71,7 @@ export const saveStudy = async (
   toggleModal: () => void,
 ) => {
   try {
-    const response = await fetch(`${STUDY_ENDPOINT}`, {
+    const response = await AuthService.authFetch(`${STUDY_ENDPOINT}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -106,7 +106,7 @@ export const saveStudy = async (
  */
 export const deleteStudy = async (id: number) => {
   try {
-    const response = await fetch(`${STUDY_ENDPOINT}/${id}`, {
+    const response = await AuthService.authFetch(`${STUDY_ENDPOINT}/${id}`, {
       method: 'DELETE',
     });
     if (!response.ok) {
