@@ -9,7 +9,7 @@ import { APP_NAME } from '@/shared/constants.ts';
 export const navBarConfig = {
   header: {
     variant: 'logo',
-    versionTextColor: 'text-gray-600',
+    versionTextColor: 'gray-600',
     appName: APP_NAME,
     appVersion: `v${import.meta.env.VITE_APP_VERSION}`,
     headerLink: '/',
@@ -21,6 +21,4 @@ export const navBarConfig = {
       logoCollapsedId: 'appIcon-expanded-id',
     },
   },
-  itemContent: 'bg-gray-50 dark:bg-gray-800',
-  itemBackground: 'bg-gray-50 dark:bg-gray-800',
 };
