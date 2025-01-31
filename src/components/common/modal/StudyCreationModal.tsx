@@ -40,13 +40,14 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({ onClose, study,
       trajectoryIds: trajectoryIds,
     };
 
-    await saveStudy(studyData, onClose);
+    await saveStudy(studyData);
     // Clear form fields
     setReloadStudies((prev) => !prev); // Trigger reload after successful save
     setStudyName('');
     setProjectName('');
     setHorizon('');
     setKeywords([]);
+    onClose();
   };
 
   const validateForm = () => {
@@ -88,8 +89,8 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({ onClose, study,
     <RdsModal size="small">
       <RdsModal.Title onClose={onClose}>{study ? t('home.@duplicate_study') : t('home.@new_study')}</RdsModal.Title>
       <RdsModal.Content>
-        <div className="flex items-center gap-4 self-stretch">
-          <div className="flex w-[300px] flex-col items-start justify-center">
+        <div className="flex gap-4 self-stretch">
+          <div className="flex w-32 flex-col items-start justify-start">
             <RdsInputText
               label="Name"
               value={studyName}
@@ -97,13 +98,19 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({ onClose, study,
               variant="outlined"
               placeHolder="Name your study..."
             />
+            <HorizonInput value={horizon} onChange={handleHorizonChange} />
+            <KeywordsInput
+              keywords={keywords}
+              setKeywords={setKeywords}
+              maxNbKeywords={6}
+              maxNbCharacters={10}
+              minNbCharacters={3}
+            />
           </div>
-          <div className="flex w-[242px] flex-col items-start justify-center">
+          <div className="flex w-32 flex-col items-start justify-start">
             <ProjectInput value={projectName} onChange={setProjectName} />
           </div>
         </div>
-        <HorizonInput value={horizon} onChange={handleHorizonChange} />
-        <KeywordsInput keywords={keywords} setKeywords={setKeywords} />
       </RdsModal.Content>
       <RdsModal.Footer>
         <RdsButton label="Cancel" onClick={onClose} color="secondary" />
