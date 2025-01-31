@@ -8,23 +8,33 @@ import { Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import './App.css';
 import ThemeHandler from './components/common/handler/ThemeHandler';
-import Navbar from './components/pegase/navbar/Navbar';
 import PegaseStar from './components/pegase/star/PegaseStar';
 import { UserContext } from '@/store/contexts/UserContext';
-import { PEGASE_NAVBAR_ID } from './shared/constants';
-import { THEME_COLOR } from './shared/types';
+import { THEME_COLOR } from '@/shared/types';
 import { menuBottomData, menuTopData } from './routes';
 import { PegaseToastContainer } from './shared/notification/containers';
 import ProjectDetails from './pages/pegase/projects/projectDetails/ProjectDetails';
 import StudyDetails from '@/pages/pegase/studies/studyDetails/studyDetails';
+import { RdsNavbar } from 'rte-design-system-react';
+import { navBarConfig } from '@/shared/const/navBarConfig';
+import { useTranslation } from 'react-i18next';
+import { translateMenuItemLabel } from '@/shared/utils/textUtils.ts';
 
 function App() {
+  const { t } = useTranslation();
+
   return (
     <div className="flex h-screen w-screen dark:bg-gray-900 dark:text-gray-200">
       <UserContext.Provider initialState={{ theme: THEME_COLOR.LIGHT }}>
         <ThemeHandler />
         <PegaseToastContainer />
-        <Navbar id={PEGASE_NAVBAR_ID} bottomItems={menuBottomData} topItems={menuTopData} />
+        <RdsNavbar
+          id={'main-nav-bar'}
+          topItems={translateMenuItemLabel(menuTopData, t)}
+          bottomItems={translateMenuItemLabel(menuBottomData, t)}
+          headerLink={'/'}
+          config={navBarConfig}
+        />
         <div className="flex h-full w-full flex-col">
           <PegaseStar />
           <Suspense>

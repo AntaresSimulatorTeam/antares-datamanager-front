@@ -5,13 +5,9 @@
  */
 
 import { MenuNavItem } from '@/shared/types';
-import { RdsIconId } from 'rte-design-system-react';
 
-export const menuItemSample: MenuNavItem = {
-  id: 'download',
-  key: 'downloads',
-  label: 'Téléchargements',
-  path: '/',
-  icon: RdsIconId.Download,
-  component: () => <></>,
+export const translateMenuItemLabel = (menuItems: MenuNavItem[], t: (key: string) => string): MenuNavItem[] => {
+  return (menuItems as MenuNavItem[]).map((data: MenuNavItem) => {
+    return { ...data, label: t(data.label) };
+  });
 };
