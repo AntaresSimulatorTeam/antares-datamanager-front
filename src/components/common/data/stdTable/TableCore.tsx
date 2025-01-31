@@ -119,18 +119,20 @@ const TableCore = <TData,>({ table, id: propId, striped, trClassName, columnSize
         </tr>
       </thead>
       <tbody>
-        {table.getRowModel().rows.map((row) => (
-          <tr
-            key={row.id}
-            className={tableCoreRowClassBuilder(striped, row.getIsSelected(), row.getReadOnly?.(), trClassName)}
-            onClick={handleToggleRow(row)}
-            aria-readonly={row.getReadOnly?.()}
-          >
-            {row.getVisibleCells().map((cell) => (
-              <TableDataCell key={cell.id} cell={cell} />
-            ))}
-          </tr>
-        ))}
+        {table.getRowModel().rows.map((row) => {
+          return (
+            <tr
+              key={row.id}
+              className={tableCoreRowClassBuilder(striped, row.getIsSelected(), row.getReadOnly?.(), trClassName)}
+              onClick={handleToggleRow(row)}
+              aria-readonly={row.getReadOnly?.()}
+            >
+              {row.getVisibleCells().map((cell) => (
+                <TableDataCell key={cell.id} cell={cell} />
+              ))}
+            </tr>
+          );
+        })}
       </tbody>
     </table>
   );

@@ -6,16 +6,23 @@
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-empty-object-type */
+import { OnChangeFn, Updater } from '@tanstack/react-table';
+
 export type ReadOnlyObject = Record<string, boolean>;
+
 export interface ReadOnlyTableState {
   readOnly: ReadOnlyObject;
 }
 
-export interface ReadOnlyOptions {}
+export interface ReadOnlyOptions {
+  enableReadOnly?: boolean;
+  onReadOnlyChange?: OnChangeFn<ReadOnlyObject>;
+}
 
 // Define types for our new feature's table APIs
 export interface ReadOnlyTableInstance {
   setReadOnly: (updater: Updater<ReadOnlyObject>) => void;
+  toggleReadOnly: (value?: ReadOnlyObject) => void;
 }
 
 export interface ReadOnlyRow {
@@ -25,7 +32,10 @@ export interface ReadOnlyRow {
 
 declare module '@tanstack/react-table' {
   interface TableState extends ReadOnlyTableState {}
+
   interface TableOptionsResolved<TData extends RowData> extends ReadOnlyOptions {}
+
   interface Table<TData extends RowData> extends ReadOnlyTableInstance {}
+
   interface Row<TData extends RowData> extends ReadOnlyRow {}
 }
