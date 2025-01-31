@@ -5,6 +5,7 @@
  */
 
 import { APP_NAME } from '@/shared/constants.ts';
+import { HeaderStyleConfig } from 'rte-design-system-react';
 
 export const navBarConfig = {
   header: {
@@ -20,5 +21,5 @@ export const navBarConfig = {
       logoCollapsedHref: 'brand/appIcon.svg',
       logoCollapsedId: 'appIcon-expanded-id',
     },
-  },
+  } as HeaderStyleConfig,
 };

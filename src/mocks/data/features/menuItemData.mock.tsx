@@ -5,13 +5,13 @@
  */
 
 import { MenuNavItem } from '@/shared/types';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
+import { RdsIconId } from 'rte-design-system-react';
 
 export const menuItemSample: MenuNavItem = {
   id: 'download',
   key: 'downloads',
   label: 'Téléchargements',
   path: '/',
-  icon: StdIconId.Download,
+  icon: RdsIconId.Download,
   component: () => <></>,
 };

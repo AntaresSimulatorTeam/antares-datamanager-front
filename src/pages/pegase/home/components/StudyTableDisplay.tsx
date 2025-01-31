@@ -5,7 +5,6 @@
  */
 
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { StudyDTO } from '@/shared/types';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type';
 import getStudyTableHeaders from './StudyTableHeaders';
@@ -16,7 +15,6 @@ import { deleteStudy } from '@/shared/services/studyService';
 import StdSimpleTable from '@/components/common/data/stdSimpleTable/StdSimpleTable';
 import { RdsButton } from 'rte-design-system-react';
 import { useStudyTableDisplay } from '@/hooks/useStudyTableDisplay';
-import { useNewStudyModal } from '@/hooks/useNewStudyModal';
 import { useStudyNavigation } from '@/hooks/useStudyNavigation';
 
 interface StudyTableDisplayProps {
@@ -25,7 +23,6 @@ interface StudyTableDisplayProps {
 }
 
 const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) => {
-  const { t } = useTranslation();
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [isHeaderHovered, setIsHeaderHovered] = useState<boolean>(false);
   // Reload trigger for re-fetching data
