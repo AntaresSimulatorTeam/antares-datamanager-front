@@ -7,7 +7,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { lazy } from 'react';
 import { MenuNavItem } from './shared/types';
-import { StdIconId } from './shared/utils/common/mappings/iconMaps';
 import { RdsIconId } from 'rte-design-system-react';
 
 const Settings = lazy(() => import('./pages/pegase/settings/Settings'));
