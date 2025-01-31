@@ -7,7 +7,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { lazy } from 'react';
 import { MenuNavItem } from './shared/types';
-import { StdIconId } from './shared/utils/common/mappings/iconMaps';
+import { RdsIconId } from 'rte-design-system-react';
 
 const Settings = lazy(() => import('./pages/pegase/settings/Settings'));
 const HomePage = lazy(() => import('./pages/pegase/home/HomePage'));
@@ -22,7 +22,7 @@ export const menuTopData: MenuNavItem[] = [
     key: 'home',
     label: 'home.@label',
     path: '/',
-    icon: StdIconId.Home,
+    icon: RdsIconId.Home,
     component: HomePage,
   },
   {
@@ -30,7 +30,7 @@ export const menuTopData: MenuNavItem[] = [
     key: 'project',
     label: 'page.@projet',
     path: '/projects',
-    icon: StdIconId.Folder,
+    icon: RdsIconId.Folder,
     component: ProjectsPage,
   },
   {
@@ -38,7 +38,7 @@ export const menuTopData: MenuNavItem[] = [
     key: 'logs',
     label: 'page.@logs',
     path: '/logs',
-    icon: StdIconId.ReceiptLong,
+    icon: RdsIconId.ReceiptLong,
     component: LogsPage,
   },
   {
@@ -46,7 +46,7 @@ export const menuTopData: MenuNavItem[] = [
     key: 'parameters',
     label: 'page.@parameters',
     path: '/parameters',
-    icon: StdIconId.Settings,
+    icon: RdsIconId.Settings,
     component: Settings,
   },
   {
@@ -54,7 +54,7 @@ export const menuTopData: MenuNavItem[] = [
     key: 'antares',
     label: 'page.@antares',
     path: '/antares',
-    icon: StdIconId.Apps,
+    icon: RdsIconId.Apps,
     component: AntaresPage,
   },
 ];
@@ -64,7 +64,7 @@ export const menuBottomData: MenuNavItem[] = [
     key: 'logout',
     label: 'page.@logout',
     path: '/logout',
-    icon: StdIconId.Logout,
+    icon: RdsIconId.Logout,
     component: LogoutPage,
   },
 ];
