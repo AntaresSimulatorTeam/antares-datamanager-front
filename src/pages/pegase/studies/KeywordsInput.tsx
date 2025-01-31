@@ -7,15 +7,27 @@
 import { useState } from 'react';
 import { RdsButton, RdsIcon, RdsIconId, RdsInputText } from 'rte-design-system-react';
 import { fetchSuggestedKeywords } from '@/shared/services/studyService';
-
-const MAX_KEYWORDS = 6;
+import { clsx } from 'clsx';
+import { useTranslation } from 'react-i18next';
 
 interface KeywordsInputProps {
   keywords: string[];
   setKeywords: React.Dispatch<React.SetStateAction<string[]>>;
+  maxNbKeywords?: number;
+  maxNbCharacters?: number;
+  minNbCharacters?: number;
+  width?: string;
 }
 
-const KeywordsInput: React.FC<KeywordsInputProps> = ({ keywords, setKeywords }) => {
+const KeywordsInput: React.FC<KeywordsInputProps> = ({
+  keywords,
+  setKeywords,
+  maxNbKeywords,
+  maxNbCharacters,
+  minNbCharacters,
+  width,
+}) => {
+  const { t } = useTranslation();
   const [keywordInput, setKeywordInput] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [suggestedKeywords, setSuggestedKeywords] = useState<string[]>([]);
@@ -34,11 +46,19 @@ const KeywordsInput: React.FC<KeywordsInputProps> = ({ keywords, setKeywords }) 
   const handleAddKeyword = (suggestedKeyword = keywordInput) => {
     if (suggestedKeyword.trim()) {
       if (keywords.includes(suggestedKeyword.trim())) {
-        setErrorMessage('Keyword already exists');
-      } else if (suggestedKeyword.trim().length < 3 || suggestedKeyword.trim().length > 10) {
-        setErrorMessage('Keyword must be between 3 and 10 characters');
-      } else if (keywords.length >= MAX_KEYWORDS) {
-        setErrorMessage('Cannot add more than 6 keywords');
+        setErrorMessage(t('projectModal.@keyword_already_exists'));
+      } else if (
+        minNbCharacters &&
+        maxNbCharacters &&
+        (suggestedKeyword.trim().length < minNbCharacters || suggestedKeyword.trim().length > maxNbCharacters)
+      ) {
+        setErrorMessage(t('projectModal.@keyword_length_error', { min: minNbCharacters, max: maxNbCharacters }));
+      } else if (minNbCharacters && !maxNbCharacters && suggestedKeyword.trim().length < minNbCharacters) {
+        setErrorMessage(t('projectModal.@keyword_minimum_error', { min: minNbCharacters }));
+      } else if (!minNbCharacters && maxNbCharacters && suggestedKeyword.trim().length > maxNbCharacters) {
+        setErrorMessage(t('projectModal.@keyword_maximum_error', { max: maxNbCharacters }));
+      } else if (maxNbKeywords && keywords.length >= maxNbKeywords) {
+        setErrorMessage(t('projectModal.@keyword_max_keys_errors', { maxNbKey: maxNbKeywords }));
       } else {
         setKeywords((prevKeywords) => [...prevKeywords, suggestedKeyword.trim()]);
         setKeywordInput('');
@@ -56,9 +76,9 @@ const KeywordsInput: React.FC<KeywordsInputProps> = ({ keywords, setKeywords }) 
   };
 
   return (
-    <div className="flex w-[300px] flex-col items-start justify-center">
-      <div className="relative w-full">
-        <div className="flex items-center gap-4">
+    <div className={clsx(width ?? 'w-full', 'flex min-h-18 flex-col items-start justify-start')}>
+      <div className="relative flex w-full">
+        <div className="flex w-full items-center gap-4">
           <RdsInputText
             label="Keywords"
             value={keywordInput}
@@ -66,7 +86,7 @@ const KeywordsInput: React.FC<KeywordsInputProps> = ({ keywords, setKeywords }) 
             placeHolder="Add a keyword"
             variant="outlined"
           />
-          {keywordInput && keywordInput.length >= 3 && (
+          {keywordInput && (minNbCharacters ? keywordInput.length >= minNbCharacters : true) && (
             <RdsButton
               onClick={() => handleAddKeyword()}
               icon={RdsIconId.Add}
@@ -78,7 +98,7 @@ const KeywordsInput: React.FC<KeywordsInputProps> = ({ keywords, setKeywords }) 
         </div>
 
         {/* Suggested Keywords Dropdown */}
-        {keywordInput && (
+        {keywordInput && suggestedKeywords.length > 0 && (
           <div
             className="bg-white max-h-40 absolute z-10 mt-1 w-full overflow-y-auto border border-gray-300"
             style={{
@@ -104,12 +124,12 @@ const KeywordsInput: React.FC<KeywordsInputProps> = ({ keywords, setKeywords }) 
       </div>
 
       {/* Error Message */}
-      {errorMessage && <div className="text-red-500 mt-2">{errorMessage}</div>}
+      {errorMessage && <div className="my-2 text-error-500">{errorMessage}</div>}
 
       {/* Keywords Display and Clear All Button */}
       <div className="flex flex-wrap gap-2">
         {keywords.map((keyword, index) => (
-          <div key={index} className="py-0.3 flex items-center rounded bg-gray-200 px-1">
+          <div key={index} className="py-0.3 flex items-center gap-2 rounded bg-gray-200 px-1">
             <span>{keyword}</span>
             <RdsButton
               icon={RdsIconId.Close}
@@ -124,7 +144,7 @@ const KeywordsInput: React.FC<KeywordsInputProps> = ({ keywords, setKeywords }) 
 
       {/* Clear All Keywords Button */}
       {keywords.length > 0 && (
-        <div className="text-sm text-secondary flex cursor-pointer items-center gap-1" onClick={clearAllKeywords}>
+        <div className="text-sm text-secondary mt-1 flex cursor-pointer items-center gap-1" onClick={clearAllKeywords}>
           <RdsIcon name={RdsIconId.InkEraser} color="secondary" />
           <span>Clear all</span>
         </div>

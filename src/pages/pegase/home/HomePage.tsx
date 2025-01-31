@@ -6,16 +6,16 @@
 
 import HomePageContent from './components/HomePageContent';
 import PinnedProject from '@/pages/pegase/home/pinnedProjects/PinnedProject';
-import { PinnedProjectProvider } from '@/store/contexts/ProjectContext.tsx';
+import { ProjectProvider } from '@/store/contexts/ProjectContext.tsx';
 
 const HomePage = () => {
   return (
-    <PinnedProjectProvider initialValue={{ pinnedProjects: [] }}>
+    <ProjectProvider initialValue={{ pinnedProjects: [], projects: [] }}>
       <div className="flex flex-col items-center gap-6 p-3">
         <PinnedProject />
         <HomePageContent />
       </div>
-    </PinnedProjectProvider>
+    </ProjectProvider>
   );
 };
 

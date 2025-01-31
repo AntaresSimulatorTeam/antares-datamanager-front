@@ -4,26 +4,47 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { PinnedProjectActionType, PinnedProjectState, ProjectInfo } from '@/shared/types/pegase/Project.type';
-import { PINNED_PROJECT_ACTION } from '@/shared/enum/project.ts';
+import { ProjectActionType, ProjectInfo, ProjectState } from '@/shared/types/pegase/Project.type';
+import { PROJECT_ACTION } from '@/shared/enum/project';
 
-const addItem = (currentState: ProjectInfo[], payload: ProjectInfo) => {
-  return { pinnedProjects: [...currentState, payload] };
+// PROJECTS
+const addProject = (currentState: ProjectState, payload: ProjectInfo) => {
+  const { pinnedProjects, projects } = currentState;
+  return { projects: [...projects, payload], pinnedProjects };
 };
-const removeItem = (currentState: ProjectInfo[], payload: string) => {
-  return { pinnedProjects: [...currentState.filter((p) => p.id !== payload)] };
+const removeProject = (currentState: ProjectState, payload: string) => {
+  const { pinnedProjects, projects } = currentState;
+  return {
+    projects: [...projects.filter((p) => p.id !== payload)],
+    pinnedProjects: [...pinnedProjects.filter((p) => p.id !== payload)],
+  };
+};
+// PINNED PROJECTS
+const addPinnedProject = (currentState: ProjectState, payload: ProjectInfo) => {
+  const { pinnedProjects, projects } = currentState;
+  payload.pinned = true;
+  return { projects, pinnedProjects: [...pinnedProjects, payload] };
+};
+const unpinPinnedProject = (currentState: ProjectState, payload: string) => {
+  const { pinnedProjects, projects } = currentState;
+  return { projects, pinnedProjects: [...pinnedProjects.filter((p) => p.id !== payload)] };
 };
 
-const pinnedProjectReducer = (prevState: PinnedProjectState, action?: PinnedProjectActionType): PinnedProjectState => {
-  const { pinnedProjects } = prevState;
+const projectReducer = (prevState: ProjectState, action?: ProjectActionType): ProjectState => {
   if (action) {
     switch (action.type) {
-      case PINNED_PROJECT_ACTION.ADD_ITEM:
-        return addItem(pinnedProjects, action.payload);
-      case PINNED_PROJECT_ACTION.REMOVE_ITEM:
-        return removeItem(pinnedProjects, action.payload);
-      case PINNED_PROJECT_ACTION.INIT_LIST:
-        return { pinnedProjects: [...action.payload] };
+      case PROJECT_ACTION.ADD_PROJECT:
+        return addProject(prevState, action.payload);
+      case PROJECT_ACTION.REMOVE_PROJECT:
+        return removeProject(prevState, action.payload);
+      case PROJECT_ACTION.INIT_PROJECT_LIST:
+        return { projects: [...action.payload], pinnedProjects: [...prevState.pinnedProjects] };
+      case PROJECT_ACTION.ADD_PINNED_PROJECT:
+        return addPinnedProject(prevState, action.payload);
+      case PROJECT_ACTION.UNPIN_PINNED_PROJECT:
+        return unpinPinnedProject(prevState, action.payload);
+      case PROJECT_ACTION.INIT_PINNED_PROJECT_LIST:
+        return { projects: [...prevState.projects], pinnedProjects: [...action.payload] };
       default:
         return prevState;
     }
@@ -32,4 +53,4 @@ const pinnedProjectReducer = (prevState: PinnedProjectState, action?: PinnedProj
   return prevState;
 };
 
-export default pinnedProjectReducer;
+export default projectReducer;

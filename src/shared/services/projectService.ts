@@ -5,6 +5,7 @@
  */
 
 import { PROJECT_AUTOCOMPLETE_ENDPOINT, PROJECT_ENDPOINT, PROJECT_SEARCH_ENDPOINT } from '@/shared/const/apiEndPoint';
+import { ProjectInfo, ProjectResponse } from '@/shared/types/pegase/Project.type';
 
 export const deleteProjectById = async (projectId: string) => {
   const response = await fetch(`${PROJECT_ENDPOINT}/${projectId}`, {
@@ -64,5 +65,32 @@ export const fetchProjectFromSearchTerm = async (searchTerm: string, current: nu
     `${PROJECT_SEARCH_ENDPOINT}?page=${current + 1}&size=${intervalSize}&search=${searchTerm || ''}`,
   );
 
+  return await response.json();
+};
+
+/**
+ * Create a new project
+ *
+ * @param {Pick<ProjectInfo, 'name' | 'description' | 'tags'>} projectData - Body data request
+ * @return {Promise<ProjectResponse | Error>}
+ */
+export const createProject = async (
+  projectData: Pick<ProjectInfo, 'name' | 'description' | 'tags'>,
+): Promise<ProjectResponse | Error> => {
+  const apiUrl = `${PROJECT_ENDPOINT}`;
+
+  const response = await fetch(apiUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(projectData),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    const errorData = JSON.parse(errorText);
+    throw new Error(`${errorData.message}`);
+  }
   return await response.json();
 };

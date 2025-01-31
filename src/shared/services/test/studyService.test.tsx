@@ -129,9 +129,8 @@ describe('saveStudy', () => {
       ok: true,
       json: () => Promise.resolve(),
     });
-    const toggleModal = vi.fn();
 
-    await saveStudy(mockStudy, toggleModal);
+    await saveStudy(mockStudy);
 
     expect(global.fetch).toHaveBeenCalledTimes(1);
     expect(global.fetch).toHaveBeenCalledWith('https://mockapi.com/v1/study', {
@@ -145,7 +144,6 @@ describe('saveStudy', () => {
       type: 'success',
       message: 'Study created successfully',
     });
-    expect(toggleModal).toHaveBeenCalledTimes(1);
   });
 
   it('should throw an error message', async () => {
@@ -155,7 +153,7 @@ describe('saveStudy', () => {
       text: () => 'error',
     });
 
-    const result = await saveStudy(mockStudy, vi.fn());
+    const result = await saveStudy(mockStudy);
     expect(result).toEqual(undefined);
   });
 
@@ -163,7 +161,7 @@ describe('saveStudy', () => {
     // Failed fetch response moc
     global.fetch = vi.fn().mockRejectedValueOnce(new Error('Failed to create study'));
 
-    await saveStudy(mockStudy, vi.fn());
+    await saveStudy(mockStudy);
 
     expect(notifyToast).toHaveBeenCalledWith({
       type: 'error',

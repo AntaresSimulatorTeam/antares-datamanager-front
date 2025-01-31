@@ -12,23 +12,18 @@ import { useDropdownOptions } from '@/hooks/useDropdownOptions';
 import { useProjectNavigation } from '@/hooks/useProjectNavigation';
 import { RdsIcon, RdsIconId, RdsTagList } from 'rte-design-system-react';
 import { deleteProjectById } from '@/shared/services/projectService';
-import { usePinnedProject, usePinnedProjectDispatch } from '@/store/contexts/ProjectContext';
 import { useHandlePinnedProjectList } from '@/hooks/useHandlePinnedProjectList.ts';
-import { PINNED_PROJECT_ACTION } from '@/shared/enum/project.ts';
-import { PinnedProjectActionType } from '@/shared/types/pegase/Project.type.ts';
 import { notifyToast } from '@/shared/notification/notification.tsx';
-import { Dispatch, SetStateAction } from 'react';
+import { useProject, useProjectDispatch } from '@/store/contexts/ProjectContext.tsx';
+import { ProjectActionType } from '@/shared/types/pegase/Project.type.ts';
+import { PROJECT_ACTION } from '@/shared/enum/project.ts';
 
-interface PinnedProjectCardsProps {
-  setShouldRefetchProjectList?: Dispatch<SetStateAction<boolean>>;
-}
-
-const PinnedProjectCards = ({ setShouldRefetchProjectList }: PinnedProjectCardsProps) => {
+const PinnedProjectCards = () => {
   const { t } = useTranslation();
   const { navigateToProject } = useProjectNavigation();
   const { settingOption, deleteOption, pinOption } = useDropdownOptions();
-  const { pinnedProjects } = usePinnedProject();
-  const dispatch = usePinnedProjectDispatch();
+  const { pinnedProjects } = useProject();
+  const dispatch = useProjectDispatch();
   const { handleUnpinProject } = useHandlePinnedProjectList();
 
   const handleCardClick = (projectId: string, projectName: string) => {
@@ -38,11 +33,11 @@ const PinnedProjectCards = ({ setShouldRefetchProjectList }: PinnedProjectCardsP
   const deleteProject = async (projectId: string) => {
     try {
       await deleteProjectById(projectId);
-      setShouldRefetchProjectList?.(true);
+      // Update pinned project list
       dispatch?.({
-        type: PINNED_PROJECT_ACTION.REMOVE_ITEM,
+        type: PROJECT_ACTION.REMOVE_PROJECT,
         payload: projectId,
-      } as PinnedProjectActionType);
+      } as ProjectActionType);
       notifyToast({
         type: 'success',
         message: 'Project deleted successfully',

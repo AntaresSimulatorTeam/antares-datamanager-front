@@ -17,30 +17,22 @@ import { deleteProjectById } from '@/shared/services/projectService.ts';
 import { RdsChip, RdsTagList } from 'rte-design-system-react';
 import { useFetchProjectList } from '@/hooks/useFetchProjectList';
 import { useHandlePinnedProjectList } from '@/hooks/useHandlePinnedProjectList.ts';
-import { PINNED_PROJECT_ACTION } from '@/shared/enum/project.ts';
-import { PinnedProjectActionType } from '@/shared/types/pegase/Project.type.ts';
-import { usePinnedProjectDispatch } from '@/store/contexts/ProjectContext.tsx';
+import { ProjectActionType } from '@/shared/types/pegase/Project.type.ts';
+import { useProject, useProjectDispatch } from '@/store/contexts/ProjectContext.tsx';
+import { PROJECT_ACTION } from '@/shared/enum/project.ts';
 
-interface ProjectContentProps {
-  shouldRefetchProjectList: boolean;
-}
-
-const ProjectContent = ({ shouldRefetchProjectList }: ProjectContentProps) => {
+const ProjectContent = () => {
   const { t } = useTranslation();
   const intervalSize = 9;
   const userName = 'mouad'; // Replace with actual user name
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [activeChip, setActiveChip] = useState<boolean | null>(false);
   const [current, setCurrent] = useState(0);
-  const { projects, count, refetch } = useFetchProjectList(
-    searchTerm || '',
-    current,
-    intervalSize,
-    shouldRefetchProjectList,
-  );
+  const { count } = useFetchProjectList(searchTerm || '', current, intervalSize);
   const { navigateToProject } = useProjectNavigation();
   const { handlePinProject } = useHandlePinnedProjectList();
-  const dispatch = usePinnedProjectDispatch();
+  const { projects } = useProject();
+  const dispatch = useProjectDispatch();
 
   const searchProject = (value?: string | undefined) => {
     value && setSearchTerm(value);
@@ -58,11 +50,11 @@ const ProjectContent = ({ shouldRefetchProjectList }: ProjectContentProps) => {
 
   const deleteProject = async (projectId: string) => {
     await deleteProjectById(projectId);
+    // Met à jour la liste des projets (et les projets épinglés)
     dispatch?.({
-      type: PINNED_PROJECT_ACTION.REMOVE_ITEM,
+      type: PROJECT_ACTION.REMOVE_PROJECT,
       payload: projectId,
-    } as PinnedProjectActionType);
-    await refetch(searchTerm, current, intervalSize); // Actualiser les projets après suppression
+    } as ProjectActionType);
   };
 
   const handleCardClick = (projectId: string, projectName: string) => {
@@ -82,7 +74,7 @@ const ProjectContent = ({ shouldRefetchProjectList }: ProjectContentProps) => {
         />
       </div>
       <div className="grid w-full grid-cols-3 gap-3">
-        {projects.map((project) => {
+        {(projects || []).map((project) => {
           const dropdownItems = [
             pinOption(false, async () => handlePinProject(project.id)),
             settingOption(() => {}, t('project.@setting')),

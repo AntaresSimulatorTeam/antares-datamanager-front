@@ -5,30 +5,30 @@
  */
 
 import { createContext, Dispatch, ReactNode, useContext, useReducer } from 'react';
-import { PinnedProjectActionType, PinnedProjectState } from '@/shared/types/pegase/Project.type';
-import pinnedProjectReducer from '@/store/reducers/projectReducer';
+import { ProjectActionType, ProjectState } from '@/shared/types/pegase/Project.type';
+import projectReducer from '@/store/reducers/projectReducer';
 
-const initialValue: PinnedProjectState = { pinnedProjects: [] };
+const initialValue: ProjectState = { projects: [], pinnedProjects: [] };
 
-export const PinnedProjectContext = createContext<PinnedProjectState>(initialValue);
-export const PinnedProjectDispatchContext = createContext<Dispatch<PinnedProjectActionType> | null>(null);
+export const ProjectContext = createContext<ProjectState>(initialValue);
+export const ProjectDispatchContext = createContext<Dispatch<ProjectActionType> | null>(null);
 
-export const usePinnedProject = () => useContext(PinnedProjectContext);
-export const usePinnedProjectDispatch = () => useContext(PinnedProjectDispatchContext);
+export const useProject = () => useContext(ProjectContext);
+export const useProjectDispatch = () => useContext(ProjectDispatchContext);
 
-export interface PinnedProjectProviderProps {
+export interface ProjectProviderProps {
   children: ReactNode;
-  initialValue: PinnedProjectState;
+  initialValue: ProjectState;
 }
 
-export const PinnedProjectProvider = ({ children, initialValue }: PinnedProjectProviderProps) => {
+export const ProjectProvider = ({ children, initialValue }: ProjectProviderProps) => {
   const initializer = (value = initialValue) => value;
 
-  const [state, dispatch] = useReducer(pinnedProjectReducer, initialValue, initializer);
+  const [state, dispatch] = useReducer(projectReducer, initialValue, initializer);
 
   return (
-    <PinnedProjectContext.Provider value={state}>
-      <PinnedProjectDispatchContext.Provider value={dispatch}>{children}</PinnedProjectDispatchContext.Provider>
-    </PinnedProjectContext.Provider>
+    <ProjectContext.Provider value={state}>
+      <ProjectDispatchContext.Provider value={dispatch}>{children}</ProjectDispatchContext.Provider>
+    </ProjectContext.Provider>
   );
 };
