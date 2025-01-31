@@ -12,6 +12,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import TableCore, { TableCoreProps } from '../stdTable/TableCore';
+import { ReadOnlyFeature } from '@common/data/stdTable/features/readOnly.ts';
 
 export type StdSimpleTableProps<TData> = {
   getCoreRowModel?: (table: Table<TData>) => () => RowModel<TData>;
@@ -33,15 +34,18 @@ const StdSimpleTable = <TData,>({
   columnResizeMode = undefined,
   enableRowSelection = false,
   enableMultiRowSelection = false,
+  enableReadOnly = false,
   ...tableOptions
 }: StdSimpleTableProps<TData>) => {
   const table = useReactTable<TData>({
+    _features: [ReadOnlyFeature],
     columns,
     data,
     getCoreRowModel: getCustomCoreRowModel ?? getTstCoreRowModel<TData>(),
     columnResizeMode,
     enableRowSelection,
     enableMultiRowSelection,
+    enableReadOnly,
     ...tableOptions,
   });
 

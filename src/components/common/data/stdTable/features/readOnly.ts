@@ -4,8 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { Row, RowData, Table, TableFeature } from '@tanstack/react-table';
-import { ReadOnlyOptions, ReadOnlyTableState } from '../types/readOnly.type';
+import { functionalUpdate, makeStateUpdater, Row, RowData, Table, TableFeature, Updater } from '@tanstack/react-table';
+import { ReadOnlyObject, ReadOnlyOptions, ReadOnlyTableState } from '../types/readOnly.type';
 
 export const ReadOnlyFeature: TableFeature = {
   getInitialState: (state): ReadOnlyTableState => ({
@@ -13,9 +13,26 @@ export const ReadOnlyFeature: TableFeature = {
     ...state,
   }),
 
-  getDefaultOptions: <TData extends RowData>(_table: Table<TData>): ReadOnlyOptions => ({}) as ReadOnlyOptions,
+  getDefaultOptions: <TData extends RowData>(table: Table<TData>): ReadOnlyOptions => {
+    return {
+      enableReadOnly: false,
+      onReadOnlyChange: makeStateUpdater('readOnly', table),
+    } as ReadOnlyOptions;
+  },
+
+  createTable: <TData extends RowData>(table: Table<TData>): void => {
+    table.setReadOnly = (updater) => {
+      const safeUpdater: Updater<ReadOnlyObject> = (old) => {
+        return functionalUpdate(updater, old);
+      };
+      return table.options.onReadOnlyChange?.(safeUpdater);
+    };
+    // table.toggleReadOnly = value => {
+    //   table.setReadOnly(old => !old);
+    // };
+  },
 
   createRow: <TData extends RowData>(row: Row<TData>, table: Table<TData>): void => {
-    row.getReadOnly = () => !!table.getState().readOnly[row.id];
+    row.getReadOnly = () => table.getState().readOnly[row.id];
   },
 };

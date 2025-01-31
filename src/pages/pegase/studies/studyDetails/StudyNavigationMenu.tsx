@@ -1,71 +1,78 @@
-import React, {useEffect, useState} from 'react';
-import {RdsTabItem} from 'rte-design-system-react';
-import {StdIconId} from "@/shared/utils/common/mappings/iconMaps";
-import LoadTab from "@/pages/pegase/studies/studyDetails/LoadTab";
-import ThermalTab from "@/pages/pegase/studies/studyDetails/ThermalTab";
-import EnrTab from "@/pages/pegase/studies/studyDetails/EnrTab";
-import MiscTab from "@/pages/pegase/studies/studyDetails/MiscLinkTab";
-import AreaLinkTab from "@/pages/pegase/studies/studyDetails/AreaLinkTab";
-import StdIcon from "@common/base/stdIcon/StdIcon";
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
 
-const StudyNavigationMenu = ({onRenderActiveComponent}: { onRenderActiveComponent?: (content: React.ReactNode) => void }) => {
-    const [activeTab, setActiveTab] = useState<string>('areasAndLinks');
+import React, { ReactNode, useEffect, useState } from 'react';
+import { RdsTabItem } from 'rte-design-system-react';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
+import LoadTab from '@/pages/pegase/studies/studyDetails/LoadTab';
+import ThermalTab from '@/pages/pegase/studies/studyDetails/ThermalTab';
+import EnrTab from '@/pages/pegase/studies/studyDetails/EnrTab';
+import MiscTab from '@/pages/pegase/studies/studyDetails/MiscLinkTab';
+import AreaLinkTab from '@/pages/pegase/studies/studyDetails/AreaLinkTab';
+import StdIcon from '@common/base/stdIcon/StdIcon';
 
-    const renderActiveComponent = () => {
-        switch (activeTab) {
-            case 'areasAndLinks':
-                return <AreaLinkTab/>;
-            case 'load':
-                return <LoadTab/>;
-            case 'thermal':
-                return <ThermalTab/>;
-            case 'enr':
-                return <EnrTab/>;
-            case 'misc':
-                return <MiscTab/>;
-            default:
-                return null;
-        }
-    };
+const StudyNavigationMenu = ({
+  onRenderActiveComponent,
+}: {
+  onRenderActiveComponent?: (content: ReactNode | null) => void;
+}) => {
+  const [activeTab, setActiveTab] = useState<string>('areasAndLinks');
 
-    useEffect(() => {
-        if (onRenderActiveComponent) {
-            onRenderActiveComponent(renderActiveComponent());
-        }
-    }, [activeTab, onRenderActiveComponent]);
+  const renderActiveComponent = (): ReactNode | null => {
+    switch (activeTab) {
+      case 'areasAndLinks':
+        return <AreaLinkTab />;
+      case 'load':
+        return <LoadTab />;
+      case 'thermal':
+        return <ThermalTab />;
+      case 'enr':
+        return <EnrTab />;
+      case 'misc':
+        return <MiscTab />;
+      default:
+        return null;
+    }
+  };
 
-    const handleTabClick = (selectedItemName: string) => {
-        setActiveTab(selectedItemName);
-        console.log(`Tab clicked: ${selectedItemName}`);
-    };
+  useEffect(() => {
+    if (onRenderActiveComponent) {
+      onRenderActiveComponent(renderActiveComponent());
+    }
+  }, [activeTab, onRenderActiveComponent]);
 
-    const tabs = [
-        {name: 'areasAndLinks', label: 'Areas & Links', icon: StdIconId.LinkedServices},
-        {name: 'load', label: 'Load', icon: StdIconId.BatteryChargingFull},
-        {name: 'thermal', label: 'Thermal', icon: StdIconId.LocalFireDepartment},
-        {name: 'enr', label: 'ENR', icon: StdIconId.EnergySavingsLeaf},
-        {name: 'misc', label: 'Misc', icon: StdIconId.Category},
-    ];
+  const handleTabClick = (selectedItemName: string) => {
+    setActiveTab(selectedItemName);
+    console.log(`Tab clicked: ${selectedItemName}`);
+  };
 
-    return (
-        <div>
-            <div className="flex space-x-4 p-4">
-                {tabs.map((tab) => (
-                    <div  className="flex items-center space-x-2">
-                        <StdIcon name={tab.icon} />
-                        <RdsTabItem
-                            key={tab.name}
-                            name={tab.name}
-                            label={tab.label}
-                            active={activeTab === tab.name}
-                            onClick={() => handleTabClick(tab.name)}
-                        />
-                    </div>
+  const tabs = [
+    { name: 'areasAndLinks', label: 'Areas & Links', icon: StdIconId.LinkedServices },
+    { name: 'load', label: 'Load', icon: StdIconId.BatteryChargingFull },
+    { name: 'thermal', label: 'Thermal', icon: StdIconId.LocalFireDepartment },
+    { name: 'enr', label: 'ENR', icon: StdIconId.EnergySavingsLeaf },
+    { name: 'misc', label: 'Misc', icon: StdIconId.Category },
+  ];
 
-                ))}
-            </div>
+  return (
+    <div className="flex space-x-4 p-4">
+      {tabs.map((tab) => (
+        <div className="flex items-center space-x-2" key={tab.name}>
+          <StdIcon name={tab.icon} />
+          <RdsTabItem
+            key={tab.name}
+            name={tab.name}
+            label={tab.label}
+            active={activeTab === tab.name}
+            onClick={() => handleTabClick(tab.name)}
+          />
         </div>
-    );
+      ))}
+    </div>
+  );
 };
 
 export default StudyNavigationMenu;
