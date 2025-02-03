@@ -6,9 +6,10 @@
 
 import clsx from 'clsx';
 
-export const STRIPED_CLASSSES = 'even:bg-primary-200';
-export const SELECTED_ROW_CLASSSES = 'bg-primary-100';
-export const READONLY_ROW_CLASSSES = 'bg-gray-100';
+export const STRIPED_CLASSES = 'even:bg-primary-200';
+export const SELECTED_ROW_CLASSES = 'bg-primary-100';
+export const READONLY_ROW_CLASSES = 'pointer-events-none bg-gray-100 [&_button]:bg-gray-400 [&_button]:border-gray-400';
+export const READONLY_SELECTED_ROW_CLASSES = 'hover:bg-gray-100';
 
 export const tableCoreRowClassBuilder = (
   isStriped?: boolean,
@@ -19,10 +20,10 @@ export const tableCoreRowClassBuilder = (
   clsx(
     {
       group: true,
-      [STRIPED_CLASSSES]: isStriped,
-      [SELECTED_ROW_CLASSSES]: isSelected,
-      [READONLY_ROW_CLASSSES]: isReadOnly,
-      'hover:bg-gray-100': !isReadOnly && !isSelected,
+      [STRIPED_CLASSES]: isStriped,
+      [SELECTED_ROW_CLASSES]: isSelected,
+      [READONLY_ROW_CLASSES]: isReadOnly,
+      [READONLY_SELECTED_ROW_CLASSES]: !isReadOnly && !isSelected,
     },
     trClassNames,
   );
