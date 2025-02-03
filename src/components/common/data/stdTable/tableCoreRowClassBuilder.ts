@@ -15,7 +15,6 @@ export const tableCoreRowClassBuilder = (
   isStriped?: boolean,
   isSelected?: boolean,
   isReadOnly?: boolean,
-  isActivated?: boolean,
   trClassNames?: string,
 ) =>
   clsx(
