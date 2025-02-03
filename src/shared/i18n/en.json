@@ -59,11 +59,6 @@
     "@keyword_length_error": "Keyword must be between {{min}} and {{max}} characters",
     "@keyword_minimum_error": "Keyword must be at least {{min}} characters",
     "@keyword_maximum_error": "Keyword must not exceed {{max}} characters",
-    "@keyword_max_keys_errors": "Cannot add more than ${maxNbKey} keywords`"
-  },
-  "study": {
-    "@open": "Open",
-    "@duplicate": "Duplicate",
-    "@delete": "Delete"
+    "@keyword_max_keys_errors": "Cannot add more than {{maxNbKey}} keywords"
   }
 }

@@ -75,7 +75,7 @@ export const ProjectCreationModal = ({ onClose }: ProjectCreationModalProps) => 
     <RdsModal size="small">
       <RdsModal.Title onClose={onClose}>{t('home.@new_project')}</RdsModal.Title>
       <RdsModal.Content>
-        <div className="flex w-7/12 flex-col items-start gap-4">
+        <div className="flex w-8/12 flex-col items-start gap-2">
           <RdsInputText
             label="Name"
             value={name}
@@ -88,22 +88,23 @@ export const ProjectCreationModal = ({ onClose }: ProjectCreationModalProps) => 
             maxLength={40}
             autoFocus={true}
           />
-          <RdsInputTextArea
-            label="Description"
-            value={description}
-            onChange={(t) => {
-              if (t.length <= 500) setDescription(t || '');
-            }}
-            maxLength={500}
-            placeHolder="Add a few lines to describe your project..."
-          />
+          <div className="flex w-full [&_textarea]:min-h-[300px] [&_textarea]:resize-none">
+            <RdsInputTextArea
+              label="Description"
+              value={description}
+              onChange={(t) => {
+                if (t.length <= 500) setDescription(t || '');
+              }}
+              maxLength={500}
+              placeHolder="Add a few lines to describe your project..."
+            />
+          </div>
           <KeywordsInput
             keywords={keywords}
             setKeywords={setKeywords}
             maxNbKeywords={6}
             maxNbCharacters={15}
             minNbCharacters={3}
-            width={'w-3/4'}
           />
         </div>
       </RdsModal.Content>

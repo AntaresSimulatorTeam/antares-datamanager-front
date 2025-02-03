@@ -55,13 +55,8 @@
   "projectModal": {
     "@keyword_already_exists": "Le mot-clé existe déjà",
     "@keyword_length_error": "Le mot-clé doit avoir entre {{min}} et {{max}} lettres",
-    "@keyword_minimum_error": "Le mot-clé doit avoir à minumum {{min}} lettres",
+    "@keyword_minimum_error": "Le mot-clé doit avoir à minimum {{min}} lettres",
     "@keyword_maximum_error": "Le mot-clé ne doit pas dépasser {{max}} lettres",
-    "@keyword_max_keys_errors": "Il n'est pas possible d'ajouter plus que ${maxNbKey} mot-clés`"
-  },
-  "study": {
-    "@open": "Ouvrir",
-    "@duplicate": "Dupliquer",
-    "@delete": "Effacer"
+    "@keyword_max_keys_errors": "Il n'est pas possible d'ajouter plus que {{maxNbKey}} mot-clés"
   }
 }
