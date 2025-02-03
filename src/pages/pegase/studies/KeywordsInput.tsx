@@ -33,6 +33,9 @@ const KeywordsInput: React.FC<KeywordsInputProps> = ({
   const [suggestedKeywords, setSuggestedKeywords] = useState<string[]>([]);
 
   const handleKeywordChange = async (value: string) => {
+    if (value.length > maxNbCharacters) {
+      return;
+    }
     setKeywordInput(value);
     setErrorMessage(''); // Clear error message when input changes
     try {
@@ -69,24 +72,41 @@ const KeywordsInput: React.FC<KeywordsInputProps> = ({
 
   const clearAllKeywords = () => {
     setKeywords([]);
+    setErrorMessage('');
+    setKeywordInput('');
   };
 
   const handleRemoveKeyword = (index: number) => {
     setKeywords((prevKeywords) => prevKeywords.filter((_, i) => i !== index));
   };
 
+  const shouldAddKeywordButton = (input: string): boolean => {
+    if (!input) {
+      return false;
+    } else {
+      if (minNbCharacters) {
+        return input.length >= minNbCharacters;
+      } else if (minNbCharacters && maxNbCharacters) {
+        return input.length >= minNbCharacters && input.length <= maxNbCharacters;
+      }
+    }
+  };
+
   return (
     <div className={clsx(width ?? 'w-full', 'flex min-h-18 flex-col items-start justify-start')}>
       <div className="relative flex w-full">
-        <div className="flex w-full items-center gap-4">
-          <RdsInputText
-            label="Keywords"
-            value={keywordInput}
-            onChange={handleKeywordChange}
-            placeHolder="Add a keyword"
-            variant="outlined"
-          />
-          {keywordInput && (minNbCharacters ? keywordInput.length >= minNbCharacters : true) && (
+        <div className="flex w-full items-center gap-2">
+          <div className="max-w-3/4 flex">
+            <RdsInputText
+              label="Keywords"
+              value={keywordInput}
+              onChange={handleKeywordChange}
+              placeHolder="Add a keyword"
+              variant="outlined"
+              maxLength={maxNbCharacters ?? null}
+            />
+          </div>
+          {shouldAddKeywordButton(keywordInput) && (
             <RdsButton
               onClick={() => handleAddKeyword()}
               icon={RdsIconId.Add}
