@@ -5,9 +5,10 @@
  */
 
 import {
-  READONLY_ROW_CLASSSES,
-  SELECTED_ROW_CLASSSES,
-  STRIPED_CLASSSES,
+  READONLY_ROW_CLASSES,
+  READONLY_SELECTED_ROW_CLASSES,
+  SELECTED_ROW_CLASSES,
+  STRIPED_CLASSES,
   tableCoreRowClassBuilder,
 } from '../tableCoreRowClassBuilder';
 
@@ -15,18 +16,22 @@ const TEST_TR_CLASSES = 'bg-acc1-500 text-caption';
 
 describe('tableCoreRowClassBuilder function', () => {
   it('should have the expected striped classes', () => {
-    expect(tableCoreRowClassBuilder(true).includes(STRIPED_CLASSSES)).toBe(true);
+    expect(tableCoreRowClassBuilder(true).includes(STRIPED_CLASSES)).toBe(true);
   });
 
   it('should have the expected selected classes', () => {
-    expect(tableCoreRowClassBuilder(false, true).includes(SELECTED_ROW_CLASSSES)).toBe(true);
+    expect(tableCoreRowClassBuilder(false, true).includes(SELECTED_ROW_CLASSES)).toBe(true);
   });
 
   it('should have the expected readonly classes', () => {
-    expect(tableCoreRowClassBuilder(false, false, true).includes(READONLY_ROW_CLASSSES)).toBe(true);
+    expect(tableCoreRowClassBuilder(false, false, true).includes(READONLY_ROW_CLASSES)).toBe(true);
   });
 
   it('should have the expected additional "tr" classes', () => {
-    expect(tableCoreRowClassBuilder(false, false, false, TEST_TR_CLASSES).includes(TEST_TR_CLASSES)).toBe(true);
+    expect(
+      tableCoreRowClassBuilder(false, false, false, READONLY_SELECTED_ROW_CLASSES).includes(
+        READONLY_SELECTED_ROW_CLASSES,
+      ),
+    ).toBe(true);
   });
 });
