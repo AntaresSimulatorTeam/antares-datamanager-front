@@ -33,7 +33,7 @@ const KeywordsInput: React.FC<KeywordsInputProps> = ({
   const [suggestedKeywords, setSuggestedKeywords] = useState<string[]>([]);
 
   const handleKeywordChange = async (value: string) => {
-    if (value.length > maxNbCharacters) {
+    if (maxNbCharacters !== undefined && value.length > maxNbCharacters) {
       return;
     }
     setKeywordInput(value);
@@ -90,6 +90,7 @@ const KeywordsInput: React.FC<KeywordsInputProps> = ({
         return input.length >= minNbCharacters && input.length <= maxNbCharacters;
       }
     }
+    return false;
   };
 
   return (
@@ -103,7 +104,7 @@ const KeywordsInput: React.FC<KeywordsInputProps> = ({
               onChange={handleKeywordChange}
               placeHolder="Add a keyword"
               variant="outlined"
-              maxLength={maxNbCharacters ?? null}
+              maxLength={maxNbCharacters as number | undefined}
             />
           </div>
           {shouldAddKeywordButton(keywordInput) && (
