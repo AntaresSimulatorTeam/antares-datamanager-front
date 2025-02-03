@@ -12,8 +12,6 @@ import {
   tableCoreRowClassBuilder,
 } from '../tableCoreRowClassBuilder';
 
-const TEST_TR_CLASSES = 'bg-acc1-500 text-caption';
-
 describe('tableCoreRowClassBuilder function', () => {
   it('should have the expected striped classes', () => {
     expect(tableCoreRowClassBuilder(true).includes(STRIPED_CLASSES)).toBe(true);
