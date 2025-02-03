@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import React, { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { RdsTabItem } from 'rte-design-system-react';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import LoadTab from '@/pages/pegase/studies/studyDetails/LoadTab';
