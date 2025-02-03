@@ -79,8 +79,9 @@ const ProjectDetails = () => {
       <div className="flex flex-col">
         <ProjectDetailsContent
           description={projectInfo.description}
-          createdBy={projectInfo.createdBy}
           creationDate={projectInfo.creationDate}
+          createdBy={projectInfo.createdBy}
+          keywords={projectInfo.tags}
         />
       </div>
       <div className="flex gap-4 px-3 py-2">

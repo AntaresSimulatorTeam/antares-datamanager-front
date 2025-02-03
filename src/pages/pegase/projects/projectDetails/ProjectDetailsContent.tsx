@@ -11,9 +11,15 @@ type ProjectDetailsContentProps = {
   description: string;
   creationDate: Date;
   createdBy: string;
+  keywords: string[];
 };
 
-export const ProjectDetailsContent = ({ description, creationDate, createdBy }: ProjectDetailsContentProps) => {
+export const ProjectDetailsContent = ({
+  description,
+  creationDate,
+  createdBy,
+  keywords,
+}: ProjectDetailsContentProps) => {
   const handleEditClick = () => {
     console.log('TO BE DONE');
   };
@@ -25,8 +31,17 @@ export const ProjectDetailsContent = ({ description, creationDate, createdBy }: 
 
         <div className="flex items-center justify-between font-sans font-light text-gray-500">
           <div className="flex items-center gap-3">
+            <span>{description}</span>
             <span>{formatDateToDDMMYYYY(creationDate)}</span>
             <span>{createdBy}</span>
+            <span>
+              {keywords.map((keyword, index) => (
+                <span key={index}>
+                  {keyword}
+                  {index < keywords.length - 1 ? ', ' : ''}
+                </span>
+              ))}
+            </span>
           </div>
 
           <RdsIconButton icon={RdsIconId.Edit} size="small" onClick={handleEditClick} />

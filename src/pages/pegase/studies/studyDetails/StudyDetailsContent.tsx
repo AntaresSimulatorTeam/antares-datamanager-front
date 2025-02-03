@@ -23,16 +23,16 @@ export const StudyDetailsContent = ({ study }: ProjectDetailsContentProps) => {
             <div className="flex flex-[1_0_0] items-center gap-6">
               <div>Study : {study.name}</div>
               <div className="flex items-center gap-2">
+                <StdIcon name={StdIconId.TimeLine} color="secondary" />
+                Horizon : {study.horizon}
+              </div>
+              <div className="flex items-center gap-2">
                 <RdsIcon name={RdsIconId.History} color="secondary" />
                 {formatDateToDDMMYYYY(study.creationDate)}
               </div>
               <div className="flex items-center gap-2">
                 <RdsIcon name={RdsIconId.Person} color="secondary" />
                 By : {study.createdBy}
-              </div>
-              <div className="flex items-center gap-2">
-                <StdIcon name={StdIconId.TimeLine} color="secondary" />
-                Horizon : {study.horizon}
               </div>
               <div className="flex h-3 w-32">
                 <RdsTagList id={`${study.id}-tag-list`} tags={study.keywords} />
