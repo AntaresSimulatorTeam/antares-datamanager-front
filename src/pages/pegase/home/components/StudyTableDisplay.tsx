@@ -16,6 +16,9 @@ import StdSimpleTable from '@/components/common/data/stdSimpleTable/StdSimpleTab
 import { RdsButton } from 'rte-design-system-react';
 import { useStudyTableDisplay } from '@/hooks/useStudyTableDisplay';
 import { useStudyNavigation } from '@/hooks/useStudyNavigation';
+import { useTranslation } from 'react-i18next';
+import { useNewStudyModal } from '@/hooks/useNewStudyModal';
+import StudyCreationModal from '@common/modal/StudyCreationModal';
 
 interface StudyTableDisplayProps {
   searchStudy: string | undefined;
@@ -23,13 +26,16 @@ interface StudyTableDisplayProps {
 }
 
 const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) => {
+  const { t } = useTranslation();
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [isHeaderHovered, setIsHeaderHovered] = useState<boolean>(false);
+  const [selectedStudy, setSelectedStudy] = useState<StudyDTO | null>(null);
   // Reload trigger for re-fetching data
   const [reloadStudies, setReloadStudies] = useState<boolean>(false);
   const [sortBy, setSortBy] = useState<{ [key: string]: 'asc' | 'desc' }>({});
   const [sortedColumn, setSortedColumn] = useState<string | null>('status');
 
+  const { isModalOpen, toggleModal } = useNewStudyModal();
   const { navigateToStudy } = useStudyNavigation();
   const { rows, count, intervalSize, currentPage, setPage } = useStudyTableDisplay({
     searchTerm: searchStudy,
@@ -56,6 +62,9 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
   const isDeleteActive = selectedStatus === StudyStatus.ERROR || selectedStatus === StudyStatus.IN_PROGRESS;
 
   const handleDuplicate = () => {
+    const selectedStudy = rows[Number.parseInt(selectedRowId || '-1')];
+    setSelectedStudy(selectedStudy);
+    toggleModal();
     setReloadStudies(!reloadStudies); // Trigger reload after deleting
   };
 
@@ -102,24 +111,37 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
       </div>
       <div className="flex h-8 items-center justify-between bg-gray-200 px-4">
         <div className="flex gap-2">
-          {selectedRowId !== undefined && (
+          {selectedRowId !== undefined ? (
             <>
-              <RdsButton label="Open" onClick={handleRowClick} variant="outlined" />
-              <RdsButton label="Duplicate" onClick={handleDuplicate} variant="outlined" disabled={!isDuplicateActive} />
+              <RdsButton label={t('study.@open')} onClick={handleRowClick} variant="outlined" />
               <RdsButton
-                label="Delete"
+                label={t('study.@duplicate')}
+                onClick={handleDuplicate}
+                variant="outlined"
+                disabled={!isDuplicateActive}
+              />
+              <RdsButton
+                label={t('study.@delete')}
                 onClick={handleDeleteClick}
                 variant="outlined"
-                color="danger"
                 disabled={!isDeleteActive}
               />
             </>
+          ) : (
+            projectId !== '' && <RdsButton label={t('project.@new_study')} onClick={toggleModal} />
           )}
         </div>
         <StudiesPagination count={count} intervalSize={intervalSize} current={currentPage} onChange={setPage} />
       </div>
+      {isModalOpen && (
+        <StudyCreationModal
+          isOpen={isModalOpen}
+          onClose={toggleModal}
+          study={selectedStudy}
+          setReloadStudies={setReloadStudies}
+        />
+      )}
     </div>
   );
 };
-
 export default StudyTableDisplay;
