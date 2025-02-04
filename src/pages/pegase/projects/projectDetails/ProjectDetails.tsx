@@ -74,7 +74,7 @@ const ProjectDetails = () => {
     </div>
   ) : (
     <div className="flex flex-col">
-      <ProjectDetailsHeader projectName={projectInfo.name} createdBy={projectInfo.createdBy} />
+      <ProjectDetailsHeader projectName={projectInfo.name} />
       <RdsDivider />
       <div className="flex flex-col">
         <ProjectDetailsContent
