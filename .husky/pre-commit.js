@@ -6,6 +6,15 @@ import path from 'path';
 const CONSOLE_ORANGE_COLOR = '\x1b[33m%s\x1b[0m';
 const CONSOLE_RED_COLOR = '\x1b[31m%s\x1b[0m';
 
+// Run the build and show output
+try {
+  console.log(CONSOLE_ORANGE_COLOR, 'Running npm build check...');
+  execSync('npm run build', { stdio: 'inherit' });
+} catch (error) {
+  console.error(CONSOLE_RED_COLOR, 'Build failed. Fix the errors before committing.');
+  process.exit(1);
+}
+
 // Check if branch matches naming convention
 const localBranch = execSync('git rev-parse --abbrev-ref HEAD').toString().trim();
 const regex = /^master|(feature|fix|test)\/.*/;
