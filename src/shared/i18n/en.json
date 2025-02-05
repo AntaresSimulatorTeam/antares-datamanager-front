@@ -65,5 +65,14 @@
     "@open": "Open",
     "@duplicate": "Duplicate",
     "@delete": "Delete"
+  },
+  "studyDetails": {
+    "@hypothesis": "Hypothesis",
+    "@area": "Area",
+    "@link": "Link",
+    "@trajectory": "Trajectory",
+    "@placeholder": "Select a trajectory",
+    "@import_trajectory": "Import a trajectory",
+    "@import_to_db": "Import into data base"
   }
 }

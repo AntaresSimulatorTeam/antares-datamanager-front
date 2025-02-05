@@ -5,7 +5,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
-import { ProjectActionType, ProjectInfo } from '@/shared/types/pegase/Project.type.ts';
+import { ProjectActionType, ProjectInfo } from '@/shared/types/Project.type.ts';
 import { fetchProjectFromSearchTerm } from '@/shared/services/projectService.ts';
 import { PROJECT_ACTION } from '@/shared/enum/project.ts';
 import { useProjectDispatch } from '@/store/contexts/ProjectContext.tsx';

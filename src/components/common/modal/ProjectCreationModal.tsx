@@ -11,7 +11,7 @@ import KeywordsInput from '@/pages/pegase/studies/KeywordsInput';
 import { createProject } from '@/shared/services/projectService';
 import { notifyToast } from '@/shared/notification/notification.tsx';
 import { PROJECT_ACTION } from '@/shared/enum/project.ts';
-import { ProjectActionType } from '@/shared/types/pegase/Project.type.ts';
+import { ProjectActionType } from '@/shared/types/Project.type.ts';
 import { useProjectDispatch } from '@/store/contexts/ProjectContext.tsx';
 
 interface ProjectCreationModalProps {

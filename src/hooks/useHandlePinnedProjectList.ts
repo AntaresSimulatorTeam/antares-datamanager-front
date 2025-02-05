@@ -5,7 +5,7 @@
  */
 
 import { useCallback, useEffect } from 'react';
-import { ProjectActionType, ProjectInfo } from '@/shared/types/pegase/Project.type';
+import { ProjectActionType, ProjectInfo } from '@/shared/types/Project.type';
 import { fetchPinnedProjects, pinProject, unpinProject } from '@/shared/services/pinnedProjectService';
 import { v4 as uuidv4 } from 'uuid';
 import { dismissToast, notifyToast, NotifyWithActionProps } from '@/shared/notification/notification.tsx';

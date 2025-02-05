@@ -7,24 +7,28 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { RdsTabItem } from 'rte-design-system-react';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
-import LoadTab from '@/pages/pegase/studies/studyDetails/LoadTab';
-import ThermalTab from '@/pages/pegase/studies/studyDetails/ThermalTab';
-import EnrTab from '@/pages/pegase/studies/studyDetails/EnrTab';
-import MiscTab from '@/pages/pegase/studies/studyDetails/MiscLinkTab';
-import AreaLinkTab from '@/pages/pegase/studies/studyDetails/AreaLinkTab';
+import LoadTab from '@/components/tab/LoadTab.tsx';
+import ThermalTab from '@/components/tab/ThermalTab.tsx';
+import EnrTab from '@/components/tab/EnrTab.tsx';
+import MiscTab from '@/components/tab/MiscLinkTab.tsx';
+import AreaLinkTab from '@/components/tab/AreaLinkTab.tsx';
 import StdIcon from '@common/base/stdIcon/StdIcon';
+import { DbTrajectory } from '@/shared/types/Trajectory.type.ts';
 
 const StudyNavigationMenu = ({
   onRenderActiveComponent,
+  studyHorizon,
 }: {
   onRenderActiveComponent?: (content: ReactNode | null) => void;
+  studyHorizon: string;
 }) => {
   const [activeTab, setActiveTab] = useState<string>('areasAndLinks');
+  const [trajectories, setTrajectories] = useState<DbTrajectory[]>([]);
 
-  const renderActiveComponent = (): ReactNode | null => {
+  const renderActiveComponent = (data: DbTrajectory[]): ReactNode | null => {
     switch (activeTab) {
       case 'areasAndLinks':
-        return <AreaLinkTab />;
+        return <AreaLinkTab studyHorizon={studyHorizon} />;
       case 'load':
         return <LoadTab />;
       case 'thermal':
@@ -40,7 +44,7 @@ const StudyNavigationMenu = ({
 
   useEffect(() => {
     if (onRenderActiveComponent) {
-      onRenderActiveComponent(renderActiveComponent());
+      onRenderActiveComponent(renderActiveComponent(trajectories));
     }
   }, [activeTab, onRenderActiveComponent]);
 

@@ -6,7 +6,7 @@
 
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { ProjectInfo } from '@/shared/types/pegase/Project.type';
+import { ProjectInfo } from '@/shared/types/Project.type.ts';
 import ProjectDetailsHeader from './ProjectDetailsHeader';
 import ProjectDetailsContent from './ProjectDetailsContent';
 import StudyTableDisplay from '@/pages/pegase/home/components/StudyTableDisplay';

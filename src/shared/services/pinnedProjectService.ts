@@ -5,7 +5,7 @@
  */
 
 import { PROJECT_PIN_ENDPOINT, PROJECT_PINNED_ENDPOINT, PROJECT_UNPIN_ENDPOINT } from '@/shared/const/apiEndPoint';
-import { ProjectInfo } from '@/shared/types/pegase/Project.type';
+import { ProjectInfo } from '@/shared/types/Project.type';
 import { AuthService } from '@/shared/services/authService.ts';
 
 /**

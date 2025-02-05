@@ -22,3 +22,8 @@ export const PROJECT_PIN_ENDPOINT = `${BASE_URL}/v1/project/pin`;
 export const PROJECT_ENDPOINT = `${BASE_URL}/v1/project`;
 export const PROJECT_AUTOCOMPLETE_ENDPOINT = `${BASE_URL}/v1/project/autocomplete`;
 export const PROJECT_SEARCH_ENDPOINT = `${BASE_URL}/v1/project/search`;
+
+// TRAJECTORY
+export const TRAJECTORY_ENDPOINT = `${BASE_URL}/v1/trajectory`;
+export const TRAJECTORY_FILE_SYSTEM_ENDPOINT = `${BASE_URL}/v1/trajectory/fs`;
+export const TRAJECTORY_DATA_BASE_ENDPOINT = `${BASE_URL}/v1/trajectory/db`;
