@@ -5,9 +5,8 @@
  */
 
 import { PROJECT_AUTOCOMPLETE_ENDPOINT, PROJECT_ENDPOINT, PROJECT_SEARCH_ENDPOINT } from '@/shared/const/apiEndPoint';
-import { ProjectInfo, ProjectResponse } from '@/shared/types/Project.type';
 import { AuthService } from '@/shared/services/authService.ts';
-import { PaginatedResponse } from '@/shared/types';
+import { ProjectInfo, ProjectResponse, PaginatedResponse } from '@/shared/types';
 
 /**
  * Delete project
