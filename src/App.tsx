@@ -12,9 +12,6 @@ import { User } from 'oidc-client-ts';
 import Navbar from './components/pegase/navbar/Navbar';
 import ThemeHandler from './components/common/handler/ThemeHandler';
 import PegaseStar from './components/pegase/star/PegaseStar';
-import { PEGASE_NAVBAR_ID } from './shared/constants';
-import { UserContext } from '@/store/contexts/UserContext';
-import { THEME_COLOR } from '@/shared/types';
 import { menuBottomData, menuTopData } from './routes';
 import ProjectDetails from './pages/pegase/projects/projectDetails/ProjectDetails';
 import StudyDetails from '@/pages/pegase/studies/studyDetails/studyDetails';
@@ -30,6 +27,8 @@ import { AuthService } from '@/auth/authService';
 import { AuthService } from '@/shared/services/auth/authService';
 import { GenericUserContext } from '@/store/contexts/GenericUserContext';
 import { PegaseToastContainer } from '@/shared/notification/containers.tsx';
+import { UserContext } from '@/store/contexts/UserContext.tsx';
+import { THEME_COLOR } from '@/shared/types';
 
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
