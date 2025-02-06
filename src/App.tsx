@@ -27,7 +27,9 @@ import { translateMenuItemLabel } from '@/shared/utils/textUtils.ts';
 import { PEGASE_NAVBAR_ID } from '@/shared/constants.ts';
 import { PegaseToastContainer } from '@/shared/notification/containers.tsx';
 import { AuthService } from '@/auth/authService';
+import { AuthService } from '@/shared/services/auth/authService';
 import { GenericUserContext } from '@/store/contexts/GenericUserContext';
+import { PegaseToastContainer } from '@/shared/notification/containers.tsx';
 
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);

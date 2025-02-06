@@ -65,7 +65,9 @@ export const fetchSuggestedKeywords = async (query: string): Promise<string[]> =
  *
  * @param {Omit<StudyDTO, 'id' | 'status' | 'creationDate'>} studyData - Partial study data
  */
-export const saveStudy = async (studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate'>) => {
+export const saveStudy = async (
+  studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate'>
+): Promise<void | Error> => {
   try {
     const response = await AuthService.authFetch(`${STUDY_ENDPOINT}`, {
       method: 'POST',
