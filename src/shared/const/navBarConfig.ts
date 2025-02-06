@@ -16,7 +16,7 @@ export const navBarConfig = {
     headerLink: '/',
     headerId: 'main-nav-bar-controller',
     logoConfig: {
-      logoExpandedHref: 'brand/appIcon.svg',
+      logoExpandedHref: 'brand/logo_antares_pegase_light_expand.svg',
       logoExpandedId: 'appIcon-collapsed-id',
       logoCollapsedHref: 'brand/appIcon.svg',
       logoCollapsedId: 'appIcon-expanded-id',
