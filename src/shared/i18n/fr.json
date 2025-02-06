@@ -21,7 +21,7 @@
   "page": {
     "@logs": "Logs",
     "@projet": "Projet",
-    "@logout": "Se déconecter",
+    "@logout": "Se déconnecter",
     "@parameters": "Paramètres",
     "@antares": "Antares"
   },
