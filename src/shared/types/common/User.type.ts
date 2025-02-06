@@ -3,11 +3,16 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
+import { User } from 'oidc-client-ts';
 
-export interface User {
+export interface UserInfo {
   id: string;
   nni: string;
   fullname: string;
   email: string;
   isAdmin?: boolean;
+}
+
+export interface UserState {
+  user: User | null;
 }

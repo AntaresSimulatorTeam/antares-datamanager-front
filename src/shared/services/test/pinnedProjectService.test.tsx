@@ -107,7 +107,7 @@ describe('fetchPinnedProjects', () => {
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledTimes(1);
-      expect(global.fetch).toHaveBeenCalledWith(`https://mockapi.com/v1/project/pinned?userId=${userId}`);
+      expect(global.fetch).toHaveBeenCalledWith(`https://mockapi.com/v1/project/pinned?userId=${userId}`, {});
       expect(result).toEqual(mockResponse);
     });
   });
@@ -160,7 +160,7 @@ describe('unpinProject', () => {
     // Failed fetch response moc
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: false,
-      text: async () => 'Error message',
+      text: async () => Promise.resolve('Error message'),
     });
 
     await expect(async () => unpinProject(userId, projectId)).rejects.toThrowError('Error message');

@@ -6,9 +6,17 @@
 
 import { PROJECT_AUTOCOMPLETE_ENDPOINT, PROJECT_ENDPOINT, PROJECT_SEARCH_ENDPOINT } from '@/shared/const/apiEndPoint';
 import { ProjectInfo, ProjectResponse } from '@/shared/types/pegase/Project.type';
+import { AuthService } from '@/shared/services/authService.ts';
+import { PaginatedResponse } from '@/shared/types';
 
-export const deleteProjectById = async (projectId: string) => {
-  const response = await fetch(`${PROJECT_ENDPOINT}/${projectId}`, {
+/**
+ * Delete project
+ *
+ * @param {string} projectId
+ * @return {Promise<void | Error>}
+ */
+export const deleteProjectById = async (projectId: string): Promise<void | Error> => {
+  const response = await AuthService.authFetch(`${PROJECT_ENDPOINT}/${projectId}`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
@@ -17,7 +25,7 @@ export const deleteProjectById = async (projectId: string) => {
 
   if (!response.ok) {
     const errorText = await response.text();
-    const errorData = JSON.parse(errorText);
+    const errorData = JSON.parse(errorText) as Error;
     throw new Error(`${errorData.message || errorText}`);
   }
 };
@@ -26,30 +34,30 @@ export const deleteProjectById = async (projectId: string) => {
  * Retrieve details of a project
  *
  * @param {string} projectId - Project id
- * @return {Promise<ProjectInfo>} - Project details
+ * @return {Promise<ProjectInfo | Error>} - Project details
  */
-export const fetchProjectDetails = async (projectId: string) => {
-  const response = await fetch(`${PROJECT_ENDPOINT}/${projectId}`);
+export const fetchProjectDetails = async (projectId: string): Promise<ProjectInfo | Error> => {
+  const response = await AuthService.authFetch(`${PROJECT_ENDPOINT}/${projectId}`);
 
   if (!response?.ok) {
     throw new Error('Failed to fetch project details');
   }
 
-  return await response.json();
+  return (await response.json()) as ProjectInfo;
 };
 
 /**
  * Retrieve a project from a partial name of project
  *
  * @param {string} query - Partial name of a project
- * @return {Promise<string[]>} - List of project name
+ * @return {Promise<string[] | Error>} - List of project name
  */
-export const fetchProjectsFromPartialName = async (query: string): Promise<string[]> => {
-  const response = await fetch(`${PROJECT_AUTOCOMPLETE_ENDPOINT}?partialName=${query}`);
+export const fetchProjectsFromPartialName = async (query: string): Promise<string[] | Error> => {
+  const response = await AuthService.authFetch(`${PROJECT_AUTOCOMPLETE_ENDPOINT}?partialName=${query}`);
   if (!response.ok) {
     throw new Error('Failed to fetch projects');
   }
-  const data = await response.json();
+  const data = (await response.json()) as ProjectInfo[];
   return data.map((project: { name: string }) => project.name);
 };
 
@@ -59,13 +67,24 @@ export const fetchProjectsFromPartialName = async (query: string): Promise<strin
  * @param {string} searchTerm
  * @param {number} current
  * @param {number} intervalSize
+ * @return {Promise<PaginatedResponse<ProjectInfo> | Error>}
  */
-export const fetchProjectFromSearchTerm = async (searchTerm: string, current: number, intervalSize: number) => {
-  const response = await fetch(
+export const fetchProjectFromSearchTerm = async (
+  searchTerm: string,
+  current: number,
+  intervalSize: number,
+): Promise<PaginatedResponse<ProjectInfo> | Error> => {
+  const response = await AuthService.authFetch(
     `${PROJECT_SEARCH_ENDPOINT}?page=${current + 1}&size=${intervalSize}&search=${searchTerm || ''}`,
   );
 
-  return await response.json();
+  if (!response.ok) {
+    const errorText = await response.text();
+    const errorData = JSON.parse(errorText) as Error;
+    throw new Error(`${errorData.message}`);
+  }
+
+  return (await response.json()) as PaginatedResponse<ProjectInfo>;
 };
 
 /**
@@ -79,7 +98,7 @@ export const createProject = async (
 ): Promise<ProjectResponse | Error> => {
   const apiUrl = `${PROJECT_ENDPOINT}`;
 
-  const response = await fetch(apiUrl, {
+  const response = await AuthService.authFetch(apiUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -89,8 +108,8 @@ export const createProject = async (
 
   if (!response.ok) {
     const errorText = await response.text();
-    const errorData = JSON.parse(errorText);
+    const errorData = JSON.parse(errorText) as Error;
     throw new Error(`${errorData.message}`);
   }
-  return await response.json();
+  return (await response.json()) as ProjectResponse;
 };

@@ -53,6 +53,7 @@ describe('fetchSearchStudies', () => {
       expect(global.fetch).toHaveBeenCalledTimes(1);
       expect(global.fetch).toHaveBeenCalledWith(
         `https://mockapi.com/v1/study/search?page=4&size=10&projectId=124&search=test&sortColumn=column&sortDirection=asc`,
+        {},
       );
       expect(result).toEqual(mockResponse);
     });
@@ -90,7 +91,7 @@ describe('fetchSuggestedKeywords', () => {
     const result = await fetchSuggestedKeywords('test');
 
     expect(global.fetch).toHaveBeenCalledTimes(1);
-    expect(global.fetch).toHaveBeenCalledWith('https://mockapi.com/v1/study/keywords/search?partialName=test');
+    expect(global.fetch).toHaveBeenCalledWith('https://mockapi.com/v1/study/keywords/search?partialName=test', {});
     expect(result).toEqual(mockResponse);
   });
 

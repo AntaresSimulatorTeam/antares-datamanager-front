@@ -5,7 +5,7 @@
  */
 
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
-import { StudyDTO } from '@/shared/types';
+import { PaginatedResponse, StudyDTO } from '@/shared/types';
 import { fetchSearchStudies } from '@/shared/services/studyService.ts';
 
 const ITEMS_PER_PAGE = 9;
@@ -37,7 +37,7 @@ export const useStudyTableDisplay = ({
   const [rows, setRows] = useState<StudyDTO[]>([]);
   const [count, setCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
-  const [error, setError] = useState(null);
+  const [errorValue, setErrorValue] = useState<Error | null>(null);
 
   const searchTermRef = useRef(searchTerm);
   const projectIdRef = useRef(projectId);
@@ -57,12 +57,13 @@ export const useStudyTableDisplay = ({
 
   useEffect(() => {
     fetchSearchStudies(searchTermRef.current, projectIdRef.current, currentPage, intervalSize, sortByRef.current)
-      .then(({ content, totalElements }) => {
+      .then((json) => {
+        const { content, totalElements } = json as PaginatedResponse<StudyDTO>;
         setRows(content);
         setCount(totalElements);
       })
-      .catch((error) => setError(error));
-  }, [currentPage, searchTerm, projectId, sortBy, reloadStudies]);
+      .catch((error: unknown) => setErrorValue(error as Error));
+  }, [currentPage, searchTermRef, projectIdRef, sortByRef, reloadStudies]);
 
-  return { rows, count, intervalSize, currentPage, setPage: setCurrentPage, error };
+  return { rows, count, intervalSize, currentPage, setPage: setCurrentPage, error: errorValue };
 };

@@ -8,12 +8,12 @@ import { render } from '@testing-library/react';
 import { describe, expect, it, Mock, vi } from 'vitest';
 import { THEME_COLOR } from '@/shared/types';
 import ThemeHandler from '../ThemeHandler';
-import { UserContext } from '@/store/contexts/UserContext';
+import { UserSettingsContext } from '@/store/contexts/UserSettingsContext.tsx';
 import usePrevious from '@/hooks/common/usePrevious';
 
-// Mocking the UserContext and usePrevious hook
-vi.mock('@/store/contexts/UserContext', () => ({
-  UserContext: {
+// Mocking the UserSettingsContext and usePrevious hook
+vi.mock('@/store/contexts/UserSettingsContext', () => ({
+  UserSettingsContext: {
     useStore: vi.fn(),
   },
 }));
@@ -23,7 +23,7 @@ vi.mock('@/hooks/common/usePrevious', () => ({
 }));
 
 describe('ThemeHandler', () => {
-  const mockUseStore = UserContext.useStore as Mock;
+  const mockUseStore = UserSettingsContext.useStore as Mock;
   const mockUsePrevious = usePrevious as Mock;
 
   beforeEach(() => {

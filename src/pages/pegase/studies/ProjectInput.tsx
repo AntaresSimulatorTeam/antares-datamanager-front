@@ -22,7 +22,7 @@ const ProjectInput: React.FC<ProjectManagerProps> = ({ value, onChange }) => {
   useEffect(() => {
     const loadProjects = async () => {
       try {
-        const projectList = await fetchProjectsFromPartialName(value);
+        const projectList = (await fetchProjectsFromPartialName(value)) as string[];
         setProjects(projectList);
       } catch (error) {
         setErrorMessage('Failed to fetch projects');
@@ -30,7 +30,7 @@ const ProjectInput: React.FC<ProjectManagerProps> = ({ value, onChange }) => {
     };
 
     if (value) {
-      loadProjects();
+      void loadProjects();
     } else {
       setProjects([]);
     }

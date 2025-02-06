@@ -8,9 +8,9 @@ import { createContext, Dispatch, ReactNode, useContext, useReducer } from 'reac
 import { ProjectActionType, ProjectState } from '@/shared/types/pegase/Project.type';
 import projectReducer from '@/store/reducers/projectReducer';
 
-const initialValue: ProjectState = { projects: [], pinnedProjects: [] };
+const initialState: ProjectState = { projects: [], pinnedProjects: [] };
 
-export const ProjectContext = createContext<ProjectState>(initialValue);
+export const ProjectContext = createContext<ProjectState>(initialState);
 export const ProjectDispatchContext = createContext<Dispatch<ProjectActionType> | null>(null);
 
 export const useProject = () => useContext(ProjectContext);

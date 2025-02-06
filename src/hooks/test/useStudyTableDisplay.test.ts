@@ -15,6 +15,7 @@ vi.mock('@/envVariables', () => ({
 describe('useStudyTableDisplay', () => {
   beforeEach(() => {
     global.fetch = vi.fn();
+    vi.restoreAllMocks();
   });
 
   afterEach(() => {
@@ -48,11 +49,11 @@ describe('useStudyTableDisplay', () => {
 
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => mockResponse,
+      json: async () => Promise.resolve(mockResponse),
     });
 
     const { result } = renderHook(() =>
-      useStudyTableDisplay({ searchTerm: 'test', sortBy: { status: 'desc' }, reloadStudies: true }),
+      useStudyTableDisplay({ searchTerm: 'test', sortBy: { status: 'desc' }, reloadStudies: false }),
     );
     await waitFor(() => {
       expect(result.current.rows).toHaveLength(2);
@@ -61,16 +62,18 @@ describe('useStudyTableDisplay', () => {
       //expect(global.fetch).toHaveBeenCalledTimes(1); TODO: ANT-2719
       expect(global.fetch).toHaveBeenCalledWith(
         'https://mockapi.com/v1/study/search?page=1&size=9&projectId=&search=test&sortColumn=status&sortDirection=desc',
+        {},
       );
     });
 
     await act(async () => {
-      renderHook(() => useStudyTableDisplay({ searchTerm: 'mouad', sortBy: { project: 'asc' }, reloadStudies: true }));
+      renderHook(() => useStudyTableDisplay({ searchTerm: 'mouad', sortBy: { project: 'asc' }, reloadStudies: false }));
     });
 
     //expect(global.fetch).toHaveBeenCalledTimes(1);  TODO: ANT-2719
     expect(global.fetch).toHaveBeenCalledWith(
       'https://mockapi.com/v1/study/search?page=1&size=9&projectId=&search=mouad&sortColumn=project&sortDirection=asc',
+      {},
     );
   });
 

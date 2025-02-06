@@ -7,8 +7,8 @@
 import { THEME_COLOR } from '@/shared/types';
 import createFastContext from './createFastContext';
 
-export type UserContextStore = {
+export type UserSettingsContextStore = {
   theme: THEME_COLOR;
 };
 
-export const UserContext = createFastContext<UserContextStore>();
+export const UserSettingsContext = createFastContext<UserSettingsContextStore>();

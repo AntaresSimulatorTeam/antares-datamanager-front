@@ -4,15 +4,14 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { User } from '@/shared/types/common/User.type';
-import StdAvatar from '../stdAvatar/StdAvatar';
-import { AvatarSize } from '../stdAvatar/StdAvatar';
+import { UserInfo } from '@/shared/types/common/User.type';
+import StdAvatar, { AvatarSize } from '../stdAvatar/StdAvatar';
 import { classBuilder as groupContainerClassBuilder } from './avatarGroupClassBuilder';
 import { getColor, getUserFullname, getUserInitials, splitUserList } from './avatarTools';
 import { useRdsId } from 'rte-design-system-react';
 
 type StdAvatarGroup = {
-  users: User[];
+  users: UserInfo[];
   avatarSize: AvatarSize;
   id?: string;
 };
