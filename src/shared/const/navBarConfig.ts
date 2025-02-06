@@ -18,7 +18,7 @@ export const navBarConfig = {
     logoConfig: {
       logoExpandedHref: 'brand/logo_antares_pegase_light_expand.svg',
       logoExpandedId: 'appIcon-collapsed-id',
-      logoCollapsedHref: 'brand/appIcon.svg',
+      logoCollapsedHref: 'brand/logo_antares_pegase_light_collapse.svg',
       logoCollapsedId: 'appIcon-expanded-id',
     },
   } as HeaderStyleConfig,
