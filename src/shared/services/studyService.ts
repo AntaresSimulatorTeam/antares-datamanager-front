@@ -8,7 +8,7 @@ import { PaginatedResponse, StudyDTO } from '@/shared/types';
 import { STUDY_SEARCH_ENDPOINT } from '@/shared/const/apiEndPoint';
 import { STUDY_ENDPOINT, STUDY_KEYWORDS_SEARCH_ENDPOINT } from '@/shared/const/apiEndPoint.ts';
 import { notifyToast } from '@/shared/notification/notification.tsx';
-import { AuthService } from '@/auth/authService';
+import { AuthService } from '@/shared/services/auth/authService';
 
 /**
  * Retrieve a list of studies from a term
@@ -22,10 +22,10 @@ import { AuthService } from '@/auth/authService';
  * @returns {Promise<PaginatedResponse<StudyDTO>>} - Promise object that represents a list of studies
  */
 export const fetchSearchStudies = async (
-  searchTerm = '',
-  projectId = '',
-  currentPage = 0,
-  intervalSize = 0,
+  searchTerm: string = '',
+  projectId: string = '',
+  currentPage: number = 0,
+  intervalSize: number = 0,
   sortBy?: { [key: string]: 'asc' | 'desc' },
 ): Promise<PaginatedResponse<StudyDTO>> => {
   let entries: [string, 'asc' | 'desc'] | null = null;
@@ -39,7 +39,7 @@ export const fetchSearchStudies = async (
   if (!response.ok) {
     throw new Error('Failed to fetch user studies');
   }
-  const json: PaginatedResponse<StudyDTO> = await response.json();
+  const json = (await response.json()) as PaginatedResponse<StudyDTO>;
 
   return { content: json.content, totalElements: json.totalElements };
 };
@@ -56,7 +56,7 @@ export const fetchSuggestedKeywords = async (query: string): Promise<string[]> =
   if (!response.ok) {
     throw new Error('Failed to fetch suggested keywords');
   }
-  return await response.json();
+  return (await response.json()) as string[];
 };
 
 /**
@@ -69,7 +69,7 @@ export const fetchSuggestedKeywords = async (query: string): Promise<string[]> =
 export const saveStudy = async (
   studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate'>,
   toggleModal: () => void,
-) => {
+): Promise<void | Error> => {
   try {
     const response = await AuthService.authFetch(`${STUDY_ENDPOINT}`, {
       method: 'POST',
@@ -80,7 +80,7 @@ export const saveStudy = async (
     });
     if (!response.ok) {
       const errorText = await response.text();
-      const errorData = JSON.parse(errorText);
+      const errorData = JSON.parse(errorText) as Error;
       throw new Error(`${errorData.message || errorText}`);
     }
     notifyToast({
@@ -104,7 +104,7 @@ export const saveStudy = async (
  *
  * @param {number} id - Study id
  */
-export const deleteStudy = async (id: number) => {
+export const deleteStudy = async (id: number): Promise<void | Error> => {
   try {
     const response = await AuthService.authFetch(`${STUDY_ENDPOINT}/${id}`, {
       method: 'DELETE',
@@ -117,10 +117,10 @@ export const deleteStudy = async (id: number) => {
       type: 'success',
       message: 'Study deleted successfully',
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     notifyToast({
       type: 'error',
-      message: `${error.message}`,
+      message: `${(error as Error).message}`,
     });
   }
 };

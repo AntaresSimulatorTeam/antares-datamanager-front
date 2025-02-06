@@ -6,7 +6,7 @@
 
 import { PROJECT_PIN_ENDPOINT, PROJECT_PINNED_ENDPOINT, PROJECT_UNPIN_ENDPOINT } from '@/shared/const/apiEndPoint';
 import { ProjectInfo } from '@/shared/types/pegase/Project.type';
-import {AuthService} from "@/auth/authService";
+import { AuthService } from '@/shared/services/auth/authService';
 
 /**
  * Retrieve pinned projects list by user id
@@ -14,7 +14,7 @@ import {AuthService} from "@/auth/authService";
  * @param {string} userId - User id
  * @returns {Promise<ProjectInfo[] | Error>} - Promise object that represents a list of projects
  */
-export const fetchPinnedProjects = async (userId: string) => {
+export const fetchPinnedProjects = async (userId: string): Promise<ProjectInfo[] | Error> => {
   const apiUrl = `${PROJECT_PINNED_ENDPOINT}?userId=${userId}`;
 
   const response = await AuthService.authFetch(apiUrl);
@@ -23,8 +23,8 @@ export const fetchPinnedProjects = async (userId: string) => {
     throw new Error('Failed to fetch project details');
   }
 
-  const json = await response.json();
-  return json.map((project: Partial<ProjectInfo>) => ({
+  const json = (await response.json()) as ProjectInfo[];
+  return json.map((project) => ({
     ...project,
     projectId: project.id?.toString(),
     pinned: project.pinned ?? true,
@@ -40,7 +40,7 @@ export const fetchPinnedProjects = async (userId: string) => {
  * @return {Promise<ProjectInfo | Error>} - Object that describes a project
  */
 
-export const pinProject = async (projectId: string) => {
+export const pinProject = async (projectId: string): Promise<ProjectInfo[] | Error> => {
   const userId = 'me00247';
   const apiUrl = `${PROJECT_PIN_ENDPOINT}?userId=${userId}&projectId=${projectId}`;
 
@@ -56,7 +56,7 @@ export const pinProject = async (projectId: string) => {
     throw new Error(`${errorText}`);
   }
 
-  return await response.json();
+  return (await response.json()) as ProjectInfo[];
 };
 
 /**

@@ -14,7 +14,7 @@ import { PEGASE_NAVBAR_ID } from './shared/constants';
 import { menuBottomData, menuTopData } from './routes';
 import ProjectDetails from './pages/pegase/projects/projectDetails/ProjectDetails';
 import StudyDetails from '@/pages/pegase/studies/studyDetails/studyDetails';
-import { AuthService } from '@/auth/authService';
+import { AuthService } from '@/shared/services/auth/authService';
 import { GenericUserContext } from '@/store/contexts/GenericUserContext';
 
 const App: React.FC = () => {
@@ -28,21 +28,21 @@ const App: React.FC = () => {
         window.location.replace('/'); // Redirige vers la page d'accueil après la connexion
       }
     };
-    handleAuth();
+    void handleAuth();
   }, []);
 
   useEffect(() => {
     const getUser = async () => {
-      const user = await AuthService.getUser();
-      if (!user) {
+      const userInfo = await AuthService.getUser();
+      if (!userInfo) {
         // Redirection automatique vers Keycloak pour l'authentification
-        AuthService.login();
+        await AuthService.login();
       } else {
         setLoading(false); // Arrêter le chargement seulement si authentifié
       }
-      setUser(user);
+      setUser(userInfo);
     };
-    getUser();
+    void getUser();
   }, []);
   if (loading) {
     return <div>Loading...</div>; // Affiche un message de chargement pendant la vérification

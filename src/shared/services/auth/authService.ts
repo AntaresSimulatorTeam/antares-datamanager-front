@@ -4,8 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { UserManager, User } from 'oidc-client-ts';
-import { useMemo } from 'react';
+import { User, UserManager } from 'oidc-client-ts';
 
 interface AuthConfig {
   authority: string;
@@ -16,8 +15,8 @@ interface AuthConfig {
 }
 
 const config: AuthConfig = {
-  client_id: 'pegase-integration-opf',
-  redirect_uri: 'https://pegase-integration-opf.rte-france.com/',
+  client_id: `${import.meta.env.VITE_APP_AUTH_CLIENT_ID}`,
+  redirect_uri: `${import.meta.env.VITE_APP_AUTH_REDIRECT_URI}`,
   authority: 'https://gaia-sso.opf.rte-france.com/',
   scope: 'openid email profile',
   maxExpiresIn: 600,
@@ -26,8 +25,7 @@ const config: AuthConfig = {
 const userManager = new UserManager(config);
 
 export const AuthService = {
-  login: () => {
-    userManager.signinRedirect();},
+  login: async () => await userManager.signinRedirect(),
   refresh: () => userManager.signinSilent(),
   logout: () => userManager.signoutRedirect(),
   getUser: async (): Promise<User | null> => await userManager.getUser(),
@@ -38,7 +36,7 @@ export const AuthService = {
     return user?.access_token || null;
   },
 
-  authFetch: async (url: string, options: RequestInit = {}) => {
+  authFetch: async (url: string, options: RequestInit = {}): Promise<Response> => {
     const token = await AuthService.getAccessToken();
     if (token) {
       if (options.headers instanceof Headers) {
@@ -52,11 +50,6 @@ export const AuthService = {
         };
       }
     }
-    return fetch(url, options);
+    return await fetch(url, options);
   },
-
-  hasPegaseUserRole: (role: string, user: any) =>
-    useMemo(() => {
-      return user?.profile.realm_access.roles?.includes(role);
-    }, [user]),
 };
