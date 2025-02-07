@@ -15,14 +15,10 @@ interface AuthConfig {
   maxExpiresIn: number;
 }
 
-const clientIdEnv = `${getEnvVariables('VITE_OAUTH2_CLIENT_ID')}`;
-const redirectUriEnv = `${getEnvVariables('VITE_OAUTH2_REDIRECT_URL')}`;
-const authorityEnv = `${getEnvVariables('VITE_OAUTH2_REDIRECT_URL')}`;
-
 const config: AuthConfig = {
-  client_id: clientIdEnv,
-  redirect_uri: redirectUriEnv,
-  authority: authorityEnv,
+  client_id: `${getEnvVariables('VITE_OAUTH2_CLIENT_ID')}`,
+  redirect_uri: `${getEnvVariables('VITE_OAUTH2_REDIRECT_URL')}`,
+  authority: `${getEnvVariables('VITE_OAUTH2_REDIRECT_URL')}`,
   scope: 'openid email profile',
   maxExpiresIn: 600,
 };
