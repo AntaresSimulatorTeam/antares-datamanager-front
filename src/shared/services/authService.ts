@@ -17,8 +17,8 @@ interface AuthConfig {
 
 const config: AuthConfig = {
   client_id: `${getEnvVariables('VITE_OAUTH2_CLIENT_ID')}`,
-  redirect_uri: 'https://pegase-integration-opf.rte-france.com/',
-  authority: 'https://gaia-sso.opf.rte-france.com/',
+  redirect_uri: `${getEnvVariables('VITE_OAUTH2_REDIRECT_URL')}`,
+  authority: `${getEnvVariables('VITE_OAUTH2_REDIRECT_URL')}`,
   scope: 'openid email profile',
   maxExpiresIn: 600,
 };
