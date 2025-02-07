@@ -5,5 +5,3 @@
  */
 
 declare const APP_VERSION: string;
-declare const APP_AUTH_CLIENT_ID: string;
-declare const APP_AUTH_REDIRECT_URI: string;

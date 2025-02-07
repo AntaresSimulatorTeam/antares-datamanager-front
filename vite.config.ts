@@ -66,8 +66,6 @@ export default defineConfig({
   },
   define: {
     APP_VERSION: JSON.stringify(process.env.APP_VERSION),
-    APP_AUTH_CLIENT_ID: JSON.stringify(process.env.APP_AUTH_CLIENT_ID),
-    APP_AUTH_REDIRECT_URI: JSON.stringify(process.env.APP_AUTH_REDIRECT_URI),
   },
   publicDir: './public',
 });
