@@ -16,9 +16,9 @@ interface AuthConfig {
 }
 
 const config: AuthConfig = {
-  client_id: `${getEnvVariables('VITE_OAUTH2_CLIENT_ID')}`,
-  redirect_uri: `${getEnvVariables('VITE_OAUTH2_REDIRECT_URL')}`,
-  authority: `${getEnvVariables('VITE_OAUTH2_REDIRECT_URL')}`,
+  client_id: getEnvVariables('VITE_OAUTH2_CLIENT_ID'),
+  redirect_uri: getEnvVariables('VITE_OAUTH2_REDIRECT_URL'),
+  authority: getEnvVariables('VITE_OAUTH2_REDIRECT_URL'),
   scope: 'openid email profile',
   maxExpiresIn: 600,
 };

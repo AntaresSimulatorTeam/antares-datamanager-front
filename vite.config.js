@@ -65,6 +65,7 @@ export default defineConfig({
     },
   },
   define: {
+    global: {},
     APP_VERSION: JSON.stringify(process.env.APP_VERSION),
   },
   publicDir: './public',

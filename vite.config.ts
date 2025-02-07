@@ -65,10 +65,8 @@ export default defineConfig({
     },
   },
   define: {
+    global: {},
     APP_VERSION: JSON.stringify(process.env.APP_VERSION),
-    PEGASE_OAUTH2_CLIENT_ID: JSON.stringify(process.env.PEGASE_OAUTH2_CLIENT_ID),
-    PEGASE_OAUTH2_REDIRECT_URL: JSON.stringify(process.env.PEGASE_OAUTH2_REDIRECT_URL),
-    PEGASE_AUTHORITY: JSON.stringify(process.env.PEGASE_AUTHORITY),
   },
   publicDir: './public',
 });
