@@ -18,5 +18,10 @@ export const envVariables: EnvVariableType = {
   VITE_OAUTH2_REDIRECT_URL: '${PEGASE_OAUTH2_REDIRECT_URL}',
   VITE_AUTHORITY: '${PEGASE_AUTHORITY}',
 };
-export const getEnvVariables = (key: keyof EnvVariableType) =>
-  envVariables[key].startsWith('$') ? (import.meta.env[key] as string) : envVariables[key];
+export const getEnvVariables = (key: keyof EnvVariableType): string => {
+  if (envVariables[key].startsWith('$')) {
+    return import.meta.env[key] as string;
+  } else {
+    return envVariables[key];
+  }
+};
