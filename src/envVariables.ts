@@ -6,11 +6,17 @@
 
 type EnvVariableType = {
   VITE_BACK_END_BASE_URL: string;
+  VITE_OAUTH2_CLIENT_ID: string;
+  VITE_OAUTH2_REDIRECT_URL: string;
 };
 
 // Environment Variable Template to Be Replaced at Runtime
 export const envVariables: EnvVariableType = {
   VITE_BACK_END_BASE_URL: '${URL_BACKEND}',
+  VITE_OAUTH2_CLIENT_ID: '${PEGASE_OAUTH2_CLIENT_ID}',
+  VITE_OAUTH2_REDIRECT_URL: '${PEGASE_OAUTH2_REDIRECT_URL}',
 };
-export const getEnvVariables = (key: keyof EnvVariableType) =>
-  envVariables[key].startsWith('$') ? (import.meta.env[key] as string) : envVariables[key];
+export const getEnvVariables = (key: keyof EnvVariableType) => {
+  console.log('================== import.meta.env', import.meta);
+  return envVariables[key].startsWith('$') ? (import.meta.env[key] as string) : envVariables[key];
+};

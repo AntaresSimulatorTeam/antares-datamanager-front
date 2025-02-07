@@ -5,6 +5,7 @@
  */
 
 import { User, UserManager } from 'oidc-client-ts';
+import { getEnvVariables } from '@/envVariables.ts';
 
 interface AuthConfig {
   authority: string;
@@ -15,9 +16,9 @@ interface AuthConfig {
 }
 
 const config: AuthConfig = {
-  client_id: `${import.meta.env.PEGASE_OAUTH2_CLIENT_ID}`,
-  redirect_uri: `${import.meta.env.PEGASE_OAUTH2_REDIRECT_URL}`,
-  authority: 'https://gaia-sso.opf.rte-france.com/',
+  client_id: getEnvVariables('VITE_OAUTH2_CLIENT_ID'),
+  redirect_uri: getEnvVariables('VITE_OAUTH2_REDIRECT_URL'),
+  authority: `${import.meta.env.VITE_AUTHORITY}`,
   scope: 'openid email profile',
   maxExpiresIn: 600,
 };
