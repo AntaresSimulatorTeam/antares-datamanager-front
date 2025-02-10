@@ -6,7 +6,7 @@
 
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { UserState } from '@/shared/types';
-import { AuthService } from '@/shared/services/authService.ts';
+import { AuthService } from '@/shared/services/authService';
 
 const initialState: UserState = {
   user: null,

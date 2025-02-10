@@ -5,23 +5,7 @@
  */
 
 import { User, UserManager } from 'oidc-client-ts';
-import { getEnvVariables } from '@/envVariables.ts';
-
-interface AuthConfig {
-  authority: string;
-  client_id: string;
-  redirect_uri: string;
-  scope: string;
-  maxExpiresIn: number;
-}
-
-const config: AuthConfig = {
-  client_id: getEnvVariables('VITE_OAUTH2_CLIENT_ID'),
-  redirect_uri: getEnvVariables('VITE_OAUTH2_REDIRECT_URL'),
-  authority: getEnvVariables('VITE_OAUTH2_REDIRECT_URL'),
-  scope: 'openid email profile',
-  maxExpiresIn: 600,
-};
+import { config } from '@/shared/const/authConfig';
 
 const userManager = new UserManager(config);
 
