@@ -30,7 +30,7 @@ function App() {
     const handleAuth = async () => {
       if (window.location.href.includes('code=')) {
         await AuthService.handleCallback();
-        window.location.replace('/'); // Redirige vers la page d'accueil après la connexion
+        window.location.replace('/'); // Redirect to home page after login
       }
     };
     void handleAuth();
