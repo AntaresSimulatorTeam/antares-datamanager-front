@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import './App.css';
 import ThemeHandler from './components/common/handler/ThemeHandler';
@@ -21,9 +21,20 @@ import { useTranslation } from 'react-i18next';
 import { translateMenuItemLabel } from '@/shared/utils/textUtils.ts';
 import { PEGASE_NAVBAR_ID } from '@/shared/constants.ts';
 import UserProvider from '@/store/contexts/UserProvider.tsx';
+import { AuthService } from '@/shared/services/authService.ts';
 
 function App() {
   const { t } = useTranslation();
+
+  useEffect(() => {
+    const handleAuth = async () => {
+      if (window.location.href.includes('code=')) {
+        await AuthService.handleCallback();
+        window.location.replace('/'); // Redirige vers la page d'accueil après la connexion
+      }
+    };
+    void handleAuth();
+  }, []);
 
   return (
     <UserProvider initialValue={{ user: null }}>

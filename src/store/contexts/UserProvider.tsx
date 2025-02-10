@@ -4,16 +4,10 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { UserState } from '@/shared/types';
 import { AuthService } from '@/shared/services/authService';
-
-const initialState: UserState = {
-  user: null,
-};
-
-export const UserContext = createContext(initialState);
-export const useUser = () => useContext(UserContext);
+import { UserContext } from './UserContext';
 
 export interface UserProviderProps {
   children: ReactNode;
@@ -25,25 +19,15 @@ const UserProvider = ({ children, initialValue }: UserProviderProps) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const handleAuth = async () => {
-      if (window.location.href.includes('code=')) {
-        await AuthService.handleCallback();
-        window.location.replace('/'); // Redirige vers la page d'accueil après la connexion
-      }
-    };
-    void handleAuth();
-  }, []);
-
-  useEffect(() => {
     const getUser = async () => {
       const userInfo = await AuthService.getUser();
       if (!userInfo) {
         // Redirection automatique vers Keycloak pour l'authentification
         await AuthService.login();
       } else {
-        setLoading(false); // Arrêter le chargement seulement si authentifié
+        setUser({ user: userInfo });
+        setLoading(false);
       }
-      setUser({ user: userInfo });
     };
     void getUser();
   }, []);
