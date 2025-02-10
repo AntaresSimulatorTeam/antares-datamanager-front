@@ -4,14 +4,14 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { UserContext } from '@/store/contexts/UserContext';
+import { UserSettingsContext } from '@/store/contexts/UserSettingsContext.tsx';
 import usePrevious from '@/hooks/common/usePrevious';
 import { THEME_COLOR } from '@/shared/types';
 import { useEffect } from 'react';
 
 const ThemeHandler = () => {
   const darkThemeMq = window.matchMedia('(prefers-color-scheme: dark)');
-  const themeColor = UserContext.useStore((store) => store.theme);
+  const themeColor = UserSettingsContext.useStore((store) => store.theme);
   const previousTheme = usePrevious(themeColor, undefined);
   useEffect(() => {
     if (previousTheme) {

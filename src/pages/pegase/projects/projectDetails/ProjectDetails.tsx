@@ -37,12 +37,12 @@ const ProjectDetails = () => {
 
   const [projectInfo, setProjectDetails] = useState<ProjectInfo>({} as ProjectInfo);
   const location = useLocation();
-  const { projectId } = location.state || {};
+  const projectId = location.state?.projectId as string | null;
 
   useEffect(() => {
-    const getProjectDetails = async (projectId: string) => {
+    const getProjectDetails = async (id: string) => {
       try {
-        const data = await fetchProjectDetails(projectId);
+        const data = (await fetchProjectDetails(id)) as ProjectInfo;
 
         setProjectDetails({
           id: data.id,
@@ -57,7 +57,7 @@ const ProjectDetails = () => {
           studies: [],
         });
       } catch (error) {
-        console.error(`Error retrieving project details: ${projectId}`, error);
+        console.error(`Error retrieving project details: ${id}`, error);
       }
     };
     if (projectId && !projectInfo.id) {

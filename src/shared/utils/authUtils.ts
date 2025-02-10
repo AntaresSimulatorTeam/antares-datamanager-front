@@ -3,16 +3,16 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
+
 import { User } from 'oidc-client-ts';
 
-export interface UserInfo {
-  id: string;
-  nni: string;
-  fullname: string;
-  email: string;
-  isAdmin?: boolean;
-}
+type ProfileWithRole = User & {
+  profile: {
+    realm_access: {
+      roles: string[];
+    };
+  };
+};
 
-export interface UserState {
-  user: User | null;
-}
+export const hasUserRole = (role: string, user: ProfileWithRole): boolean =>
+  user?.profile.realm_access.roles?.includes(role);

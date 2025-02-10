@@ -4,15 +4,15 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { UserContext } from '@/store/contexts/UserContext';
+import { UserSettingsContext } from '@/store/contexts/UserSettingsContext.tsx';
 import { THEME_COLOR } from '@/shared/types';
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';
 import { RdsSwitch } from 'rte-design-system-react';
 
 const Settings = () => {
-  const themeColor = UserContext.useStore((store) => store.theme);
-  const setContext = UserContext.useSetStore();
+  const themeColor = UserSettingsContext.useStore((store) => store.theme);
+  const setContext = UserSettingsContext.useSetStore();
   const { i18n } = useTranslation();
   const changeLanguageHandler = (lang: string) => {
     void i18n.changeLanguage(lang);

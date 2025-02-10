@@ -5,7 +5,7 @@
  */
 
 import { useCallback, useEffect } from 'react';
-import { ProjectActionType } from '@/shared/types/pegase/Project.type';
+import { ProjectActionType, ProjectInfo } from '@/shared/types/pegase/Project.type';
 import { fetchPinnedProjects, pinProject, unpinProject } from '@/shared/services/pinnedProjectService';
 import { v4 as uuidv4 } from 'uuid';
 import { dismissToast, notifyToast, NotifyWithActionProps } from '@/shared/notification/notification.tsx';
@@ -20,7 +20,7 @@ export const useHandlePinnedProjectList = () => {
 
   const getPinnedProjects = useCallback(async () => {
     try {
-      const projects = await fetchPinnedProjects(userId);
+      const projects = (await fetchPinnedProjects(userId)) as ProjectInfo[];
       if (projects?.length) {
         dispatch?.({
           type: PROJECT_ACTION.INIT_PINNED_PROJECT_LIST,

@@ -16,23 +16,22 @@ vi.mock('@/envVariables', () => ({
 
 describe('useFetchProjectList', () => {
   beforeEach(() => {
-    global.fetch = vi.fn(() =>
-      Promise.resolve({
-        json: () =>
-          Promise.resolve({
-            content: [
-              {
-                projectId: '1',
-                name: 'Project 1',
-                tags: ['Tag1', 'Tag2'],
-                creationDate: '2023-10-01',
-                createdBy: 'User A',
-              },
-            ],
-            totalElements: 1,
-          }),
-      }),
-    ) as unknown as typeof fetch;
+    global.fetch = vi.fn().mockResolvedValueOnce({
+      ok: true,
+      json: async () =>
+        Promise.resolve({
+          content: [
+            {
+              projectId: '1',
+              name: 'Project 1',
+              tags: ['Tag1', 'Tag2'],
+              creationDate: '2023-10-01',
+              createdBy: 'User A',
+            },
+          ],
+          totalElements: 1,
+        }),
+    });
   });
 
   afterEach(() => {
@@ -60,7 +59,7 @@ describe('useFetchProjectList', () => {
     renderHook(() => useFetchProjectList('test', 0, 9));
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith('https://mockapi.com/v1/project/search?page=1&size=9&search=test');
+      expect(global.fetch).toHaveBeenCalledWith('https://mockapi.com/v1/project/search?page=1&size=9&search=test', {});
     });
   });
 
@@ -68,7 +67,7 @@ describe('useFetchProjectList', () => {
     renderHook(() => useFetchProjectList('', 1, 9));
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith('https://mockapi.com/v1/project/search?page=2&size=9&search=');
+      expect(global.fetch).toHaveBeenCalledWith('https://mockapi.com/v1/project/search?page=2&size=9&search=', {});
     });
   });
 });

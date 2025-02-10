@@ -4,11 +4,11 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { THEME_COLOR } from '@/shared/types';
-import createFastContext from './createFastContext';
+import { createContext, useContext } from 'react';
+import { UserState } from '@/shared/types';
 
-export type UserContextStore = {
-  theme: THEME_COLOR;
+const initialState: UserState = {
+  user: null,
 };
-
-export const UserContext = createFastContext<UserContextStore>();
+export const UserContext = createContext(initialState);
+export const useUser = () => useContext(UserContext);

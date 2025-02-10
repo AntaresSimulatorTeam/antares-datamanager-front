@@ -4,13 +4,13 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { User } from '@/shared/types/common/User.type';
+import { UserInfo } from '@/shared/types/common/User.type';
 
 export const AVATAR_COLORS = ['green', 'purple', 'blue', 'pink', 'gray', 'orange'] as const;
 const USER_SEPARATOR = ' - ';
 const MAX_USER_CHIP = 3;
 
-export const splitUserList = (users: User[]) => {
+export const splitUserList = (users: UserInfo[]) => {
   if (users.length <= MAX_USER_CHIP) {
     return users;
   }
@@ -18,19 +18,19 @@ export const splitUserList = (users: User[]) => {
   return [firstUser, secondUser, otherUsers];
 };
 
-export const getInitials = (user: User) => {
+export const getInitials = (user: UserInfo) => {
   const [firstName, lastName = ''] = user.fullname.split(' ');
   return lastName.charAt(0) + firstName.charAt(0);
 };
 
-export const getUserInitials = (users: User | User[]) => {
+export const getUserInitials = (users: UserInfo | UserInfo[]) => {
   if (!Array.isArray(users)) {
     return getInitials(users);
   }
   return `+${users.length}`;
 };
 
-export const getUserFullname = (users: User | User[]) => {
+export const getUserFullname = (users: UserInfo | UserInfo[]) => {
   if (!Array.isArray(users)) {
     return users.fullname;
   }
@@ -38,7 +38,7 @@ export const getUserFullname = (users: User | User[]) => {
 };
 
 //assign a random color from COLORS
-export const getColor = (users: User | User[]) => {
+export const getColor = (users: UserInfo | UserInfo[]) => {
   if (!Array.isArray(users)) {
     return AVATAR_COLORS[
       users.fullname.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % AVATAR_COLORS.length

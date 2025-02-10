@@ -25,9 +25,7 @@ describe('deleteProjectById', () => {
     global.fetch = vi.fn();
     vi.clearAllMocks();
     vi.stubGlobal('JSON', {
-      parse: (text: string) => {
-        return { message: text };
-      },
+      parse: (text: string) => ({ message: text }),
       stringify: (text: string) => text,
     });
   });
@@ -97,7 +95,7 @@ describe('fetchProjectDetails', () => {
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledTimes(1);
-      expect(global.fetch).toHaveBeenCalledWith(`https://mockapi.com/v1/project/${projectId}`);
+      expect(global.fetch).toHaveBeenCalledWith(`https://mockapi.com/v1/project/${projectId}`, {});
     });
   });
 
@@ -123,9 +121,7 @@ describe('fetchProjectsFromPartialName', () => {
     global.fetch = vi.fn();
     vi.clearAllMocks();
     vi.stubGlobal('JSON', {
-      parse: (text: string) => {
-        return { message: text };
-      },
+      parse: (text: string) => ({ message: text }),
       stringify: (text: string) => text,
     });
   });
@@ -138,8 +134,8 @@ describe('fetchProjectsFromPartialName', () => {
   it('should delete a pinned project from pinned project list', async () => {
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: true,
-      json: () => {
-        return Promise.resolve([
+      json: () =>
+        Promise.resolve([
           {
             id: '123',
             name: 'Bilan prévisionnel 2023',
@@ -156,15 +152,14 @@ describe('fetchProjectsFromPartialName', () => {
             creationDate: '2013-08-01',
             tags: ['tag3', 'tag4'],
           },
-        ]);
-      },
+        ]),
     });
 
     const result = await fetchProjectsFromPartialName('name');
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledTimes(1);
-      expect(global.fetch).toHaveBeenCalledWith('https://mockapi.com/v1/project/autocomplete?partialName=name');
+      expect(global.fetch).toHaveBeenCalledWith('https://mockapi.com/v1/project/autocomplete?partialName=name', {});
       expect(result).toEqual(['Bilan prévisionnel 2023', 'Bilan prévisionnel 2019']);
     });
   });
@@ -188,9 +183,7 @@ describe('createProject', () => {
     global.fetch = vi.fn();
     vi.clearAllMocks();
     vi.stubGlobal('JSON', {
-      parse: (text: string) => {
-        return { message: text };
-      },
+      parse: (text: string) => ({ message: text }),
       stringify: (text: string) => text,
     });
   });

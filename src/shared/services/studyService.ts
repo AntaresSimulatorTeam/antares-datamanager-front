@@ -8,6 +8,7 @@ import { PaginatedResponse, StudyDTO } from '@/shared/types';
 import { STUDY_SEARCH_ENDPOINT } from '@/shared/const/apiEndPoint';
 import { STUDY_ENDPOINT, STUDY_KEYWORDS_SEARCH_ENDPOINT } from '@/shared/const/apiEndPoint.ts';
 import { notifyToast } from '@/shared/notification/notification.tsx';
+import { AuthService } from '@/shared/services/authService.ts';
 
 /**
  * Retrieve a list of studies from a term
@@ -18,15 +19,15 @@ import { notifyToast } from '@/shared/notification/notification.tsx';
  * @param {number} intervalSize - Number of items per page
  * @param {{ [key: string]: 'asc' | 'desc' })} sortBy - Object that describes the sorting type (ascending or descending) of a column
  *
- * @returns {Promise<PaginatedResponse<StudyDTO>>} - Promise object that represents a list of studies
+ * @return {Promise<PaginatedResponse<StudyDTO> | Error>} - Promise object that represents a list of studies
  */
 export const fetchSearchStudies = async (
-  searchTerm = '',
-  projectId = '',
-  currentPage = 0,
-  intervalSize = 0,
+  searchTerm: string = '',
+  projectId: string = '',
+  currentPage: number = 0,
+  intervalSize: number = 0,
   sortBy?: { [key: string]: 'asc' | 'desc' },
-): Promise<PaginatedResponse<StudyDTO>> => {
+): Promise<PaginatedResponse<StudyDTO> | Error> => {
   let entries: [string, 'asc' | 'desc'] | null = null;
   if (sortBy && JSON.stringify(sortBy) !== '{}') {
     entries = Object.entries(sortBy)[0];
@@ -34,11 +35,11 @@ export const fetchSearchStudies = async (
 
   const apiUrl = `${STUDY_SEARCH_ENDPOINT}?page=${currentPage + 1}&size=${intervalSize}&projectId=${projectId}&search=${searchTerm}&sortColumn=${entries?.[0] ?? ''}&sortDirection=${entries?.[1] ?? ''}`;
 
-  const response = await fetch(apiUrl);
+  const response = await AuthService.authFetch(apiUrl);
   if (!response.ok) {
     throw new Error('Failed to fetch user studies');
   }
-  const json: PaginatedResponse<StudyDTO> = await response.json();
+  const json = (await response.json()) as PaginatedResponse<StudyDTO>;
 
   return { content: json.content, totalElements: json.totalElements };
 };
@@ -47,15 +48,14 @@ export const fetchSearchStudies = async (
  * Retrieve a list of suggested keywords from a partial name of a study
  *
  * @param {string} query - Partial name of a study
- *
- * @returns {Promise<string[]>} - Promise object that represents a list of keywords
+ * @return {Promise<string[] | Error>} - Promise object that represents a list of keywords
  */
-export const fetchSuggestedKeywords = async (query: string): Promise<string[]> => {
-  const response = await fetch(`${STUDY_KEYWORDS_SEARCH_ENDPOINT}?partialName=${query}`);
+export const fetchSuggestedKeywords = async (query: string): Promise<string[] | Error> => {
+  const response = await AuthService.authFetch(`${STUDY_KEYWORDS_SEARCH_ENDPOINT}?partialName=${query}`);
   if (!response.ok) {
     throw new Error('Failed to fetch suggested keywords');
   }
-  return await response.json();
+  return (await response.json()) as string[];
 };
 
 /**
@@ -63,10 +63,11 @@ export const fetchSuggestedKeywords = async (query: string): Promise<string[]> =
  * Display toast if creation succeeds or fails
  *
  * @param {Omit<StudyDTO, 'id' | 'status' | 'creationDate'>} studyData - Partial study data
+ * @return {Promise<void | Error>}
  */
-export const saveStudy = async (studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate'>) => {
+export const saveStudy = async (studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate'>): Promise<void | Error> => {
   try {
-    const response = await fetch(`${STUDY_ENDPOINT}`, {
+    const response = await AuthService.authFetch(`${STUDY_ENDPOINT}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -75,7 +76,7 @@ export const saveStudy = async (studyData: Omit<StudyDTO, 'id' | 'status' | 'cre
     });
     if (!response.ok) {
       const errorText = await response.text();
-      const errorData = JSON.parse(errorText);
+      const errorData = JSON.parse(errorText) as Error;
       throw new Error(`${errorData.message || errorText}`);
     }
     notifyToast({
@@ -97,10 +98,11 @@ export const saveStudy = async (studyData: Omit<StudyDTO, 'id' | 'status' | 'cre
  * Display toast if deletion succeeds or fails
  *
  * @param {number} id - Study id
+ * @return {Promise<void | Error>}
  */
-export const deleteStudy = async (id: number) => {
+export const deleteStudy = async (id: number): Promise<void | Error> => {
   try {
-    const response = await fetch(`${STUDY_ENDPOINT}/${id}`, {
+    const response = await AuthService.authFetch(`${STUDY_ENDPOINT}/${id}`, {
       method: 'DELETE',
     });
     if (!response.ok) {
@@ -111,10 +113,10 @@ export const deleteStudy = async (id: number) => {
       type: 'success',
       message: 'Study deleted successfully',
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     notifyToast({
       type: 'error',
-      message: `${error.message}`,
+      message: `${(error as Error).message}`,
     });
   }
 };

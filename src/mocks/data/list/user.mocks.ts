@@ -6,9 +6,9 @@
 
 import { randomNumber } from '@/mocks/mockTools';
 import { LIST_FIRSTNAME, LIST_NAME } from './names';
-import { User } from '@/shared/types/common/User.type';
+import { UserInfo } from '@/shared/types/common/User.type';
 
-export const generateFixedUser = (userIdx: number, seed = 1): User => {
+export const generateFixedUser = (userIdx: number, seed = 1): UserInfo => {
   const firstName = LIST_FIRSTNAME[userIdx % LIST_FIRSTNAME.length];
   const name = LIST_NAME[(userIdx + seed) % LIST_FIRSTNAME.length];
   return {

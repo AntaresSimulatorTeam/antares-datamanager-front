@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { RdsButton, RdsIcon, RdsIconId, RdsInputText } from 'rte-design-system-react';
 import { fetchSuggestedKeywords } from '@/shared/services/studyService';
 import { clsx } from 'clsx';
@@ -12,21 +12,21 @@ import { useTranslation } from 'react-i18next';
 
 interface KeywordsInputProps {
   keywords: string[];
-  setKeywords: React.Dispatch<React.SetStateAction<string[]>>;
+  setKeywords: Dispatch<SetStateAction<string[]>>;
   maxNbKeywords?: number;
   maxNbCharacters?: number;
   minNbCharacters?: number;
   width?: string;
 }
 
-const KeywordsInput: React.FC<KeywordsInputProps> = ({
+const KeywordsInput = ({
   keywords,
   setKeywords,
   maxNbKeywords,
   maxNbCharacters,
   minNbCharacters,
   width,
-}) => {
+}: KeywordsInputProps) => {
   const { t } = useTranslation();
   const [keywordInput, setKeywordInput] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
@@ -39,7 +39,7 @@ const KeywordsInput: React.FC<KeywordsInputProps> = ({
     setKeywordInput(value);
     setErrorMessage(''); // Clear error message when input changes
     try {
-      const tags = await fetchSuggestedKeywords(value);
+      const tags = (await fetchSuggestedKeywords(value)) as string[];
       setSuggestedKeywords(tags);
     } catch (error) {
       setErrorMessage('Failed to fetch suggested keywords');
@@ -47,7 +47,7 @@ const KeywordsInput: React.FC<KeywordsInputProps> = ({
   };
 
   const handleAddKeyword = (suggestedKeyword = keywordInput) => {
-    if (suggestedKeyword.trim()) {
+    if (keywords?.length > 0 && suggestedKeyword.trim()) {
       if (keywords.includes(suggestedKeyword.trim())) {
         setErrorMessage(t('projectModal.@keyword_already_exists'));
       } else if (
@@ -84,7 +84,7 @@ const KeywordsInput: React.FC<KeywordsInputProps> = ({
     if (!input) {
       return false;
     } else {
-      if (minNbCharacters) {
+      if (minNbCharacters && !maxNbCharacters) {
         return input.length >= minNbCharacters;
       } else if (minNbCharacters && maxNbCharacters) {
         return input.length >= minNbCharacters && input.length <= maxNbCharacters;
@@ -104,7 +104,7 @@ const KeywordsInput: React.FC<KeywordsInputProps> = ({
               onChange={handleKeywordChange}
               placeHolder="Add a keyword"
               variant="outlined"
-              maxLength={maxNbCharacters as number | undefined}
+              maxLength={maxNbCharacters}
             />
           </div>
           {shouldAddKeywordButton(keywordInput) && (
@@ -164,7 +164,7 @@ const KeywordsInput: React.FC<KeywordsInputProps> = ({
       </div>
 
       {/* Clear All Keywords Button */}
-      {keywords.length > 0 && (
+      {keywords?.length > 0 && (
         <div className="text-sm text-secondary mt-1 flex cursor-pointer items-center gap-1" onClick={clearAllKeywords}>
           <RdsIcon name={RdsIconId.InkEraser} color="secondary" />
           <span>Clear all</span>
