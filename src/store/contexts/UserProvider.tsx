@@ -1,9 +1,3 @@
-/*
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
-
 import { ReactNode, useEffect, useState } from 'react';
 import { UserState } from '@/shared/types';
 import { AuthService } from '@/shared/services/authService';
@@ -19,21 +13,34 @@ const UserProvider = ({ children, initialValue }: UserProviderProps) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const controller = new AbortController();
+    const signal = controller.signal;
+
     const getUser = async () => {
-      const userInfo = await AuthService.getUser();
-      if (!userInfo) {
-        // Redirection automatique vers Keycloak pour l'authentification
-        await AuthService.login();
-      } else {
-        setUser({ user: userInfo });
-        setLoading(false);
+      try {
+        const userInfo = await AuthService.getUser({ signal });
+        if (!userInfo) {
+          await AuthService.login();
+        } else {
+          setUser({ user: userInfo });
+          setLoading(false);
+        }
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          console.error('Failed to fetch user:', error);
+        }
       }
     };
+
     void getUser();
+
+    return () => {
+      controller.abort();
+    };
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>; // Affiche un message de chargement pendant la vérification
+    return <div>Loading...</div>;
   }
   return <UserContext.Provider value={user}>{children}</UserContext.Provider>;
 };
