@@ -14,7 +14,7 @@ import { THEME_COLOR } from '@/shared/types';
 import { menuBottomData, menuTopData } from './routes';
 import { PegaseToastContainer } from './shared/notification/containers';
 import ProjectDetails from './pages/pegase/projects/projectDetails/ProjectDetails';
-import StudyDetails from '@/pages/pegase/studies/studyDetails/StudyDetails.tsx';
+import StudyDetails from '@/pages/pegase/studies/studyDetails/StudyDetails';
 import { RdsNavbar } from 'rte-design-system-react';
 import { navBarConfig } from '@/shared/const/navBarConfig';
 import { useTranslation } from 'react-i18next';

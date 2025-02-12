@@ -10,7 +10,7 @@ import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { DbTrajectory } from '@/shared/types';
 
 export const useFetchTrajectoriesFromDB = (trajectoryType: TRAJECTORY_TYPE, studyHorizon: string) => {
-  const [trajectories, setTrajectories] = useState<DbTrajectory[]>();
+  const [trajectories, setTrajectories] = useState<DbTrajectory[] | null>(null);
 
   useEffect(() => {
     const getTrajectoriesFromDb = async (type: TRAJECTORY_TYPE, horizon: string) => {
@@ -22,7 +22,7 @@ export const useFetchTrajectoriesFromDB = (trajectoryType: TRAJECTORY_TYPE, stud
       }
     };
 
-    if (studyHorizon) {
+    if (trajectoryType && studyHorizon) {
       void getTrajectoriesFromDb(trajectoryType, studyHorizon);
     }
   }, [trajectoryType, studyHorizon]);
