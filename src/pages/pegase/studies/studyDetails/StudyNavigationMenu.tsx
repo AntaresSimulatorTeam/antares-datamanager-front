@@ -13,7 +13,8 @@ import EnrTab from '@/components/tab/EnrTab.tsx';
 import MiscTab from '@/components/tab/MiscLinkTab.tsx';
 import AreaLinkTab from '@/components/tab/AreaLinkTab.tsx';
 import StdIcon from '@common/base/stdIcon/StdIcon';
-import { DbTrajectory } from '@/shared/types/Trajectory.type.ts';
+import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { useTranslation } from 'react-i18next';
 
 const StudyNavigationMenu = ({
   onRenderActiveComponent,
@@ -22,20 +23,20 @@ const StudyNavigationMenu = ({
   onRenderActiveComponent?: (content: ReactNode | null) => void;
   studyHorizon: string;
 }) => {
-  const [activeTab, setActiveTab] = useState<string>('areasAndLinks');
-  const [trajectories, setTrajectories] = useState<DbTrajectory[]>([]);
+  const { t } = useTranslation();
+  const [activeTab, setActiveTab] = useState<TRAJECTORY_TYPE>(TRAJECTORY_TYPE.AREA);
 
-  const renderActiveComponent = (data: DbTrajectory[]): ReactNode | null => {
+  const renderActiveComponent = (horizon: string): ReactNode | null => {
     switch (activeTab) {
-      case 'areasAndLinks':
-        return <AreaLinkTab studyHorizon={studyHorizon} />;
-      case 'load':
+      case TRAJECTORY_TYPE.AREA:
+        return <AreaLinkTab studyHorizon={horizon} />;
+      case TRAJECTORY_TYPE.LINK:
         return <LoadTab />;
-      case 'thermal':
+      case TRAJECTORY_TYPE.THERMAL_COST:
         return <ThermalTab />;
-      case 'enr':
+      case TRAJECTORY_TYPE.ENR:
         return <EnrTab />;
-      case 'misc':
+      case TRAJECTORY_TYPE.MISC:
         return <MiscTab />;
       default:
         return null;
@@ -44,21 +45,21 @@ const StudyNavigationMenu = ({
 
   useEffect(() => {
     if (onRenderActiveComponent) {
-      onRenderActiveComponent(renderActiveComponent(trajectories));
+      onRenderActiveComponent(renderActiveComponent(studyHorizon));
     }
   }, [activeTab, onRenderActiveComponent]);
 
-  const handleTabClick = (selectedItemName: string) => {
+  const handleTabClick = (selectedItemName: TRAJECTORY_TYPE) => {
     setActiveTab(selectedItemName);
     console.log(`Tab clicked: ${selectedItemName}`);
   };
 
   const tabs = [
-    { name: 'areasAndLinks', label: 'Areas & Links', icon: StdIconId.LinkedServices },
-    { name: 'load', label: 'Load', icon: StdIconId.BatteryChargingFull },
-    { name: 'thermal', label: 'Thermal', icon: StdIconId.LocalFireDepartment },
-    { name: 'enr', label: 'ENR', icon: StdIconId.EnergySavingsLeaf },
-    { name: 'misc', label: 'Misc', icon: StdIconId.Category },
+    { name: TRAJECTORY_TYPE.AREA, label: t('studyDetails@areas_links'), icon: StdIconId.LinkedServices },
+    { name: TRAJECTORY_TYPE.LOAD, label: t('studyDetails@load'), icon: StdIconId.BatteryChargingFull },
+    { name: TRAJECTORY_TYPE.THERMAL_COST, label: t('studyDetails@thermal'), icon: StdIconId.LocalFireDepartment },
+    { name: TRAJECTORY_TYPE.ENR, label: t('studyDetails@enr'), icon: StdIconId.EnergySavingsLeaf },
+    { name: TRAJECTORY_TYPE.MISC, label: t('studyDetails@misc'), icon: StdIconId.Category },
   ];
 
   return (

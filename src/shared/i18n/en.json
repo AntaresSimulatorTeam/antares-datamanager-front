@@ -70,9 +70,16 @@
     "@hypothesis": "Hypothesis",
     "@area": "Area",
     "@link": "Link",
+    "@areas_links": "Areas & Links",
+    "@load": "Load",
+    "@thermal": "thermal",
+    "@enr": "ENR",
+    "@misc": "Misc",
     "@trajectory": "Trajectory",
-    "@placeholder": "Select a trajectory",
-    "@import_trajectory": "Import a trajectory",
-    "@import_to_db": "Import into data base"
+    "@select_trajectory": "Select a trajectory",
+    "@select_link": "Add an area first",
+    "@select_file": "Select a file",
+    "@import_from_file_system": "Import from File System",
+    "@import": "Import"
   }
 }

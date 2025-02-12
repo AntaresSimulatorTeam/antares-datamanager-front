@@ -10,3 +10,5 @@ export * from './common/Tailwind.type';
 export * from './common/User.type';
 export * from './common/UserSettings.type';
 export * from './Study.type.ts';
+export * from './Project.type.ts';
+export * from './Trajectory.type.ts';

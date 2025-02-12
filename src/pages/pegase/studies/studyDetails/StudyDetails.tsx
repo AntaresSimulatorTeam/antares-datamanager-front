@@ -5,15 +5,21 @@
  */
 
 import { ReactNode, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { Location, useLocation } from 'react-router-dom';
 import StudyHeader from './studyHeader';
 import StudyDetailsContent from './StudyDetailsContent';
 import { RdsDivider } from 'rte-design-system-react';
 import StudyNavigationMenu from '@/pages/pegase/studies/studyDetails/StudyNavigationMenu';
+import { StudyDTO } from '@/shared/types';
+
+interface StudyState {
+  study: StudyDTO;
+}
 
 const StudyDetails = () => {
   const [activeContent, setActiveContent] = useState<ReactNode>(null);
-  const location = useLocation();
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const location: Location<StudyState> = useLocation();
   const { study } = location.state || {};
 
   return !study.id ? (
@@ -22,7 +28,7 @@ const StudyDetails = () => {
     </div>
   ) : (
     <div className="flex flex-col">
-      <StudyHeader projectName={study.project} studyName={study.name} createdBy={study.createdBy} />
+      <StudyHeader projectName={study.project} studyName={study.name} />
       <RdsDivider />
       <div className="flex flex-col">
         <StudyDetailsContent study={study} />

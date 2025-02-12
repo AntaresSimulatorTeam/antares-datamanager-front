@@ -9,7 +9,8 @@ import {
   TRAJECTORY_ENDPOINT,
   TRAJECTORY_FILE_SYSTEM_ENDPOINT,
 } from '@/shared/const/apiEndPoint.ts';
-import { DbTrajectory, FsTrajectory } from '@/shared/types/Trajectory.type.ts';
+import { DbTrajectory, FsTrajectory } from '@/shared/types';
+import { AuthService } from '@/shared/services/authService.ts';
 
 /**
  * Retrieve a list of trajectories by type and horizon from database
@@ -24,13 +25,12 @@ export const fetchTrajectoriesFromDB = async (
   horizon: string,
   fileName?: string,
 ): Promise<DbTrajectory[]> => {
-  const response = await fetch(
-    `${TRAJECTORY_DATA_BASE_ENDPOINT}?trajectoryType=${trajectoryType}&horizon=${horizon}&fileNameStartsWith=${fileName ?? ''}`,
-  );
+  const urlApi = `${TRAJECTORY_DATA_BASE_ENDPOINT}?trajectoryType=${trajectoryType}&horizon=${horizon}&fileNameStartsWith=${fileName ?? ''}`;
+  const response = await AuthService.authFetch(urlApi);
   if (!response.ok) {
-    throw new Error('Failed to fetch trajectories from file system');
+    throw new Error('Failed to fetch trajectories from data base');
   }
-  return await response.json();
+  return (await response.json()) as DbTrajectory[];
 };
 
 /**
@@ -44,33 +44,31 @@ export const fetchTrajectoriesFromFS = async (
   trajectoryType: string,
   thermalCapacityArea?: string | undefined,
 ): Promise<FsTrajectory[]> => {
-  const response = await fetch(
-    `${TRAJECTORY_FILE_SYSTEM_ENDPOINT}?trajectoryType=${trajectoryType}&thermalCapacityArea=${thermalCapacityArea ?? ''}`,
-  );
+  const urlApi = `${TRAJECTORY_FILE_SYSTEM_ENDPOINT}?trajectoryType=${trajectoryType}&thermalCapacityArea=${thermalCapacityArea ?? ''}`;
+  const response = await AuthService.authFetch(urlApi);
   if (!response.ok) {
     throw new Error('Failed to fetch trajectories from file system');
   }
-  return await response.json();
+  return (await response.json()) as FsTrajectory[];
 };
 
 /**
  * Import a trajectory file into database
  *
  * @param {TRAJECTORY_TYPE} trajectoryType - Trajectory type
- * @param {string} trajectoryToUse - Trajectory to use
+ * @param {string} trajectoryName - Name of trajectory to add to data base
  * @param {string} horizon - Trajectory horizon
  * @returns {Promise<DbTrajectory>} - Promise object that represents a trajectory inserted into database
  */
-export const createTrajectory = async (
+export const addTrajectory = async (
   trajectoryType: string,
-  trajectoryToUse: string,
+  trajectoryName: string,
   horizon: string,
 ): Promise<DbTrajectory> => {
-  const response = await fetch(
-    `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryToUse}&horizon=${horizon}`,
-  );
+  const urlApi = `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}`;
+  const response = await AuthService.authFetch(urlApi);
   if (!response.ok) {
     throw new Error('Failed to import trajectory into data base');
   }
-  return await response.json();
+  return (await response.json()) as DbTrajectory;
 };

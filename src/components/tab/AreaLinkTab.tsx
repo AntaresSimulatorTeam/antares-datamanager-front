@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import StdSimpleTable from '@common/data/stdSimpleTable/StdSimpleTable.tsx';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import getAreaLinkTableHeaders from '@/pages/pegase/studies/studyDetails/AreaLinkTableHeaders.tsx';
@@ -12,33 +12,27 @@ import { RdsButton, RdsIconId, RdsModal } from 'rte-design-system-react';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { useTranslation } from 'react-i18next';
 import {
-  createTrajectory,
+  addTrajectory,
   fetchTrajectoriesFromDB,
   fetchTrajectoriesFromFS,
 } from '@/shared/services/trajectoryService.ts';
-import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import SelectAndSearchableInput from '@/components/input/SelectAndSearchableInput.tsx';
-import { DbTrajectory, FsTrajectory } from '@/shared/types/Trajectory.type.ts';
-
-type RowStatus = 'Missing' | 'OK' | 'Error';
-
-type RowData = {
-  hypothesis: string;
-  trajectory: string | null;
-  status: RowStatus;
-};
+import { AreaAndLinkRowData, DbTrajectory, FsTrajectory } from '@/shared/types';
+import { useFetchTrajectoriesFromDB } from '@/hooks/useFetchTrajectoriesFromDB.ts';
+import { convertToSelectionOptionType } from '@/shared/utils/formFormatter.ts';
 
 interface AreaLinkTabProps {
   studyHorizon: string;
 }
 
 const AreaLinkTab = ({ studyHorizon }: AreaLinkTabProps) => {
-  const [data, setData] = useState<RowData[]>([
-    { hypothesis: 'Areas', trajectory: null, status: 'Missing' },
-    { hypothesis: 'Links', trajectory: null, status: 'Missing' },
+  const [data, setData] = useState<AreaAndLinkRowData[]>([
+    { hypothesis: 'Areas', trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING },
+    { hypothesis: 'Links', trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING },
   ]);
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({ '0': false, '1': !data[0].trajectory });
-  const [trajectoriesDB, setTrajectoriesDB] = useState<DbTrajectory[][]>();
+  const [_, setTrajectoriesDB] = useState<DbTrajectory[][]>();
   const [trajectoriesFS, setTrajectoriesFS] = useState<FsTrajectory[]>();
   const [optionsDB, setOptionsDB] = useState<SelectOption[][]>();
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
@@ -48,51 +42,27 @@ const AreaLinkTab = ({ studyHorizon }: AreaLinkTabProps) => {
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const { t } = useTranslation();
 
-  useEffect(() => {
-    const getTrajectoriesFromDb = async (studyHorizon) => {
-      try {
-        // replace by studyHorizon
-        const resultsArea = await fetchTrajectoriesFromDB(TRAJECTORY_TYPE.AREA, '2023-2024');
-        const areasOptions: SelectOption[] = resultsArea.map((trajectory) => {
-          return {
-            id: trajectory.id,
-            label: trajectory.trajectory_name,
-          };
-        });
-        const resultsLink = await fetchTrajectoriesFromDB(TRAJECTORY_TYPE.LINK, '2030-2031');
-        const linksOptions: SelectOption[] = resultsLink.map((trajectory) => {
-          return {
-            id: trajectory.id,
-            label: trajectory.trajectory_name,
-          };
-        });
-        setTrajectoriesDB([resultsArea, resultsLink]);
-        setOptionsDB([areasOptions, linksOptions]);
-      } catch (error) {
-        // Handle errors
-      }
-    };
+  const { trajectories: trajectoriesArea } = useFetchTrajectoriesFromDB(TRAJECTORY_TYPE.AREA, studyHorizon);
+  const { trajectories: trajectoriesLink } = useFetchTrajectoriesFromDB(TRAJECTORY_TYPE.LINK, studyHorizon);
 
-    if (studyHorizon) {
-      void getTrajectoriesFromDb(studyHorizon);
-    }
-  }, []);
+  if (trajectoriesArea && trajectoriesLink) {
+    setTrajectoriesDB([trajectoriesArea, trajectoriesLink]);
+    setOptionsDB([convertToSelectionOptionType(trajectoriesArea), convertToSelectionOptionType(trajectoriesLink)]);
+  }
 
   const handleTrajectoryImport = async (index: number) => {
     try {
       const results = await fetchTrajectoriesFromFS(index === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK);
       setTrajectoriesFS(results);
       setOptionsFS(
-        results.map((result, index) => {
-          return {
-            id: `option-fs-${index}`,
-            label: result.trajectory_name,
-          };
-        }),
+        results.map((result, indexTrajectory) => ({
+          id: `option-fs-${indexTrajectory}`,
+          label: result.trajectory_name,
+        })),
       );
       toggleModal();
-    } catch (error) {
-      setErrorImportMessage(error);
+    } catch (error: unknown) {
+      setErrorImportMessage(error as string);
     } finally {
       setRowIndexSelected(index);
     }
@@ -103,24 +73,20 @@ const AreaLinkTab = ({ studyHorizon }: AreaLinkTabProps) => {
     setTrajectorySelected(trajectory);
   };
 
-  const handleImportToDB = async () => {
+  const handleImportToDB = async (): Promise<void> => {
     if (!rowIndexSelected || !trajectorySelected || !studyHorizon) return;
 
-    try {
-      await createTrajectory(
-        rowIndexSelected === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
-        trajectorySelected.trajectory_name,
-        studyHorizon,
-      );
-    } catch {
-      // silent handler
-    }
+    await addTrajectory(
+      rowIndexSelected === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
+      trajectorySelected.trajectory_name,
+      studyHorizon,
+    ).then((newTrajectory) => setTrajectorySelected(newTrajectory));
   };
 
   const handleTrajectorySelection = (index: number, trajectory: SelectOption) => {
     const updatedData = [...data];
     updatedData[index].trajectory = trajectory.label;
-    updatedData[index].status = 'OK';
+    updatedData[index].status = TRAJECTORY_SELECTION_STATUS.OK;
     setReadOnly({ '0': false, '1': false });
     setData(updatedData);
   };
@@ -128,28 +94,26 @@ const AreaLinkTab = ({ studyHorizon }: AreaLinkTabProps) => {
   const handlerDeleteSelection = (index: number) => {
     const updatedData = [...data];
     updatedData[index].trajectory = null;
-    updatedData[index].status = 'Missing';
+    updatedData[index].status = TRAJECTORY_SELECTION_STATUS.MISSING;
     if (index === 0) {
       updatedData[1].trajectory = null;
-      updatedData[1].status = 'Missing';
+      updatedData[1].status = TRAJECTORY_SELECTION_STATUS.MISSING;
       setReadOnly({ '0': false, '1': true });
     }
     setData(updatedData);
   };
 
-  const handlerSearch = async (index, value) => {
+  const handlerSearch = async (index: number, value: string | undefined): Promise<SelectOption[] | undefined> => {
     try {
       const results = await fetchTrajectoriesFromDB(
         index === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
         '2023-2024',
         value,
       );
-      return results.map((result) => {
-        return {
-          id: result.id,
-          label: result.trajectory_name,
-        };
-      });
+      return results.map((result) => ({
+        id: result.id,
+        label: result.trajectory_name,
+      }));
     } catch {
       // silent handler
     }
@@ -159,12 +123,12 @@ const AreaLinkTab = ({ studyHorizon }: AreaLinkTabProps) => {
     if (!errorImportMessage && trajectorySelected && rowIndexSelected) {
       const updatedData = [...data];
       updatedData[rowIndexSelected].trajectory = trajectorySelected.trajectory_name;
-      updatedData[rowIndexSelected].status = 'OK';
+      updatedData[rowIndexSelected].status = TRAJECTORY_SELECTION_STATUS.OK;
       setData(updatedData);
     } else if (errorImportMessage) {
       const updatedData = [...data];
       updatedData[rowIndexSelected].trajectory = null;
-      updatedData[rowIndexSelected].status = 'Error';
+      updatedData[rowIndexSelected].status = TRAJECTORY_SELECTION_STATUS.ERROR;
       setData(updatedData);
     }
     toggleModal();
@@ -172,6 +136,7 @@ const AreaLinkTab = ({ studyHorizon }: AreaLinkTabProps) => {
 
   const columns = getAreaLinkTableHeaders(
     optionsDB,
+    t,
     handleTrajectorySelection,
     handlerDeleteSelection,
     handleTrajectoryImport,
@@ -190,7 +155,7 @@ const AreaLinkTab = ({ studyHorizon }: AreaLinkTabProps) => {
       />
       {isModalOpen && (
         <RdsModal size="small">
-          <RdsModal.Title onClose={closeModal}>{t('studyDetails.@import_trajectory')}</RdsModal.Title>
+          <RdsModal.Title onClose={closeModal}>{t('studyDetails.@import_from_file_system')}</RdsModal.Title>
           <RdsModal.Content>
             <SelectAndSearchableInput
               options={optionsFS}
@@ -202,8 +167,8 @@ const AreaLinkTab = ({ studyHorizon }: AreaLinkTabProps) => {
             <RdsButton label="Cancel" onClick={closeModal} color="secondary" />
             <RdsButton
               icon={RdsIconId.Add}
-              label={t('studyDetails.@import_to_db')}
-              onClick={handleImportToDB}
+              label={t('studyDetails.@import')}
+              onClick={() => void handleImportToDB()}
               variant="contained"
               color="primary"
               //disabled={!isFormValid}
