@@ -28,6 +28,7 @@ const UserProvider = ({ children, initialValue }: UserProviderProps) => {
       try {
         if (!isAuthEnabled) {
           console.log('Authentication is disabled in local mode. Mocking user...');
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           setUser({ user: USER_FAKE });
           setLoading(false);
           return;
