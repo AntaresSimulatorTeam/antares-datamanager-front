@@ -13,6 +13,7 @@ interface ProjectManagerProps {
   onSelect: (value: SelectOption) => void;
   setSearchTerm?: (value: string | undefined) => Promise<SelectOption[] | undefined>;
   isSearchable?: boolean;
+  isInputDisabled?: boolean;
 }
 
 const SelectAndSearchableInput = ({
@@ -21,6 +22,7 @@ const SelectAndSearchableInput = ({
   onSelect,
   setSearchTerm,
   isSearchable = false,
+  isInputDisabled = false,
 }: ProjectManagerProps) => {
   const [defaultOptions] = useState<SelectOption[] | undefined>(options);
   const [optionsSelection, setOptionsSelection] = useState<SelectOption[] | undefined>(options);
@@ -28,10 +30,12 @@ const SelectAndSearchableInput = ({
   const [isSelectEnable, setIsSelectEnable] = useState<boolean>(true);
   const [isSearchableEnable, setIsSearchableEnable] = useState<boolean>(false);
   const [placeHolder] = useState<string>(defaultPlaceHolder);
+  const [valueInput, setValueInput] = useState<string>('');
 
   const handleInputChange = async (value: string) => {
     try {
       if (value) {
+        setValueInput(value);
         setIsDropdownOpen(false);
         setIsSelectEnable(false);
         setIsSearchableEnable(true);
@@ -43,6 +47,7 @@ const SelectAndSearchableInput = ({
           }
         });
       } else {
+        setValueInput('');
         setIsSelectEnable(true);
         setIsSearchableEnable(false);
         setIsDropdownOpen(false);
@@ -51,6 +56,11 @@ const SelectAndSearchableInput = ({
     } catch {
       // silent handler
     }
+  };
+
+  const handleSelectOption = (value: SelectOption) => {
+    setValueInput(value?.label);
+    onSelect(value);
   };
 
   return (
@@ -85,32 +95,36 @@ const SelectAndSearchableInput = ({
       </div>
       <RdsInputText
         onChange={(e) => {
-          if (isSearchable) void handleInputChange(e);
+          if (isSearchable) {
+            void handleInputChange(e);
+          } else {
+            setValueInput('');
+          }
         }}
         placeHolder={placeHolder}
         variant="outlined"
-        disabled={!isSearchable}
-        value={''}
+        value={valueInput}
+        onBlur={() => setIsDropdownOpen(false)}
+        disabled={isInputDisabled}
       />
       {isDropdownOpen && optionsSelection && optionsSelection?.length > 0 && (
         <div
-          className="shadow-inner bg-white max-h-40 absolute left-0 top-10 z-10 w-full overflow-y-auto border border-gray-300"
-          // style={{
-          //   backgroundColor: 'white',
-          //   maxHeight: '100px',
-          //   top: '55px',
-          //   left: 0,
-          //   boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-          // }}
+          className="max-h-40 absolute z-50 w-full overflow-y-auto rounded border border-gray-300"
+          style={{
+            backgroundColor: 'white',
+            maxHeight: '100px',
+            top: '55px',
+            left: 0,
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+          }}
           onMouseDown={(e) => e.preventDefault()}
         >
-          {optionsSelection?.map((trajectory, index) => (
+          {optionsSelection.map((trajectory, index) => (
             <div
-              key={index}
+              key={`option-item-${index}`}
               className="cursor-pointer px-2 py-1 hover:bg-gray-200"
-              onClick={(e) => {
-                console.log('==========================e', e);
-                onSelect(trajectory);
+              onClick={() => {
+                handleSelectOption(trajectory);
                 setIsDropdownOpen(false);
               }}
             >

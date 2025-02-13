@@ -28,9 +28,13 @@ function App() {
 
   useEffect(() => {
     const handleAuth = async () => {
-      if (window.location.href.includes('code=')) {
-        await AuthService.handleCallback();
-        window.location.replace('/'); // Redirect to home page after login
+      try {
+        if (window.location.href.includes('code=')) {
+          await AuthService.handleCallback();
+          window.location.replace('/'); // Redirect to home page after login
+        }
+      } catch (error) {
+        console.error('Error during authentication callback:', error);
       }
     };
     void handleAuth();
