@@ -6,9 +6,10 @@
 
 import { User, UserManager } from 'oidc-client-ts';
 import { config } from '@/shared/const/authConfig';
+import { getEnvVariables } from '@/envVariables.ts';
 
 const userManager = new UserManager(config);
-const isAuthEnabled = false; //getEnvVariables('APP_AUTH_ENABLED');
+const isAuthEnabled = getEnvVariables('APP_AUTH_ENABLED');
 
 export const AuthService = {
   login: async () => await userManager.signinRedirect(),

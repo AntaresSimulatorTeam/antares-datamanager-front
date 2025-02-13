@@ -9,6 +9,7 @@ import { UserState } from '@/shared/types';
 import { AuthService } from '@/shared/services/authService';
 import { UserContext } from './UserContext';
 import { USER_FAKE } from '@/mocks/data/list/user.ts';
+import { getEnvVariables } from '@/envVariables.ts';
 
 export interface UserProviderProps {
   children: ReactNode;
@@ -18,7 +19,7 @@ export interface UserProviderProps {
 const UserProvider = ({ children, initialValue }: UserProviderProps) => {
   const [user, setUser] = useState<UserState>(initialValue);
   const [loading, setLoading] = useState(true);
-  const isAuthEnabled = false; //getEnvVariables('APP_AUTH_ENABLED');
+  const isAuthEnabled = getEnvVariables('APP_AUTH_ENABLED');
 
   useEffect(() => {
     const controller = new AbortController();
