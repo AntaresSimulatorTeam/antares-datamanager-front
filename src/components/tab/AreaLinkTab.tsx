@@ -8,7 +8,6 @@ import { useEffect, useMemo, useState } from 'react';
 import StdSimpleTable from '@common/data/stdSimpleTable/StdSimpleTable.tsx';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import getAreaLinkTableHeaders from '@/pages/pegase/studies/studyDetails/AreaLinkTableHeaders.tsx';
-import { RdsButton, RdsIconId, RdsModal } from 'rte-design-system-react';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { useTranslation } from 'react-i18next';
 import { addTrajectory, fetchTrajectoriesFromDB } from '@/shared/services/trajectoryService.ts';
