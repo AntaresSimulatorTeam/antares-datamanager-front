@@ -28,7 +28,7 @@ export const ImportTrajectoryModal = ({ options, onClose, handleFileImport }: Im
         {t('studyDetails.@import_from_file_system')}
       </RdsModal.Title>
       <RdsModal.Content>
-        <div className="pb-120-80 w-2/5" style={{ height: '100px' }}>
+        <div className="pb-120-80 w-2/5" style={{ height: '110px' }}>
           <SelectAndSearchableInput
             options={options}
             defaultPlaceHolder={t('studyDetails.@select_trajectory')}

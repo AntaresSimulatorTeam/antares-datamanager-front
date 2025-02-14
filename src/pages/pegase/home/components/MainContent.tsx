@@ -8,7 +8,7 @@ import { Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import PegaseStar from '@/components/pegase/star/PegaseStar';
 import ProjectDetails from '@/pages/pegase/projects/projectDetails/ProjectDetails';
-import StudyDetails from '@/pages/pegase/studies/studyDetails/studyDetails';
+import StudyDetails from '@/pages/pegase/studies/studyDetails/StudyDetails';
 import { menuBottomData, menuTopData } from '@/routes';
 import { UserSettingsContext } from '@/store/contexts/UserSettingsContext';
 import { THEME_COLOR } from '@/shared/types';
