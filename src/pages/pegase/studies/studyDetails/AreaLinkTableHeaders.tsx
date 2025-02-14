@@ -6,12 +6,12 @@
 
 import { createColumnHelper } from '@tanstack/react-table';
 import { RdsButton, RdsIcon, RdsIconButton, RdsIconId } from 'rte-design-system-react';
-import { AreaAndLinkRowData } from '@/shared/types/Trajectory.type.ts';
+import { AreaAndLinkRowData } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
-import { ButtonPreview } from '@/components/button/ButtonPreview';
 import SelectAndSearchableInput from '@/components/input/SelectAndSearchableInput.tsx';
+import { ButtonPreview } from '@/components/button/ButtonPreview.tsx';
 
 const columnHelper = createColumnHelper<AreaAndLinkRowData>();
 
@@ -30,15 +30,7 @@ const getAreaLinkTableHeaders = (
       return (
         <div className="inline-flex w-[180px] items-center gap-2">
           {getValue()}
-          {trajectory ? (
-            <ButtonPreview
-              label={t('studyDetails.@preview')}
-              icon={StdIconId.Preview}
-              position="left"
-              width={16}
-              height={16}
-            />
-          ) : null}
+          {trajectory ? <ButtonPreview label={'View'} icon={StdIconId.Preview} position={'left'} /> : null}
         </div>
       );
     },
@@ -82,19 +74,19 @@ const getAreaLinkTableHeaders = (
       if (status === TRAJECTORY_SELECTION_STATUS.MISSING)
         return (
           <div className="flex flex-1 items-end gap-1">
-            <StdIcon name={StdIconId.QuestionMark} color="text-error-500" /> {t('studyDetails@import_status_missing')}
+            <StdIcon name={StdIconId.QuestionMark} color="text-error-500" /> {t('studyDetails.@import_status_missing')}
           </div>
         );
       if (status === TRAJECTORY_SELECTION_STATUS.OK)
         return (
           <div className="flex flex-1 items-end gap-1">
-            <RdsIcon name={RdsIconId.Done} color="secondary" /> {t('studyDetails@import_status_ok')}
+            <RdsIcon name={RdsIconId.Done} color="secondary" /> {t('studyDetails.@import_status_done')}
           </div>
         );
       if (status === TRAJECTORY_SELECTION_STATUS.ERROR)
         return (
           <div className="flex flex-1 items-end gap-1">
-            <RdsIcon name={RdsIconId.Info} color="text-error-500" /> {t('studyDetails@import_status_error')}
+            <RdsIcon name={RdsIconId.Info} color="text-error-500" /> {t('studyDetails.@import_status_error')}
           </div>
         );
       return null;

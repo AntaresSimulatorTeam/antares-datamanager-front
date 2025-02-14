@@ -37,8 +37,8 @@ const AreaLinkTab = ({ studyHorizon }: AreaLinkTabProps) => {
   const [errorImportMessage, setErrorImportMessage] = useState<string | undefined>();
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const { t } = useTranslation();
-  const { trajectories: trajectoriesArea } = useFetchTrajectoriesFromDB(TRAJECTORY_TYPE.AREA, '2025-2026');
-  const { trajectories: trajectoriesLink } = useFetchTrajectoriesFromDB(TRAJECTORY_TYPE.LINK, '2030-2031');
+  const { trajectories: trajectoriesArea } = useFetchTrajectoriesFromDB(TRAJECTORY_TYPE.AREA, studyHorizon);
+  const { trajectories: trajectoriesLink } = useFetchTrajectoriesFromDB(TRAJECTORY_TYPE.LINK, studyHorizon);
 
   useEffect(() => {
     if (trajectoriesArea && trajectoriesLink) {
@@ -110,7 +110,7 @@ const AreaLinkTab = ({ studyHorizon }: AreaLinkTabProps) => {
     try {
       const results = await fetchTrajectoriesFromDB(
         index === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
-        '2023-2024',
+        studyHorizon,
         value,
       );
       return convertToSelectionOptionType(results);

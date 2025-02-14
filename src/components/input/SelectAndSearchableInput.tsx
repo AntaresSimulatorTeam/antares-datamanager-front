@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { RdsButton, RdsIconId, RdsInputText } from 'rte-design-system-react';
 
 interface ProjectManagerProps {
@@ -31,6 +31,7 @@ const SelectAndSearchableInput = ({
   const [isSearchableEnable, setIsSearchableEnable] = useState<boolean>(false);
   const [placeHolder] = useState<string>(defaultPlaceHolder);
   const [valueInput, setValueInput] = useState<string>('');
+  const dropdownList = useRef<HTMLDivElement | null>(null);
 
   const handleInputChange = async (value: string) => {
     try {
@@ -61,6 +62,7 @@ const SelectAndSearchableInput = ({
   const handleSelectOption = (value: SelectOption) => {
     setValueInput(value?.label);
     onSelect(value);
+    setIsDropdownOpen(false);
   };
 
   return (
@@ -86,6 +88,9 @@ const SelectAndSearchableInput = ({
             variant="text"
             onClick={(e) => {
               setIsDropdownOpen((prev) => !prev);
+              setTimeout(() => {
+                dropdownList.current?.focus();
+              }, 0);
               e.stopPropagation();
             }}
             color="secondary"
@@ -99,34 +104,28 @@ const SelectAndSearchableInput = ({
             void handleInputChange(e);
           } else {
             setValueInput('');
+            setIsDropdownOpen(false);
           }
         }}
         placeHolder={placeHolder}
         variant="outlined"
         value={valueInput}
-        onBlur={() => setIsDropdownOpen(false)}
         disabled={isInputDisabled}
       />
       {isDropdownOpen && optionsSelection && optionsSelection?.length > 0 && (
         <div
-          className="max-h-40 absolute z-50 w-full overflow-y-auto rounded border border-gray-300"
-          style={{
-            backgroundColor: 'white',
-            maxHeight: '100px',
-            top: '55px',
-            left: 0,
-            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-          }}
+          className="absolute left-0 top-7 z-50 max-h-14 w-full overflow-y-auto rounded border border-gray-300 bg-gray-w shadow-2 outline-none"
           onMouseDown={(e) => e.preventDefault()}
+          ref={dropdownList}
+          tabIndex={0}
+          onBlur={() => setIsDropdownOpen(false)}
         >
           {optionsSelection.map((trajectory, index) => (
             <div
               key={`option-item-${index}`}
+              role="option"
               className="cursor-pointer px-2 py-1 hover:bg-gray-200"
-              onClick={() => {
-                handleSelectOption(trajectory);
-                setIsDropdownOpen(false);
-              }}
+              onClick={() => handleSelectOption(trajectory)}
             >
               {trajectory.label}
             </div>

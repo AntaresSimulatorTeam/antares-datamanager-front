@@ -30,7 +30,7 @@ const StudyNavigationMenu = ({
     switch (activeTab) {
       case TRAJECTORY_TYPE.AREA:
         return <AreaLinkTab studyHorizon={horizon} />;
-      case TRAJECTORY_TYPE.LINK:
+      case TRAJECTORY_TYPE.LOAD:
         return <LoadTab />;
       case TRAJECTORY_TYPE.THERMAL_COST:
         return <ThermalTab />;
@@ -55,11 +55,11 @@ const StudyNavigationMenu = ({
   };
 
   const tabs = [
-    { name: TRAJECTORY_TYPE.AREA, label: t('studyDetails@areas_links'), icon: StdIconId.LinkedServices },
-    { name: TRAJECTORY_TYPE.LOAD, label: t('studyDetails@load'), icon: StdIconId.BatteryChargingFull },
-    { name: TRAJECTORY_TYPE.THERMAL_COST, label: t('studyDetails@thermal'), icon: StdIconId.LocalFireDepartment },
-    { name: TRAJECTORY_TYPE.ENR, label: t('studyDetails@enr'), icon: StdIconId.EnergySavingsLeaf },
-    { name: TRAJECTORY_TYPE.MISC, label: t('studyDetails@misc'), icon: StdIconId.Category },
+    { name: TRAJECTORY_TYPE.AREA, label: t('studyDetails.@areas_links'), icon: StdIconId.LinkedServices },
+    { name: TRAJECTORY_TYPE.LOAD, label: t('studyDetails.@load'), icon: StdIconId.BatteryChargingFull },
+    { name: TRAJECTORY_TYPE.THERMAL_COST, label: t('studyDetails.@thermal'), icon: StdIconId.LocalFireDepartment },
+    { name: TRAJECTORY_TYPE.ENR, label: t('studyDetails.@enr'), icon: StdIconId.EnergySavingsLeaf },
+    { name: TRAJECTORY_TYPE.MISC, label: t('studyDetails.@misc'), icon: StdIconId.Category },
   ];
 
   return (
