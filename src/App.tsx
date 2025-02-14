@@ -26,7 +26,7 @@ function App() {
     void handleAuth();
   }, []);
 
-  return isAuthenticationActive ? (
+  return !isAuthenticationActive ? (
     <MainContent />
   ) : (
     <UserProvider initialValue={{ user: null }}>
