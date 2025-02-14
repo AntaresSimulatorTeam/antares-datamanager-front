@@ -74,7 +74,8 @@ const getAreaLinkTableHeaders = (
       if (status === TRAJECTORY_SELECTION_STATUS.MISSING)
         return (
           <div className="flex flex-1 items-end gap-1">
-            <StdIcon name={StdIconId.QuestionMark} color="text-error-500" /> {t('studyDetails.@import_status_missing')}
+            <StdIcon name={StdIconId.QuestionMark} color="text-warning-500" />{' '}
+            {t('studyDetails.@import_status_missing')}
           </div>
         );
       if (status === TRAJECTORY_SELECTION_STATUS.OK)
