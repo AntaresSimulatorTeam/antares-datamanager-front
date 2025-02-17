@@ -14,9 +14,13 @@ function App() {
   const isAuthenticationActive = import.meta.env.VITE_IS_AUTHENTICATION_ACTIVE ?? true; // true if no variable is set
   useEffect(() => {
     const handleAuth = async () => {
-      if (window.location.href.includes('code=')) {
-        await AuthService.handleCallback();
-        window.location.replace('/'); // Redirect to home page after login
+      try {
+        if (window.location.href.includes('code=')) {
+          await AuthService.handleCallback();
+          window.location.replace('/'); // Redirect to home page after login
+        }
+      } catch (error) {
+        console.error('Error during authentication callback:', error);
       }
     };
     void handleAuth();

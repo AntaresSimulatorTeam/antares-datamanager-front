@@ -6,7 +6,7 @@
 
 import StdAvatar from '@/components/common/layout/stdAvatar/StdAvatar';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type';
-import { StudyDTO } from '@/shared/types/pegase/Study.type.ts';
+import { StudyDTO } from '@/shared/types/Study.type.ts';
 import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter';
 import { createColumnHelper } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';

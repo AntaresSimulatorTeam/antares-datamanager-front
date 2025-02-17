@@ -4,7 +4,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-// src/components/ProjectInput.tsx
 import React, { useEffect, useState } from 'react';
 import { RdsInputText } from 'rte-design-system-react';
 import { fetchProjectsFromPartialName } from '@/shared/services/projectService';

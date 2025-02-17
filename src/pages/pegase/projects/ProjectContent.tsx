@@ -17,7 +17,7 @@ import { deleteProjectById } from '@/shared/services/projectService.ts';
 import { RdsChip, RdsTagList } from 'rte-design-system-react';
 import { useFetchProjectList } from '@/hooks/useFetchProjectList';
 import { useHandlePinnedProjectList } from '@/hooks/useHandlePinnedProjectList.ts';
-import { ProjectActionType } from '@/shared/types/pegase/Project.type.ts';
+import { ProjectActionType } from '@/shared/types/Project.type.ts';
 import { useProject, useProjectDispatch } from '@/store/contexts/ProjectContext.tsx';
 import { PROJECT_ACTION } from '@/shared/enum/project.ts';
 

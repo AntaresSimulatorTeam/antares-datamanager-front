@@ -77,13 +77,9 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
     }
   };
 
-  const handleStudyClick = (study: StudyDTO) => {
-    navigateToStudy(study);
-  };
-
   const handleRowClick = () => {
     const selectedStudy = rows[Number.parseInt(selectedRowId || '-1')];
-    handleStudyClick(selectedStudy);
+    navigateToStudy(selectedStudy);
   };
 
   const sortedHeaders = addSortColumn(headers, handleSort, sortBy, sortedColumn, handleHeaderHover, isHeaderHovered);

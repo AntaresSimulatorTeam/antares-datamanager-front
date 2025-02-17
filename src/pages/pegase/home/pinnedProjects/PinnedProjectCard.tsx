@@ -15,7 +15,7 @@ import { deleteProjectById } from '@/shared/services/projectService';
 import { useHandlePinnedProjectList } from '@/hooks/useHandlePinnedProjectList.ts';
 import { notifyToast } from '@/shared/notification/notification.tsx';
 import { useProject, useProjectDispatch } from '@/store/contexts/ProjectContext.tsx';
-import { ProjectActionType } from '@/shared/types/pegase/Project.type.ts';
+import { ProjectActionType } from '@/shared/types/Project.type.ts';
 import { PROJECT_ACTION } from '@/shared/enum/project.ts';
 
 const PinnedProjectCards = () => {

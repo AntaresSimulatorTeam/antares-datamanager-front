@@ -4,14 +4,12 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-const MiscTab = () => {
-
-
-    return (
-        <div className="flex-1">
-            <h1>Misc</h1>
-        </div>
-    );
+const ThermalTab = () => {
+  return (
+    <div className="flex-1">
+      <h1>Thermal</h1>
+    </div>
+  );
 };
 
-export default MiscTab;
+export default ThermalTab;

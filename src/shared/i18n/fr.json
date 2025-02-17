@@ -63,5 +63,24 @@
     "@open": "Ouvrir",
     "@duplicate": "Dupliquer",
     "@delete": "Effacer"
+  },
+  "studyDetails": {
+    "@hypothesis": "Hypothèse",
+    "@area": "Zone",
+    "@link": "Lien",
+    "@areas_links": "Zones & Liens",
+    "@load": "Consommation",
+    "@thermal": "Central thermique",
+    "@enr": "Energie renouvelable",
+    "@misc": "Misc",
+    "@trajectory": "Trajectoire",
+    "@select_trajectory": "Selectionner une trajectoire",
+    "@select_file": "Selectionner un fichier",
+    "@import_from_file_system": "Importer du système de fichier",
+    "@import": "Importer",
+    "@preview": "Prévisualisation",
+    "@import_status_done": "OK",
+    "@import_status_missing": "Missing",
+    "@import_status_error": "Error"
   }
 }

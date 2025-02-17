@@ -65,5 +65,25 @@
     "@open": "Open",
     "@duplicate": "Duplicate",
     "@delete": "Delete"
+  },
+  "studyDetails": {
+    "@hypothesis": "Hypothesis",
+    "@area": "Area",
+    "@link": "Link",
+    "@areas_links": "Areas & Links",
+    "@load": "Load",
+    "@thermal": "thermal",
+    "@enr": "ENR",
+    "@misc": "Misc",
+    "@trajectory": "Trajectory",
+    "@select_trajectory": "Select a trajectory",
+    "@select_link": "Add an area first",
+    "@select_file": "Select a file",
+    "@import_from_file_system": "Import from File System",
+    "@import": "Import",
+    "@import_status_done": "OK",
+    "@import_status_missing": "Missing",
+    "@import_status_error": "Error",
+    "@preview": "View"
   }
 }

@@ -5,7 +5,7 @@
  */
 
 import { createContext, Dispatch, ReactNode, useContext, useReducer } from 'react';
-import { ProjectActionType, ProjectState } from '@/shared/types/pegase/Project.type';
+import { ProjectActionType, ProjectState } from '@/shared/types/Project.type.ts';
 import projectReducer from '@/store/reducers/projectReducer';
 
 const initialState: ProjectState = { projects: [], pinnedProjects: [] };

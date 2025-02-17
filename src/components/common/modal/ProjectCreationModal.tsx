@@ -11,7 +11,7 @@ import KeywordsInput from '@/pages/pegase/studies/KeywordsInput';
 import { createProject } from '@/shared/services/projectService';
 import { notifyToast } from '@/shared/notification/notification.tsx';
 import { PROJECT_ACTION } from '@/shared/enum/project.ts';
-import { ProjectActionType } from '@/shared/types/pegase/Project.type.ts';
+import { ProjectActionType } from '@/shared/types/Project.type.ts';
 import { useProjectDispatch } from '@/store/contexts/ProjectContext.tsx';
 
 interface ProjectCreationModalProps {
@@ -41,9 +41,9 @@ export const ProjectCreationModal = ({ onClose }: ProjectCreationModalProps) => 
   const handleCreateProject = async () => {
     try {
       const projectData = {
-        name: name,
+        name,
         tags: keywords,
-        description: description,
+        description,
       };
 
       const newProject = await createProject(projectData);
@@ -79,8 +79,8 @@ export const ProjectCreationModal = ({ onClose }: ProjectCreationModalProps) => 
           <RdsInputText
             label="Name"
             value={name}
-            onChange={(t) => {
-              if (t.length <= 40) setName(t || '');
+            onChange={(text: string) => {
+              if (text.length <= 40) setName(text || '');
             }}
             variant="outlined"
             placeHolder="Name your project..."
@@ -92,8 +92,8 @@ export const ProjectCreationModal = ({ onClose }: ProjectCreationModalProps) => 
             <RdsInputTextArea
               label="Description"
               value={description}
-              onChange={(t) => {
-                if (t.length <= 500) setDescription(t || '');
+              onChange={(text) => {
+                if (text.length <= 500) setDescription(text || '');
               }}
               maxLength={500}
               placeHolder="Add a few lines to describe your project..."

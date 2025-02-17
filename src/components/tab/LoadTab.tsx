@@ -5,13 +5,11 @@
  */
 
 const LoadTab = () => {
-
-
-    return (
-        <div className="flex-1">
-            <h1>Load</h1>
-        </div>
-    );
+  return (
+    <div className="flex-1">
+      <h1>Load</h1>
+    </div>
+  );
 };
 
 export default LoadTab;

@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { ProjectActionType, ProjectInfo, ProjectState } from '@/shared/types/pegase/Project.type';
+import { ProjectActionType, ProjectInfo, ProjectState } from '@/shared/types/Project.type.ts';
 import { PROJECT_ACTION } from '@/shared/enum/project';
 
 // PROJECTS

@@ -15,46 +15,43 @@ export const useDropdownOptions = () => {
   const { t } = useTranslation();
 
   const settingOption = useCallback(
-    (onClick: () => void, label?: string, disabled?: boolean): RdsDropdownOption => {
-      return {
+    (onClick: () => void, label?: string, disabled?: boolean): RdsDropdownOption =>
+      ({
         key: 'setting',
         label: label ?? t('project.@setting'),
         value: 'setting',
         onItemClick: onClick,
-        disabled: disabled,
+        disabled,
         icon: RdsIconId.Settings,
         extraClasses: NO_WRAP_CLASS,
-      } as RdsDropdownOption;
-    },
+      }) as RdsDropdownOption,
     [t],
   );
 
   const deleteOption = useCallback(
-    (onClick: () => void, label?: string, disabled?: boolean): RdsDropdownOption => {
-      return {
+    (onClick: () => void, label?: string, disabled?: boolean): RdsDropdownOption =>
+      ({
         key: 'delete',
         label: label ?? t('project.@delete'),
         value: 'delete',
         icon: RdsIconId.Delete,
         onItemClick: onClick,
         extraClasses: clsx(NO_WRAP_CLASS, '[&]:text-error-600 [&]:hover:text-error-600'),
-        disabled: disabled,
-      } as RdsDropdownOption;
-    },
+        disabled,
+      }) as RdsDropdownOption,
     [t],
   );
 
   const pinOption = useCallback(
-    (pinned: boolean, onClick: () => void): RdsDropdownOption => {
-      return {
+    (pinned: boolean, onClick: () => void): RdsDropdownOption =>
+      ({
         key: 'pin',
         label: pinned ? t('project.@unpin') : t('project.@pin'),
         value: 'pin',
         icon: pinned ? RdsIconId.KeepOff : RdsIconId.PushPin,
         onItemClick: onClick,
         extraClasses: NO_WRAP_CLASS,
-      } as RdsDropdownOption;
-    },
+      }) as RdsDropdownOption,
     [t],
   );
 

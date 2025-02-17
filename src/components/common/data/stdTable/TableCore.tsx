@@ -70,9 +70,7 @@ type TableDataCellProps<TData> = {
 
 const TableDataCell = <TData,>({ cell }: TableDataCellProps<TData>) => (
   <td className="text-left">
-    <div className="flex flex-1 items-center px-1 py-0.5">
-      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-    </div>
+    <div className="px-1 py-0.5">{flexRender(cell.column.columnDef.cell, cell.getContext())}</div>
   </td>
 );
 
@@ -119,20 +117,18 @@ const TableCore = <TData,>({ table, id: propId, striped, trClassName, columnSize
         </tr>
       </thead>
       <tbody>
-        {table.getRowModel().rows.map((row) => {
-          return (
-            <tr
-              key={row.id}
-              className={tableCoreRowClassBuilder(striped, row.getIsSelected(), row.getReadOnly?.(), trClassName)}
-              onClick={handleToggleRow(row)}
-              aria-readonly={row.getReadOnly?.()}
-            >
-              {row.getVisibleCells().map((cell) => (
-                <TableDataCell key={cell.id} cell={cell} />
-              ))}
-            </tr>
-          );
-        })}
+        {table.getRowModel().rows.map((row) => (
+          <tr
+            key={row.id}
+            className={tableCoreRowClassBuilder(striped, row.getIsSelected(), row.getReadOnly?.(), trClassName)}
+            onClick={handleToggleRow(row)}
+            aria-readonly={row.getReadOnly?.()}
+          >
+            {row.getVisibleCells().map((cell) => (
+              <TableDataCell key={cell.id} cell={cell} />
+            ))}
+          </tr>
+        ))}
       </tbody>
     </table>
   );
