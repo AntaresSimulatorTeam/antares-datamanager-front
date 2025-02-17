@@ -5,6 +5,7 @@
  */
 
 import { User } from 'oidc-client-ts';
+import { getEnvVariables } from '@/envVariables.ts';
 
 type ProfileWithRole = User & {
   profile: {
@@ -16,3 +17,12 @@ type ProfileWithRole = User & {
 
 export const hasUserRole = (role: string, user: ProfileWithRole): boolean =>
   user?.profile.realm_access.roles?.includes(role);
+
+export const isAuthenticationActive = (): boolean => {
+  const isAuthActive: string | undefined = getEnvVariables('VITE_IS_AUTHENTICATION_ACTIVE');
+  if (isAuthActive === 'false') {
+    return false;
+  } else {
+    return isAuthActive === 'true' || isAuthActive === undefined; // true if no variable is set or set to true
+  }
+};

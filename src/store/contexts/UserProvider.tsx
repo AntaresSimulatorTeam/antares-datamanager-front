@@ -8,8 +8,6 @@ import { ReactNode, useEffect, useState } from 'react';
 import { UserState } from '@/shared/types';
 import { AuthService } from '@/shared/services/authService';
 import { UserContext } from './UserContext';
-import { USER_FAKE } from '@/mocks/data/list/user.ts';
-import { getEnvVariables } from '@/envVariables.ts';
 
 export interface UserProviderProps {
   children: ReactNode;
@@ -19,20 +17,12 @@ export interface UserProviderProps {
 const UserProvider = ({ children, initialValue }: UserProviderProps) => {
   const [user, setUser] = useState<UserState>(initialValue);
   const [loading, setLoading] = useState(true);
-  const isAuthEnabled = getEnvVariables('APP_AUTH_ENABLED');
 
   useEffect(() => {
     const controller = new AbortController();
 
     const getUser = async () => {
       try {
-        if (!isAuthEnabled) {
-          console.log('Authentication is disabled in local mode. Mocking user...');
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          setUser({ user: USER_FAKE });
-          setLoading(false);
-          return;
-        }
         const userInfo = await AuthService.getUser();
         if (!userInfo) {
           await AuthService.login();

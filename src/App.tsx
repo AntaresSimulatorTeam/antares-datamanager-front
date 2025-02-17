@@ -9,9 +9,9 @@ import './App.css';
 import UserProvider from '@/store/contexts/UserProvider.tsx';
 import { AuthService } from '@/shared/services/authService.ts';
 import MainContent from '@/pages/pegase/home/components/MainContent';
+import { isAuthenticationActive } from '@/shared/utils/authUtils.ts';
 
 function App() {
-  const isAuthenticationActive = import.meta.env.VITE_IS_AUTHENTICATION_ACTIVE ?? true; // true if no variable is set
   useEffect(() => {
     const handleAuth = async () => {
       try {
@@ -26,7 +26,7 @@ function App() {
     void handleAuth();
   }, []);
 
-  return !isAuthenticationActive ? (
+  return !isAuthenticationActive() ? (
     <MainContent />
   ) : (
     <UserProvider initialValue={{ user: null }}>

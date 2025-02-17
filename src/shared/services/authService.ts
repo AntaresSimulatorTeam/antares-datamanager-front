@@ -6,10 +6,9 @@
 
 import { User, UserManager } from 'oidc-client-ts';
 import { config } from '@/shared/const/authConfig';
-import { getEnvVariables } from '@/envVariables.ts';
+import { isAuthenticationActive } from '@/shared/utils/authUtils.ts';
 
 const userManager = new UserManager(config);
-const isAuthEnabled = getEnvVariables('APP_AUTH_ENABLED');
 
 export const AuthService = {
   login: async () => await userManager.signinRedirect(),
@@ -24,7 +23,7 @@ export const AuthService = {
   },
 
   authFetch: async (url: string, options: RequestInit = {}): Promise<Response> => {
-    if (isAuthEnabled) {
+    if (isAuthenticationActive()) {
       const token = await AuthService.getAccessToken();
       if (token) {
         // Add Authorization header for different types of options.headers
