@@ -9,6 +9,7 @@ type EnvVariableType = {
   VITE_OAUTH2_CLIENT_ID: string;
   VITE_OAUTH2_REDIRECT_URL: string;
   VITE_OAUTH2_AUTHORITY: string;
+  VITE_IS_AUTHENTICATION_ACTIVE: string;
 };
 
 // Environment Variable Template to Be Replaced at Runtime
@@ -17,6 +18,7 @@ export const envVariables: EnvVariableType = {
   VITE_OAUTH2_CLIENT_ID: '${PEGASE_OAUTH2_CLIENT_ID}',
   VITE_OAUTH2_REDIRECT_URL: '${PEGASE_OAUTH2_REDIRECT_URL}',
   VITE_OAUTH2_AUTHORITY: '${PEGASE_OAUTH2_AUTHORITY}',
+  VITE_IS_AUTHENTICATION_ACTIVE: '${PEGASE_AUTHENTIFICATION_ACTIVE}'
 };
 export const getEnvVariables = (key: keyof EnvVariableType): string =>
   envVariables[key]?.startsWith('$') ? (import.meta.env[key] as string) : envVariables[key];
