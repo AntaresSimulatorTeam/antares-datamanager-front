@@ -8,9 +8,15 @@ interface ImportTrajectoryModalProps {
   options: SelectOption[] | undefined;
   onClose: () => void;
   handleFileImport: (value: SelectOption | null) => Promise<void>;
+  trajectoryType: string;
 }
 
-export const ImportTrajectoryModal = ({ options, onClose, handleFileImport }: ImportTrajectoryModalProps) => {
+export const ImportTrajectoryModal = ({
+  options,
+  onClose,
+  handleFileImport,
+  trajectoryType,
+}: ImportTrajectoryModalProps) => {
   const { t } = useTranslation();
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [trajectorySelected, setTrajectorySelected] = useState<SelectOption | null>(null);
@@ -25,7 +31,7 @@ export const ImportTrajectoryModal = ({ options, onClose, handleFileImport }: Im
   return (
     <RdsModal size="small">
       <RdsModal.Title onClose={onClose} icon="Upload">
-        {t('studyDetails.@import_from_file_system')}
+        {t('studyDetails.@import_from_file_system', { trajectoryType })}
       </RdsModal.Title>
       <RdsModal.Content>
         <div className="pb-120-80 w-2/5" style={{ height: '110px' }}>
