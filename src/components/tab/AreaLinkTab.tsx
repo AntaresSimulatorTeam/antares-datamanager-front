@@ -52,8 +52,8 @@ const AreaLinkTab = ({ studyHorizon }: AreaLinkTabProps) => {
 
   const handleFetchTrajectoriesFS = async (index: number) => {
     try {
-      //TODO
       const results = await fetchTrajectoriesFromFS(index === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK);
+      setRowIndexSelected(index);
       setTrajectoriesFS(results);
       setOptionsFS(
         results.map((result, indexTrajectory) => ({
@@ -65,7 +65,6 @@ const AreaLinkTab = ({ studyHorizon }: AreaLinkTabProps) => {
       setTrajectorySelected(null);
     } catch (error: unknown) {
       setErrorImportMessage(error as string);
-    } finally {
       setRowIndexSelected(index);
     }
   };
@@ -164,7 +163,12 @@ const AreaLinkTab = ({ studyHorizon }: AreaLinkTabProps) => {
         state={{ readOnly }}
       />
       {isModalOpen && (
-        <ImportTrajectoryModal options={optionsFS} onClose={closeModal} handleFileImport={handleTrajectoryImportToDB} />
+        <ImportTrajectoryModal
+          options={optionsFS}
+          onClose={closeModal}
+          handleFileImport={handleTrajectoryImportToDB}
+          trajectoryType={rowIndexSelected === 0 ? 'areas' : 'links'}
+        />
       )}
     </div>
   );

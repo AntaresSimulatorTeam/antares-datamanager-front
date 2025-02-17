@@ -76,7 +76,7 @@
     "@trajectory": "Trajectoire",
     "@select_trajectory": "Selectionner une trajectoire",
     "@select_file": "Selectionner un fichier",
-    "@import_from_file_system": "Importer du système de fichier",
+    "@import_from_file_system": "Importer {{trajectoryType}} du système de fichier",
     "@import": "Importer",
     "@preview": "Prévisualisation",
     "@import_status_done": "OK",

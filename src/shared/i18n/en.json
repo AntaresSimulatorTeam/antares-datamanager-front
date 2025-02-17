@@ -79,7 +79,7 @@
     "@select_trajectory": "Select a trajectory",
     "@select_link": "Add an area first",
     "@select_file": "Select a file",
-    "@import_from_file_system": "Import from File System",
+    "@import_from_file_system": "Select {{trajectoryType}} from File System",
     "@import": "Import",
     "@import_status_done": "OK",
     "@import_status_missing": "Missing",
