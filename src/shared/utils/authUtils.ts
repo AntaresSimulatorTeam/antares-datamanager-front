@@ -5,7 +5,6 @@
  */
 
 import { User } from 'oidc-client-ts';
-import { getEnvVariables } from '@/envVariables.ts';
 
 type ProfileWithRole = User & {
   profile: {
@@ -19,7 +18,8 @@ export const hasUserRole = (role: string, user: ProfileWithRole): boolean =>
   user?.profile.realm_access.roles?.includes(role);
 
 export const isAuthenticationActive = (): boolean => {
-  const isAuthActive: string | undefined = getEnvVariables('VITE_IS_AUTHENTICATION_ACTIVE');
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const isAuthActive: string | undefined = import.meta.env.VITE_IS_AUTHENTICATION_ACTIVE;
   if (isAuthActive === 'false') {
     return false;
   } else {
