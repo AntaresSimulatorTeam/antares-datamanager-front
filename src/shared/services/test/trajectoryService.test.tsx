@@ -20,14 +20,11 @@ vi.mock('@/envVariables', () => ({
 
 const mockResponseDB: DbTrajectory = {
   id: 1,
-  // eslint-disable-next-line camelcase
-  trajectory_name: 'area_BP_23_v6',
+  trajectoryName: 'area_BP_23_v6',
   type: TRAJECTORY_TYPE.AREA,
   version: 6,
-  // eslint-disable-next-line camelcase
-  user_name: 'mouad',
-  // eslint-disable-next-line camelcase
-  creation_date: '2024-07-22 15:13:56.860045' as unknown as Date,
+  userName: 'mouad',
+  creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
 };
 
 describe('fetchTrajectoriesFromDB', () => {
@@ -82,11 +79,9 @@ describe('fetchTrajectoriesFromDB', () => {
 
 describe('fetchTrajectoriesFromFS', () => {
   const mockResponseFS = {
-    // eslint-disable-next-line camelcase
-    trajectory_name: 'area_BP_23_v6',
+    trajectoryName: 'area_BP_23_v6',
     type: TRAJECTORY_TYPE.AREA,
-    // eslint-disable-next-line camelcase
-    last_modified_date: '2024-07-22 15:13:56.860045',
+    lastModifiedDate: '2024-07-22 15:13:56.860045',
   };
 
   beforeEach(() => {

@@ -11,13 +11,13 @@ import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
 export const convertToSelectionOptionType = (trajectories: DbTrajectory[]): SelectOption[] =>
   trajectories.map((trajectory) => ({
     id: trajectory.id,
-    label: trajectory.trajectory_name,
+    label: trajectory.trajectoryName,
   }));
 
 export const convertToFSSelectionOptionType = (options: FsTrajectory[]): SelectOption[] =>
   options.map((option, indexTrajectory) => ({
     id: `option-fs-${indexTrajectory}`,
-    label: option.trajectory_name ? option.trajectory_name.substring(0, option.trajectory_name.lastIndexOf('.')) : '',
+    label: option.trajectoryName ? option.trajectoryName.substring(0, option.trajectoryName.lastIndexOf('.')) : '',
   }));
 
 export const getStatus = (status: RowStatus) => {
