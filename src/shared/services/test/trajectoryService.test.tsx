@@ -137,6 +137,14 @@ describe('fetchTrajectoriesFromFS', () => {
 });
 
 describe('addTrajectory', () => {
+  const onProgress = vi.fn();
+  const requestOptions = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+
   beforeEach(() => {
     global.fetch = vi.fn();
     vi.clearAllMocks();
@@ -153,13 +161,13 @@ describe('addTrajectory', () => {
       json: async () => Promise.resolve(mockResponseDB),
     });
 
-    await addTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026');
+    await addTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026', onProgress);
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledTimes(1);
       expect(global.fetch).toHaveBeenCalledWith(
         `https://mockapi.com/v1/trajectory?trajectoryType=AREA&trajectoryToUse=area_BP_23_v6&horizon=2025-2026`,
-        {},
+        requestOptions,
       );
     });
   });
@@ -170,17 +178,17 @@ describe('addTrajectory', () => {
       ok: false,
     });
 
-    await expect(async () => addTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026')).rejects.toThrowError(
-      'Failed to import trajectory into data base',
-    );
+    await expect(async () =>
+      addTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026', onProgress),
+    ).rejects.toThrowError('Failed to import trajectory into data base');
   });
 
   it('should handle exceptions during fetch', async () => {
     //Fetch throwing an error mock
     global.fetch = vi.fn().mockRejectedValueOnce(new Error('Network error'));
 
-    await expect(async () => addTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026')).rejects.toThrowError(
-      'Network error',
-    );
+    await expect(async () =>
+      addTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026', onProgress),
+    ).rejects.toThrowError('Network error');
   });
 });
