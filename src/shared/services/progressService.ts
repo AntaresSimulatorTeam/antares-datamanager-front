@@ -8,8 +8,6 @@ const simulateProgress = async (duration: number, onProgress: (value: number) =>
       if (!startTime) startTime = timestamp;
       const elapsed = timestamp - startTime;
       const progress = Math.min((elapsed / duration) * 100, 100);
-      // progressElement.style.width = progress + '%';
-      // progressElement.textContent = Math.floor(progress) + '%';
       onProgress(progress);
 
       if (progress < 100) {
