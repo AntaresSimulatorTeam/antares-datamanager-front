@@ -1,25 +1,32 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { RdsButton, RdsIconId, RdsModal } from 'rte-design-system-react';
+import { FileInputStatus, RdsButton, RdsIconId, RdsModal } from 'rte-design-system-react';
 import SelectAndSearchableInput from '@/components/input/SelectAndSearchableInput.tsx';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
+import { ProgressBar } from '@/components/forms/ProgressBar.tsx';
+import { DbTrajectory } from '@/shared/types';
+import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { addTrajectory } from '@/shared/services/trajectoryService.ts';
 
 interface ImportTrajectoryModalProps {
   options: SelectOption[] | undefined;
   onClose: () => void;
-  handleFileImport: (value: SelectOption | null) => Promise<void>;
-  trajectoryType: string;
+  handleTrajectoryImport: (value: DbTrajectory | undefined, status: FileInputStatus) => void;
+  trajectoryType: TRAJECTORY_TYPE;
+  studyHorizon: string;
 }
 
 export const ImportTrajectoryModal = ({
   options,
   onClose,
-  handleFileImport,
+  handleTrajectoryImport,
   trajectoryType,
+  studyHorizon,
 }: ImportTrajectoryModalProps) => {
   const { t } = useTranslation();
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [trajectorySelected, setTrajectorySelected] = useState<SelectOption | null>(null);
+  const [fileStatus, setFileStatus] = useState<FileInputStatus>('empty');
+  const [progress, setProgress] = useState(0);
 
   const handleSelectOption = (value: SelectOption | null) => {
     if (value) {
@@ -28,18 +35,51 @@ export const ImportTrajectoryModal = ({
     }
   };
 
+  const resetField = () => {
+    setTrajectorySelected(null);
+    setFileStatus('empty');
+  };
+
+  const handleImportTrajectory = async (value: SelectOption) => {
+    setFileStatus('loading');
+    setIsButtonDisabled(true);
+    let newTrajectory: DbTrajectory | undefined;
+    try {
+      newTrajectory = await addTrajectory(trajectoryType, value.label, studyHorizon, (progressValue: number) => {
+        setProgress(+progressValue?.toFixed(0));
+      });
+
+      setFileStatus('success');
+      handleTrajectoryImport(newTrajectory, 'success');
+    } catch (error) {
+      // TODO add warning status
+      setFileStatus('error');
+      handleTrajectoryImport(newTrajectory, 'error');
+    } finally {
+      onClose();
+    }
+  };
+
   return (
     <RdsModal size="small">
       <RdsModal.Title onClose={onClose} icon="Upload">
-        {t('studyDetails.@import_from_file_system', { trajectoryType })}
+        {t('studyDetails.@import_from_file_system', {
+          trajectoryType: trajectoryType === TRAJECTORY_TYPE.AREA ? 'areas' : 'links',
+        })}
       </RdsModal.Title>
       <RdsModal.Content>
-        <div className="pb-120-80 w-2/5" style={{ height: '110px' }}>
-          <SelectAndSearchableInput
-            options={options}
-            defaultPlaceHolder={t('studyDetails.@select_trajectory')}
-            onSelect={handleSelectOption}
-          />
+        <div className="inline-flex w-full items-start gap-4" style={{ height: '110px' }}>
+          <div className="w-3/5">
+            <SelectAndSearchableInput
+              options={options}
+              defaultPlaceHolder={t('studyDetails.@select_trajectory')}
+              onSelect={handleSelectOption}
+              resetField={resetField}
+            />
+          </div>
+          <div className="flex w-3/5 flex-col items-start pt-2">
+            <ProgressBar statusFile={fileStatus} progressValue={progress} />
+          </div>
         </div>
       </RdsModal.Content>
       <RdsModal.Footer>
@@ -47,7 +87,7 @@ export const ImportTrajectoryModal = ({
         <RdsButton
           icon={RdsIconId.Add}
           label={t('studyDetails.@import')}
-          onClick={() => void handleFileImport(trajectorySelected)}
+          onClick={() => trajectorySelected && void handleImportTrajectory(trajectorySelected)}
           variant="contained"
           color="primary"
           disabled={isButtonDisabled}
