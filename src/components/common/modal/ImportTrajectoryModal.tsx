@@ -3,14 +3,13 @@ import SelectAndSearchableInput from '@/components/input/SelectAndSearchableInpu
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { ProgressBar } from '@/components/forms/ProgressBar.tsx';
-import { DbTrajectory } from '@/shared/types';
+import { DbTrajectory, RowStatus } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { addTrajectory } from '@/shared/services/trajectoryService.ts';
 
 interface ImportTrajectoryModalProps {
   options: SelectOption[] | undefined;
-  onClose: () => void;
-  handleTrajectoryImport: (value: DbTrajectory | undefined, status: FileInputStatus) => void;
+  onClose: (value: DbTrajectory | SelectOption | null, status: RowStatus) => void;
   trajectoryType: TRAJECTORY_TYPE;
   studyHorizon: string;
 }
@@ -18,7 +17,6 @@ interface ImportTrajectoryModalProps {
 export const ImportTrajectoryModal = ({
   options,
   onClose,
-  handleTrajectoryImport,
   trajectoryType,
   studyHorizon,
 }: ImportTrajectoryModalProps) => {
@@ -50,19 +48,17 @@ export const ImportTrajectoryModal = ({
       });
 
       setFileStatus('success');
-      handleTrajectoryImport(newTrajectory, 'success');
+      newTrajectory && onClose(newTrajectory, 'success');
     } catch (error) {
-      // TODO add warning status
+      // TODO handle errors considered as warning ones
       setFileStatus('error');
-      handleTrajectoryImport(newTrajectory, 'error');
-    } finally {
-      onClose();
+      onClose(value, 'error');
     }
   };
 
   return (
     <RdsModal size="small">
-      <RdsModal.Title onClose={onClose} icon="Upload">
+      <RdsModal.Title onClose={() => onClose(null, 'empty')} icon="Upload">
         {t('studyDetails.@import_from_file_system', {
           trajectoryType: trajectoryType === TRAJECTORY_TYPE.AREA ? 'areas' : 'links',
         })}
@@ -83,7 +79,7 @@ export const ImportTrajectoryModal = ({
         </div>
       </RdsModal.Content>
       <RdsModal.Footer>
-        <RdsButton label="Cancel" onClick={onClose} color="secondary" />
+        <RdsButton label="Cancel" onClick={() => onClose(null, 'empty')} color="secondary" />
         <RdsButton
           icon={RdsIconId.Add}
           label={t('studyDetails.@import')}

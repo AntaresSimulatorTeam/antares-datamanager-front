@@ -5,6 +5,7 @@
  */
 
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { FileInputStatus } from 'rte-design-system-react';
 
 export interface FsTrajectory {
   trajectory_name: string;
@@ -26,3 +27,5 @@ export type AreaAndLinkRowData = {
   trajectory: string | null;
   status: TRAJECTORY_SELECTION_STATUS;
 };
+
+export type RowStatus = FileInputStatus | 'warning';

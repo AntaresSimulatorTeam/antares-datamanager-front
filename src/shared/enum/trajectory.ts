@@ -19,4 +19,5 @@ export enum TRAJECTORY_SELECTION_STATUS {
   MISSING = 'Missing',
   OK = 'OK',
   ERROR = 'Error',
+  WARNING = 'Warning',
 }
