@@ -67,7 +67,7 @@ export const addTrajectory = async (
   trajectoryName: string,
   horizon: string,
   onProgress: (progress: number) => void,
-): Promise<DbTrajectory | undefined> => {
+): Promise<DbTrajectory> => {
   const urlApi = `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}`;
   const [_, response] = await fetchWithProgress(
     urlApi,

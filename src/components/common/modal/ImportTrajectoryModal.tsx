@@ -41,14 +41,14 @@ export const ImportTrajectoryModal = ({
   const handleImportTrajectory = async (value: SelectOption) => {
     setFileStatus('loading');
     setIsButtonDisabled(true);
-    let newTrajectory: DbTrajectory | undefined;
+    let newTrajectory: DbTrajectory;
     try {
       newTrajectory = await addTrajectory(trajectoryType, value.label, studyHorizon, (progressValue: number) => {
         setProgress(+progressValue?.toFixed(0));
       });
 
       setFileStatus('success');
-      newTrajectory && onClose(newTrajectory, 'success');
+      onClose(newTrajectory, 'success');
     } catch (error) {
       // TODO handle errors considered as warning ones
       setFileStatus('error');
