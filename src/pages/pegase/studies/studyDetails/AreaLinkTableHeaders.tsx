@@ -6,7 +6,7 @@
 
 import { createColumnHelper } from '@tanstack/react-table';
 import { RdsButton, RdsIcon, RdsIconButton, RdsIconId } from 'rte-design-system-react';
-import { AreaAndLinkRowData } from '@/shared/types';
+import { AreaAndLinkRowData, RowStatus } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
@@ -18,8 +18,7 @@ const columnHelper = createColumnHelper<AreaAndLinkRowData>();
 const getAreaLinkTableHeaders = (
   options: SelectOption[][] | undefined,
   t: (value: string) => string,
-  handlerSelection: (index: number, trajectory: SelectOption) => void,
-  handlerDelete: (index: number) => void,
+  handleUpdate: (index: number, trajectory: SelectOption | null, status: RowStatus) => void,
   handleImport: (index: number) => Promise<void>,
   handlerSearch: (index: number, value: string | undefined) => Promise<SelectOption[] | undefined>,
 ) => [
@@ -42,13 +41,13 @@ const getAreaLinkTableHeaders = (
       return trajectory ? (
         <div className="inline-flex w-[850px] space-x-2 py-3">
           <span>{trajectory}</span>
-          <RdsIconButton icon={RdsIconId.Delete} size="small" onClick={() => handlerDelete(row.index)} />
+          <RdsIconButton icon={RdsIconId.Delete} size="small" onClick={() => handleUpdate(row.index, null, 'empty')} />
         </div>
       ) : (
         <div className="inline-flex w-[850px] items-center space-x-2">
           <SelectAndSearchableInput
             options={options?.[row.index] ?? []}
-            onSelect={(value: SelectOption) => handlerSelection(row.index, value)}
+            onSelect={(value: SelectOption) => handleUpdate(row.index, value, 'success')}
             setSearchTerm={async (value: string | undefined) => await handlerSearch(row.index, value)}
             defaultPlaceHolder={
               row.getReadOnly() ? t('studyDetails.@select_link') : t('studyDetails.@select_trajectory')

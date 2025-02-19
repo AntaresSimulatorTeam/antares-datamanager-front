@@ -11,6 +11,7 @@ import {
 } from '@/shared/const/apiEndPoint.ts';
 import { DbTrajectory, FsTrajectory } from '@/shared/types';
 import { AuthService } from '@/shared/services/authService.ts';
+import { fetchWithProgress } from '@/shared/services/progressService.ts';
 
 /**
  * Retrieve a list of trajectories by type and horizon from database
@@ -58,17 +59,30 @@ export const fetchTrajectoriesFromFS = async (
  * @param {TRAJECTORY_TYPE} trajectoryType - Trajectory type
  * @param {string} trajectoryName - Name of trajectory to add to data base
  * @param {string} horizon - Trajectory horizon
+ * @param {(progress: number) => void} onProgress - Set progress value
  * @returns {Promise<DbTrajectory>} - Promise object that represents a trajectory inserted into database
  */
 export const addTrajectory = async (
   trajectoryType: string,
   trajectoryName: string,
   horizon: string,
+  onProgress: (progress: number) => void,
 ): Promise<DbTrajectory> => {
   const urlApi = `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}`;
-  const response = await AuthService.authFetch(urlApi);
-  if (!response.ok) {
+  const [_, response] = await fetchWithProgress(
+    urlApi,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+    onProgress,
+  );
+
+  if (!(response as Response).ok) {
     throw new Error('Failed to import trajectory into data base');
+  } else {
+    return (await (response as Response).json()) as DbTrajectory;
   }
-  return (await response.json()) as DbTrajectory;
 };

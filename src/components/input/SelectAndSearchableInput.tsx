@@ -14,6 +14,7 @@ interface ProjectManagerProps {
   setSearchTerm?: (value: string | undefined) => Promise<SelectOption[] | undefined>;
   isSearchable?: boolean;
   isInputDisabled?: boolean;
+  resetField?: () => void;
 }
 
 const SelectAndSearchableInput = ({
@@ -23,6 +24,7 @@ const SelectAndSearchableInput = ({
   setSearchTerm,
   isSearchable = false,
   isInputDisabled = false,
+  resetField,
 }: ProjectManagerProps) => {
   const [defaultOptions] = useState<SelectOption[] | undefined>(options);
   const [optionsSelection, setOptionsSelection] = useState<SelectOption[] | undefined>(options);
@@ -103,6 +105,7 @@ const SelectAndSearchableInput = ({
           if (isSearchable) {
             void handleInputChange(e);
           } else {
+            resetField?.();
             setValueInput('');
             setIsDropdownOpen(false);
           }
