@@ -46,7 +46,6 @@ export const ImportTrajectoryModal = ({
       newTrajectory = await addTrajectory(trajectoryType, value.label, studyHorizon, (progressValue: number) => {
         setProgress(+progressValue?.toFixed(0));
       });
-
       setFileStatus('success');
       onClose(newTrajectory, 'success');
     } catch (error) {

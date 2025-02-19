@@ -61,6 +61,20 @@ const AreaLinkTab = ({ studyHorizon }: AreaLinkTabProps) => {
       ? ((trajectory as SelectOption)?.label ?? (trajectory as DbTrajectory)?.trajectory_name)
       : null;
     updatedData[index].status = getStatus(status);
+    if (status === 'success') {
+      setOptionsDB((prev) => {
+        if (prev && prev[index]?.length >= 0) {
+          prev[index] = [
+            ...prev[index],
+            {
+              id: (trajectory as DbTrajectory).id,
+              label: (trajectory as DbTrajectory).trajectory_name,
+            },
+          ];
+          return prev;
+        }
+      });
+    }
 
     // Handle deletion case
     if (index === 0 && status === 'empty') {
@@ -93,7 +107,7 @@ const AreaLinkTab = ({ studyHorizon }: AreaLinkTabProps) => {
     value && handleTrajectoryUpdate(rowIndexSelected, value, status);
     toggleModal();
   };
-
+  handleTrajectoryUpdate;
   const columns = useMemo(
     () =>
       getAreaLinkTableHeaders(optionsDB, t, handleTrajectoryUpdate, handleFetchTrajectoriesFS, handleTrajectorySearch),
