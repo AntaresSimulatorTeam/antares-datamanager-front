@@ -19,6 +19,7 @@ import { PEGASE_NAVBAR_ID } from '@/shared/constants';
 import { translateMenuItemLabel } from '@/shared/utils/textUtils';
 import { navBarConfig } from '@/shared/const/navBarConfig';
 import { useTranslation } from 'react-i18next';
+import { StudyProvider } from '@/store/contexts/StudyProvider.tsx';
 
 const MainContent = () => {
   const { t } = useTranslation();
@@ -38,13 +39,15 @@ const MainContent = () => {
         <div className="flex h-full w-full flex-col">
           <PegaseStar />
           <Suspense>
-            <Routes>
-              <Route path="/study/:studyName" element={<StudyDetails />} />
-              <Route path="/project/:projectName" element={<ProjectDetails />} />
-              {Object.entries([...menuBottomData, ...menuTopData]).map(([key, route]) => (
-                <Route key={key} path={route.path} Component={route.component} />
-              ))}
-            </Routes>
+            <StudyProvider initialValue={{ areaTrajectory: null, linkTrajectory: null }}>
+              <Routes>
+                <Route path="/study/:studyName" element={<StudyDetails />} />
+                <Route path="/project/:projectName" element={<ProjectDetails />} />
+                {Object.entries([...menuBottomData, ...menuTopData]).map(([key, route]) => (
+                  <Route key={key} path={route.path} Component={route.component} />
+                ))}
+              </Routes>
+            </StudyProvider>
           </Suspense>
         </div>
       </UserSettingsContext.Provider>

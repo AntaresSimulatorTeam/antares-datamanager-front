@@ -6,7 +6,7 @@
 
 import { Dispatch, SetStateAction, useState } from 'react';
 import { RdsButton, RdsIcon, RdsIconId, RdsInputText } from 'rte-design-system-react';
-import { fetchSuggestedKeywords } from '@/shared/services/studyService';
+import { fetchSuggestedKeywords } from '@/shared/services/studyService.ts';
 import { clsx } from 'clsx';
 import { useTranslation } from 'react-i18next';
 

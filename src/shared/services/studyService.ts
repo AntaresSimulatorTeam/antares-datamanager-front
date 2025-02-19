@@ -5,7 +5,7 @@
  */
 
 import { PaginatedResponse, StudyDTO } from '@/shared/types';
-import { STUDY_SEARCH_ENDPOINT } from '@/shared/const/apiEndPoint';
+import { STUDY_GENERATE_ENDPOINT, STUDY_SEARCH_ENDPOINT } from '@/shared/const/apiEndPoint';
 import { STUDY_ENDPOINT, STUDY_KEYWORDS_SEARCH_ENDPOINT } from '@/shared/const/apiEndPoint.ts';
 import { notifyToast } from '@/shared/notification/notification.tsx';
 import { AuthService } from '@/shared/services/authService.ts';
@@ -119,4 +119,19 @@ export const deleteStudy = async (id: number): Promise<void | Error> => {
       message: `${(error as Error).message}`,
     });
   }
+};
+
+/**
+ * Generate a study
+ *
+ * @param {number} id - Study id
+ */
+export const createStudy = async (id: number) => {
+  const urlApi = `${STUDY_GENERATE_ENDPOINT}?${id}`;
+  await AuthService.authFetch(urlApi, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
 };

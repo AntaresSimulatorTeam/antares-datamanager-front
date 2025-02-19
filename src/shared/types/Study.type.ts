@@ -4,6 +4,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+import { DbTrajectory } from '@/shared/types/Trajectory.type.ts';
+import { STUDY_ACTION } from '@/shared/enum/study.ts';
+
 export interface StudyDTO {
   id: number;
   name: string;
@@ -20,3 +23,12 @@ export interface PaginatedResponse<T> {
   content: T[];
   totalElements: number;
 }
+
+export interface StudyState {
+  areaTrajectory: DbTrajectory | null;
+  linkTrajectory: DbTrajectory | null;
+}
+
+export type StudyActionType =
+  | { type: STUDY_ACTION.ADD_TRAJECTORY_AREA; payload: DbTrajectory }
+  | { type: STUDY_ACTION.ADD_TRAJECTORY_LINK; payload: DbTrajectory };
