@@ -58,7 +58,7 @@ const AreaLinkTab = ({ studyHorizon }: AreaLinkTabProps) => {
   const handleTrajectoryUpdate = (index: number, trajectory: SelectOption | DbTrajectory | null, status: RowStatus) => {
     const updatedData = [...data];
     updatedData[index].trajectory = trajectory
-      ? ((trajectory as SelectOption)?.label ?? (trajectory as DbTrajectory)?.trajectory_name)
+      ? ((trajectory as SelectOption)?.label ?? (trajectory as DbTrajectory)?.trajectoryName)
       : null;
     updatedData[index].status = getStatus(status);
     if (status === 'success') {
@@ -68,7 +68,7 @@ const AreaLinkTab = ({ studyHorizon }: AreaLinkTabProps) => {
             ...prev[index],
             {
               id: (trajectory as DbTrajectory).id,
-              label: (trajectory as DbTrajectory).trajectory_name,
+              label: (trajectory as DbTrajectory).trajectoryName,
             },
           ];
           return prev;
@@ -107,7 +107,7 @@ const AreaLinkTab = ({ studyHorizon }: AreaLinkTabProps) => {
     value && handleTrajectoryUpdate(rowIndexSelected, value, status);
     toggleModal();
   };
-  handleTrajectoryUpdate;
+
   const columns = useMemo(
     () =>
       getAreaLinkTableHeaders(optionsDB, t, handleTrajectoryUpdate, handleFetchTrajectoriesFS, handleTrajectorySearch),

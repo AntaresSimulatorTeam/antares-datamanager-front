@@ -8,18 +8,18 @@ import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/traj
 import { FileInputStatus } from 'rte-design-system-react';
 
 export interface FsTrajectory {
-  trajectory_name: string;
+  trajectoryName: string;
   type: string;
-  last_modified_date: Date;
+  lastModifiedDate: Date;
 }
 
 export interface DbTrajectory {
   id: number;
-  trajectory_name: string;
+  trajectoryName: string;
   type: TRAJECTORY_TYPE;
   version: number;
-  user_name: string;
-  creation_date: Date;
+  userName: string;
+  creationDate: Date;
 }
 
 export type AreaAndLinkRowData = {
