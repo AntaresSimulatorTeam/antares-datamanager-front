@@ -84,10 +84,13 @@ const AreaLinkTab = ({ studyHorizon }: AreaLinkTabProps) => {
       });
     }
 
-    // Handle deletion case
+    // Handle deletion case for areas
     if (index === 0 && status === 'empty') {
       updatedData[1].trajectory = null;
       updatedData[1].status = TRAJECTORY_SELECTION_STATUS.MISSING;
+      dispatch?.({
+        type: STUDY_ACTION.CLEAR_AREA_LINK_TRAJECTORY,
+      } as StudyActionType);
       setReadOnly({ '0': false, '1': true });
     } else {
       setReadOnly({ '0': false, '1': false });

@@ -127,11 +127,14 @@ export const deleteStudy = async (id: number): Promise<void | Error> => {
  * @param {number} id - Study id
  */
 export const createStudy = async (id: number) => {
-  const urlApi = `${STUDY_GENERATE_ENDPOINT}?${id}`;
-  await AuthService.authFetch(urlApi, {
+  const urlApi = `${STUDY_GENERATE_ENDPOINT}?id=${id}`;
+  const response = await AuthService.authFetch(urlApi, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
   });
+  if (!response.ok) {
+    throw new Error('Failed to generate a study');
+  }
 };

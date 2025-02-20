@@ -2,6 +2,7 @@ import { createContext, Dispatch, useContext } from 'react';
 import { StudyActionType, StudyState } from '@/shared/types';
 
 const initialState: StudyState = {
+  isStudyGenerated: false,
   areaTrajectory: null,
   linkTrajectory: null,
 };

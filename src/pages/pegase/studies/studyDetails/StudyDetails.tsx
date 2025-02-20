@@ -8,12 +8,15 @@ import { ReactNode, useState } from 'react';
 import { Location, useLocation } from 'react-router-dom';
 import StudyHeader from './StudyHeader.tsx';
 import StudyDetailsContent from './StudyDetailsContent';
-import { RdsButton, RdsDivider } from 'rte-design-system-react';
+import { RdsDivider } from 'rte-design-system-react';
 import StudyNavigationMenu from '@/pages/pegase/studies/studyDetails/StudyNavigationMenu';
 import { StudyDTO } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
-import { useStudy } from '@/store/contexts/StudyContext.tsx';
+import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { createStudy } from '@/shared/services/studyService.ts';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
+import { ButtonWithStdIcon } from '@/components/button/ButtonWithStdIcon.tsx';
+import { STUDY_ACTION } from '@/shared/enum/study.ts';
 
 interface StudyState {
   study: StudyDTO;
@@ -24,14 +27,19 @@ const StudyDetails = () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const location: Location<StudyState> = useLocation();
   const { t } = useTranslation();
-  const { areaTrajectory } = useStudy();
+  const { isStudyGenerated, areaTrajectory } = useStudy();
+  const dispatch = useStudyDispatch();
+  const [isGenerating, setIsGenerating] = useState(false);
   const { study } = location.state || {};
 
   const handleGenerateStudy = async () => {
     try {
+      setIsGenerating(true);
       await createStudy(study.id);
+      setIsGenerating(false);
+      dispatch?.({ type: STUDY_ACTION.SET_IS_STUDY_GENERATED });
     } catch (error) {
-      //silent handler
+      setIsGenerating(false);
     }
   };
 
@@ -55,11 +63,15 @@ const StudyDetails = () => {
         {activeContent}
         <div className="flex flex-col gap-2">
           <RdsDivider />
-          <div className="self-end">
-            <RdsButton
+          <div className="flex items-center gap-2 self-end">
+            {!areaTrajectory && <div className={'text-error-600'}>{t('studyDetails.@add_trajectories_message')}</div>}
+            <ButtonWithStdIcon
               label={t('studyDetails.@generate')}
               onClick={() => void handleGenerateStudy()}
-              disabled={!areaTrajectory}
+              disabled={!areaTrajectory || isStudyGenerated}
+              icon={StdIconId.CheckCircle}
+              position="right"
+              isLoading={isGenerating}
             />
           </div>
         </div>

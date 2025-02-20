@@ -3,12 +3,15 @@ import { STUDY_ACTION } from '@/shared/enum/study.ts';
 
 export const studyReducer = (prevState: StudyState, action?: StudyActionType): StudyState => {
   if (action) {
-    const { areaTrajectory, linkTrajectory } = prevState;
     switch (action.type) {
       case STUDY_ACTION.ADD_TRAJECTORY_AREA:
-        return { areaTrajectory: action.payload, linkTrajectory };
+        return { ...prevState, areaTrajectory: action.payload };
       case STUDY_ACTION.ADD_TRAJECTORY_LINK:
-        return { areaTrajectory, linkTrajectory: action.payload };
+        return { ...prevState, linkTrajectory: action.payload };
+      case STUDY_ACTION.CLEAR_AREA_LINK_TRAJECTORY:
+        return { isStudyGenerated: false, areaTrajectory: null, linkTrajectory: null };
+      case STUDY_ACTION.SET_IS_STUDY_GENERATED:
+        return { ...prevState, isStudyGenerated: true };
       default:
         return prevState;
     }

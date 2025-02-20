@@ -85,6 +85,7 @@
     "@import_status_missing": "Missing",
     "@import_status_error": "Error",
     "@preview": "View",
-    "@generate": "Generate"
+    "@generate": "Generate",
+    "@add_trajectories_message": "Please add Areas trajectories first"
   }
 }

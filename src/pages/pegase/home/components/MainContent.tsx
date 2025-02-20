@@ -39,7 +39,7 @@ const MainContent = () => {
         <div className="flex h-full w-full flex-col">
           <PegaseStar />
           <Suspense>
-            <StudyProvider initialValue={{ areaTrajectory: null, linkTrajectory: null }}>
+            <StudyProvider initialValue={{ isStudyGenerated: false, areaTrajectory: null, linkTrajectory: null }}>
               <Routes>
                 <Route path="/study/:studyName" element={<StudyDetails />} />
                 <Route path="/project/:projectName" element={<ProjectDetails />} />
