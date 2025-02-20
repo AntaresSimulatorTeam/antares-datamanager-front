@@ -7,7 +7,8 @@
 import { act, Queries, renderHook, RenderHookOptions, waitFor } from '@testing-library/react';
 import { useHandlePinnedProjectList } from '@/hooks/useHandlePinnedProjectList';
 import { afterEach, beforeEach, describe, expectTypeOf, it, Mock, vi } from 'vitest';
-import { ProjectProvider, ProjectProviderProps, useProjectDispatch } from '@/store/contexts/ProjectContext';
+import { ProjectProvider, ProjectProviderProps } from '@/store/contexts/ProjectProvider.tsx';
+import { useProjectDispatch } from '@/store/contexts/ProjectContext';
 import { fetchPinnedProjects, pinProject } from '@/shared/services/pinnedProjectService.ts';
 import { v4 as uuidv4 } from 'uuid';
 import { notifyToast } from '@/shared/notification/notification.tsx';
@@ -63,11 +64,9 @@ vi.mock('@/store/contexts/ProjectContext', async (importOriginal) => {
   return {
     ...actual,
     useProject: vi.fn(),
-    useProjectDispatch: vi.fn(() => {
-      return {
-        dispatch: vi.fn(),
-      };
-    }),
+    useProjectDispatch: vi.fn(() => ({
+      dispatch: vi.fn(),
+    })),
   };
 });
 
@@ -91,7 +90,7 @@ describe('useHandlePinnedProjectList', () => {
     mockUsePinnedProjectDispatch.mockReturnValue(mockDispatch);
 
     const wrapper = ({ children, initialValue }: ProjectProviderProps) => (
-      <ProjectProvider children={children} initialValue={initialValue}></ProjectProvider>
+      <ProjectProvider initialValue={initialValue}>{children}</ProjectProvider>
     );
 
     const { result } = renderHook(() => useHandlePinnedProjectList(), {
@@ -134,7 +133,7 @@ describe('useHandlePinnedProjectList', () => {
     const id = uuidv4();
 
     const wrapper = ({ children, initialValue }: ProjectProviderProps) => (
-      <ProjectProvider children={children} initialValue={initialValue}></ProjectProvider>
+      <ProjectProvider initialValue={initialValue}>{children}</ProjectProvider>
     );
 
     const { result } = renderHook(() => useHandlePinnedProjectList(), {
@@ -152,7 +151,7 @@ describe('useHandlePinnedProjectList', () => {
         payload: mockPinProjectResponse,
       });
       expect(notifyToast).toHaveBeenCalledWith({
-        id: id,
+        id,
         type: 'success',
         message: 'Project pinned successfully',
       });
@@ -168,7 +167,7 @@ describe('useHandlePinnedProjectList', () => {
     const id = uuidv4();
 
     const wrapper = ({ children, initialValue }: ProjectProviderProps) => (
-      <ProjectProvider children={children} initialValue={initialValue}></ProjectProvider>
+      <ProjectProvider initialValue={initialValue}>{children}</ProjectProvider>
     );
 
     const { result } = renderHook(() => useHandlePinnedProjectList(), {
@@ -182,7 +181,7 @@ describe('useHandlePinnedProjectList', () => {
       expect(pinProject).toHaveBeenCalledWith('me00247');
       expect(mockDispatch).toHaveBeenCalledTimes(0);
       expect(notifyToast).toHaveBeenCalledWith({
-        id: id,
+        id,
         type: 'error',
         message: 'Project already pinned',
       });

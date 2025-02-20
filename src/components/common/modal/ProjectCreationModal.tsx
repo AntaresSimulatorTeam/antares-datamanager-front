@@ -7,7 +7,7 @@
 import { RdsButton, RdsIconId, RdsInputText, RdsInputTextArea, RdsModal } from 'rte-design-system-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import KeywordsInput from '@/pages/pegase/studies/KeywordsInput';
+import KeywordsInput from '@/components/input/KeywordsInput.tsx';
 import { createProject } from '@/shared/services/projectService';
 import { notifyToast } from '@/shared/notification/notification.tsx';
 import { PROJECT_ACTION } from '@/shared/enum/project.ts';

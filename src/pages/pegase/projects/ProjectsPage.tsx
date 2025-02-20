@@ -6,10 +6,9 @@
 
 import PinnedProject from '@/pages/pegase/home/pinnedProjects/PinnedProject';
 import ProjectContent from '@/pages/pegase/projects/ProjectContent';
-import { ProjectProvider } from '@/store/contexts/ProjectContext.tsx';
+import { ProjectProvider } from '@/store/contexts/ProjectProvider.tsx';
 
-const ProjectsPage = () => {
-  return (
+const ProjectsPage = () => (
     <ProjectProvider initialValue={{ pinnedProjects: [], projects: [] }}>
       <div className="flex flex-col items-center gap-6 p-3">
         <PinnedProject />
@@ -17,6 +16,5 @@ const ProjectsPage = () => {
       </div>
     </ProjectProvider>
   );
-};
 
 export default ProjectsPage;

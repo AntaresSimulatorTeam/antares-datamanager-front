@@ -51,7 +51,6 @@ const StudyNavigationMenu = ({
 
   const handleTabClick = (selectedItemName: TRAJECTORY_TYPE) => {
     setActiveTab(selectedItemName);
-    console.log(`Tab clicked: ${selectedItemName}`);
   };
 
   const tabs = [

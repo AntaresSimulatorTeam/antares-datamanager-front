@@ -12,7 +12,7 @@ import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { useTranslation } from 'react-i18next';
 import { fetchTrajectoriesFromDB, fetchTrajectoriesFromFS } from '@/shared/services/trajectoryService.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { AreaAndLinkRowData, DbTrajectory, RowStatus } from '@/shared/types';
+import { AreaAndLinkRowData, DbTrajectory, RowStatus, StudyActionType } from '@/shared/types';
 import { useFetchTrajectoriesFromDB } from '@/hooks/useFetchTrajectoriesFromDB.ts';
 import {
   convertToFSSelectionOptionType,
@@ -20,6 +20,8 @@ import {
   getStatus,
 } from '@/shared/utils/formFormatter.ts';
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
+import { useStudyDispatch } from '@/store/contexts/StudyContext';
+import { STUDY_ACTION } from '@/shared/enum/study.ts';
 
 interface AreaLinkTabProps {
   studyHorizon: string;
@@ -35,6 +37,7 @@ const AreaLinkTab = ({ studyHorizon }: AreaLinkTabProps) => {
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
   const [rowIndexSelected, setRowIndexSelected] = useState<number>(0);
   const { isModalOpen, toggleModal } = useNewStudyModal();
+  const dispatch = useStudyDispatch();
   const { t } = useTranslation();
   const { trajectories: trajectoriesArea } = useFetchTrajectoriesFromDB(TRAJECTORY_TYPE.AREA, studyHorizon);
   const { trajectories: trajectoriesLink } = useFetchTrajectoriesFromDB(TRAJECTORY_TYPE.LINK, studyHorizon);
@@ -62,6 +65,11 @@ const AreaLinkTab = ({ studyHorizon }: AreaLinkTabProps) => {
       : null;
     updatedData[index].status = getStatus(status);
     if (status === 'success') {
+      dispatch?.({
+        type: index === 0 ? STUDY_ACTION.ADD_TRAJECTORY_AREA : STUDY_ACTION.ADD_TRAJECTORY_LINK,
+        payload: trajectory,
+      } as StudyActionType);
+
       setOptionsDB((prev) => {
         if (prev && prev[index]?.length >= 0) {
           prev[index] = [
@@ -76,11 +84,18 @@ const AreaLinkTab = ({ studyHorizon }: AreaLinkTabProps) => {
       });
     }
 
-    // Handle deletion case
+    // Handle deletion case for areas
     if (index === 0 && status === 'empty') {
       updatedData[1].trajectory = null;
       updatedData[1].status = TRAJECTORY_SELECTION_STATUS.MISSING;
+      dispatch?.({
+        type: STUDY_ACTION.CLEAR_AREA_LINK_TRAJECTORY,
+      } as StudyActionType);
       setReadOnly({ '0': false, '1': true });
+    } else if (index === 1) {
+      dispatch?.({
+        type: STUDY_ACTION.CLEAR_LINK_TRAJECTORY,
+      } as StudyActionType);
     } else {
       setReadOnly({ '0': false, '1': false });
     }

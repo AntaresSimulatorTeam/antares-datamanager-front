@@ -6,7 +6,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { RdsInputText } from 'rte-design-system-react';
-import { fetchProjectsFromPartialName } from '@/shared/services/projectService';
+import { fetchProjectsFromPartialName } from '@/shared/services/projectService.ts';
 
 interface ProjectManagerProps {
   value: string;

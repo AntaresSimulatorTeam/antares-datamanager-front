@@ -20,6 +20,7 @@ export enum StdIconId {
   Build = 'build',
   Cancel = 'cancel',
   Category = 'category',
+  CheckCircle = 'check-circle',
   Close = 'close',
   Compare = 'compare',
   ContentCopy = 'content-copy',
