@@ -92,6 +92,10 @@ const AreaLinkTab = ({ studyHorizon }: AreaLinkTabProps) => {
         type: STUDY_ACTION.CLEAR_AREA_LINK_TRAJECTORY,
       } as StudyActionType);
       setReadOnly({ '0': false, '1': true });
+    } else if (index === 1) {
+      dispatch?.({
+        type: STUDY_ACTION.CLEAR_LINK_TRAJECTORY,
+      } as StudyActionType);
     } else {
       setReadOnly({ '0': false, '1': false });
     }

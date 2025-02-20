@@ -34,4 +34,5 @@ export type StudyActionType =
   | { type: STUDY_ACTION.ADD_TRAJECTORY_AREA; payload: DbTrajectory }
   | { type: STUDY_ACTION.ADD_TRAJECTORY_LINK; payload: DbTrajectory }
   | { type: STUDY_ACTION.CLEAR_AREA_LINK_TRAJECTORY }
-  | { type: STUDY_ACTION.SET_IS_STUDY_GENERATED };
+  | { type: STUDY_ACTION.SET_IS_STUDY_GENERATED }
+  | { type: STUDY_ACTION.CLEAR_LINK_TRAJECTORY };

@@ -10,6 +10,8 @@ export const studyReducer = (prevState: StudyState, action?: StudyActionType): S
         return { ...prevState, linkTrajectory: action.payload };
       case STUDY_ACTION.CLEAR_AREA_LINK_TRAJECTORY:
         return { isStudyGenerated: false, areaTrajectory: null, linkTrajectory: null };
+      case STUDY_ACTION.CLEAR_LINK_TRAJECTORY:
+        return { ...prevState, isStudyGenerated: false, linkTrajectory: null };
       case STUDY_ACTION.SET_IS_STUDY_GENERATED:
         return { ...prevState, isStudyGenerated: true };
       default:
