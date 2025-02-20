@@ -10,7 +10,7 @@ import { fetchPinnedProjects, pinProject, unpinProject } from '@/shared/services
 import { v4 as uuidv4 } from 'uuid';
 import { dismissToast, notifyToast, NotifyWithActionProps } from '@/shared/notification/notification.tsx';
 import { useTranslation } from 'react-i18next';
-import { useProjectDispatch } from '@/store/contexts/ProjectProvider.tsx';
+import { useProjectDispatch } from '@/store/contexts/ProjectContext';
 import { PROJECT_ACTION } from '@/shared/enum/project.ts';
 
 export const useHandlePinnedProjectList = () => {
