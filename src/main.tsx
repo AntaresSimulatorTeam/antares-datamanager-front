@@ -11,14 +11,22 @@ import App from './App.tsx';
 import './i18n.ts';
 import { config } from '@/shared/const/authConfig.ts';
 import { AuthProvider } from 'react-oidc-context';
+import { isAuthenticationActive } from '@/shared/utils/authUtils.ts';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <AuthProvider {...config}>
+    {!isAuthenticationActive() && (
       <BrowserRouter>
         <App />
       </BrowserRouter>
-    </AuthProvider>
+    )}
+    {isAuthenticationActive() && (
+      <AuthProvider {...config}>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </AuthProvider>
+    )}
   </React.StrictMode>,
 );
 document.documentElement.style.setProperty('--colors-primary-50', '#fafce9');
