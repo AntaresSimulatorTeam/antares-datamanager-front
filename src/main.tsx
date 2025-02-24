@@ -9,12 +9,16 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App.tsx';
 import './i18n.ts';
+import { config } from '@/shared/const/authConfig.ts';
+import { AuthProvider } from 'react-oidc-context';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <AuthProvider {...config}>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </AuthProvider>
   </React.StrictMode>,
 );
 document.documentElement.style.setProperty('--colors-primary-50', '#fafce9');

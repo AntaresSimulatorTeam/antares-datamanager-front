@@ -4,35 +4,40 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { useEffect } from 'react';
 import './App.css';
-import UserProvider from '@/store/contexts/UserProvider.tsx';
-import { AuthService } from '@/shared/services/authService.ts';
 import MainContent from '@/pages/pegase/home/components/MainContent';
-import { isAuthenticationActive } from '@/shared/utils/authUtils.ts';
+import { hasAuthParams, useAuth } from 'react-oidc-context';
+import { useEffect, useState } from 'react';
 
 function App() {
-  useEffect(() => {
-    const handleAuth = async () => {
-      try {
-        if (window.location.href.includes('code=')) {
-          await AuthService.handleCallback();
-          window.location.replace('/'); // Redirect to home page after login
-        }
-      } catch (error) {
-        console.error('Error during authentication callback:', error);
-      }
-    };
-    void handleAuth();
-  }, []);
+  const auth = useAuth();
+  const [hasTriedSignIn, setHasTriedSignIn] = useState(false);
 
-  return !isAuthenticationActive() ? (
-    <MainContent />
-  ) : (
-    <UserProvider initialValue={{ user: null }}>
-      <MainContent />
-    </UserProvider>
-  );
+  // automatically sign-in
+  useEffect(() => {
+    if (
+      !hasAuthParams() &&
+      auth &&
+      !auth.isAuthenticated &&
+      !auth.activeNavigator &&
+      !auth.isLoading &&
+      !hasTriedSignIn
+    ) {
+      void auth.signinRedirect().then(() => setHasTriedSignIn(true));
+    }
+  }, [auth, hasTriedSignIn]);
+
+  if (auth?.isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (auth?.isAuthenticated || !auth) {
+    return <MainContent />;
+  }
+
+  if (auth?.error) {
+    return <div>Oops... {auth.error.message}</div>;
+  }
 }
 
 export default App;
