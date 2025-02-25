@@ -31,13 +31,13 @@ const StudyDetails = () => {
   const { isStudyGenerated, areaTrajectory } = useStudy();
   const dispatch = useStudyDispatch();
   const [isGenerating, setIsGenerating] = useState(false);
-  const { user } = useAuth();
+  const authContext = useAuth();
   const { study } = location.state || {};
 
   const handleGenerateStudy = async () => {
     try {
       setIsGenerating(true);
-      await createStudy(study.id, user?.access_token);
+      await createStudy(study.id, authContext?.user?.access_token);
       setIsGenerating(false);
       dispatch?.({ type: STUDY_ACTION.SET_IS_STUDY_GENERATED });
     } catch (error) {

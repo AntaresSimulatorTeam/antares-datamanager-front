@@ -12,12 +12,12 @@ import { useAuth } from 'react-oidc-context';
 
 export const useFetchTrajectoriesFromDB = (trajectoryType: TRAJECTORY_TYPE, studyHorizon: string) => {
   const [trajectories, setTrajectories] = useState<DbTrajectory[] | null>(null);
-  const { user } = useAuth();
+  const authContext = useAuth();
 
   useEffect(() => {
     const getTrajectoriesFromDb = async (type: TRAJECTORY_TYPE, horizon: string) => {
       try {
-        const results = await fetchTrajectoriesFromDB(type, horizon, user?.access_token);
+        const results = await fetchTrajectoriesFromDB(type, horizon, authContext?.user?.access_token);
         setTrajectories(results);
       } catch (error) {
         // Handle errors

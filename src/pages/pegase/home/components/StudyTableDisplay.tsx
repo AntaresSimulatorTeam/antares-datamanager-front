@@ -35,7 +35,7 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
   const [reloadStudies, setReloadStudies] = useState<boolean>(false);
   const [sortBy, setSortBy] = useState<{ [key: string]: 'asc' | 'desc' }>({});
   const [sortedColumn, setSortedColumn] = useState<string | null>('status');
-  const { user } = useAuth();
+  const authContext = useAuth();
 
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const { navigateToStudy } = useStudyNavigation();
@@ -73,7 +73,7 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
   const handleDeleteClick = () => {
     const selectedStudyId = rows[Number.parseInt(selectedRowId || '-1')]?.id;
     if (selectedStudyId) {
-      deleteStudy(selectedStudyId, user?.access_token).then(() => {
+      deleteStudy(selectedStudyId, authContext?.user?.access_token).then(() => {
         setReloadStudies(!reloadStudies); // Trigger reload after deleting
       });
     }

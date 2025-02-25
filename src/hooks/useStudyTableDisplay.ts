@@ -45,7 +45,7 @@ export const useStudyTableDisplay = ({
   const sortByRef = useRef(sortBy);
   const reloadStudiesRef = useRef(reloadStudies);
 
-  const { user } = useAuth();
+  const authContext = useAuth();
 
   useEffect(() => {
     setCurrentPage(PAGINATION_CURRENT);
@@ -65,7 +65,7 @@ export const useStudyTableDisplay = ({
       currentPage,
       intervalSize,
       sortByRef.current,
-      user?.access_token,
+      authContext?.user?.access_token,
     )
       .then((json) => {
         const { content, totalElements } = json as PaginatedResponse<StudyDTO>;

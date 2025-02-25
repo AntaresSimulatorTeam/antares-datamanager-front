@@ -16,7 +16,7 @@ export const useFetchProjectList = (searchTerm: string, current: number, interva
   const [projects, setProjects] = useState<ProjectInfo[]>([]);
   const [count, setCount] = useState(0);
   const dispatch = useProjectDispatch();
-  const { user } = useAuth();
+  const authContext = useAuth();
 
   const fetchProjects = useCallback(
     async (term: string, currentPage: number, size: number) => {
@@ -25,7 +25,7 @@ export const useFetchProjectList = (searchTerm: string, current: number, interva
           term,
           currentPage,
           size,
-          user?.access_token,
+          authContext?.user?.access_token,
         )) as PaginatedResponse<ProjectInfo>;
 
         dispatch?.({

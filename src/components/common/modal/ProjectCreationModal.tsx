@@ -26,7 +26,7 @@ export const ProjectCreationModal = ({ onClose }: ProjectCreationModalProps) => 
   const [keywords, setKeywords] = useState<string[]>([]);
   const [isFormValid, setIsFormValid] = useState(false);
   const dispatch = useProjectDispatch();
-  const { user } = useAuth();
+  const authContext = useAuth();
 
   const validateForm = () => {
     if (name) {
@@ -48,7 +48,7 @@ export const ProjectCreationModal = ({ onClose }: ProjectCreationModalProps) => 
         description,
       };
 
-      const newProject = await createProject(projectData, user?.access_token);
+      const newProject = await createProject(projectData, authContext?.user?.access_token);
       if (newProject) {
         dispatch?.({
           type: PROJECT_ACTION.ADD_PROJECT,

@@ -18,12 +18,12 @@ const ProjectInput: React.FC<ProjectManagerProps> = ({ value, onChange }) => {
   const [projects, setProjects] = useState<string[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
-  const { user } = useAuth();
+  const authContext = useAuth();
 
   useEffect(() => {
     const loadProjects = async () => {
       try {
-        const projectList = (await fetchProjectsFromPartialName(value, user?.access_token)) as string[];
+        const projectList = (await fetchProjectsFromPartialName(value, authContext?.user?.access_token)) as string[];
         setProjects(projectList);
       } catch (error) {
         setErrorMessage('Failed to fetch projects');

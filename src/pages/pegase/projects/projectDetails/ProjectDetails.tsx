@@ -21,7 +21,7 @@ const ProjectDetails = () => {
   const [searchTerm, setSearchTerm] = useState<string | undefined>('');
   const [activeChip, setActiveChip] = useState<boolean | null>(false);
   const userName = 'mouad'; // Replace with actual user name
-  const { user } = useAuth();
+  const authContext = useAuth();
 
   const searchStudy = (value?: string | undefined) => {
     setSearchTerm(value);
@@ -63,7 +63,7 @@ const ProjectDetails = () => {
       }
     };
     if (projectId && !projectInfo.id) {
-      void getProjectDetails(projectId, user?.access_token);
+      void getProjectDetails(projectId, authContext?.user?.access_token);
     }
   }, [projectId, projectInfo.id]);
 

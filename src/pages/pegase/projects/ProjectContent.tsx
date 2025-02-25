@@ -34,7 +34,7 @@ const ProjectContent = () => {
   const { handlePinProject } = useHandlePinnedProjectList();
   const { projects } = useProject();
   const dispatch = useProjectDispatch();
-  const { user } = useAuth();
+  const authContext = useAuth();
 
   const searchProject = (value?: string | undefined) => {
     value && setSearchTerm(value);
@@ -51,7 +51,7 @@ const ProjectContent = () => {
   };
 
   const deleteProject = async (projectId: string) => {
-    await deleteProjectById(projectId, user?.access_token);
+    await deleteProjectById(projectId, authContext?.user?.access_token);
     // Update projects and pinned projects list
     dispatch?.({
       type: PROJECT_ACTION.REMOVE_PROJECT,

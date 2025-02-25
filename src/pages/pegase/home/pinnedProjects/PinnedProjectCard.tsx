@@ -26,7 +26,7 @@ const PinnedProjectCards = () => {
   const { pinnedProjects } = useProject();
   const dispatch = useProjectDispatch();
   const { handleUnpinProject } = useHandlePinnedProjectList();
-  const { user } = useAuth();
+  const authContext = useAuth();
 
   const handleCardClick = (projectId: string, projectName: string) => {
     navigateToProject(projectId, projectName);
@@ -34,7 +34,7 @@ const PinnedProjectCards = () => {
 
   const deleteProject = async (projectId: string) => {
     try {
-      await deleteProjectById(projectId, user?.access_token);
+      await deleteProjectById(projectId, authContext?.user?.access_token);
       // Update pinned project list
       dispatch?.({
         type: PROJECT_ACTION.REMOVE_PROJECT,

@@ -32,7 +32,7 @@ const KeywordsInput = ({
   const [keywordInput, setKeywordInput] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [suggestedKeywords, setSuggestedKeywords] = useState<string[]>([]);
-  const { user } = useAuth();
+  const authContext = useAuth();
 
   const handleKeywordChange = async (value: string) => {
     if (maxNbCharacters !== undefined && value.length > maxNbCharacters) {
@@ -41,7 +41,7 @@ const KeywordsInput = ({
     setKeywordInput(value);
     setErrorMessage(''); // Clear error message when input changes
     try {
-      const tags = (await fetchSuggestedKeywords(value, user?.access_token)) as string[];
+      const tags = (await fetchSuggestedKeywords(value, authContext?.user?.access_token)) as string[];
       setSuggestedKeywords(tags);
     } catch (error) {
       setErrorMessage('Failed to fetch suggested keywords');

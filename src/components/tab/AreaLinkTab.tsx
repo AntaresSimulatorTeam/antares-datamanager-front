@@ -42,7 +42,7 @@ const AreaLinkTab = ({ studyHorizon }: AreaLinkTabProps) => {
   const { t } = useTranslation();
   const { trajectories: trajectoriesArea } = useFetchTrajectoriesFromDB(TRAJECTORY_TYPE.AREA, studyHorizon);
   const { trajectories: trajectoriesLink } = useFetchTrajectoriesFromDB(TRAJECTORY_TYPE.LINK, studyHorizon);
-  const { user } = useAuth();
+  const authContext = useAuth();
 
   useEffect(() => {
     if (trajectoriesArea && trajectoriesLink) {
@@ -54,7 +54,7 @@ const AreaLinkTab = ({ studyHorizon }: AreaLinkTabProps) => {
     try {
       const results = await fetchTrajectoriesFromFS(
         index === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
-        user?.access_token,
+        authContext?.user?.access_token,
       );
       setOptionsFS(convertToFSSelectionOptionType(results));
       toggleModal();
@@ -115,7 +115,7 @@ const AreaLinkTab = ({ studyHorizon }: AreaLinkTabProps) => {
       const results = await fetchTrajectoriesFromDB(
         index === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
         studyHorizon,
-        user?.access_token,
+        authContext?.user?.access_token,
         value,
       );
       return convertToSelectionOptionType(results);

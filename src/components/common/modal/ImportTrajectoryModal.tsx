@@ -26,7 +26,7 @@ export const ImportTrajectoryModal = ({
   const [trajectorySelected, setTrajectorySelected] = useState<SelectOption | null>(null);
   const [fileStatus, setFileStatus] = useState<FileInputStatus>('empty');
   const [progress, setProgress] = useState(0);
-  const { user } = useAuth();
+  const authContext = useAuth();
 
   const handleSelectOption = (value: SelectOption | null) => {
     if (value) {
@@ -52,7 +52,7 @@ export const ImportTrajectoryModal = ({
         (progressValue: number) => {
           setProgress(+progressValue?.toFixed(0));
         },
-        user?.access_token,
+        authContext?.user?.access_token,
       );
       setFileStatus('success');
       onClose(newTrajectory, 'success');

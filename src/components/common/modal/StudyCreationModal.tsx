@@ -30,7 +30,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({ onClose, study,
   const [trajectoryIds] = useState<number[]>(study?.trajectoryIds || []);
   const [isFormValid, setIsFormValid] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
-  const { user } = useAuth();
+  const authContext = useAuth();
 
   const saveStudyHandler = async () => {
     const studyData = {
@@ -42,7 +42,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({ onClose, study,
       trajectoryIds,
     };
 
-    await saveStudy(studyData, user?.access_token);
+    await saveStudy(studyData, authContext?.user?.access_token);
     // Clear form fields
     setReloadStudies((prev) => !prev); // Trigger reload after successful save
     setStudyName('');
