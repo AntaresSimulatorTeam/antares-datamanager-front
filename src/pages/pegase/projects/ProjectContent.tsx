@@ -20,6 +20,7 @@ import { useHandlePinnedProjectList } from '@/hooks/useHandlePinnedProjectList.t
 import { ProjectActionType } from '@/shared/types/Project.type.ts';
 import { useProject, useProjectDispatch } from '@/store/contexts/ProjectContext.tsx';
 import { PROJECT_ACTION } from '@/shared/enum/project.ts';
+import { useAuth } from 'react-oidc-context';
 
 const ProjectContent = () => {
   const { t } = useTranslation();
@@ -33,6 +34,7 @@ const ProjectContent = () => {
   const { handlePinProject } = useHandlePinnedProjectList();
   const { projects } = useProject();
   const dispatch = useProjectDispatch();
+  const { user } = useAuth();
 
   const searchProject = (value?: string | undefined) => {
     value && setSearchTerm(value);
@@ -49,8 +51,8 @@ const ProjectContent = () => {
   };
 
   const deleteProject = async (projectId: string) => {
-    await deleteProjectById(projectId);
-    // Met à jour la liste des projets (et les projets épinglés)
+    await deleteProjectById(projectId, user?.access_token);
+    // Update projects and pinned projects list
     dispatch?.({
       type: PROJECT_ACTION.REMOVE_PROJECT,
       payload: projectId,

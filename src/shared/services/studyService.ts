@@ -8,7 +8,7 @@ import { PaginatedResponse, StudyDTO } from '@/shared/types';
 import { STUDY_GENERATE_ENDPOINT, STUDY_SEARCH_ENDPOINT } from '@/shared/const/apiEndPoint';
 import { STUDY_ENDPOINT, STUDY_KEYWORDS_SEARCH_ENDPOINT } from '@/shared/const/apiEndPoint.ts';
 import { notifyToast } from '@/shared/notification/notification.tsx';
-import { AuthService } from '@/shared/services/authService.ts';
+import { authFetch } from '@/shared/services/authService.ts';
 
 /**
  * Retrieve a list of studies from a term
@@ -17,6 +17,7 @@ import { AuthService } from '@/shared/services/authService.ts';
  * @param {string} projectId - Project id related to a study
  * @param {number} currentPage - Current page number
  * @param {number} intervalSize - Number of items per page
+ * @param {string | undefined} accessToken - Access token of the user
  * @param {{ [key: string]: 'asc' | 'desc' })} sortBy - Object that describes the sorting type (ascending or descending) of a column
  *
  * @return {Promise<PaginatedResponse<StudyDTO> | Error>} - Promise object that represents a list of studies
@@ -27,6 +28,7 @@ export const fetchSearchStudies = async (
   currentPage: number = 0,
   intervalSize: number = 0,
   sortBy?: { [key: string]: 'asc' | 'desc' },
+  accessToken?: string,
 ): Promise<PaginatedResponse<StudyDTO> | Error> => {
   let entries: [string, 'asc' | 'desc'] | null = null;
   if (sortBy && JSON.stringify(sortBy) !== '{}') {
@@ -35,7 +37,7 @@ export const fetchSearchStudies = async (
 
   const apiUrl = `${STUDY_SEARCH_ENDPOINT}?page=${currentPage + 1}&size=${intervalSize}&projectId=${projectId}&search=${searchTerm}&sortColumn=${entries?.[0] ?? ''}&sortDirection=${entries?.[1] ?? ''}`;
 
-  const response = await AuthService.authFetch(apiUrl);
+  const response = await authFetch(apiUrl, accessToken);
   if (!response.ok) {
     throw new Error('Failed to fetch user studies');
   }
@@ -48,10 +50,11 @@ export const fetchSearchStudies = async (
  * Retrieve a list of suggested keywords from a partial name of a study
  *
  * @param {string} query - Partial name of a study
+ * @param {string | undefined} accessToken - Access token of the user
  * @return {Promise<string[] | Error>} - Promise object that represents a list of keywords
  */
-export const fetchSuggestedKeywords = async (query: string): Promise<string[] | Error> => {
-  const response = await AuthService.authFetch(`${STUDY_KEYWORDS_SEARCH_ENDPOINT}?partialName=${query}`);
+export const fetchSuggestedKeywords = async (query: string, accessToken?: string): Promise<string[] | Error> => {
+  const response = await authFetch(`${STUDY_KEYWORDS_SEARCH_ENDPOINT}?partialName=${query}`, accessToken);
   if (!response.ok) {
     throw new Error('Failed to fetch suggested keywords');
   }
@@ -63,11 +66,15 @@ export const fetchSuggestedKeywords = async (query: string): Promise<string[] | 
  * Display toast if creation succeeds or fails
  *
  * @param {Omit<StudyDTO, 'id' | 'status' | 'creationDate'>} studyData - Partial study data
+ * @param {string | undefined} accessToken - Access token of the user
  * @return {Promise<void | Error>}
  */
-export const saveStudy = async (studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate'>): Promise<void | Error> => {
+export const saveStudy = async (
+  studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate'>,
+  accessToken?: string,
+): Promise<void | Error> => {
   try {
-    const response = await AuthService.authFetch(`${STUDY_ENDPOINT}`, {
+    const response = await authFetch(`${STUDY_ENDPOINT}`, accessToken, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -98,11 +105,12 @@ export const saveStudy = async (studyData: Omit<StudyDTO, 'id' | 'status' | 'cre
  * Display toast if deletion succeeds or fails
  *
  * @param {number} id - Study id
+ * @param {string | undefined} accessToken - Access token of the user
  * @return {Promise<void | Error>}
  */
-export const deleteStudy = async (id: number): Promise<void | Error> => {
+export const deleteStudy = async (id: number, accessToken?: string): Promise<void | Error> => {
   try {
-    const response = await AuthService.authFetch(`${STUDY_ENDPOINT}/${id}`, {
+    const response = await authFetch(`${STUDY_ENDPOINT}/${id}`, accessToken, {
       method: 'DELETE',
     });
     if (!response.ok) {
@@ -125,10 +133,11 @@ export const deleteStudy = async (id: number): Promise<void | Error> => {
  * Generate a study
  *
  * @param {number} id - Study id
+ * @param {string | undefined} accessToken - Access token of the user
  */
-export const createStudy = async (id: number) => {
+export const createStudy = async (id: number, accessToken?: string) => {
   const urlApi = `${STUDY_GENERATE_ENDPOINT}?id=${id}`;
-  const response = await AuthService.authFetch(urlApi, {
+  const response = await authFetch(urlApi, accessToken, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

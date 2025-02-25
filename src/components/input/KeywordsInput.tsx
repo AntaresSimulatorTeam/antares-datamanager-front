@@ -9,6 +9,7 @@ import { RdsButton, RdsIcon, RdsIconId, RdsInputText } from 'rte-design-system-r
 import { fetchSuggestedKeywords } from '@/shared/services/studyService.ts';
 import { clsx } from 'clsx';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from 'react-oidc-context';
 
 interface KeywordsInputProps {
   keywords: string[];
@@ -31,6 +32,7 @@ const KeywordsInput = ({
   const [keywordInput, setKeywordInput] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [suggestedKeywords, setSuggestedKeywords] = useState<string[]>([]);
+  const { user } = useAuth();
 
   const handleKeywordChange = async (value: string) => {
     if (maxNbCharacters !== undefined && value.length > maxNbCharacters) {
@@ -39,7 +41,7 @@ const KeywordsInput = ({
     setKeywordInput(value);
     setErrorMessage(''); // Clear error message when input changes
     try {
-      const tags = (await fetchSuggestedKeywords(value)) as string[];
+      const tags = (await fetchSuggestedKeywords(value, user?.access_token)) as string[];
       setSuggestedKeywords(tags);
     } catch (error) {
       setErrorMessage('Failed to fetch suggested keywords');

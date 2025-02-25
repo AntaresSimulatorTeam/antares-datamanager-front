@@ -19,6 +19,7 @@ import { useStudyNavigation } from '@/hooks/useStudyNavigation';
 import { useTranslation } from 'react-i18next';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal';
 import StudyCreationModal from '@common/modal/StudyCreationModal';
+import { useAuth } from 'react-oidc-context';
 
 interface StudyTableDisplayProps {
   searchStudy: string | undefined;
@@ -34,6 +35,7 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
   const [reloadStudies, setReloadStudies] = useState<boolean>(false);
   const [sortBy, setSortBy] = useState<{ [key: string]: 'asc' | 'desc' }>({});
   const [sortedColumn, setSortedColumn] = useState<string | null>('status');
+  const { user } = useAuth();
 
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const { navigateToStudy } = useStudyNavigation();
@@ -71,7 +73,7 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
   const handleDeleteClick = () => {
     const selectedStudyId = rows[Number.parseInt(selectedRowId || '-1')]?.id;
     if (selectedStudyId) {
-      deleteStudy(selectedStudyId).then(() => {
+      deleteStudy(selectedStudyId, user?.access_token).then(() => {
         setReloadStudies(!reloadStudies); // Trigger reload after deleting
       });
     }
@@ -89,7 +91,7 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
       <div className="flex-1">
         <StdSimpleTable
           columns={sortedHeaders}
-          data={rows as StudyDTO[]}
+          data={rows}
           enableRowSelection={true}
           state={{
             rowSelection,

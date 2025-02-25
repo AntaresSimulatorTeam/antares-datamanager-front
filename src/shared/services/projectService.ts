@@ -5,17 +5,19 @@
  */
 
 import { PROJECT_AUTOCOMPLETE_ENDPOINT, PROJECT_ENDPOINT, PROJECT_SEARCH_ENDPOINT } from '@/shared/const/apiEndPoint';
-import { AuthService } from '@/shared/services/authService.ts';
-import { ProjectInfo, ProjectResponse, PaginatedResponse } from '@/shared/types';
+import { authFetch } from '@/shared/services/authService.ts';
+import { PaginatedResponse, ProjectInfo, ProjectResponse } from '@/shared/types';
 
 /**
  * Delete project
  *
  * @param {string} projectId
+ * @param {string | undefined} accessToken - Access token of the user
  * @return {Promise<void | Error>}
  */
-export const deleteProjectById = async (projectId: string): Promise<void | Error> => {
-  const response = await AuthService.authFetch(`${PROJECT_ENDPOINT}/${projectId}`, {
+export const deleteProjectById = async (projectId: string, accessToken?: string): Promise<void | Error> => {
+  const urlApi = `${PROJECT_ENDPOINT}/${projectId}`;
+  const response = await authFetch(urlApi, accessToken, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
@@ -33,10 +35,11 @@ export const deleteProjectById = async (projectId: string): Promise<void | Error
  * Retrieve details of a project
  *
  * @param {string} projectId - Project id
+ * @param {string | undefined} accessToken - Access token of the user
  * @return {Promise<ProjectInfo | Error>} - Project details
  */
-export const fetchProjectDetails = async (projectId: string): Promise<ProjectInfo | Error> => {
-  const response = await AuthService.authFetch(`${PROJECT_ENDPOINT}/${projectId}`);
+export const fetchProjectDetails = async (projectId: string, accessToken?: string): Promise<ProjectInfo | Error> => {
+  const response = await authFetch(`${PROJECT_ENDPOINT}/${projectId}`, accessToken);
 
   if (!response?.ok) {
     throw new Error('Failed to fetch project details');
@@ -49,10 +52,12 @@ export const fetchProjectDetails = async (projectId: string): Promise<ProjectInf
  * Retrieve a project from a partial name of project
  *
  * @param {string} query - Partial name of a project
+ * @param {string | undefined} accessToken - Access token of the user
  * @return {Promise<string[] | Error>} - List of project name
  */
-export const fetchProjectsFromPartialName = async (query: string): Promise<string[] | Error> => {
-  const response = await AuthService.authFetch(`${PROJECT_AUTOCOMPLETE_ENDPOINT}?partialName=${query}`);
+export const fetchProjectsFromPartialName = async (query: string, accessToken?: string): Promise<string[] | Error> => {
+  const urlApi = `${PROJECT_AUTOCOMPLETE_ENDPOINT}?partialName=${query}`;
+  const response = await authFetch(urlApi, accessToken);
   if (!response.ok) {
     throw new Error('Failed to fetch projects');
   }
@@ -66,16 +71,17 @@ export const fetchProjectsFromPartialName = async (query: string): Promise<strin
  * @param {string} searchTerm
  * @param {number} current
  * @param {number} intervalSize
+ * @param {string | undefined} accessToken - Access token of the user
  * @return {Promise<PaginatedResponse<ProjectInfo> | Error>}
  */
 export const fetchProjectFromSearchTerm = async (
   searchTerm: string,
   current: number,
   intervalSize: number,
+  accessToken?: string,
 ): Promise<PaginatedResponse<ProjectInfo> | Error> => {
-  const response = await AuthService.authFetch(
-    `${PROJECT_SEARCH_ENDPOINT}?page=${current + 1}&size=${intervalSize}&search=${searchTerm || ''}`,
-  );
+  const urlApi = `${PROJECT_SEARCH_ENDPOINT}?page=${current + 1}&size=${intervalSize}&search=${searchTerm || ''}`;
+  const response = await authFetch(urlApi, accessToken);
 
   if (!response.ok) {
     const errorText = await response.text();
@@ -90,14 +96,16 @@ export const fetchProjectFromSearchTerm = async (
  * Create a new project
  *
  * @param {Pick<ProjectInfo, 'name' | 'description' | 'tags'>} projectData - Body data request
+ * @param {string | undefined} accessToken - Access token of the user
  * @return {Promise<ProjectResponse | Error>}
  */
 export const createProject = async (
   projectData: Pick<ProjectInfo, 'name' | 'description' | 'tags'>,
+  accessToken?: string,
 ): Promise<ProjectResponse | Error> => {
   const apiUrl = `${PROJECT_ENDPOINT}`;
 
-  const response = await AuthService.authFetch(apiUrl, {
+  const response = await authFetch(apiUrl, accessToken, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

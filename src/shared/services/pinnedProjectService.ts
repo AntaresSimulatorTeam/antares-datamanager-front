@@ -6,18 +6,19 @@
 
 import { PROJECT_PIN_ENDPOINT, PROJECT_PINNED_ENDPOINT, PROJECT_UNPIN_ENDPOINT } from '@/shared/const/apiEndPoint';
 import { ProjectInfo } from '@/shared/types/Project.type.ts';
-import { AuthService } from '@/shared/services/authService.ts';
+import { authFetch } from '@/shared/services/authService.ts';
 
 /**
  * Retrieve pinned projects list by user id
  *
  * @param {string} userId - User id
+ * @param {string | undefined} accessToken - Access token of the user
  * @returns {Promise<ProjectInfo[] | Error>} - Promise object that represents a list of projects
  */
-export const fetchPinnedProjects = async (userId: string): Promise<ProjectInfo[] | Error> => {
+export const fetchPinnedProjects = async (userId: string, accessToken?: string): Promise<ProjectInfo[] | Error> => {
   const apiUrl = `${PROJECT_PINNED_ENDPOINT}?userId=${userId}`;
 
-  const response = await AuthService.authFetch(apiUrl);
+  const response = await authFetch(apiUrl, accessToken);
 
   if (!response?.ok) {
     throw new Error('Failed to fetch project details');
@@ -37,14 +38,15 @@ export const fetchPinnedProjects = async (userId: string): Promise<ProjectInfo[]
  * on the toast is not clicked.
  *
  * @param {string} projectId - Project id
+ * @param {string | undefined} accessToken - Access token of the user
  * @return {Promise<ProjectInfo | Error>} - Object that describes a project
  */
 
-export const pinProject = async (projectId: string): Promise<ProjectInfo | Error> => {
+export const pinProject = async (projectId: string, accessToken?: string): Promise<ProjectInfo | Error> => {
   const userId = 'me00247';
   const apiUrl = `${PROJECT_PIN_ENDPOINT}?userId=${userId}&projectId=${projectId}`;
 
-  const response = await AuthService.authFetch(apiUrl, {
+  const response = await authFetch(apiUrl, accessToken, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -64,11 +66,12 @@ export const pinProject = async (projectId: string): Promise<ProjectInfo | Error
  *
  * @param {string} userId
  * @param {string} projectId
+ * @param {string | undefined} accessToken - Access token of the user
  */
-export const unpinProject = async (userId: string, projectId: string) => {
+export const unpinProject = async (userId: string, projectId: string, accessToken?: string) => {
   const apiUrl = `${PROJECT_UNPIN_ENDPOINT}?userId=${userId}&projectId=${projectId}`;
 
-  const response = await AuthService.authFetch(apiUrl, {
+  const response = await authFetch(apiUrl, accessToken, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',

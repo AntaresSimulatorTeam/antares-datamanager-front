@@ -7,6 +7,7 @@
 import React, { useEffect, useState } from 'react';
 import { RdsInputText } from 'rte-design-system-react';
 import { fetchProjectsFromPartialName } from '@/shared/services/projectService.ts';
+import { useAuth } from 'react-oidc-context';
 
 interface ProjectManagerProps {
   value: string;
@@ -17,11 +18,12 @@ const ProjectInput: React.FC<ProjectManagerProps> = ({ value, onChange }) => {
   const [projects, setProjects] = useState<string[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     const loadProjects = async () => {
       try {
-        const projectList = (await fetchProjectsFromPartialName(value)) as string[];
+        const projectList = (await fetchProjectsFromPartialName(value, user?.access_token)) as string[];
         setProjects(projectList);
       } catch (error) {
         setErrorMessage('Failed to fetch projects');

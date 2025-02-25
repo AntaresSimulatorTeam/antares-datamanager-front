@@ -12,15 +12,17 @@ import { dismissToast, notifyToast, NotifyWithActionProps } from '@/shared/notif
 import { useTranslation } from 'react-i18next';
 import { useProjectDispatch } from '@/store/contexts/ProjectContext';
 import { PROJECT_ACTION } from '@/shared/enum/project.ts';
+import { useAuth } from 'react-oidc-context';
 
 export const useHandlePinnedProjectList = () => {
   const userId = 'me00247';
   const dispatch = useProjectDispatch();
   const { t } = useTranslation();
+  const { user } = useAuth();
 
   const getPinnedProjects = useCallback(async () => {
     try {
-      const projects = (await fetchPinnedProjects(userId)) as ProjectInfo[];
+      const projects = (await fetchPinnedProjects(userId, user?.access_token)) as ProjectInfo[];
       if (projects?.length) {
         dispatch?.({
           type: PROJECT_ACTION.INIT_PINNED_PROJECT_LIST,
@@ -44,7 +46,7 @@ export const useHandlePinnedProjectList = () => {
   const handlePinProject = useCallback(async (projectId: string) => {
     const toastId = uuidv4();
     try {
-      const newProject = await pinProject(projectId);
+      const newProject = await pinProject(projectId, user?.access_token);
       if (newProject) {
         dispatch?.({
           type: PROJECT_ACTION.ADD_PINNED_PROJECT,
@@ -77,7 +79,7 @@ export const useHandlePinnedProjectList = () => {
     let apiCallTimeout: number | null = null;
     const toastId = uuidv4();
     const userId = 'me00247';
-    const currentPinnedProjects = await fetchPinnedProjects(userId);
+    const currentPinnedProjects = await fetchPinnedProjects(userId, user?.access_token);
 
     dispatch?.({
       type: PROJECT_ACTION.UNPIN_PINNED_PROJECT,
@@ -102,7 +104,7 @@ export const useHandlePinnedProjectList = () => {
     } as NotifyWithActionProps);
 
     apiCallTimeout = setTimeout(() => {
-      unpinProject(userId, projectId).catch((error) => {
+      unpinProject(userId, projectId, user?.access_token).catch((error) => {
         dispatch?.({
           type: PROJECT_ACTION.INIT_PINNED_PROJECT_LIST,
           payload: currentPinnedProjects,

@@ -7,6 +7,7 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { PaginatedResponse, StudyDTO } from '@/shared/types';
 import { fetchSearchStudies } from '@/shared/services/studyService.ts';
+import { useAuth } from 'react-oidc-context';
 
 const ITEMS_PER_PAGE = 9;
 const PAGINATION_CURRENT = 0;
@@ -44,6 +45,8 @@ export const useStudyTableDisplay = ({
   const sortByRef = useRef(sortBy);
   const reloadStudiesRef = useRef(reloadStudies);
 
+  const { user } = useAuth();
+
   useEffect(() => {
     setCurrentPage(PAGINATION_CURRENT);
   }, []);
@@ -56,7 +59,14 @@ export const useStudyTableDisplay = ({
   }, [searchTerm, projectId, sortBy, reloadStudies]);
 
   useEffect(() => {
-    fetchSearchStudies(searchTermRef.current, projectIdRef.current, currentPage, intervalSize, sortByRef.current)
+    fetchSearchStudies(
+      searchTermRef.current,
+      projectIdRef.current,
+      currentPage,
+      intervalSize,
+      sortByRef.current,
+      user?.access_token,
+    )
       .then((json) => {
         const { content, totalElements } = json as PaginatedResponse<StudyDTO>;
         setRows(content);

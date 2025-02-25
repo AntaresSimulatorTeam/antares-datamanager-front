@@ -13,6 +13,7 @@ import { notifyToast } from '@/shared/notification/notification.tsx';
 import { PROJECT_ACTION } from '@/shared/enum/project.ts';
 import { ProjectActionType } from '@/shared/types/Project.type.ts';
 import { useProjectDispatch } from '@/store/contexts/ProjectContext.tsx';
+import { useAuth } from 'react-oidc-context';
 
 interface ProjectCreationModalProps {
   onClose: () => void;
@@ -25,6 +26,7 @@ export const ProjectCreationModal = ({ onClose }: ProjectCreationModalProps) => 
   const [keywords, setKeywords] = useState<string[]>([]);
   const [isFormValid, setIsFormValid] = useState(false);
   const dispatch = useProjectDispatch();
+  const { user } = useAuth();
 
   const validateForm = () => {
     if (name) {
@@ -46,7 +48,7 @@ export const ProjectCreationModal = ({ onClose }: ProjectCreationModalProps) => 
         description,
       };
 
-      const newProject = await createProject(projectData);
+      const newProject = await createProject(projectData, user?.access_token);
       if (newProject) {
         dispatch?.({
           type: PROJECT_ACTION.ADD_PROJECT,

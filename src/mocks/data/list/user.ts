@@ -42,7 +42,7 @@ const USER_NAMES: string[] = [
 export default USER_NAMES;
 
 export const USER_FAKE = {
-  access_token: '',
+  access_token: '893837token',
   expires_at: 1111,
   id_token: '',
   profile: {

@@ -17,6 +17,7 @@ import { notifyToast } from '@/shared/notification/notification.tsx';
 import { useProject, useProjectDispatch } from '@/store/contexts/ProjectContext.tsx';
 import { ProjectActionType } from '@/shared/types/Project.type.ts';
 import { PROJECT_ACTION } from '@/shared/enum/project.ts';
+import { useAuth } from 'react-oidc-context';
 
 const PinnedProjectCards = () => {
   const { t } = useTranslation();
@@ -25,6 +26,7 @@ const PinnedProjectCards = () => {
   const { pinnedProjects } = useProject();
   const dispatch = useProjectDispatch();
   const { handleUnpinProject } = useHandlePinnedProjectList();
+  const { user } = useAuth();
 
   const handleCardClick = (projectId: string, projectName: string) => {
     navigateToProject(projectId, projectName);
@@ -32,7 +34,7 @@ const PinnedProjectCards = () => {
 
   const deleteProject = async (projectId: string) => {
     try {
-      await deleteProjectById(projectId);
+      await deleteProjectById(projectId, user?.access_token);
       // Update pinned project list
       dispatch?.({
         type: PROJECT_ACTION.REMOVE_PROJECT,

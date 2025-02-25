@@ -7,6 +7,9 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useFetchTrajectoriesFromDB } from '@/hooks/useFetchTrajectoriesFromDB.ts';
+import { Mock, vi } from 'vitest';
+import { useAuth } from 'react-oidc-context';
+import { USER_FAKE } from '@/mocks/data/list/user.ts';
 
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
@@ -18,24 +21,37 @@ vi.mock('@/envVariables', () => ({
 const mockResponseTrajectoriesDB = [
   {
     id: 1,
-    trajectory_name: 'area_PB_2024',
+    trajectoryName: 'area_PB_2024',
     type: TRAJECTORY_TYPE.AREA,
     version: 3,
-    user_name: 'mouad',
-    creation_date: '2024-07-22 15:13:56.860045' as unknown as Date,
+    userName: 'mouad',
+    creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
   },
   {
     id: 2,
-    trajectory_name: 'area_PB_2026',
+    trajectoryName: 'area_PB_2026',
     type: TRAJECTORY_TYPE.AREA,
     version: 3,
-    user_name: 'mouad',
-    creation_date: '2026-08-22 15:13:56.860045' as unknown as Date,
+    userName: 'mouad',
+    creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
   },
 ];
 
+vi.mock('react-oidc-context', async (importOriginal) => {
+  const actual: Mock = await importOriginal();
+  return {
+    ...actual,
+    useAuth: vi.fn(),
+  };
+});
+
 describe('useFetchTrajectoriesFromDB', () => {
+  const mockUseAuth = useAuth as Mock<typeof useAuth>;
+
   beforeEach(() => {
+    // @ts-expect-error
+    mockUseAuth.mockReturnValue({ user: USER_FAKE } as Partial<AuthContextProps>);
+
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: true,
       json: async () => Promise.resolve(mockResponseTrajectoriesDB),

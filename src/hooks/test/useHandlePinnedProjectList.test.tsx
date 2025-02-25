@@ -13,6 +13,8 @@ import { fetchPinnedProjects, pinProject } from '@/shared/services/pinnedProject
 import { v4 as uuidv4 } from 'uuid';
 import { notifyToast } from '@/shared/notification/notification.tsx';
 import { PROJECT_ACTION } from '@/shared/enum/project.ts';
+import { AuthContextProps, useAuth } from 'react-oidc-context';
+import { USER_FAKE } from '@/mocks/data/list/user.ts';
 
 const mockProjectsApiResponse = [
   {
@@ -69,18 +71,27 @@ vi.mock('@/store/contexts/ProjectContext', async (importOriginal) => {
     })),
   };
 });
+vi.mock('react-oidc-context', async (importOriginal) => {
+  const actual: Mock = await importOriginal();
+  return {
+    ...actual,
+    useAuth: vi.fn(),
+  };
+});
 
 describe('useHandlePinnedProjectList', () => {
   const mockUsePinnedProjectDispatch = useProjectDispatch as Mock<typeof useProjectDispatch>;
   const mockDispatch = vi.fn().mockImplementation(vi.fn());
+  const mockUseAuth = useAuth as Mock<typeof useAuth>;
 
   beforeEach(() => {
+    // @ts-expect-error
+    mockUseAuth.mockReturnValue({ user: USER_FAKE } as Partial<AuthContextProps>);
     global.fetch = vi.fn();
-    vi.resetAllMocks();
   });
 
   afterEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
   });
 
   it('should trigger getPinnedProject method on init and call dispatch to update pinned project list correctly', async () => {
@@ -103,7 +114,7 @@ describe('useHandlePinnedProjectList', () => {
       expectTypeOf(result.current.handleUnpinProject).toBeFunction();
       expectTypeOf(result.current.handlePinProject).toBeFunction();
       expect(fetchPinnedProjects).toHaveBeenCalledTimes(1);
-      expect(fetchPinnedProjects).toHaveBeenCalledWith('me00247');
+      expect(fetchPinnedProjects).toHaveBeenCalledWith('me00247', USER_FAKE.access_token);
       expect(mockUsePinnedProjectDispatch).toHaveBeenCalledTimes(1);
       expect(mockDispatch).toHaveBeenCalledTimes(1);
       expect(mockDispatch).toHaveBeenCalledWith({
@@ -144,7 +155,7 @@ describe('useHandlePinnedProjectList', () => {
     await act(async () => result.current.handlePinProject('me00247'));
 
     await waitFor(() => {
-      expect(pinProject).toHaveBeenCalledWith('me00247');
+      expect(pinProject).toHaveBeenCalledWith('me00247', USER_FAKE.access_token);
       expect(mockDispatch).toHaveBeenCalledTimes(1);
       expect(mockDispatch).toHaveBeenCalledWith({
         type: PROJECT_ACTION.ADD_PINNED_PROJECT,
@@ -178,7 +189,7 @@ describe('useHandlePinnedProjectList', () => {
     await act(async () => result.current.handlePinProject('me00247'));
 
     await waitFor(() => {
-      expect(pinProject).toHaveBeenCalledWith('me00247');
+      expect(pinProject).toHaveBeenCalledWith('me00247', USER_FAKE.access_token);
       expect(mockDispatch).toHaveBeenCalledTimes(0);
       expect(notifyToast).toHaveBeenCalledWith({
         id,

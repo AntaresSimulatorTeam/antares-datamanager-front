@@ -17,6 +17,7 @@ import { createStudy } from '@/shared/services/studyService.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { ButtonWithStdIcon } from '@/components/button/ButtonWithStdIcon.tsx';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
+import { useAuth } from 'react-oidc-context';
 
 interface StudyState {
   study: StudyDTO;
@@ -30,12 +31,13 @@ const StudyDetails = () => {
   const { isStudyGenerated, areaTrajectory } = useStudy();
   const dispatch = useStudyDispatch();
   const [isGenerating, setIsGenerating] = useState(false);
+  const { user } = useAuth();
   const { study } = location.state || {};
 
   const handleGenerateStudy = async () => {
     try {
       setIsGenerating(true);
-      await createStudy(study.id);
+      await createStudy(study.id, user?.access_token);
       setIsGenerating(false);
       dispatch?.({ type: STUDY_ACTION.SET_IS_STUDY_GENERATED });
     } catch (error) {

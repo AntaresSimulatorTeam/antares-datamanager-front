@@ -1,4 +1,4 @@
-import { AuthService } from '@/shared/services/authService.ts';
+import { authFetch } from '@/shared/services/authService.ts';
 
 const simulateProgress = async (duration: number, onProgress: (value: number) => void) =>
   new Promise((resolve) => {
@@ -24,10 +24,11 @@ export const fetchWithProgress = async (
   url: string,
   options: RequestInit = {},
   onProgress: (value: number) => void,
+  accessToken?: string,
 ): Promise<[unknown, Response | Error]> => {
   const duration = 1000; // Simulate 2 seconds progress
   const progressPromise = simulateProgress(duration, onProgress);
-  const fetchPromise = AuthService.authFetch(url, options);
+  const fetchPromise = authFetch(url, accessToken, options);
 
   return await Promise.all([progressPromise, fetchPromise]);
 };

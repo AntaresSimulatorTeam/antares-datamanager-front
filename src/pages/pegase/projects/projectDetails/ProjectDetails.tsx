@@ -14,12 +14,14 @@ import SearchBar from '@/pages/pegase/home/components/SearchBar';
 import { useTranslation } from 'react-i18next';
 import { RdsChip, RdsDivider } from 'rte-design-system-react';
 import { fetchProjectDetails } from '@/shared/services/projectService.ts';
+import { useAuth } from 'react-oidc-context';
 
 const ProjectDetails = () => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState<string | undefined>('');
   const [activeChip, setActiveChip] = useState<boolean | null>(false);
   const userName = 'mouad'; // Replace with actual user name
+  const { user } = useAuth();
 
   const searchStudy = (value?: string | undefined) => {
     setSearchTerm(value);
@@ -40,9 +42,9 @@ const ProjectDetails = () => {
   const projectId = location.state?.projectId as string | null;
 
   useEffect(() => {
-    const getProjectDetails = async (id: string) => {
+    const getProjectDetails = async (id: string, accessToken?: string) => {
       try {
-        const data = (await fetchProjectDetails(id)) as ProjectInfo;
+        const data = (await fetchProjectDetails(id, accessToken)) as ProjectInfo;
 
         setProjectDetails({
           id: data.id,
@@ -61,7 +63,7 @@ const ProjectDetails = () => {
       }
     };
     if (projectId && !projectInfo.id) {
-      void getProjectDetails(projectId);
+      void getProjectDetails(projectId, user?.access_token);
     }
   }, [projectId, projectInfo.id]);
 

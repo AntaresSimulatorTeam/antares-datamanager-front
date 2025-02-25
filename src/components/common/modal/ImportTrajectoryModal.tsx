@@ -6,6 +6,7 @@ import { ProgressBar } from '@/components/forms/ProgressBar.tsx';
 import { DbTrajectory, RowStatus } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { addTrajectory } from '@/shared/services/trajectoryService.ts';
+import { useAuth } from 'react-oidc-context';
 
 interface ImportTrajectoryModalProps {
   options: SelectOption[] | undefined;
@@ -25,6 +26,7 @@ export const ImportTrajectoryModal = ({
   const [trajectorySelected, setTrajectorySelected] = useState<SelectOption | null>(null);
   const [fileStatus, setFileStatus] = useState<FileInputStatus>('empty');
   const [progress, setProgress] = useState(0);
+  const { user } = useAuth();
 
   const handleSelectOption = (value: SelectOption | null) => {
     if (value) {
@@ -43,9 +45,15 @@ export const ImportTrajectoryModal = ({
     setIsButtonDisabled(true);
     let newTrajectory: DbTrajectory;
     try {
-      newTrajectory = await addTrajectory(trajectoryType, value.label, studyHorizon, (progressValue: number) => {
-        setProgress(+progressValue?.toFixed(0));
-      });
+      newTrajectory = await addTrajectory(
+        trajectoryType,
+        value.label,
+        studyHorizon,
+        (progressValue: number) => {
+          setProgress(+progressValue?.toFixed(0));
+        },
+        user?.access_token,
+      );
       setFileStatus('success');
       onClose(newTrajectory, 'success');
     } catch (error) {

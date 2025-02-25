@@ -22,6 +22,7 @@ import {
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { useStudyDispatch } from '@/store/contexts/StudyContext';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
+import { useAuth } from 'react-oidc-context';
 
 interface AreaLinkTabProps {
   studyHorizon: string;
@@ -41,6 +42,7 @@ const AreaLinkTab = ({ studyHorizon }: AreaLinkTabProps) => {
   const { t } = useTranslation();
   const { trajectories: trajectoriesArea } = useFetchTrajectoriesFromDB(TRAJECTORY_TYPE.AREA, studyHorizon);
   const { trajectories: trajectoriesLink } = useFetchTrajectoriesFromDB(TRAJECTORY_TYPE.LINK, studyHorizon);
+  const { user } = useAuth();
 
   useEffect(() => {
     if (trajectoriesArea && trajectoriesLink) {
@@ -50,7 +52,10 @@ const AreaLinkTab = ({ studyHorizon }: AreaLinkTabProps) => {
 
   const handleFetchTrajectoriesFS = async (index: number) => {
     try {
-      const results = await fetchTrajectoriesFromFS(index === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK);
+      const results = await fetchTrajectoriesFromFS(
+        index === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
+        user?.access_token,
+      );
       setOptionsFS(convertToFSSelectionOptionType(results));
       toggleModal();
     } finally {
@@ -110,6 +115,7 @@ const AreaLinkTab = ({ studyHorizon }: AreaLinkTabProps) => {
       const results = await fetchTrajectoriesFromDB(
         index === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
         studyHorizon,
+        user?.access_token,
         value,
       );
       return convertToSelectionOptionType(results);

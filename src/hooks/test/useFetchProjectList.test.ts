@@ -6,6 +6,9 @@
 
 import { renderHook, waitFor } from '@testing-library/react';
 import { useFetchProjectList } from '@/hooks/useFetchProjectList.ts';
+import { Mock, vi } from 'vitest';
+import { AuthContextProps, useAuth } from 'react-oidc-context';
+import { USER_FAKE } from '@/mocks/data/list/user.ts';
 
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
@@ -13,9 +16,20 @@ vi.mock('@/shared/notification/notification');
 vi.mock('@/envVariables', () => ({
   getEnvVariables: vi.fn(() => 'https://mockapi.com'),
 }));
+vi.mock('react-oidc-context', async (importOriginal) => {
+  const actual: Mock = await importOriginal();
+  return {
+    ...actual,
+    useAuth: vi.fn(),
+  };
+});
 
 describe('useFetchProjectList', () => {
+  const mockUseAuth = useAuth as Mock<typeof useAuth>;
+
   beforeEach(() => {
+    // @ts-expect-error
+    mockUseAuth.mockReturnValue({ user: USER_FAKE } as Partial<AuthContextProps>);
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: true,
       json: async () =>
@@ -42,6 +56,7 @@ describe('useFetchProjectList', () => {
     const { result } = renderHook(() => useFetchProjectList('mouad', 0, 9));
 
     await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith('https://mockapi.com/v1/project/search?page=1&size=9&search=mouad', {});
       expect(result.current.projects).toEqual([
         {
           projectId: '1',

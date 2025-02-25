@@ -12,6 +12,7 @@ import HorizonInput from '@/components/input/HorizonInput.tsx';
 import ProjectInput from '@/components/input/ProjectInput.tsx';
 import { saveStudy } from '@/shared/services/studyService';
 import { StudyDTO } from '@/shared/types';
+import { useAuth } from 'react-oidc-context';
 
 interface StudyCreationModalProps {
   isOpen?: boolean;
@@ -29,6 +30,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({ onClose, study,
   const [trajectoryIds] = useState<number[]>(study?.trajectoryIds || []);
   const [isFormValid, setIsFormValid] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const { user } = useAuth();
 
   const saveStudyHandler = async () => {
     const studyData = {
@@ -40,7 +42,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({ onClose, study,
       trajectoryIds,
     };
 
-    await saveStudy(studyData);
+    await saveStudy(studyData, user?.access_token);
     // Clear form fields
     setReloadStudies((prev) => !prev); // Trigger reload after successful save
     setStudyName('');

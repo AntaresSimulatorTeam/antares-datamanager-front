@@ -6,20 +6,32 @@
 
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { useStudyTableDisplay } from '@/hooks/useStudyTableDisplay';
-import { vi } from 'vitest';
+import { Mock, vi } from 'vitest';
+import { useAuth } from 'react-oidc-context';
+import { USER_FAKE } from '@/mocks/data/list/user.ts';
 
 vi.mock('@/envVariables', () => ({
   getEnvVariables: vi.fn(() => 'https://mockapi.com'),
 }));
+vi.mock('react-oidc-context', async (importOriginal) => {
+  const actual: Mock = await importOriginal();
+  return {
+    ...actual,
+    useAuth: vi.fn(),
+  };
+});
 
 describe('useStudyTableDisplay', () => {
+  const mockUseAuth = useAuth as Mock<typeof useAuth>;
+
   beforeEach(() => {
+    // @ts-expect-error
+    mockUseAuth.mockReturnValue({ user: USER_FAKE } as Partial<AuthContextProps>);
     global.fetch = vi.fn();
-    vi.restoreAllMocks();
   });
 
   afterEach(() => {
-    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('fetches data and updates state correctly', async () => {
@@ -109,7 +121,7 @@ describe('useStudyTableDisplay', () => {
 
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => mockResponse,
+      json: async () => Promise.resolve(mockResponse),
     });
 
     const { result } = renderHook(() =>

@@ -10,7 +10,7 @@ import {
   TRAJECTORY_FILE_SYSTEM_ENDPOINT,
 } from '@/shared/const/apiEndPoint.ts';
 import { DbTrajectory, FsTrajectory } from '@/shared/types';
-import { AuthService } from '@/shared/services/authService.ts';
+import { authFetch } from '@/shared/services/authService.ts';
 import { fetchWithProgress } from '@/shared/services/progressService.ts';
 
 /**
@@ -18,16 +18,18 @@ import { fetchWithProgress } from '@/shared/services/progressService.ts';
  *
  * @param {TRAJECTORY_TYPE} trajectoryType - Partial name of a study
  * @param {string} horizon - Horizon value (ex: 2020-2021)
+ * @param {string | undefined} accessToken - Access token of the user
  * @param {string | undefined} fileName - Autocompletion - filter trajectories by file name
  * @returns {Promise<DbTrajectory[]>} - Promise object that represents a list of trajectories
  */
 export const fetchTrajectoriesFromDB = async (
   trajectoryType: string,
   horizon: string,
+  accessToken?: string,
   fileName?: string,
 ): Promise<DbTrajectory[]> => {
   const urlApi = `${TRAJECTORY_DATA_BASE_ENDPOINT}?trajectoryType=${trajectoryType}&horizon=${horizon}&fileNameStartsWith=${fileName ?? ''}`;
-  const response = await AuthService.authFetch(urlApi);
+  const response = await authFetch(urlApi, accessToken);
   if (!response.ok) {
     throw new Error('Failed to fetch trajectories from data base');
   }
@@ -38,15 +40,17 @@ export const fetchTrajectoriesFromDB = async (
  * Retrieve a list of trajectories by type and thermal capacity area from file system
  *
  * @param {TRAJECTORY_TYPE} trajectoryType - Partial name of a study
+ * @param {string | undefined} accessToken - Access token of the user
  * @param {string | undefined} thermalCapacityArea - To use just in thermal capacity case
  * @returns {Promise<FsTrajectory[]>} - Promise object that represents a list of trajectories
  */
 export const fetchTrajectoriesFromFS = async (
   trajectoryType: string,
+  accessToken?: string,
   thermalCapacityArea?: string | undefined,
 ): Promise<FsTrajectory[]> => {
   const urlApi = `${TRAJECTORY_FILE_SYSTEM_ENDPOINT}?trajectoryType=${trajectoryType}&thermalCapacityArea=${thermalCapacityArea ?? ''}`;
-  const response = await AuthService.authFetch(urlApi);
+  const response = await authFetch(urlApi, accessToken);
   if (!response.ok) {
     throw new Error('Failed to fetch trajectories from file system');
   }
@@ -60,6 +64,7 @@ export const fetchTrajectoriesFromFS = async (
  * @param {string} trajectoryName - Name of trajectory to add to data base
  * @param {string} horizon - Trajectory horizon
  * @param {(progress: number) => void} onProgress - Set progress value
+ * @param {string | undefined} accessToken - Access token of the user
  * @returns {Promise<DbTrajectory>} - Promise object that represents a trajectory inserted into database
  */
 export const addTrajectory = async (
@@ -67,6 +72,7 @@ export const addTrajectory = async (
   trajectoryName: string,
   horizon: string,
   onProgress: (progress: number) => void,
+  accessToken?: string,
 ): Promise<DbTrajectory> => {
   const urlApi = `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}`;
   const [_, response] = await fetchWithProgress(
@@ -78,6 +84,7 @@ export const addTrajectory = async (
       },
     },
     onProgress,
+    accessToken,
   );
 
   if (!(response as Response).ok) {

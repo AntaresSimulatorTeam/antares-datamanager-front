@@ -10,11 +10,13 @@ import { fetchProjectFromSearchTerm } from '@/shared/services/projectService.ts'
 import { PROJECT_ACTION } from '@/shared/enum/project.ts';
 import { useProjectDispatch } from '@/store/contexts/ProjectContext.tsx';
 import { PaginatedResponse } from '@/shared/types';
+import { useAuth } from 'react-oidc-context';
 
 export const useFetchProjectList = (searchTerm: string, current: number, intervalSize: number) => {
   const [projects, setProjects] = useState<ProjectInfo[]>([]);
   const [count, setCount] = useState(0);
   const dispatch = useProjectDispatch();
+  const { user } = useAuth();
 
   const fetchProjects = useCallback(
     async (term: string, currentPage: number, size: number) => {
@@ -23,6 +25,7 @@ export const useFetchProjectList = (searchTerm: string, current: number, interva
           term,
           currentPage,
           size,
+          user?.access_token,
         )) as PaginatedResponse<ProjectInfo>;
 
         dispatch?.({
