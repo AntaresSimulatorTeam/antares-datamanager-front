@@ -5,7 +5,6 @@
  */
 
 import { useState } from 'react';
-
 import SearchBar from './SearchBar';
 import StudyTableDisplay from './StudyTableDisplay';
 import { useTranslation } from 'react-i18next';
@@ -33,7 +32,7 @@ const HomePageContent = () => {
 
   return (
     <div className="flex w-full flex-1 flex-col gap-3">
-      <RdsHeading title="Studies in progress" />
+      <RdsHeading title={t('home.@study_table_title')} />
       <div className="flex gap-4 py-2">
         <SearchBar onSearch={searchStudy} chipLabels={['']} />
         <RdsChip

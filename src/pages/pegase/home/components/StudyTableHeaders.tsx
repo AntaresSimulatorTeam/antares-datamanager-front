@@ -9,14 +9,11 @@ import { StudyStatus } from '@/shared/types/common/StudyStatus.type';
 import { StudyDTO } from '@/shared/types/Study.type.ts';
 import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter';
 import { createColumnHelper } from '@tanstack/react-table';
-import { useTranslation } from 'react-i18next';
 import { RdsRadioButton, RdsTagList } from 'rte-design-system-react';
 
 const columnHelper = createColumnHelper<StudyDTO>();
 
-const getStudyTableHeaders = () => {
-  const { t } = useTranslation();
-  return [
+const getStudyTableHeaders = (t: (value: string) => string) => [
     columnHelper.display({
       id: 'radioColumn',
       header: '',
@@ -77,6 +74,5 @@ const getStudyTableHeaders = () => {
       cell: ({ getValue }) => formatDateToDDMMYYYY(getValue(), true),
     }),
   ];
-};
 
 export default getStudyTableHeaders;
