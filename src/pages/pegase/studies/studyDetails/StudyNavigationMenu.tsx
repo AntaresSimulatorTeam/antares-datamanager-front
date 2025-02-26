@@ -15,21 +15,22 @@ import AreaLinkTab from '@/components/tab/AreaLinkTab.tsx';
 import StdIcon from '@common/base/stdIcon/StdIcon';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useTranslation } from 'react-i18next';
+import { StudyDTO } from '@/shared/types';
 
 const StudyNavigationMenu = ({
   onRenderActiveComponent,
-  studyHorizon,
+  study,
 }: {
   onRenderActiveComponent?: (content: ReactNode | null) => void;
-  studyHorizon: string;
+  study: StudyDTO;
 }) => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<TRAJECTORY_TYPE>(TRAJECTORY_TYPE.AREA);
 
-  const renderActiveComponent = (horizon: string): ReactNode | null => {
+  const renderActiveComponent = (studyData: StudyDTO): ReactNode | null => {
     switch (activeTab) {
       case TRAJECTORY_TYPE.AREA:
-        return <AreaLinkTab studyHorizon={horizon} />;
+        return <AreaLinkTab study={studyData} />;
       case TRAJECTORY_TYPE.LOAD:
         return <LoadTab />;
       case TRAJECTORY_TYPE.THERMAL_COST:
@@ -45,7 +46,7 @@ const StudyNavigationMenu = ({
 
   useEffect(() => {
     if (onRenderActiveComponent) {
-      onRenderActiveComponent(renderActiveComponent(studyHorizon));
+      onRenderActiveComponent(renderActiveComponent(study));
     }
   }, [activeTab, onRenderActiveComponent]);
 

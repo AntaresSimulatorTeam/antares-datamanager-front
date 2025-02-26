@@ -56,7 +56,7 @@ const StudyDetails = () => {
       </div>
       <div className="flex gap-4 px-3 py-2">
         <div className="flex h-10 items-end self-stretch">
-          <StudyNavigationMenu onRenderActiveComponent={setActiveContent} studyHorizon={study.horizon} />
+          <StudyNavigationMenu onRenderActiveComponent={setActiveContent} study={study} />
         </div>
       </div>
       <div className="flex h-full flex-col justify-between space-x-4 p-4">

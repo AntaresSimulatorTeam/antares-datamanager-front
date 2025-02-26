@@ -12,6 +12,7 @@ import {
 import { DbTrajectory, FsTrajectory } from '@/shared/types';
 import { AuthService } from '@/shared/services/authService.ts';
 import { fetchWithProgress } from '@/shared/services/progressService.ts';
+import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 
 /**
  * Retrieve a list of trajectories by type and horizon from database
@@ -85,4 +86,27 @@ export const addTrajectory = async (
   } else {
     return (await (response as Response).json()) as DbTrajectory;
   }
+};
+
+/**
+ * Fetch trajectories linked to one or several studies
+ * @param {number} studyIds - Array of study ids
+ * @param {TRAJECTORY_TYPE} trajectoryType - Trajectory type
+ *
+ * @return {Promise<DbTrajectory[] | Error>} Array of trajectories (data base trajectories)
+ */
+
+export const getStudyTrajectories = async (
+  studyIds: number[],
+  trajectoryType: TRAJECTORY_TYPE,
+): Promise<DbTrajectory[] | Error> => {
+  const studyParams = studyIds?.map((id) => `studyIds=${id}`).join('');
+  const urlApi = `${TRAJECTORY_ENDPOINT}?${studyParams}&trajectoryType=${trajectoryType}`;
+
+  const response = await AuthService.authFetch(urlApi);
+  if (!response.ok) {
+    throw new Error('Failed to generate a study');
+  }
+
+  return (await response.json()) as DbTrajectory[];
 };
