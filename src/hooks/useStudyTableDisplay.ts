@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { PaginatedResponse, StudyDTO } from '@/shared/types';
 import { fetchSearchStudies } from '@/shared/services/studyService.ts';
 
@@ -39,31 +39,19 @@ export const useStudyTableDisplay = ({
   const [currentPage, setCurrentPage] = useState(0);
   const [errorValue, setErrorValue] = useState<Error | null>(null);
 
-  const searchTermRef = useRef(searchTerm);
-  const projectIdRef = useRef(projectId);
-  const sortByRef = useRef(sortBy);
-  const reloadStudiesRef = useRef(reloadStudies);
-
   useEffect(() => {
     setCurrentPage(PAGINATION_CURRENT);
   }, []);
 
   useEffect(() => {
-    searchTermRef.current = searchTerm;
-    projectIdRef.current = projectId;
-    sortByRef.current = sortBy;
-    reloadStudiesRef.current = reloadStudies;
-  }, [searchTerm, projectId, sortBy, reloadStudies]);
-
-  useEffect(() => {
-    fetchSearchStudies(searchTermRef.current, projectIdRef.current, currentPage, intervalSize, sortByRef.current)
+    fetchSearchStudies(searchTerm, projectId, currentPage, intervalSize, sortBy)
       .then((json) => {
         const { content, totalElements } = json as PaginatedResponse<StudyDTO>;
         setRows(content);
         setCount(totalElements);
       })
       .catch((error: unknown) => setErrorValue(error as Error));
-  }, [currentPage, searchTermRef, projectIdRef, sortByRef, reloadStudies]);
+  }, [currentPage, searchTerm, projectId, sortBy, reloadStudies]);
 
   return { rows, count, intervalSize, currentPage, setPage: setCurrentPage, error: errorValue };
 };

@@ -39,7 +39,8 @@
     "@my_studies": "My studies",
     "@my_projects": "My projects",
     "@new_project": "Create a project",
-    "@duplicate_study": "Duplicate a study"
+    "@duplicate_study": "Duplicate a study",
+    "@study_table_title": "Last studies"
   },
   "project": {
     "@setting": "Setting",
