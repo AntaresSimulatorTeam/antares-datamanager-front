@@ -85,6 +85,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
         payload,
       } as StudyActionType);
 
+      // Update trajectory list in BDD for dropdown
       setOptionsDB((prev) => {
         if (prev && prev[index]?.length >= 0) {
           prev[index] = [
@@ -116,7 +117,6 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
     } else {
       setReadOnly({ '0': false, '1': false });
     }
-    setRowIndexSelected((prev) => (prev === 0 ? 1 : 0));
     setData(updatedData);
   };
 
