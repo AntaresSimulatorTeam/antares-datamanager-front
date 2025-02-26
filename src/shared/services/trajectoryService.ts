@@ -105,7 +105,7 @@ export const getStudyTrajectories = async (
 
   const response = await AuthService.authFetch(urlApi);
   if (!response.ok) {
-    throw new Error('Failed to generate a study');
+    throw new Error('Failed to fetch trajectories linked to studies');
   }
 
   return (await response.json()) as DbTrajectory[];
