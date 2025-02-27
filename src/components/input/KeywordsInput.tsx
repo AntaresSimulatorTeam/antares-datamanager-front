@@ -33,6 +33,7 @@ const KeywordsInput = ({
   const [suggestedKeywords, setSuggestedKeywords] = useState<string[]>([]);
 
   const handleKeywordChange = async (value: string) => {
+    console.log('================= handleKeywordChange', maxNbCharacters !== undefined);
     if (maxNbCharacters !== undefined && value.length > maxNbCharacters) {
       return;
     }
@@ -47,8 +48,8 @@ const KeywordsInput = ({
   };
 
   const handleAddKeyword = (suggestedKeyword = keywordInput) => {
-    if (keywords?.length > 0 && suggestedKeyword.trim()) {
-      if (keywords.includes(suggestedKeyword.trim())) {
+    if (suggestedKeyword.trim()) {
+      if (keywords?.includes(suggestedKeyword.trim())) {
         setErrorMessage(t('projectModal.@keyword_already_exists'));
       } else if (
         minNbCharacters &&
@@ -60,7 +61,7 @@ const KeywordsInput = ({
         setErrorMessage(t('projectModal.@keyword_minimum_error', { min: minNbCharacters }));
       } else if (!minNbCharacters && maxNbCharacters && suggestedKeyword.trim().length > maxNbCharacters) {
         setErrorMessage(t('projectModal.@keyword_maximum_error', { max: maxNbCharacters }));
-      } else if (maxNbKeywords && keywords.length >= maxNbKeywords) {
+      } else if (maxNbKeywords && keywords?.length >= maxNbKeywords) {
         setErrorMessage(t('projectModal.@keyword_max_keys_errors', { maxNbKey: maxNbKeywords }));
       } else {
         setKeywords((prevKeywords) => [...prevKeywords, suggestedKeyword.trim()]);
