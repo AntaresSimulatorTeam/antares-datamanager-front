@@ -124,7 +124,7 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
               />
             </>
           ) : (
-            projectId !== '' && <RdsButton label={t('project.@new_study')} onClick={toggleModal} />
+            projectId !== '' && <RdsButton label={t('studyModal.@new_study')} onClick={toggleModal} />
           )}
         </div>
         <StudiesPagination count={count} intervalSize={intervalSize} current={currentPage} onChange={setPage} />
