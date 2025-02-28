@@ -21,6 +21,7 @@ const getAreaLinkTableHeaders = (
   handleUpdate: (index: number, status: RowStatus, trajectory?: SelectOption) => Promise<void>,
   handleImport: (index: number) => Promise<void>,
   handlerSearch: (index: number, value: string | undefined) => Promise<SelectOption[] | undefined>,
+  error: { index: number; message: string },
 ) => [
   columnHelper.accessor('hypothesis', {
     header: t('studyDetails.@hypothesis'),
@@ -61,6 +62,7 @@ const getAreaLinkTableHeaders = (
             onClick={() => void handleImport(row.index)}
             disabled={row.getReadOnly()}
           />
+          {error.message && row.index === error.index && <div className="text-error-600">{error.message}</div>}
         </div>
       );
     },

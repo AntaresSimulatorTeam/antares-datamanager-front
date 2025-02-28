@@ -31,7 +31,6 @@ const SelectAndSearchableInput = ({
   const [optionsSelection, setOptionsSelection] = useState<SelectOption[] | undefined>(options);
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [isSelectEnable, setIsSelectEnable] = useState<boolean>(true);
-  const [isSearchableEnable, setIsSearchableEnable] = useState<boolean>(false);
   const [placeHolder] = useState<string>(defaultPlaceHolder);
   const [valueInput, setValueInput] = useState<string>('');
   const dropdownList = useRef<HTMLDivElement | null>(null);
@@ -42,8 +41,8 @@ const SelectAndSearchableInput = ({
         setValueInput(value);
         setIsDropdownOpen(false);
         setIsSelectEnable(false);
-        setIsSearchableEnable(true);
         await setSearchTerm?.(value).then((results) => {
+          setIsDropdownOpen(true);
           if (results && results.length > 0) {
             setOptionsSelection(results);
           } else {
@@ -53,7 +52,6 @@ const SelectAndSearchableInput = ({
       } else {
         setValueInput('');
         setIsSelectEnable(true);
-        setIsSearchableEnable(false);
         setIsDropdownOpen(false);
         setOptionsSelection(defaultOptions);
       }
@@ -71,19 +69,6 @@ const SelectAndSearchableInput = ({
   return (
     <div className="relative">
       <div className="absolute right-0 top-3">
-        {isSearchableEnable && isSearchable && (
-          <RdsButton
-            icon={RdsIconId.Search}
-            size="extraSmall"
-            variant="text"
-            onClick={(e) => {
-              setIsDropdownOpen(true);
-              e.stopPropagation();
-            }}
-            color="secondary"
-            disabled={!isSearchableEnable}
-          />
-        )}
         {isSelectEnable && (
           <RdsButton
             icon={!isDropdownOpen ? RdsIconId.KeyboardArrowRight : RdsIconId.KeyboardArrowDown}
