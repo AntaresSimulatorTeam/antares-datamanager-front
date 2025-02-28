@@ -23,7 +23,9 @@ interface StudyCreationModalProps {
 const StudyCreationModal: React.FC<StudyCreationModalProps> = ({ onClose, study, setReloadStudies }) => {
   const { t } = useTranslation();
   const [studyName, setStudyName] = useState<string>('');
-  const [horizon, setHorizon] = useState<string>('');
+  const [horizon, setHorizon] = useState<string>(
+    study?.horizon ? study.horizon.substring(0, 4) : ''
+  );
   const [projectName, setProjectName] = useState<string>(study?.project || '');
   const [keywords, setKeywords] = useState<string[]>(study?.keywords || []);
   const [trajectoryIds] = useState<number[]>(study?.trajectoryIds || []);
@@ -87,9 +89,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({ onClose, study,
 
   return (
     <RdsModal size="small">
-      <RdsModal.Title onClose={onClose}>
-        {study ? t('home.@duplicate_study') : t('studyModal.@new_study')}
-      </RdsModal.Title>
+      <RdsModal.Title onClose={onClose}>{study ? t('home.@duplicate_study') : t('studyModal.@new_study')}</RdsModal.Title>
       <RdsModal.Content>
         <div className="flex gap-4 self-stretch">
           <div className="flex w-32 flex-col items-start justify-start">
@@ -116,10 +116,10 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({ onClose, study,
         </div>
       </RdsModal.Content>
       <RdsModal.Footer>
-        <RdsButton label="Cancel" onClick={onClose} color="secondary" />
+        <RdsButton label={t('components.quickAccess.@cancel') } onClick={onClose} color="secondary" />
         <RdsButton
-          icon={RdsIconId.Add}
-          label={t('studyModal.@button_create')}
+          icon={study ? RdsIconId.ContentCopy : RdsIconId.Add}
+          label={study ? t('study.@duplicate'):t('studyModal.@button_create')}
           onClick={() => void saveStudyHandler()}
           variant="contained"
           color="primary"

@@ -82,6 +82,12 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
     navigateToStudy(selectedStudy);
   };
 
+  const handleModalClose = () => {
+    setSelectedStudy(null);
+    setRowSelection({});
+    toggleModal();
+  };
+
   const sortedHeaders = addSortColumn(headers, handleSort, sortBy, sortedColumn, handleHeaderHover, isHeaderHovered);
 
   return (
@@ -132,7 +138,7 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
       {isModalOpen && (
         <StudyCreationModal
           isOpen={isModalOpen}
-          onClose={toggleModal}
+          onClose={handleModalClose}
           study={selectedStudy}
           setReloadStudies={setReloadStudies}
         />
