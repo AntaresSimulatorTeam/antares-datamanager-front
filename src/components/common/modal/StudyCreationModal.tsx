@@ -89,7 +89,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({ onClose, study,
 
   return (
     <RdsModal size="small">
-      <RdsModal.Title onClose={onClose}>{study ? t('home.@duplicate_study') : t('project.@new_study')}</RdsModal.Title>
+      <RdsModal.Title onClose={onClose}>{study ? t('home.@duplicate_study') : t('studyModal.@new_study')}</RdsModal.Title>
       <RdsModal.Content>
         <div className="flex gap-4 self-stretch">
           <div className="flex w-32 flex-col items-start justify-start">
