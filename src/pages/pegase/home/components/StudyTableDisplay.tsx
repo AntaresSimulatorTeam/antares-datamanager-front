@@ -84,6 +84,8 @@ const StudyTableDisplay = ({ searchStudy, projectId, projectInfoName }: StudyTab
     toggleModal();
   };
 
+  const sortedHeaders = addSortColumn(headers, handleSort, sortBy, sortedColumn, setIsHeaderHovered, isHeaderHovered);
+  const memoizedRows = useMemo(() => rows, [rows]);
   return (
     <div>
       <div className="flex-1">
