@@ -23,7 +23,9 @@ interface StudyCreationModalProps {
 const StudyCreationModal: React.FC<StudyCreationModalProps> = ({ onClose, study, setReloadStudies }) => {
   const { t } = useTranslation();
   const [studyName, setStudyName] = useState<string>('');
-  const [horizon, setHorizon] = useState<string>(study?.horizon || '');
+  const [horizon, setHorizon] = useState<string>(
+    study?.horizon ? study.horizon.substring(0, 4) : ''
+  );
   const [projectName, setProjectName] = useState<string>(study?.project || '');
   const [keywords, setKeywords] = useState<string[]>(study?.keywords || []);
   const [trajectoryIds] = useState<number[]>(study?.trajectoryIds || []);
