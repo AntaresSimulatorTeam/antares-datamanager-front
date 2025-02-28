@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { StudyDTO } from '@/shared/types';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type';
 import getStudyTableHeaders from './StudyTableHeaders';
@@ -44,10 +44,6 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
     reloadStudies, // Key change here
   });
 
-  const handleHeaderHover = (hovered: boolean) => {
-    setIsHeaderHovered(hovered);
-  };
-
   const headers = getStudyTableHeaders(t);
 
   const handleSort = (column: string) => {
@@ -57,39 +53,38 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
   };
 
   const selectedRowId = Object.keys(rowSelection)[0];
-  const selectedStatus = rows[Number.parseInt(selectedRowId || '-1')]?.status?.toUpperCase();
+  const selectedStatus = rows[Number.parseInt(selectedRowId || '-1')]?.status?.toUpperCase() as StudyStatus;
   const isDuplicateActive = selectedStatus === StudyStatus.GENERATED;
   const isDeleteActive = selectedStatus === StudyStatus.ERROR || selectedStatus === StudyStatus.IN_PROGRESS;
 
   const handleDuplicate = () => {
-    const selectedStudy = rows[Number.parseInt(selectedRowId || '-1')];
-    setSelectedStudy(selectedStudy);
+    const studySelected = rows[Number.parseInt(selectedRowId || '-1')];
+    setSelectedStudy(studySelected);
     toggleModal();
     setReloadStudies(!reloadStudies); // Trigger reload after deleting
   };
 
-  const handleDeleteClick = () => {
+  const handleDeleteClick = async () => {
     const selectedStudyId = rows[Number.parseInt(selectedRowId || '-1')]?.id;
     if (selectedStudyId) {
-      deleteStudy(selectedStudyId).then(() => {
+      await deleteStudy(selectedStudyId).then(() => {
         setReloadStudies(!reloadStudies); // Trigger reload after deleting
       });
     }
   };
 
   const handleRowClick = () => {
-    const selectedStudy = rows[Number.parseInt(selectedRowId || '-1')];
-    navigateToStudy(selectedStudy);
+    navigateToStudy(rows[Number.parseInt(selectedRowId || '-1')]);
   };
 
-  const sortedHeaders = addSortColumn(headers, handleSort, sortBy, sortedColumn, handleHeaderHover, isHeaderHovered);
-
+  const sortedHeaders = addSortColumn(headers, handleSort, sortBy, sortedColumn, setIsHeaderHovered, isHeaderHovered);
+  const memoizedRows = useMemo(() => rows, [rows]);
   return (
     <div>
       <div className="flex-1">
         <StdSimpleTable
           columns={sortedHeaders}
-          data={rows}
+          data={memoizedRows}
           enableRowSelection={true}
           state={{
             rowSelection,
@@ -118,7 +113,7 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
               />
               <RdsButton
                 label={t('study.@delete')}
-                onClick={handleDeleteClick}
+                onClick={() => void handleDeleteClick()}
                 variant="outlined"
                 disabled={!isDeleteActive}
               />

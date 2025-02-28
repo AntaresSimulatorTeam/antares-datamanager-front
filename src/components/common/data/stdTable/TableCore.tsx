@@ -10,7 +10,8 @@ import { useRdsId } from 'rte-design-system-react';
 import { tableClassBuilder, tableStyleBuilder } from '@/shared/utils/tableClassBuilder.ts';
 import { TableHeader } from '@common/data/stdTable/TableHeader.tsx';
 import { ColumnSizeType } from '@/shared/types/Table.type.ts';
-import MemoizedTableCell from '@common/data/stdTable/TableCell.tsx';
+import { TableCell } from '@common/data/stdTable/TableCell.tsx';
+import { memo } from 'react';
 
 export type TableCoreProps<TData> = {
   id?: string;
@@ -20,6 +21,9 @@ export type TableCoreProps<TData> = {
   columnResizeMode?: ColumnResizeMode;
   table: Table<TData>;
 };
+
+const typedMemo: <T>(c: T) => T = memo;
+const MemoizedTableCell = typedMemo(TableCell);
 
 const TableCore = <TData,>({ table, id: propId, striped, trClassName, columnSize = 'meta' }: TableCoreProps<TData>) => {
   const id = useRdsId('table-', propId);

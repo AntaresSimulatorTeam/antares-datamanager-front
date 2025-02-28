@@ -12,7 +12,7 @@ export function addSortColumn(
   handleSort: (column: string) => void,
   sortBy: { [key: string]: 'asc' | 'desc' },
   sortedColumn: string | null,
-  handleHeaderHover: (hovered: boolean) => void,
+  setIsHeaderHovered: (hovered: boolean) => void,
   isHeaderHovered: boolean,
 ) {
   return headers.map((column) => {
@@ -22,11 +22,11 @@ export function addSortColumn(
       header: (
         <div
           className={`flex items-center ${isSortable ? 'cursor-pointer' : ''} header-container group`}
-          onMouseEnter={() => isSortable && handleHeaderHover(true)}
-          onMouseLeave={() => isSortable && handleHeaderHover(false)}
+          onMouseEnter={() => isSortable && setIsHeaderHovered(true)}
+          onMouseLeave={() => isSortable && setIsHeaderHovered(false)}
           onClick={() => {
             if (isSortable) {
-              handleHeaderHover(false);
+              setIsHeaderHovered(false);
               handleSort(column.accessorKey as string);
             }
           }}

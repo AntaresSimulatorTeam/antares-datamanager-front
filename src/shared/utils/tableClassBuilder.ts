@@ -1,7 +1,7 @@
 import { clsx } from 'clsx';
 import { COMMON_HEADER_CLASSES, RESIZER_CLASSES, ROW_CLASSES } from '@/shared/const/classesConst.ts';
 import { Table } from '@tanstack/react-table';
-import { ColumnSizeType } from '@common/data/stdTable/TableCore.tsx';
+import { ColumnSizeType } from '@/shared/types/Table.type.ts';
 import { TableHeaderProps } from '@common/data/stdTable/TableHeader.tsx';
 
 export const headerClassBuilder = <TData>({ table, header, columnSize }: TableHeaderProps<TData>) =>

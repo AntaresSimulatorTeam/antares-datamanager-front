@@ -1,6 +1,6 @@
 import { flexRender, Header, Table } from '@tanstack/react-table';
 import { headerClassBuilder, headerDivClassBuilder, headerDivStyleBuilder } from '@/shared/utils/tableClassBuilder.ts';
-import { ColumnSizeType } from '@common/data/stdTable/TableCore.tsx';
+import { ColumnSizeType } from '@/shared/types/Table.type.ts';
 
 export type TableHeaderProps<TData> = {
   table: Table<TData>;
