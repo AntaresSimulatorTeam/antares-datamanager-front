@@ -79,12 +79,15 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
 
   const sortedHeaders = addSortColumn(headers, handleSort, sortBy, sortedColumn, setIsHeaderHovered, isHeaderHovered);
   const memoizedRows = useMemo(() => rows, [rows]);
+
   return (
     <div>
       <div className="flex-1">
         <StdSimpleTable
+          columnSize="pixels"
           columns={sortedHeaders}
           data={memoizedRows}
+          areRowsMemoized={true}
           enableRowSelection={true}
           state={{
             rowSelection,

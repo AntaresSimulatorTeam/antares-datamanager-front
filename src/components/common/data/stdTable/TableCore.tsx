@@ -4,14 +4,13 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { ColumnResizeMode, Row, Table } from '@tanstack/react-table';
-import { tableCoreRowClassBuilder } from './tableCoreRowClassBuilder';
+import { ColumnResizeMode, Table } from '@tanstack/react-table';
 import { useRdsId } from 'rte-design-system-react';
 import { tableClassBuilder, tableStyleBuilder } from '@/shared/utils/tableClassBuilder.ts';
 import { TableHeader } from '@common/data/stdTable/TableHeader.tsx';
 import { ColumnSizeType } from '@/shared/types/Table.type.ts';
-import { TableCell } from '@common/data/stdTable/TableCell.tsx';
-import { memo } from 'react';
+import { TableRow } from '@common/data/stdTable/TableRow.tsx';
+import { typedMemo } from '@/shared/types/Generic.type.ts';
 
 export type TableCoreProps<TData> = {
   id?: string;
@@ -20,19 +19,21 @@ export type TableCoreProps<TData> = {
   columnSize?: ColumnSizeType;
   columnResizeMode?: ColumnResizeMode;
   table: Table<TData>;
+  areRowsMemoized?: boolean;
 };
 
-const typedMemo: <T>(c: T) => T = memo;
-const MemoizedTableCell = typedMemo(TableCell);
+const MemoizedTableRow = typedMemo(TableRow);
 
-const TableCore = <TData,>({ table, id: propId, striped, trClassName, columnSize = 'meta' }: TableCoreProps<TData>) => {
+const TableCore = <TData,>({
+  table,
+  id: propId,
+  striped,
+  trClassName,
+  columnSize = 'meta',
+  areRowsMemoized = false,
+}: TableCoreProps<TData>) => {
   const id = useRdsId('table-', propId);
-
-  const handleToggleRow = (row: Row<unknown>) => () => {
-    if (row.getCanSelect()) {
-      row.toggleSelected();
-    }
-  };
+  const RowComponent = areRowsMemoized ? MemoizedTableRow : TableRow;
 
   return (
     <table className={tableClassBuilder(table)} id={id} style={tableStyleBuilder(table, columnSize)}>
@@ -49,16 +50,13 @@ const TableCore = <TData,>({ table, id: propId, striped, trClassName, columnSize
       </thead>
       <tbody>
         {table.getRowModel().rows.map((row) => (
-          <tr
+          <RowComponent
             key={row.id}
-            className={tableCoreRowClassBuilder(striped, row.getIsSelected(), row.getReadOnly?.(), trClassName)}
-            onClick={handleToggleRow(row)}
-            aria-readonly={row.getReadOnly?.()}
-          >
-            {row.getVisibleCells().map((cell) => (
-              <MemoizedTableCell key={cell.id} cell={cell} />
-            ))}
-          </tr>
+            row={row}
+            striped={striped}
+            trClassName={trClassName}
+            isSelected={row.getIsSelected()}
+          />
         ))}
       </tbody>
     </table>

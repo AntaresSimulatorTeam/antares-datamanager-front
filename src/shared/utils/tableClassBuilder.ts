@@ -29,7 +29,7 @@ export const headerDivStyleBuilder = <TData>({ table, header }: TableHeaderProps
 });
 
 export const tableClassBuilder = <TData>(table: Table<TData>) =>
-  clsx(table.options.columnResizeMode ? 'w-fit' : 'w-full', ROW_CLASSES);
+  clsx(table.options.columnResizeMode ? 'w-fit' : 'w-full', ROW_CLASSES, 'table-fixed');
 
 export const tableStyleBuilder = <TData>(table: Table<TData>, columnSize: ColumnSizeType) =>
   columnSize === 'pixels'

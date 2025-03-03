@@ -24,6 +24,7 @@ const getAreaLinkTableHeaders = (
 ) => [
   columnHelper.accessor('hypothesis', {
     header: t('studyDetails.@hypothesis'),
+    size: 200,
     cell: ({ getValue, row }) => {
       const { trajectory } = row.original;
       return (
@@ -36,6 +37,7 @@ const getAreaLinkTableHeaders = (
   }),
   columnHelper.accessor('trajectory', {
     header: t('studyDetails.@trajectory'),
+    size: 900,
     cell: ({ row }) => {
       const { trajectory } = row.original;
       return trajectory ? (

@@ -135,7 +135,7 @@ const AreaLinkTab = ({ studyHorizon }: AreaLinkTabProps) => {
         id="example-table"
         data={data}
         columns={columns}
-        columnSize="meta"
+        columnSize="pixels"
         enableColumnResizing={false}
         enableReadOnly={true}
         state={{ readOnly }}
