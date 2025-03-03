@@ -4,6 +4,33 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-export const Logout = () => <div>Logout</div>;
+import { useEffect, useState } from 'react';
+import { AuthService } from '@/shared/services/authService.ts';
+
+export const Logout = () => {
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  useEffect(() => {
+    const logout = async () => {
+      try {
+        setIsLoggingOut(true);
+        await AuthService.logout();
+        await AuthService.handleCallback();
+      } finally {
+        setIsLoggingOut(false);
+      }
+    };
+    void logout();
+  }, []);
+  return (
+    isLoggingOut && (
+      <div className={'max-h-3 min-w-12'}>
+        <div
+          className={'inline-block h-3 w-3 animate-spin rounded-full border-2 border-gray-600 border-b-transparent p-0'}
+        ></div>
+      </div>
+    )
+  );
+};
 
 export default Logout;
