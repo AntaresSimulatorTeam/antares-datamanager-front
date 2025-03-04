@@ -16,6 +16,7 @@ export const AuthService = {
   getUser: async (): Promise<User | null> => await userManager.getUser(),
   handleCallback: async () => {
     try {
+      console.log('================ signinRedirectCallback');
       await userManager.signinRedirectCallback();
     } catch (error) {
       throw new Error('Failed to redirect');
