@@ -15,8 +15,8 @@ export const Logout = () => {
     const logout = async () => {
       try {
         setIsLoggingOut(true);
-        await AuthService.logout();
         await AuthService.handleCallback();
+        await AuthService.logout();
         //await AuthService.removeUser();
         //await navigate('/logout-callback');
         //window.location.replace(getEnvVariables('VITE_OAUTH2_REDIRECT_URL'));
@@ -28,9 +28,7 @@ export const Logout = () => {
         //}
       } finally {
         setIsLoggingOut(false);
-        if (window.location.href.includes('id_token_hint')) {
-          window.location.replace('/');
-        }
+        window.location.replace('/');
       }
     };
     void logout();

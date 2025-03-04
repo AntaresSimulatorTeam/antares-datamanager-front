@@ -16,6 +16,5 @@ export const config: UserManagerSettings = {
   // eslint-disable-next-line camelcase
   post_logout_redirect_uri: getEnvVariables('VITE_OAUTH2_LOGOFF_REDIRECT_URL'),
   scope: 'openid email profile',
-  revokeTokensOnSignout: true,
   redirectMethod: 'replace',
 };
