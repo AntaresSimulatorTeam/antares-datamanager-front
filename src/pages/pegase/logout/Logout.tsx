@@ -6,7 +6,6 @@
 
 import { useEffect, useState } from 'react';
 import { AuthService } from '@/shared/services/authService.ts';
-import { getEnvVariables } from '@/envVariables.ts';
 
 export const Logout = () => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -25,12 +24,12 @@ export const Logout = () => {
         console.log('========================== signinRedirectCallback', error);
         setIsLoggingOut(false);
         //if (window.location.href.includes('id_token_hint')) {
-        window.location.replace(getEnvVariables('VITE_OAUTH2_REDIRECT_URL'));
+        window.location.replace('/');
         //}
       } finally {
         setIsLoggingOut(false);
         if (window.location.href.includes('id_token_hint')) {
-          window.location.replace(getEnvVariables('VITE_OAUTH2_REDIRECT_URL'));
+          window.location.replace('/');
         }
       }
     };
