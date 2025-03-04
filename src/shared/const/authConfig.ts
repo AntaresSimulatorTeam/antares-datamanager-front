@@ -17,4 +17,6 @@ export const config: UserManagerSettings = {
   post_logout_redirect_uri: getEnvVariables('VITE_OAUTH2_LOGOFF_REDIRECT_URL'),
   scope: 'openid email profile',
   redirectMethod: 'replace',
+  // eslint-disable-next-line camelcase
+  response_mode: 'query',
 };

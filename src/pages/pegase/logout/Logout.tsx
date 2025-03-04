@@ -28,8 +28,9 @@ export const Logout = () => {
         window.location.replace(getEnvVariables('VITE_OAUTH2_REDIRECT_URL'));
         //}
       } finally {
+        console.log('========================== finally');
         setIsLoggingOut(false);
-        window.location.replace('/');
+        window.location.replace(getEnvVariables('VITE_OAUTH2_REDIRECT_URL'));
       }
     };
     void logout();
