@@ -26,7 +26,7 @@ export const AuthService = {
     try {
       const accessToken = await AuthService.getAccessToken();
       // eslint-disable-next-line camelcase
-      await userManager.signoutRedirect({ id_token_hint: accessToken ?? undefined });
+      return await userManager.signoutRedirect({ id_token_hint: accessToken ?? undefined });
     } catch {
       // silent handler
     }

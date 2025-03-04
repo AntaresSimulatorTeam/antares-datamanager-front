@@ -17,10 +17,10 @@ export const Logout = () => {
         setIsLoggingOut(true);
         //await AuthService.removeUser();
         await AuthService.logout();
-        await AuthService.handleCallback();
-        if (window.location.href.includes('id_token_hint')) {
-          window.location.replace('/');
-        }
+        // await AuthService.handleCallback();
+        // if (window.location.href.includes('id_token_hint')) {
+        //   window.location.replace('/');
+        // }
 
         //await navigate('/logout-callback');
         //window.location.replace(getEnvVariables('VITE_OAUTH2_REDIRECT_URL'));
