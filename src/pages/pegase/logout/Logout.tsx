@@ -10,31 +10,16 @@ import { getEnvVariables } from '@/envVariables.ts';
 
 export const Logout = () => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  //const navigate = useNavigate();
 
   useEffect(() => {
     const logout = async () => {
       try {
         setIsLoggingOut(true);
         await AuthService.logout();
-        await AuthService.handleCallback().then(() => {
-          console.log('========================== signinRedirectCallback');
-          window.location.replace(getEnvVariables('VITE_OAUTH2_REDIRECT_URL'));
-        });
-        //await AuthService.removeUser();
-        //await navigate('/logout-callback');
-        //window.location.replace(getEnvVariables('VITE_OAUTH2_REDIRECT_URL'));
-      } catch (error) {
-        console.log('========================== signinRedirectCallback', error);
-        setIsLoggingOut(false);
-        //if (window.location.href.includes('id_token_hint')) {
-        window.location.replace('/');
-        //}
+        await AuthService.handleCallback();
+        window.location.replace(getEnvVariables('VITE_OAUTH2_REDIRECT_URL'));
       } finally {
-        console.log('========================== finally');
         setIsLoggingOut(false);
-        //window.location.replace(getEnvVariables('VITE_OAUTH2_REDIRECT_URL'));
-        window.location.replace('/');
       }
     };
     void logout();
