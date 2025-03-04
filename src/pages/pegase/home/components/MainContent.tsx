@@ -5,7 +5,7 @@
  */
 
 import { Suspense } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import PegaseStar from '@/components/pegase/star/PegaseStar';
 import ProjectDetails from '@/pages/pegase/projects/projectDetails/ProjectDetails';
 import StudyDetails from '@/pages/pegase/studies/studyDetails/StudyDetails';
@@ -20,7 +20,7 @@ import { translateMenuItemLabel } from '@/shared/utils/textUtils';
 import { navBarConfig } from '@/shared/const/navBarConfig';
 import { useTranslation } from 'react-i18next';
 import { StudyProvider } from '@/store/contexts/StudyProvider.tsx';
-import { getEnvVariables } from '@/envVariables.ts';
+import { LogoutCallback } from '@/pages/pegase/logout/LogoutCallback.tsx';
 
 const MainContent = () => {
   const { t } = useTranslation();
@@ -44,10 +44,7 @@ const MainContent = () => {
               <Routes>
                 <Route path="/study/:studyName" element={<StudyDetails />} />
                 <Route path="/project/:projectName" element={<ProjectDetails />} />
-                <Route
-                  path="/logout-callback"
-                  element={<Navigate to={`${getEnvVariables('VITE_OAUTH2_REDIRECT_URL')}`} />}
-                />
+                <Route path="/logout-callback" element={<LogoutCallback />} />
                 {Object.entries([...menuBottomData, ...menuTopData]).map(([key, route]) => (
                   <Route key={key} path={route.path} Component={route.component} />
                 ))}
