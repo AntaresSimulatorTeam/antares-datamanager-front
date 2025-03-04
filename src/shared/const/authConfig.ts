@@ -14,7 +14,7 @@ export const config: UserManagerSettings = {
   redirect_uri: getEnvVariables('VITE_OAUTH2_REDIRECT_URL'),
   authority: getEnvVariables('VITE_OAUTH2_AUTHORITY'),
   // eslint-disable-next-line camelcase
-  post_logout_redirect_uri: getEnvVariables('VITE_OAUTH2_AUTHORITY'),
+  post_logout_redirect_uri: getEnvVariables('VITE_OAUTH2_REDIRECT_URL'),
   scope: 'openid email profile',
   redirectMethod: 'replace',
   // eslint-disable-next-line camelcase
