@@ -19,6 +19,7 @@ export const AuthService = {
       await userManager.signinRedirectCallback();
     } catch (error) {
       console.log('========================== signinRedirectCallback', error);
+      throw new Error('Failed to redirect');
     }
   },
   removeUser: async () => await userManager.removeUser(),
