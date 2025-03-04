@@ -22,7 +22,7 @@ export const config: AuthConfig = {
   redirect_uri: getEnvVariables('VITE_OAUTH2_REDIRECT_URL'),
   authority: getEnvVariables('VITE_OAUTH2_AUTHORITY'),
   // eslint-disable-next-line camelcase
-  post_logout_redirect_uri: getEnvVariables('VITE_OAUTH2_LOGOFF_REDIRECT_URL'),
+  post_logout_redirect_uri: getEnvVariables('VITE_OAUTH2_REDIRECT_URL'),
   scope: 'openid email profile',
   maxExpiresIn: 600,
 };
