@@ -30,9 +30,11 @@ export const AuthService = {
 
   logout: async () => {
     try {
-      const accessToken = await AuthService.getAccessToken();
+      const accessToken = (await userManager.getUser())?.access_token;
       // eslint-disable-next-line camelcase
-      return await userManager.signoutRedirect({ id_token_hint: accessToken ?? undefined });
+      const response = await userManager.signoutRedirect({ id_token_hint: accessToken ?? undefined });
+      console.log('============== reponse', response);
+      return response;
     } catch {
       // silent handler
     }
