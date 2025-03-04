@@ -6,11 +6,11 @@
 
 import { useEffect, useState } from 'react';
 import { AuthService } from '@/shared/services/authService.ts';
-import { useNavigate } from 'react-router-dom';
+import { getEnvVariables } from '@/envVariables.ts';
 
 export const Logout = () => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
 
   useEffect(() => {
     const logout = async () => {
@@ -18,7 +18,9 @@ export const Logout = () => {
         setIsLoggingOut(true);
         await AuthService.removeUser();
         await AuthService.logout();
-        await navigate('/logout-callback');
+        await AuthService.handleCallback();
+        window.location.replace(getEnvVariables('VITE_OAUTH2_REDIRECT_URL'));
+        //await navigate('/logout-callback');
         //window.location.replace(getEnvVariables('VITE_OAUTH2_REDIRECT_URL'));
       } finally {
         setIsLoggingOut(false);
