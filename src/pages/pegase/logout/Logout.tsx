@@ -6,6 +6,7 @@
 
 import { useEffect, useState } from 'react';
 import { AuthService } from '@/shared/services/authService.ts';
+import { getEnvVariables } from '@/envVariables.ts';
 
 export const Logout = () => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -16,6 +17,7 @@ export const Logout = () => {
         setIsLoggingOut(true);
         await AuthService.logout();
         await AuthService.handleCallback();
+        window.location.replace(getEnvVariables('VITE_OAUTH2_REDIRECT_URL'));
       } finally {
         setIsLoggingOut(false);
       }
