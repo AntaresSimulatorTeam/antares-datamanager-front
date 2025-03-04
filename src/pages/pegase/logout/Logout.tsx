@@ -18,7 +18,7 @@ export const Logout = () => {
         setIsLoggingOut(true);
         await AuthService.logout();
         await AuthService.handleCallback();
-        await AuthService.removeUser();
+        //await AuthService.removeUser();
         //await navigate('/logout-callback');
         //window.location.replace(getEnvVariables('VITE_OAUTH2_REDIRECT_URL'));
       } finally {
