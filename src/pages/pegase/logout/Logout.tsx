@@ -21,11 +21,12 @@ export const Logout = () => {
         //await AuthService.removeUser();
         //await navigate('/logout-callback');
         //window.location.replace(getEnvVariables('VITE_OAUTH2_REDIRECT_URL'));
-      } catch {
+      } catch (error) {
+        console.log('========================== signinRedirectCallback', error);
         setIsLoggingOut(false);
-        if (window.location.href.includes('id_token_hint')) {
-          window.location.replace(getEnvVariables('VITE_OAUTH2_REDIRECT_URL'));
-        }
+        //if (window.location.href.includes('id_token_hint')) {
+        window.location.replace(getEnvVariables('VITE_OAUTH2_REDIRECT_URL'));
+        //}
       } finally {
         setIsLoggingOut(false);
         if (window.location.href.includes('id_token_hint')) {
