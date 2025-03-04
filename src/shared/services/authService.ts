@@ -14,7 +14,13 @@ export const AuthService = {
   login: async () => await userManager.signinRedirect(),
   refresh: () => userManager.signinSilent(),
   getUser: async (): Promise<User | null> => await userManager.getUser(),
-  handleCallback: async () => await userManager.signinRedirectCallback(),
+  handleCallback: async () => {
+    try {
+      await userManager.signinRedirectCallback();
+    } catch (error) {
+      console.log('========================== signinRedirectCallback', error);
+    }
+  },
   removeUser: async () => await userManager.removeUser(),
 
   getAccessToken: async (): Promise<string | null> => {
