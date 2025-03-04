@@ -36,7 +36,8 @@ export const AuthService = {
       const response = await userManager.signoutRedirect({ id_token_hint: accessToken ?? undefined });
       console.log('============== reponse', response);
       return response;
-    } catch {
+    } catch (error) {
+      console.log('============== error', error);
       // silent handler
     }
   },
