@@ -78,37 +78,23 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
     status: RowStatus,
   ) => {
     const updatedData = [...data];
+    const payload: DbTrajectory | null | undefined =
+      trajectory && 'label' in trajectory
+        ? getTrajectoryDB(index === 0 ? trajectoriesArea : trajectoriesLink, trajectory.id as number)
+        : trajectory;
     try {
-      updatedData[index].trajectory = trajectory
-        ? ((trajectory as SelectOption)?.label ?? (trajectory as DbTrajectory)?.trajectoryName)
-        : null;
-      updatedData[index].status = getStatus(status);
-
-      const payload: DbTrajectory | null | undefined =
-        trajectory && 'label' in trajectory
-          ? getTrajectoryDB(index === 0 ? trajectoriesArea : trajectoriesLink, trajectory.id as number)
-          : trajectory;
-
       if (status === 'success' && payload) {
         await linkTrajectoryToStudy(payload.type, payload.id, study.id);
+        // Update context
         dispatch?.({
           type: index === 0 ? STUDY_ACTION.ADD_TRAJECTORY_AREA : STUDY_ACTION.ADD_TRAJECTORY_LINK,
           payload,
         } as StudyActionType);
-
-        // Update trajectory list options (synchronized with update of trajectory list in BDD) for dropdown
-        setOptionsDB((prev) => {
-          if (prev && prev[index]?.length >= 0) {
-            prev[index] = [
-              ...prev[index],
-              {
-                id: (trajectory as DbTrajectory).id,
-                label: (trajectory as DbTrajectory).trajectoryName,
-              },
-            ];
-            return prev;
-          }
-        });
+        // Update data state
+        updatedData[index].trajectory = trajectory
+          ? ((trajectory as SelectOption)?.label ?? (trajectory as DbTrajectory)?.trajectoryName)
+          : null;
+        updatedData[index].status = getStatus(status);
       }
 
       // Handle deletion case for areas
@@ -129,6 +115,10 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
       } else {
         setReadOnly({ '0': false, '1': false });
       }
+    } catch {
+      // Trajectory status is set to error one
+      updatedData[index].trajectory = payload?.trajectoryName ?? null;
+      updatedData[index].status = TRAJECTORY_SELECTION_STATUS.ERROR;
     } finally {
       setData(updatedData);
     }
@@ -153,6 +143,19 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
   const closeModal = useCallback(
     async (value: DbTrajectory | SelectOption | null, status: RowStatus) => {
       try {
+        // Update trajectory list options (synchronized with update of trajectory list in BDD after trajectory import) for dropdown
+        setOptionsDB((prev) => {
+          if (prev && prev[rowIndexSelected]?.length >= 0) {
+            prev[rowIndexSelected] = [
+              ...prev[rowIndexSelected],
+              {
+                id: (value as DbTrajectory).id,
+                label: (value as DbTrajectory).trajectoryName,
+              },
+            ];
+            return prev;
+          }
+        });
         await handleTrajectoryUpdate(rowIndexSelected, value, status);
       } finally {
         toggleModal();

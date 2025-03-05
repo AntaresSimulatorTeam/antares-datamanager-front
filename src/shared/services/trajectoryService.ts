@@ -127,9 +127,14 @@ export const linkTrajectoryToStudy = async (
   studyId: number,
 ): Promise<DbTrajectory | Error> => {
   const urlApi = `${TRAJECTORY_LINK_TO_STUDY_ENDPOINT}?type=${type}&trajectoryId=${trajectoryId}&studyId=${studyId}`;
-  const response = await AuthService.authFetch(urlApi);
+  const response = await AuthService.authFetch(urlApi, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
   if (!response.ok) {
-    throw new Error('Failed to link a trajectory to a study');
+    throw new Error(`${(response as unknown as Error).message}`);
   }
 
   return (await response.json()) as DbTrajectory;
