@@ -41,7 +41,11 @@ const getAreaLinkTableHeaders = (
       return trajectory ? (
         <div className="inline-flex w-[850px] space-x-2 py-3">
           <span>{trajectory}</span>
-          <RdsIconButton icon={RdsIconId.Delete} size="small" onClick={() => handleUpdate(row.index, null, 'empty')} />
+          <RdsIconButton
+            icon={RdsIconId.Delete}
+            size="small"
+            onClick={() => void handleUpdate(row.index, null, 'empty')}
+          />
         </div>
       ) : (
         <div className="inline-flex w-[850px] items-center space-x-2">

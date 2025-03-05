@@ -30,25 +30,23 @@ interface AreaLinkTabProps {
 
 const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
   const studyState = useStudy();
+  const trajectoryNameArea: string | null = studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectoryName ?? null;
+  const trajectoryNameLink: string | null = studyState[`${TRAJECTORY_TYPE.LINK}`]?.trajectoryName ?? null;
   const [data, setData] = useState<AreaAndLinkRowData[]>([
     {
       hypothesis: 'Areas',
-      trajectory: studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectoryName ?? null,
-      status: studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectoryName
-        ? TRAJECTORY_SELECTION_STATUS.OK
-        : TRAJECTORY_SELECTION_STATUS.MISSING,
+      trajectory: trajectoryNameArea,
+      status: trajectoryNameArea ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
     },
     {
       hypothesis: 'Links',
-      trajectory: studyState[`${TRAJECTORY_TYPE.LINK}`]?.trajectoryName ?? null,
-      status: studyState[`${TRAJECTORY_TYPE.LINK}`]?.trajectoryName
-        ? TRAJECTORY_SELECTION_STATUS.OK
-        : TRAJECTORY_SELECTION_STATUS.MISSING,
+      trajectory: trajectoryNameLink,
+      status: trajectoryNameLink ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
     },
   ]);
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({
     '0': false,
-    '1': !studyState[`${TRAJECTORY_TYPE.LINK}`]?.trajectoryName,
+    '1': !trajectoryNameLink,
   });
   const [optionsDB, setOptionsDB] = useState<SelectOption[][]>();
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
@@ -58,28 +56,6 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
   const { t } = useTranslation();
   const { trajectories: trajectoriesArea } = useFetchTrajectoriesFromDB(TRAJECTORY_TYPE.AREA, study.horizon);
   const { trajectories: trajectoriesLink } = useFetchTrajectoriesFromDB(TRAJECTORY_TYPE.LINK, study.horizon);
-
-  // useEffect(() => {
-  //   if (studyState[`${TRAJECTORY_TYPE.AREA}`] && studyState[`${TRAJECTORY_TYPE.LINK}`]) {
-  //     setData([
-  //       {
-  //         hypothesis: 'Areas',
-  //         trajectory: studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectoryName ?? null,
-  //         status: studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectoryName
-  //           ? TRAJECTORY_SELECTION_STATUS.OK
-  //           : TRAJECTORY_SELECTION_STATUS.MISSING,
-  //       },
-  //       {
-  //         hypothesis: 'Links',
-  //         trajectory: studyState[`${TRAJECTORY_TYPE.LINK}`]?.trajectoryName ?? null,
-  //         status: studyState[`${TRAJECTORY_TYPE.LINK}`]?.trajectoryName
-  //           ? TRAJECTORY_SELECTION_STATUS.OK
-  //           : TRAJECTORY_SELECTION_STATUS.MISSING,
-  //       },
-  //     ]);
-  //     setReadOnly({ '0': false, '1': !studyState[`${TRAJECTORY_TYPE.LINK}`]?.trajectoryName });
-  //   }
-  // }, [studyState]);
 
   useEffect(() => {
     if (trajectoriesArea && trajectoriesLink) {
@@ -126,8 +102,10 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
       if (status === 'empty') {
         // TODO: ANT-2892 (delete link between study and trajectory in data base)
         if (index === 0) {
-          updatedData[1].trajectory = null;
-          updatedData[1].status = TRAJECTORY_SELECTION_STATUS.MISSING;
+          updatedData.forEach((rowData) => {
+            rowData.trajectory = null;
+            rowData.status = TRAJECTORY_SELECTION_STATUS.MISSING;
+          });
           dispatch?.({
             type: STUDY_ACTION.CLEAR_AREA_LINK_TRAJECTORY,
           } as StudyActionType);
@@ -194,7 +172,6 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
       getAreaLinkTableHeaders(optionsDB, t, handleTrajectoryUpdate, handleFetchTrajectoriesFS, handleTrajectorySearch),
     [data, optionsDB],
   );
-  //const dataMemoized = useMemo(() => data, [data]);
 
   return (
     <div className="flex-1">
