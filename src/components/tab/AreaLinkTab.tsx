@@ -42,24 +42,22 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
   const { trajectories: trajectoriesLink } = useFetchTrajectoriesFromDB(TRAJECTORY_TYPE.LINK, study.horizon);
 
   useEffect(() => {
-    if (trajectoriesArea && trajectoriesLink) {
-      setData([
-        {
-          hypothesis: 'Areas',
-          trajectory: studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectoryName ?? null,
-          status: studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectoryName
-            ? TRAJECTORY_SELECTION_STATUS.OK
-            : TRAJECTORY_SELECTION_STATUS.MISSING,
-        },
-        {
-          hypothesis: 'Links',
-          trajectory: studyState[`${TRAJECTORY_TYPE.LINK}`]?.trajectoryName ?? null,
-          status: studyState[`${TRAJECTORY_TYPE.LINK}`]?.trajectoryName
-            ? TRAJECTORY_SELECTION_STATUS.OK
-            : TRAJECTORY_SELECTION_STATUS.MISSING,
-        },
-      ]);
-    }
+    setData([
+      {
+        hypothesis: 'Areas',
+        trajectory: studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectoryName ?? null,
+        status: studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectoryName
+          ? TRAJECTORY_SELECTION_STATUS.OK
+          : TRAJECTORY_SELECTION_STATUS.MISSING,
+      },
+      {
+        hypothesis: 'Links',
+        trajectory: studyState[`${TRAJECTORY_TYPE.LINK}`]?.trajectoryName ?? null,
+        status: studyState[`${TRAJECTORY_TYPE.LINK}`]?.trajectoryName
+          ? TRAJECTORY_SELECTION_STATUS.OK
+          : TRAJECTORY_SELECTION_STATUS.MISSING,
+      },
+    ]);
   }, [studyState]);
 
   useEffect(() => {
