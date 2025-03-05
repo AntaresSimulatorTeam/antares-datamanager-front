@@ -8,6 +8,7 @@ import {
   TRAJECTORY_DATA_BASE_ENDPOINT,
   TRAJECTORY_ENDPOINT,
   TRAJECTORY_FILE_SYSTEM_ENDPOINT,
+  TRAJECTORY_LINK_TO_STUDY_ENDPOINT,
 } from '@/shared/const/apiEndPoint.ts';
 import { DbTrajectory, FsTrajectory } from '@/shared/types';
 import { AuthService } from '@/shared/services/authService.ts';
@@ -109,4 +110,27 @@ export const getStudyTrajectories = async (
   }
 
   return (await response.json()) as DbTrajectory[];
+};
+
+/**
+ * Linked a trajectory to study
+ * @param {TRAJECTORY_TYPE} type - Trajectory type
+ * @param {number} trajectoryId - Trajectory id
+ * @param {number} studyId - Study id
+ *
+ * @return {Promise<DbTrajectory | Error>} - Trajectory linked to a study
+ */
+
+export const linkTrajectoryToStudy = async (
+  type: TRAJECTORY_TYPE,
+  trajectoryId: number,
+  studyId: number,
+): Promise<DbTrajectory | Error> => {
+  const urlApi = `${TRAJECTORY_LINK_TO_STUDY_ENDPOINT}?type=${type}&trajectoryId=${trajectoryId}&studyId=${studyId}`;
+  const response = await AuthService.authFetch(urlApi);
+  if (!response.ok) {
+    throw new Error('Failed to link a trajectory to a study');
+  }
+
+  return (await response.json()) as DbTrajectory;
 };

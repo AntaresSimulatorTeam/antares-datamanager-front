@@ -4,13 +4,17 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import StdSimpleTable from '@common/data/stdSimpleTable/StdSimpleTable.tsx';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import getAreaLinkTableHeaders from '@/pages/pegase/studies/studyDetails/AreaLinkTableHeaders.tsx';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { useTranslation } from 'react-i18next';
-import { fetchTrajectoriesFromDB, fetchTrajectoriesFromFS } from '@/shared/services/trajectoryService.ts';
+import {
+  fetchTrajectoriesFromDB,
+  fetchTrajectoriesFromFS,
+  linkTrajectoryToStudy,
+} from '@/shared/services/trajectoryService.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { AreaAndLinkRowData, DbTrajectory, RowStatus, StudyActionType, StudyDTO } from '@/shared/types';
 import { useFetchTrajectoriesFromDB } from '@/hooks/useFetchTrajectoriesFromDB.ts';
@@ -68,56 +72,66 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
     }
   };
 
-  const handleTrajectoryUpdate = (index: number, trajectory: SelectOption | DbTrajectory | null, status: RowStatus) => {
+  const handleTrajectoryUpdate = async (
+    index: number,
+    trajectory: SelectOption | DbTrajectory | null,
+    status: RowStatus,
+  ) => {
     const updatedData = [...data];
-    updatedData[index].trajectory = trajectory
-      ? ((trajectory as SelectOption)?.label ?? (trajectory as DbTrajectory)?.trajectoryName)
-      : null;
-    updatedData[index].status = getStatus(status);
-    if (status === 'success' && trajectory) {
-      // TODO ANT-2878
-      const payload =
-        'label' in trajectory
+    try {
+      updatedData[index].trajectory = trajectory
+        ? ((trajectory as SelectOption)?.label ?? (trajectory as DbTrajectory)?.trajectoryName)
+        : null;
+      updatedData[index].status = getStatus(status);
+
+      const payload: DbTrajectory | null | undefined =
+        trajectory && 'label' in trajectory
           ? getTrajectoryDB(index === 0 ? trajectoriesArea : trajectoriesLink, trajectory.id as number)
           : trajectory;
-      dispatch?.({
-        type: index === 0 ? STUDY_ACTION.ADD_TRAJECTORY_AREA : STUDY_ACTION.ADD_TRAJECTORY_LINK,
-        payload,
-      } as StudyActionType);
 
-      // Update trajectory list in BDD for dropdown
-      setOptionsDB((prev) => {
-        if (prev && prev[index]?.length >= 0) {
-          prev[index] = [
-            ...prev[index],
-            {
-              id: (trajectory as DbTrajectory).id,
-              label: (trajectory as DbTrajectory).trajectoryName,
-            },
-          ];
-          return prev;
-        }
-      });
-    }
+      if (status === 'success' && payload) {
+        await linkTrajectoryToStudy(payload.type, payload.id, study.id);
+        dispatch?.({
+          type: index === 0 ? STUDY_ACTION.ADD_TRAJECTORY_AREA : STUDY_ACTION.ADD_TRAJECTORY_LINK,
+          payload,
+        } as StudyActionType);
 
-    // Handle deletion case for areas
-    if (status === 'empty') {
-      if (index === 0) {
-        updatedData[1].trajectory = null;
-        updatedData[1].status = TRAJECTORY_SELECTION_STATUS.MISSING;
-        dispatch?.({
-          type: STUDY_ACTION.CLEAR_AREA_LINK_TRAJECTORY,
-        } as StudyActionType);
-        setReadOnly({ '0': false, '1': true });
-      } else if (index === 1) {
-        dispatch?.({
-          type: STUDY_ACTION.CLEAR_LINK_TRAJECTORY,
-        } as StudyActionType);
+        // Update trajectory list options (synchronized with update of trajectory list in BDD) for dropdown
+        setOptionsDB((prev) => {
+          if (prev && prev[index]?.length >= 0) {
+            prev[index] = [
+              ...prev[index],
+              {
+                id: (trajectory as DbTrajectory).id,
+                label: (trajectory as DbTrajectory).trajectoryName,
+              },
+            ];
+            return prev;
+          }
+        });
       }
-    } else {
-      setReadOnly({ '0': false, '1': false });
+
+      // Handle deletion case for areas
+      if (status === 'empty') {
+        // TODO: ANT-2892 (delete link between study and trajectory in data base)
+        if (index === 0) {
+          updatedData[1].trajectory = null;
+          updatedData[1].status = TRAJECTORY_SELECTION_STATUS.MISSING;
+          dispatch?.({
+            type: STUDY_ACTION.CLEAR_AREA_LINK_TRAJECTORY,
+          } as StudyActionType);
+          setReadOnly({ '0': false, '1': true });
+        } else if (index === 1) {
+          dispatch?.({
+            type: STUDY_ACTION.CLEAR_LINK_TRAJECTORY,
+          } as StudyActionType);
+        }
+      } else {
+        setReadOnly({ '0': false, '1': false });
+      }
+    } finally {
+      setData(updatedData);
     }
-    setData(updatedData);
   };
 
   const handleTrajectorySearch = async (
@@ -136,10 +150,16 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
     }
   };
 
-  const closeModal = (value: DbTrajectory | SelectOption | null, status: RowStatus) => {
-    value && handleTrajectoryUpdate(rowIndexSelected, value, status);
-    toggleModal();
-  };
+  const closeModal = useCallback(
+    async (value: DbTrajectory | SelectOption | null, status: RowStatus) => {
+      try {
+        await handleTrajectoryUpdate(rowIndexSelected, value, status);
+      } finally {
+        toggleModal();
+      }
+    },
+    [rowIndexSelected],
+  );
 
   const columns = useMemo(
     () =>

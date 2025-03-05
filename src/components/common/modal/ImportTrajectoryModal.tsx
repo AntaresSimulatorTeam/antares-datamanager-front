@@ -9,7 +9,7 @@ import { addTrajectory } from '@/shared/services/trajectoryService.ts';
 
 interface ImportTrajectoryModalProps {
   options: SelectOption[] | undefined;
-  onClose: (value: DbTrajectory | SelectOption | null, status: RowStatus) => void;
+  onClose: (value: DbTrajectory | SelectOption | null, status: RowStatus) => Promise<void>;
   trajectoryType: TRAJECTORY_TYPE;
   studyHorizon: string;
 }
