@@ -57,8 +57,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
   };
 
   const validateForm = () => {
-    //const isProjectValid = !study || projectName;
-    if (studyName && projectName && horizon && !errorMessage) {
+    if (studyName && projectName && horizon && keywords.length > 0 && !errorMessage) {
       setIsFormValid(true);
     } else {
       setIsFormValid(false);
