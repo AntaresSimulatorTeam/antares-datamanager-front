@@ -31,7 +31,7 @@ interface AreaLinkTabProps {
 const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
   const studyState = useStudy();
   const [data, setData] = useState<AreaAndLinkRowData[]>([]);
-  const [readOnly, setReadOnly] = useState<ReadOnlyObject>({ '0': false, '1': !data?.[0]?.trajectory });
+  const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
   const [optionsDB, setOptionsDB] = useState<SelectOption[][]>();
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
   const [rowIndexSelected, setRowIndexSelected] = useState<number>(0);
@@ -59,6 +59,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
             : TRAJECTORY_SELECTION_STATUS.MISSING,
         },
       ]);
+      setReadOnly({ '0': false, '1': !studyState[`${TRAJECTORY_TYPE.LINK}`]?.trajectoryName });
     }
   }, [studyState]);
 
