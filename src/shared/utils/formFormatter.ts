@@ -14,6 +14,6 @@ export const convertToSelectionOptionType = (trajectories: DbTrajectory[]): Sele
 
 export const convertToFSSelectionOptionType = (options: FsTrajectory[]): SelectOption[] =>
   options.map((option, indexTrajectory) => ({
-    id: `option-fs-${indexTrajectory}`,
+    id: indexTrajectory,
     label: option.trajectoryName ? option.trajectoryName.substring(0, option.trajectoryName.lastIndexOf('.')) : '',
   }));

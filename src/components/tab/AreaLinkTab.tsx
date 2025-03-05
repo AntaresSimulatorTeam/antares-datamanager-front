@@ -46,7 +46,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
   ]);
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({
     '0': false,
-    '1': !trajectoryNameLink,
+    '1': !trajectoryNameArea,
   });
   const [optionsDB, setOptionsDB] = useState<SelectOption[][]>();
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
@@ -73,59 +73,68 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
     }
   };
 
-  const handleTrajectoryUpdate = async (
-    index: number,
-    trajectory: SelectOption | DbTrajectory | null,
-    status: RowStatus,
-  ) => {
-    const updatedData = [...data];
-    const payload: DbTrajectory | null | undefined =
-      trajectory && 'label' in trajectory
-        ? getTrajectoryDB(index === 0 ? trajectoriesArea : trajectoriesLink, trajectory.id as number)
-        : trajectory;
-    try {
-      if (status === 'success' && payload) {
-        await linkTrajectoryToStudy(payload.type, payload.id, study.id);
-        // Update context
-        dispatch?.({
-          type: index === 0 ? STUDY_ACTION.ADD_TRAJECTORY_AREA : STUDY_ACTION.ADD_TRAJECTORY_LINK,
-          payload,
-        } as StudyActionType);
-        // Update data state
-        updatedData[index].trajectory = trajectory
-          ? ((trajectory as SelectOption)?.label ?? (trajectory as DbTrajectory)?.trajectoryName)
-          : null;
-        updatedData[index].status = getStatus(status);
-      }
+  const handleTrajectoryUpdate = useCallback(
+    async (index: number, trajectory: SelectOption | DbTrajectory | null, status: RowStatus) => {
+      const updatedData = [...data];
+      const payload: DbTrajectory | null | undefined =
+        trajectory && 'label' in trajectory
+          ? getTrajectoryDB(index === 0 ? trajectoriesArea : trajectoriesLink, trajectory.id as number)
+          : trajectory;
 
-      // Handle deletion case for areas
-      if (status === 'empty') {
-        // TODO: ANT-2892 (delete link between study and trajectory in data base)
-        if (index === 0) {
-          updatedData.forEach((rowData) => {
-            rowData.trajectory = null;
-            rowData.status = TRAJECTORY_SELECTION_STATUS.MISSING;
-          });
+      try {
+        if (status === 'success' && payload) {
+          await linkTrajectoryToStudy(payload.type, payload.id, study.id);
+          // Update context
           dispatch?.({
-            type: STUDY_ACTION.CLEAR_AREA_LINK_TRAJECTORY,
+            type: index === 0 ? STUDY_ACTION.ADD_TRAJECTORY_AREA : STUDY_ACTION.ADD_TRAJECTORY_LINK,
+            payload,
           } as StudyActionType);
-          setReadOnly({ '0': false, '1': true });
-        } else if (index === 1) {
-          dispatch?.({
-            type: STUDY_ACTION.CLEAR_LINK_TRAJECTORY,
-          } as StudyActionType);
+          // Update data state
+          updatedData[index].trajectory = trajectory
+            ? ((trajectory as SelectOption)?.label ?? (trajectory as DbTrajectory)?.trajectoryName)
+            : null;
+          updatedData[index].status = getStatus(status);
+          setReadOnly({ '0': false, '1': false });
         }
-      } else {
-        setReadOnly({ '0': false, '1': false });
+
+        // Handle deletion case for areas
+        if (status === 'empty') {
+          // TODO: ANT-2892 (delete link between study and trajectory in data base)
+          if (index === 0) {
+            updatedData.forEach((rowData) => {
+              rowData.trajectory = null;
+              rowData.status = TRAJECTORY_SELECTION_STATUS.MISSING;
+            });
+            dispatch?.({
+              type: STUDY_ACTION.CLEAR_AREA_LINK_TRAJECTORY,
+            } as StudyActionType);
+            setReadOnly({ '0': false, '1': true });
+          } else if (index === 1) {
+            updatedData[1].trajectory = null;
+            updatedData[1].status = TRAJECTORY_SELECTION_STATUS.MISSING;
+            dispatch?.({
+              type: STUDY_ACTION.CLEAR_LINK_TRAJECTORY,
+            } as StudyActionType);
+            setReadOnly({ '0': false, '1': false });
+          }
+        }
+
+        if (status === 'error') {
+          updatedData[index].trajectory =
+            (trajectory as SelectOption).label || (trajectory as DbTrajectory).trajectoryName || null;
+          updatedData[index].status = TRAJECTORY_SELECTION_STATUS.ERROR;
+        }
+      } catch {
+        // Trajectory status is set to error one
+        updatedData[index].trajectory =
+          (trajectory as SelectOption).label || (trajectory as DbTrajectory).trajectoryName || null;
+        updatedData[index].status = TRAJECTORY_SELECTION_STATUS.ERROR;
+      } finally {
+        setData(updatedData);
       }
-    } catch {
-      // Trajectory status is set to error one
-      updatedData[index].trajectory = payload?.trajectoryName ?? null;
-      updatedData[index].status = TRAJECTORY_SELECTION_STATUS.ERROR;
-    } finally {
-      setData(updatedData);
-    }
-  };
+    },
+    [trajectoriesArea, trajectoriesLink],
+  );
 
   const handleTrajectorySearch = async (
     index: number,
@@ -146,20 +155,22 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
   const closeModal = useCallback(
     async (value: DbTrajectory | SelectOption | null, status: RowStatus) => {
       try {
-        // Update trajectory list options (synchronized with update of trajectory list in BDD after trajectory import) for dropdown
-        setOptionsDB((prev) => {
-          if (prev && prev[rowIndexSelected]?.length >= 0) {
-            prev[rowIndexSelected] = [
-              ...prev[rowIndexSelected],
-              {
-                id: (value as DbTrajectory).id,
-                label: (value as DbTrajectory).trajectoryName,
-              },
-            ];
-            return prev;
-          }
-        });
         await handleTrajectoryUpdate(rowIndexSelected, value, status);
+        // Update trajectory list options (synchronized with update of trajectory list in BDD after trajectory import) for dropdown
+        if (status !== 'error') {
+          setOptionsDB((prev) => {
+            if (prev && prev[rowIndexSelected]?.length >= 0) {
+              prev[rowIndexSelected] = [
+                ...prev[rowIndexSelected],
+                {
+                  id: (value as DbTrajectory).id,
+                  label: (value as DbTrajectory).trajectoryName,
+                },
+              ];
+              return prev;
+            }
+          });
+        }
       } finally {
         toggleModal();
       }
