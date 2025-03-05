@@ -30,8 +30,26 @@ interface AreaLinkTabProps {
 
 const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
   const studyState = useStudy();
-  const [data, setData] = useState<AreaAndLinkRowData[]>([]);
-  const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
+  const [data, setData] = useState<AreaAndLinkRowData[]>([
+    {
+      hypothesis: 'Areas',
+      trajectory: studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectoryName ?? null,
+      status: studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectoryName
+        ? TRAJECTORY_SELECTION_STATUS.OK
+        : TRAJECTORY_SELECTION_STATUS.MISSING,
+    },
+    {
+      hypothesis: 'Links',
+      trajectory: studyState[`${TRAJECTORY_TYPE.LINK}`]?.trajectoryName ?? null,
+      status: studyState[`${TRAJECTORY_TYPE.LINK}`]?.trajectoryName
+        ? TRAJECTORY_SELECTION_STATUS.OK
+        : TRAJECTORY_SELECTION_STATUS.MISSING,
+    },
+  ]);
+  const [readOnly, setReadOnly] = useState<ReadOnlyObject>({
+    '0': false,
+    '1': !studyState[`${TRAJECTORY_TYPE.LINK}`]?.trajectoryName,
+  });
   const [optionsDB, setOptionsDB] = useState<SelectOption[][]>();
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
   const [rowIndexSelected, setRowIndexSelected] = useState<number>(0);
@@ -41,27 +59,27 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
   const { trajectories: trajectoriesArea } = useFetchTrajectoriesFromDB(TRAJECTORY_TYPE.AREA, study.horizon);
   const { trajectories: trajectoriesLink } = useFetchTrajectoriesFromDB(TRAJECTORY_TYPE.LINK, study.horizon);
 
-  useEffect(() => {
-    if (studyState[`${TRAJECTORY_TYPE.AREA}`] && studyState[`${TRAJECTORY_TYPE.LINK}`]) {
-      setData([
-        {
-          hypothesis: 'Areas',
-          trajectory: studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectoryName ?? null,
-          status: studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectoryName
-            ? TRAJECTORY_SELECTION_STATUS.OK
-            : TRAJECTORY_SELECTION_STATUS.MISSING,
-        },
-        {
-          hypothesis: 'Links',
-          trajectory: studyState[`${TRAJECTORY_TYPE.LINK}`]?.trajectoryName ?? null,
-          status: studyState[`${TRAJECTORY_TYPE.LINK}`]?.trajectoryName
-            ? TRAJECTORY_SELECTION_STATUS.OK
-            : TRAJECTORY_SELECTION_STATUS.MISSING,
-        },
-      ]);
-      setReadOnly({ '0': false, '1': !studyState[`${TRAJECTORY_TYPE.LINK}`]?.trajectoryName });
-    }
-  }, [studyState]);
+  // useEffect(() => {
+  //   if (studyState[`${TRAJECTORY_TYPE.AREA}`] && studyState[`${TRAJECTORY_TYPE.LINK}`]) {
+  //     setData([
+  //       {
+  //         hypothesis: 'Areas',
+  //         trajectory: studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectoryName ?? null,
+  //         status: studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectoryName
+  //           ? TRAJECTORY_SELECTION_STATUS.OK
+  //           : TRAJECTORY_SELECTION_STATUS.MISSING,
+  //       },
+  //       {
+  //         hypothesis: 'Links',
+  //         trajectory: studyState[`${TRAJECTORY_TYPE.LINK}`]?.trajectoryName ?? null,
+  //         status: studyState[`${TRAJECTORY_TYPE.LINK}`]?.trajectoryName
+  //           ? TRAJECTORY_SELECTION_STATUS.OK
+  //           : TRAJECTORY_SELECTION_STATUS.MISSING,
+  //       },
+  //     ]);
+  //     setReadOnly({ '0': false, '1': !studyState[`${TRAJECTORY_TYPE.LINK}`]?.trajectoryName });
+  //   }
+  // }, [studyState]);
 
   useEffect(() => {
     if (trajectoriesArea && trajectoriesLink) {
@@ -176,13 +194,13 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
       getAreaLinkTableHeaders(optionsDB, t, handleTrajectoryUpdate, handleFetchTrajectoriesFS, handleTrajectorySearch),
     [data, optionsDB],
   );
-  const dataMemoized = useMemo(() => data, [data]);
+  //const dataMemoized = useMemo(() => data, [data]);
 
   return (
     <div className="flex-1">
       <StdSimpleTable
         id="example-table"
-        data={dataMemoized}
+        data={data}
         columns={columns}
         columnSize="meta"
         enableColumnResizing={false}
