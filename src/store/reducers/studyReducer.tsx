@@ -5,7 +5,6 @@ import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 const addTrajectories = (prevState: StudyState, trajectories: DbTrajectory[]): StudyState => {
   const studyState = {};
   trajectories.forEach((trajectory) => Object.assign(studyState, { [`${trajectory.type}`]: trajectory }));
-  console.log('addTrajectories', { ...prevState, ...studyState });
   return { ...prevState, ...studyState };
 };
 
@@ -28,7 +27,6 @@ export const studyReducer = (prevState: StudyState, action?: StudyActionType): S
       case STUDY_ACTION.SET_IS_STUDY_GENERATED:
         return { ...prevState, isStudyGenerated: true };
       case STUDY_ACTION.ADD_TRAJECTORIES:
-        console.log('========================== addTrajectories', { ...addTrajectories(prevState, action.payload) });
         return { ...addTrajectories(prevState, action.payload) };
       default:
         return prevState;
