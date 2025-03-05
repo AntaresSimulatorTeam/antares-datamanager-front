@@ -176,12 +176,13 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
       getAreaLinkTableHeaders(optionsDB, t, handleTrajectoryUpdate, handleFetchTrajectoriesFS, handleTrajectorySearch),
     [data, optionsDB],
   );
+  const dataMemoized = useMemo(() => data, [data]);
 
   return (
     <div className="flex-1">
       <StdSimpleTable
         id="example-table"
-        data={data}
+        data={dataMemoized}
         columns={columns}
         columnSize="meta"
         enableColumnResizing={false}
