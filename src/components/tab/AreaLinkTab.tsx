@@ -30,6 +30,8 @@ interface AreaLinkTabProps {
 
 const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
   const studyState = useStudy();
+  console.log('============== studyState', studyState);
+  console.log('============== studyState[`${TRAJECTORY_TYPE.AREA}`]', studyState[`${TRAJECTORY_TYPE.AREA}`]);
   const [data, setData] = useState<AreaAndLinkRowData[]>([
     {
       hypothesis: 'Areas',
