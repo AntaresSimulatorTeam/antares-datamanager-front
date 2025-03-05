@@ -157,7 +157,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
       try {
         await handleTrajectoryUpdate(rowIndexSelected, value, status);
         // Update trajectory list options (synchronized with update of trajectory list in BDD after trajectory import) for dropdown
-        if (status !== 'error') {
+        if (status !== 'error' && value) {
           setOptionsDB((prev) => {
             if (prev && prev[rowIndexSelected]?.length >= 0) {
               prev[rowIndexSelected] = [
