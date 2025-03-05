@@ -18,13 +18,19 @@ interface StudyCreationModalProps {
   onClose: () => void;
   study?: StudyDTO | null;
   setReloadStudies: React.Dispatch<React.SetStateAction<boolean>>;
+  projectInfoName?: string;
 }
 
-const StudyCreationModal: React.FC<StudyCreationModalProps> = ({ onClose, study, setReloadStudies }) => {
+const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
+  onClose,
+  study,
+  setReloadStudies,
+  projectInfoName,
+}) => {
   const { t } = useTranslation();
   const [studyName, setStudyName] = useState<string>('');
   const [horizon, setHorizon] = useState<string>('');
-  const [projectName, setProjectName] = useState<string>(study?.project || '');
+  const [projectName, setProjectName] = useState<string>(study?.project || projectInfoName || '');
   const [keywords, setKeywords] = useState<string[]>(study?.keywords || []);
   const [trajectoryIds] = useState<number[]>(study?.trajectoryIds || []);
   const [isFormValid, setIsFormValid] = useState(false);
@@ -51,7 +57,8 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({ onClose, study,
   };
 
   const validateForm = () => {
-    if (studyName && projectName && horizon && keywords.length > 0 && !errorMessage) {
+    //const isProjectValid = !study || projectName;
+    if (studyName && projectName && horizon && !errorMessage) {
       setIsFormValid(true);
     } else {
       setIsFormValid(false);
@@ -107,9 +114,11 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({ onClose, study,
               minNbCharacters={3}
             />
           </div>
-          <div className="flex w-32 flex-col items-start justify-start">
-            <ProjectInput value={projectName} onChange={setProjectName} />
-          </div>
+          {study && (
+            <div className="flex w-32 flex-col items-start justify-start">
+              <ProjectInput value={projectName} onChange={setProjectName} />
+            </div>
+          )}
         </div>
       </RdsModal.Content>
       <RdsModal.Footer>
