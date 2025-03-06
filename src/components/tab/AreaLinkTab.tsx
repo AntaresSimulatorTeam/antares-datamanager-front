@@ -119,7 +119,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
             payload,
           } as StudyActionType);
           // Update data state
-          updatedData[index].trajectory = payload ?? null;
+          updatedData[index].trajectory = payload;
           updatedData[index].status = getStatus(status);
           setReadOnly({ '0': false, '1': false });
         }
