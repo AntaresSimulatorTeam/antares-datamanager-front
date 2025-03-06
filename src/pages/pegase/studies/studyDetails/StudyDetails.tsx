@@ -28,7 +28,7 @@ const StudyDetails = () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const location: Location<StudyState> = useLocation();
   const { t } = useTranslation();
-  const { isStudyGenerated, areaTrajectory } = useStudy();
+  const { isStudyGenerated, AREA } = useStudy();
   const dispatch = useStudyDispatch();
   const [isGenerating, setIsGenerating] = useState(false);
   const authContext = useAuth();
@@ -58,7 +58,7 @@ const StudyDetails = () => {
       </div>
       <div className="flex gap-4 px-3 py-2">
         <div className="flex h-10 items-end self-stretch">
-          <StudyNavigationMenu onRenderActiveComponent={setActiveContent} studyHorizon={study.horizon} />
+          <StudyNavigationMenu onRenderActiveComponent={setActiveContent} study={study} />
         </div>
       </div>
       <div className="flex h-full flex-col justify-between space-x-4 p-4">
@@ -66,11 +66,11 @@ const StudyDetails = () => {
         <div className="flex flex-col gap-2">
           <RdsDivider />
           <div className="flex items-center gap-2 self-end">
-            {!areaTrajectory && <div className={'text-error-600'}>{t('studyDetails.@add_trajectories_message')}</div>}
+            {!AREA && <div className={'text-error-600'}>{t('studyDetails.@add_trajectories_message')}</div>}
             <ButtonWithStdIcon
               label={t('studyDetails.@generate')}
               onClick={() => void handleGenerateStudy()}
-              disabled={!areaTrajectory || isStudyGenerated}
+              disabled={!AREA || !!isStudyGenerated}
               icon={StdIconId.CheckCircle}
               position="right"
               isLoading={isGenerating}

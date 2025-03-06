@@ -4,36 +4,51 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import StdSimpleTable from '@common/data/stdSimpleTable/StdSimpleTable.tsx';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import getAreaLinkTableHeaders from '@/pages/pegase/studies/studyDetails/AreaLinkTableHeaders.tsx';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { useTranslation } from 'react-i18next';
-import { fetchTrajectoriesFromDB, fetchTrajectoriesFromFS } from '@/shared/services/trajectoryService.ts';
-import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { AreaAndLinkRowData, DbTrajectory, RowStatus, StudyActionType } from '@/shared/types';
-import { useFetchTrajectoriesFromDB } from '@/hooks/useFetchTrajectoriesFromDB.ts';
 import {
-  convertToFSSelectionOptionType,
-  convertToSelectionOptionType,
-  getStatus,
-} from '@/shared/utils/formFormatter.ts';
+  fetchTrajectoriesFromDB,
+  fetchTrajectoriesFromFS,
+  linkTrajectoryToStudy,
+} from '@/shared/services/trajectoryService.ts';
+import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { AreaAndLinkRowData, DbTrajectory, RowStatus, StudyActionType, StudyDTO } from '@/shared/types';
+import { useFetchTrajectoriesFromDB } from '@/hooks/useFetchTrajectoriesFromDB.ts';
+import { getStatus, getTrajectoryDB } from '@/shared/utils/trajectoryUtils';
+import { convertToFSSelectionOptionType, convertToSelectionOptionType } from '@/shared/utils/formFormatter';
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
-import { useStudyDispatch } from '@/store/contexts/StudyContext';
+import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { useAuth } from 'react-oidc-context';
 
 interface AreaLinkTabProps {
-  studyHorizon: string;
+  study: StudyDTO;
 }
 
-const AreaLinkTab = ({ studyHorizon }: AreaLinkTabProps) => {
+const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
+  const studyState = useStudy();
+  const trajectoryNameArea: string | null = studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectoryName ?? null;
+  const trajectoryNameLink: string | null = studyState[`${TRAJECTORY_TYPE.LINK}`]?.trajectoryName ?? null;
   const [data, setData] = useState<AreaAndLinkRowData[]>([
-    { hypothesis: 'Areas', trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING },
-    { hypothesis: 'Links', trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING },
+    {
+      hypothesis: 'Areas',
+      trajectory: trajectoryNameArea,
+      status: trajectoryNameArea ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+    },
+    {
+      hypothesis: 'Links',
+      trajectory: trajectoryNameLink,
+      status: trajectoryNameLink ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+    },
   ]);
-  const [readOnly, setReadOnly] = useState<ReadOnlyObject>({ '0': false, '1': !data[0].trajectory });
+  const [readOnly, setReadOnly] = useState<ReadOnlyObject>({
+    '0': false,
+    '1': !trajectoryNameArea,
+  });
   const [optionsDB, setOptionsDB] = useState<SelectOption[][]>();
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
   const [rowIndexSelected, setRowIndexSelected] = useState<number>(0);
@@ -63,49 +78,68 @@ const AreaLinkTab = ({ studyHorizon }: AreaLinkTabProps) => {
     }
   };
 
-  const handleTrajectoryUpdate = (index: number, trajectory: SelectOption | DbTrajectory | null, status: RowStatus) => {
-    const updatedData = [...data];
-    updatedData[index].trajectory = trajectory
-      ? ((trajectory as SelectOption)?.label ?? (trajectory as DbTrajectory)?.trajectoryName)
-      : null;
-    updatedData[index].status = getStatus(status);
-    if (status === 'success') {
-      dispatch?.({
-        type: index === 0 ? STUDY_ACTION.ADD_TRAJECTORY_AREA : STUDY_ACTION.ADD_TRAJECTORY_LINK,
-        payload: trajectory,
-      } as StudyActionType);
+  const handleTrajectoryUpdate = useCallback(
+    async (index: number, trajectory: SelectOption | DbTrajectory | null, status: RowStatus) => {
+      const updatedData = [...data];
+      const payload: DbTrajectory | null | undefined =
+        trajectory && 'label' in trajectory
+          ? getTrajectoryDB(index === 0 ? trajectoriesArea : trajectoriesLink, trajectory.id as number)
+          : trajectory;
 
-      setOptionsDB((prev) => {
-        if (prev && prev[index]?.length >= 0) {
-          prev[index] = [
-            ...prev[index],
-            {
-              id: (trajectory as DbTrajectory).id,
-              label: (trajectory as DbTrajectory).trajectoryName,
-            },
-          ];
-          return prev;
+      try {
+        if (status === 'success' && payload) {
+          await linkTrajectoryToStudy(payload.type, payload.id, study.id);
+          // Update context
+          dispatch?.({
+            type: index === 0 ? STUDY_ACTION.ADD_TRAJECTORY_AREA : STUDY_ACTION.ADD_TRAJECTORY_LINK,
+            payload,
+          } as StudyActionType);
+          // Update data state
+          updatedData[index].trajectory = trajectory
+            ? ((trajectory as SelectOption)?.label ?? (trajectory as DbTrajectory)?.trajectoryName)
+            : null;
+          updatedData[index].status = getStatus(status);
+          setReadOnly({ '0': false, '1': false });
         }
-      });
-    }
 
-    // Handle deletion case for areas
-    if (index === 0 && status === 'empty') {
-      updatedData[1].trajectory = null;
-      updatedData[1].status = TRAJECTORY_SELECTION_STATUS.MISSING;
-      dispatch?.({
-        type: STUDY_ACTION.CLEAR_AREA_LINK_TRAJECTORY,
-      } as StudyActionType);
-      setReadOnly({ '0': false, '1': true });
-    } else if (index === 1) {
-      dispatch?.({
-        type: STUDY_ACTION.CLEAR_LINK_TRAJECTORY,
-      } as StudyActionType);
-    } else {
-      setReadOnly({ '0': false, '1': false });
-    }
-    setData(updatedData);
-  };
+        // Handle deletion case for areas
+        if (status === 'empty') {
+          // TODO: ANT-2892 (delete link between study and trajectory in data base)
+          if (index === 0) {
+            updatedData.forEach((rowData) => {
+              rowData.trajectory = null;
+              rowData.status = TRAJECTORY_SELECTION_STATUS.MISSING;
+            });
+            dispatch?.({
+              type: STUDY_ACTION.CLEAR_AREA_LINK_TRAJECTORY,
+            } as StudyActionType);
+            setReadOnly({ '0': false, '1': true });
+          } else if (index === 1) {
+            updatedData[1].trajectory = null;
+            updatedData[1].status = TRAJECTORY_SELECTION_STATUS.MISSING;
+            dispatch?.({
+              type: STUDY_ACTION.CLEAR_LINK_TRAJECTORY,
+            } as StudyActionType);
+            setReadOnly({ '0': false, '1': false });
+          }
+        }
+
+        if (status === 'error') {
+          updatedData[index].trajectory =
+            (trajectory as SelectOption).label || (trajectory as DbTrajectory).trajectoryName || null;
+          updatedData[index].status = TRAJECTORY_SELECTION_STATUS.ERROR;
+        }
+      } catch {
+        // Trajectory status is set to error one
+        updatedData[index].trajectory =
+          (trajectory as SelectOption).label || (trajectory as DbTrajectory).trajectoryName || null;
+        updatedData[index].status = TRAJECTORY_SELECTION_STATUS.ERROR;
+      } finally {
+        setData(updatedData);
+      }
+    },
+    [trajectoriesArea, trajectoriesLink],
+  );
 
   const handleTrajectorySearch = async (
     index: number,
@@ -114,7 +148,7 @@ const AreaLinkTab = ({ studyHorizon }: AreaLinkTabProps) => {
     try {
       const results = await fetchTrajectoriesFromDB(
         index === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
-        studyHorizon,
+        study.horizon,
         authContext?.user?.access_token,
         value,
       );
@@ -124,10 +158,31 @@ const AreaLinkTab = ({ studyHorizon }: AreaLinkTabProps) => {
     }
   };
 
-  const closeModal = (value: DbTrajectory | SelectOption | null, status: RowStatus) => {
-    value && handleTrajectoryUpdate(rowIndexSelected, value, status);
-    toggleModal();
-  };
+  const closeModal = useCallback(
+    async (value: DbTrajectory | SelectOption | null, status: RowStatus) => {
+      try {
+        await handleTrajectoryUpdate(rowIndexSelected, value, status);
+        // Update trajectory list options (synchronized with update of trajectory list in BDD after trajectory import) for dropdown
+        if (status !== 'error' && value) {
+          setOptionsDB((prev) => {
+            if (prev && prev[rowIndexSelected]?.length >= 0) {
+              prev[rowIndexSelected] = [
+                ...prev[rowIndexSelected],
+                {
+                  id: (value as DbTrajectory).id,
+                  label: (value as DbTrajectory).trajectoryName,
+                },
+              ];
+              return prev;
+            }
+          });
+        }
+      } finally {
+        toggleModal();
+      }
+    },
+    [rowIndexSelected],
+  );
 
   const columns = useMemo(
     () =>
@@ -151,7 +206,7 @@ const AreaLinkTab = ({ studyHorizon }: AreaLinkTabProps) => {
           options={optionsFS}
           onClose={closeModal}
           trajectoryType={rowIndexSelected === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK}
-          studyHorizon={studyHorizon}
+          studyHorizon={study.horizon}
         />
       )}
     </div>

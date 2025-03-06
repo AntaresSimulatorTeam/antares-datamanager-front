@@ -4,8 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { ReactNode, useReducer } from 'react';
-import { ProjectState } from '@/shared/types/Project.type.ts';
+import { ReactNode, Reducer, useReducer } from 'react';
+import { ProjectActionType, ProjectState } from '@/shared/types/Project.type.ts';
 import projectReducer from '@/store/reducers/projectReducer';
 import { ProjectContext, ProjectDispatchContext } from '@/store/contexts/ProjectContext';
 
@@ -15,9 +15,7 @@ export interface ProjectProviderProps {
 }
 
 export const ProjectProvider = ({ children, initialValue }: ProjectProviderProps) => {
-  const initializer = (value = initialValue) => value;
-
-  const [state, dispatch] = useReducer(projectReducer, initialValue, initializer);
+  const [state, dispatch] = useReducer<Reducer<ProjectState, ProjectActionType>>(projectReducer, initialValue);
 
   return (
     <ProjectContext.Provider value={state}>

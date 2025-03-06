@@ -50,7 +50,7 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
     setIsHeaderHovered(hovered);
   };
 
-  const headers = getStudyTableHeaders();
+  const headers = getStudyTableHeaders(t);
 
   const handleSort = (column: string) => {
     const newSortOrder = sortBy[column] === 'asc' ? 'desc' : 'asc';
