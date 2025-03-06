@@ -47,7 +47,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
         status: trajectoryNameLink ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
       },
     ]);
-  }, [studyState]);
+  }, [studyState, trajectoryNameArea, trajectoryNameLink]);
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({
     '0': false,
     '1': !trajectoryNameArea,
