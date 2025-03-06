@@ -8,10 +8,12 @@ import {
   TRAJECTORY_DATA_BASE_ENDPOINT,
   TRAJECTORY_ENDPOINT,
   TRAJECTORY_FILE_SYSTEM_ENDPOINT,
+  TRAJECTORY_LINK_TO_STUDY_ENDPOINT,
 } from '@/shared/const/apiEndPoint.ts';
 import { DbTrajectory, FsTrajectory } from '@/shared/types';
 import { AuthService } from '@/shared/services/authService.ts';
 import { fetchWithProgress } from '@/shared/services/progressService.ts';
+import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 
 /**
  * Retrieve a list of trajectories by type and horizon from database
@@ -85,4 +87,55 @@ export const addTrajectory = async (
   } else {
     return (await (response as Response).json()) as DbTrajectory;
   }
+};
+
+/**
+ * Fetch trajectories linked to one or several studies
+ * @param {number} studyIds - Array of study ids
+ * @param {TRAJECTORY_TYPE} trajectoryType - Trajectory type
+ *
+ * @return {Promise<DbTrajectory[] | Error>} Array of trajectories (data base trajectories)
+ */
+
+export const getStudyTrajectories = async (
+  studyIds: number[],
+  trajectoryType: TRAJECTORY_TYPE,
+): Promise<DbTrajectory[] | Error> => {
+  const studyParams = studyIds?.map((id) => `studyIds=${id}`).join('');
+  const urlApi = `${TRAJECTORY_ENDPOINT}?${studyParams}&trajectoryType=${trajectoryType}`;
+
+  const response = await AuthService.authFetch(urlApi);
+  if (!response.ok) {
+    throw new Error('Failed to fetch trajectories linked to studies');
+  }
+
+  return (await response.json()) as DbTrajectory[];
+};
+
+/**
+ * Linked a trajectory to study
+ * @param {TRAJECTORY_TYPE} type - Trajectory type
+ * @param {number} trajectoryId - Trajectory id
+ * @param {number} studyId - Study id
+ *
+ * @return {Promise<DbTrajectory | Error>} - Trajectory linked to a study
+ */
+
+export const linkTrajectoryToStudy = async (
+  type: TRAJECTORY_TYPE,
+  trajectoryId: number,
+  studyId: number,
+): Promise<DbTrajectory | Error> => {
+  const urlApi = `${TRAJECTORY_LINK_TO_STUDY_ENDPOINT}?type=${type}&trajectoryId=${trajectoryId}&studyId=${studyId}`;
+  const response = await AuthService.authFetch(urlApi, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  if (!response.ok) {
+    throw new Error(`${(response as unknown as Error).message}`);
+  }
+
+  return (await response.json()) as DbTrajectory;
 };
