@@ -32,18 +32,22 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
   const studyState = useStudy();
   const trajectoryNameArea: string | null = studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectoryName ?? null;
   const trajectoryNameLink: string | null = studyState[`${TRAJECTORY_TYPE.LINK}`]?.trajectoryName ?? null;
-  const [data, setData] = useState<AreaAndLinkRowData[]>([
-    {
-      hypothesis: 'Areas',
-      trajectory: trajectoryNameArea,
-      status: trajectoryNameArea ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
-    },
-    {
-      hypothesis: 'Links',
-      trajectory: trajectoryNameLink,
-      status: trajectoryNameLink ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
-    },
-  ]);
+  const [data, setData] = useState<AreaAndLinkRowData[]>([]);
+
+  useEffect(() => {
+    setData([
+      {
+        hypothesis: 'Areas',
+        trajectory: trajectoryNameArea,
+        status: trajectoryNameArea ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+      },
+      {
+        hypothesis: 'Links',
+        trajectory: trajectoryNameLink,
+        status: trajectoryNameLink ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+      },
+    ]);
+  }, [studyState]);
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({
     '0': false,
     '1': !trajectoryNameArea,
