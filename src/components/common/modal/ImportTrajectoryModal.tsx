@@ -9,7 +9,7 @@ import { addTrajectory } from '@/shared/services/trajectoryService.ts';
 
 interface ImportTrajectoryModalProps {
   options: SelectOption[] | undefined;
-  onClose: (value: DbTrajectory | SelectOption | null, status: RowStatus) => void;
+  onClose: (value: DbTrajectory | SelectOption | null, status: RowStatus) => Promise<void>;
   trajectoryType: TRAJECTORY_TYPE;
   studyHorizon: string;
 }
@@ -47,17 +47,17 @@ export const ImportTrajectoryModal = ({
         setProgress(+progressValue?.toFixed(0));
       });
       setFileStatus('success');
-      onClose(newTrajectory, 'success');
+      await onClose(newTrajectory, 'success');
     } catch (error) {
       // TODO handle errors considered as warning ones
       setFileStatus('error');
-      onClose(value, 'error');
+      await onClose(value, 'error');
     }
   };
 
   return (
     <RdsModal size="small">
-      <RdsModal.Title onClose={() => onClose(null, 'empty')} icon="Upload">
+      <RdsModal.Title onClose={() => void onClose(null, 'empty')} icon="Upload">
         {t('studyDetails.@import_from_file_system', {
           trajectoryType: trajectoryType === TRAJECTORY_TYPE.AREA ? 'areas' : 'links',
         })}

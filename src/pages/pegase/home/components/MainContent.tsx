@@ -40,16 +40,20 @@ const MainContent = () => {
         <div className="flex h-full w-full flex-col">
           <PegaseStar />
           <Suspense>
-            <StudyProvider initialValue={{ isStudyGenerated: false, areaTrajectory: null, linkTrajectory: null }}>
-              <Routes>
-                <Route path="/study/:studyName" element={<StudyDetails />} />
-                <Route path="/project/:projectName" element={<ProjectDetails />} />
-                <Route path="/logout-callback" element={<LogoutCallback />} />
-                {Object.entries([...menuBottomData, ...menuTopData]).map(([key, route]) => (
-                  <Route key={key} path={route.path} Component={route.component} />
-                ))}
-              </Routes>
-            </StudyProvider>
+            <Routes>
+              <Route
+                path="/study/:studyName"
+                element={
+                  <StudyProvider initialValue={{ isStudyGenerated: false }}>
+                    <StudyDetails />
+                  </StudyProvider>
+                }
+              />
+              <Route path="/project/:projectName" element={<ProjectDetails />} />
+              {Object.entries([...menuBottomData, ...menuTopData]).map(([key, route]) => (
+                <Route key={key} path={route.path} Component={route.component} />
+              ))}
+            </Routes>
           </Suspense>
         </div>
       </UserSettingsContext.Provider>
