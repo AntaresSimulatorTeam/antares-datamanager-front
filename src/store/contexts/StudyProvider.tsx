@@ -4,6 +4,8 @@ import { studyReducer } from '@/store/reducers/studyReducer.tsx';
 import { StudyContext, StudyDispatchContext } from '@/store/contexts/StudyContext';
 import { useLocation } from 'react-router-dom';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
+import { getStudyTrajectories } from '@/shared/services/trajectoryService.ts';
+import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 
 export interface StudyProviderProps {
   children: ReactNode;
@@ -23,16 +25,7 @@ export const StudyProvider = ({ children, initialValue }: StudyProviderProps) =>
     const getTrajectories = async (d: Dispatch<StudyActionType>) => {
       let response: unknown = [];
       try {
-        response = [
-          {
-            id: 103,
-            trajectoryName: 'areas_BP2030_A_ref_v8',
-            type: 'AREA',
-            version: 1,
-            userName: null,
-            creationDate: '2025-02-19T15:53:54.453608',
-          },
-        ]; //await getStudyTrajectories([study.id], TRAJECTORY_TYPE.AREA);
+        response = await getStudyTrajectories([study.id], TRAJECTORY_TYPE.AREA);
       } finally {
         if (response && (response as DbTrajectory[]).length > 0) {
           d({
