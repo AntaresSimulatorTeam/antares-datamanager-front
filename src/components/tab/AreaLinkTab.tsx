@@ -24,6 +24,7 @@ import { convertToFSSelectionOptionType, convertToSelectionOptionType } from '@/
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
+import { SelectOption } from '@/shared/types/Input.type.ts';
 
 export interface ErrorMessageType {
   index: number;
