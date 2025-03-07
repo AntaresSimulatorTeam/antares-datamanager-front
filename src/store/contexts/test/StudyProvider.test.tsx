@@ -4,10 +4,10 @@ import { render, waitFor } from '@testing-library/react';
 import { mockStudy } from '@/mocks/data/list/study.ts';
 import { StudyProvider } from '@/store/contexts/StudyProvider.tsx';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { mockResponseGetTrajectoryFromStudy } from '@/mocks/data/list/trajectory.ts';
 import * as trajectoryService from '@/shared/services/trajectoryService.ts';
+import { useReducer } from 'react';
 
 vi.mock('react-router-dom', async (importOriginal) => {
   const actual: Mock = await importOriginal();
@@ -28,15 +28,24 @@ vi.mock('@/store/contexts/StudyContext', async (importOriginal) => {
   return {
     ...actual,
     useStudy: vi.fn(),
-    useStudyDispatch: vi.fn(() => ({
-      dispatch: vi.fn(),
-    })),
+    // useStudyDispatch: vi.fn(() => ({
+    //   dispatch: vi.fn(),
+    // })),
+  };
+});
+
+vi.mock('react', async (importOriginal) => {
+  const actual: Mock = await importOriginal();
+  return {
+    ...actual,
+    useReducer: vi.fn(),
   };
 });
 
 describe('StudyProvider', () => {
   const mockUseLocation = useLocation as Mock<typeof useLocation>;
-  const mockUseStudyDispatch = useStudyDispatch as Mock<typeof useStudyDispatch>;
+  //const mockUseStudy = useStudy as Mock<typeof useStudy>;
+  const mockUseReducer = useReducer as unknown as Mock<typeof useReducer>;
   const mockDispatch = vi.fn().mockImplementation(vi.fn());
 
   beforeEach(() => {
@@ -50,15 +59,15 @@ describe('StudyProvider', () => {
   it('should update study context when study is linked to trajectories', async () => {
     vi.mocked(trajectoryService.getStudyTrajectories).mockResolvedValueOnce(mockResponseGetTrajectoryFromStudy);
     mockUseLocation.mockImplementationOnce(vi.fn().mockReturnValue({ state: { study: mockStudy } }));
-    mockUseStudyDispatch.mockReturnValue(mockDispatch);
+    mockUseReducer.mockImplementation(() => [{}, mockDispatch]);
 
     //act(() => {
     // eslint-disable-next-line react/no-children-prop
-    render(<StudyProvider children={<div></div>} initialValue={{ isStudyGenerated: false }}></StudyProvider>);
+    render(<StudyProvider children={<div></div>}></StudyProvider>);
     //});
 
     await waitFor(() => {
-      expect(trajectoryService.getStudyTrajectories).toHaveBeenCalledWith([mockStudy.id], TRAJECTORY_TYPE.AREA);
+      expect(trajectoryService.getStudyTrajectories).toHaveBeenCalledWith(mockStudy.id, TRAJECTORY_TYPE.AREA);
       expect(mockDispatch).toHaveBeenCalledTimes(1);
       expect(mockDispatch).toHaveBeenCalledWith({
         type: STUDY_ACTION.ADD_TRAJECTORIES,

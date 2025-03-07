@@ -1,7 +1,7 @@
 import { createContext, Dispatch, useContext } from 'react';
 import { StudyActionType, StudyState } from '@/shared/types';
 
-const initialState: Partial<StudyState> = {
+export const initialState: Partial<StudyState> = {
   isStudyGenerated: false,
 };
 

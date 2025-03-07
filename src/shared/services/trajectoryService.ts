@@ -91,17 +91,17 @@ export const addTrajectory = async (
 
 /**
  * Fetch trajectories linked to one or several studies
- * @param {number} studyIds - Study id
+ * @param {number} studyId - Study id
  * @param {TRAJECTORY_TYPE} trajectoryType - Trajectory type
  *
  * @return {Promise<DbTrajectory[] | Error>} Array of trajectories (data base trajectories)
  */
 
 export const getStudyTrajectories = async (
-  studyIds: number,
+  studyId: number,
   trajectoryType: TRAJECTORY_TYPE,
 ): Promise<DbTrajectory[] | Error> => {
-  const urlApi = `${TRAJECTORY_ENDPOINT}?studyIds=${studyIds}&trajectoryType=${trajectoryType}`;
+  const urlApi = `${TRAJECTORY_ENDPOINT}?studyId=${studyId}&trajectoryType=${trajectoryType}`;
 
   const response = await AuthService.authFetch(urlApi);
   if (!response.ok) {

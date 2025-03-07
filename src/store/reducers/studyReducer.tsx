@@ -2,13 +2,13 @@ import { DbTrajectory, StudyActionType, StudyState } from '@/shared/types';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 
-const addTrajectories = (prevState: StudyState, trajectories: DbTrajectory[]): StudyState => {
+const addTrajectories = (prevState: Partial<StudyState>, trajectories: DbTrajectory[]): Partial<StudyState> => {
   const studyState = {};
   trajectories.forEach((trajectory) => Object.assign(studyState, { [`${trajectory.type}`]: trajectory }));
   return { ...prevState, ...studyState };
 };
 
-export const studyReducer = (prevState: StudyState, action?: StudyActionType): StudyState => {
+export const studyReducer = (prevState: Partial<StudyState>, action?: StudyActionType): Partial<StudyState> => {
   if (action) {
     switch (action.type) {
       case STUDY_ACTION.ADD_TRAJECTORY_AREA:

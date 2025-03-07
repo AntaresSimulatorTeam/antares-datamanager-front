@@ -11,6 +11,7 @@ import {
   addTrajectory,
   fetchTrajectoriesFromDB,
   fetchTrajectoriesFromFS,
+  getStudyTrajectories,
   linkTrajectoryToStudy,
 } from '@/shared/services/trajectoryService.ts';
 import { mockResponseTrajectoryDB, mockResponseTrajectoryListFS } from '@/mocks/data/list/trajectory.ts';
@@ -171,6 +172,50 @@ describe('addTrajectory', () => {
     await expect(async () =>
       addTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026', onProgress),
     ).rejects.toThrowError('Network error');
+  });
+});
+
+describe('getStudyTrajectories', () => {
+  beforeEach(() => {
+    global.fetch = vi.fn();
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('should retrieve trajectories from study id and trajectory type', async () => {
+    global.fetch = vi.fn().mockResolvedValueOnce({
+      ok: true,
+      json: async () => Promise.resolve(mockResponseTrajectoryDB),
+    });
+
+    await getStudyTrajectories(1, TRAJECTORY_TYPE.AREA);
+
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(global.fetch).toHaveBeenCalledWith(`https://mockapi.com/v1/trajectory?studyId=1&trajectoryType=AREA`, {});
+    });
+  });
+
+  it('should handle fetch failure gracefully', async () => {
+    // Failed fetch response moc
+    global.fetch = vi.fn().mockResolvedValueOnce({
+      ok: false,
+      message: 'Failed to fetch trajectories',
+    });
+
+    await expect(async () => getStudyTrajectories(1, TRAJECTORY_TYPE.AREA)).rejects.toThrowError(
+      'Failed to fetch trajectories',
+    );
+  });
+
+  it('should handle exceptions during fetch', async () => {
+    //Fetch throwing an error mock
+    global.fetch = vi.fn().mockRejectedValueOnce(new Error('Network error'));
+
+    await expect(async () => getStudyTrajectories(1, TRAJECTORY_TYPE.AREA)).rejects.toThrowError('Network error');
   });
 });
 

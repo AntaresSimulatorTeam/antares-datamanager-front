@@ -43,7 +43,7 @@ const MainContent = () => {
               <Route
                 path="/study/:studyName"
                 element={
-                  <StudyProvider initialValue={{ isStudyGenerated: false }}>
+                  <StudyProvider>
                     <StudyDetails />
                   </StudyProvider>
                 }
