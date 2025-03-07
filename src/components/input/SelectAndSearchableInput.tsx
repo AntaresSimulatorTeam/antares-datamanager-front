@@ -7,6 +7,7 @@
 import { useRef, useState } from 'react';
 import { RdsButton, RdsIconId, RdsInputText } from 'rte-design-system-react';
 import { useTranslation } from 'react-i18next';
+import { SelectOption } from '@/shared/types/Input.type.ts';
 
 interface ProjectManagerProps {
   options: SelectOption[] | undefined;
