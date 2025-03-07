@@ -28,3 +28,4 @@ export const PROJECT_SEARCH_ENDPOINT = `${BASE_URL}/v1/project/search`;
 export const TRAJECTORY_ENDPOINT = `${BASE_URL}/v1/trajectory`;
 export const TRAJECTORY_FILE_SYSTEM_ENDPOINT = `${BASE_URL}/v1/trajectory/fs`;
 export const TRAJECTORY_DATA_BASE_ENDPOINT = `${BASE_URL}/v1/trajectory/db`;
+export const TRAJECTORY_LINK_TO_STUDY_ENDPOINT = `${BASE_URL}/v1/trajectory/link`;

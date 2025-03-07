@@ -13,6 +13,9 @@
     "quickAccess": {
       "@confirmUnpin": "Project unppined",
       "@cancel": "Cancel"
+    },
+    "selectAnsSearchInput": {
+      "@emptyList": "No result found"
     }
   },
   "Pegase": {

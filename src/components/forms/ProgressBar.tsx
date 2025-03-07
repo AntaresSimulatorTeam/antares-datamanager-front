@@ -1,4 +1,4 @@
-import { getBgColor } from '@/shared/utils/formFormatter.ts';
+import { getBgColor } from '@/shared/utils/trajectoryUtils';
 
 export type FileInputStatus = 'loading' | 'success' | 'error' | 'empty';
 

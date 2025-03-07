@@ -23,9 +23,10 @@ import StudyCreationModal from '@common/modal/StudyCreationModal';
 interface StudyTableDisplayProps {
   searchStudy: string | undefined;
   projectId?: string;
+  projectInfoName?: string;
 }
 
-const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) => {
+const StudyTableDisplay = ({ searchStudy, projectId, projectInfoName }: StudyTableDisplayProps) => {
   const { t } = useTranslation();
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [isHeaderHovered, setIsHeaderHovered] = useState<boolean>(false);
@@ -141,6 +142,7 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
           onClose={handleModalClose}
           study={selectedStudy}
           setReloadStudies={setReloadStudies}
+          projectInfoName={projectInfoName}
         />
       )}
     </div>
