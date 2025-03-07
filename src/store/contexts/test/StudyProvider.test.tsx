@@ -38,6 +38,17 @@ vi.mock('react', async (importOriginal) => {
   const actual: Mock = await importOriginal();
   return {
     ...actual,
+    useStudy: vi.fn(),
+    // useStudyDispatch: vi.fn(() => ({
+    //   dispatch: vi.fn(),
+    // })),
+  };
+});
+
+vi.mock('react', async (importOriginal) => {
+  const actual: Mock = await importOriginal();
+  return {
+    ...actual,
     useReducer: vi.fn(),
   };
 });
