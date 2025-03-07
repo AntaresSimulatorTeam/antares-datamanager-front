@@ -138,3 +138,19 @@ export const linkTrajectoryToStudy = async (
 
   return (await response.json()) as DbTrajectory;
 };
+
+/**
+ * Delete a link between a trajectory and a study
+ *
+ * @param {number} trajectoryId - Trajectory id
+ * @param {number} studyId - Study id
+ */
+export const unlinkTrajectoryFromStudy = async (trajectoryId: number, studyId: number) => {
+  const urlApi = `${TRAJECTORY_LINK_TO_STUDY_ENDPOINT}?trajectoryId=${trajectoryId}&studyId=${studyId}`;
+  const response = await AuthService.authFetch(urlApi, {
+    method: 'DELETE',
+  });
+  if (!response.ok) {
+    throw new Error(`${(response as unknown as Error).message}`);
+  }
+};
