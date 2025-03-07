@@ -11,7 +11,7 @@ import { fetchProjectsFromPartialName } from '@/shared/services/projectService.t
 interface ProjectManagerProps {
   value: string;
   onChange: (value: string) => void;
-  required: boolean;
+  required?: boolean;
 }
 
 const ProjectInput: React.FC<ProjectManagerProps> = ({ value, onChange, required = false }) => {

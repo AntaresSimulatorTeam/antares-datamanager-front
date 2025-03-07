@@ -29,10 +29,8 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
 }) => {
   const { t } = useTranslation();
   const [studyName, setStudyName] = useState<string>('');
-  const [horizon, setHorizon] = useState<string>(
-    study?.horizon ? study.horizon.substring(0, 4) : ''
-  );
-  const [projectName, setProjectName] = useState<string>(study?.project || '');
+  const [horizon, setHorizon] = useState<string>(study?.horizon ? study.horizon.substring(0, 4) : '');
+  const [projectName, setProjectName] = useState<string>(study?.project || projectInfoName || '');
   const [keywords, setKeywords] = useState<string[]>(study?.keywords || []);
   const [trajectoryIds] = useState<number[]>(study?.trajectoryIds || []);
   const [isFormValid, setIsFormValid] = useState(false);
@@ -95,7 +93,9 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
 
   return (
     <RdsModal size="small">
-      <RdsModal.Title onClose={onClose}>{study ? t('home.@duplicate_study') : t('studyModal.@new_study')}</RdsModal.Title>
+      <RdsModal.Title onClose={onClose}>
+        {study ? t('home.@duplicate_study') : t('studyModal.@new_study')}
+      </RdsModal.Title>
       <RdsModal.Content>
         <div className="flex gap-4 self-stretch">
           <div className="flex w-32 flex-col items-start justify-start">
@@ -118,16 +118,16 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
           </div>
           {study && (
             <div className="flex w-32 flex-col items-start justify-start">
-              <ProjectInput value={projectName} onChange={setProjectName} />
+              <ProjectInput value={projectName} onChange={setProjectName} required />
             </div>
           )}
         </div>
       </RdsModal.Content>
       <RdsModal.Footer>
-        <RdsButton label={t('components.quickAccess.@cancel') } onClick={onClose} color="secondary" />
+        <RdsButton label={t('components.quickAccess.@cancel')} onClick={onClose} color="secondary" />
         <RdsButton
           icon={study ? RdsIconId.ContentCopy : RdsIconId.Add}
-          label={study ? t('study.@duplicate'):t('studyModal.@button_create')}
+          label={study ? t('study.@duplicate') : t('studyModal.@button_create')}
           onClick={() => void saveStudyHandler()}
           variant="contained"
           color="primary"
