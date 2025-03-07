@@ -92,7 +92,7 @@ const ProjectDetails = () => {
           status={activeChip ? 'secondary' : 'primary'}
         />
       </div>
-      <StudyTableDisplay searchStudy={searchTerm} projectId={projectInfo.id} />
+      <StudyTableDisplay searchStudy={searchTerm} projectId={projectInfo.id} projectInfoName={projectInfo.name} />
     </div>
   );
 };
