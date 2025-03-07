@@ -23,16 +23,16 @@ vi.mock('@/shared/services/trajectoryService', async (importOriginal) => {
     getStudyTrajectories: vi.fn(),
   };
 });
-vi.mock('@/store/contexts/StudyContext', async (importOriginal) => {
-  const actual: Mock = await importOriginal();
-  return {
-    ...actual,
-    useStudy: vi.fn(),
-    // useStudyDispatch: vi.fn(() => ({
-    //   dispatch: vi.fn(),
-    // })),
-  };
-});
+// vi.mock('@/store/contexts/StudyContext', async (importOriginal) => {
+//   const actual: Mock = await importOriginal();
+//   return {
+//     ...actual,
+//     useStudy: vi.fn(),
+//     // useStudyDispatch: vi.fn(() => ({
+//     //   dispatch: vi.fn(),
+//     // })),
+//   };
+// });
 
 vi.mock('react', async (importOriginal) => {
   const actual: Mock = await importOriginal();
@@ -59,12 +59,11 @@ describe('StudyProvider', () => {
   it('should update study context when study is linked to trajectories', async () => {
     vi.mocked(trajectoryService.getStudyTrajectories).mockResolvedValueOnce(mockResponseGetTrajectoryFromStudy);
     mockUseLocation.mockImplementationOnce(vi.fn().mockReturnValue({ state: { study: mockStudy } }));
-    mockUseReducer.mockImplementation(() => [{}, mockDispatch]);
+    mockUseReducer.mockImplementation(() => [{ isStudyGenerated: false }, mockDispatch]);
 
-    //act(() => {
     // eslint-disable-next-line react/no-children-prop
-    render(<StudyProvider children={<div></div>}></StudyProvider>);
-    //});
+    const provider = <StudyProvider children={<div></div>}></StudyProvider>;
+    render(provider);
 
     await waitFor(() => {
       expect(trajectoryService.getStudyTrajectories).toHaveBeenCalledWith(mockStudy.id, TRAJECTORY_TYPE.AREA);
@@ -74,5 +73,13 @@ describe('StudyProvider', () => {
         payload: mockResponseGetTrajectoryFromStudy,
       });
     });
+
+    //rerender(<StudyProvider children={<div></div>}></StudyProvider>);
+    // const { result } = renderHook(() => useStudy());
+    // console.log('================= result.current', result.current);
+    //
+    // await waitFor(() => {
+    //   expect(result.current).toEqual({ isStudyGenerated: false, AREA: mockResponseGetTrajectoryFromStudy[0] });
+    // });
   });
 });
