@@ -18,7 +18,7 @@ interface LocationState {
 
 export const StudyProvider = ({ children, initialValue }: StudyProviderProps) => {
   const location = useLocation();
-  const study = (location.state as LocationState)?.study;
+  const study = (location?.state as LocationState)?.study;
   const [state, dispatch] = useReducer<Reducer<StudyState, StudyActionType>>(studyReducer, initialValue as StudyState);
 
   useEffect(() => {

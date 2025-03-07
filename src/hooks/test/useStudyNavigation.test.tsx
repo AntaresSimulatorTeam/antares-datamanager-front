@@ -9,25 +9,8 @@ import { act, Queries, renderHook, RenderHookOptions } from '@testing-library/re
 import { useStudyNavigation } from '@/hooks/useStudyNavigation.ts';
 import { Router, useNavigate } from 'react-router-dom';
 import { ReactNode } from 'react';
-
-const mockNavigator = {
-  createHref: vi.fn(),
-  go: vi.fn(),
-  push: vi.fn(),
-  replace: vi.fn(),
-};
-
-const mockStudy = {
-  id: 1,
-  name: 'BP_ref_1',
-  createdBy: 'Isaac Asimov',
-  creationDate: new Date('Janvier 18'),
-  keywords: ['covid', 'silence'],
-  project: 'Bilan previsionnel 2027',
-  status: 'missing',
-  horizon: '2020_2024',
-  trajectoryIds: [2],
-};
+import { mockStudy } from '@/mocks/data/list/study.ts';
+import { mockNavigator } from '@/mocks/data/router.ts';
 
 vi.mock('react-router-dom', async (importOriginal) => {
   const actual: Mock = await importOriginal();

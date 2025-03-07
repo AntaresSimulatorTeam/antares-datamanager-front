@@ -13,42 +13,7 @@ import { fetchPinnedProjects, pinProject } from '@/shared/services/pinnedProject
 import { v4 as uuidv4 } from 'uuid';
 import { notifyToast } from '@/shared/notification/notification.tsx';
 import { PROJECT_ACTION } from '@/shared/enum/project.ts';
-
-const mockProjectsApiResponse = [
-  {
-    id: '1',
-    name: 'Bilan previsionnel 2027',
-    createdBy: 'MOUAD Paris test',
-    creationDate: '2024-07-25T10:09:41',
-    studies: [1, 2, 3],
-    tags: ['gaz', 'elec', 'antares', 'misc', 'tag2 antares', 'area link'],
-    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    projectId: '1',
-    pinned: true,
-  },
-  {
-    id: '2',
-    name: 'Bilan previsionnel 2023',
-    createdBy: 'Taher benjelloun amine',
-    creationDate: '2024-07-25T10:09:41',
-    studies: [6, 5, 9],
-    tags: ['bilan 22'],
-    description: 'description2023',
-    projectId: '2',
-    pinned: true,
-  },
-  {
-    id: '3',
-    name: 'Bilan previsionnel 2025',
-    createdBy: 'zayd guillaume pegase',
-    creationDate: '2024-07-25T10:09:41',
-    studies: [7, 8],
-    tags: ['figma', 'config', 'modal'],
-    description: 'In the world of software development, achieving perfection is a journey rather than a destination.',
-    projectId: '3',
-    pinned: true,
-  },
-];
+import { mockPinProjectResponse, mockProjectsApiResponse } from '@/mocks/data/list/projects.ts';
 
 vi.mock('@/envVariables', () => ({
   getEnvVariables: vi.fn(() => 'https://mockapi.com'),
@@ -115,17 +80,6 @@ describe('useHandlePinnedProjectList', () => {
 
   it('should call handlePinProject that calls pinProject and dispatch and update pinned project list correctly', async () => {
     const mockPinProject = pinProject as Mock;
-    const mockPinProjectResponse = {
-      id: '3',
-      name: 'Bilan previsionnel 2025',
-      createdBy: 'zayd guillaume pegase',
-      creationDate: '2024-07-25T10:09:41',
-      studies: [7, 8],
-      tags: ['figma', 'config', 'modal'],
-      description: 'In the world of software development, achieving perfection is a journey rather than a destination.',
-      projectId: '3',
-      pinned: true,
-    };
     mockPinProject.mockResolvedValueOnce(mockPinProjectResponse);
 
     mockUsePinnedProjectDispatch.mockReturnValue(mockDispatch);

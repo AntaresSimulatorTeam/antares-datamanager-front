@@ -8,6 +8,7 @@ import { vi } from 'vitest';
 import { waitFor } from '@testing-library/react';
 import { deleteStudy, fetchSearchStudies, fetchSuggestedKeywords, saveStudy } from '@/shared/services/studyService.ts';
 import { notifyToast } from '@/shared/notification/notification.tsx';
+import { mockResponseGetStudyApi, mockResponseSaveStudyApi } from '@/mocks/data/list/study.ts';
 
 vi.mock('@/shared/notification/notification');
 vi.mock('@/envVariables', () => ({
@@ -25,26 +26,9 @@ describe('fetchSearchStudies', () => {
   });
 
   it('should fetch study list', async () => {
-    //Successful fetch response mock
-    const mockResponse = {
-      content: [
-        {
-          id: 1,
-          name: 'Project 1',
-          createdBy: 'User A',
-          creationDate: '2023-10-01',
-          keywords: ['Keyword1', 'Keyword2'],
-          project: '1',
-          status: 'IN_PROGRESS',
-          horizon: '2030-2031',
-          trajectoryIds: [1, 7],
-        },
-      ],
-      totalElements: 1,
-    };
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: true,
-      json: () => Promise.resolve(mockResponse),
+      json: () => Promise.resolve(mockResponseGetStudyApi),
     });
 
     const result = await fetchSearchStudies('test', '124', 3, 10, { column: 'asc' });
@@ -55,7 +39,7 @@ describe('fetchSearchStudies', () => {
         `https://mockapi.com/v1/study/search?page=4&size=10&projectId=124&search=test&sortColumn=column&sortDirection=asc`,
         {},
       );
-      expect(result).toEqual(mockResponse);
+      expect(result).toEqual(mockResponseGetStudyApi);
     });
   });
 
@@ -106,16 +90,6 @@ describe('fetchSuggestedKeywords', () => {
 });
 
 describe('saveStudy', () => {
-  const mockStudy = {
-    id: 1,
-    name: 'Project 1',
-    createdBy: 'User A',
-    keywords: ['Keyword1', 'Keyword2'],
-    project: '1',
-    horizon: '2030-2031',
-    trajectoryIds: [1, 7],
-  };
-
   beforeEach(() => {
     global.fetch = vi.fn();
     vi.clearAllMocks();
@@ -131,7 +105,7 @@ describe('saveStudy', () => {
       json: () => Promise.resolve(),
     });
 
-    await saveStudy(mockStudy);
+    await saveStudy(mockResponseSaveStudyApi);
 
     expect(global.fetch).toHaveBeenCalledTimes(1);
     expect(global.fetch).toHaveBeenCalledWith('https://mockapi.com/v1/study', {
@@ -139,7 +113,7 @@ describe('saveStudy', () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(mockStudy),
+      body: JSON.stringify(mockResponseSaveStudyApi),
     });
     expect(notifyToast).toHaveBeenCalledWith({
       type: 'success',
@@ -154,7 +128,7 @@ describe('saveStudy', () => {
       text: () => 'error',
     });
 
-    const result = await saveStudy(mockStudy);
+    const result = await saveStudy(mockResponseSaveStudyApi);
     expect(result).toEqual(undefined);
   });
 
@@ -162,7 +136,7 @@ describe('saveStudy', () => {
     // Failed fetch response moc
     global.fetch = vi.fn().mockRejectedValueOnce(new Error('Failed to create study'));
 
-    await saveStudy(mockStudy);
+    await saveStudy(mockResponseSaveStudyApi);
 
     expect(notifyToast).toHaveBeenCalledWith({
       type: 'error',

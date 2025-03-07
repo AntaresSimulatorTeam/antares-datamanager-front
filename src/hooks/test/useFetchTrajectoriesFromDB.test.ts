@@ -7,6 +7,7 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useFetchTrajectoriesFromDB } from '@/hooks/useFetchTrajectoriesFromDB.ts';
+import { mockResponseTrajectoriesDB } from '@/mocks/data/list/trajectory.ts';
 
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
@@ -14,25 +15,6 @@ vi.mock('@/shared/notification/notification');
 vi.mock('@/envVariables', () => ({
   getEnvVariables: vi.fn(() => 'https://mockapi.com'),
 }));
-
-const mockResponseTrajectoriesDB = [
-  {
-    id: 1,
-    trajectory_name: 'area_PB_2024',
-    type: TRAJECTORY_TYPE.AREA,
-    version: 3,
-    user_name: 'mouad',
-    creation_date: '2024-07-22 15:13:56.860045' as unknown as Date,
-  },
-  {
-    id: 2,
-    trajectory_name: 'area_PB_2026',
-    type: TRAJECTORY_TYPE.AREA,
-    version: 3,
-    user_name: 'mouad',
-    creation_date: '2026-08-22 15:13:56.860045' as unknown as Date,
-  },
-];
 
 describe('useFetchTrajectoriesFromDB', () => {
   beforeEach(() => {
