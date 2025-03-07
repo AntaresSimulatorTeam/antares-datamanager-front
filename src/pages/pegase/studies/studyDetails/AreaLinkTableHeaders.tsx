@@ -12,6 +12,7 @@ import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 import SelectAndSearchableInput from '@/components/input/SelectAndSearchableInput.tsx';
 import { ButtonPreview } from '@/components/button/ButtonPreview.tsx';
+import { SelectOption } from '@/shared/types/Input.type.ts';
 
 const columnHelper = createColumnHelper<AreaAndLinkRowData>();
 
