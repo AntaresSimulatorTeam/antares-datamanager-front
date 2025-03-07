@@ -121,7 +121,14 @@ const KeywordsInput = ({
         {/* Suggested Keywords Dropdown */}
         {keywordInput && suggestedKeywords.length > 0 && (
           <div
-            className="absolute left-0 top-7 z-50 max-h-14 w-full overflow-y-auto rounded border border-gray-300 bg-gray-w shadow-2 outline-none"
+            className="bg-white max-h-40 absolute z-10 w-full overflow-y-auto border border-gray-300"
+            style={{
+              backgroundColor: 'white', // Ensure opaque background
+              maxHeight: '100px', // Set max height for scrollbar
+              top: '100%',
+              left: 0,
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // Optional: add shadow for better visibility
+            }}
             onMouseDown={(e) => e.preventDefault()} // Prevent closing when interacting with dropdown
           >
             {suggestedKeywords.map((suggestedKeyword, index) => (
