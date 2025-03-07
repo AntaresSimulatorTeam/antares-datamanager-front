@@ -6,10 +6,11 @@ import { ProgressBar } from '@/components/forms/ProgressBar.tsx';
 import { DbTrajectory, RowStatus } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { addTrajectory } from '@/shared/services/trajectoryService.ts';
+import { SelectOption } from '@/shared/types/Input.type.ts';
 
 interface ImportTrajectoryModalProps {
   options: SelectOption[] | undefined;
-  onClose: (value: DbTrajectory | SelectOption | null, status: RowStatus) => Promise<void>;
+  onClose: (status: RowStatus, value?: DbTrajectory | SelectOption) => Promise<void>;
   trajectoryType: TRAJECTORY_TYPE;
   studyHorizon: string;
 }
@@ -47,17 +48,17 @@ export const ImportTrajectoryModal = ({
         setProgress(+progressValue?.toFixed(0));
       });
       setFileStatus('success');
-      await onClose(newTrajectory, 'success');
+      await onClose('success', newTrajectory);
     } catch (error) {
       // TODO handle errors considered as warning ones
       setFileStatus('error');
-      await onClose(value, 'error');
+      await onClose('error', value);
     }
   };
 
   return (
     <RdsModal size="small">
-      <RdsModal.Title onClose={() => void onClose(null, 'empty')} icon="Upload">
+      <RdsModal.Title onClose={() => void onClose('empty')} icon="Upload">
         {t('studyDetails.@import_from_file_system', {
           trajectoryType: trajectoryType === TRAJECTORY_TYPE.AREA ? 'areas' : 'links',
         })}
@@ -78,7 +79,7 @@ export const ImportTrajectoryModal = ({
         </div>
       </RdsModal.Content>
       <RdsModal.Footer>
-        <RdsButton label="Cancel" onClick={() => onClose(null, 'empty')} color="secondary" />
+        <RdsButton label="Cancel" onClick={() => void onClose('empty')} color="secondary" />
         <RdsButton
           icon={RdsIconId.Add}
           label={t('studyDetails.@import')}

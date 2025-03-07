@@ -5,6 +5,7 @@
  */
 
 import { DbTrajectory, FsTrajectory } from '@/shared/types';
+import { SelectOption } from '@/shared/types/Input.type.ts';
 
 export const convertToSelectionOptionType = (trajectories: DbTrajectory[]): SelectOption[] =>
   trajectories.map((trajectory) => ({
