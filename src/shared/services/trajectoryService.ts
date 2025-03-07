@@ -90,7 +90,7 @@ export const addTrajectory = async (
 };
 
 /**
- * Fetch trajectories linked to one or several studies
+ * Fetch trajectories linked to a study
  * @param {number} studyId - Study id
  * @param {TRAJECTORY_TYPE} trajectoryType - Trajectory type
  *
