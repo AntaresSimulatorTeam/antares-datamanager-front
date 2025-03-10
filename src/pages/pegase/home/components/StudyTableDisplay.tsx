@@ -83,6 +83,12 @@ const StudyTableDisplay = ({ searchStudy, projectId, projectInfoName }: StudyTab
     navigateToStudy(selectedStudy);
   };
 
+  const handleModalClose = () => {
+    setSelectedStudy(null);
+    setRowSelection({});
+    toggleModal();
+  };
+
   const sortedHeaders = addSortColumn(headers, handleSort, sortBy, sortedColumn, handleHeaderHover, isHeaderHovered);
 
   return (
@@ -125,7 +131,7 @@ const StudyTableDisplay = ({ searchStudy, projectId, projectInfoName }: StudyTab
               />
             </>
           ) : (
-            projectId !== '' && <RdsButton label={t('project.@new_study')} onClick={toggleModal} />
+            projectId !== '' && <RdsButton label={t('studyModal.@new_study')} onClick={toggleModal} />
           )}
         </div>
         <StudiesPagination count={count} intervalSize={intervalSize} current={currentPage} onChange={setPage} />
@@ -133,7 +139,7 @@ const StudyTableDisplay = ({ searchStudy, projectId, projectInfoName }: StudyTab
       {isModalOpen && (
         <StudyCreationModal
           isOpen={isModalOpen}
-          onClose={toggleModal}
+          onClose={handleModalClose}
           study={selectedStudy}
           setReloadStudies={setReloadStudies}
           projectInfoName={projectInfoName}
