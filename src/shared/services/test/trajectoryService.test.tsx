@@ -13,6 +13,7 @@ import {
   fetchTrajectoriesFromFS,
   getStudyTrajectories,
   linkTrajectoryToStudy,
+  unlinkTrajectoryFromStudy,
 } from '@/shared/services/trajectoryService.ts';
 import { mockResponseTrajectoryDB, mockResponseTrajectoryListFS } from '@/mocks/data/list/trajectory.ts';
 
@@ -271,5 +272,39 @@ describe('linkTrajectoryToStudy', () => {
     global.fetch = vi.fn().mockRejectedValueOnce(new Error('Network error'));
 
     await expect(async () => linkTrajectoryToStudy(TRAJECTORY_TYPE.AREA, 100, 2)).rejects.toThrowError('Network error');
+  });
+});
+
+describe('unlinkTrajectoryFromStudy', () => {
+  const requestOptions = {
+    method: 'DELETE',
+  };
+
+  beforeEach(() => {
+    global.fetch = vi.fn();
+    vi.restoreAllMocks();
+  });
+
+  it('should unlink a trajectory from a study', async () => {
+    global.fetch = vi.fn().mockResolvedValueOnce({
+      ok: true,
+    });
+
+    await unlinkTrajectoryFromStudy(100, 2);
+
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(global.fetch).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/trajectory/link?trajectoryId=100&studyId=2',
+        requestOptions,
+      );
+    });
+  });
+
+  it('should handle exceptions during fetch', async () => {
+    //Fetch throwing an error mock
+    global.fetch = vi.fn().mockRejectedValueOnce(new Error('Network error'));
+
+    await expect(async () => unlinkTrajectoryFromStudy(100, 2)).rejects.toThrowError('Network error');
   });
 });
