@@ -47,8 +47,8 @@ const KeywordsInput = ({
   };
 
   const handleAddKeyword = (suggestedKeyword = keywordInput) => {
-    if (keywords?.length > 0 && suggestedKeyword.trim()) {
-      if (keywords.includes(suggestedKeyword.trim())) {
+    if (suggestedKeyword.trim()) {
+      if (keywords?.includes(suggestedKeyword.trim())) {
         setErrorMessage(t('projectModal.@keyword_already_exists'));
       } else if (
         minNbCharacters &&
@@ -60,7 +60,7 @@ const KeywordsInput = ({
         setErrorMessage(t('projectModal.@keyword_minimum_error', { min: minNbCharacters }));
       } else if (!minNbCharacters && maxNbCharacters && suggestedKeyword.trim().length > maxNbCharacters) {
         setErrorMessage(t('projectModal.@keyword_maximum_error', { max: maxNbCharacters }));
-      } else if (maxNbKeywords && keywords.length >= maxNbKeywords) {
+      } else if (maxNbKeywords && keywords?.length >= maxNbKeywords) {
         setErrorMessage(t('projectModal.@keyword_max_keys_errors', { maxNbKey: maxNbKeywords }));
       } else {
         setKeywords((prevKeywords) => [...prevKeywords, suggestedKeyword.trim()]);
@@ -121,7 +121,7 @@ const KeywordsInput = ({
         {/* Suggested Keywords Dropdown */}
         {keywordInput && suggestedKeywords.length > 0 && (
           <div
-            className="bg-white max-h-40 absolute z-10 mt-1 w-full overflow-y-auto border border-gray-300"
+            className="bg-white max-h-40 absolute z-10 w-full overflow-y-auto border border-gray-300"
             style={{
               backgroundColor: 'white', // Ensure opaque background
               maxHeight: '100px', // Set max height for scrollbar

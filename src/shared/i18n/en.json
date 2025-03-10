@@ -13,6 +13,9 @@
     "quickAccess": {
       "@confirmUnpin": "Project unppined",
       "@cancel": "Cancel"
+    },
+    "selectAnsSearchInput": {
+      "@emptyList": "No result found"
     }
   },
   "Pegase": {
@@ -49,8 +52,7 @@
     "@unpin": "Unpin",
     "@close": "Close",
     "@created": "Created",
-    "@by": "By",
-    "@new_study": "Create a study"
+    "@by": "By"
   },
   "projectDetails": {
     "@buttonEdit": "Edit"
@@ -61,6 +63,12 @@
     "@keyword_minimum_error": "Keyword must be at least {{min}} characters",
     "@keyword_maximum_error": "Keyword must not exceed {{max}} characters",
     "@keyword_max_keys_errors": "Cannot add more than {{maxNbKey}} keywords"
+  },
+  "studyModal": {
+    "@new_study": "Create a study",
+    "@study_creation_placeholder": "Name your study...",
+    "@button_create": "Create",
+    "@input_name": "Name"
   },
   "study": {
     "@open": "Open",

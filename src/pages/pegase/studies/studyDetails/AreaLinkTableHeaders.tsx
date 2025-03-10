@@ -18,7 +18,7 @@ const columnHelper = createColumnHelper<AreaAndLinkRowData>();
 const getAreaLinkTableHeaders = (
   options: SelectOption[][] | undefined,
   t: (value: string) => string,
-  handleUpdate: (index: number, trajectory: SelectOption | null, status: RowStatus) => void,
+  handleUpdate: (index: number, trajectory: SelectOption | null, status: RowStatus) => Promise<void>,
   handleImport: (index: number) => Promise<void>,
   handlerSearch: (index: number, value: string | undefined) => Promise<SelectOption[] | undefined>,
 ) => [
@@ -43,13 +43,17 @@ const getAreaLinkTableHeaders = (
       return trajectory ? (
         <div className="inline-flex w-[850px] space-x-2 py-3">
           <span>{trajectory}</span>
-          <RdsIconButton icon={RdsIconId.Delete} size="small" onClick={() => handleUpdate(row.index, null, 'empty')} />
+          <RdsIconButton
+            icon={RdsIconId.Delete}
+            size="small"
+            onClick={() => void handleUpdate(row.index, null, 'empty')}
+          />
         </div>
       ) : (
         <div className="inline-flex w-[850px] items-center space-x-2">
           <SelectAndSearchableInput
             options={options?.[row.index] ?? []}
-            onSelect={(value: SelectOption) => handleUpdate(row.index, value, 'success')}
+            onSelect={(value: SelectOption) => void handleUpdate(row.index, value, 'success')}
             setSearchTerm={async (value: string | undefined) => await handlerSearch(row.index, value)}
             defaultPlaceHolder={
               row.getReadOnly() ? t('studyDetails.@select_link') : t('studyDetails.@select_trajectory')

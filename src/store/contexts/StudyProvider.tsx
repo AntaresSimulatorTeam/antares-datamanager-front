@@ -1,17 +1,44 @@
-import { ReactNode, useReducer } from 'react';
-import { StudyState } from '@/shared/types';
+import { Dispatch, ReactNode, Reducer, useEffect, useReducer } from 'react';
+import { DbTrajectory, StudyActionType, StudyDTO, StudyState } from '@/shared/types';
 import { studyReducer } from '@/store/reducers/studyReducer.tsx';
 import { StudyContext, StudyDispatchContext } from '@/store/contexts/StudyContext';
+import { useLocation } from 'react-router-dom';
+import { STUDY_ACTION } from '@/shared/enum/study.ts';
+import { getStudyTrajectories } from '@/shared/services/trajectoryService.ts';
+import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 
 export interface StudyProviderProps {
   children: ReactNode;
-  initialValue: StudyState;
+  initialValue: Partial<StudyState>;
+}
+
+interface LocationState {
+  study: StudyDTO;
 }
 
 export const StudyProvider = ({ children, initialValue }: StudyProviderProps) => {
-  const initializer = (value = initialValue) => value;
+  const location = useLocation();
+  const study = (location.state as LocationState)?.study;
+  const [state, dispatch] = useReducer<Reducer<StudyState, StudyActionType>>(studyReducer, initialValue as StudyState);
 
-  const [state, dispatch] = useReducer(studyReducer, initialValue, initializer);
+  useEffect(() => {
+    const getTrajectories = async (d: Dispatch<StudyActionType>) => {
+      let response: unknown = [];
+      try {
+        response = await getStudyTrajectories([study.id], TRAJECTORY_TYPE.AREA);
+      } finally {
+        if (response && (response as DbTrajectory[]).length > 0) {
+          d({
+            type: STUDY_ACTION.ADD_TRAJECTORIES,
+            payload: response as DbTrajectory[],
+          });
+        }
+      }
+    };
+    if (study?.trajectoryIds.length > 0) {
+      void getTrajectories(dispatch);
+    }
+  }, [study]);
 
   return (
     <StudyContext.Provider value={state}>

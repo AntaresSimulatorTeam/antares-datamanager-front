@@ -23,9 +23,10 @@ import StudyCreationModal from '@common/modal/StudyCreationModal';
 interface StudyTableDisplayProps {
   searchStudy: string | undefined;
   projectId?: string;
+  projectInfoName?: string;
 }
 
-const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) => {
+const StudyTableDisplay = ({ searchStudy, projectId, projectInfoName }: StudyTableDisplayProps) => {
   const { t } = useTranslation();
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [isHeaderHovered, setIsHeaderHovered] = useState<boolean>(false);
@@ -77,8 +78,11 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
     navigateToStudy(rows[Number.parseInt(selectedRowId || '-1')]);
   };
 
-  const sortedHeaders = addSortColumn(headers, handleSort, sortBy, sortedColumn, setIsHeaderHovered, isHeaderHovered);
-  const memoizedRows = useMemo(() => rows, [rows]);
+  const handleModalClose = () => {
+    setSelectedStudy(null);
+    setRowSelection({});
+    toggleModal();
+  };
 
   return (
     <div>
@@ -122,7 +126,7 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
               />
             </>
           ) : (
-            projectId !== '' && <RdsButton label={t('project.@new_study')} onClick={toggleModal} />
+            projectId !== '' && <RdsButton label={t('studyModal.@new_study')} onClick={toggleModal} />
           )}
         </div>
         <StudiesPagination count={count} intervalSize={intervalSize} current={currentPage} onChange={setPage} />
@@ -130,9 +134,10 @@ const StudyTableDisplay = ({ searchStudy, projectId }: StudyTableDisplayProps) =
       {isModalOpen && (
         <StudyCreationModal
           isOpen={isModalOpen}
-          onClose={toggleModal}
+          onClose={handleModalClose}
           study={selectedStudy}
           setReloadStudies={setReloadStudies}
+          projectInfoName={projectInfoName}
         />
       )}
     </div>
