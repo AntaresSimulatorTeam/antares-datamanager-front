@@ -10,6 +10,7 @@ import { RdsButton, RdsIconId, RdsInputText } from 'rte-design-system-react';
 interface YearDropdownProps {
   value: string;
   onChange: (value: string) => void;
+  required: boolean;
 }
 
 const generateYears = (startYear: number, endYear: number): number[] => {
@@ -20,7 +21,7 @@ const generateYears = (startYear: number, endYear: number): number[] => {
   return years;
 };
 
-const HorizonInput: React.FC<YearDropdownProps> = ({ value, onChange }) => {
+const HorizonInput: React.FC<YearDropdownProps> = ({ value, onChange, required = false }) => {
   const [isOpen, setIsOpen] = useState(false); // State to control dropdown visibility
   const [errorMessage, setErrorMessage] = useState<string>(''); // State for error message
 
@@ -56,6 +57,7 @@ const HorizonInput: React.FC<YearDropdownProps> = ({ value, onChange }) => {
           onBlur={handleBlur} // Validate input on blur
           placeHolder="Select a horizon"
           variant="outlined"
+          required={required}
         />
 
         {/* Toggle Button */}
