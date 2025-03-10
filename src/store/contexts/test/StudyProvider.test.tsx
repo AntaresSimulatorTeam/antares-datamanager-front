@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, it, Mock, vi } from 'vitest';
 import { useLocation } from 'react-router-dom';
-import { render, waitFor } from '@testing-library/react';
+import { act, render, waitFor } from '@testing-library/react';
 import { mockStudy } from '@/mocks/data/list/study.ts';
 import { StudyProvider } from '@/store/contexts/StudyProvider.tsx';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
@@ -8,6 +8,7 @@ import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { mockResponseGetTrajectoryFromStudy } from '@/mocks/data/list/trajectory.ts';
 import * as trajectoryService from '@/shared/services/trajectoryService.ts';
 import { useReducer } from 'react';
+import { ProviderTestChildComponent } from '@/store/contexts/test/components/ProviderTestChildComponent.tsx';
 
 vi.mock('react-router-dom', async (importOriginal) => {
   const actual: Mock = await importOriginal();
@@ -50,6 +51,7 @@ vi.mock('react', async (importOriginal) => {
   return {
     ...actual,
     useReducer: vi.fn(),
+    //useContext: vi.fn(),
   };
 });
 
@@ -70,11 +72,16 @@ describe('StudyProvider', () => {
   it('should update study context when study is linked to trajectories', async () => {
     vi.mocked(trajectoryService.getStudyTrajectories).mockResolvedValueOnce(mockResponseGetTrajectoryFromStudy);
     mockUseLocation.mockImplementationOnce(vi.fn().mockReturnValue({ state: { study: mockStudy } }));
-    mockUseReducer.mockImplementation(() => [{ isStudyGenerated: false }, mockDispatch]);
+    mockUseReducer.mockImplementation(() => [
+      {
+        isStudyGenerated: false,
+      },
+      mockDispatch,
+    ]);
 
     // eslint-disable-next-line react/no-children-prop
-    const provider = <StudyProvider children={<div></div>}></StudyProvider>;
-    render(provider);
+    const provider = <StudyProvider children={<ProviderTestChildComponent />}></StudyProvider>;
+    const { getByTestId, rerender } = render(provider);
 
     await waitFor(() => {
       expect(trajectoryService.getStudyTrajectories).toHaveBeenCalledWith(mockStudy.id, TRAJECTORY_TYPE.AREA);
@@ -85,12 +92,11 @@ describe('StudyProvider', () => {
       });
     });
 
-    //rerender(<StudyProvider children={<div></div>}></StudyProvider>);
-    // const { result } = renderHook(() => useStudy());
-    // console.log('================= result.current', result.current);
-    //
-    // await waitFor(() => {
-    //   expect(result.current).toEqual({ isStudyGenerated: false, AREA: mockResponseGetTrajectoryFromStudy[0] });
-    // });
+    act(() => rerender(provider));
+
+    await waitFor(() => {
+      expect(getByTestId('study-generated')).toHaveTextContent('false');
+      //expect(getByTestId('area-trajectory')).toHaveTextContent(mockResponseGetTrajectoryFromStudy[0].trajectoryName);
+    });
   });
 });
