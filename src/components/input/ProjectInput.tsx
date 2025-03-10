@@ -11,9 +11,10 @@ import { fetchProjectsFromPartialName } from '@/shared/services/projectService.t
 interface ProjectManagerProps {
   value: string;
   onChange: (value: string) => void;
+  required?: boolean;
 }
 
-const ProjectInput: React.FC<ProjectManagerProps> = ({ value, onChange }) => {
+const ProjectInput: React.FC<ProjectManagerProps> = ({ value, onChange, required = false }) => {
   const [projects, setProjects] = useState<string[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
@@ -51,17 +52,11 @@ const ProjectInput: React.FC<ProjectManagerProps> = ({ value, onChange }) => {
         }}
         placeHolder="Select or add a project"
         variant="outlined"
+        required={required}
       />
       {isDropdownOpen && projects.length > 0 && (
         <div
-          className="bg-white max-h-40 absolute z-10 mt-1 w-full overflow-y-auto border border-gray-300"
-          style={{
-            backgroundColor: 'white', // Ensure opaque background
-            maxHeight: '100px', // Set max height for scrollbar
-            top: '100%',
-            left: 0,
-            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // Optional: add shadow for better visibility
-          }}
+          className="absolute left-0 top-7 z-50 max-h-14 w-full overflow-y-auto rounded border border-gray-300 bg-gray-w shadow-2 outline-none"
           onMouseDown={(e) => e.preventDefault()} // Prevent dropdown from closing when clicking inside
         >
           {projects.map((project, index) => (
