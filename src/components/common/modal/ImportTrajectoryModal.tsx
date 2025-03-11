@@ -3,7 +3,7 @@ import SelectAndSearchableInput from '@/components/input/SelectAndSearchableInpu
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { ProgressBar } from '@/components/forms/ProgressBar.tsx';
-import { DbTrajectory, RowStatus } from '@/shared/types';
+import { DbTrajectory, RowStatus, SelectOption } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { addTrajectory } from '@/shared/services/trajectoryService.ts';
 

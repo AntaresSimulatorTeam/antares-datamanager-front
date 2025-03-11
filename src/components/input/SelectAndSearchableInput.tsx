@@ -6,7 +6,7 @@
 
 import { useRef, useState } from 'react';
 import { RdsButton, RdsIconId, RdsInputText } from 'rte-design-system-react';
-import { useTranslation } from 'react-i18next';
+import { SelectOption } from '@/shared/types';
 
 interface ProjectManagerProps {
   options: SelectOption[] | undefined;
@@ -35,7 +35,6 @@ const SelectAndSearchableInput = ({
   const [placeHolder] = useState<string>(defaultPlaceHolder);
   const [valueInput, setValueInput] = useState<string>('');
   const dropdownList = useRef<HTMLDivElement | null>(null);
-  const { t } = useTranslation();
 
   const handleInputChange = async (value: string) => {
     try {
@@ -112,7 +111,7 @@ const SelectAndSearchableInput = ({
             setIsDropdownOpen(false);
           }
         }}
-        placeHolder={!options?.length ? t('components.selectAnsSearchInput.@emptyList') : placeHolder}
+        placeHolder={placeHolder}
         variant="outlined"
         value={valueInput}
         disabled={isInputDisabled}
@@ -125,7 +124,7 @@ const SelectAndSearchableInput = ({
           tabIndex={0}
           onBlur={() => setIsDropdownOpen(false)}
         >
-          {optionsSelection.map((trajectory, index) => (
+          {optionsSelection.map((trajectory: SelectOption, index) => (
             <div
               key={`option-item-${index}`}
               role="option"

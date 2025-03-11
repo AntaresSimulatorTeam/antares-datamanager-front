@@ -18,19 +18,19 @@ vi.mock('@/envVariables', () => ({
 const mockResponseTrajectoriesDB = [
   {
     id: 1,
-    trajectory_name: 'area_PB_2024',
+    trajectoryName: 'area_PB_2024',
     type: TRAJECTORY_TYPE.AREA,
     version: 3,
-    user_name: 'mouad',
-    creation_date: '2024-07-22 15:13:56.860045' as unknown as Date,
+    userName: 'mouad',
+    creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
   },
   {
     id: 2,
-    trajectory_name: 'area_PB_2026',
+    trajectoryName: 'area_PB_2026',
     type: TRAJECTORY_TYPE.AREA,
     version: 3,
-    user_name: 'mouad',
-    creation_date: '2026-08-22 15:13:56.860045' as unknown as Date,
+    userName: 'mouad',
+    creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
   },
 ];
 
@@ -51,7 +51,7 @@ describe('useFetchTrajectoriesFromDB', () => {
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
-        'https://mockapi.com/v1/trajectory/db?trajectoryType=AREA&horizon=2023_2024&fileNameStartsWith=',
+        'https://mockapi.com/v1/trajectory/db?trajectoryType=AREA&horizon=2023_2024&fileNameContains=',
         {},
       );
       expect(result.current.trajectories).toEqual(mockResponseTrajectoriesDB);

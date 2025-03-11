@@ -28,7 +28,7 @@ export const fetchTrajectoriesFromDB = async (
   horizon: string,
   fileName?: string,
 ): Promise<DbTrajectory[]> => {
-  const urlApi = `${TRAJECTORY_DATA_BASE_ENDPOINT}?trajectoryType=${trajectoryType}&horizon=${horizon}&fileNameStartsWith=${fileName ?? ''}`;
+  const urlApi = `${TRAJECTORY_DATA_BASE_ENDPOINT}?trajectoryType=${trajectoryType}&horizon=${horizon}&fileNameContains=${fileName ?? ''}`;
   const response = await AuthService.authFetch(urlApi);
   if (!response.ok) {
     throw new Error('Failed to fetch trajectories from data base');
@@ -90,19 +90,18 @@ export const addTrajectory = async (
 };
 
 /**
- * Fetch trajectories linked to one or several studies
- * @param {number} studyIds - Array of study ids
+ * Fetch trajectories linked to a study
+ * @param {number} studyId - Study id
  * @param {TRAJECTORY_TYPE} trajectoryType - Trajectory type
  *
  * @return {Promise<DbTrajectory[] | Error>} Array of trajectories (data base trajectories)
  */
 
 export const getStudyTrajectories = async (
-  studyIds: number[],
+  studyId: number,
   trajectoryType: TRAJECTORY_TYPE,
 ): Promise<DbTrajectory[] | Error> => {
-  const studyParams = studyIds?.map((id) => `studyIds=${id}`).join('');
-  const urlApi = `${TRAJECTORY_ENDPOINT}?${studyParams}&trajectoryType=${trajectoryType}`;
+  const urlApi = `${TRAJECTORY_ENDPOINT}?studyId=${studyId}&trajectoryType=${trajectoryType}`;
 
   const response = await AuthService.authFetch(urlApi);
   if (!response.ok) {
