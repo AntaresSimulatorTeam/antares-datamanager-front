@@ -53,8 +53,11 @@ describe('StudyProvider', () => {
       mockDispatch,
     ]);
 
-    // eslint-disable-next-line react/no-children-prop
-    const provider = <StudyProvider children={<ProviderTestChildComponent />}></StudyProvider>;
+    const provider = (
+      <StudyProvider>
+        <ProviderTestChildComponent />
+      </StudyProvider>
+    );
     const { getByTestId } = render(provider);
 
     await waitFor(() => {
