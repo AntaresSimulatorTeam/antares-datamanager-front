@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { DbTrajectory, FsTrajectory } from '@/shared/types';
+import { DbTrajectory, FsTrajectory, SelectOption } from '@/shared/types';
 
 export const convertToSelectionOptionType = (trajectories: DbTrajectory[]): SelectOption[] =>
   trajectories.map((trajectory) => ({
