@@ -6,7 +6,7 @@
 
 import { createColumnHelper } from '@tanstack/react-table';
 import { RdsButton, RdsIcon, RdsIconButton, RdsIconId } from 'rte-design-system-react';
-import { AreaAndLinkRowData, RowStatus } from '@/shared/types';
+import { AreaAndLinkRowData, RowStatus, SelectOption } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import StdIcon from '@common/base/stdIcon/StdIcon.tsx';

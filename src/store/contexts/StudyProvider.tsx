@@ -25,7 +25,7 @@ export const StudyProvider = ({ children, initialValue }: StudyProviderProps) =>
     const getTrajectories = async (d: Dispatch<StudyActionType>) => {
       let response: unknown = [];
       try {
-        response = await getStudyTrajectories([study.id], TRAJECTORY_TYPE.AREA);
+        response = await getStudyTrajectories(study.id, TRAJECTORY_TYPE.AREA);
       } finally {
         if (response && (response as DbTrajectory[]).length > 0) {
           d({
