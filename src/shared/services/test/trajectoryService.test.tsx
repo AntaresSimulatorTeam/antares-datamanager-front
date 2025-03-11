@@ -49,7 +49,7 @@ describe('fetchTrajectoriesFromDB', () => {
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledTimes(1);
       expect(global.fetch).toHaveBeenCalledWith(
-        `https://mockapi.com/v1/trajectory/db?trajectoryType=AREA&horizon=2023-2024&fileNameStartsWith=`,
+        `https://mockapi.com/v1/trajectory/db?trajectoryType=AREA&horizon=2023-2024&fileNameContains=`,
         {},
       );
       expect(result).toEqual(mockResponseDB);
