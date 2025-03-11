@@ -23,14 +23,19 @@ export const StudyProvider = ({ children, initialValue }: StudyProviderProps) =>
 
   useEffect(() => {
     const getTrajectories = async (d: Dispatch<StudyActionType>) => {
-      let response: unknown = [];
+      const trajectories: DbTrajectory[] = [];
       try {
-        response = await getStudyTrajectories(study.id, TRAJECTORY_TYPE.AREA);
+        const promises = [TRAJECTORY_TYPE.AREA, TRAJECTORY_TYPE.LINK].map(async (type) => {
+          const response = (await getStudyTrajectories(study.id, type)) as DbTrajectory[];
+          if (response[0] || response[0]) trajectories.push(response[0]);
+        });
+
+        await Promise.all(promises);
       } finally {
-        if (response && (response as DbTrajectory[]).length > 0) {
+        if (trajectories && trajectories?.length > 0) {
           d({
             type: STUDY_ACTION.ADD_TRAJECTORIES,
-            payload: response as DbTrajectory[],
+            payload: trajectories,
           });
         }
       }
