@@ -6,7 +6,6 @@ import { ProgressBar } from '@/components/forms/ProgressBar.tsx';
 import { DbTrajectory, RowStatus, SelectOption } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { addTrajectory } from '@/shared/services/trajectoryService.ts';
-import { SelectOption } from '@/shared/types/Input.type.ts';
 
 interface ImportTrajectoryModalProps {
   options: SelectOption[] | undefined;
