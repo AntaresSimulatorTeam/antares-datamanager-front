@@ -88,7 +88,7 @@
     "@select_trajectory": "Select a trajectory",
     "@select_link": "Add an area first",
     "@select_file": "Select a file",
-    "@select_file_fs_error": "Not such files on file system. Please add files and retry",
+    "@select_file_fs_error": "Not such files on file system",
     "@import_from_file_system": "Select {{trajectoryType}} from File System",
     "@import": "Import",
     "@import_status_done": "OK",
