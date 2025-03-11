@@ -25,6 +25,11 @@ import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 
+export interface ErrorMessageType {
+  index: number;
+  message: string;
+}
+
 interface AreaLinkTabProps {
   study: StudyDTO;
 }
@@ -72,7 +77,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
   const [optionsDB, setOptionsDB] = useState<SelectOption[][]>();
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
   const [rowIndexSelected, setRowIndexSelected] = useState<number>(0);
-  const [errorInfo, setErrorInfo] = useState<{ index: number; message: string }>({ index: 0, message: '' });
+  const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const dispatch = useStudyDispatch();
   const { t } = useTranslation();
@@ -86,7 +91,6 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
   }, [trajectoriesArea, trajectoriesLink]);
 
   const handleFetchTrajectoriesFS = async (index: number) => {
-    setErrorInfo({ index, message: '' });
     try {
       const results = await fetchTrajectoriesFromFS(index === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK);
       setOptionsFS(convertToFSSelectionOptionType(results));
@@ -100,7 +104,6 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
 
   const handleTrajectoryUpdate = useCallback(
     async (index: number, status: RowStatus, trajectory?: SelectOption | DbTrajectory) => {
-      setErrorInfo({ index, message: '' });
       const updatedData = [...data];
       const payload: DbTrajectory | undefined =
         trajectory && 'label' in trajectory
@@ -226,6 +229,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
         handleFetchTrajectoriesFS,
         handleTrajectorySearch,
         errorInfo,
+        setErrorInfo,
       ),
     [data, optionsDB, errorInfo],
   );
