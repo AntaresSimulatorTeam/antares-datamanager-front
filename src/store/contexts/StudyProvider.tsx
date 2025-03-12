@@ -9,23 +9,22 @@ import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 
 export interface StudyProviderProps {
   children: ReactNode;
-  initialValue: Partial<StudyState>;
 }
 
 interface LocationState {
   study: StudyDTO;
 }
 
-export const StudyProvider = ({ children, initialValue }: StudyProviderProps) => {
+export const StudyProvider = ({ children}: StudyProviderProps) => {
   const location = useLocation();
   const study = (location.state as LocationState)?.study;
-  const [state, dispatch] = useReducer<Reducer<StudyState, StudyActionType>>(studyReducer, initialValue as StudyState);
+  const [state, dispatch] = useReducer<Reducer<StudyState, StudyActionType>>(studyReducer, {studyStatus: study?.status});
 
   useEffect(() => {
     const getTrajectories = async (d: Dispatch<StudyActionType>) => {
       let response: unknown = [];
       try {
-        response = await getStudyTrajectories(study.id, TRAJECTORY_TYPE.AREA);
+        response = await getStudyTrajectories(study.id, TRAJECTORY_TYPE.ALL);
       } finally {
         if (response && (response as DbTrajectory[]).length > 0) {
           d({

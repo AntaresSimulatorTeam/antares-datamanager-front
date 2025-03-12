@@ -101,7 +101,7 @@ export const uploadTrajectory = async (
 
 export const getStudyTrajectories = async (
   studyId: number,
-  trajectoryType: TRAJECTORY_TYPE,
+  trajectoryType?: TRAJECTORY_TYPE,
 ): Promise<DbTrajectory[] | Error> => {
   const urlApi = `${TRAJECTORY_ENDPOINT}?studyId=${studyId}&trajectoryType=${trajectoryType}`;
 

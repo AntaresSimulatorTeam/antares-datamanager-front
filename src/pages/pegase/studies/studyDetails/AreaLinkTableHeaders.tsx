@@ -14,6 +14,7 @@ import SelectAndSearchableInput from '@/components/input/SelectAndSearchableInpu
 import { ButtonPreview } from '@/components/button/ButtonPreview.tsx';
 import { Dispatch, SetStateAction } from 'react';
 import { ErrorMessageType } from '@/components/tab/AreaLinkTab.tsx';
+import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 
 const columnHelper = createColumnHelper<AreaAndLinkRowData>();
 
@@ -25,6 +26,7 @@ const getAreaLinkTableHeaders = (
   handlerSearch: (index: number, value: string | undefined) => Promise<SelectOption[] | undefined>,
   error: { index: number; message: string },
   setErrorInfo: Dispatch<SetStateAction<ErrorMessageType>>,
+  studyStatus: StudyStatus | undefined
 ) => [
   columnHelper.accessor('hypothesis', {
     header: t('studyDetails.@hypothesis'),
@@ -41,10 +43,11 @@ const getAreaLinkTableHeaders = (
   columnHelper.accessor('trajectory', {
     header: t('studyDetails.@trajectory'),
     cell: ({ row }) => {
-      const { trajectory } = row.original;
+      const { trajectory} = row.original;
+      const textClass =  studyStatus === StudyStatus.GENERATED ? "text-primary-900" : "group-hover:text-green-500";
       return trajectory ? (
         <div className="inline-flex w-[850px] space-x-2 py-3">
-          <span>{trajectory.trajectoryName}</span>
+          <span className={`transition-colors ${textClass}`}>{trajectory.trajectoryName}</span>
           <RdsIconButton icon={RdsIconId.Delete} size="small" onClick={() => {
             setErrorInfo({ index: row.index, message: '' });
             void handleUpdate(row.index, 'empty');

@@ -9,6 +9,7 @@ import { act, Queries, renderHook, RenderHookOptions } from '@testing-library/re
 import { useStudyNavigation } from '@/hooks/useStudyNavigation.ts';
 import { Router, useNavigate } from 'react-router-dom';
 import { ReactNode } from 'react';
+import { StudyStatus } from '@/shared/types/common/StudyStatus.type';
 
 const mockNavigator = {
   createHref: vi.fn(),
@@ -24,7 +25,7 @@ const mockStudy = {
   creationDate: new Date('Janvier 18'),
   keywords: ['covid', 'silence'],
   project: 'Bilan previsionnel 2027',
-  status: 'missing',
+  status: StudyStatus.GENERATED,
   horizon: '2020_2024',
   trajectoryIds: [2],
 };

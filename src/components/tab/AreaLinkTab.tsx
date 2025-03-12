@@ -81,8 +81,8 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const dispatch = useStudyDispatch();
   const { t } = useTranslation();
-  const { trajectories: trajectoriesArea } = useFetchTrajectoriesFromDB(TRAJECTORY_TYPE.AREA, study.horizon);
-  const { trajectories: trajectoriesLink } = useFetchTrajectoriesFromDB(TRAJECTORY_TYPE.LINK, study.horizon);
+  const { trajectories: trajectoriesArea } = useFetchTrajectoriesFromDB(TRAJECTORY_TYPE.AREA, study.horizon, study.status);
+  const { trajectories: trajectoriesLink } = useFetchTrajectoriesFromDB(TRAJECTORY_TYPE.LINK, study.horizon, study.status);
 
   useEffect(() => {
     if (trajectoriesArea && trajectoriesLink) {
@@ -226,10 +226,11 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
         optionsDB,
         t,
         handleTrajectoryUpdate,
-        handleFetchTrajectoriesFS,
+        handleFetchTrajectoriesFS,studyState.studyStatus
         handleTrajectorySearch,
         errorInfo,
         setErrorInfo,
+          studyState.studyStatus
       ),
     [data, optionsDB, errorInfo],
   );
