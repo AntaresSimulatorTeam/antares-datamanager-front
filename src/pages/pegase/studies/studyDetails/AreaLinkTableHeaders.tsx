@@ -18,7 +18,7 @@ const columnHelper = createColumnHelper<AreaAndLinkRowData>();
 const getAreaLinkTableHeaders = (
   options: SelectOption[][] | undefined,
   t: (value: string) => string,
-  handleUpdate: (index: number, trajectory: SelectOption | null, status: RowStatus) => Promise<void>,
+  handleUpdate: (index: number, status: RowStatus, trajectory?: SelectOption) => Promise<void>,
   handleImport: (index: number) => Promise<void>,
   handlerSearch: (index: number, value: string | undefined) => Promise<SelectOption[] | undefined>,
 ) => [
@@ -40,18 +40,14 @@ const getAreaLinkTableHeaders = (
       const { trajectory } = row.original;
       return trajectory ? (
         <div className="inline-flex w-[850px] space-x-2 py-3">
-          <span>{trajectory}</span>
-          <RdsIconButton
-            icon={RdsIconId.Delete}
-            size="small"
-            onClick={() => void handleUpdate(row.index, null, 'empty')}
-          />
+          <span>{trajectory.trajectoryName}</span>
+          <RdsIconButton icon={RdsIconId.Delete} size="small" onClick={() => void handleUpdate(row.index, 'empty')} />
         </div>
       ) : (
         <div className="inline-flex w-[850px] items-center space-x-2">
           <SelectAndSearchableInput
             options={options?.[row.index] ?? []}
-            onSelect={(value: SelectOption) => void handleUpdate(row.index, value, 'success')}
+            onSelect={(value: SelectOption) => void handleUpdate(row.index, 'success', value)}
             setSearchTerm={async (value: string | undefined) => await handlerSearch(row.index, value)}
             defaultPlaceHolder={
               row.getReadOnly() ? t('studyDetails.@select_link') : t('studyDetails.@select_trajectory')
@@ -90,7 +86,7 @@ const getAreaLinkTableHeaders = (
       if (status === TRAJECTORY_SELECTION_STATUS.ERROR)
         return (
           <div className="flex flex-1 items-end gap-1">
-            <RdsIcon name={RdsIconId.Info} color="text-error-500" /> {t('studyDetails.@import_status_error')}
+            <RdsIcon name={RdsIconId.Info} color="primary-error" /> {t('studyDetails.@import_status_error')}
           </div>
         );
       return null;
