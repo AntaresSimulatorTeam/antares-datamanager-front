@@ -69,7 +69,7 @@ const StudyDetails = () => {
             <ButtonWithStdIcon
               label={t('studyDetails.@generate')}
               onClick={() => void handleGenerateStudy()}
-              disabled={!AREA || !!studyStatus}
+              disabled={!AREA || studyStatus === StudyStatus.GENERATED}
               icon={StdIconId.CheckCircle}
               position="right"
               isLoading={isGenerating}
