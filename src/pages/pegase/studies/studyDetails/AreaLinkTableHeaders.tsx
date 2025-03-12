@@ -34,7 +34,7 @@ const getAreaLinkTableHeaders = (
       const { trajectory } = row.original;
       return (
         <div className="inline-flex w-[180px] items-center gap-2">
-          {getValue()}
+          <span className={`${trajectory ? 'text-primary-600' : 'text-gray-900'}`}>{getValue()}</span>
           {trajectory ? <ButtonPreview label={'View'} icon={StdIconId.Preview} position={'left'} /> : null}
         </div>
       );
@@ -43,15 +43,17 @@ const getAreaLinkTableHeaders = (
   columnHelper.accessor('trajectory', {
     header: t('studyDetails.@trajectory'),
     cell: ({ row }) => {
-      const { trajectory} = row.original;
-      const textClass =  studyStatus === StudyStatus.GENERATED ? "text-primary-900" : "group-hover:text-green-500";
+      const { trajectory } = row.original;
+      const textClass = studyStatus === StudyStatus.GENERATED ? 'text-primary-600' : 'text-gray-900';
       return trajectory ? (
         <div className="inline-flex w-[850px] space-x-2 py-3">
-          <span className={`transition-colors ${textClass}`}>{trajectory.trajectoryName}</span>
-          <RdsIconButton icon={RdsIconId.Delete} size="small" onClick={() => {
-            setErrorInfo({ index: row.index, message: '' });
-            void handleUpdate(row.index, 'empty');
-          }} />
+          <span className={`${textClass}`}>{trajectory.trajectoryName}</span>
+          {studyStatus != StudyStatus.GENERATED && (
+            <RdsIconButton icon={RdsIconId.Delete} size="small" onClick={() => {
+              setErrorInfo({ index: row.index, message: '' });
+              void handleUpdate(row.index, 'empty');
+            }} />
+          )}
         </div>
       ) : (
         <div className="inline-flex w-[850px] items-center space-x-2">

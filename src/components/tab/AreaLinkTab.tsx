@@ -24,6 +24,7 @@ import { convertToFSSelectionOptionType, convertToSelectionOptionType } from '@/
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
+import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 
 export interface ErrorMessageType {
   index: number;
@@ -70,7 +71,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
     ]);
     setReadOnly({
       '0': false,
-      '1': !trajectoryArea,
+      '1': !trajectoryArea || (!trajectoryLink && studyState.studyStatus === StudyStatus.GENERATED),
     });
   }, [studyState, trajectoryArea, trajectoryLink]);
 
@@ -81,8 +82,16 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const dispatch = useStudyDispatch();
   const { t } = useTranslation();
-  const { trajectories: trajectoriesArea } = useFetchTrajectoriesFromDB(TRAJECTORY_TYPE.AREA, study.horizon, study.status);
-  const { trajectories: trajectoriesLink } = useFetchTrajectoriesFromDB(TRAJECTORY_TYPE.LINK, study.horizon, study.status);
+  const { trajectories: trajectoriesArea } = useFetchTrajectoriesFromDB(
+    TRAJECTORY_TYPE.AREA,
+    study.horizon,
+    study.status,
+  );
+  const { trajectories: trajectoriesLink } = useFetchTrajectoriesFromDB(
+    TRAJECTORY_TYPE.LINK,
+    study.horizon,
+    study.status,
+  );
 
   useEffect(() => {
     if (trajectoriesArea && trajectoriesLink) {
