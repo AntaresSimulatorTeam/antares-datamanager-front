@@ -14,6 +14,7 @@ import {
   fetchTrajectoriesFromDB,
   fetchTrajectoriesFromFS,
   linkTrajectoryToStudy,
+  unlinkTrajectoryFromStudy,
 } from '@/shared/services/trajectoryService.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { AreaAndLinkRowData, DbTrajectory, RowStatus, SelectOption, StudyActionType, StudyDTO } from '@/shared/types';
@@ -30,24 +31,44 @@ interface AreaLinkTabProps {
 
 const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
   const studyState = useStudy();
-  const trajectoryNameArea: string | null = studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectoryName ?? null;
-  const trajectoryNameLink: string | null = studyState[`${TRAJECTORY_TYPE.LINK}`]?.trajectoryName ?? null;
+  const trajectoryArea: DbTrajectory | null = studyState[`${TRAJECTORY_TYPE.AREA}`] ?? null;
+  const trajectoryLink: DbTrajectory | null = studyState[`${TRAJECTORY_TYPE.LINK}`] ?? null;
   const [data, setData] = useState<AreaAndLinkRowData[]>([
     {
       hypothesis: 'Areas',
-      trajectory: trajectoryNameArea,
-      status: trajectoryNameArea ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+      trajectory: null,
+      status: TRAJECTORY_SELECTION_STATUS.MISSING,
     },
     {
       hypothesis: 'Links',
-      trajectory: trajectoryNameLink,
-      status: trajectoryNameLink ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+      trajectory: null,
+      status: TRAJECTORY_SELECTION_STATUS.MISSING,
     },
   ]);
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({
     '0': false,
-    '1': !trajectoryNameArea,
+    '1': !studyState[`${TRAJECTORY_TYPE.AREA}`],
   });
+
+  useEffect(() => {
+    setData([
+      {
+        hypothesis: 'Areas',
+        trajectory: trajectoryArea,
+        status: trajectoryArea ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+      },
+      {
+        hypothesis: 'Links',
+        trajectory: trajectoryLink,
+        status: trajectoryLink ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+      },
+    ]);
+    setReadOnly({
+      '0': false,
+      '1': !trajectoryArea,
+    });
+  }, [studyState, trajectoryArea, trajectoryLink]);
+
   const [optionsDB, setOptionsDB] = useState<SelectOption[][]>();
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
   const [rowIndexSelected, setRowIndexSelected] = useState<number>(0);
@@ -74,11 +95,11 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
   };
 
   const handleTrajectoryUpdate = useCallback(
-    async (index: number, trajectory: SelectOption | DbTrajectory | null, status: RowStatus) => {
+    async (index: number, status: RowStatus, trajectory?: SelectOption | DbTrajectory) => {
       const updatedData = [...data];
-      const payload: DbTrajectory | null | undefined =
+      const payload: DbTrajectory | undefined =
         trajectory && 'label' in trajectory
-          ? getTrajectoryDB(index === 0 ? trajectoriesArea : trajectoriesLink, trajectory.id as number)
+          ? getTrajectoryDB(index === 0 ? trajectoriesArea : trajectoriesLink, trajectory.id)
           : trajectory;
 
       try {
@@ -90,45 +111,58 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
             payload,
           } as StudyActionType);
           // Update data state
-          updatedData[index].trajectory = trajectory
-            ? ((trajectory as SelectOption)?.label ?? (trajectory as DbTrajectory)?.trajectoryName)
-            : null;
+          updatedData[index].trajectory = payload ?? null;
           updatedData[index].status = getStatus(status);
           setReadOnly({ '0': false, '1': false });
         }
 
         // Handle deletion case for areas
         if (status === 'empty') {
-          // TODO: ANT-2892 (delete link between study and trajectory in data base)
-          if (index === 0) {
-            updatedData.forEach((rowData) => {
-              rowData.trajectory = null;
-              rowData.status = TRAJECTORY_SELECTION_STATUS.MISSING;
-            });
-            dispatch?.({
-              type: STUDY_ACTION.CLEAR_AREA_LINK_TRAJECTORY,
-            } as StudyActionType);
-            setReadOnly({ '0': false, '1': true });
-          } else if (index === 1) {
-            updatedData[1].trajectory = null;
-            updatedData[1].status = TRAJECTORY_SELECTION_STATUS.MISSING;
-            dispatch?.({
-              type: STUDY_ACTION.CLEAR_LINK_TRAJECTORY,
-            } as StudyActionType);
-            setReadOnly({ '0': false, '1': false });
+          // Reset trajectory line to initial state when in cas of trajectory error status
+          if (updatedData[index].status === TRAJECTORY_SELECTION_STATUS.ERROR) {
+            updatedData[index].trajectory = null;
+            updatedData[index].status = TRAJECTORY_SELECTION_STATUS.MISSING;
+          } else {
+            if (index === 0 && updatedData[0]?.trajectory) {
+              await unlinkTrajectoryFromStudy(updatedData[0].trajectory.id, study.id);
+              if (updatedData[1].trajectory && updatedData[1].status === TRAJECTORY_SELECTION_STATUS.OK) {
+                await unlinkTrajectoryFromStudy(updatedData[1].trajectory.id, study.id);
+              }
+              updatedData.forEach((rowData) => {
+                rowData.trajectory = null;
+                rowData.status = TRAJECTORY_SELECTION_STATUS.MISSING;
+              });
+              dispatch?.({
+                type: STUDY_ACTION.CLEAR_AREA_LINK_TRAJECTORY,
+              } as StudyActionType);
+              setReadOnly({ '0': false, '1': true });
+            } else if (index === 1 && updatedData[1].trajectory) {
+              await unlinkTrajectoryFromStudy(updatedData[1].trajectory.id, study.id);
+              updatedData[1].trajectory = null;
+              updatedData[1].status = TRAJECTORY_SELECTION_STATUS.MISSING;
+              dispatch?.({
+                type: STUDY_ACTION.CLEAR_LINK_TRAJECTORY,
+              } as StudyActionType);
+              setReadOnly({ '0': false, '1': false });
+            }
           }
         }
 
-        if (status === 'error') {
-          updatedData[index].trajectory =
-            (trajectory as SelectOption).label || (trajectory as DbTrajectory).trajectoryName || null;
+        if (status === 'error' && trajectory) {
+          updatedData[index].trajectory = {
+            id: (trajectory as SelectOption).id,
+            trajectoryName: (trajectory as SelectOption).label,
+            type: null,
+            version: null,
+            userName: null,
+            creationDate: null,
+          };
           updatedData[index].status = TRAJECTORY_SELECTION_STATUS.ERROR;
         }
       } catch {
-        // Trajectory status is set to error one
-        updatedData[index].trajectory =
-          (trajectory as SelectOption).label || (trajectory as DbTrajectory).trajectoryName || null;
-        updatedData[index].status = TRAJECTORY_SELECTION_STATUS.ERROR;
+        // Reset trajectory line to initial state
+        updatedData[index].trajectory = null;
+        updatedData[index].status = TRAJECTORY_SELECTION_STATUS.MISSING;
       } finally {
         setData(updatedData);
       }
@@ -153,9 +187,9 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
   };
 
   const closeModal = useCallback(
-    async (value: DbTrajectory | SelectOption | null, status: RowStatus) => {
+    async (status: RowStatus, value?: DbTrajectory | SelectOption) => {
       try {
-        await handleTrajectoryUpdate(rowIndexSelected, value, status);
+        await handleTrajectoryUpdate(rowIndexSelected, status, value);
         // Update trajectory list options (synchronized with update of trajectory list in BDD after trajectory import) for dropdown
         if (status !== 'error' && value) {
           setOptionsDB((prev) => {
