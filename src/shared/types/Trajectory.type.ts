@@ -6,6 +6,7 @@
 
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { FileInputStatus } from 'rte-design-system-react';
+import { WithNullableFields } from '@/shared/types/Generic.type.ts';
 
 export interface FsTrajectory {
   trajectoryName: string;
@@ -24,7 +25,7 @@ export interface DbTrajectory {
 
 export type AreaAndLinkRowData = {
   hypothesis: string;
-  trajectory: string | null;
+  trajectory: WithNullableFields<DbTrajectory, 'type' | 'version' | 'userName' | 'creationDate'> | null;
   status: TRAJECTORY_SELECTION_STATUS;
 };
 
