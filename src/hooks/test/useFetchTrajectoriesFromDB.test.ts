@@ -33,10 +33,11 @@ describe('useFetchTrajectoriesFromDB', () => {
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
-        'https://mockapi.com/v1/trajectory/db?trajectoryType=AREA&horizon=2023_2024&fileNameStartsWith=',
+        'https://mockapi.com/v1/trajectory/db?trajectoryType=AREA&horizon=2023_2024&fileNameContains=',
         {},
       );
-      expect(result.current.trajectories).toEqual(mockResponseTrajectoriesDB);
+      expect(result.current.trajectories).toEqual(
+      );
       expect(result.current.trajectories).toHaveLength(2);
     });
   });

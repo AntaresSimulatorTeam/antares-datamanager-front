@@ -17,7 +17,7 @@ import {
   unlinkTrajectoryFromStudy,
 } from '@/shared/services/trajectoryService.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { AreaAndLinkRowData, DbTrajectory, RowStatus, StudyActionType, StudyDTO } from '@/shared/types';
+import { AreaAndLinkRowData, DbTrajectory, RowStatus, SelectOption, StudyActionType, StudyDTO } from '@/shared/types';
 import { useFetchTrajectoriesFromDB } from '@/hooks/useFetchTrajectoriesFromDB.ts';
 import { getStatus, getTrajectoryDB } from '@/shared/utils/trajectoryUtils';
 import { convertToFSSelectionOptionType, convertToSelectionOptionType } from '@/shared/utils/formFormatter';
