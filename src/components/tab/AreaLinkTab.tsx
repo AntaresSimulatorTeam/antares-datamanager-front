@@ -135,7 +135,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
 
         // Handle deletion case for areas
         if (status === 'empty') {
-          // Reset trajectory line to initial state when in cas of trajectory error status
+          // Reset trajectory line to initial state in case of trajectory error status
           if (updatedData[index].status === TRAJECTORY_SELECTION_STATUS.ERROR) {
             updatedData[index].trajectory = null;
             updatedData[index].status = TRAJECTORY_SELECTION_STATUS.MISSING;
@@ -235,11 +235,11 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
         optionsDB,
         t,
         handleTrajectoryUpdate,
-        handleFetchTrajectoriesFS,studyState.studyStatus
+        handleFetchTrajectoriesFS,
         handleTrajectorySearch,
         errorInfo,
         setErrorInfo,
-          studyState.studyStatus
+        studyState.studyStatus,
       ),
     [data, optionsDB, errorInfo],
   );
