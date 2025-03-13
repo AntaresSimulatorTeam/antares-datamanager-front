@@ -12,6 +12,8 @@ import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 import SelectAndSearchableInput from '@/components/input/SelectAndSearchableInput.tsx';
 import { ButtonPreview } from '@/components/button/ButtonPreview.tsx';
+import { Dispatch, SetStateAction } from 'react';
+import { ErrorMessageType } from '@/components/tab/AreaLinkTab.tsx';
 
 const columnHelper = createColumnHelper<AreaAndLinkRowData>();
 
@@ -21,6 +23,8 @@ const getAreaLinkTableHeaders = (
   handleUpdate: (index: number, status: RowStatus, trajectory?: SelectOption) => Promise<void>,
   handleImport: (index: number) => Promise<void>,
   handlerSearch: (index: number, value: string | undefined) => Promise<SelectOption[] | undefined>,
+  error: { index: number; message: string },
+  setErrorInfo: Dispatch<SetStateAction<ErrorMessageType>>,
 ) => [
   columnHelper.accessor('hypothesis', {
     header: t('studyDetails.@hypothesis'),
@@ -41,13 +45,19 @@ const getAreaLinkTableHeaders = (
       return trajectory ? (
         <div className="inline-flex w-[850px] space-x-2 py-3">
           <span>{trajectory.trajectoryName}</span>
-          <RdsIconButton icon={RdsIconId.Delete} size="small" onClick={() => void handleUpdate(row.index, 'empty')} />
+          <RdsIconButton icon={RdsIconId.Delete} size="small" onClick={() => {
+            setErrorInfo({ index: row.index, message: '' });
+            void handleUpdate(row.index, 'empty');
+          }} />
         </div>
       ) : (
         <div className="inline-flex w-[850px] items-center space-x-2">
           <SelectAndSearchableInput
             options={options?.[row.index] ?? []}
-            onSelect={(value: SelectOption) => void handleUpdate(row.index, 'success', value)}
+            onSelect={(value: SelectOption) => {
+              setErrorInfo({ index: row.index, message: '' });
+              void handleUpdate(row.index, 'success', value);
+            }}
             setSearchTerm={async (value: string | undefined) => await handlerSearch(row.index, value)}
             defaultPlaceHolder={
               row.getReadOnly() ? t('studyDetails.@select_link') : t('studyDetails.@select_trajectory')
@@ -58,9 +68,13 @@ const getAreaLinkTableHeaders = (
           <span>or</span>
           <RdsButton
             label={t('studyDetails.@select_file')}
-            onClick={() => void handleImport(row.index)}
+            onClick={() => {
+              setErrorInfo({ index: row.index, message: '' });
+              void handleImport(row.index);
+            }}
             disabled={row.getReadOnly()}
           />
+          {error.message && row.index === error.index && <div className="text-error-600">{error.message}</div>}
         </div>
       );
     },

@@ -5,13 +5,14 @@ import { useState } from 'react';
 import { ProgressBar } from '@/components/forms/ProgressBar.tsx';
 import { DbTrajectory, RowStatus, SelectOption } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { addTrajectory } from '@/shared/services/trajectoryService.ts';
+import { uploadTrajectory } from '@/shared/services/trajectoryService.ts';
 
 interface ImportTrajectoryModalProps {
   options: SelectOption[] | undefined;
   onClose: (status: RowStatus, value?: DbTrajectory | SelectOption) => Promise<void>;
   trajectoryType: TRAJECTORY_TYPE;
   studyHorizon: string;
+  studyId: number;
 }
 
 export const ImportTrajectoryModal = ({
@@ -19,6 +20,7 @@ export const ImportTrajectoryModal = ({
   onClose,
   trajectoryType,
   studyHorizon,
+  studyId,
 }: ImportTrajectoryModalProps) => {
   const { t } = useTranslation();
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
@@ -43,9 +45,15 @@ export const ImportTrajectoryModal = ({
     setIsButtonDisabled(true);
     let newTrajectory: DbTrajectory;
     try {
-      newTrajectory = await addTrajectory(trajectoryType, value.label, studyHorizon, (progressValue: number) => {
-        setProgress(+progressValue?.toFixed(0));
-      });
+      newTrajectory = await uploadTrajectory(
+        trajectoryType,
+        value.label,
+        studyHorizon,
+        studyId,
+        (progressValue: number) => {
+          setProgress(+progressValue?.toFixed(0));
+        },
+      );
       setFileStatus('success');
       await onClose('success', newTrajectory);
     } catch (error) {

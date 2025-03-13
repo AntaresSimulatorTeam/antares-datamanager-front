@@ -25,6 +25,11 @@ import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 
+export interface ErrorMessageType {
+  index: number;
+  message: string;
+}
+
 interface AreaLinkTabProps {
   study: StudyDTO;
 }
@@ -72,6 +77,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
   const [optionsDB, setOptionsDB] = useState<SelectOption[][]>();
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
   const [rowIndexSelected, setRowIndexSelected] = useState<number>(0);
+  const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const dispatch = useStudyDispatch();
   const { t } = useTranslation();
@@ -89,6 +95,8 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
       const results = await fetchTrajectoriesFromFS(index === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK);
       setOptionsFS(convertToFSSelectionOptionType(results));
       toggleModal();
+    } catch (error) {
+      setErrorInfo({ index, message: t('studyDetails.@select_file_fs_error') });
     } finally {
       setRowIndexSelected(index);
     }
@@ -214,8 +222,16 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
 
   const columns = useMemo(
     () =>
-      getAreaLinkTableHeaders(optionsDB, t, handleTrajectoryUpdate, handleFetchTrajectoriesFS, handleTrajectorySearch),
-    [data, optionsDB],
+      getAreaLinkTableHeaders(
+        optionsDB,
+        t,
+        handleTrajectoryUpdate,
+        handleFetchTrajectoriesFS,
+        handleTrajectorySearch,
+        errorInfo,
+        setErrorInfo,
+      ),
+    [data, optionsDB, errorInfo],
   );
 
   return (
@@ -235,6 +251,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
           onClose={closeModal}
           trajectoryType={rowIndexSelected === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK}
           studyHorizon={study.horizon}
+          studyId={study.id}
         />
       )}
     </div>
