@@ -251,6 +251,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
           onClose={closeModal}
           trajectoryType={rowIndexSelected === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK}
           studyHorizon={study.horizon}
+          studyId={study.id}
         />
       )}
     </div>

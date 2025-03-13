@@ -60,17 +60,19 @@ export const fetchTrajectoriesFromFS = async (
  *
  * @param {TRAJECTORY_TYPE} trajectoryType - Trajectory type
  * @param {string} trajectoryName - Name of trajectory to add to data base
- * @param {string} horizon - Trajectory horizon
+ * @param {string} horizon - Study horizon
+ * @param {number} studyId - Study id
  * @param {(progress: number) => void} onProgress - Set progress value
  * @returns {Promise<DbTrajectory>} - Promise object that represents a trajectory inserted into database
  */
-export const addTrajectory = async (
+export const uploadTrajectory = async (
   trajectoryType: string,
   trajectoryName: string,
   horizon: string,
+  studyId: number,
   onProgress: (progress: number) => void,
 ): Promise<DbTrajectory> => {
-  const urlApi = `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}`;
+  const urlApi = `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   const [_, response] = await fetchWithProgress(
     urlApi,
     {
