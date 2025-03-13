@@ -8,9 +8,9 @@ import { vi } from 'vitest';
 import { waitFor } from '@testing-library/react';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import {
-  addTrajectory,
   fetchTrajectoriesFromDB,
   fetchTrajectoriesFromFS,
+  uploadTrajectory,
 } from '@/shared/services/trajectoryService.ts';
 import { DbTrajectory } from '@/shared/types';
 
@@ -131,7 +131,7 @@ describe('fetchTrajectoriesFromFS', () => {
   });
 });
 
-describe('addTrajectory', () => {
+describe('uploadTrajectory', () => {
   const onProgress = vi.fn();
   const requestOptions = {
     method: 'POST',
@@ -156,12 +156,12 @@ describe('addTrajectory', () => {
       json: async () => Promise.resolve(mockResponseDB),
     });
 
-    await addTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026', onProgress);
+    await uploadTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026', 2, onProgress);
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledTimes(1);
       expect(global.fetch).toHaveBeenCalledWith(
-        `https://mockapi.com/v1/trajectory?trajectoryType=AREA&trajectoryToUse=area_BP_23_v6&horizon=2025-2026`,
+        `https://mockapi.com/v1/trajectory?trajectoryType=AREA&trajectoryToUse=area_BP_23_v6&horizon=2025-2026&studyId=2`,
         requestOptions,
       );
     });
@@ -174,7 +174,7 @@ describe('addTrajectory', () => {
     });
 
     await expect(async () =>
-      addTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026', onProgress),
+      uploadTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026', 2, onProgress),
     ).rejects.toThrowError('Failed to import trajectory into data base');
   });
 
@@ -183,7 +183,7 @@ describe('addTrajectory', () => {
     global.fetch = vi.fn().mockRejectedValueOnce(new Error('Network error'));
 
     await expect(async () =>
-      addTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026', onProgress),
+      uploadTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026', 2, onProgress),
     ).rejects.toThrowError('Network error');
   });
 });
