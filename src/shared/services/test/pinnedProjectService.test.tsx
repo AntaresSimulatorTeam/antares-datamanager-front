@@ -50,7 +50,10 @@ describe('pinProject', () => {
   it('should handle pin project error ', async () => {
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: false,
-      text: async () => 'Error message',
+      json: async () =>
+        Promise.resolve({
+          message: 'Error message',
+        }),
     });
 
     await expect(async () => pinProject(projectId)).rejects.toThrowError('Error message');
@@ -100,7 +103,7 @@ describe('fetchPinnedProjects', () => {
   it('should fetch pinned project list', async () => {
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: true,
-      json: async () => mockResponse,
+      json: async () => Promise.resolve(mockResponse),
     });
 
     const result = await fetchPinnedProjects(userId);

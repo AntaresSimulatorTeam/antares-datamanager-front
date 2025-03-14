@@ -52,8 +52,8 @@ export const pinProject = async (projectId: string): Promise<ProjectInfo | Error
   });
 
   if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`${errorText}`);
+    const error = (await response.json()) as Error;
+    throw new Error(`${error.message}`);
   }
 
   return (await response.json()) as ProjectInfo;
