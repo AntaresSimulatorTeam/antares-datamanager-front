@@ -133,15 +133,10 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
           } else {
             if (index === 0 && updatedData[0]?.trajectory) {
               await unlinkTrajectoryFromStudy(updatedData[0].trajectory.id, study.id);
-              if (updatedData[1].trajectory && updatedData[1].status === TRAJECTORY_SELECTION_STATUS.OK) {
-                await unlinkTrajectoryFromStudy(updatedData[1].trajectory.id, study.id);
-              }
-              updatedData.forEach((rowData) => {
-                rowData.trajectory = null;
-                rowData.status = TRAJECTORY_SELECTION_STATUS.MISSING;
-              });
+              updatedData[0].trajectory = null;
+              updatedData[0].status = TRAJECTORY_SELECTION_STATUS.MISSING;
               dispatch?.({
-                type: STUDY_ACTION.CLEAR_AREA_LINK_TRAJECTORY,
+                type: STUDY_ACTION.CLEAR_AREA_TRAJECTORY,
               } as StudyActionType);
               setReadOnly({ '0': false, '1': true });
             } else if (index === 1 && updatedData[1].trajectory) {

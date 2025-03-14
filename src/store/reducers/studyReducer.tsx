@@ -15,12 +15,11 @@ export const studyReducer = (prevState: StudyState, action?: StudyActionType): S
         return { ...prevState, [`${TRAJECTORY_TYPE.AREA}`]: action.payload };
       case STUDY_ACTION.ADD_TRAJECTORY_LINK:
         return { ...prevState, [`${TRAJECTORY_TYPE.LINK}`]: action.payload };
-      case STUDY_ACTION.CLEAR_AREA_LINK_TRAJECTORY:
+      case STUDY_ACTION.CLEAR_AREA_TRAJECTORY:
         return {
           ...prevState,
           isStudyGenerated: false,
           [`${TRAJECTORY_TYPE.AREA}`]: null,
-          [`${TRAJECTORY_TYPE.LINK}`]: null,
         };
       case STUDY_ACTION.CLEAR_LINK_TRAJECTORY:
         return { ...prevState, isStudyGenerated: false, [`${TRAJECTORY_TYPE.LINK}`]: null };

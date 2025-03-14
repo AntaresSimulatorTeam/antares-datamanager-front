@@ -33,7 +33,14 @@ const getAreaLinkTableHeaders = (
       return (
         <div className="inline-flex w-[180px] items-center gap-2">
           {getValue()}
-          {trajectory ? <ButtonPreview label={'View'} icon={StdIconId.Preview} position={'left'} /> : null}
+          {trajectory ? (
+            <ButtonPreview
+              label={'View'}
+              icon={StdIconId.Preview}
+              position={'left'}
+              color={row.getReadOnly() ? 'acc1-700' : 'acc1-600'}
+            />
+          ) : null}
         </div>
       );
     },
@@ -45,10 +52,14 @@ const getAreaLinkTableHeaders = (
       return trajectory ? (
         <div className="inline-flex w-[850px] space-x-2 py-3">
           <span>{trajectory.trajectoryName}</span>
-          <RdsIconButton icon={RdsIconId.Delete} size="small" onClick={() => {
-            setErrorInfo({ index: row.index, message: '' });
-            void handleUpdate(row.index, 'empty');
-          }} />
+          <RdsIconButton
+            icon={RdsIconId.Delete}
+            size="small"
+            onClick={() => {
+              setErrorInfo({ index: row.index, message: '' });
+              void handleUpdate(row.index, 'empty');
+            }}
+          />
         </div>
       ) : (
         <div className="inline-flex w-[850px] items-center space-x-2">
