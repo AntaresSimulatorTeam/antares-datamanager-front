@@ -160,7 +160,7 @@ describe('useHandlePinnedProjectList', () => {
 
   it('should call handlePinProject and catch error when pinProject throws one', async () => {
     const mockPinProject = pinProject as Mock;
-    mockPinProject.mockRejectedValueOnce('error');
+    mockPinProject.mockRejectedValueOnce({ message: 'error' });
 
     mockUsePinnedProjectDispatch.mockReturnValue(mockDispatch);
 
@@ -183,7 +183,7 @@ describe('useHandlePinnedProjectList', () => {
       expect(notifyToast).toHaveBeenCalledWith({
         id,
         type: 'error',
-        message: 'Project already pinned',
+        message: 'error',
       });
     });
   });
