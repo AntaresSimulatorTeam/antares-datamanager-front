@@ -55,7 +55,8 @@
     "@by": "By"
   },
   "projectDetails": {
-    "@buttonEdit": "Edit"
+    "@buttonEdit": "Edit",
+    "@bannerProjectName": "Project: {{name}}"
   },
   "projectModal": {
     "@keyword_already_exists": "Keyword already exists",
@@ -76,6 +77,9 @@
     "@delete": "Delete"
   },
   "studyDetails": {
+    "@bannerStudyName": "Study: {{name}}",
+    "@bannerHorizon": "Horizon: {{horizon}}",
+    "@bannerCreatedBy": "By: {{createdBy}}",
     "@hypothesis": "Hypothesis",
     "@area": "Area",
     "@link": "Link",

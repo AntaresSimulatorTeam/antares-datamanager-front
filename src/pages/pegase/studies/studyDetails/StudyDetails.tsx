@@ -7,7 +7,6 @@
 import { ReactNode, useState } from 'react';
 import { Location, useLocation } from 'react-router-dom';
 import StudyHeader from './StudyHeader.tsx';
-import StudyDetailsContent from './StudyDetailsContent';
 import { RdsDivider } from 'rte-design-system-react';
 import StudyNavigationMenu from '@/pages/pegase/studies/studyDetails/StudyNavigationMenu';
 import { StudyDTO } from '@/shared/types';
@@ -17,6 +16,7 @@ import { createStudy } from '@/shared/services/studyService.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { ButtonWithStdIcon } from '@/components/button/ButtonWithStdIcon.tsx';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
+import { DetailsContent } from '@/components/banner/DetailsContent.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 
 interface StudyState {
@@ -53,7 +53,7 @@ const StudyDetails = () => {
       <StudyHeader projectName={study.project} studyName={study.name} />
       <RdsDivider />
       <div className="flex flex-col">
-        <StudyDetailsContent study={study} />
+        <DetailsContent content={study} />
       </div>
       <div className="flex gap-4 px-3 py-2">
         <div className="flex h-10 items-end self-stretch">
