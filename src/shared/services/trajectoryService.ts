@@ -103,7 +103,7 @@ export const getStudyTrajectories = async (
   studyId: number,
   trajectoryType?: TRAJECTORY_TYPE,
 ): Promise<DbTrajectory[] | Error> => {
-  const urlApi = `${TRAJECTORY_ENDPOINT}?studyId=${studyId}&trajectoryType=${trajectoryType}`;
+  const urlApi = `${TRAJECTORY_ENDPOINT}?studyId=${studyId}&trajectoryType=${trajectoryType ?? ''}`;
 
   const response = await AuthService.authFetch(urlApi);
   if (!response.ok) {
