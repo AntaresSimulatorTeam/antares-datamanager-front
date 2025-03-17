@@ -50,7 +50,7 @@ const getAreaLinkTableHeaders = (
   columnHelper.accessor('trajectory', {
     header: t('studyDetails.@trajectory'),
     cell: ({ row }) => {
-      const { trajectory } = row.original;
+      const { trajectory, status } = row.original;
       const textClass = studyStatus === StudyStatus.GENERATED ? 'text-primary-600' : 'text-gray-900';
       return trajectory ? (
         <div className="inline-flex w-[850px] space-x-2 py-3">

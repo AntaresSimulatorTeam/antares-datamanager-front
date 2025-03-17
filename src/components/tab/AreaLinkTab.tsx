@@ -170,12 +170,12 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
         if (status === 'empty' && trajectoryId) {
           // Reset trajectory line to initial state in case of trajectory error status
           if (trajectoryId || updatedData[index].status === TRAJECTORY_SELECTION_STATUS.ERROR) {
-            if (trajectoryId) {
+            if (trajectoryId && updatedData[index].status === TRAJECTORY_SELECTION_STATUS.OK) {
               await unlinkTrajectoryFromStudy(trajectoryId, study.id);
-              dispatch?.({
-                type: index === 0 ? STUDY_ACTION.CLEAR_AREA_TRAJECTORY : STUDY_ACTION.CLEAR_LINK_TRAJECTORY,
-              } as StudyActionType);
             }
+            dispatch?.({
+              type: index === 0 ? STUDY_ACTION.CLEAR_AREA_TRAJECTORY : STUDY_ACTION.CLEAR_LINK_TRAJECTORY,
+            } as StudyActionType);
             setData((prev) => {
               prev[index].trajectory = null;
               prev[index].status = TRAJECTORY_SELECTION_STATUS.MISSING;
@@ -186,7 +186,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
         }
 
         if (status === 'error' && trajectoryId && trajectoryLabel) {
-          updatedData[index].trajectory = {
+          const newDbTrajectory = {
             id: trajectoryId,
             trajectoryName: trajectoryLabel,
             type: null,
@@ -194,9 +194,13 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
             userName: null,
             creationDate: null,
           };
-          updatedData[index].status = TRAJECTORY_SELECTION_STATUS.ERROR;
+          setData((prev) => {
+            prev[index].trajectory = newDbTrajectory;
+            prev[index].status = TRAJECTORY_SELECTION_STATUS.ERROR;
+            return prev;
+          });
         }
-      } catch {
+      } catch (error) {
         // Reset trajectory line to initial state
         setData((prev) => {
           prev[index].trajectory = null;
