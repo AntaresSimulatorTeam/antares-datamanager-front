@@ -5,7 +5,7 @@ import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 
 const addTrajectories = (prevState: Partial<StudyState>, trajectories: DbTrajectory[]): Partial<StudyState> => {
   const studyState = {};
-  trajectories.forEach((trajectory) => Object.assign(studyState, { [`${trajectory.type}`]: trajectory }));
+  trajectories.forEach((trajectory) => Object.assign(studyState, { [`${trajectory?.type}`]: trajectory }));
   return { ...prevState, ...studyState };
 };
 

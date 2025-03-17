@@ -20,7 +20,7 @@ const columnHelper = createColumnHelper<AreaAndLinkRowData>();
 
 const getAreaLinkTableHeaders = (
   t: (value: string) => string,
-  handleUpdate: (index: number, status: RowStatus, trajectory?: SelectOption) => Promise<void>,
+  handleUpdate: (index: number, status: RowStatus, trajectoryId: number, trajectoryLabel?: string) => Promise<void>,
   handleImport: (index: number) => Promise<void>,
   handlerSearch: (index: number, value: string | undefined) => Promise<SelectOption[] | undefined>,
   error: { index: number; message: string },
@@ -61,7 +61,7 @@ const getAreaLinkTableHeaders = (
               size="small"
               onClick={() => {
                 setErrorInfo({ index: row.index, message: '' });
-                void handleUpdate(row.index, 'empty');
+                void handleUpdate(row.index, 'empty', trajectory.id);
               }}
             />
           )}
@@ -71,7 +71,7 @@ const getAreaLinkTableHeaders = (
           <SelectAndSearchableInput
             onSelect={(value: SelectOption) => {
               setErrorInfo({ index: row.index, message: '' });
-              void handleUpdate(row.index, 'success', value);
+              void handleUpdate(row.index, 'success', value.id);
             }}
             setSearchTerm={async (value: string | undefined) => await handlerSearch(row.index, value)}
             defaultPlaceHolder={

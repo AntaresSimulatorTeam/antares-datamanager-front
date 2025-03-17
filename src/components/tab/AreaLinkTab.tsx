@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import {
   fetchTrajectoriesFromDB,
   fetchTrajectoriesFromFS,
+  getStudyTrajectories,
   linkTrajectoryToStudy,
   unlinkTrajectoryFromStudy,
 } from '@/shared/services/trajectoryService.ts';
@@ -45,12 +46,12 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
   const [data, setData] = useState<AreaAndLinkRowData[]>([
     {
       hypothesis: 'Areas',
-      trajectory: null,
+      trajectory: studyState[`${TRAJECTORY_TYPE.AREA}`] ?? null,
       status: TRAJECTORY_SELECTION_STATUS.MISSING,
     },
     {
       hypothesis: 'Links',
-      trajectory: null,
+      trajectory: studyState[`${TRAJECTORY_TYPE.LINK}`] ?? null,
       status: TRAJECTORY_SELECTION_STATUS.MISSING,
     },
   ]);
@@ -58,27 +59,50 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
     '0': false,
     '1': !studyState[`${TRAJECTORY_TYPE.AREA}`],
   });
-  const trajectoryArea = studyState[`${TRAJECTORY_TYPE.AREA}`] ?? null;
-  const trajectoryLink = studyState[`${TRAJECTORY_TYPE.LINK}`] ?? null;
 
   useEffect(() => {
-    setData([
-      {
-        hypothesis: 'Areas',
-        trajectory: trajectoryArea,
-        status: trajectoryArea ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
-      },
-      {
-        hypothesis: 'Links',
-        trajectory: trajectoryLink,
-        status: trajectoryLink ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
-      },
-    ]);
-    setReadOnly({
-      '0': false,
-      '1': !trajectoryArea || (!trajectoryLink && studyState?.studyStatus === StudyStatus.GENERATED),
-    });
-  }, [trajectoryArea, trajectoryLink, studyState?.studyStatus]);
+    const getTrajectories = async () => {
+      let trajectoryAreaResult;
+      let trajectoryLinkResult;
+      try {
+        [trajectoryAreaResult, trajectoryLinkResult] = await Promise.all([
+          getStudyTrajectories(study.id, TRAJECTORY_TYPE.AREA),
+          getStudyTrajectories(study.id, TRAJECTORY_TYPE.LINK),
+        ]);
+      } finally {
+        if (
+          (trajectoryAreaResult as DbTrajectory[])?.length > 0 ||
+          (trajectoryLinkResult as DbTrajectory[])?.length > 0
+        ) {
+          const trajectoryArea = (trajectoryAreaResult as DbTrajectory[])[0] ?? null;
+          const trajectoryLink = (trajectoryLinkResult as DbTrajectory[])[0] ?? null;
+          setData([
+            {
+              hypothesis: 'Areas',
+              trajectory: trajectoryArea,
+              status: trajectoryArea ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+            },
+            {
+              hypothesis: 'Links',
+              trajectory: trajectoryLink,
+              status: trajectoryLink ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+            },
+          ]);
+          setReadOnly({
+            '0': false,
+            '1': !trajectoryArea || (!trajectoryLink && studyState?.studyStatus === StudyStatus.GENERATED),
+          });
+          dispatch?.({
+            type: STUDY_ACTION.ADD_TRAJECTORIES,
+            payload: [trajectoryArea, trajectoryLink].filter(Boolean),
+          });
+        }
+      }
+    };
+    if (study?.trajectoryIds.length > 0) {
+      void getTrajectories();
+    }
+  }, []);
 
   const handleFetchTrajectoriesFS = async (index: number) => {
     try {
@@ -93,13 +117,13 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
   };
 
   const handleTrajectoryUpdate = useCallback(
-    async (index: number, status: RowStatus, trajectory?: SelectOption | DbTrajectory) => {
+    async (index: number, status: RowStatus, trajectoryId: number, trajectoryLabel?: string) => {
       const updatedData = [...data];
       try {
-        if (status === 'success' && trajectory?.id) {
+        if (status === 'success' && trajectoryId) {
           const payload = (await linkTrajectoryToStudy(
             index === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
-            trajectory.id,
+            trajectoryId,
             study.id,
           )) as DbTrajectory;
           // Update context
@@ -114,11 +138,11 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
         }
 
         // Handle deletion case for areas
-        if (status === 'empty') {
+        if (status === 'empty' && trajectoryId) {
           // Reset trajectory line to initial state in case of trajectory error status
-          if (updatedData[index]?.trajectory || updatedData[index].status === TRAJECTORY_SELECTION_STATUS.ERROR) {
-            if (updatedData[index]?.trajectory) {
-              await unlinkTrajectoryFromStudy(updatedData[index].trajectory.id, study.id);
+          if (trajectoryId || updatedData[index].status === TRAJECTORY_SELECTION_STATUS.ERROR) {
+            if (trajectoryId) {
+              await unlinkTrajectoryFromStudy(trajectoryId, study.id);
               dispatch?.({
                 type: index === 0 ? STUDY_ACTION.CLEAR_AREA_TRAJECTORY : STUDY_ACTION.CLEAR_LINK_TRAJECTORY,
               } as StudyActionType);
@@ -129,10 +153,10 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
           }
         }
 
-        if (status === 'error' && trajectory) {
+        if (status === 'error' && trajectoryId && trajectoryLabel) {
           updatedData[index].trajectory = {
-            id: (trajectory as SelectOption).id,
-            trajectoryName: (trajectory as SelectOption).label,
+            id: trajectoryId,
+            trajectoryName: trajectoryLabel,
             type: null,
             version: null,
             userName: null,
@@ -168,9 +192,11 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
   );
 
   const closeModal = useCallback(
-    async (status: RowStatus, value?: DbTrajectory | SelectOption) => {
+    async (status?: RowStatus, valueId?: number, valueLabel?: string) => {
       try {
-        await handleTrajectoryUpdate(rowIndexSelected, status, value);
+        if (status && valueId && valueLabel) {
+          await handleTrajectoryUpdate(rowIndexSelected, status, valueId, valueLabel);
+        }
       } finally {
         toggleModal();
       }
