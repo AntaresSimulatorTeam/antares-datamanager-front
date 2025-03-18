@@ -12,15 +12,16 @@ import { dismissToast, notifyToast, NotifyWithActionProps } from '@/shared/notif
 import { useTranslation } from 'react-i18next';
 import { useProjectDispatch } from '@/store/contexts/ProjectContext';
 import { PROJECT_ACTION } from '@/shared/enum/project.ts';
+import { useUser } from '@/store/contexts/UserContext.tsx';
 
 export const useHandlePinnedProjectList = () => {
-  const userId = 'me00247';
+  const { user } = useUser();
   const dispatch = useProjectDispatch();
   const { t } = useTranslation();
 
   const getPinnedProjects = useCallback(async () => {
     try {
-      const projects = (await fetchPinnedProjects(userId)) as ProjectInfo[];
+      const projects = (await fetchPinnedProjects(user?.profile.sub)) as ProjectInfo[];
       if (projects?.length) {
         dispatch?.({
           type: PROJECT_ACTION.INIT_PINNED_PROJECT_LIST,
@@ -44,7 +45,7 @@ export const useHandlePinnedProjectList = () => {
   const handlePinProject = useCallback(async (projectId: string) => {
     const toastId = uuidv4();
     try {
-      const newProject = await pinProject(projectId);
+      const newProject = await pinProject(projectId, user?.profile.sub);
       if (newProject) {
         dispatch?.({
           type: PROJECT_ACTION.ADD_PINNED_PROJECT,
@@ -76,8 +77,7 @@ export const useHandlePinnedProjectList = () => {
   const handleUnpinProject = useCallback(async (projectId: string) => {
     let apiCallTimeout: number | null = null;
     const toastId = uuidv4();
-    const userId = 'me00247';
-    const currentPinnedProjects = await fetchPinnedProjects(userId);
+    const currentPinnedProjects = await fetchPinnedProjects(user?.profile.sub);
 
     dispatch?.({
       type: PROJECT_ACTION.UNPIN_PINNED_PROJECT,
@@ -102,7 +102,7 @@ export const useHandlePinnedProjectList = () => {
     } as NotifyWithActionProps);
 
     apiCallTimeout = setTimeout(() => {
-      unpinProject(userId, projectId).catch((error) => {
+      unpinProject(projectId, user?.profile.sub).catch((error: unknown) => {
         dispatch?.({
           type: PROJECT_ACTION.INIT_PINNED_PROJECT_LIST,
           payload: currentPinnedProjects,
@@ -111,7 +111,7 @@ export const useHandlePinnedProjectList = () => {
         notifyToast({
           id: toastId,
           type: 'error',
-          message: `${error.message}`,
+          message: `${(error as Error).message}`,
         });
       });
     }, 4000) as unknown as number;
