@@ -43,7 +43,7 @@ const ProjectContent = () => {
       setSearchTerm('');
     } else {
       setActiveChip(true);
-      setSearchTerm(user?.profile.sub);
+      setSearchTerm(user?.profile.name);
     }
   };
 
