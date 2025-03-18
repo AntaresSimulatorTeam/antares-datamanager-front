@@ -12,6 +12,7 @@ import HorizonInput from '@/components/input/HorizonInput.tsx';
 import ProjectInput from '@/components/input/ProjectInput.tsx';
 import { saveStudy } from '@/shared/services/studyService';
 import { StudyDTO } from '@/shared/types';
+import { useUser } from '@/store/contexts/UserContext.tsx';
 
 interface StudyCreationModalProps {
   isOpen?: boolean;
@@ -35,11 +36,12 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
   const [trajectoryIds] = useState<number[]>(study?.trajectoryIds || []);
   const [isFormValid, setIsFormValid] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const { user } = useUser();
 
   const saveStudyHandler = async () => {
     const studyData = {
       name: studyName,
-      createdBy: 'currentUser', // Replace with the actual user identifier
+      createdBy: user?.profile.sub,
       keywords,
       project: projectName,
       horizon,
