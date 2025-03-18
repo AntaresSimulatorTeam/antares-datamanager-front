@@ -145,7 +145,6 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
 
   const handleTrajectoryUpdate = useCallback(
     async (index: number, status: RowStatus, trajectoryId: number, trajectoryLabel?: string) => {
-      const updatedData = [...data];
       try {
         if (status === 'success' && trajectoryId) {
           const payload = (await linkTrajectoryToStudy(
@@ -167,22 +166,20 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
         }
 
         // Handle deletion case for areas
-        if (status === 'empty' && trajectoryId) {
+        if (status === 'empty' || (status === 'emptyError' && trajectoryId)) {
           // Reset trajectory line to initial state in case of trajectory error status
-          if (trajectoryId || updatedData[index].status === TRAJECTORY_SELECTION_STATUS.ERROR) {
-            if (trajectoryId && updatedData[index].status === TRAJECTORY_SELECTION_STATUS.OK) {
-              await unlinkTrajectoryFromStudy(trajectoryId, study.id);
-            }
-            dispatch?.({
-              type: index === 0 ? STUDY_ACTION.CLEAR_AREA_TRAJECTORY : STUDY_ACTION.CLEAR_LINK_TRAJECTORY,
-            } as StudyActionType);
-            setData((prev) => {
-              prev[index].trajectory = null;
-              prev[index].status = TRAJECTORY_SELECTION_STATUS.MISSING;
-              return prev;
-            });
-            setReadOnly({ '0': false, '1': index === 0 });
+          if (trajectoryId && status === 'empty') {
+            await unlinkTrajectoryFromStudy(trajectoryId, study.id);
           }
+          dispatch?.({
+            type: index === 0 ? STUDY_ACTION.CLEAR_AREA_TRAJECTORY : STUDY_ACTION.CLEAR_LINK_TRAJECTORY,
+          } as StudyActionType);
+          setData((prev) => {
+            prev[index].trajectory = null;
+            prev[index].status = TRAJECTORY_SELECTION_STATUS.MISSING;
+            return prev;
+          });
+          setReadOnly({ '0': false, '1': index === 0 });
         }
 
         if (status === 'error' && trajectoryId && trajectoryLabel) {
