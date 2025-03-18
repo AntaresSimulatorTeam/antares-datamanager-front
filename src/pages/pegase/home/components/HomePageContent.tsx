@@ -27,7 +27,7 @@ const HomePageContent = () => {
       searchStudy('');
     } else {
       setActiveChip(true);
-      searchStudy(user?.profile.name);
+      searchStudy(user?.profile.sub);
     }
   };
 
