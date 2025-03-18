@@ -21,6 +21,11 @@ export const DetailsContent = ({ content }: DetailsContentProps) => {
   return (
     <div className="flex flex-col gap-3 p-3">
       <div className="group flex flex-col gap-3 rounded bg-primary-100 p-2" role="banner">
+        {(content as ProjectInfo)?.description && (
+          <div className="text-base justify-between text-left font-sans font-normal text-gray-900">
+            {(content as ProjectInfo).description}
+          </div>
+        )}
         <div className="flex items-center justify-between font-sans font-light text-gray-500">
           <div className="flex items-center gap-3">
             <div className="flex flex-[1_0_0] items-center gap-6">
