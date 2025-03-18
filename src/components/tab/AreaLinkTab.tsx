@@ -166,7 +166,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
         }
 
         // Handle deletion case for areas
-        if (status === 'empty' || (status === 'emptyError' && trajectoryId)) {
+        if ((trajectoryId && status === 'empty') || status === 'emptyError') {
           // Reset trajectory line to initial state in case of trajectory error status
           if (trajectoryId && status === 'empty') {
             await unlinkTrajectoryFromStudy(trajectoryId, study.id);
