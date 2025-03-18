@@ -77,7 +77,7 @@ export const ProjectCreationModal = ({ onClose }: ProjectCreationModalProps) => 
       <RdsModal.Content>
         <div className="flex w-8/12 flex-col items-start gap-2">
           <RdsInputText
-            label="Name"
+            label={t('modal.@input_name')}
             value={name}
             onChange={(text: string) => {
               if (text.length <= 40) setName(text || '');
@@ -90,13 +90,13 @@ export const ProjectCreationModal = ({ onClose }: ProjectCreationModalProps) => 
           />
           <div className="flex w-full [&_textarea]:min-h-[300px] [&_textarea]:resize-none">
             <RdsInputTextArea
-              label="Description"
+              label={t('modal.@input_description')}
               value={description}
               onChange={(text) => {
                 if (text.length <= 500) setDescription(text || '');
               }}
               maxLength={500}
-              placeHolder="Add a few lines to describe your project..."
+              placeHolder={t('projectDetails.@placeholder_description')}
             />
           </div>
           <KeywordsInput
@@ -109,11 +109,11 @@ export const ProjectCreationModal = ({ onClose }: ProjectCreationModalProps) => 
         </div>
       </RdsModal.Content>
       <RdsModal.Footer>
-        <RdsButton label="Cancel" onClick={onClose} color="secondary" />
+        <RdsButton label={t('components.quickAccess.@cancel')} onClick={onClose} color="secondary" />
         <RdsButton
           icon={RdsIconId.Add}
-          label="Create"
-          onClick={handleCreateProject}
+          label={t('components.buttonLabel.@cancel')}
+          onClick={() => void handleCreateProject}
           variant="contained"
           color="primary"
           disabled={!isFormValid}

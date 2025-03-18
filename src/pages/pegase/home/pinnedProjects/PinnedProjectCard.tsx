@@ -60,8 +60,12 @@ const PinnedProjectCards = () => {
             title={project.name}
             dropdownOptions={[
               pinOption(project.pinned ?? false, () => handleUnpinProject(project.id)), // Toggle pin/unpin
-              settingOption(() => {}, t('project.@setting')),
-              deleteOption(() => deleteProject(project.id), t('project.@delete'), project.studies?.length > 0),
+              settingOption(() => {}, t('components.buttonLabel.@setting')),
+              deleteOption(
+                () => deleteProject(project.id),
+                t('components.buttonLabel.@delete'),
+                project.studies?.length > 0,
+              ),
             ]}
             id={project.id}
             onClick={() => handleCardClick(project.id, project.name)}

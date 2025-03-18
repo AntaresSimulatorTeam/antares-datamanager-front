@@ -127,7 +127,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
         <RdsButton label={t('components.quickAccess.@cancel')} onClick={onClose} color="secondary" />
         <RdsButton
           icon={study ? RdsIconId.ContentCopy : RdsIconId.Add}
-          label={study ? t('study.@duplicate') : t('studyModal.@button_create')}
+          label={study ? t('components.duplicate.@duplicate') : t('components.buttonLabel.@create')}
           onClick={() => void saveStudyHandler()}
           variant="contained"
           color="primary"

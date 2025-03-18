@@ -67,7 +67,7 @@ const StudyDetails = () => {
           <div className="flex items-center gap-2 self-end">
             {!AREA && <div className={'text-error-600'}>{t('studyDetails.@add_trajectories_message')}</div>}
             <ButtonWithStdIcon
-              label={t('studyDetails.@generate')}
+              label={t('components.buttonLabel.@generate')}
               onClick={() => void handleGenerateStudy()}
               disabled={!AREA || studyStatus === StudyStatus.GENERATED}
               icon={StdIconId.CheckCircle}

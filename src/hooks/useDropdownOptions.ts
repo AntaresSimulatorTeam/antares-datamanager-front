@@ -18,7 +18,7 @@ export const useDropdownOptions = () => {
     (onClick: () => void, label?: string, disabled?: boolean): RdsDropdownOption =>
       ({
         key: 'setting',
-        label: label ?? t('project.@setting'),
+        label: label ?? t('components.buttonLabel.@setting'),
         value: 'setting',
         onItemClick: onClick,
         disabled,
@@ -32,7 +32,7 @@ export const useDropdownOptions = () => {
     (onClick: () => void, label?: string, disabled?: boolean): RdsDropdownOption =>
       ({
         key: 'delete',
-        label: label ?? t('project.@delete'),
+        label: label ?? t('components.buttonLabel.@delete'),
         value: 'delete',
         icon: RdsIconId.Delete,
         onItemClick: onClick,

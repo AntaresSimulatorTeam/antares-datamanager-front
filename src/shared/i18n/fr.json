@@ -13,6 +13,16 @@
     "quickAccess": {
       "confirmUnpin": "Projet détaché avec succes",
       "@cancel": "Annuler"
+    },
+    "buttonLabel": {
+      "@create": "Créer",
+      "@open": "Ouvrir",
+      "@duplicate": "Dupliquer",
+      "@setting": "Setting",
+      "@delete": "Supprimer",
+      "@pin": "Épingler",
+      "@unpin": "Désépingler",
+      "@close": "Fermer"
     }
   },
   "Pegase": {
@@ -40,11 +50,6 @@
     "@my_projects": "Mes projets"
   },
   "project": {
-    "@setting": "Setting",
-    "@delete": "Supprimer",
-    "@pin": "Épingler",
-    "@unpin": "Désépingler",
-    "@close": "Fermer",
     "@created": "Crée le",
     "@by": "Par",
     "@new_study": "Creer une étude"
@@ -58,11 +63,6 @@
     "@keyword_minimum_error": "Le mot-clé doit avoir à minimum {{min}} lettres",
     "@keyword_maximum_error": "Le mot-clé ne doit pas dépasser {{max}} lettres",
     "@keyword_max_keys_errors": "Il n'est pas possible d'ajouter plus que {{maxNbKey}} mot-clés"
-  },
-  "study": {
-    "@open": "Ouvrir",
-    "@duplicate": "Dupliquer",
-    "@delete": "Effacer"
   },
   "studyDetails": {
     "@hypothesis": "Hypothèse",

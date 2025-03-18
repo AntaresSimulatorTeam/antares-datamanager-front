@@ -16,6 +16,24 @@
     },
     "selectAnsSearchInput": {
       "@emptyList": "No result found"
+    },
+    "modal": {
+      "@input_name": "Name",
+      "@input_description": "Description"
+    },
+    "buttonLabel": {
+      "@create": "Create",
+      "@open": "Open",
+      "@duplicate": "Duplicate",
+      "@delete": "Delete",
+      "@setting": "Setting",
+      "@pin": "Pin",
+      "@unpin": "Unpin",
+      "@close": "Close",
+      "@edit": "Edit",
+      "@preview": "View",
+      "@generate": "Generate",
+      "@import": "Import"
     }
   },
   "Pegase": {
@@ -46,16 +64,11 @@
     "@study_table_title": "Last studies"
   },
   "project": {
-    "@setting": "Setting",
-    "@delete": "Delete",
-    "@pin": "Pin",
-    "@unpin": "Unpin",
-    "@close": "Close",
     "@created": "Created",
     "@by": "By"
   },
   "projectDetails": {
-    "@buttonEdit": "Edit"
+    "@placeholder_description": "Add a few lines to describe your project..."
   },
   "projectModal": {
     "@keyword_already_exists": "Keyword already exists",
@@ -66,14 +79,7 @@
   },
   "studyModal": {
     "@new_study": "Create a study",
-    "@study_creation_placeholder": "Name your study...",
-    "@button_create": "Create",
-    "@input_name": "Name"
-  },
-  "study": {
-    "@open": "Open",
-    "@duplicate": "Duplicate",
-    "@delete": "Delete"
+    "@study_creation_placeholder": "Name your study..."
   },
   "studyDetails": {
     "@hypothesis": "Hypothesis",
@@ -90,12 +96,9 @@
     "@select_file": "Select a file",
     "@select_file_fs_error": "Not such files on file system",
     "@import_from_file_system": "Select {{trajectoryType}} from File System",
-    "@import": "Import",
     "@import_status_done": "OK",
     "@import_status_missing": "Missing",
     "@import_status_error": "Error",
-    "@preview": "View",
-    "@generate": "Generate",
     "@add_trajectories_message": "Please add Areas trajectories first"
   }
 }

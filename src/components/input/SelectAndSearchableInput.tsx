@@ -113,22 +113,22 @@ const SelectAndSearchableInput = ({
         value={valueInput}
         disabled={isInputDisabled}
       />
-      {isDropdownOpen && optionsSelection && optionsSelection?.length > 0 && (
+      {isDropdownOpen && !!optionsSelection?.length && (
         <div
-          className="absolute left-0 top-7 z-50 max-h-14 w-full overflow-y-auto rounded border border-gray-300 bg-gray-w shadow-2 outline-none"
+          className="max-h-26 absolute left-0 top-7 z-50 w-full overflow-y-auto rounded border border-gray-300 bg-gray-w shadow-2 outline-none"
           onMouseDown={(e) => e.preventDefault()}
           ref={dropdownList}
           tabIndex={0}
           onBlur={() => setIsDropdownOpen(false)}
         >
-          {optionsSelection.map((trajectory: SelectOption, index) => (
+          {optionsSelection.map((option: SelectOption, index) => (
             <div
               key={`option-item-${index}`}
               role="option"
               className="cursor-pointer px-2 py-1 hover:bg-gray-200"
-              onClick={() => handleSelectOption(trajectory)}
+              onClick={() => handleSelectOption(option)}
             >
-              {trajectory.label}
+              {option.label}
             </div>
           ))}
         </div>

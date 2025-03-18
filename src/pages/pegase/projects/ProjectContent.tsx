@@ -77,8 +77,12 @@ const ProjectContent = () => {
         {(projects || []).map((project) => {
           const dropdownItems = [
             pinOption(false, async () => handlePinProject(project.id)),
-            settingOption(() => {}, t('project.@setting')),
-            deleteOption(() => deleteProject(project.id), t('project.@delete'), project.studies?.length > 0),
+            settingOption(() => {}, t('components.buttonLabel.@setting')),
+            deleteOption(
+              () => deleteProject(project.id),
+              t('components.buttonLabel.@delete'),
+              project.studies?.length > 0,
+            ),
           ];
           return (
             <PegaseCard

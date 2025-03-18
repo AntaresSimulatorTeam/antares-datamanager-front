@@ -71,25 +71,25 @@ export const ImportTrajectoryModal = ({
         })}
       </RdsModal.Title>
       <RdsModal.Content>
-        <div className="inline-flex w-full items-start gap-4" style={{ height: '110px' }}>
-          <div className="w-3/5">
+        <div className="w-full items-start gap-4">
+          <div className="absolute">
             <SelectAndSearchableInput
-              options={options}
+              options={options ? [...options, ...options, ...options] : options}
               defaultPlaceHolder={t('studyDetails.@select_trajectory')}
               onSelect={handleSelectOption}
               resetField={resetField}
             />
           </div>
-          <div className="flex w-3/5 flex-col items-start pt-2">
+          <div className="relative float-right w-2/5 flex-col pt-2">
             <ProgressBar statusFile={fileStatus} progressValue={progress} />
           </div>
         </div>
       </RdsModal.Content>
       <RdsModal.Footer>
-        <RdsButton label="Cancel" onClick={() => void onClose()} color="secondary" />
+        <RdsButton label={t('components.quickAccess.@cancel')} onClick={() => void onClose()} color="secondary" />
         <RdsButton
           icon={RdsIconId.Add}
-          label={t('studyDetails.@import')}
+          label={t('components.buttonLabel.@import')}
           onClick={() => trajectorySelected && void handleImportTrajectory(trajectorySelected)}
           variant="contained"
           color="primary"

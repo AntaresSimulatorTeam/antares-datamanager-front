@@ -116,15 +116,15 @@ const StudyTableDisplay = ({ searchStudy, projectId, projectInfoName }: StudyTab
         <div className="flex gap-2">
           {selectedRowId !== undefined ? (
             <>
-              <RdsButton label={t('study.@open')} onClick={handleRowClick} variant="outlined" />
+              <RdsButton label={t('components.buttonLabel.@open')} onClick={handleRowClick} variant="outlined" />
               <RdsButton
-                label={t('study.@duplicate')}
+                label={t('components.buttonLabel.@duplicate')}
                 onClick={handleDuplicate}
                 variant="outlined"
                 disabled={!isDuplicateActive}
               />
               <RdsButton
-                label={t('study.@delete')}
+                label={t('components.buttonLabel.@delete')}
                 onClick={handleDeleteClick}
                 variant="outlined"
                 disabled={!isDeleteActive}
