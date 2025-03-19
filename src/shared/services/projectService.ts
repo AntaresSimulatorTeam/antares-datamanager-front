@@ -6,7 +6,7 @@
 
 import { PROJECT_AUTOCOMPLETE_ENDPOINT, PROJECT_ENDPOINT, PROJECT_SEARCH_ENDPOINT } from '@/shared/const/apiEndPoint';
 import { AuthService } from '@/shared/services/authService.ts';
-import { ProjectInfo, ProjectResponse, PaginatedResponse } from '@/shared/types';
+import { PaginatedResponse, ProjectInfo, ProjectResponse } from '@/shared/types';
 
 /**
  * Delete project
@@ -77,7 +77,7 @@ export const fetchProjectFromSearchTerm = async (
     `${PROJECT_SEARCH_ENDPOINT}?page=${current + 1}&size=${intervalSize}&search=${searchTerm || ''}`,
   );
 
-  if (!response.ok) {
+  if (!response?.ok) {
     const errorText = await response.text();
     const errorData = JSON.parse(errorText) as Error;
     throw new Error(`${errorData.message}`);
