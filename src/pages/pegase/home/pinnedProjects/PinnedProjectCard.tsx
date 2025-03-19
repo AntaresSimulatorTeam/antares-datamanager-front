@@ -11,45 +11,20 @@ import { useTranslation } from 'react-i18next';
 import { useDropdownOptions } from '@/hooks/useDropdownOptions';
 import { useProjectNavigation } from '@/hooks/useProjectNavigation';
 import { RdsIcon, RdsIconId, RdsTagList } from 'rte-design-system-react';
-import { deleteProjectById } from '@/shared/services/projectService';
 import { useHandlePinnedProjectList } from '@/hooks/useHandlePinnedProjectList.ts';
-import { notifyToast } from '@/shared/notification/notification.tsx';
-import { useProject, useProjectDispatch } from '@/store/contexts/ProjectContext.tsx';
-import { ProjectActionType } from '@/shared/types/Project.type.ts';
-import { PROJECT_ACTION } from '@/shared/enum/project.ts';
+import { useProject } from '@/store/contexts/ProjectContext.tsx';
+import { useDeleteProject } from '@/hooks/useDeleteProject.ts';
 
 const PinnedProjectCards = () => {
   const { t } = useTranslation();
   const { navigateToProject } = useProjectNavigation();
   const { settingOption, deleteOption, pinOption } = useDropdownOptions();
   const { pinnedProjects } = useProject();
-  const dispatch = useProjectDispatch();
   const { handleUnpinProject } = useHandlePinnedProjectList();
+  const { deleteProject } = useDeleteProject();
 
   const handleCardClick = (projectId: string, projectName: string) => {
     navigateToProject(projectId, projectName);
-  };
-
-  const deleteProject = async (projectId: string) => {
-    try {
-      await deleteProjectById(projectId);
-      // Update pinned project list
-      dispatch?.({
-        type: PROJECT_ACTION.REMOVE_PROJECT,
-        payload: projectId,
-      } as ProjectActionType);
-      notifyToast({
-        type: 'success',
-        message: 'Project deleted successfully',
-      });
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        notifyToast({
-          type: 'error',
-          message: `${error.message}`,
-        });
-      }
-    }
   };
 
   return (
@@ -61,7 +36,7 @@ const PinnedProjectCards = () => {
             dropdownOptions={[
               pinOption(project.pinned ?? false, () => handleUnpinProject(project.id)), // Toggle pin/unpin
               settingOption(() => {}, t('project.@setting')),
-              deleteOption(() => deleteProject(project.id), t('project.@delete'), project.studies?.length > 0),
+              deleteOption(() => void deleteProject(project.id), t('project.@delete'), project.studies?.length > 0),
             ]}
             id={project.id}
             onClick={() => handleCardClick(project.id, project.name)}

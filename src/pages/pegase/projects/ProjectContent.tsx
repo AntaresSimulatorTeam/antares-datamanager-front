@@ -13,13 +13,11 @@ import StdAvatar from '@common/layout/stdAvatar/StdAvatar';
 import StudiesPagination from '@/pages/pegase/home/components/StudiesPagination';
 import { useDropdownOptions } from '@/hooks/useDropdownOptions';
 import { useProjectNavigation } from '@/hooks/useProjectNavigation';
-import { deleteProjectById } from '@/shared/services/projectService.ts';
 import { RdsChip, RdsTagList } from 'rte-design-system-react';
 import { useFetchProjectList } from '@/hooks/useFetchProjectList';
 import { useHandlePinnedProjectList } from '@/hooks/useHandlePinnedProjectList.ts';
-import { ProjectActionType } from '@/shared/types/Project.type.ts';
-import { useProject, useProjectDispatch } from '@/store/contexts/ProjectContext.tsx';
-import { PROJECT_ACTION } from '@/shared/enum/project.ts';
+import { useProject } from '@/store/contexts/ProjectContext.tsx';
+import { useDeleteProject } from '@/hooks/useDeleteProject.ts';
 
 const ProjectContent = () => {
   const { t } = useTranslation();
@@ -32,7 +30,7 @@ const ProjectContent = () => {
   const { navigateToProject } = useProjectNavigation();
   const { handlePinProject } = useHandlePinnedProjectList();
   const { projects } = useProject();
-  const dispatch = useProjectDispatch();
+  const { deleteProject } = useDeleteProject();
 
   const searchProject = (value?: string | undefined) => {
     value && setSearchTerm(value);
@@ -46,15 +44,6 @@ const ProjectContent = () => {
       setActiveChip(true);
       setSearchTerm(userName);
     }
-  };
-
-  const deleteProject = async (projectId: string) => {
-    await deleteProjectById(projectId);
-    // Met à jour la liste des projets (et les projets épinglés)
-    dispatch?.({
-      type: PROJECT_ACTION.REMOVE_PROJECT,
-      payload: projectId,
-    } as ProjectActionType);
   };
 
   const handleCardClick = (projectId: string, projectName: string) => {
@@ -76,9 +65,9 @@ const ProjectContent = () => {
       <div className="grid w-full grid-cols-3 gap-3">
         {(projects || []).map((project) => {
           const dropdownItems = [
-            pinOption(false, async () => handlePinProject(project.id)),
+            pinOption(false, () => void handlePinProject(project.id)),
             settingOption(() => {}, t('project.@setting')),
-            deleteOption(() => deleteProject(project.id), t('project.@delete'), project.studies?.length > 0),
+            deleteOption(() => void deleteProject(project.id), t('project.@delete'), project.studies?.length > 0),
           ];
           return (
             <PegaseCard
