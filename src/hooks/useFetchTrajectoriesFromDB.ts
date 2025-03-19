@@ -8,8 +8,9 @@ import { useEffect, useState } from 'react';
 import { fetchTrajectoriesFromDB } from '@/shared/services/trajectoryService.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { DbTrajectory } from '@/shared/types';
+import { StudyStatus } from '@/shared/types/common/StudyStatus.type';
 
-export const useFetchTrajectoriesFromDB = (trajectoryType: TRAJECTORY_TYPE, studyHorizon: string) => {
+export const useFetchTrajectoriesFromDB = (trajectoryType: TRAJECTORY_TYPE, studyHorizon: string, studyStatus: StudyStatus) => {
   const [trajectories, setTrajectories] = useState<DbTrajectory[] | null>(null);
 
   useEffect(() => {
@@ -22,7 +23,7 @@ export const useFetchTrajectoriesFromDB = (trajectoryType: TRAJECTORY_TYPE, stud
       }
     };
 
-    if (trajectoryType && studyHorizon) {
+    if (trajectoryType && studyHorizon && studyStatus != StudyStatus.GENERATED) {
       void getTrajectoriesFromDb(trajectoryType, studyHorizon);
     }
   }, [trajectoryType, studyHorizon]);

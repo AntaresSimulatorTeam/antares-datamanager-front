@@ -7,6 +7,7 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useFetchTrajectoriesFromDB } from '@/hooks/useFetchTrajectoriesFromDB.ts';
+import { StudyStatus } from '@/shared/types/common/StudyStatus.type';
 
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
@@ -47,7 +48,7 @@ describe('useFetchTrajectoriesFromDB', () => {
   });
 
   it('should fetches trajectories from data base on mount', async () => {
-    const { result } = renderHook(() => useFetchTrajectoriesFromDB(TRAJECTORY_TYPE.AREA, '2023_2024'));
+    const { result } = renderHook(() => useFetchTrajectoriesFromDB(TRAJECTORY_TYPE.AREA, '2023_2024', StudyStatus.IN_PROGRESS));
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
@@ -60,7 +61,7 @@ describe('useFetchTrajectoriesFromDB', () => {
   });
 
   it('should not call fetchTrajectoriesFromDB api if horizon is an empty string', async () => {
-    const { result } = renderHook(() => useFetchTrajectoriesFromDB(TRAJECTORY_TYPE.AREA, ''));
+    const { result } = renderHook(() => useFetchTrajectoriesFromDB(TRAJECTORY_TYPE.AREA, '',StudyStatus.IN_PROGRESS));
 
     await waitFor(() => {
       expect(global.fetch).to.not.toHaveBeenCalled();

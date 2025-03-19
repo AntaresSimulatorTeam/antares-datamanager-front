@@ -29,4 +29,4 @@ export type AreaAndLinkRowData = {
   status: TRAJECTORY_SELECTION_STATUS;
 };
 
-export type RowStatus = FileInputStatus | 'warning';
+export type RowStatus = FileInputStatus | 'warning' | 'emptyError';
