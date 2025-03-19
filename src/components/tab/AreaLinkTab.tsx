@@ -225,7 +225,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
         <ImportTrajectoryModal
           options={optionsFS}
           onClose={async (status, value, label) => {
-            if (status && value != null && label) {
+            if (status && value != null) {
               await handleTrajectoryUpdate(rowIndexSelected, status, value, label);
             }
             toggleModal();
