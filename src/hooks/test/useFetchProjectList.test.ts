@@ -6,13 +6,27 @@
 
 import { renderHook, waitFor } from '@testing-library/react';
 import { useFetchProjectList } from '@/hooks/useFetchProjectList.ts';
+import * as projectService from '@/shared/services/projectService.ts';
+import { vi } from 'vitest';
+import { ProjectResponse } from '@/shared/types';
 
-const mockFetch = vi.fn();
-global.fetch = mockFetch;
+const mockContentResponseFetchProjectApi: ProjectResponse[] = [
+  {
+    id: '1',
+    name: 'Project 1',
+    tags: ['Tag1', 'Tag2'],
+    creationDate: '2023-10-01' as unknown as Date,
+    createdBy: 'User A',
+    studies: [4, 6, 7],
+    description: '',
+  },
+];
+
 vi.mock('@/shared/notification/notification');
 vi.mock('@/envVariables', () => ({
   getEnvVariables: vi.fn(() => 'https://mockapi.com'),
 }));
+vi.mock('@/shared/services/projectService');
 
 describe('useFetchProjectList', () => {
   beforeEach(() => {
@@ -20,37 +34,27 @@ describe('useFetchProjectList', () => {
       ok: true,
       json: async () =>
         Promise.resolve({
-          content: [
-            {
-              projectId: '1',
-              name: 'Project 1',
-              tags: ['Tag1', 'Tag2'],
-              creationDate: '2023-10-01',
-              createdBy: 'User A',
-            },
-          ],
+          content: mockContentResponseFetchProjectApi,
           totalElements: 1,
         }),
     });
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    vi.clearAllMocks();
   });
 
   it('fetches projects on mount', async () => {
+    vi.mocked(projectService.fetchProjectFromSearchTerm).mockResolvedValueOnce({
+      content: mockContentResponseFetchProjectApi,
+      totalElements: 1,
+    });
     const { result } = renderHook(() => useFetchProjectList('mouad', 0, 9));
 
     await waitFor(() => {
-      expect(result.current.projects).toEqual([
-        {
-          projectId: '1',
-          name: 'Project 1',
-          tags: ['Tag1', 'Tag2'],
-          creationDate: '2023-10-01',
-          createdBy: 'User A',
-        },
-      ]);
+      expect(projectService.fetchProjectFromSearchTerm).toHaveBeenCalledTimes(1);
+      expect(projectService.fetchProjectFromSearchTerm).toHaveBeenCalledWith('mouad', 0, 9);
+      expect(result.current.projects).toEqual(mockContentResponseFetchProjectApi);
       expect(result.current.count).toBe(1);
     });
   });
@@ -59,7 +63,8 @@ describe('useFetchProjectList', () => {
     renderHook(() => useFetchProjectList('test', 0, 9));
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith('https://mockapi.com/v1/project/search?page=1&size=9&search=test', {});
+      expect(projectService.fetchProjectFromSearchTerm).toHaveBeenCalledTimes(1);
+      expect(projectService.fetchProjectFromSearchTerm).toHaveBeenCalledWith('test', 0, 9);
     });
   });
 
@@ -67,7 +72,7 @@ describe('useFetchProjectList', () => {
     renderHook(() => useFetchProjectList('', 1, 9));
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith('https://mockapi.com/v1/project/search?page=2&size=9&search=', {});
+      expect(projectService.fetchProjectFromSearchTerm).toHaveBeenCalledWith('', 1, 9);
     });
   });
 });
