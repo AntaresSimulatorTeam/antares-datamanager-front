@@ -27,7 +27,7 @@ const ProjectContent = () => {
   const [searchTerm, setSearchTerm] = useState<string | undefined>('');
   const [activeChip, setActiveChip] = useState<boolean | null>(false);
   const [current, setCurrent] = useState(0);
-  const { count } = useFetchProjectList(searchTerm || '', current, intervalSize);
+  const { count } = useFetchProjectList(searchTerm, current, intervalSize);
   const { navigateToProject } = useProjectNavigation();
   const { handlePinProject } = useHandlePinnedProjectList();
   const { projects } = useProject();

@@ -8,6 +8,7 @@ import {
   createProject,
   deleteProjectById,
   fetchProjectDetails,
+  fetchProjectFromSearchTerm,
   fetchProjectsFromPartialName,
 } from '@/shared/services/projectService';
 import { vi } from 'vitest';
@@ -18,12 +19,30 @@ vi.mock('@/envVariables', () => ({
   getEnvVariables: vi.fn(() => 'https://mockapi.com'),
 }));
 
+const mockResponseApi = [
+  {
+    id: '123',
+    name: 'Bilan prévisionnel 2023',
+    description: 'Project Description',
+    createdBy: 'User A',
+    creationDate: '2024-01-01',
+    tags: ['tag1', 'tag2'],
+  },
+  {
+    id: '123',
+    name: 'Bilan prévisionnel 2019',
+    description: 'Project Description',
+    createdBy: 'User B',
+    creationDate: '2013-08-01',
+    tags: ['tag3', 'tag4'],
+  },
+];
+
 describe('deleteProjectById', () => {
   const projectId = '123';
 
   beforeEach(() => {
     global.fetch = vi.fn();
-    vi.clearAllMocks();
     vi.stubGlobal('JSON', {
       parse: (text: string) => ({ message: text }),
       stringify: (text: string) => text,
@@ -31,8 +50,8 @@ describe('deleteProjectById', () => {
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
     vi.unstubAllGlobals();
+    vi.clearAllMocks();
   });
 
   it('should delete a pinned project from pinned project list', async () => {
@@ -77,11 +96,10 @@ describe('fetchProjectDetails', () => {
 
   beforeEach(() => {
     global.fetch = vi.fn();
-    vi.clearAllMocks();
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should fetch project details', async () => {
@@ -91,11 +109,12 @@ describe('fetchProjectDetails', () => {
       json: async () => Promise.resolve(mockResponse),
     });
 
-    await fetchProjectDetails(projectId);
+    const result = await fetchProjectDetails(projectId);
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledTimes(1);
       expect(global.fetch).toHaveBeenCalledWith(`https://mockapi.com/v1/project/${projectId}`, {});
+      expect(result).toEqual(mockResponse);
     });
   });
 
@@ -119,7 +138,6 @@ describe('fetchProjectDetails', () => {
 describe('fetchProjectsFromPartialName', () => {
   beforeEach(() => {
     global.fetch = vi.fn();
-    vi.clearAllMocks();
     vi.stubGlobal('JSON', {
       parse: (text: string) => ({ message: text }),
       stringify: (text: string) => text,
@@ -127,32 +145,14 @@ describe('fetchProjectsFromPartialName', () => {
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    vi.clearAllMocks();
     vi.unstubAllGlobals();
   });
 
-  it('should delete a pinned project from pinned project list', async () => {
+  it('should search projects by partial name', async () => {
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: true,
-      json: () =>
-        Promise.resolve([
-          {
-            id: '123',
-            name: 'Bilan prévisionnel 2023',
-            description: 'Project Description',
-            createdBy: 'User A',
-            creationDate: '2024-01-01',
-            tags: ['tag1', 'tag2'],
-          },
-          {
-            id: '123',
-            name: 'Bilan prévisionnel 2019',
-            description: 'Project Description',
-            createdBy: 'User B',
-            creationDate: '2013-08-01',
-            tags: ['tag3', 'tag4'],
-          },
-        ]),
+      json: () => Promise.resolve(mockResponseApi),
     });
 
     const result = await fetchProjectsFromPartialName('name');
@@ -164,15 +164,59 @@ describe('fetchProjectsFromPartialName', () => {
     });
   });
 
-  it('should handle delete failure gracefully', async () => {
+  it('should handle fetch projects failure gracefully', async () => {
     // Failed fetch response moc
-    vi.stubGlobal('JSON', { parse: (text: string) => text });
+    //vi.stubGlobal('JSON', { parse: (text: string) => text });
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: false,
-      text: () => 'Error',
+      text: async () => Promise.resolve('Failed to fetch projects'),
     });
 
     await expect(async () => fetchProjectsFromPartialName('name')).rejects.toThrowError('Failed to fetch projects');
+  });
+});
+
+describe('fetchProjectFromSearchTerm', () => {
+  beforeEach(() => {
+    global.fetch = vi.fn();
+    vi.stubGlobal('JSON', {
+      parse: (text: string) => ({ message: text }),
+      stringify: (text: string) => text,
+    });
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
+    vi.unstubAllGlobals();
+  });
+
+  it('should search projects by search term', async () => {
+    global.fetch = vi.fn().mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(mockResponseApi),
+    });
+    const result = await fetchProjectFromSearchTerm(3, 10, 'searchTerm');
+
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(global.fetch).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/project/search?search=searchTerm&page=4&size=10',
+        {},
+      );
+      expect(result).toHaveLength(2);
+      expect(result).toEqual(mockResponseApi);
+    });
+  });
+
+  it('should handle search by term failure gracefully', async () => {
+    global.fetch = vi.fn().mockResolvedValueOnce({
+      ok: false,
+      text: async () => Promise.resolve('Failed to search projects'),
+    });
+
+    await expect(async () => fetchProjectFromSearchTerm(3, 10, 'searchTerm')).rejects.toThrowError(
+      'Failed to search projects',
+    );
   });
 });
 
@@ -181,7 +225,6 @@ describe('createProject', () => {
 
   beforeEach(() => {
     global.fetch = vi.fn();
-    vi.clearAllMocks();
     vi.stubGlobal('JSON', {
       parse: (text: string) => ({ message: text }),
       stringify: (text: string) => text,
@@ -189,26 +232,26 @@ describe('createProject', () => {
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    vi.clearAllMocks();
     vi.unstubAllGlobals();
   });
 
   it('should create de project', async () => {
-    const mockProjectResponse = {
+    const creationResponse = {
       id: 107,
-      name: 'Bilan prévisionnel 2050',
+      name: projectData.name,
       createdBy: 'pegase',
       creationDate: '2025-01-30T10:32:10.631003175',
       studies: [],
-      tags: [],
-      description: '',
+      tags: projectData.tags,
+      description: projectData.description,
     };
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: true,
-      json: () => Promise.resolve(mockProjectResponse),
+      json: () => Promise.resolve(creationResponse),
     });
 
-    await createProject(projectData);
+    const result = await createProject(projectData);
 
     expect(global.fetch).toHaveBeenCalledTimes(1);
     expect(global.fetch).toHaveBeenCalledWith(`https://mockapi.com/v1/project`, {
@@ -218,6 +261,7 @@ describe('createProject', () => {
       },
       body: JSON.stringify(projectData),
     });
+    expect(result).toEqual(creationResponse);
   });
 
   it('should handle delete failure gracefully', async () => {
