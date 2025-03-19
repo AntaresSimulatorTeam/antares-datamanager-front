@@ -5,32 +5,32 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
-import { ProjectActionType, ProjectInfo } from '@/shared/types/Project.type.ts';
+import { ProjectActionType, ProjectResponse } from '@/shared/types/Project.type.ts';
 import { fetchProjectFromSearchTerm } from '@/shared/services/projectService.ts';
 import { PROJECT_ACTION } from '@/shared/enum/project.ts';
 import { useProjectDispatch } from '@/store/contexts/ProjectContext.tsx';
 import { PaginatedResponse } from '@/shared/types';
 
 export const useFetchProjectList = (searchTerm: string, current: number, intervalSize: number) => {
-  const [projects, setProjects] = useState<ProjectInfo[]>([]);
+  const [projects, setProjects] = useState<ProjectResponse[]>([]);
   const [count, setCount] = useState(0);
   const dispatch = useProjectDispatch();
 
   const fetchProjects = useCallback(
     async (term: string, currentPage: number, size: number) => {
       try {
-        const { content, totalElements } = (await fetchProjectFromSearchTerm(
+        const response = (await fetchProjectFromSearchTerm(
           term,
           currentPage,
           size,
-        )) as PaginatedResponse<ProjectInfo>;
+        )) as PaginatedResponse<ProjectResponse>;
 
         dispatch?.({
           type: PROJECT_ACTION.INIT_PROJECT_LIST,
-          payload: content,
+          payload: response?.content,
         } as ProjectActionType);
-        setProjects(content);
-        setCount(totalElements);
+        setProjects(response?.content);
+        setCount(response?.totalElements);
       } catch (error) {
         console.error(error);
       }
