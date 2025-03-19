@@ -14,12 +14,13 @@ import { UserSettingsContext } from '@/store/contexts/UserSettingsContext';
 import { THEME_COLOR } from '@/shared/types';
 import ThemeHandler from '@common/handler/ThemeHandler';
 import { PegaseToastContainer } from '@/shared/notification/containers';
-import { RdsNavbar } from 'rte-design-system-react';
 import { PEGASE_NAVBAR_ID } from '@/shared/constants';
 import { translateMenuItemLabel } from '@/shared/utils/textUtils';
 import { navBarConfig } from '@/shared/const/navBarConfig';
 import { useTranslation } from 'react-i18next';
-import { StudyProvider } from '@/store/contexts/StudyProvider.tsx';
+import { StudyProvider } from '@/store/contexts/StudyProvider';
+import { RdsNavbar } from 'rte-design-system-react';
+
 
 const MainContent = () => {
   const { t } = useTranslation();
@@ -43,7 +44,7 @@ const MainContent = () => {
               <Route
                 path="/study/:studyName"
                 element={
-                  <StudyProvider initialValue={{ isStudyGenerated: false }}>
+                  <StudyProvider>
                     <StudyDetails />
                   </StudyProvider>
                 }

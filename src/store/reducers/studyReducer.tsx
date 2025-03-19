@@ -1,31 +1,30 @@
 import { DbTrajectory, StudyActionType, StudyState } from '@/shared/types';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 
-const addTrajectories = (prevState: StudyState, trajectories: DbTrajectory[]): StudyState => {
+const addTrajectories = (prevState: Partial<StudyState>, trajectories: DbTrajectory[]): Partial<StudyState> => {
   const studyState = {};
-  trajectories.forEach((trajectory) => Object.assign(studyState, { [`${trajectory.type}`]: trajectory }));
+  trajectories.forEach((trajectory) => Object.assign(studyState, { [`${trajectory?.type}`]: trajectory }));
   return { ...prevState, ...studyState };
 };
 
-export const studyReducer = (prevState: StudyState, action?: StudyActionType): StudyState => {
+export const studyReducer = (prevState: Partial<StudyState>, action?: StudyActionType): Partial<StudyState> => {
   if (action) {
     switch (action.type) {
       case STUDY_ACTION.ADD_TRAJECTORY_AREA:
         return { ...prevState, [`${TRAJECTORY_TYPE.AREA}`]: action.payload };
       case STUDY_ACTION.ADD_TRAJECTORY_LINK:
         return { ...prevState, [`${TRAJECTORY_TYPE.LINK}`]: action.payload };
-      case STUDY_ACTION.CLEAR_AREA_LINK_TRAJECTORY:
+      case STUDY_ACTION.CLEAR_AREA_TRAJECTORY:
         return {
           ...prevState,
-          isStudyGenerated: false,
           [`${TRAJECTORY_TYPE.AREA}`]: null,
-          [`${TRAJECTORY_TYPE.LINK}`]: null,
         };
       case STUDY_ACTION.CLEAR_LINK_TRAJECTORY:
-        return { ...prevState, isStudyGenerated: false, [`${TRAJECTORY_TYPE.LINK}`]: null };
-      case STUDY_ACTION.SET_IS_STUDY_GENERATED:
-        return { ...prevState, isStudyGenerated: true };
+        return { ...prevState, [`${TRAJECTORY_TYPE.LINK}`]: null };
+      case STUDY_ACTION.SET_STUDY_STATUS:
+        return { ...prevState, studyStatus: StudyStatus.GENERATED };
       case STUDY_ACTION.ADD_TRAJECTORIES:
         return { ...addTrajectories(prevState, action.payload) };
       default:

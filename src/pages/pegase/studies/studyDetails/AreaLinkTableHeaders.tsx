@@ -14,17 +14,18 @@ import SelectAndSearchableInput from '@/components/input/SelectAndSearchableInpu
 import { ButtonPreview } from '@/components/button/ButtonPreview.tsx';
 import { Dispatch, SetStateAction } from 'react';
 import { ErrorMessageType } from '@/components/tab/AreaLinkTab.tsx';
+import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 
 const columnHelper = createColumnHelper<AreaAndLinkRowData>();
 
 const getAreaLinkTableHeaders = (
-  options: SelectOption[][] | undefined,
   t: (value: string) => string,
-  handleUpdate: (index: number, status: RowStatus, trajectory?: SelectOption) => Promise<void>,
+  handleUpdate: (index: number, status: RowStatus, trajectoryId: number, trajectoryLabel?: string) => Promise<void>,
   handleImport: (index: number) => Promise<void>,
   handlerSearch: (index: number, value: string | undefined) => Promise<SelectOption[] | undefined>,
   error: { index: number; message: string },
   setErrorInfo: Dispatch<SetStateAction<ErrorMessageType>>,
+  studyStatus: StudyStatus | undefined,
 ) => [
   columnHelper.accessor('hypothesis', {
     header: t('studyDetails.@hypothesis'),
@@ -32,8 +33,16 @@ const getAreaLinkTableHeaders = (
       const { trajectory } = row.original;
       return (
         <div className="inline-flex w-[180px] items-center gap-2">
-          {getValue()}
-          {trajectory ? <ButtonPreview label={'View'} icon={StdIconId.Preview} position={'left'} /> : null}
+          <span className={`${trajectory ? 'text-primary-600' : 'text-gray-900'}`}>{getValue()}</span>
+          {trajectory ? (
+            <ButtonPreview
+              label={'View'}
+              icon={StdIconId.Preview}
+              position={'left'}
+              color={row.getReadOnly() ? 'gray-700' : 'primary-600'}
+              borderColor={row.getReadOnly() ? 'gray-700' : 'acc1-600'}
+            />
+          ) : null}
         </div>
       );
     },
@@ -41,22 +50,32 @@ const getAreaLinkTableHeaders = (
   columnHelper.accessor('trajectory', {
     header: t('studyDetails.@trajectory'),
     cell: ({ row }) => {
-      const { trajectory } = row.original;
+      const { trajectory, status } = row.original;
+      const textClass = studyStatus === StudyStatus.GENERATED ? 'text-primary-600' : 'text-gray-900';
       return trajectory ? (
         <div className="inline-flex w-[850px] space-x-2 py-3">
-          <span>{trajectory.trajectoryName}</span>
-          <RdsIconButton icon={RdsIconId.Delete} size="small" onClick={() => {
-            setErrorInfo({ index: row.index, message: '' });
-            void handleUpdate(row.index, 'empty');
-          }} />
+          <span className={`${textClass}`}>{trajectory.trajectoryName}</span>
+          {studyStatus != StudyStatus.GENERATED && (
+            <RdsIconButton
+              icon={RdsIconId.Delete}
+              size="small"
+              onClick={() => {
+                setErrorInfo({ index: row.index, message: '' });
+                void handleUpdate(
+                  row.index,
+                  status === TRAJECTORY_SELECTION_STATUS.ERROR ? 'emptyError' : 'empty',
+                  trajectory.id,
+                );
+              }}
+            />
+          )}
         </div>
       ) : (
         <div className="inline-flex w-[850px] items-center space-x-2">
           <SelectAndSearchableInput
-            options={options?.[row.index] ?? []}
             onSelect={(value: SelectOption) => {
               setErrorInfo({ index: row.index, message: '' });
-              void handleUpdate(row.index, 'success', value);
+              void handleUpdate(row.index, 'success', value.id);
             }}
             setSearchTerm={async (value: string | undefined) => await handlerSearch(row.index, value)}
             defaultPlaceHolder={
