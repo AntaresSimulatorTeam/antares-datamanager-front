@@ -20,7 +20,7 @@ export const DetailsContent = ({ content }: DetailsContentProps) => {
 
   return (
     <div className="flex flex-col gap-3 p-3">
-      <div className="group flex flex-col gap-3 rounded bg-primary-100 p-2" role="banner">
+      <div className="group flex flex-col gap-3 rounded bg-acc1-50 p-2" role="banner">
         {(content as ProjectInfo)?.description && (
           <div className="text-base justify-between text-left font-sans font-normal text-gray-900">
             {(content as ProjectInfo).description}
@@ -35,23 +35,39 @@ export const DetailsContent = ({ content }: DetailsContentProps) => {
                 })}
               </div>
               {(content as StudyDTO)?.horizon && (
-                <div className="flex items-center gap-2">
-                  <StdIcon name={StdIconId.TimeLine} color="secondary" />
-                  {t('studyDetails.@bannerHorizon', { horizon: (content as StudyDTO).horizon })}
-                </div>
+                <>
+                  <div>|</div>
+                  <div className="flex items-center gap-2">
+                    <StdIcon name={StdIconId.TimeLine} color="secondary" />
+                    {t('studyDetails.@bannerHorizon', { horizon: (content as StudyDTO).horizon })}
+                  </div>
+                </>
               )}
+              <div>|</div>
               <div className="flex items-center gap-2">
                 <RdsIcon name={RdsIconId.History} color="secondary" />
                 {formatDateToDDMMYYYY(content?.creationDate)}
               </div>
+              <div>|</div>
               <div className="flex items-center gap-2">
                 <RdsIcon name={RdsIconId.Person} color="secondary" />
                 {t('studyDetails.@bannerCreatedBy', { createdBy: content?.createdBy ?? '' })}
               </div>
-              {(content as StudyDTO)?.keywords && (
-                <div className="flex h-3 w-32">
-                  <RdsTagList id={`${content.id}-tag-list`} tags={(content as StudyDTO).keywords} />
-                </div>
+              {(content as StudyDTO)?.keywords?.length > 0 && (
+                <>
+                  <div>|</div>
+                  <div className="flex h-3 w-32">
+                    <RdsTagList id={`${content.id}-tag-list`} tags={(content as StudyDTO).keywords} />
+                  </div>
+                </>
+              )}
+              {(content as ProjectInfo)?.tags?.length > 0 && (
+                <>
+                  <div>|</div>
+                  <div className="flex h-3 w-32">
+                    <RdsTagList id={`${content.id}-tag-list`} tags={(content as ProjectInfo).tags} />
+                  </div>
+                </>
               )}
             </div>
           </div>
