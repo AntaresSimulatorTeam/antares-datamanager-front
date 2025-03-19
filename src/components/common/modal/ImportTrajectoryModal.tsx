@@ -9,7 +9,7 @@ import { uploadTrajectory } from '@/shared/services/trajectoryService.ts';
 
 interface ImportTrajectoryModalProps {
   options: SelectOption[] | undefined;
-  onClose: (status: RowStatus, value?: DbTrajectory | SelectOption) => Promise<void>;
+  onClose: (status?: RowStatus, valueId?: number, valueLabel?: string) => Promise<void>;
   trajectoryType: TRAJECTORY_TYPE;
   studyHorizon: string;
   studyId: number;
@@ -55,17 +55,17 @@ export const ImportTrajectoryModal = ({
         },
       );
       setFileStatus('success');
-      await onClose('success', newTrajectory);
+      await onClose('success', newTrajectory.id);
     } catch (error) {
       // TODO handle errors considered as warning ones
       setFileStatus('error');
-      await onClose('error', value);
+      void onClose('error', value.id, value.label);
     }
   };
 
   return (
     <RdsModal size="small">
-      <RdsModal.Title onClose={() => void onClose('empty')} icon="Upload">
+      <RdsModal.Title onClose={() => void onClose()} icon="Upload">
         {t('studyDetails.@import_from_file_system', {
           trajectoryType: trajectoryType === TRAJECTORY_TYPE.AREA ? 'areas' : 'links',
         })}
@@ -86,7 +86,7 @@ export const ImportTrajectoryModal = ({
         </div>
       </RdsModal.Content>
       <RdsModal.Footer>
-        <RdsButton label="Cancel" onClick={() => void onClose('empty')} color="secondary" />
+        <RdsButton label="Cancel" onClick={() => void onClose()} color="secondary" />
         <RdsButton
           icon={RdsIconId.Add}
           label={t('studyDetails.@import')}

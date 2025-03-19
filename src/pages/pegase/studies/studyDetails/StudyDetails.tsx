@@ -17,6 +17,7 @@ import { createStudy } from '@/shared/services/studyService.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { ButtonWithStdIcon } from '@/components/button/ButtonWithStdIcon.tsx';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
+import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 
 interface StudyState {
   study: StudyDTO;
@@ -27,7 +28,7 @@ const StudyDetails = () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const location: Location<StudyState> = useLocation();
   const { t } = useTranslation();
-  const { isStudyGenerated, AREA } = useStudy();
+  const { studyStatus, AREA } = useStudy();
   const dispatch = useStudyDispatch();
   const [isGenerating, setIsGenerating] = useState(false);
   const { study } = location.state || {};
@@ -37,7 +38,7 @@ const StudyDetails = () => {
       setIsGenerating(true);
       await createStudy(study.id);
       setIsGenerating(false);
-      dispatch?.({ type: STUDY_ACTION.SET_IS_STUDY_GENERATED });
+      dispatch?.({ type: STUDY_ACTION.SET_STUDY_STATUS, payload: StudyStatus.GENERATED });
     } catch (error) {
       setIsGenerating(false);
     }
@@ -68,7 +69,7 @@ const StudyDetails = () => {
             <ButtonWithStdIcon
               label={t('studyDetails.@generate')}
               onClick={() => void handleGenerateStudy()}
-              disabled={!AREA || !!isStudyGenerated}
+              disabled={!AREA || studyStatus === StudyStatus.GENERATED}
               icon={StdIconId.CheckCircle}
               position="right"
               isLoading={isGenerating}

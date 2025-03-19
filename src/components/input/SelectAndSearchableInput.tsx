@@ -4,28 +4,28 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { useRef, useState } from 'react';
+import { MouseEvent, useRef, useState } from 'react';
 import { RdsButton, RdsIconId, RdsInputText } from 'rte-design-system-react';
 import { SelectOption } from '@/shared/types';
 
 interface ProjectManagerProps {
-  options: SelectOption[] | undefined;
   defaultPlaceHolder: string;
   onSelect: (value: SelectOption) => void;
-  setSearchTerm?: (value: string | undefined) => Promise<SelectOption[] | undefined>;
+  setSearchTerm?: (value?: string) => Promise<SelectOption[] | undefined>;
   isSearchable?: boolean;
   isInputDisabled?: boolean;
   resetField?: () => void;
+  options?: SelectOption[];
 }
 
 const SelectAndSearchableInput = ({
-  options,
   defaultPlaceHolder,
   onSelect,
   setSearchTerm,
   isSearchable = false,
   isInputDisabled = false,
   resetField,
+  options,
 }: ProjectManagerProps) => {
   const [defaultOptions] = useState<SelectOption[] | undefined>(options);
   const [optionsSelection, setOptionsSelection] = useState<SelectOption[] | undefined>(options);
@@ -41,14 +41,13 @@ const SelectAndSearchableInput = ({
         setValueInput(value);
         setIsDropdownOpen(false);
         setIsSelectEnable(false);
-        await setSearchTerm?.(value).then((results) => {
-          setIsDropdownOpen(true);
-          if (results && results.length > 0) {
-            setOptionsSelection(results);
-          } else {
-            setOptionsSelection([]);
-          }
-        });
+        const results = await setSearchTerm?.(value);
+        setIsDropdownOpen(true);
+        if (results && results.length > 0) {
+          setOptionsSelection(results);
+        } else {
+          setOptionsSelection([]);
+        }
       } else {
         setValueInput('');
         setIsSelectEnable(true);
@@ -66,6 +65,25 @@ const SelectAndSearchableInput = ({
     setIsDropdownOpen(false);
   };
 
+  const handleClickOnKeyboard = async (event: MouseEvent<HTMLButtonElement>) => {
+    try {
+      if (setSearchTerm) {
+        const results = await setSearchTerm();
+        if (results && results.length > 0) {
+          setOptionsSelection(results);
+        } else {
+          setOptionsSelection([]);
+        }
+      }
+    } finally {
+      setIsDropdownOpen((prev) => !prev);
+      setTimeout(() => {
+        dropdownList.current?.focus();
+      }, 0);
+      event.stopPropagation();
+    }
+  };
+
   return (
     <div className="relative">
       <div className="absolute right-0 top-3">
@@ -74,13 +92,7 @@ const SelectAndSearchableInput = ({
             icon={!isDropdownOpen ? RdsIconId.KeyboardArrowRight : RdsIconId.KeyboardArrowDown}
             size="extraSmall"
             variant="text"
-            onClick={(e) => {
-              setIsDropdownOpen((prev) => !prev);
-              setTimeout(() => {
-                dropdownList.current?.focus();
-              }, 0);
-              e.stopPropagation();
-            }}
+            onClick={(e) => void handleClickOnKeyboard(e)}
             color="secondary"
             disabled={!isSelectEnable}
           />
