@@ -59,7 +59,7 @@ export const ImportTrajectoryModal = ({
     } catch (error) {
       // TODO handle errors considered as warning ones
       setFileStatus('error');
-      await onClose('error', value.id, value.label);
+      void onClose('error', value.id, value.label);
     }
   };
 

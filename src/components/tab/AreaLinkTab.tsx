@@ -46,24 +46,18 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
   const [data, setData] = useState<AreaAndLinkRowData[]>([
     {
       hypothesis: 'Areas',
-      trajectory: studyState[`${TRAJECTORY_TYPE.AREA}`] ?? null,
-      status: studyState[`${TRAJECTORY_TYPE.AREA}`]
-        ? TRAJECTORY_SELECTION_STATUS.OK
-        : TRAJECTORY_SELECTION_STATUS.MISSING,
+      trajectory: null,
+      status: TRAJECTORY_SELECTION_STATUS.MISSING,
     },
     {
       hypothesis: 'Links',
-      trajectory: studyState[`${TRAJECTORY_TYPE.LINK}`] ?? null,
-      status: studyState[`${TRAJECTORY_TYPE.LINK}`]
-        ? TRAJECTORY_SELECTION_STATUS.OK
-        : TRAJECTORY_SELECTION_STATUS.MISSING,
+      trajectory: null,
+      status: TRAJECTORY_SELECTION_STATUS.MISSING,
     },
   ]);
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({
     '0': false,
-    '1':
-      !studyState[`${TRAJECTORY_TYPE.AREA}`] ||
-      (!studyState[`${TRAJECTORY_TYPE.LINK}`] && studyState?.studyStatus === StudyStatus.GENERATED),
+    '1': true,
   });
 
   useEffect(() => {
@@ -105,30 +99,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
         }
       }
     };
-    if (study?.trajectoryIds.length > 0) {
-      void getTrajectories();
-    } else {
-      setData([
-        {
-          hypothesis: 'Areas',
-          trajectory: studyState[`${TRAJECTORY_TYPE.AREA}`] ?? null,
-          status: studyState[`${TRAJECTORY_TYPE.AREA}`]
-            ? TRAJECTORY_SELECTION_STATUS.OK
-            : TRAJECTORY_SELECTION_STATUS.MISSING,
-        },
-        {
-          hypothesis: 'Links',
-          trajectory: studyState[`${TRAJECTORY_TYPE.LINK}`] ?? null,
-          status: studyState[`${TRAJECTORY_TYPE.LINK}`]
-            ? TRAJECTORY_SELECTION_STATUS.OK
-            : TRAJECTORY_SELECTION_STATUS.MISSING,
-        },
-      ]);
-      setReadOnly({
-        '0': false,
-        '1': true,
-      });
-    }
+    void getTrajectories();
   }, []);
 
   const handleFetchTrajectoriesFS = async (index: number) => {
@@ -182,7 +153,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
           setReadOnly({ '0': false, '1': index === 0 });
         }
 
-        if (status === 'error' && trajectoryId && trajectoryLabel) {
+        if (status === 'error' && trajectoryId != null && trajectoryLabel) {
           const newDbTrajectory = {
             id: trajectoryId,
             trajectoryName: trajectoryLabel,
@@ -225,19 +196,6 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
     [study.horizon],
   );
 
-  const closeModal = useCallback(
-    async (status?: RowStatus, valueId?: number, valueLabel?: string) => {
-      try {
-        if (status && valueId && valueLabel) {
-          await handleTrajectoryUpdate(rowIndexSelected, status, valueId, valueLabel);
-        }
-      } finally {
-        toggleModal();
-      }
-    },
-    [rowIndexSelected],
-  );
-
   const columns = useMemo(
     () =>
       getAreaLinkTableHeaders(
@@ -266,7 +224,12 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
       {isModalOpen && (
         <ImportTrajectoryModal
           options={optionsFS}
-          onClose={closeModal}
+          onClose={async (status, value, label) => {
+            if (status && value != null && label) {
+              await handleTrajectoryUpdate(rowIndexSelected, status, value, label);
+            }
+            toggleModal();
+          }}
           trajectoryType={rowIndexSelected === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK}
           studyHorizon={study.horizon}
           studyId={study.id}
