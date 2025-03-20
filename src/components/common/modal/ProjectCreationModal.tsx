@@ -113,7 +113,7 @@ export const ProjectCreationModal = ({ onClose }: ProjectCreationModalProps) => 
         <RdsButton
           icon={RdsIconId.Add}
           label="Create"
-          onClick={handleCreateProject}
+          onClick={() => void handleCreateProject()}
           variant="contained"
           color="primary"
           disabled={!isFormValid}
