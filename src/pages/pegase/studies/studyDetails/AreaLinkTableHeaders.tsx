@@ -93,7 +93,7 @@ const getAreaLinkTableHeaders = (
             }}
             disabled={row.getReadOnly()}
           />
-          {error.message && row.index === error.index && <div className="text-error-600">{error.message}</div>}
+          {error.message && row.index === error.index && <div className="text-error-700">{error.message}</div>}
         </div>
       );
     },
