@@ -87,7 +87,7 @@ export const ImportTrajectoryModal = ({
         <div className="w-full items-start gap-4">
           <div className="absolute">
             <SelectAndSearchableInput
-              options={options ? [...options, ...options, ...options, ...options, ...options, ...options] : []}
+              options={options}
               defaultPlaceHolder={t('studyDetails.@select_trajectory')}
               onSelect={handleSelectOption}
               isSearchable={true}
