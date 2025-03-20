@@ -18,8 +18,8 @@ import {
 import {
   mockDbTrajectory,
   mockDbTrajectoryArray,
-  mockResponseTrajectoryListFS,
-} from '@/shared/services/test/mock/trajectoryMock.ts';
+  mockFsTrajectoryArray,
+} from '@/shared/services/test/mocks/trajectoryMock.tsx';
 
 vi.mock('@/envVariables', () => ({
   getEnvVariables: vi.fn(() => 'https://mockapi.com'),
@@ -89,7 +89,7 @@ describe('fetchTrajectoriesFromFS', () => {
     //Successful fetch response mock
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: true,
-      json: async () => Promise.resolve(mockResponseTrajectoryListFS),
+      json: async () => Promise.resolve(mockFsTrajectoryArray),
     });
 
     const result = await fetchTrajectoriesFromFS(TRAJECTORY_TYPE.AREA);
@@ -100,7 +100,7 @@ describe('fetchTrajectoriesFromFS', () => {
         `https://mockapi.com/v1/trajectory/fs?trajectoryType=AREA&thermalCapacityArea=`,
         {},
       );
-      expect(result).toEqual(mockResponseTrajectoryListFS);
+      expect(result).toEqual(mockFsTrajectoryArray);
     });
   });
 

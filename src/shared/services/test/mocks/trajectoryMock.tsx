@@ -29,7 +29,7 @@ export const mockDbTrajectoryArray = [
   },
 ];
 
-export const mockResponseTrajectoryListFS = [
+export const mockFsTrajectoryArray = [
   {
     trajectoryName: 'area_BP_2028',
     type: TRAJECTORY_TYPE.AREA,
