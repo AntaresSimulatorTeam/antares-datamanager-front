@@ -36,7 +36,6 @@ const SelectAndSearchableInput = ({
   const dropdownList = useRef<HTMLDivElement | null>(null);
 
   const handleInputChange = async (value: string) => {
-    console.log('================= value', value);
     try {
       if (value) {
         setValueInput(value);
