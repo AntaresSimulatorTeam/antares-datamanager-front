@@ -14,65 +14,70 @@ import { RdsRadioButton, RdsTagList } from 'rte-design-system-react';
 const columnHelper = createColumnHelper<StudyDTO>();
 
 const getStudyTableHeaders = (t: (value: string) => string) => [
-    columnHelper.display({
-      id: 'radioColumn',
-      header: '',
-      cell: ({ row }) => (
-        <div className={`${row.getIsSelected() ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
-          <RdsRadioButton
-            value={row.original.id.toString()}
-            label=""
-            disabled={!row.getCanSelect()}
-            checked={row.getIsSelected()}
-            name={`radio-${row.original.id}`}
-          />
-        </div>
-      ),
-    }),
+  columnHelper.display({
+    id: 'radioColumn',
+    header: '',
+    cell: ({ row }) => (
+      <div className={`${row.getIsSelected() ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+        <RdsRadioButton
+          value={row.original.id.toString()}
+          label=""
+          disabled={!row.getCanSelect()}
+          checked={row.getIsSelected()}
+          name={`radio-${row.original.id}`}
+        />
+      </div>
+    ),
+  }),
 
-    columnHelper.accessor('name', {
-      header: t('home.@study_name'),
-      cell: ({ getValue, row }) => {
-        const status = row.original.status;
-        const textClass = status === StudyStatus.GENERATED ? 'text-primary-900' : 'group-hover:text-green-500';
-        return <span className={`transition-colors ${textClass}`}>{getValue()}</span>;
-      },
-    }),
+  columnHelper.accessor('name', {
+    header: t('home.@study_name'),
+    cell: ({ getValue, row }) => {
+      const status = row.original.status;
+      const textClass = status === StudyStatus.GENERATED ? 'text-primary-900' : 'group-hover:text-green-500';
+      return <span className={`transition-colors ${textClass}`}>{getValue()}</span>;
+    },
+  }),
 
-    columnHelper.accessor('createdBy', {
-      header: t('home.@user_name'),
-      cell: ({ getValue }) => (
-        <StdAvatar size="es" backgroundColor="gray" fullname={getValue()} initials={getValue().substring(0, 2)} />
-      ),
-    }),
+  columnHelper.accessor('createdBy', {
+    header: t('home.@user_name'),
+    cell: ({ getValue }) => (
+      <StdAvatar
+        size="es"
+        backgroundColor="gray"
+        fullname={getValue() ?? ''}
+        initials={getValue()?.substring(0, 2) ?? ''}
+      />
+    ),
+  }),
 
-    columnHelper.accessor('project', {
-      header: t('home.@project'),
-    }),
+  columnHelper.accessor('project', {
+    header: t('home.@project'),
+  }),
 
-    columnHelper.accessor('status', {
-      header: t('home.@status'),
-    }),
+  columnHelper.accessor('status', {
+    header: t('home.@status'),
+  }),
 
-    columnHelper.accessor('horizon', {
-      header: t('home.@horizon'),
-    }),
+  columnHelper.accessor('horizon', {
+    header: t('home.@horizon'),
+  }),
 
-    columnHelper.accessor('keywords', {
-      header: t('home.@keywords'),
-      minSize: 500,
-      size: 500,
-      cell: ({ getValue, row }) => (
-        <div className="flex h-3 w-32">
-          <RdsTagList id={`pegase-tags-${row.id}`} tags={getValue()} />
-        </div>
-      ),
-    }),
+  columnHelper.accessor('keywords', {
+    header: t('home.@keywords'),
+    minSize: 500,
+    size: 500,
+    cell: ({ getValue, row }) => (
+      <div className="flex h-3 w-32">
+        <RdsTagList id={`pegase-tags-${row.id}`} tags={getValue()} />
+      </div>
+    ),
+  }),
 
-    columnHelper.accessor('creationDate', {
-      header: t('home.@creation_date'),
-      cell: ({ getValue }) => formatDateToDDMMYYYY(getValue(), true),
-    }),
-  ];
+  columnHelper.accessor('creationDate', {
+    header: t('home.@creation_date'),
+    cell: ({ getValue }) => formatDateToDDMMYYYY(getValue(), true),
+  }),
+];
 
 export default getStudyTableHeaders;

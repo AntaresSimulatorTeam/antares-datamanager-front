@@ -63,19 +63,18 @@ export const fetchProjectsFromPartialName = async (query: string): Promise<strin
 /**
  * Retrieve a list of project from a user name
  *
- * @param {string} searchTerm
  * @param {number} current
  * @param {number} intervalSize
+ * @param {string | undefined} searchTerm - Text entered by a user or user id
  * @return {Promise<PaginatedResponse<ProjectResponse> | Error>}
  */
 export const fetchProjectFromSearchTerm = async (
-  searchTerm: string,
   current: number,
   intervalSize: number,
+  searchTerm?: string,
 ): Promise<PaginatedResponse<ProjectResponse> | Error> => {
-  const response = await AuthService.authFetch(
-    `${PROJECT_SEARCH_ENDPOINT}?page=${current + 1}&size=${intervalSize}&search=${searchTerm ?? ''}`,
-  );
+  const urlApi = `${PROJECT_SEARCH_ENDPOINT}?search=${searchTerm ?? ''}&page=${current != null ? current + 1 : ''}&size=${intervalSize ?? ''}`;
+  const response = await AuthService.authFetch(urlApi);
 
   if (!response?.ok) {
     const errorText = await response.text();
