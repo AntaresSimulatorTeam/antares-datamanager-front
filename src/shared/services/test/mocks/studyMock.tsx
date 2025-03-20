@@ -22,8 +22,10 @@ export const mockStudy: StudyDTO = {
   id: 1,
   name: 'Project 1',
   createdBy: 'User A',
+  creationDate: '2023-10-01' as unknown as Date,
   keywords: ['Keyword1', 'Keyword2'],
   project: '1',
+  status: StudyStatus.IN_PROGRESS,
   horizon: '2030-2031',
   trajectoryIds: [1, 7],
 };
