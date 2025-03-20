@@ -113,13 +113,13 @@ const getAreaLinkTableHeaders = (
       if (status === TRAJECTORY_SELECTION_STATUS.OK)
         return (
           <div className="flex flex-1 items-end gap-1">
-            <RdsIcon name={RdsIconId.Done} color="secondary" /> {t('studyDetails.@import_status_done')}
+            <RdsIcon name={RdsIconId.Done} color="primary-600" /> {t('studyDetails.@import_status_done')}
           </div>
         );
       if (status === TRAJECTORY_SELECTION_STATUS.ERROR)
         return (
           <div className="flex flex-1 items-end gap-1">
-            <RdsIcon name={RdsIconId.Info} color="primary-error" /> {t('studyDetails.@import_status_error')}
+            <RdsIcon name={RdsIconId.Info} color="error-700" /> {t('studyDetails.@import_status_error')}
           </div>
         );
       return null;
