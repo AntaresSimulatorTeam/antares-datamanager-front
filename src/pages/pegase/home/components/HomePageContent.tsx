@@ -9,12 +9,13 @@ import SearchBar from './SearchBar';
 import StudyTableDisplay from './StudyTableDisplay';
 import { useTranslation } from 'react-i18next';
 import { RdsChip, RdsHeading } from 'rte-design-system-react';
+import { useUser } from '@/store/contexts/UserContext.tsx';
 
 const HomePageContent = () => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState<string | undefined>('');
   const [activeChip, setActiveChip] = useState<boolean | null>(false);
-  const userName = 'mouad'; // Replace with actual user name
+  const { user } = useUser();
 
   const searchStudy = (value?: string | undefined) => {
     setSearchTerm(value);
@@ -26,7 +27,7 @@ const HomePageContent = () => {
       searchStudy('');
     } else {
       setActiveChip(true);
-      searchStudy(userName);
+      searchStudy(user?.profile.sub);
     }
   };
 

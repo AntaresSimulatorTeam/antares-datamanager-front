@@ -53,7 +53,7 @@ describe('useFetchProjectList', () => {
 
     await waitFor(() => {
       expect(projectService.fetchProjectFromSearchTerm).toHaveBeenCalledTimes(1);
-      expect(projectService.fetchProjectFromSearchTerm).toHaveBeenCalledWith('mouad', 0, 9);
+      expect(projectService.fetchProjectFromSearchTerm).toHaveBeenCalledWith(0, 9, 'mouad');
       expect(result.current.projects).toEqual(mockContentResponseFetchProjectApi);
       expect(result.current.count).toBe(1);
     });
@@ -64,7 +64,7 @@ describe('useFetchProjectList', () => {
 
     await waitFor(() => {
       expect(projectService.fetchProjectFromSearchTerm).toHaveBeenCalledTimes(1);
-      expect(projectService.fetchProjectFromSearchTerm).toHaveBeenCalledWith('test', 0, 9);
+      expect(projectService.fetchProjectFromSearchTerm).toHaveBeenCalledWith(0, 9, 'test');
     });
   });
 
@@ -72,7 +72,7 @@ describe('useFetchProjectList', () => {
     renderHook(() => useFetchProjectList('', 1, 9));
 
     await waitFor(() => {
-      expect(projectService.fetchProjectFromSearchTerm).toHaveBeenCalledWith('', 1, 9);
+      expect(projectService.fetchProjectFromSearchTerm).toHaveBeenCalledWith(1, 9, '');
     });
   });
 });

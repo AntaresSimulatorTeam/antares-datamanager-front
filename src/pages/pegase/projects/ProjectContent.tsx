@@ -16,17 +16,18 @@ import { useProjectNavigation } from '@/hooks/useProjectNavigation';
 import { RdsChip, RdsTagList } from 'rte-design-system-react';
 import { useFetchProjectList } from '@/hooks/useFetchProjectList';
 import { useHandlePinnedProjectList } from '@/hooks/useHandlePinnedProjectList.ts';
-import { useProject } from '@/store/contexts/ProjectContext.tsx';
 import { useDeleteProject } from '@/hooks/useDeleteProject.ts';
+import { useProject } from '@/store/contexts/ProjectContext.tsx';
+import { useUser } from '@/store/contexts/UserContext.tsx';
 
 const ProjectContent = () => {
   const { t } = useTranslation();
   const intervalSize = 9;
-  const userName = 'mouad'; // Replace with actual user name
-  const [searchTerm, setSearchTerm] = useState<string>('');
+  const { user } = useUser();
+  const [searchTerm, setSearchTerm] = useState<string | undefined>('');
   const [activeChip, setActiveChip] = useState<boolean | null>(false);
   const [current, setCurrent] = useState(0);
-  const { count } = useFetchProjectList(searchTerm || '', current, intervalSize);
+  const { count } = useFetchProjectList(searchTerm, current, intervalSize);
   const { navigateToProject } = useProjectNavigation();
   const { handlePinProject } = useHandlePinnedProjectList();
   const { projects } = useProject();
@@ -42,7 +43,7 @@ const ProjectContent = () => {
       setSearchTerm('');
     } else {
       setActiveChip(true);
-      setSearchTerm(userName);
+      setSearchTerm(user?.profile.sub);
     }
   };
 
