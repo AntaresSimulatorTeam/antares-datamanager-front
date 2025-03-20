@@ -6,49 +6,16 @@
 
 import { act, Queries, renderHook, RenderHookOptions, waitFor } from '@testing-library/react';
 import { useHandlePinnedProjectList } from '@/hooks/useHandlePinnedProjectList';
-import { afterEach, beforeEach, describe, expectTypeOf, it, Mock, vi } from 'vitest';
+import { beforeEach, describe, expectTypeOf, it, Mock, vi } from 'vitest';
 import { ProjectProvider, ProjectProviderProps } from '@/store/contexts/ProjectProvider.tsx';
 import { useProjectDispatch } from '@/store/contexts/ProjectContext';
 import { fetchPinnedProjects, pinProject } from '@/shared/services/pinnedProjectService.ts';
 import { v4 as uuidv4 } from 'uuid';
 import { notifyToast } from '@/shared/notification/notification.tsx';
 import { PROJECT_ACTION } from '@/shared/enum/project.ts';
-
-const mockProjectsApiResponse = [
-  {
-    id: '1',
-    name: 'Bilan previsionnel 2027',
-    createdBy: 'MOUAD Paris test',
-    creationDate: '2024-07-25T10:09:41',
-    studies: [1, 2, 3],
-    tags: ['gaz', 'elec', 'antares', 'misc', 'tag2 antares', 'area link'],
-    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    projectId: '1',
-    pinned: true,
-  },
-  {
-    id: '2',
-    name: 'Bilan previsionnel 2023',
-    createdBy: 'Taher benjelloun amine',
-    creationDate: '2024-07-25T10:09:41',
-    studies: [6, 5, 9],
-    tags: ['bilan 22'],
-    description: 'description2023',
-    projectId: '2',
-    pinned: true,
-  },
-  {
-    id: '3',
-    name: 'Bilan previsionnel 2025',
-    createdBy: 'zayd guillaume pegase',
-    creationDate: '2024-07-25T10:09:41',
-    studies: [7, 8],
-    tags: ['figma', 'config', 'modal'],
-    description: 'In the world of software development, achieving perfection is a journey rather than a destination.',
-    projectId: '3',
-    pinned: true,
-  },
-];
+import { useUser } from '@/store/contexts/UserContext.tsx';
+import { UserState } from '@/shared/types';
+import { mockPinProjectResponse, mockProjectsApiResponse } from '@/shared/services/test/mocks/pinnedProjectMock';
 
 vi.mock('@/envVariables', () => ({
   getEnvVariables: vi.fn(() => 'https://mockapi.com'),
@@ -69,24 +36,30 @@ vi.mock('@/store/contexts/ProjectContext', async (importOriginal) => {
     })),
   };
 });
+vi.mock('@/store/contexts/UserContext', async (importOriginal) => {
+  const actual: Mock = await importOriginal();
+  return {
+    ...actual,
+    useUser: vi.fn(),
+  };
+});
 
 describe('useHandlePinnedProjectList', () => {
   const mockUsePinnedProjectDispatch = useProjectDispatch as Mock<typeof useProjectDispatch>;
+  const mockUseUser = useUser as Mock<typeof useUser>;
   const mockDispatch = vi.fn().mockImplementation(vi.fn());
 
   beforeEach(() => {
     global.fetch = vi.fn();
-    vi.resetAllMocks();
+    mockUseUser.mockImplementation(() => ({ user: { profile: { sub: 'testUser' } } }) as UserState);
   });
-
   afterEach(() => {
-    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('should trigger getPinnedProject method on init and call dispatch to update pinned project list correctly', async () => {
     const mockFetchPinnedProjects = fetchPinnedProjects as Mock;
     mockFetchPinnedProjects.mockResolvedValueOnce(mockProjectsApiResponse);
-
     mockUsePinnedProjectDispatch.mockReturnValue(mockDispatch);
 
     const wrapper = ({ children, initialValue }: ProjectProviderProps) => (
@@ -103,7 +76,7 @@ describe('useHandlePinnedProjectList', () => {
       expectTypeOf(result.current.handleUnpinProject).toBeFunction();
       expectTypeOf(result.current.handlePinProject).toBeFunction();
       expect(fetchPinnedProjects).toHaveBeenCalledTimes(1);
-      expect(fetchPinnedProjects).toHaveBeenCalledWith('me00247');
+      expect(fetchPinnedProjects).toHaveBeenCalledWith('testUser');
       expect(mockUsePinnedProjectDispatch).toHaveBeenCalledTimes(1);
       expect(mockDispatch).toHaveBeenCalledTimes(1);
       expect(mockDispatch).toHaveBeenCalledWith({
@@ -115,21 +88,8 @@ describe('useHandlePinnedProjectList', () => {
 
   it('should call handlePinProject that calls pinProject and dispatch and update pinned project list correctly', async () => {
     const mockPinProject = pinProject as Mock;
-    const mockPinProjectResponse = {
-      id: '3',
-      name: 'Bilan previsionnel 2025',
-      createdBy: 'zayd guillaume pegase',
-      creationDate: '2024-07-25T10:09:41',
-      studies: [7, 8],
-      tags: ['figma', 'config', 'modal'],
-      description: 'In the world of software development, achieving perfection is a journey rather than a destination.',
-      projectId: '3',
-      pinned: true,
-    };
     mockPinProject.mockResolvedValueOnce(mockPinProjectResponse);
-
     mockUsePinnedProjectDispatch.mockReturnValue(mockDispatch);
-
     const id = uuidv4();
 
     const wrapper = ({ children, initialValue }: ProjectProviderProps) => (
@@ -141,10 +101,10 @@ describe('useHandlePinnedProjectList', () => {
       initialProps: { initialValue: { pinnedProject: [] } },
     } as RenderHookOptions<{ initialValue: { pinnedProject: never[]; projects: [] } }, Queries>);
 
-    await act(async () => result.current.handlePinProject('me00247'));
+    await act(async () => result.current.handlePinProject('projectId'));
 
     await waitFor(() => {
-      expect(pinProject).toHaveBeenCalledWith('me00247');
+      expect(pinProject).toHaveBeenCalledWith('projectId', 'testUser');
       expect(mockDispatch).toHaveBeenCalledTimes(1);
       expect(mockDispatch).toHaveBeenCalledWith({
         type: PROJECT_ACTION.ADD_PINNED_PROJECT,
@@ -161,9 +121,7 @@ describe('useHandlePinnedProjectList', () => {
   it('should call handlePinProject and catch error when pinProject throws one', async () => {
     const mockPinProject = pinProject as Mock;
     mockPinProject.mockRejectedValueOnce({ message: 'error' });
-
     mockUsePinnedProjectDispatch.mockReturnValue(mockDispatch);
-
     const id = uuidv4();
 
     const wrapper = ({ children, initialValue }: ProjectProviderProps) => (
@@ -175,10 +133,10 @@ describe('useHandlePinnedProjectList', () => {
       initialProps: { initialValue: { pinnedProject: [] } },
     } as RenderHookOptions<{ initialValue: { pinnedProject: never[] } }, Queries>);
 
-    await act(async () => result.current.handlePinProject('me00247'));
+    await act(async () => result.current.handlePinProject('projectId'));
 
     await waitFor(() => {
-      expect(pinProject).toHaveBeenCalledWith('me00247');
+      expect(pinProject).toHaveBeenCalledWith('projectId', 'testUser');
       expect(mockDispatch).toHaveBeenCalledTimes(0);
       expect(notifyToast).toHaveBeenCalledWith({
         id,

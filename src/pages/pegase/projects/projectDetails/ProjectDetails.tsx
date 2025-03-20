@@ -14,12 +14,13 @@ import SearchBar from '@/pages/pegase/home/components/SearchBar';
 import { useTranslation } from 'react-i18next';
 import { RdsChip, RdsDivider } from 'rte-design-system-react';
 import { fetchProjectDetails } from '@/shared/services/projectService.ts';
+import { useUser } from '@/store/contexts/UserContext.tsx';
 
 const ProjectDetails = () => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState<string | undefined>('');
   const [activeChip, setActiveChip] = useState<boolean | null>(false);
-  const userName = 'mouad'; // Replace with actual user name
+  const { user } = useUser();
 
   const searchStudy = (value?: string | undefined) => {
     setSearchTerm(value);
@@ -31,7 +32,7 @@ const ProjectDetails = () => {
       searchStudy('');
     } else {
       setActiveChip(true);
-      searchStudy(userName);
+      searchStudy(user?.profile.sub);
     }
   };
 

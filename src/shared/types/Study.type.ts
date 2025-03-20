@@ -12,7 +12,7 @@ import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 export interface StudyDTO {
   id: number;
   name: string;
-  createdBy: string;
+  createdBy: string | undefined;
   creationDate: Date;
   keywords: string[];
   project: string;
