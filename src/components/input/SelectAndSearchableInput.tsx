@@ -115,7 +115,7 @@ const SelectAndSearchableInput = ({
       />
       {isDropdownOpen && !!optionsSelection?.length && (
         <div
-          className="max-h-26 absolute left-0 top-7 z-50 w-full overflow-y-auto rounded border border-gray-300 bg-gray-w shadow-2 outline-none"
+          className="absolute left-0 top-7 z-50 max-h-24 w-full overflow-y-auto rounded border border-gray-300 bg-gray-w shadow-2 outline-none"
           onMouseDown={(e) => e.preventDefault()}
           ref={dropdownList}
           tabIndex={0}
