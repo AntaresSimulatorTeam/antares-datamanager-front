@@ -4,17 +4,21 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import PinnedProject from '@/pages/pegase/home/pinnedProjects/PinnedProject';
 import ProjectContent from '@/pages/pegase/projects/ProjectContent';
 import { ProjectProvider } from '@/store/contexts/ProjectProvider.tsx';
+import ProjectCreator from '@/pages/pegase/home/pinnedProjects/ProjectCreator.tsx';
+import PinnedProjectCards from '@/pages/pegase/home/pinnedProjects/PinnedProjectCard.tsx';
 
 const ProjectsPage = () => (
-    <ProjectProvider initialValue={{ pinnedProjects: [], projects: [] }}>
-      <div className="flex flex-col items-center gap-6 p-3">
-        <PinnedProject />
-        <ProjectContent />
+  <ProjectProvider initialValue={{ pinnedProjects: [], projects: [] }}>
+    <div className="flex flex-col items-center gap-6 p-3">
+      <div className="flex w-full gap-3">
+        <ProjectCreator />
+        <PinnedProjectCards />
       </div>
-    </ProjectProvider>
-  );
+      <ProjectContent />
+    </div>
+  </ProjectProvider>
+);
 
 export default ProjectsPage;

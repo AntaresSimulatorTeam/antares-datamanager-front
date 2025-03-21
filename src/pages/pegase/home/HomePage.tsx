@@ -5,16 +5,20 @@
  */
 
 import HomePageContent from './components/HomePageContent';
-import PinnedProject from '@/pages/pegase/home/pinnedProjects/PinnedProject';
 import { ProjectProvider } from '@/store/contexts/ProjectProvider.tsx';
+import ProjectCreator from '@/pages/pegase/home/pinnedProjects/ProjectCreator.tsx';
+import PinnedProjectCards from '@/pages/pegase/home/pinnedProjects/PinnedProjectCard.tsx';
 
 const HomePage = () => (
-    <ProjectProvider initialValue={{ pinnedProjects: [], projects: [] }}>
-      <div className="flex flex-col items-center gap-6 p-3">
-        <PinnedProject />
-        <HomePageContent />
+  <ProjectProvider initialValue={{ pinnedProjects: [], projects: [] }}>
+    <div className="flex flex-col items-center gap-6 p-3">
+      <div className="flex w-full gap-3">
+        <ProjectCreator />
+        <PinnedProjectCards />
       </div>
-    </ProjectProvider>
-  );
+      <HomePageContent />
+    </div>
+  </ProjectProvider>
+);
 
 export default HomePage;
