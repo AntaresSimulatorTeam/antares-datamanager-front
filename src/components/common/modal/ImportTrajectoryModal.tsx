@@ -85,7 +85,7 @@ export const ImportTrajectoryModal = ({
       </RdsModal.Title>
       <RdsModal.Content>
         <div className="w-full items-start gap-4">
-          <div className="absolute">
+          <div className="absolute w-[400px]">
             <SelectAndSearchableInput
               options={options}
               defaultPlaceHolder={t('studyDetails.@select_trajectory')}
