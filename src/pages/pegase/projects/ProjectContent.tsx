@@ -18,6 +18,7 @@ import { useFetchProjectList } from '@/hooks/useFetchProjectList';
 import { useHandlePinnedProjectList } from '@/hooks/useHandlePinnedProjectList.ts';
 import { useDeleteProject } from '@/hooks/useDeleteProject.ts';
 import { useUser } from '@/store/contexts/UserContext.tsx';
+import { useProject } from '@/store/contexts/ProjectContext.tsx';
 
 const ProjectContent = () => {
   const { t } = useTranslation();
@@ -26,10 +27,10 @@ const ProjectContent = () => {
   const [searchTerm, setSearchTerm] = useState<string | undefined>('');
   const [activeChip, setActiveChip] = useState<boolean | null>(false);
   const [current, setCurrent] = useState(0);
-  const { count, projects } = useFetchProjectList(searchTerm, current, intervalSize);
+  const { count } = useFetchProjectList(searchTerm, current, intervalSize);
   const { navigateToProject } = useProjectNavigation();
   const { handlePinProject } = useHandlePinnedProjectList();
-  //const { projects } = useProject();
+  const { projects } = useProject();
   const { deleteProject } = useDeleteProject();
 
   const searchProject = (value?: string | undefined) => {
