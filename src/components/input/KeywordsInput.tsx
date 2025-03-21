@@ -78,6 +78,9 @@ const KeywordsInput = ({
 
   const handleRemoveKeyword = (index: number) => {
     setKeywords((prevKeywords) => prevKeywords.filter((_, i) => i !== index));
+    if (maxNbKeywords && keywords.length === maxNbKeywords) {
+      setErrorMessage('');
+    }
   };
 
   const shouldAddKeywordButton = (input: string): boolean => {

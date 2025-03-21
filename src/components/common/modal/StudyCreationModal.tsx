@@ -114,7 +114,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
               keywords={keywords}
               setKeywords={setKeywords}
               maxNbKeywords={6}
-              maxNbCharacters={10}
+              maxNbCharacters={15}
               minNbCharacters={3}
             />
           </div>
