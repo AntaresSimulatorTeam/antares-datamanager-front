@@ -4,11 +4,12 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { PaginatedResponse, StudyDTO } from '@/shared/types';
-import { STUDY_GENERATE_ENDPOINT, STUDY_SEARCH_ENDPOINT } from '@/shared/const/apiEndPoint';
+import { DbTrajectory, PaginatedResponse, StudyDTO } from '@/shared/types';
+import { STUDY_GENERATE_ENDPOINT, STUDY_SEARCH_ENDPOINT, TRAJECTORY_ENDPOINT } from '@/shared/const/apiEndPoint';
 import { STUDY_ENDPOINT, STUDY_KEYWORDS_SEARCH_ENDPOINT } from '@/shared/const/apiEndPoint.ts';
 import { notifyToast } from '@/shared/notification/notification.tsx';
 import { AuthService } from '@/shared/services/authService.ts';
+import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 
 /**
  * Retrieve a list of studies from a term
@@ -137,4 +138,26 @@ export const createStudy = async (id: number) => {
   if (!response.ok) {
     throw new Error('Failed to generate a study');
   }
+};
+
+/**
+ * Fetch trajectories linked to a study
+ * @param {number} studyId - Study id
+ * @param {TRAJECTORY_TYPE} trajectoryType - Trajectory type
+ *
+ * @return {Promise<DbTrajectory[] | Error>} Array of trajectories (data base trajectories)
+ */
+
+export const getStudyTrajectories = async (
+  studyId: number,
+  trajectoryType?: TRAJECTORY_TYPE,
+): Promise<DbTrajectory[] | Error> => {
+  const urlApi = `${TRAJECTORY_ENDPOINT}?studyId=${studyId}&trajectoryType=${trajectoryType ?? ''}`;
+
+  const response = await AuthService.authFetch(urlApi);
+  if (!response.ok) {
+    throw new Error('Failed to fetch trajectories linked to studies');
+  }
+
+  return (await response.json()) as DbTrajectory[];
 };

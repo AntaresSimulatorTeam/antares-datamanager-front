@@ -6,9 +6,17 @@
 
 import { vi } from 'vitest';
 import { waitFor } from '@testing-library/react';
-import { deleteStudy, fetchSearchStudies, fetchSuggestedKeywords, saveStudy } from '@/shared/services/studyService.ts';
+import {
+  deleteStudy,
+  fetchSearchStudies,
+  fetchSuggestedKeywords,
+  getStudyTrajectories,
+  saveStudy,
+} from '@/shared/services/studyService.ts';
 import { notifyToast } from '@/shared/notification/notification.tsx';
 import { mockStudy, mockStudyResponse } from '@/shared/services/test/mocks/studyMock.tsx';
+import { mockDbTrajectoryArray } from '@/shared/services/test/mocks/trajectoryMock.tsx';
+import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 
 vi.mock('@/shared/notification/notification');
 vi.mock('@/envVariables', () => ({
@@ -194,5 +202,47 @@ describe('deleteStudy', () => {
       type: 'error',
       message: 'Failed to delete study',
     });
+  });
+});
+
+describe('getStudyTrajectories', () => {
+  beforeEach(() => {
+    global.fetch = vi.fn();
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('should retrieve trajectories from study id and trajectory type', async () => {
+    global.fetch = vi.fn().mockResolvedValueOnce({
+      ok: true,
+      json: async () => Promise.resolve(mockDbTrajectoryArray),
+    });
+
+    await getStudyTrajectories(1, TRAJECTORY_TYPE.AREA);
+
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(global.fetch).toHaveBeenCalledWith(`https://mockapi.com/v1/trajectory?studyId=1&trajectoryType=AREA`, {});
+    });
+  });
+
+  it('should handle fetch failure gracefully', async () => {
+    global.fetch = vi.fn().mockResolvedValueOnce({
+      ok: false,
+      message: 'Failed to fetch trajectories',
+    });
+
+    await expect(async () => getStudyTrajectories(1, TRAJECTORY_TYPE.AREA)).rejects.toThrowError(
+      'Failed to fetch trajectories',
+    );
+  });
+
+  it('should handle exceptions during fetch', async () => {
+    global.fetch = vi.fn().mockRejectedValueOnce(new Error('Network error'));
+
+    await expect(async () => getStudyTrajectories(1, TRAJECTORY_TYPE.AREA)).rejects.toThrowError('Network error');
   });
 });
