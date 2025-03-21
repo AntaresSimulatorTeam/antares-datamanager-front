@@ -13,34 +13,16 @@ import {
 } from '@/shared/services/projectService';
 import { vi } from 'vitest';
 import { waitFor } from '@testing-library/react';
+import { mockProjectInfo, mockProjectInfoArray } from '@/shared/services/test/mocks/projectMock.tsx';
 
 vi.mock('@/shared/notification/notification');
 vi.mock('@/envVariables', () => ({
   getEnvVariables: vi.fn(() => 'https://mockapi.com'),
 }));
 
-const mockResponseApi = [
-  {
-    id: '123',
-    name: 'Bilan prévisionnel 2023',
-    description: 'Project Description',
-    createdBy: 'User A',
-    creationDate: '2024-01-01',
-    tags: ['tag1', 'tag2'],
-  },
-  {
-    id: '123',
-    name: 'Bilan prévisionnel 2019',
-    description: 'Project Description',
-    createdBy: 'User B',
-    creationDate: '2013-08-01',
-    tags: ['tag3', 'tag4'],
-  },
-];
+const projectId = '123';
 
 describe('deleteProjectById', () => {
-  const projectId = '123';
-
   beforeEach(() => {
     global.fetch = vi.fn();
     vi.stubGlobal('JSON', {
@@ -84,16 +66,6 @@ describe('deleteProjectById', () => {
 });
 
 describe('fetchProjectDetails', () => {
-  const projectId = '123';
-  const mockResponse = {
-    id: '123',
-    name: 'Project Name',
-    description: 'Project Description',
-    createdBy: 'User A',
-    creationDate: '2024-01-01',
-    tags: ['tag1', 'tag2'],
-  };
-
   beforeEach(() => {
     global.fetch = vi.fn();
   });
@@ -106,7 +78,7 @@ describe('fetchProjectDetails', () => {
     //Successful fetch response mock
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: true,
-      json: async () => Promise.resolve(mockResponse),
+      json: async () => Promise.resolve(mockProjectInfo),
     });
 
     const result = await fetchProjectDetails(projectId);
@@ -114,7 +86,7 @@ describe('fetchProjectDetails', () => {
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledTimes(1);
       expect(global.fetch).toHaveBeenCalledWith(`https://mockapi.com/v1/project/${projectId}`, {});
-      expect(result).toEqual(mockResponse);
+      expect(result).toEqual(mockProjectInfo);
     });
   });
 
@@ -152,7 +124,7 @@ describe('fetchProjectsFromPartialName', () => {
   it('should search projects by partial name', async () => {
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: true,
-      json: () => Promise.resolve(mockResponseApi),
+      json: () => Promise.resolve(mockProjectInfoArray),
     });
 
     const result = await fetchProjectsFromPartialName('name');
@@ -193,7 +165,7 @@ describe('fetchProjectFromSearchTerm', () => {
   it('should search projects by search term', async () => {
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: true,
-      json: () => Promise.resolve(mockResponseApi),
+      json: () => Promise.resolve(mockProjectInfoArray),
     });
     const result = await fetchProjectFromSearchTerm(3, 10, 'searchTerm');
 
@@ -204,7 +176,7 @@ describe('fetchProjectFromSearchTerm', () => {
         {},
       );
       expect(result).toHaveLength(2);
-      expect(result).toEqual(mockResponseApi);
+      expect(result).toEqual(mockProjectInfoArray);
     });
   });
 

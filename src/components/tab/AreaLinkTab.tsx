@@ -13,7 +13,6 @@ import { useTranslation } from 'react-i18next';
 import {
   fetchTrajectoriesFromDB,
   fetchTrajectoriesFromFS,
-  getStudyTrajectories,
   linkTrajectoryToStudy,
   unlinkTrajectoryFromStudy,
 } from '@/shared/services/trajectoryService.ts';
@@ -25,6 +24,7 @@ import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { getStatus } from '@/shared/utils/trajectoryUtils.ts';
+import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 
 export interface ErrorMessageType {
   index: number;

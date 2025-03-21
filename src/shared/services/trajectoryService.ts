@@ -86,31 +86,8 @@ export const uploadTrajectory = async (
 
   if (!(response as Response).ok) {
     throw new Error('Failed to import trajectory into data base');
-  } else {
-    return (await (response as Response).json()) as DbTrajectory;
   }
-};
-
-/**
- * Fetch trajectories linked to a study
- * @param {number} studyId - Study id
- * @param {TRAJECTORY_TYPE} trajectoryType - Trajectory type
- *
- * @return {Promise<DbTrajectory[] | Error>} Array of trajectories (data base trajectories)
- */
-
-export const getStudyTrajectories = async (
-  studyId: number,
-  trajectoryType?: TRAJECTORY_TYPE,
-): Promise<DbTrajectory[] | Error> => {
-  const urlApi = `${TRAJECTORY_ENDPOINT}?studyId=${studyId}&trajectoryType=${trajectoryType ?? ''}`;
-
-  const response = await AuthService.authFetch(urlApi);
-  if (!response.ok) {
-    throw new Error('Failed to fetch trajectories linked to studies');
-  }
-
-  return (await response.json()) as DbTrajectory[];
+  return (await (response as Response).json()) as DbTrajectory;
 };
 
 /**
