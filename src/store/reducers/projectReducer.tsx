@@ -10,7 +10,7 @@ import { PROJECT_ACTION } from '@/shared/enum/project';
 // PROJECTS
 const addProject = (currentState: ProjectState, payload: ProjectInfo) => {
   const { pinnedProjects, projects } = currentState;
-  return { projects: [...projects, payload], pinnedProjects };
+  return { projects: [payload, ...projects], pinnedProjects };
 };
 const removeProject = (currentState: ProjectState, payload: string) => {
   const { pinnedProjects, projects } = currentState;

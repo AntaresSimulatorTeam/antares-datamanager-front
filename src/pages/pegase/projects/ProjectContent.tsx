@@ -17,7 +17,6 @@ import { RdsChip, RdsTagList } from 'rte-design-system-react';
 import { useFetchProjectList } from '@/hooks/useFetchProjectList';
 import { useHandlePinnedProjectList } from '@/hooks/useHandlePinnedProjectList.ts';
 import { useDeleteProject } from '@/hooks/useDeleteProject.ts';
-import { useProject } from '@/store/contexts/ProjectContext.tsx';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 
 const ProjectContent = () => {
@@ -27,10 +26,10 @@ const ProjectContent = () => {
   const [searchTerm, setSearchTerm] = useState<string | undefined>('');
   const [activeChip, setActiveChip] = useState<boolean | null>(false);
   const [current, setCurrent] = useState(0);
-  const { count } = useFetchProjectList(searchTerm, current, intervalSize);
+  const { count, projects } = useFetchProjectList(searchTerm, current, intervalSize);
   const { navigateToProject } = useProjectNavigation();
   const { handlePinProject } = useHandlePinnedProjectList();
-  const { projects } = useProject();
+  //const { projects } = useProject();
   const { deleteProject } = useDeleteProject();
 
   const searchProject = (value?: string | undefined) => {
@@ -64,7 +63,7 @@ const ProjectContent = () => {
         />
       </div>
       <div className="grid w-full grid-cols-3 gap-3">
-        {(projects || []).map((project) => {
+        {(projects.length > intervalSize ? projects.splice(0, 9) : projects || []).map((project) => {
           const dropdownItems = [
             pinOption(false, () => void handlePinProject(project.id)),
             settingOption(() => {}, t('project.@setting')),
