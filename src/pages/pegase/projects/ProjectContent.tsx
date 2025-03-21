@@ -17,8 +17,8 @@ import { RdsChip, RdsTagList } from 'rte-design-system-react';
 import { useFetchProjectList } from '@/hooks/useFetchProjectList';
 import { useHandlePinnedProjectList } from '@/hooks/useHandlePinnedProjectList.ts';
 import { useDeleteProject } from '@/hooks/useDeleteProject.ts';
-import { useProject } from '@/store/contexts/ProjectContext.tsx';
 import { useUser } from '@/store/contexts/UserContext.tsx';
+import { useProject } from '@/store/contexts/ProjectContext.tsx';
 
 const ProjectContent = () => {
   const { t } = useTranslation();
@@ -64,7 +64,7 @@ const ProjectContent = () => {
         />
       </div>
       <div className="grid w-full grid-cols-3 gap-3">
-        {(projects || []).map((project) => {
+        {(projects.length > intervalSize ? projects.splice(0, 9) : projects || []).map((project) => {
           const dropdownItems = [
             pinOption(false, () => void handlePinProject(project.id)),
             settingOption(() => {}, t('project.@setting')),
