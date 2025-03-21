@@ -23,10 +23,6 @@ const PinnedProjectCards = () => {
   const { handleUnpinProject } = useHandlePinnedProjectList();
   const { deleteProject } = useDeleteProject();
 
-  const handleCardClick = (projectId: string, projectName: string) => {
-    navigateToProject(projectId, projectName);
-  };
-
   return (
     <>
       {pinnedProjects?.map((project, index) => (
@@ -34,12 +30,12 @@ const PinnedProjectCards = () => {
           <PegaseCard
             title={project.name}
             dropdownOptions={[
-              pinOption(project.pinned ?? false, () => handleUnpinProject(project.id)), // Toggle pin/unpin
+              pinOption(project.pinned ?? false, () => void handleUnpinProject(project.id)), // Toggle pin/unpin
               settingOption(() => {}, t('project.@setting')),
               deleteOption(() => void deleteProject(project.id), t('project.@delete'), project.studies?.length > 0),
             ]}
             id={project.id}
-            onClick={() => handleCardClick(project.id, project.name)}
+            onClick={() => navigateToProject(project.id, project.name)}
             icons={
               <div className="text-primary-600">
                 <RdsIcon name={RdsIconId.PushPin} />{' '}
