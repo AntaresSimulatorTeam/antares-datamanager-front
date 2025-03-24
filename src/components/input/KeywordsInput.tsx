@@ -36,6 +36,7 @@ const KeywordsInput = ({
     if (maxNbCharacters !== undefined && value.length > maxNbCharacters) {
       return;
     }
+    if (!value && errorMessage) setErrorMessage('');
     setKeywordInput(value);
     try {
       const tags = (await fetchSuggestedKeywords(value)) as string[];
@@ -97,7 +98,7 @@ const KeywordsInput = ({
 
   return (
     <div className={clsx(width ?? 'w-full', 'flex min-h-18 flex-col items-start justify-start')}>
-      <div className="relative flex w-full">
+      <div className="relative">
         <div className="flex w-full items-center gap-2">
           <div className="max-w-3/4 flex">
             <RdsInputText
@@ -125,14 +126,7 @@ const KeywordsInput = ({
         {/* Suggested Keywords Dropdown */}
         {keywordInput && !errorMessage && suggestedKeywords.length > 0 && (
           <div
-            className="bg-white max-h-40 absolute z-10 w-full overflow-y-auto border border-gray-300"
-            style={{
-              backgroundColor: 'white', // Ensure opaque background
-              maxHeight: '100px', // Set max height for scrollbar
-              top: '100%',
-              left: 0,
-              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // Optional: add shadow for better visibility
-            }}
+            className="absolute left-0 top-8 z-50 max-h-14 w-full overflow-y-auto rounded border border-gray-300 bg-gray-w shadow-2 outline-none"
             onMouseDown={(e) => e.preventDefault()} // Prevent closing when interacting with dropdown
           >
             {suggestedKeywords.map((suggestedKeyword, index) => (

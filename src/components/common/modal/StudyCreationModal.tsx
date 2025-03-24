@@ -99,30 +99,32 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
         {study ? t('home.@duplicate_study') : t('studyModal.@new_study')}
       </RdsModal.Title>
       <RdsModal.Content>
-        <div className="flex gap-4 self-stretch">
-          <div className="flex w-32 flex-col items-start justify-start">
-            <RdsInputText
-              label={t('studyModal.@input_name')}
-              value={studyName}
-              onChange={(value) => setStudyName(value || '')}
-              variant="outlined"
-              placeHolder={t('studyModal.@study_creation_placeholder')}
-              required
-            />
-            <HorizonInput value={horizon} onChange={handleHorizonChange} required />
-            <KeywordsInput
-              keywords={keywords}
-              setKeywords={setKeywords}
-              maxNbKeywords={6}
-              maxNbCharacters={15}
-              minNbCharacters={3}
-            />
-          </div>
-          {study && (
-            <div className="flex w-32 flex-col items-start justify-start">
-              <ProjectInput value={projectName} onChange={setProjectName} required />
+        <div className="flex flex-col gap-4 self-stretch">
+          <div className="flex justify-between gap-2">
+            <div className="w-1/2">
+              <RdsInputText
+                label={t('studyModal.@input_name')}
+                value={studyName}
+                onChange={(value) => setStudyName(value || '')}
+                variant="outlined"
+                placeHolder={t('studyModal.@study_creation_placeholder')}
+                required
+              />
             </div>
-          )}
+            {study && (
+              <div className="w-1/2">
+                <ProjectInput value={projectName} onChange={setProjectName} required />
+              </div>
+            )}
+          </div>
+          <HorizonInput value={horizon} onChange={handleHorizonChange} required />
+          <KeywordsInput
+            keywords={keywords}
+            setKeywords={setKeywords}
+            maxNbKeywords={6}
+            maxNbCharacters={15}
+            minNbCharacters={3}
+          />
         </div>
       </RdsModal.Content>
       <RdsModal.Footer>
