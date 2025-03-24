@@ -33,10 +33,16 @@ const KeywordsInput = ({
   const [suggestedKeywords, setSuggestedKeywords] = useState<string[]>([]);
 
   const handleKeywordChange = async (value: string) => {
-    if (maxNbCharacters !== undefined && value.length > maxNbCharacters) {
+    if (maxNbCharacters != null && value?.length > maxNbCharacters) {
       return;
     }
-    if (!value && errorMessage) setErrorMessage('');
+    // Remove error message when
+    const isKeywordExist = keywords?.some((keyword) => keyword == keywordInput);
+    if (
+      (!value && errorMessage && maxNbKeywords != null && keywords?.length < maxNbKeywords) ||
+      (!value && errorMessage && isKeywordExist)
+    )
+      setErrorMessage('');
     setKeywordInput(value);
     try {
       const tags = (await fetchSuggestedKeywords(value)) as string[];
@@ -78,7 +84,8 @@ const KeywordsInput = ({
 
   const handleRemoveKeyword = (index: number) => {
     setKeywords((prevKeywords) => prevKeywords.filter((_, i) => i !== index));
-    if (maxNbKeywords && keywords.length === maxNbKeywords) {
+    // In case of keyword is deleted, remove error message when max nb is reached or keyword already exists
+    if ((maxNbKeywords && keywords.length === maxNbKeywords) || keywordInput === keywords[index]) {
       setErrorMessage('');
     }
   };
