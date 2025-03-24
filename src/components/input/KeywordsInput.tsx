@@ -37,7 +37,6 @@ const KeywordsInput = ({
       return;
     }
     setKeywordInput(value);
-    setErrorMessage(''); // Clear error message when input changes
     try {
       const tags = (await fetchSuggestedKeywords(value)) as string[];
       setSuggestedKeywords(tags);
@@ -119,10 +118,12 @@ const KeywordsInput = ({
               variant="transparent"
             />
           )}
+          {/* Error Message */}
+          {errorMessage && <div className="my-2 text-error-500">{errorMessage}</div>}
         </div>
 
         {/* Suggested Keywords Dropdown */}
-        {keywordInput && suggestedKeywords.length > 0 && (
+        {keywordInput && !errorMessage && suggestedKeywords.length > 0 && (
           <div
             className="bg-white max-h-40 absolute z-10 w-full overflow-y-auto border border-gray-300"
             style={{
@@ -146,9 +147,6 @@ const KeywordsInput = ({
           </div>
         )}
       </div>
-
-      {/* Error Message */}
-      {errorMessage && <div className="my-2 text-error-500">{errorMessage}</div>}
 
       {/* Keywords Display and Clear All Button */}
       <div className="flex flex-wrap gap-2">

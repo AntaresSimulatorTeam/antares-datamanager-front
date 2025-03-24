@@ -99,14 +99,14 @@ export const ProjectCreationModal = ({ onClose }: ProjectCreationModalProps) => 
               placeHolder="Add a few lines to describe your project..."
             />
           </div>
-          <KeywordsInput
-            keywords={keywords}
-            setKeywords={setKeywords}
-            maxNbKeywords={6}
-            maxNbCharacters={15}
-            minNbCharacters={3}
-          />
         </div>
+        <KeywordsInput
+          keywords={keywords}
+          setKeywords={setKeywords}
+          maxNbKeywords={6}
+          maxNbCharacters={15}
+          minNbCharacters={3}
+        />
       </RdsModal.Content>
       <RdsModal.Footer>
         <RdsButton label="Cancel" onClick={onClose} color="secondary" />
