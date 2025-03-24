@@ -54,6 +54,10 @@
     "@created": "Created",
     "@by": "By"
   },
+  "pinnedProject": {
+    "@pinSuccess": "Project pinned successfully",
+    "@unpinSuccess": "Project unpinned successfully"
+  },
   "projectDetails": {
     "@buttonEdit": "Edit"
   },

@@ -8,7 +8,7 @@ import { useCallback, useEffect } from 'react';
 import { ProjectActionType, ProjectInfo } from '@/shared/types/Project.type';
 import { fetchPinnedProjects, pinProject, unpinProject } from '@/shared/services/pinnedProjectService';
 import { v4 as uuidv4 } from 'uuid';
-import { dismissToast, notifyToast, NotifyWithActionProps } from '@/shared/notification/notification.tsx';
+import { notifyToast } from '@/shared/notification/notification.tsx';
 import { useTranslation } from 'react-i18next';
 import { useProjectDispatch } from '@/store/contexts/ProjectContext';
 import { PROJECT_ACTION } from '@/shared/enum/project.ts';
@@ -56,7 +56,7 @@ export const useHandlePinnedProjectList = () => {
       notifyToast({
         id: toastId,
         type: 'success',
-        message: 'Project pinned successfully',
+        message: t('pinnedProject.@pinSuccess'),
       });
     } catch (error: unknown) {
       notifyToast({
@@ -75,46 +75,26 @@ export const useHandlePinnedProjectList = () => {
    * @param {string} projectId - Project id
    */
   const handleUnpinProject = useCallback(async (projectId: string) => {
-    let apiCallTimeout: number | null = null;
     const toastId = uuidv4();
-    const currentPinnedProjects = await fetchPinnedProjects(user?.profile.sub);
 
-    dispatch?.({
-      type: PROJECT_ACTION.UNPIN_PINNED_PROJECT,
-      payload: projectId,
-    } as ProjectActionType);
-
-    notifyToast({
-      id: toastId,
-      type: 'info',
-      message: t('components.quickAccess.@confirmUnpin', { name: projectId }),
-      action: {
-        label: t('components.quickAccess.@cancel'),
-        onClick: () => {
-          dismissToast(toastId);
-          clearTimeout(apiCallTimeout!);
-          dispatch?.({
-            type: PROJECT_ACTION.INIT_PINNED_PROJECT_LIST,
-            payload: currentPinnedProjects,
-          } as ProjectActionType);
-        },
-      },
-    } as NotifyWithActionProps);
-
-    apiCallTimeout = setTimeout(() => {
-      unpinProject(projectId, user?.profile.sub).catch((error: unknown) => {
-        dispatch?.({
-          type: PROJECT_ACTION.INIT_PINNED_PROJECT_LIST,
-          payload: currentPinnedProjects,
-        } as ProjectActionType);
-
-        notifyToast({
-          id: toastId,
-          type: 'error',
-          message: `${(error as Error).message}`,
-        });
+    try {
+      await unpinProject(projectId, user?.profile.sub);
+      dispatch?.({
+        type: PROJECT_ACTION.UNPIN_PINNED_PROJECT,
+        payload: projectId,
+      } as ProjectActionType);
+      notifyToast({
+        id: toastId,
+        type: 'success',
+        message: t('pinnedProject.@unpinSuccess'),
       });
-    }, 4000) as unknown as number;
+    } catch (error) {
+      notifyToast({
+        id: toastId,
+        type: 'error',
+        message: `${(error as Error).message}`,
+      });
+    }
   }, []);
 
   return { getPinnedProjects, handlePinProject, handleUnpinProject };

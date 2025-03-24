@@ -9,7 +9,7 @@ import { useHandlePinnedProjectList } from '@/hooks/useHandlePinnedProjectList';
 import { beforeEach, describe, expectTypeOf, it, Mock, vi } from 'vitest';
 import { ProjectProvider, ProjectProviderProps } from '@/store/contexts/ProjectProvider.tsx';
 import { useProjectDispatch } from '@/store/contexts/ProjectContext';
-import { fetchPinnedProjects, pinProject } from '@/shared/services/pinnedProjectService.ts';
+import { fetchPinnedProjects, pinProject, unpinProject } from '@/shared/services/pinnedProjectService.ts';
 import { v4 as uuidv4 } from 'uuid';
 import { notifyToast } from '@/shared/notification/notification.tsx';
 import { PROJECT_ACTION } from '@/shared/enum/project.ts';
@@ -137,6 +137,64 @@ describe('useHandlePinnedProjectList', () => {
 
     await waitFor(() => {
       expect(pinProject).toHaveBeenCalledWith('projectId', 'testUser');
+      expect(mockDispatch).toHaveBeenCalledTimes(0);
+      expect(notifyToast).toHaveBeenCalledWith({
+        id,
+        type: 'error',
+        message: 'error',
+      });
+    });
+  });
+
+  it('should call handleUnpinProject that calls unpinProject and dispatch and update pinned project list correctly', async () => {
+    mockUsePinnedProjectDispatch.mockReturnValue(mockDispatch);
+    const id = uuidv4();
+
+    const wrapper = ({ children, initialValue }: ProjectProviderProps) => (
+      <ProjectProvider initialValue={initialValue}>{children}</ProjectProvider>
+    );
+
+    const { result } = renderHook(() => useHandlePinnedProjectList(), {
+      wrapper,
+      initialProps: { initialValue: { pinnedProject: mockProjectsApiResponse } },
+    } as RenderHookOptions<{ initialValue: { pinnedProject: never[]; projects: [] } }, Queries>);
+
+    await act(async () => result.current.handleUnpinProject('2'));
+
+    await waitFor(() => {
+      expect(unpinProject).toHaveBeenCalledWith('2', 'testUser');
+      expect(mockDispatch).toHaveBeenCalledTimes(1);
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: PROJECT_ACTION.UNPIN_PINNED_PROJECT,
+        payload: '2',
+      });
+      expect(notifyToast).toHaveBeenCalledWith({
+        id,
+        type: 'success',
+        message: 'Project unpinned successfully',
+      });
+    });
+  });
+
+  it('should call handlePinProject and catch error when unpinProject throws one', async () => {
+    const mockUnpinProject = unpinProject as Mock;
+    mockUnpinProject.mockRejectedValueOnce({ message: 'error' });
+    mockUsePinnedProjectDispatch.mockReturnValue(mockDispatch);
+    const id = uuidv4();
+
+    const wrapper = ({ children, initialValue }: ProjectProviderProps) => (
+      <ProjectProvider initialValue={initialValue}>{children}</ProjectProvider>
+    );
+
+    const { result } = renderHook(() => useHandlePinnedProjectList(), {
+      wrapper,
+      initialProps: { initialValue: { pinnedProject: [] } },
+    } as RenderHookOptions<{ initialValue: { pinnedProject: never[] } }, Queries>);
+
+    await act(async () => result.current.handleUnpinProject('2'));
+
+    await waitFor(() => {
+      expect(unpinProject).toHaveBeenCalledWith('2', 'testUser');
       expect(mockDispatch).toHaveBeenCalledTimes(0);
       expect(notifyToast).toHaveBeenCalledWith({
         id,
