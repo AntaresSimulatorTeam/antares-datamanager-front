@@ -26,7 +26,8 @@
     "@projet": "Project",
     "@logout": "Log out",
     "@parameters": "Parameters",
-    "@antares": "Antares"
+    "@antares": "Antares",
+    "@about": "About"
   },
   "home": {
     "@label": "Home",

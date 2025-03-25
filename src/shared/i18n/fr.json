@@ -23,7 +23,8 @@
     "@projet": "Projet",
     "@logout": "Se déconnecter",
     "@parameters": "Paramètres",
-    "@antares": "Antares"
+    "@antares": "Antares",
+    "@about": "À propos"
   },
   "home": {
     "@label": "Home",

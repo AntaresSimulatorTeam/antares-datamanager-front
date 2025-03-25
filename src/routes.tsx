@@ -14,6 +14,7 @@ const HomePage = lazy(() => import('./pages/pegase/home/HomePage'));
 const ProjectsPage = lazy(() => import('./pages/pegase/projects/ProjectsPage'));
 const LogsPage = lazy(() => import('./pages/pegase/reports/LogsPage'));
 const AntaresPage = lazy(() => import('./pages/pegase/antares/Antares'));
+const About = lazy(() => import('./pages/pegase/antares/About'));
 const LogoutPage = lazy(() => import('./pages/pegase/logout/Logout'));
 
 export const menuTopData: MenuNavItem[] = [
@@ -56,6 +57,14 @@ export const menuTopData: MenuNavItem[] = [
     path: '/antares',
     icon: RdsIconId.Apps,
     component: AntaresPage,
+  },
+  {
+    id: 'antares-about',
+    key: 'about',
+    label: 'page.@about',
+    path: '/about',
+    icon: RdsIconId.Info,
+    component: About,
   },
 ];
 
