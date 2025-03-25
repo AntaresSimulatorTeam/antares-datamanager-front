@@ -39,11 +39,13 @@ const KeywordsInput = ({
     // Remove error message when input keyword is deleted and error message (max nb or already keyword is displayed)
     const isKeywordExist = keywords?.some((keyword) => keyword == keywordInput);
     if (
-      (!value && errorMessage && maxNbKeywords != null && keywords?.length < maxNbKeywords) ||
+      (!value && errorMessage && maxNbKeywords != null && keywords?.length === maxNbKeywords) ||
       (!value && errorMessage && isKeywordExist)
-    )
+    ) {
       setErrorMessage('');
+    }
     setKeywordInput(value);
+
     try {
       const tags = (await fetchSuggestedKeywords(value)) as string[];
       setSuggestedKeywords(tags);
