@@ -14,6 +14,7 @@ import { DbTrajectory, FsTrajectory } from '@/shared/types';
 import { AuthService } from '@/shared/services/authService.ts';
 import { fetchWithProgress } from '@/shared/services/progressService.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { AreaData, LinkData } from '@/mocks/data/list/trajectoryData.ts';
 
 /**
  * Retrieve a list of trajectories by type and horizon from database
@@ -135,3 +136,6 @@ export const unlinkTrajectoryFromStudy = async (trajectoryId: number, studyId: n
     throw new Error(`${(response as unknown as Error).message}`);
   }
 };
+
+export const trajectoryData = async (index: number) =>
+  index === 0 ? Promise.resolve(AreaData) : Promise.resolve(LinkData);

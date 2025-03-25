@@ -30,3 +30,26 @@ export type AreaAndLinkRowData = {
 };
 
 export type RowStatus = FileInputStatus | 'warning' | 'emptyError';
+
+export interface TrajectoryAreaData {
+  area_name: string;
+  power_to_gas: string;
+  short_term_storage: string;
+}
+
+export interface TrajectoryLinkData {
+  link_name: string;
+  direct_w_hp: number;
+  direct_w_hc: number;
+  direct_s_hp: number;
+  direct_s_hc: number;
+  indirect_w_hp: number;
+  indirect_w_hc: number;
+  indirect_s_hp: number;
+  indirect_s_hc: number;
+  flowbased_perimeter: string;
+  hvdc: string;
+  specific_ts: string;
+  forced_outage_hvac: string;
+  hurdle_cost: number;
+}

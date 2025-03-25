@@ -105,5 +105,11 @@
     "@preview": "View",
     "@generate": "Generate",
     "@add_trajectories_message": "Please add Areas trajectories first"
+  },
+  "trajectoryViewModal": {
+    "@title": "Vizualise trajectory data",
+    "@areaName": "Name",
+    "@areaPowerToGas": "Power to gas",
+    "@shortTermStorage": "Short term storage"
   }
 }

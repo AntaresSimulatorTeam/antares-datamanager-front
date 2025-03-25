@@ -23,6 +23,7 @@ const getAreaLinkTableHeaders = (
   handleUpdate: (index: number, status: RowStatus, trajectoryId: number, trajectoryLabel?: string) => Promise<void>,
   handleImport: (index: number) => Promise<void>,
   handlerSearch: (index: number, value: string | undefined) => Promise<SelectOption[] | undefined>,
+  handleView: (index: number) => void,
   error: { index: number; message: string },
   setErrorInfo: Dispatch<SetStateAction<ErrorMessageType>>,
   studyStatus: StudyStatus | undefined,
@@ -41,6 +42,7 @@ const getAreaLinkTableHeaders = (
               position={'left'}
               color={row.getReadOnly() ? 'gray-700' : 'primary-600'}
               borderColor={row.getReadOnly() ? 'gray-700' : 'acc1-600'}
+              onClick={() => void handleView(row.index)}
             />
           ) : null}
         </div>

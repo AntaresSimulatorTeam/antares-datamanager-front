@@ -17,7 +17,16 @@ import {
   unlinkTrajectoryFromStudy,
 } from '@/shared/services/trajectoryService.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { AreaAndLinkRowData, DbTrajectory, RowStatus, SelectOption, StudyActionType, StudyDTO } from '@/shared/types';
+import {
+  AreaAndLinkRowData,
+  DbTrajectory,
+  RowStatus,
+  SelectOption,
+  StudyActionType,
+  StudyDTO,
+  TrajectoryAreaData,
+  TrajectoryLinkData,
+} from '@/shared/types';
 import { convertToFSSelectionOptionType, convertToSelectionOptionType } from '@/shared/utils/formFormatter';
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext';
@@ -25,11 +34,24 @@ import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { getStatus } from '@/shared/utils/trajectoryUtils.ts';
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
+import { TrajectoryDataVisualisation } from '@common/modal/TrajectoryDataVisualisation.tsx';
+import { AreaData, LinkData } from '@/mocks/data/list/trajectoryData.ts';
+import { AccessorKeyColumnDefBase } from '@tanstack/react-table';
+import getTrajectoryAreaHeader from '@/components/header/TrajectoryAreaHeader.tsx';
 
 export interface ErrorMessageType {
   index: number;
   message: string;
 }
+
+export interface TrajectoryViewData<TData> {
+  data: TData[];
+  columns: AccessorKeyColumnDefBase<TData, string>;
+}
+
+export type TrajectoryAreaALinkViewData =
+  | TrajectoryViewData<TrajectoryAreaData>
+  | TrajectoryViewData<TrajectoryLinkData>;
 
 interface AreaLinkTabProps {
   study: StudyDTO;
@@ -40,7 +62,9 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
   const [rowIndexSelected, setRowIndexSelected] = useState<number>(0);
   const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
+  const [trajectoryData, setTrajectoryData] = useState<TrajectoryAreaALinkViewData | undefined>();
   const { isModalOpen, toggleModal } = useNewStudyModal();
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const dispatch = useStudyDispatch();
   const { t } = useTranslation();
   const [data, setData] = useState<AreaAndLinkRowData[]>([
@@ -202,6 +226,28 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
     [study.horizon],
   );
 
+  const handleViewTrajectory = (index: number) => {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      //const results: TrajectoryData[] = await trajectoryData();
+      if (index === 0) {
+        setTrajectoryData({
+          data: AreaData,
+          columns: getTrajectoryAreaHeader(t),
+        } as unknown as TrajectoryViewData<TrajectoryAreaData>);
+      } else {
+        setTrajectoryData({
+          data: LinkData,
+          columns: getTrajectoryAreaHeader(t),
+        } as unknown as TrajectoryViewData<TrajectoryLinkData>);
+      }
+
+      setIsViewModalOpen(true);
+    } catch (error) {
+      // silent handler
+    }
+  };
+
   const columns = useMemo(
     () =>
       getAreaLinkTableHeaders(
@@ -209,6 +255,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
         handleTrajectoryUpdate,
         handleFetchTrajectoriesFS,
         handleTrajectorySearch,
+        handleViewTrajectory,
         errorInfo,
         setErrorInfo,
         studyState?.studyStatus,
@@ -240,6 +287,9 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
           studyHorizon={study.horizon}
           studyId={study.id}
         />
+      )}
+      {isViewModalOpen && trajectoryData && (
+        <TrajectoryDataVisualisation trajectoryData={trajectoryData} onClose={() => setIsViewModalOpen(false)} />
       )}
     </div>
   );
