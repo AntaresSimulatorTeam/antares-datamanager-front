@@ -89,7 +89,7 @@ describe('fetchTrajectoriesFromFS', () => {
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledTimes(1);
       expect(global.fetch).toHaveBeenCalledWith(
-        `https://mockapi.com/v1/trajectory/fs?trajectoryType=AREA&thermalCapacityArea=`,
+        `https://mockapi.com/v1/trajectory/fs?trajectoryType=AREA&thermalCapacityArea=&fileNameContains=`,
         {},
       );
       expect(result).toEqual(mockFsTrajectoryArray);
