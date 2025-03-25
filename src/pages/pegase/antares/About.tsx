@@ -1,8 +1,16 @@
+// src/pages/pegase/antares/About.tsx
 import { useEffect, useState } from 'react';
 import { fetchAppInfo } from '@/shared/services/aboutService.ts';
 import { AppInfo } from '@/shared/types/AppInfo';
+import packageJson from '../../../../package.json';
+import { GIT_INFO } from '../../../gitInfo';
 
-const TableRow = ({ label, value }) => (
+interface TableRowProps {
+  label: string;
+  value: string;
+}
+
+const TableRow = ({ label, value }: TableRowProps) => (
   <tr>
     <td className="py-1 px-2 border-b border-gray-200 text-sm">{label}</td>
     <td className="py-1 px-2 border-b border-gray-200 text-sm">{value}</td>
@@ -25,10 +33,20 @@ export const About = () => {
   return (
     <div className="p-4">
       <h1 className="text-3xl font-bold mb-4">À propos</h1>
+
+      <div>
+        <h1>{packageJson.name} (v{packageJson.version})</h1>
+        <p>{packageJson.description || 'No description available'}</p> {/* Handle absence of description */}
+
+        <h3>Git</h3>
+        <p>Branch: {GIT_INFO.branch}</p>
+        <p>Commit: {GIT_INFO.commit}</p>
+        <p>Build Time: {GIT_INFO.buildTime}</p>
+      </div>
       {info ? (
         <table className="min-w-full bg-white">
           <tbody>
-            <TableRow className="font-bold" label="App Name" value={info.appName} />
+            <TableRow label="App Name" value={info.appName} />
             <TableRow label="App Description" value={info.appDescription} />
             <TableRow label="App Version" value={info.appVersion} />
             <TableRow label="Git Branch" value={info.appBranch} />
