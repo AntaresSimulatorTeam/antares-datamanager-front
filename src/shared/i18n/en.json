@@ -107,9 +107,24 @@
     "@add_trajectories_message": "Please add Areas trajectories first"
   },
   "trajectoryViewModal": {
-    "@title": "Vizualise trajectory data",
-    "@areaName": "Name",
-    "@areaPowerToGas": "Power to gas",
-    "@shortTermStorage": "Short term storage"
+    "@title_area": "Areas",
+    "@title_link": "Links",
+    "@area_name": "Name",
+    "@power_to_gas": "Power to gas",
+    "@short_term_storage": "Short term storage",
+    "@link_name": "Name",
+    "@direct_w_hp": "Winter HP Direct MW",
+    "@direct_w_hc": "Winter HC Direct MW",
+    "@direct_s_hp": "Summer HP Direct MW",
+    "@direct_s_hc": "Summer HC Direct MW",
+    "@indirect_w_hp": "Winter HP Indirect MW",
+    "@indirect_w_hc": "Winter HC Indirect MW",
+    "@indirect_s_hp": "Summer HP Indirect MW",
+    "@indirect_s_hc": "Summer HC Indirect MW",
+    "@flowbased_perimeter": "Flowbased perimeter",
+    "@hvdc": "HVDC",
+    "@specific_ts": "Specific TS",
+    "@forced_outage_hvac": "Forced Outage HVAC",
+    "@hurdle_cost": "Hurdle cost"
   }
 }

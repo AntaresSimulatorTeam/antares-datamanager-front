@@ -7,7 +7,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import StdSimpleTable from '@common/data/stdSimpleTable/StdSimpleTable.tsx';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
-import getAreaLinkTableHeaders from '@/pages/pegase/studies/studyDetails/AreaLinkTableHeaders.tsx';
+import getAreaLinkTableHeaders from '@/components/header/AreaLinkTableHeaders.tsx';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { useTranslation } from 'react-i18next';
 import {
@@ -24,8 +24,12 @@ import {
   SelectOption,
   StudyActionType,
   StudyDTO,
+  TrajectoryAreaALinkViewData,
   TrajectoryAreaData,
+  TrajectoryAreaDataScheme,
   TrajectoryLinkData,
+  TrajectoryLinkDataScheme,
+  TrajectoryViewData,
 } from '@/shared/types';
 import { convertToFSSelectionOptionType, convertToSelectionOptionType } from '@/shared/utils/formFormatter';
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
@@ -36,22 +40,12 @@ import { getStatus } from '@/shared/utils/trajectoryUtils.ts';
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { TrajectoryDataVisualisation } from '@common/modal/TrajectoryDataVisualisation.tsx';
 import { AreaData, LinkData } from '@/mocks/data/list/trajectoryData.ts';
-import { AccessorKeyColumnDefBase } from '@tanstack/react-table';
-import getTrajectoryAreaHeader from '@/components/header/TrajectoryAreaHeader.tsx';
+import { generateTrajectoryViewHeader } from '@/components/header/TrajectoryLinkHeader.tsx';
 
 export interface ErrorMessageType {
   index: number;
   message: string;
 }
-
-export interface TrajectoryViewData<TData> {
-  data: TData[];
-  columns: AccessorKeyColumnDefBase<TData, string>;
-}
-
-export type TrajectoryAreaALinkViewData =
-  | TrajectoryViewData<TrajectoryAreaData>
-  | TrajectoryViewData<TrajectoryLinkData>;
 
 interface AreaLinkTabProps {
   study: StudyDTO;
@@ -228,17 +222,18 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
 
   const handleViewTrajectory = (index: number) => {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       //const results: TrajectoryData[] = await trajectoryData();
       if (index === 0) {
         setTrajectoryData({
+          trajectory: data[0]?.trajectory,
           data: AreaData,
-          columns: getTrajectoryAreaHeader(t),
+          columns: generateTrajectoryViewHeader(TrajectoryAreaDataScheme, t, 350),
         } as unknown as TrajectoryViewData<TrajectoryAreaData>);
       } else {
         setTrajectoryData({
+          trajectory: data[1]?.trajectory,
           data: LinkData,
-          columns: getTrajectoryAreaHeader(t),
+          columns: generateTrajectoryViewHeader(TrajectoryLinkDataScheme, t, 128),
         } as unknown as TrajectoryViewData<TrajectoryLinkData>);
       }
 

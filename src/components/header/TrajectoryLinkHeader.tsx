@@ -3,63 +3,18 @@ import { TrajectoryLinkData } from '@/shared/types';
 
 const columnHelperLink = createColumnHelper<TrajectoryLinkData>();
 
-const getTrajectoryLinkHeader = (t: (value: string) => string) => [
-  columnHelperLink.accessor('link_name', {
-    header: t('trajectoryViewModal.@areaName'),
-    cell: ({ getValue }) => <span>{getValue()}</span>,
-  }),
-  columnHelperLink.accessor('direct_w_hp', {
-    header: t('trajectoryViewModal.@areaPowerToGas'),
-    cell: ({ getValue }) => <div className="bg-gray-400 p-0">{getValue()}</div>,
-  }),
-  columnHelperLink.accessor('direct_w_hc', {
-    header: t('trajectoryViewModal.@shortTermStorage'),
-    cell: ({ getValue }) => <div className="bg-gray-400 p-0">{getValue()}</div>,
-  }),
-  columnHelperLink.accessor('direct_s_hp', {
-    header: t('trajectoryViewModal.@areaName'),
-    cell: ({ getValue }) => <div className="bg-gray-400 p-0">{getValue()}</div>,
-  }),
-  columnHelperLink.accessor('direct_s_hc', {
-    header: t('trajectoryViewModal.@areaPowerToGas'),
-    cell: ({ getValue }) => <div className="bg-gray-400 p-0">{getValue()}</div>,
-  }),
-  columnHelperLink.accessor('indirect_w_hp', {
-    header: t('trajectoryViewModal.@shortTermStorage'),
-    cell: ({ getValue }) => <div className="bg-gray-400 p-0">{getValue()}</div>,
-  }),
-  columnHelperLink.accessor('indirect_w_hc', {
-    header: t('trajectoryViewModal.@areaName'),
-    cell: ({ getValue }) => <span>{getValue()}</span>,
-  }),
-  columnHelperLink.accessor('indirect_s_hp', {
-    header: t('trajectoryViewModal.@areaPowerToGas'),
-    cell: ({ getValue }) => <div className="bg-gray-400 p-0">{getValue()}</div>,
-  }),
-  columnHelperLink.accessor('indirect_s_hc', {
-    header: t('trajectoryViewModal.@shortTermStorage'),
-    cell: ({ getValue }) => <div className="bg-gray-400 p-0">{getValue()}</div>,
-  }),
-  columnHelperLink.accessor('flowbased_perimeter', {
-    header: t('trajectoryViewModal.@areaName'),
-    cell: ({ getValue }) => <span>{getValue()}</span>,
-  }),
-  columnHelperLink.accessor('hvdc', {
-    header: t('trajectoryViewModal.@areaPowerToGas'),
-    cell: ({ getValue }) => <div className="bg-gray-400 p-0">{getValue()}</div>,
-  }),
-  columnHelperLink.accessor('specific_ts', {
-    header: t('trajectoryViewModal.@shortTermStorage'),
-    cell: ({ getValue }) => <div className="bg-gray-400 p-0">{getValue()}</div>,
-  }),
-  columnHelperLink.accessor('forced_outage_hvac', {
-    header: t('trajectoryViewModal.@areaPowerToGas'),
-    cell: ({ getValue }) => <div className="bg-gray-400 p-0">{getValue()}</div>,
-  }),
-  columnHelperLink.accessor('hurdle_cost', {
-    header: t('trajectoryViewModal.@shortTermStorage'),
-    cell: ({ getValue }) => <div className="bg-gray-400 p-0">{getValue()}</div>,
-  }),
-];
+interface TypeNames {
+  string: string;
+  number: number;
+}
 
-export default getTrajectoryLinkHeader;
+export type Schema = keyof TypeNames | { [k: string]: Schema };
+
+export const generateTrajectoryViewHeader = (schema: Schema, t: (value: string) => string, size: number) =>
+  Object.keys(schema).map((value) =>
+    columnHelperLink.accessor(value as unknown as keyof TrajectoryLinkData, {
+      header: t(`trajectoryViewModal.@${value}`),
+      size,
+      cell: ({ getValue }) => <div className={'w-1/12'}>{getValue()}</div>,
+    }),
+  );
