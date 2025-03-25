@@ -1,11 +1,12 @@
 import { FileInputStatus, RdsButton, RdsIconId, RdsModal } from 'rte-design-system-react';
 import SelectAndSearchableInput from '@/components/input/SelectAndSearchableInput.tsx';
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { ProgressBar } from '@/components/forms/ProgressBar.tsx';
 import { DbTrajectory, RowStatus, SelectOption } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { uploadTrajectory } from '@/shared/services/trajectoryService.ts';
+import { fetchTrajectoriesFromFS, uploadTrajectory } from '@/shared/services/trajectoryService.ts';
+import { convertToFSSelectionOptionType } from '@/shared/utils/formFormatter.ts';
 
 interface ImportTrajectoryModalProps {
   options: SelectOption[] | undefined;
@@ -63,6 +64,18 @@ export const ImportTrajectoryModal = ({
     }
   };
 
+  const handleSearchTerm = useCallback(
+    async (searchTerm?: string) => {
+      try {
+        const results = await fetchTrajectoriesFromFS(trajectoryType, searchTerm);
+        return convertToFSSelectionOptionType(results);
+      } catch (error) {
+        // silent handler
+      }
+    },
+    [trajectoryType],
+  );
+
   return (
     <RdsModal size="small">
       <RdsModal.Title onClose={() => void onClose()} icon="Upload">
@@ -71,16 +84,18 @@ export const ImportTrajectoryModal = ({
         })}
       </RdsModal.Title>
       <RdsModal.Content>
-        <div className="inline-flex w-full items-start gap-4" style={{ height: '110px' }}>
-          <div className="w-3/5">
+        <div className="w-full items-start gap-4">
+          <div className="absolute w-[400px]">
             <SelectAndSearchableInput
               options={options}
               defaultPlaceHolder={t('studyDetails.@select_trajectory')}
               onSelect={handleSelectOption}
+              isSearchable={true}
+              setSearchTerm={handleSearchTerm}
               resetField={resetField}
             />
           </div>
-          <div className="flex w-3/5 flex-col items-start pt-2">
+          <div className="relative float-right w-2/5 flex-col pt-2">
             <ProgressBar statusFile={fileStatus} progressValue={progress} />
           </div>
         </div>
