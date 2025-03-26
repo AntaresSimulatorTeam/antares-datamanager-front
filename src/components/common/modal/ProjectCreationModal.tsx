@@ -75,29 +75,31 @@ export const ProjectCreationModal = ({ onClose }: ProjectCreationModalProps) => 
     <RdsModal size="small">
       <RdsModal.Title onClose={onClose}>{t('home.@new_project')}</RdsModal.Title>
       <RdsModal.Content>
-        <div className="flex w-8/12 flex-col items-start gap-2">
-          <RdsInputText
-            label="Name"
-            value={name}
-            onChange={(text: string) => {
-              if (text.length <= 40) setName(text || '');
-            }}
-            variant="outlined"
-            placeHolder="Name your project..."
-            required
-            maxLength={40}
-            autoFocus={true}
-          />
-          <div className="flex w-full [&_textarea]:min-h-[300px] [&_textarea]:resize-none">
-            <RdsInputTextArea
-              label="Description"
-              value={description}
-              onChange={(text) => {
-                if (text.length <= 500) setDescription(text || '');
+        <div className="flex flex-col items-start gap-2">
+          <div className="flex w-8/12 flex-col items-start gap-2">
+            <RdsInputText
+              label="Name"
+              value={name}
+              onChange={(text: string) => {
+                if (text.length <= 40) setName(text || '');
               }}
-              maxLength={500}
-              placeHolder="Add a few lines to describe your project..."
+              variant="outlined"
+              placeHolder="Name your project..."
+              required
+              maxLength={40}
+              autoFocus={true}
             />
+            <div className="flex w-full [&_textarea]:min-h-[300px] [&_textarea]:resize-none">
+              <RdsInputTextArea
+                label="Description"
+                value={description}
+                onChange={(text) => {
+                  if (text.length <= 500) setDescription(text || '');
+                }}
+                maxLength={500}
+                placeHolder="Add a few lines to describe your project..."
+              />
+            </div>
           </div>
           <KeywordsInput
             keywords={keywords}
