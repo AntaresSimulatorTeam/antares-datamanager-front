@@ -8,12 +8,12 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ProjectInfo } from '@/shared/types/Project.type.ts';
 import ProjectDetailsHeader from './ProjectDetailsHeader';
-import ProjectDetailsContent from './ProjectDetailsContent';
 import StudyTableDisplay from '@/pages/pegase/home/components/StudyTableDisplay';
 import SearchBar from '@/pages/pegase/home/components/SearchBar';
 import { useTranslation } from 'react-i18next';
 import { RdsChip, RdsDivider } from 'rte-design-system-react';
 import { fetchProjectDetails } from '@/shared/services/projectService.ts';
+import DetailsContent from '@/components/banner/DetailsContent.tsx';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 
 const ProjectDetails = () => {
@@ -78,12 +78,7 @@ const ProjectDetails = () => {
       <ProjectDetailsHeader projectName={projectInfo.name} />
       <RdsDivider />
       <div className="flex flex-col">
-        <ProjectDetailsContent
-          description={projectInfo.description}
-          creationDate={projectInfo.creationDate}
-          createdBy={projectInfo.createdBy}
-          keywords={projectInfo.tags}
-        />
+        <DetailsContent content={projectInfo} />
       </div>
       <div className="flex gap-4 px-3 py-2">
         <SearchBar onSearch={searchStudy} chipLabels={['']} />
