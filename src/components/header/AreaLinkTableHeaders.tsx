@@ -23,7 +23,7 @@ const getAreaLinkTableHeaders = (
   handleUpdate: (index: number, status: RowStatus, trajectoryId: number, trajectoryLabel?: string) => Promise<void>,
   handleImport: (index: number) => Promise<void>,
   handlerSearch: (index: number, value: string | undefined) => Promise<SelectOption[] | undefined>,
-  handleView: (index: number) => void,
+  handleView: (index: number) => Promise<void>,
   error: { index: number; message: string },
   setErrorInfo: Dispatch<SetStateAction<ErrorMessageType>>,
   studyStatus: StudyStatus | undefined,
