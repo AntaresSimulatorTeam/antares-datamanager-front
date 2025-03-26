@@ -7,7 +7,8 @@
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { FileInputStatus } from 'rte-design-system-react';
 import { WithNullableFields } from '@/shared/types/Generic.type.ts';
-import { AccessorKeyColumnDefBase } from '@tanstack/react-table';
+// @ts-ignore
+import { AccessorKeyColumnDef } from '@tanstack/table-core/src/types.ts';
 
 export interface FsTrajectory {
   trajectoryName: string;
@@ -32,58 +33,63 @@ export type AreaAndLinkRowData = {
 
 export type RowStatus = FileInputStatus | 'warning' | 'emptyError';
 
-export interface TrajectoryViewData<TData> {
+export interface TrajectoryViewData {
   trajectory: DbTrajectory;
-  data: TData[];
-  columns: AccessorKeyColumnDefBase<TData, string>;
+  data: Types<TRAJECTORY_DATA_TYPE>[];
+  columns: AccessorKeyColumnDef<Types<TRAJECTORY_DATA_TYPE>>[];
 }
 
-export type TrajectoryAreaALinkViewData =
-  | TrajectoryViewData<TrajectoryAreaData>
-  | TrajectoryViewData<TrajectoryLinkData>;
+export enum TRAJECTORY_DATA_TYPE {
+  TrajectoryAreaData = 'TrajectoryAreaData',
+  TrajectoryLinkData = 'BTrajectoryLinkData',
+}
+
+export type Types<T extends TRAJECTORY_DATA_TYPE> = T extends TrajectoryAreaData
+  ? TrajectoryAreaData
+  : TrajectoryLinkData;
 
 export interface TrajectoryAreaData {
-  area_name: string;
-  power_to_gas: string;
-  short_term_storage: string;
+  areaName: string;
+  powerToGas: string | null;
+  shortTermStorage: string | null;
 }
 
 export const TrajectoryAreaDataScheme = {
-  area_name: 'string',
-  power_to_gas: 'string',
-  short_term_storage: 'string',
+  areaName: 'string',
+  powerToGas: 'string',
+  shortTermStorage: 'string',
 } as const;
 
 export interface TrajectoryLinkData {
-  link_name: string;
-  direct_w_hp: number;
-  direct_w_hc: number;
-  direct_s_hp: number;
-  direct_s_hc: number;
-  indirect_w_hp: number;
-  indirect_w_hc: number;
-  indirect_s_hp: number;
-  indirect_s_hc: number;
-  flowbased_perimeter: string;
-  hvdc: string;
-  specific_ts: string;
-  forced_outage_hvac: string;
-  hurdle_cost: number;
+  name: string;
+  winterHpDirectMw: number | null;
+  winterHpIndirectMw: number | null;
+  winterHcDirectMw: number | null;
+  winterHcIndirectMw: number | null;
+  summerHpDirectMw: number | null;
+  summerHpIndirectMw: number | null;
+  summerHcDirectMw: number | null;
+  summerHcIndirectMw: number | null;
+  flowbasedPerimeter: string | null;
+  hvdc: string | null;
+  specificTs: string | null;
+  forcedOutageHvac: string | null;
+  hurdleCost: number | null;
 }
 
 export const TrajectoryLinkDataScheme = {
-  link_name: 'string',
-  direct_w_hp: 'number',
-  direct_w_hc: 'number',
-  direct_s_hp: 'number',
-  direct_s_hc: 'number',
-  indirect_w_hp: 'number',
-  indirect_w_hc: 'number',
-  indirect_s_hp: 'number',
-  indirect_s_hc: 'number',
-  flowbased_perimeter: 'string',
+  name: 'string',
+  winterHpDirectMw: 'number',
+  winterHpIndirectMw: 'number',
+  winterHcDirectMw: 'number',
+  winterHcIndirectMw: 'number',
+  summerHpDirectMw: 'number',
+  summerHpIndirectMw: 'number',
+  summerHcDirectMw: 'number',
+  summerHcIndirectMw: 'number',
+  flowbasedPerimeter: 'string',
   hvdc: 'string',
-  specific_ts: 'string',
-  forced_outage_hvac: 'string',
-  hurdle_cost: 'number',
+  specificTs: 'string',
+  forcedOutageHvac: 'string',
+  hurdleCost: 'number',
 } as const;

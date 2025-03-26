@@ -6,15 +6,15 @@
 
 import {
   TRAJECTORY_DATA_BASE_ENDPOINT,
+  TRAJECTORY_DATA_FILE_ENDPOINT,
   TRAJECTORY_ENDPOINT,
   TRAJECTORY_FILE_SYSTEM_ENDPOINT,
   TRAJECTORY_LINK_TO_STUDY_ENDPOINT,
 } from '@/shared/const/apiEndPoint.ts';
-import { DbTrajectory, FsTrajectory } from '@/shared/types';
+import { DbTrajectory, FsTrajectory, TRAJECTORY_DATA_TYPE, Types } from '@/shared/types';
 import { AuthService } from '@/shared/services/authService.ts';
 import { fetchWithProgress } from '@/shared/services/progressService.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { AreaData, LinkData } from '@/mocks/data/list/trajectoryData.ts';
 
 /**
  * Retrieve a list of trajectories by type and horizon from database
@@ -137,5 +137,22 @@ export const unlinkTrajectoryFromStudy = async (trajectoryId: number, studyId: n
   }
 };
 
-export const trajectoryData = async (index: number) =>
-  index === 0 ? Promise.resolve(AreaData) : Promise.resolve(LinkData);
+/**
+ * Fetch data of trajectory file from its type and id
+ *
+ * @param {TRAJECTORY_TYPE} trajectoryType - Trajectory type
+ * @param {number} trajectoryId - Trajectory id
+ * @return {Promise<Types<TRAJECTORY_DATA_TYPE>[]>}
+ */
+export const getTrajectoryDataByTypeAndId = async (
+  trajectoryType: TRAJECTORY_TYPE,
+  trajectoryId: number,
+): Promise<Types<TRAJECTORY_DATA_TYPE>[]> => {
+  const urlApi = `${TRAJECTORY_DATA_FILE_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryId=${trajectoryId}`;
+  const response = await AuthService.authFetch(urlApi);
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch data trajectory');
+  }
+  return (await response.json()) as Types<TRAJECTORY_DATA_TYPE>[];
+};
