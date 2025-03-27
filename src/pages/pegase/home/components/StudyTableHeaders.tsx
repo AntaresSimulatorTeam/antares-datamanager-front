@@ -17,6 +17,7 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
   columnHelper.display({
     id: 'radioColumn',
     header: '',
+    size: 50,
     cell: ({ row }) => (
       <div className={`${row.getIsSelected() ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
         <RdsRadioButton
@@ -32,6 +33,7 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
 
   columnHelper.accessor('name', {
     header: t('home.@study_name'),
+    size: 300,
     cell: ({ getValue, row }) => {
       const status = row.original.status;
       const textClass = status === StudyStatus.GENERATED ? 'text-primary-900' : 'group-hover:text-green-500';
@@ -53,6 +55,7 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
 
   columnHelper.accessor('project', {
     header: t('home.@project'),
+    size: 200,
   }),
 
   columnHelper.accessor('status', {
@@ -65,13 +68,17 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
 
   columnHelper.accessor('keywords', {
     header: t('home.@keywords'),
-    minSize: 500,
-    size: 500,
-    cell: ({ getValue, row }) => (
-      <div className="flex h-3 w-32">
-        <RdsTagList id={`pegase-tags-${row.id}`} tags={getValue()} />
-      </div>
-    ),
+    size: 300,
+    cell: ({ getValue, row }) => {
+      const tags = getValue();
+      return (
+        tags.length > 0 && (
+          <div className="min-w-96 flex h-3">
+            <RdsTagList id={`pegase-tags-${row.id}`} tags={tags} />
+          </div>
+        )
+      );
+    },
   }),
 
   columnHelper.accessor('creationDate', {

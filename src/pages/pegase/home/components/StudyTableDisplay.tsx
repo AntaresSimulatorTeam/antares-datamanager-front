@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { StudyDTO } from '@/shared/types';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type';
 import getStudyTableHeaders from './StudyTableHeaders';
@@ -90,14 +90,17 @@ const StudyTableDisplay = ({ searchStudy, projectId, projectInfoName }: StudyTab
   };
 
   const sortedHeaders = addSortColumn(headers, handleSort, sortBy, sortedColumn, handleHeaderHover, isHeaderHovered);
+  const memoizedRows = useMemo(() => rows, [rows]);
 
   return (
     <div>
       <div className="flex-1">
         <StdSimpleTable
           columns={sortedHeaders}
-          data={rows}
+          columnSize="pixels"
+          data={memoizedRows}
           enableRowSelection={true}
+          areRowsMemoized={true}
           state={{
             rowSelection,
           }}

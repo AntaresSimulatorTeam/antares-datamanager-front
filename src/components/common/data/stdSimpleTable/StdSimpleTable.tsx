@@ -17,7 +17,7 @@ import { ReadOnlyFeature } from '@common/data/stdTable/features/readOnly.ts';
 export type StdSimpleTableProps<TData> = {
   getCoreRowModel?: (table: Table<TData>) => () => RowModel<TData>;
 } & Omit<TableCoreProps<TData>, 'table'> &
-  Omit<TableOptions<TData>, 'getCoreRowModel'>;
+  Omit<TableOptions<TData>, 'getCoreRowModel'> & { areRowsMemoized?: boolean };
 
 export type TableRef<TData> = {
   table: Table<TData>;
@@ -35,6 +35,7 @@ const StdSimpleTable = <TData,>({
   enableRowSelection = false,
   enableMultiRowSelection = false,
   enableReadOnly = false,
+  areRowsMemoized = false,
   ...tableOptions
 }: StdSimpleTableProps<TData>) => {
   const table = useReactTable<TData>({
@@ -57,6 +58,7 @@ const StdSimpleTable = <TData,>({
       columnSize={columnSize}
       columnResizeMode={columnResizeMode}
       trClassName={trClassName}
+      areRowsMemoized={areRowsMemoized}
     />
   );
 };
