@@ -1,16 +1,13 @@
 import { clsx } from 'clsx';
 import { TableHeaderProps } from '@common/data/stdTable/TableHeader.tsx';
+import { COMMON_HEADER_CLASSES, RESIZER_CLASSES } from '@common/data/stdTable/const/TableClasses.ts';
 
-const COMMON_HEADER_CLASSES = 'px-1 py-0.5 text-left font-semibold';
 export const headerClassBuilder = <TData>({ table, header, columnSize }: TableHeaderProps<TData>) =>
   clsx(
     COMMON_HEADER_CLASSES,
     columnSize === 'meta' ? (header.column.columnDef.meta?.sizeClassNames ?? '') : '',
     table.options.columnResizeMode ? 'group relative' : '',
   );
-
-const RESIZER_CLASSES =
-  'absolute top-0 h-full w-0.5 cursor-col-resize touch-none select-none bg-gray-900 bg-opacity-50 opacity-0 group-hover:opacity-100';
 
 export const headerDivClassBuilder = <TData>({ table, header }: TableHeaderProps<TData>) =>
   clsx(
