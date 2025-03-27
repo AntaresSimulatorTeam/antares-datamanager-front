@@ -34,7 +34,11 @@ const getAreaLinkTableHeaders = (
       const { trajectory, status } = row.original;
       return (
         <div className="inline-flex w-[180px] items-center gap-2">
-          <span className={`${trajectory ? 'text-primary-600' : 'text-gray-900'}`}>{getValue()}</span>
+          <span
+            className={`${trajectory && status === TRAJECTORY_SELECTION_STATUS.OK ? 'text-primary-600' : 'text-gray-900'}`}
+          >
+            {getValue()}
+          </span>
           {trajectory && status === TRAJECTORY_SELECTION_STATUS.OK && (
             <ButtonPreview
               label={'View'}
