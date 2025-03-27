@@ -16,7 +16,6 @@ export const AuthService = {
   getUser: async (): Promise<User | null> => await userManager.getUser(),
   handleCallback: async () => {
     try {
-      console.log('================ signinRedirectCallback');
       await userManager.signinRedirectCallback();
     } catch (error) {
       throw new Error('Failed to redirect');
@@ -33,11 +32,8 @@ export const AuthService = {
     try {
       const accessToken = (await userManager.getUser())?.access_token;
       // eslint-disable-next-line camelcase
-      const response = await userManager.signoutRedirect({ id_token_hint: accessToken ?? undefined });
-      console.log('============== reponse', response);
-      return response;
+      await userManager.signoutRedirect({ id_token_hint: accessToken ?? undefined });
     } catch (error) {
-      console.log('============== error', error);
       // silent handler
     }
   },

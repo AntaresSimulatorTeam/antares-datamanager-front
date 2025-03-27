@@ -20,8 +20,6 @@ import { navBarConfig } from '@/shared/const/navBarConfig';
 import { useTranslation } from 'react-i18next';
 import { StudyProvider } from '@/store/contexts/StudyProvider';
 import { RdsNavbar } from 'rte-design-system-react';
-import { getEnvVariables } from '@/envVariables.ts';
-import { LogoutCallback } from '@/pages/pegase/logout/LogoutCallback.tsx';
 
 const MainContent = () => {
   const { t } = useTranslation();
@@ -51,7 +49,6 @@ const MainContent = () => {
                 }
               />
               <Route path="/project/:projectName" element={<ProjectDetails />} />
-              <Route path="/logout-callback" element={<LogoutCallback />} />
               {Object.entries([...menuBottomData, ...menuTopData]).map(([key, route]) => (
                 <Route key={key} path={route.path} Component={route.component} />
               ))}
