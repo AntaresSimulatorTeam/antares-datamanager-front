@@ -9,8 +9,8 @@ import {
   READONLY_SELECTED_ROW_CLASSES,
   SELECTED_ROW_CLASSES,
   STRIPED_CLASSES,
-  tableCoreRowClassBuilder,
-} from '../tableCoreRowClassBuilder';
+} from '@common/data/stdTable/const/TableClasses.ts';
+import { tableCoreRowClassBuilder } from '@common/data/stdTable/tableCoreRowClassBuilder.ts';
 
 describe('tableCoreRowClassBuilder function', () => {
   it('should have the expected striped classes', () => {
