@@ -31,11 +31,11 @@ const getAreaLinkTableHeaders = (
   columnHelper.accessor('hypothesis', {
     header: t('studyDetails.@hypothesis'),
     cell: ({ getValue, row }) => {
-      const { trajectory } = row.original;
+      const { trajectory, status } = row.original;
       return (
         <div className="inline-flex w-[180px] items-center gap-2">
           <span className={`${trajectory ? 'text-primary-600' : 'text-gray-900'}`}>{getValue()}</span>
-          {trajectory ? (
+          {trajectory && status === TRAJECTORY_SELECTION_STATUS.OK && (
             <ButtonPreview
               label={'View'}
               icon={StdIconId.Preview}
@@ -44,7 +44,7 @@ const getAreaLinkTableHeaders = (
               borderColor={row.getReadOnly() ? 'gray-700' : 'acc1-600'}
               onClick={() => void handleView(row.index)}
             />
-          ) : null}
+          )}
         </div>
       );
     },
