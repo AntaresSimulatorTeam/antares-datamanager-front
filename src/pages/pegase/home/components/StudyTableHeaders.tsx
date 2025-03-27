@@ -33,7 +33,7 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
 
   columnHelper.accessor('name', {
     header: t('home.@study_name'),
-    size: 300,
+    size: 400,
     cell: ({ getValue, row }) => {
       const status = row.original.status;
       const textClass = status === StudyStatus.GENERATED ? 'text-primary-900' : 'group-hover:text-green-500';
@@ -68,7 +68,7 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
 
   columnHelper.accessor('keywords', {
     header: t('home.@keywords'),
-    size: 300,
+    size: 370,
     cell: ({ getValue, row }) => {
       const tags = getValue();
       return (
