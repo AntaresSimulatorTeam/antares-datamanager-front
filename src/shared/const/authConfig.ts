@@ -12,12 +12,17 @@ interface AuthConfig {
   redirect_uri: string;
   scope: string;
   maxExpiresIn: number;
+  post_logout_redirect_uri: string;
 }
 
 export const config: AuthConfig = {
+  // eslint-disable-next-line camelcase
   client_id: getEnvVariables('VITE_OAUTH2_CLIENT_ID'),
+  // eslint-disable-next-line camelcase
   redirect_uri: getEnvVariables('VITE_OAUTH2_REDIRECT_URL'),
   authority: getEnvVariables('VITE_OAUTH2_AUTHORITY'),
+  // eslint-disable-next-line camelcase
+  post_logout_redirect_uri: getEnvVariables('VITE_OAUTH2_LOGOFF_REDIRECT_URL'),
   scope: 'openid email profile',
   maxExpiresIn: 600,
 };
