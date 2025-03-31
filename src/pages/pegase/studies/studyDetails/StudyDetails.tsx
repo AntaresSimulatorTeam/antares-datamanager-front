@@ -9,7 +9,7 @@ import { Location, useLocation } from 'react-router-dom';
 import StudyHeader from './StudyHeader.tsx';
 import { RdsDivider } from 'rte-design-system-react';
 import StudyNavigationMenu from '@/pages/pegase/studies/studyDetails/StudyNavigationMenu';
-import { StudyDTO } from '@/shared/types';
+import { StudyDTO, WarningMessage } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { createStudy } from '@/shared/services/studyService.ts';
@@ -29,9 +29,10 @@ const StudyDetails = () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const location: Location<StudyState> = useLocation();
   const { t } = useTranslation();
-  const { studyStatus, AREA, LINK } = useStudy();
+  const { studyStatus, AREA, LINK, messages } = useStudy();
   const dispatch = useStudyDispatch();
   const [isGenerating, setIsGenerating] = useState(false);
+  const [warningMessages, setWarningMessages] = useState<WarningMessage[]>(messages ?? []);
   const { study } = location.state || {};
 
   const handleGenerateStudy = async () => {
