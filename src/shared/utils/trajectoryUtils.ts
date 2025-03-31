@@ -32,7 +32,7 @@ export const getBgColor = (status: FileInputStatus) => {
   }
 };
 
-export const sortByStatus = (a: WarningMessage, b: WarningMessage): number => {
+export const sortByLevel = (a: WarningMessage, b: WarningMessage): number => {
   const map: Map<WARNING_MESSAGE_LEVEL, number> = new Map();
   map.set(WARNING_MESSAGE_LEVEL.ERROR_LEVEL, 0);
   map.set(WARNING_MESSAGE_LEVEL.WARNING_LEVEL, 1);
