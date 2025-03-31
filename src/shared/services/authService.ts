@@ -27,14 +27,14 @@ export const AuthService = {
     try {
       const accessToken = (await userManager.getUser())?.access_token;
       // eslint-disable-next-line camelcase
-      const response = await userManager.signoutRedirect({
+      await userManager.signoutRedirect({
         // eslint-disable-next-line camelcase
         id_token_hint: accessToken ?? undefined,
         // eslint-disable-next-line camelcase
         post_logout_redirect_uri: getEnvVariables('VITE_OAUTH2_REDIRECT_URL'),
         redirectMethod: 'replace',
+        redirectTarget: 'self',
       });
-      console.log('=================== reponse', response);
     } catch {
       // silent handler
     }
