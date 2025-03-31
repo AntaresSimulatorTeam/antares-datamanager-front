@@ -7,17 +7,28 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import StdSimpleTable from '@common/data/stdSimpleTable/StdSimpleTable.tsx';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
-import getAreaLinkTableHeaders from '@/pages/pegase/studies/studyDetails/AreaLinkTableHeaders.tsx';
+import getAreaLinkTableHeaders from '@/components/header/AreaLinkTableHeaders.tsx';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { useTranslation } from 'react-i18next';
 import {
   fetchTrajectoriesFromDB,
   fetchTrajectoriesFromFS,
+  getTrajectoryDataByTypeAndId,
   linkTrajectoryToStudy,
   unlinkTrajectoryFromStudy,
 } from '@/shared/services/trajectoryService.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { AreaAndLinkRowData, DbTrajectory, RowStatus, SelectOption, StudyActionType, StudyDTO } from '@/shared/types';
+import {
+  AreaAndLinkRowData,
+  DbTrajectory,
+  RowStatus,
+  SelectOption,
+  StudyActionType,
+  StudyDTO,
+  TrajectoryAreaDataScheme,
+  TrajectoryLinkDataScheme,
+  TrajectoryViewData,
+} from '@/shared/types';
 import { convertToFSSelectionOptionType, convertToSelectionOptionType } from '@/shared/utils/formFormatter';
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext';
@@ -25,6 +36,8 @@ import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { getStatus } from '@/shared/utils/trajectoryUtils.ts';
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
+import { TrajectoryDataVisualisation } from '@common/modal/TrajectoryDataVisualisation.tsx';
+import { generateTrajectoryViewHeader } from '@/components/header/TrajectoryLinkHeader.tsx';
 
 export interface ErrorMessageType {
   index: number;
@@ -40,7 +53,9 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
   const [rowIndexSelected, setRowIndexSelected] = useState<number>(0);
   const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
+  const [trajectoryData, setTrajectoryData] = useState<TrajectoryViewData | undefined>();
   const { isModalOpen, toggleModal } = useNewStudyModal();
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const dispatch = useStudyDispatch();
   const { t } = useTranslation();
   const [data, setData] = useState<AreaAndLinkRowData[]>([
@@ -202,6 +217,29 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
     [study.horizon],
   );
 
+  const handleViewTrajectory = async (index: number) => {
+    const trajectory = data[index].trajectory as unknown as DbTrajectory;
+    if (trajectory) {
+      try {
+        const results = await getTrajectoryDataByTypeAndId(trajectory.type, trajectory.id);
+        const columns =
+          trajectory.type === TRAJECTORY_TYPE.AREA
+            ? generateTrajectoryViewHeader(TrajectoryAreaDataScheme, t, 350)
+            : generateTrajectoryViewHeader(TrajectoryLinkDataScheme, t, 128);
+        setTrajectoryData({
+          trajectory,
+          data: results,
+          columns,
+        });
+        setIsViewModalOpen(true);
+      } catch (error) {
+        // silent handler
+      }
+    } else {
+      return;
+    }
+  };
+
   const columns = useMemo(
     () =>
       getAreaLinkTableHeaders(
@@ -209,6 +247,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
         handleTrajectoryUpdate,
         handleFetchTrajectoriesFS,
         handleTrajectorySearch,
+        handleViewTrajectory,
         errorInfo,
         setErrorInfo,
         studyState?.studyStatus,
@@ -240,6 +279,9 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
           studyHorizon={study.horizon}
           studyId={study.id}
         />
+      )}
+      {isViewModalOpen && trajectoryData && (
+        <TrajectoryDataVisualisation trajectoryData={trajectoryData} onClose={() => setIsViewModalOpen(false)} />
       )}
     </div>
   );

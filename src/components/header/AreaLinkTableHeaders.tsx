@@ -23,6 +23,7 @@ const getAreaLinkTableHeaders = (
   handleUpdate: (index: number, status: RowStatus, trajectoryId: number, trajectoryLabel?: string) => Promise<void>,
   handleImport: (index: number) => Promise<void>,
   handlerSearch: (index: number, value: string | undefined) => Promise<SelectOption[] | undefined>,
+  handleView: (index: number) => Promise<void>,
   error: { index: number; message: string },
   setErrorInfo: Dispatch<SetStateAction<ErrorMessageType>>,
   studyStatus: StudyStatus | undefined,
@@ -30,19 +31,24 @@ const getAreaLinkTableHeaders = (
   columnHelper.accessor('hypothesis', {
     header: t('studyDetails.@hypothesis'),
     cell: ({ getValue, row }) => {
-      const { trajectory } = row.original;
+      const { trajectory, status } = row.original;
       return (
         <div className="inline-flex w-[180px] items-center gap-2">
-          <span className={`${trajectory ? 'text-primary-600' : 'text-gray-900'}`}>{getValue()}</span>
-          {trajectory ? (
+          <span
+            className={`${trajectory && status === TRAJECTORY_SELECTION_STATUS.OK ? 'text-primary-600' : 'text-gray-900'}`}
+          >
+            {getValue()}
+          </span>
+          {trajectory && status === TRAJECTORY_SELECTION_STATUS.OK && (
             <ButtonPreview
               label={'View'}
               icon={StdIconId.Preview}
               position={'left'}
               color={row.getReadOnly() ? 'gray-700' : 'primary-600'}
               borderColor={row.getReadOnly() ? 'gray-700' : 'acc1-600'}
+              onClick={() => void handleView(row.index)}
             />
-          ) : null}
+          )}
         </div>
       );
     },

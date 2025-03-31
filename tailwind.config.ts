@@ -25,7 +25,8 @@ export default {
       sm: '1024px',
       md: '1280px',
       lg: '1440px',
-      xl: '1920px',
+      xl: '1280px',
+      '2xl': '1920px',
     },
     colors: {
       primary: {
