@@ -31,7 +31,7 @@ export const AuthService = {
         // eslint-disable-next-line camelcase
         id_token_hint: accessToken ?? undefined,
         // eslint-disable-next-line camelcase
-        post_logout_redirect_uri: getEnvVariables('VITE_OAUTH2_LOGOFF_REDIRECT_URL'),
+        post_logout_redirect_uri: getEnvVariables('VITE_OAUTH2_REDIRECT_URL'),
         redirectMethod: 'replace',
       });
       console.log('=================== reponse', response);
