@@ -2,18 +2,18 @@ import { DbTrajectory, StudyActionType, StudyState, WarningMessage } from '@/sha
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
-import { sortByStatus } from '@/shared/utils/trajectoryUtils.ts';
+import { sortByLevel } from '@/shared/utils/trajectoryUtils.ts';
 
 const addTrajectories = (prevState: Partial<StudyState>, trajectories: DbTrajectory[]): Partial<StudyState> => {
   const studyState = {};
   trajectories.forEach((trajectory) => Object.assign(studyState, { [`${trajectory?.type}`]: trajectory }));
 
   const messages: WarningMessage[] = trajectories
-    .flatMap((trajectory) => (trajectory.messages.length > 0 ? trajectory.messages : null))
+    .flatMap((trajectory) => (trajectory?.messages.length > 0 ? trajectory.messages : null))
     .filter((f) => f != null);
 
   if (messages.length > 0) {
-    messages.sort(sortByStatus);
+    messages.sort(sortByLevel);
     return { ...prevState, ...studyState, messages };
   } else {
     return { ...prevState, ...studyState };
