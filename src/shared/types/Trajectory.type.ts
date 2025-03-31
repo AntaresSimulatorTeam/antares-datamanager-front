@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE, WARNING_MESSAGE_LEVEL } from '@/shared/enum/trajectory.ts';
 import { FileInputStatus } from 'rte-design-system-react';
 import { WithNullableFields } from '@/shared/types/Generic.type.ts';
 // @ts-ignore
@@ -23,6 +23,7 @@ export interface DbTrajectory {
   version: number;
   userName: string;
   creationDate: Date;
+  messages: WarningMessage[];
 }
 
 export interface DbTrajectoryWithState extends DbTrajectory {
@@ -31,7 +32,7 @@ export interface DbTrajectoryWithState extends DbTrajectory {
 
 export type AreaAndLinkRowData = {
   hypothesis: string;
-  trajectory: WithNullableFields<DbTrajectory, 'type' | 'version' | 'userName' | 'creationDate'> | null;
+  trajectory: WithNullableFields<DbTrajectory, 'type' | 'version' | 'userName' | 'creationDate' | 'messages'> | null;
   status: TRAJECTORY_SELECTION_STATUS;
 };
 
@@ -97,3 +98,9 @@ export const TrajectoryLinkDataScheme = {
   forcedOutageHvac: 'string',
   hurdleCost: 'number',
 } as const;
+
+export interface WarningMessage {
+  id: number;
+  content: string;
+  level: WARNING_MESSAGE_LEVEL;
+}
