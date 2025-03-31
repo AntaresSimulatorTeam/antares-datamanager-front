@@ -15,6 +15,7 @@ export const AuthService = {
   refresh: () => userManager.signinSilent(),
   getUser: async (): Promise<User | null> => await userManager.getUser(),
   handleCallback: async () => await userManager.signinRedirectCallback(),
+  removeUser: async () => await userManager.removeUser(),
 
   getAccessToken: async (): Promise<string | null> => {
     const user = await userManager.getUser();
