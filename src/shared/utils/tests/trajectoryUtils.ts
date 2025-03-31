@@ -25,7 +25,7 @@ const mockMessages: WarningMessage[] = [
   },
 ];
 
-describe('sortByStatus', () => {
+describe('sortByLevel', () => {
   it('should sort messages according to the level priority', () => {
     const sortedMessages = mockMessages.sort(sortByLevel);
     expect(sortedMessages).toBe([
