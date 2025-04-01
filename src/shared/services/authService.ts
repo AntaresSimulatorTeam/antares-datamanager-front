@@ -7,6 +7,7 @@
 import { User, UserManager } from 'oidc-client-ts';
 import { config } from '@/shared/const/authConfig';
 import { isAuthenticationActive } from '@/shared/utils/authUtils.ts';
+import { getEnvVariables } from '@/envVariables.ts';
 
 const userManager = new UserManager(config);
 
@@ -27,10 +28,18 @@ export const AuthService = {
     try {
       const accessToken = (await userManager.getUser())?.access_token;
       // eslint-disable-next-line camelcase
+      //await userManager.signoutRedirect({
+      // eslint-disable-next-line camelcase
+      //id_token_hint: accessToken ?? undefined,
+      //});
+      await AuthService.revokeTokens();
+      await AuthService.removeUser();
       await userManager.signoutRedirect({
         // eslint-disable-next-line camelcase
         id_token_hint: accessToken ?? undefined,
       });
+      // await AuthService.handleCallback();
+      window.location.href = getEnvVariables('VITE_OAUTH2_REDIRECT_URL');
     } catch {
       // silent handler
     }
