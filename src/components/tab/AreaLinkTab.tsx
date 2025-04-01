@@ -145,6 +145,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
         userName: null,
         creationDate: null,
       };
+      //Case: area control failed and a trajectory Links is linked to the study
       if (index === 0 && data[1].trajectory) {
         await unlinkTrajectoryFromStudy(data[1].trajectory.id, study.id);
         dispatch?.({
@@ -158,6 +159,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
           return prev;
         });
       } else {
+        //Case: links control failed and a trajectory area is linked to the study
         setData((prev) => {
           prev[index].trajectory = newDbTrajectory;
           prev[index].status = TRAJECTORY_SELECTION_STATUS.ERROR;
