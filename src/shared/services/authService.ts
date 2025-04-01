@@ -15,6 +15,7 @@ export const AuthService = {
   refresh: () => userManager.signinSilent(),
   getUser: async (): Promise<User | null> => await userManager.getUser(),
   handleCallback: async () => await userManager.signinRedirectCallback(),
+  revokeTokens: async () => await userManager.revokeTokens(),
   removeUser: async () => await userManager.removeUser(),
 
   getAccessToken: async (): Promise<string | null> => {
@@ -29,10 +30,6 @@ export const AuthService = {
       await userManager.signoutRedirect({
         // eslint-disable-next-line camelcase
         id_token_hint: accessToken ?? undefined,
-        // eslint-disable-next-line camelcase
-        // post_logout_redirect_uri: getEnvVariables('VITE_OAUTH2_REDIRECT_URL'),
-        // redirectMethod: 'assign',
-        // redirectTarget: 'self',
       });
     } catch {
       // silent handler
