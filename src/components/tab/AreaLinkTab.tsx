@@ -166,8 +166,9 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
           return prev;
         });
       }
-    } finally {
       setReadOnly({ '0': false, '1': false });
+    } catch {
+      //Silent handler
     }
   };
 
