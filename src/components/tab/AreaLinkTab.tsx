@@ -201,7 +201,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
               await unlinkTrajectoryFromStudy(trajectoryId, study.id);
               await unlinkTrajectoryFromStudy(data[1].trajectory.id, study.id);
               dispatch?.({
-                type: index === 0 ? STUDY_ACTION.CLEAR_AREA_TRAJECTORY : STUDY_ACTION.CLEAR_LINK_TRAJECTORY,
+                type: STUDY_ACTION.CLEAR_AREA_AND_LINK_TRAJECTORY,
               } as StudyActionType);
               setData((prev) => {
                 prev[0].trajectory = null;

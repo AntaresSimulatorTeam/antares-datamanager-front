@@ -23,7 +23,7 @@ export const studyReducer = (prevState: Partial<StudyState>, action?: StudyActio
         };
       case STUDY_ACTION.CLEAR_LINK_TRAJECTORY:
         return { ...prevState, [`${TRAJECTORY_TYPE.LINK}`]: null };
-      case STUDY_ACTION.CLEAR_AREA_AND_LINK:
+      case STUDY_ACTION.CLEAR_AREA_AND_LINK_TRAJECTORY:
         return { ...prevState, [`${TRAJECTORY_TYPE.AREA}`]: null, [`${TRAJECTORY_TYPE.LINK}`]: null };
       case STUDY_ACTION.SET_STUDY_STATUS:
         return { ...prevState, studyStatus: StudyStatus.GENERATED };
