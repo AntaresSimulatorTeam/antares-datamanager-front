@@ -7,7 +7,6 @@
 import { User, UserManager } from 'oidc-client-ts';
 import { config } from '@/shared/const/authConfig';
 import { isAuthenticationActive } from '@/shared/utils/authUtils.ts';
-import { getEnvVariables } from '@/envVariables.ts';
 
 const userManager = new UserManager(config);
 
@@ -31,9 +30,9 @@ export const AuthService = {
         // eslint-disable-next-line camelcase
         id_token_hint: accessToken ?? undefined,
         // eslint-disable-next-line camelcase
-        post_logout_redirect_uri: getEnvVariables('VITE_OAUTH2_REDIRECT_URL'),
-        redirectMethod: 'replace',
-        redirectTarget: 'self',
+        // post_logout_redirect_uri: getEnvVariables('VITE_OAUTH2_REDIRECT_URL'),
+        // redirectMethod: 'assign',
+        // redirectTarget: 'self',
       });
     } catch {
       // silent handler

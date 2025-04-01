@@ -6,6 +6,7 @@
 
 import { useEffect, useState } from 'react';
 import { AuthService } from '@/shared/services/authService.ts';
+import { getEnvVariables } from '@/envVariables.ts';
 
 const Logout = () => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -14,10 +15,10 @@ const Logout = () => {
     const logout = async () => {
       try {
         setIsLoggingOut(true);
-        await AuthService.logout();
+        //await AuthService.logout();
         await AuthService.removeUser();
         // await AuthService.handleCallback();
-        // window.location.href = getEnvVariables('VITE_OAUTH2_REDIRECT_URL');
+        window.location.href = getEnvVariables('VITE_OAUTH2_REDIRECT_URL');
       } finally {
         setIsLoggingOut(false);
       }
