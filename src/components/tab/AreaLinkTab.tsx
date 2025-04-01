@@ -135,6 +135,40 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
     }
   };
 
+  const handleControlFailed = async (index: number, trajectoryId: number, trajectoryLabel: string) => {
+    try {
+      const newDbTrajectory = {
+        id: trajectoryId,
+        trajectoryName: trajectoryLabel,
+        type: null,
+        version: null,
+        userName: null,
+        creationDate: null,
+      };
+      if (index === 0 && data[1].trajectory) {
+        await unlinkTrajectoryFromStudy(data[1].trajectory.id, study.id);
+        dispatch?.({
+          type: STUDY_ACTION.CLEAR_LINK_TRAJECTORY,
+        } as StudyActionType);
+        setData((prev) => {
+          prev[0].trajectory = newDbTrajectory;
+          prev[0].status = TRAJECTORY_SELECTION_STATUS.ERROR;
+          prev[1].trajectory = null;
+          prev[1].status = TRAJECTORY_SELECTION_STATUS.MISSING;
+          return prev;
+        });
+      } else {
+        setData((prev) => {
+          prev[index].trajectory = newDbTrajectory;
+          prev[index].status = TRAJECTORY_SELECTION_STATUS.ERROR;
+          return prev;
+        });
+      }
+    } finally {
+      setReadOnly({ '0': false, '1': false });
+    }
+  };
+
   const handleTrajectoryUpdate = useCallback(
     async (index: number, status: RowStatus, trajectoryId: number, trajectoryLabel?: string) => {
       try {
@@ -159,8 +193,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
 
         // Handle deletion case for areas
         if ((trajectoryId != null && status === 'empty') || status === 'emptyError') {
-          // Reset trajectory line to initial state in case of trajectory error status
-          if (trajectoryId && status === 'empty') {
+          if (trajectoryId != null && status === 'empty') {
             await unlinkTrajectoryFromStudy(trajectoryId, study.id);
           }
           dispatch?.({
@@ -175,27 +208,20 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
         }
 
         if (status === 'error' && trajectoryId != null && trajectoryLabel) {
-          const newDbTrajectory = {
-            id: trajectoryId,
-            trajectoryName: trajectoryLabel,
-            type: null,
-            version: null,
-            userName: null,
-            creationDate: null,
-          };
+          await handleControlFailed(index, trajectoryId, trajectoryLabel);
+        }
+      } catch (error) {
+        //Handle case when control failed during link creation
+        if (status === 'success' && trajectoryId != null && trajectoryLabel) {
+          await handleControlFailed(index, trajectoryId, trajectoryLabel);
+        } else {
+          // Reset trajectory line to initial state
           setData((prev) => {
-            prev[index].trajectory = newDbTrajectory;
-            prev[index].status = TRAJECTORY_SELECTION_STATUS.ERROR;
+            prev[index].trajectory = null;
+            prev[index].status = TRAJECTORY_SELECTION_STATUS.MISSING;
             return prev;
           });
         }
-      } catch (error) {
-        // Reset trajectory line to initial state
-        setData((prev) => {
-          prev[index].trajectory = null;
-          prev[index].status = TRAJECTORY_SELECTION_STATUS.MISSING;
-          return prev;
-        });
       }
     },
     [study.id],
