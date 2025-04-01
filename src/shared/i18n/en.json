@@ -128,5 +128,8 @@
     "@specificTs": "Specific TS",
     "@forcedOutageHvac": "Forced Outage HVAC",
     "@hurdleCost": "Hurdle cost"
+  },
+  "about": {
+    "@title": "About"
   }
 }

@@ -3,6 +3,7 @@ import { fetchAppInfo } from '@/shared/services/aboutService.ts';
 import { AppInfo } from '@/shared/types/AppInfo.ts';
 import packageJson from '../../../../package.json';
 import { GIT_INFO } from '@/gitInfo.ts';
+import { useTranslation } from 'react-i18next';
 
 interface TableRowProps {
   label: string;
@@ -18,6 +19,7 @@ const TableRow = ({ label, value }: TableRowProps) => (
 
 export const About = () => {
   const [info, setInfo] = useState<AppInfo | null>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchAppInfo()
@@ -31,7 +33,7 @@ export const About = () => {
 
   return (
     <div className="p-4">
-      <h1 className="text-3xl mb-4 font-bold">À propos</h1>
+      <h1 className="text-3xl mb-4 font-bold">{t('about.@title')}</h1>
 
       <div>
         <h1>
