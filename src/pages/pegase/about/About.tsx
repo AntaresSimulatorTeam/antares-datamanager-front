@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { fetchAppInfo } from '@/shared/services/aboutService.ts';
 import { AppInfo } from '@/shared/types/AppInfo.ts';
 import packageJson from '../../../../package.json';
-import { GIT_INFO } from '../../../gitInfo';
+import { GIT_INFO } from '@/gitInfo.ts';
 
 interface TableRowProps {
   label: string;
@@ -37,7 +37,6 @@ export const About = () => {
         <h1>
           {packageJson.name} (v{packageJson.version})
         </h1>
-        <p>{packageJson.description || 'No description available'}</p> {/* Handle absence of description */}
         <h3>Git</h3>
         <p>Branch: {GIT_INFO.branch}</p>
         <p>Commit: {GIT_INFO.commit}</p>
