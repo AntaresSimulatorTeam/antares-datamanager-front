@@ -28,7 +28,7 @@ const StudyDetails = () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const location: Location<StudyState> = useLocation();
   const { t } = useTranslation();
-  const { studyStatus, AREA } = useStudy();
+  const { studyStatus, AREA, LINK } = useStudy();
   const dispatch = useStudyDispatch();
   const [isGenerating, setIsGenerating] = useState(false);
   const { study } = location.state || {};
@@ -66,10 +66,11 @@ const StudyDetails = () => {
           <RdsDivider />
           <div className="flex items-center gap-2 self-end">
             {!AREA && <div className={'text-error-600'}>{t('studyDetails.@add_trajectories_message')}</div>}
+            {AREA && !LINK && <div className={'text-error-600'}>{t('studyDetails.@add_trajectories_message')}</div>}
             <ButtonWithStdIcon
               label={t('studyDetails.@generate')}
               onClick={() => void handleGenerateStudy()}
-              disabled={!AREA || studyStatus === StudyStatus.GENERATED}
+              disabled={!AREA?.type || (AREA && !LINK) || studyStatus === StudyStatus.GENERATED}
               icon={StdIconId.CheckCircle}
               position="right"
               isLoading={isGenerating}

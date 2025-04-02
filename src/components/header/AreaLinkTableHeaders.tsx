@@ -57,10 +57,7 @@ const getAreaLinkTableHeaders = (
     header: t('studyDetails.@trajectory'),
     cell: ({ row }) => {
       const { trajectory, status } = row.original;
-      const textClass =
-        status === TRAJECTORY_SELECTION_STATUS.OK && studyStatus === StudyStatus.GENERATED
-          ? 'text-primary-600'
-          : 'text-gray-900';
+      const textClass = studyStatus === StudyStatus.GENERATED ? 'text-primary-600' : 'text-gray-900';
       return trajectory ? (
         <div className="inline-flex w-[850px] space-x-2 py-3">
           <span className={`${textClass}`}>{trajectory.trajectoryName}</span>
