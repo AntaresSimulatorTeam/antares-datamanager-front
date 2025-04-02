@@ -23,6 +23,7 @@ import {
   DbTrajectory,
   RowStatus,
   SelectOption,
+  StudyActionType,
   StudyDTO,
   TrajectoryAreaDataScheme,
   TrajectoryLinkDataScheme,
@@ -141,6 +142,9 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
       //Case: area control failed and a trajectory Links is linked to the study
       if (index === 0 && data[1].trajectory) {
         await unlinkTrajectoryFromStudy(data[1].trajectory.id, study.id);
+        dispatch?.({
+          type: STUDY_ACTION.CLEAR_LINK_TRAJECTORY,
+        } as StudyActionType);
         setData((prev) => {
           prev[0].trajectory = newDbTrajectory;
           prev[0].status = TRAJECTORY_SELECTION_STATUS.ERROR;
@@ -175,6 +179,10 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
           trajectoryId,
           study.id,
         )) as DbTrajectory;
+        dispatch?.({
+          type: index === 0 ? STUDY_ACTION.ADD_TRAJECTORY_AREA : STUDY_ACTION.ADD_TRAJECTORY_LINK,
+          payload,
+        } as StudyActionType);
         setData((prev) => {
           prev[index].trajectory = payload;
           prev[index].status = getStatus(status);
@@ -188,6 +196,9 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
         if (index === 0 && data[1].trajectory) {
           await unlinkTrajectoryFromStudy(trajectoryId, study.id);
           await unlinkTrajectoryFromStudy(data[1].trajectory.id, study.id);
+          dispatch?.({
+            type: STUDY_ACTION.CLEAR_AREA_AND_LINK_TRAJECTORY,
+          } as StudyActionType);
           setData((prev) => {
             prev[0].trajectory = null;
             prev[0].status = TRAJECTORY_SELECTION_STATUS.MISSING;
@@ -198,6 +209,9 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
           setReadOnly({ '0': false, '1': true });
         } else {
           await unlinkTrajectoryFromStudy(trajectoryId, study.id);
+          dispatch?.({
+            type: index === 0 ? STUDY_ACTION.CLEAR_AREA_TRAJECTORY : STUDY_ACTION.CLEAR_LINK_TRAJECTORY,
+          } as StudyActionType);
           setData((prev) => {
             prev[index].trajectory = null;
             prev[index].status = TRAJECTORY_SELECTION_STATUS.MISSING;
