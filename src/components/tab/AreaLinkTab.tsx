@@ -238,6 +238,9 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
 
       //Handle case when deletion a trajectory with error status
       if (status === 'emptyError') {
+        dispatch?.({
+          type: index === 0 ? STUDY_ACTION.CLEAR_AREA_TRAJECTORY : STUDY_ACTION.CLEAR_LINK_TRAJECTORY,
+        } as StudyActionType);
         setData((prev) => {
           prev[index].trajectory = null;
           prev[index].status = TRAJECTORY_SELECTION_STATUS.MISSING;
