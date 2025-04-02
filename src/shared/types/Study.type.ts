@@ -28,7 +28,10 @@ export interface PaginatedResponse<T> {
 }
 
 export type StudyState = {
-  [key in keyof typeof TRAJECTORY_TYPE]?: DbTrajectoryWithState | null;
+  [key in keyof typeof TRAJECTORY_TYPE]?: WithNullableFields<
+    DbTrajectoryWithState,
+    'type' | 'version' | 'userName' | 'creationDate'
+  > | null;
 } & {
   studyStatus?: StudyStatus | undefined;
 };
