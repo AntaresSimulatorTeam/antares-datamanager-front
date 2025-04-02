@@ -35,7 +35,7 @@ import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { getStatus } from '@/shared/utils/trajectoryUtils.ts';
-import { getStudyTrajectories } from '@/shared/services/studyService.ts';
+import { getStudyById, getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { TrajectoryDataVisualisation } from '@common/modal/TrajectoryDataVisualisation.tsx';
 import { generateTrajectoryViewHeader } from '@/components/header/TrajectoryLinkHeader.tsx';
 
@@ -70,12 +70,8 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
       status: TRAJECTORY_SELECTION_STATUS.MISSING,
     },
   ]);
-  const [readOnly, setReadOnly] = useState<ReadOnlyObject>({
-    '0': false,
-    '1':
-      !data[0].trajectory ||
-      (!studyState[`${TRAJECTORY_TYPE.LINK}`] && studyState?.studyStatus === StudyStatus.GENERATED),
-  });
+
+  const [readOnly, setReadOnly] = useState<ReadOnlyObject>({ '0': false, '1': false });
 
   useEffect(() => {
     setReadOnly({
@@ -90,12 +86,13 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
     const getTrajectories = async () => {
       let trajectoryAreaResult;
       let trajectoryLinkResult;
+      let studyData;
       try {
-        [trajectoryAreaResult, trajectoryLinkResult] = await Promise.all([
+        [studyData, trajectoryAreaResult, trajectoryLinkResult] = await Promise.all([
+          getStudyById(study.id),
           getStudyTrajectories(study.id, TRAJECTORY_TYPE.AREA),
           getStudyTrajectories(study.id, TRAJECTORY_TYPE.LINK),
         ]);
-      } finally {
         if (
           (trajectoryAreaResult as DbTrajectory[])?.length > 0 ||
           (trajectoryLinkResult as DbTrajectory[])?.length > 0
@@ -118,13 +115,13 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
               status: trajectoryLink ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
             },
           ]);
-          console.log('=================== !trajectoryLink', !trajectoryLink);
-          console.log('=================== studyState', studyState?.studyStatus === StudyStatus.GENERATED);
           setReadOnly({
             '0': false,
-            '1': !trajectoryArea || (!trajectoryLink && studyState?.studyStatus === StudyStatus.GENERATED),
+            '1': !trajectoryArea || (!trajectoryLink && (studyData as StudyDTO)?.status === StudyStatus.GENERATED),
           });
         }
+      } catch {
+        //Silent handler
       }
     };
     void getTrajectories();
