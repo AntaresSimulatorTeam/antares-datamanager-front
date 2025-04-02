@@ -18,6 +18,7 @@ import { ButtonWithStdIcon } from '@/components/button/ButtonWithStdIcon.tsx';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { DetailsContent } from '@/components/banner/DetailsContent.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
+import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
 
 interface StudyState {
   study: StudyDTO;
@@ -66,13 +67,15 @@ const StudyDetails = () => {
           <RdsDivider />
           <div className="flex items-center gap-2 self-end">
             {!AREA && <div className={'text-error-600'}>{t('studyDetails.@add_trajectories_message')}</div>}
-            {AREA && !LINK?.type && !!LINK?.id && (
+            {AREA && LINK?.state === TRAJECTORY_SELECTION_STATUS.ERROR && (
               <div className={'text-error-600'}>{t('studyDetails.@error_link_trajectory_message')}</div>
             )}
             <ButtonWithStdIcon
               label={t('studyDetails.@generate')}
               onClick={() => void handleGenerateStudy()}
-              disabled={!AREA || (AREA && !LINK?.type && !!LINK?.id) || studyStatus === StudyStatus.GENERATED}
+              disabled={
+                !AREA || LINK?.state === TRAJECTORY_SELECTION_STATUS.ERROR || studyStatus === StudyStatus.GENERATED
+              }
               icon={StdIconId.CheckCircle}
               position="right"
               isLoading={isGenerating}

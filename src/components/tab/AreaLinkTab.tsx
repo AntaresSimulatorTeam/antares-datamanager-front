@@ -145,6 +145,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
         version: null,
         userName: null,
         creationDate: null,
+        state: TRAJECTORY_SELECTION_STATUS.ERROR,
       };
       //Case: area control failed and a trajectory Links is linked to the study
       if (index === 0 && data[1]?.trajectory) {
@@ -167,6 +168,9 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
           return prev;
         });
       }
+      dispatch?.({
+        type: index === 0 ? STUDY_ACTION.ADD_TRAJECTORY_AREA : STUDY_ACTION.ADD_TRAJECTORY_LINK,
+      } as StudyActionType);
       setReadOnly({ '0': false, '1': false });
     } catch {
       //Silent handler

@@ -25,6 +25,10 @@ export interface DbTrajectory {
   creationDate: Date;
 }
 
+export interface DbTrajectoryWithState extends DbTrajectory {
+  state?: TRAJECTORY_SELECTION_STATUS;
+}
+
 export type AreaAndLinkRowData = {
   hypothesis: string;
   trajectory: WithNullableFields<DbTrajectory, 'type' | 'version' | 'userName' | 'creationDate'> | null;
