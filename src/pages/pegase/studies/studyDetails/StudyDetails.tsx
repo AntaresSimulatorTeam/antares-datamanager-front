@@ -66,7 +66,10 @@ const StudyDetails = () => {
         <div className="flex flex-col gap-2">
           <RdsDivider />
           <div className="flex items-center gap-2 self-end">
-            {!AREA && <div className={'text-error-600'}>{t('studyDetails.@add_trajectories_message')}</div>}
+            {!AREA ||
+              (AREA?.state === TRAJECTORY_SELECTION_STATUS.ERROR && (
+                <div className={'text-error-600'}>{t('studyDetails.@add_trajectories_message')}</div>
+              ))}
             {AREA && LINK?.state === TRAJECTORY_SELECTION_STATUS.ERROR && (
               <div className={'text-error-600'}>{t('studyDetails.@error_link_trajectory_message')}</div>
             )}
@@ -74,7 +77,10 @@ const StudyDetails = () => {
               label={t('studyDetails.@generate')}
               onClick={() => void handleGenerateStudy()}
               disabled={
-                !AREA || LINK?.state === TRAJECTORY_SELECTION_STATUS.ERROR || studyStatus === StudyStatus.GENERATED
+                !AREA ||
+                AREA?.state === TRAJECTORY_SELECTION_STATUS.ERROR ||
+                LINK?.state === TRAJECTORY_SELECTION_STATUS.ERROR ||
+                studyStatus === StudyStatus.GENERATED
               }
               icon={StdIconId.CheckCircle}
               position="right"
