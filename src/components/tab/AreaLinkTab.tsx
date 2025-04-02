@@ -118,6 +118,8 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
               status: trajectoryLink ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
             },
           ]);
+          console.log('=================== !trajectoryLink', !trajectoryLink);
+          console.log('=================== studyState', studyState?.studyStatus === StudyStatus.GENERATED);
           setReadOnly({
             '0': false,
             '1': !trajectoryArea || (!trajectoryLink && studyState?.studyStatus === StudyStatus.GENERATED),
