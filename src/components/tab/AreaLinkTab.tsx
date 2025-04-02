@@ -78,7 +78,9 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
   useEffect(() => {
     setReadOnly({
       '0': false,
-      '1': !data[0].trajectory || (!data[1].trajectory && studyState?.studyStatus === StudyStatus.GENERATED),
+      '1':
+        !data[0].trajectory ||
+        (!studyState[`${TRAJECTORY_TYPE.LINK}`] && studyState?.studyStatus === StudyStatus.GENERATED),
     });
   }, [studyState?.studyStatus]);
 
