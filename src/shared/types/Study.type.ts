@@ -8,6 +8,7 @@ import { DbTrajectoryWithState } from '@/shared/types/Trajectory.type.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
+import { WithNullableFields } from '@/shared/types/Generic.type.ts';
 
 export interface StudyDTO {
   id: number;
@@ -33,8 +34,14 @@ export type StudyState = {
 };
 
 export type StudyActionType =
-  | { type: STUDY_ACTION.ADD_TRAJECTORY_AREA; payload: DbTrajectoryWithState }
-  | { type: STUDY_ACTION.ADD_TRAJECTORY_LINK; payload: DbTrajectoryWithState }
+  | {
+      type: STUDY_ACTION.ADD_TRAJECTORY_AREA;
+      payload: WithNullableFields<DbTrajectoryWithState, 'type' | 'version' | 'userName' | 'creationDate'> | null;
+    }
+  | {
+      type: STUDY_ACTION.ADD_TRAJECTORY_LINK;
+      payload: WithNullableFields<DbTrajectoryWithState, 'type' | 'version' | 'userName' | 'creationDate'> | null;
+    }
   | { type: STUDY_ACTION.CLEAR_AREA_TRAJECTORY }
   | { type: STUDY_ACTION.CLEAR_AREA_AND_LINK_TRAJECTORY }
   | { type: STUDY_ACTION.SET_STUDY_STATUS; payload: StudyStatus }

@@ -170,6 +170,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
       }
       dispatch?.({
         type: index === 0 ? STUDY_ACTION.ADD_TRAJECTORY_AREA : STUDY_ACTION.ADD_TRAJECTORY_LINK,
+        payload: newDbTrajectory,
       } as StudyActionType);
       setReadOnly({ '0': false, '1': false });
     } catch {
