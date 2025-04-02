@@ -66,7 +66,9 @@ const StudyDetails = () => {
           <RdsDivider />
           <div className="flex items-center gap-2 self-end">
             {!AREA && <div className={'text-error-600'}>{t('studyDetails.@add_trajectories_message')}</div>}
-            {AREA && !LINK && <div className={'text-error-600'}>{t('studyDetails.@add_trajectories_message')}</div>}
+            {AREA && !LINK && (
+              <div className={'text-error-600'}>{t('studyDetails.@error_link_trajectory_message')}</div>
+            )}
             <ButtonWithStdIcon
               label={t('studyDetails.@generate')}
               onClick={() => void handleGenerateStudy()}
