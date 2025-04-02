@@ -184,29 +184,37 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
       }
 
       // Handle deletion case for areas
-      if ((trajectoryId != null && status === 'empty') || status === 'emptyError') {
-        if (trajectoryId != null && status === 'empty') {
-          if (index === 0 && data[1].trajectory) {
-            await unlinkTrajectoryFromStudy(trajectoryId, study.id);
-            await unlinkTrajectoryFromStudy(data[1].trajectory.id, study.id);
-            setData((prev) => {
-              prev[0].trajectory = null;
-              prev[0].status = TRAJECTORY_SELECTION_STATUS.MISSING;
-              prev[1].trajectory = null;
-              prev[1].status = TRAJECTORY_SELECTION_STATUS.MISSING;
-              return prev;
-            });
-            setReadOnly({ '0': false, '1': true });
-          } else {
-            await unlinkTrajectoryFromStudy(trajectoryId, study.id);
-            setData((prev) => {
-              prev[index].trajectory = null;
-              prev[index].status = TRAJECTORY_SELECTION_STATUS.MISSING;
-              return prev;
-            });
-            setReadOnly({ '0': false, '1': index === 0 });
-          }
+      if (trajectoryId != null && status === 'empty') {
+        if (index === 0 && data[1].trajectory) {
+          await unlinkTrajectoryFromStudy(trajectoryId, study.id);
+          await unlinkTrajectoryFromStudy(data[1].trajectory.id, study.id);
+          setData((prev) => {
+            prev[0].trajectory = null;
+            prev[0].status = TRAJECTORY_SELECTION_STATUS.MISSING;
+            prev[1].trajectory = null;
+            prev[1].status = TRAJECTORY_SELECTION_STATUS.MISSING;
+            return prev;
+          });
+          setReadOnly({ '0': false, '1': true });
+        } else {
+          await unlinkTrajectoryFromStudy(trajectoryId, study.id);
+          setData((prev) => {
+            prev[index].trajectory = null;
+            prev[index].status = TRAJECTORY_SELECTION_STATUS.MISSING;
+            return prev;
+          });
+          setReadOnly({ '0': false, '1': index === 0 });
         }
+      }
+
+      //Handle case when deletion a trajectory with error status
+      if (status === 'emptyError') {
+        setData((prev) => {
+          prev[index].trajectory = null;
+          prev[index].status = TRAJECTORY_SELECTION_STATUS.MISSING;
+          return prev;
+        });
+        setReadOnly({ '0': false, '1': false });
       }
 
       if (status === 'error' && trajectoryId != null && trajectoryLabel) {
