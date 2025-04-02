@@ -72,9 +72,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
   ]);
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({
     '0': false,
-    '1':
-      !data[0].trajectory ||
-      (!studyState[`${TRAJECTORY_TYPE.LINK}`] && studyState?.studyStatus === StudyStatus.GENERATED),
+    '1': !data[0].trajectory || (!data[1].trajectory && studyState?.studyStatus === StudyStatus.GENERATED),
   });
 
   useEffect(() => {
@@ -142,7 +140,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
         creationDate: null,
       };
       //Case: area control failed and a trajectory Links is linked to the study
-      if (index === 0 && data[1].trajectory) {
+      if (index === 0 && data[1]?.trajectory) {
         await unlinkTrajectoryFromStudy(data[1].trajectory.id, study.id);
         dispatch?.({
           type: STUDY_ACTION.CLEAR_LINK_TRAJECTORY,
