@@ -150,8 +150,8 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
         creationDate: null,
         state: TRAJECTORY_SELECTION_STATUS.ERROR,
       };
-      //Case: area control failed and a trajectory Links is linked to the study
-      if (index === 0 && data[1]?.trajectory) {
+      //Case: area control failed and a trajectory Links is linked to the study with ok status
+      if (index === 0 && data[1]?.trajectory && data[1]?.status != TRAJECTORY_SELECTION_STATUS.ERROR) {
         await unlinkTrajectoryFromStudy(data[1].trajectory.id, study.id);
         dispatch?.({
           type: STUDY_ACTION.CLEAR_LINK_TRAJECTORY,
@@ -185,7 +185,9 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
     if (index === 0 && data[1].trajectory) {
       if (status === 'empty') {
         await unlinkTrajectoryFromStudy(trajectoryId, study.id);
-        await unlinkTrajectoryFromStudy(data[1].trajectory.id, study.id);
+        if (data[1]?.status != TRAJECTORY_SELECTION_STATUS.ERROR) {
+          await unlinkTrajectoryFromStudy(data[1].trajectory.id, study.id);
+        }
       }
       dispatch?.({
         type: STUDY_ACTION.CLEAR_AREA_AND_LINK_TRAJECTORY,
