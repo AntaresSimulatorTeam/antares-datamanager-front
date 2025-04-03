@@ -139,7 +139,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
     }
   };
 
-  const handleControlFailed = async (index: number, trajectoryId: number, trajectoryLabel: string) => {
+  const handleTrajectoryError = async (index: number, trajectoryId: number, trajectoryLabel: string) => {
     try {
       const newDbTrajectory = {
         id: trajectoryId,
@@ -181,6 +181,39 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
     }
   };
 
+  const handleTrajectoryDeletion = async (index: number, status: RowStatus, trajectoryId: number) => {
+    if (index === 0 && data[1].trajectory) {
+      if (status === 'empty') {
+        await unlinkTrajectoryFromStudy(trajectoryId, study.id);
+        await unlinkTrajectoryFromStudy(data[1].trajectory.id, study.id);
+      }
+      dispatch?.({
+        type: STUDY_ACTION.CLEAR_AREA_AND_LINK_TRAJECTORY,
+      } as StudyActionType);
+      setData((prev) => {
+        prev[0].trajectory = null;
+        prev[0].status = TRAJECTORY_SELECTION_STATUS.MISSING;
+        prev[1].trajectory = null;
+        prev[1].status = TRAJECTORY_SELECTION_STATUS.MISSING;
+        return prev;
+      });
+      setReadOnly({ '0': false, '1': true });
+    } else {
+      if (status === 'empty') {
+        await unlinkTrajectoryFromStudy(trajectoryId, study.id);
+      }
+      dispatch?.({
+        type: index === 0 ? STUDY_ACTION.CLEAR_AREA_TRAJECTORY : STUDY_ACTION.CLEAR_LINK_TRAJECTORY,
+      } as StudyActionType);
+      setData((prev) => {
+        prev[index].trajectory = null;
+        prev[index].status = TRAJECTORY_SELECTION_STATUS.MISSING;
+        return prev;
+      });
+      setReadOnly({ '0': false, '1': index === 0 });
+    }
+  };
+
   const handleTrajectoryUpdate = async (
     index: number,
     status: RowStatus,
@@ -188,7 +221,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
     trajectoryLabel?: string,
   ) => {
     try {
-      if (status === 'success' && trajectoryId) {
+      if (trajectoryId != null && status === 'success') {
         const payload = (await linkTrajectoryToStudy(
           index === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
           trajectoryId,
@@ -207,55 +240,17 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
       }
 
       // Handle deletion case for areas
-      if (trajectoryId != null && status === 'empty') {
-        if (index === 0 && data[1].trajectory) {
-          await unlinkTrajectoryFromStudy(trajectoryId, study.id);
-          await unlinkTrajectoryFromStudy(data[1].trajectory.id, study.id);
-          dispatch?.({
-            type: STUDY_ACTION.CLEAR_AREA_AND_LINK_TRAJECTORY,
-          } as StudyActionType);
-          setData((prev) => {
-            prev[0].trajectory = null;
-            prev[0].status = TRAJECTORY_SELECTION_STATUS.MISSING;
-            prev[1].trajectory = null;
-            prev[1].status = TRAJECTORY_SELECTION_STATUS.MISSING;
-            return prev;
-          });
-          setReadOnly({ '0': false, '1': true });
-        } else {
-          await unlinkTrajectoryFromStudy(trajectoryId, study.id);
-          dispatch?.({
-            type: index === 0 ? STUDY_ACTION.CLEAR_AREA_TRAJECTORY : STUDY_ACTION.CLEAR_LINK_TRAJECTORY,
-          } as StudyActionType);
-          setData((prev) => {
-            prev[index].trajectory = null;
-            prev[index].status = TRAJECTORY_SELECTION_STATUS.MISSING;
-            return prev;
-          });
-          setReadOnly({ '0': false, '1': index === 0 });
-        }
-      }
-
-      //Handle case when deletion a trajectory with error status
-      if (status === 'emptyError') {
-        dispatch?.({
-          type: index === 0 ? STUDY_ACTION.CLEAR_AREA_TRAJECTORY : STUDY_ACTION.CLEAR_LINK_TRAJECTORY,
-        } as StudyActionType);
-        setData((prev) => {
-          prev[index].trajectory = null;
-          prev[index].status = TRAJECTORY_SELECTION_STATUS.MISSING;
-          return prev;
-        });
-        setReadOnly({ '0': false, '1': false });
+      if ((trajectoryId != null && status === 'empty') || (trajectoryId != null && status === 'emptyError')) {
+        await handleTrajectoryDeletion(index, status, trajectoryId);
       }
 
       if (status === 'error' && trajectoryId != null && trajectoryLabel) {
-        await handleControlFailed(index, trajectoryId, trajectoryLabel);
+        await handleTrajectoryError(index, trajectoryId, trajectoryLabel);
       }
     } catch (error) {
       //Handle case when control failed during link creation
       if (status === 'success' && trajectoryId != null && trajectoryLabel) {
-        await handleControlFailed(index, trajectoryId, trajectoryLabel);
+        await handleTrajectoryError(index, trajectoryId, trajectoryLabel);
       } else {
         // Reset trajectory line to initial state
         setData((prev) => {
