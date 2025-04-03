@@ -81,7 +81,7 @@ const getAreaLinkTableHeaders = (
           <SelectAndSearchableInput
             onSelect={(value: SelectOption) => {
               setErrorInfo({ index: row.index, message: '' });
-              void handleUpdate(row.index, 'success', value.id);
+              void handleUpdate(row.index, 'success', value.id, value.label);
             }}
             setSearchTerm={async (value: string | undefined) => await handlerSearch(row.index, value)}
             defaultPlaceHolder={
