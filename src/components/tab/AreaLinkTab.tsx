@@ -222,21 +222,22 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
   ) => {
     try {
       if (trajectoryId != null && status === 'success') {
-        const payload = (await linkTrajectoryToStudy(
-          index === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
-          trajectoryId,
-          study.id,
-        )) as DbTrajectory;
-        dispatch?.({
-          type: index === 0 ? STUDY_ACTION.ADD_TRAJECTORY_AREA : STUDY_ACTION.ADD_TRAJECTORY_LINK,
-          payload,
-        } as StudyActionType);
-        setData((prev) => {
-          prev[index].trajectory = payload;
-          prev[index].status = getStatus(status);
-          return prev;
-        });
-        setReadOnly({ '0': false, '1': false });
+        await linkTrajectoryToStudy(index === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK, trajectoryId, study.id)
+          .then((payload) => {
+            dispatch?.({
+              type: index === 0 ? STUDY_ACTION.ADD_TRAJECTORY_AREA : STUDY_ACTION.ADD_TRAJECTORY_LINK,
+              payload,
+            } as StudyActionType);
+            setData((prev) => {
+              prev[index].trajectory = payload as DbTrajectory;
+              prev[index].status = getStatus(status);
+              return prev;
+            });
+            setReadOnly({ '0': false, '1': false });
+          })
+          .catch(async () => {
+            await handleTrajectoryError(index, trajectoryId, trajectoryLabel ?? '');
+          });
       }
 
       // Handle deletion case for areas
@@ -248,17 +249,12 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
         await handleTrajectoryError(index, trajectoryId, trajectoryLabel);
       }
     } catch (error) {
-      //Handle case when control failed during link creation
-      //if (status === 'success' && trajectoryId != null && trajectoryLabel) {
-      await handleTrajectoryError(index, trajectoryId, trajectoryLabel ?? '');
-      // } else {
-      //   // Reset trajectory line to initial state
-      //   setData((prev) => {
-      //     prev[index].trajectory = null;
-      //     prev[index].status = TRAJECTORY_SELECTION_STATUS.MISSING;
-      //     return prev;
-      //   });
-      // }
+      // Reset trajectory line to initial state
+      setData((prev) => {
+        prev[index].trajectory = null;
+        prev[index].status = TRAJECTORY_SELECTION_STATUS.MISSING;
+        return prev;
+      });
     }
   };
 
