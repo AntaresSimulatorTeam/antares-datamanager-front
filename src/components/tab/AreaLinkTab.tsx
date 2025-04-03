@@ -249,16 +249,16 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
       }
     } catch (error) {
       //Handle case when control failed during link creation
-      if (status === 'success' && trajectoryId != null && trajectoryLabel) {
-        await handleTrajectoryError(index, trajectoryId, trajectoryLabel);
-      } else {
-        // Reset trajectory line to initial state
-        setData((prev) => {
-          prev[index].trajectory = null;
-          prev[index].status = TRAJECTORY_SELECTION_STATUS.MISSING;
-          return prev;
-        });
-      }
+      //if (status === 'success' && trajectoryId != null && trajectoryLabel) {
+      await handleTrajectoryError(index, trajectoryId, trajectoryLabel ?? '');
+      // } else {
+      //   // Reset trajectory line to initial state
+      //   setData((prev) => {
+      //     prev[index].trajectory = null;
+      //     prev[index].status = TRAJECTORY_SELECTION_STATUS.MISSING;
+      //     return prev;
+      //   });
+      // }
     }
   };
 
