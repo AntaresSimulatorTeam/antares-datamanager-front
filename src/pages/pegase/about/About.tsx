@@ -1,62 +1,40 @@
 import { useEffect, useState } from 'react';
-import { fetchAppInfo } from '@/shared/services/aboutService.ts';
-import { AppInfo } from '@/shared/types/AppInfo.ts';
-import packageJson from '../../../../package.json';
-import { GIT_INFO } from '@/gitInfo.ts';
+import { AppData } from '@/shared/types/AppInfo.ts';
 import { useTranslation } from 'react-i18next';
-
-interface TableRowProps {
-  label: string;
-  value: string;
-}
-
-const TableRow = ({ label, value }: TableRowProps) => (
-  <tr>
-    <td className="text-sm border-b border-gray-200 px-2 py-1">{label}</td>
-    <td className="text-sm border-b border-gray-200 px-2 py-1">{value}</td>
-  </tr>
-);
+import StdSimpleTable from '@common/data/stdSimpleTable/StdSimpleTable.tsx';
+import { RdsHeading } from 'rte-design-system-react';
+import { AboutHeaders } from '@/components/header/AboutHeader.tsx';
+import { fetchAppInfo } from '@/shared/services/aboutService.ts';
 
 export const About = () => {
-  const [info, setInfo] = useState<AppInfo | null>(null);
+  const [info, setInfo] = useState<AppData[] | null>(null);
+  const [isLoadingInfo, setIsLoadingInfo] = useState(false);
   const { t } = useTranslation();
 
   useEffect(() => {
-    fetchAppInfo()
-      .then((data) => {
-        setInfo(data);
-      })
-      .catch((error) => {
+    const fetchInfo = async () => {
+      try {
+        setIsLoadingInfo(true);
+        const appInfos = await fetchAppInfo();
+        setInfo(appInfos);
+      } catch (error) {
         console.error('Error fetching info:', error);
-      });
+      } finally {
+        setIsLoadingInfo(false);
+      }
+    };
+    void fetchInfo();
   }, []);
 
   return (
-    <div className="p-4">
-      <h1 className="text-3xl mb-4 font-bold">{t('about.@title')}</h1>
-
-      <div>
-        <h1>
-          {packageJson.name} (v{packageJson.version})
-        </h1>
-        <h3>Git</h3>
-        <p>Branch: {GIT_INFO.branch}</p>
-        <p>Commit: {GIT_INFO.commit}</p>
-        <p>Build Time: {GIT_INFO.buildTime}</p>
-      </div>
-      {info ? (
-        <table className="bg-white min-w-full">
-          <tbody>
-            <TableRow label="App Name" value={info.appName} />
-            <TableRow label="App Description" value={info.appDescription} />
-            <TableRow label="App Version" value={info.appVersion} />
-            <TableRow label="Git Branch" value={info.appBranch} />
-            <TableRow label="Git Commit ID" value={info.commitId} />
-            <TableRow label="Git Commit Time" value={info.time} />
-          </tbody>
-        </table>
+    <div className="flex h-1/2 w-full flex-col items-start justify-center gap-4">
+      <RdsHeading title={t('about.@title')} />
+      {info && !isLoadingInfo ? (
+        <div className="w-3/4">
+          <StdSimpleTable id="app-data" data={info} columns={AboutHeaders(t)} enableColumnResizing={false} />
+        </div>
       ) : (
-        <p className="text-gray-500">Loading...</p>
+        <p className="text-gray-500">{t('components.spinner.@label')}</p>
       )}
     </div>
   );
