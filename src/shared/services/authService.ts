@@ -27,23 +27,35 @@ export const AuthService = {
   logout: async () => {
     try {
       const accessToken = (await userManager.getUser())?.access_token;
-      // eslint-disable-next-line camelcase
-      //await userManager.signoutRedirect({
-      // eslint-disable-next-line camelcase
-      //id_token_hint: accessToken ?? undefined,
-      //});
-      await AuthService.revokeTokens();
+      //await AuthService.revokeTokens();
       await AuthService.removeUser();
       await userManager.signoutRedirect({
         // eslint-disable-next-line camelcase
         id_token_hint: accessToken ?? undefined,
       });
-      // await AuthService.handleCallback();
       window.location.href = getEnvVariables('VITE_OAUTH2_REDIRECT_URL');
     } catch {
       // silent handler
     }
   },
+
+  addAccessTokenExpired: () =>
+    userManager.events.addAccessTokenExpired(async () => {
+      console.log('Access token expired');
+      try {
+        const accessToken = (await userManager.getUser())?.access_token;
+        await AuthService.removeUser();
+        await userManager.signoutRedirect({
+          // eslint-disable-next-line camelcase
+          id_token_hint: accessToken ?? undefined,
+        });
+        window.location.href = getEnvVariables('VITE_OAUTH2_REDIRECT_URL');
+      } catch {
+        // silent handler
+      }
+    }),
+
+  //removeAccessTokenExpired: () => userManager.events.removeAccessTokenExpired(),
 
   authFetch: async (url: string, options: RequestInit = {}): Promise<Response> => {
     if (isAuthenticationActive()) {

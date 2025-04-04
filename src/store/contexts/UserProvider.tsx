@@ -44,6 +44,10 @@ const UserProvider = ({ children, initialValue }: UserProviderProps) => {
     };
   }, []);
 
+  useEffect(() => {
+    AuthService.addAccessTokenExpired();
+  }, []);
+
   if (loading) {
     return <div>Loading...</div>;
   }
