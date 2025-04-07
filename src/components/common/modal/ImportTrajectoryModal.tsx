@@ -95,7 +95,7 @@ export const ImportTrajectoryModal = ({
               resetField={resetField}
             />
           </div>
-          <div className="relative w-[400px] pt-10">
+          <div className="relative mt-10 w-[400px]">
             <ProgressBar statusFile={fileStatus} progressValue={progress} />
           </div>
         </div>
