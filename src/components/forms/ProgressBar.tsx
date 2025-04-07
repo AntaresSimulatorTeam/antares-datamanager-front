@@ -13,6 +13,6 @@ export const ProgressBar = ({ progressValue, statusFile }: ProgressBarProps) => 
     <div className="h-1 w-4/5 rounded bg-gray-w">
       <div className={`h-1 rounded ${getBgColor(statusFile)}`} style={{ width: `${progressValue}%` }}></div>
     </div>
-    <div className={`fontSize[caption] w-1/5 opacity-${progressValue === 0 ? '0' : '100'}`}>{`${progressValue}%`}</div>
+    <div className={`fontSize[caption] w-1/5 opacity-${progressValue === 0 ? '1' : '100'}`}>{`${progressValue}%`}</div>
   </div>
 );

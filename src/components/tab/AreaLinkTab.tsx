@@ -325,20 +325,20 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
         enableReadOnly={true}
         state={{ readOnly }}
       />
-      {isModalOpen && (
-        <ImportTrajectoryModal
-          options={optionsFS}
-          onClose={async (status, value, label) => {
-            if (status && value != null) {
-              await handleTrajectoryUpdate(rowIndexSelected, status, value, label);
-            }
-            toggleModal();
-          }}
-          trajectoryType={rowIndexSelected === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK}
-          studyHorizon={study.horizon}
-          studyId={study.id}
-        />
-      )}
+      {/*{isModalOpen && (*/}
+      <ImportTrajectoryModal
+        options={optionsFS}
+        onClose={async (status, value, label) => {
+          if (status && value != null) {
+            await handleTrajectoryUpdate(rowIndexSelected, status, value, label);
+          }
+          toggleModal();
+        }}
+        trajectoryType={rowIndexSelected === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK}
+        studyHorizon={study.horizon}
+        studyId={study.id}
+      />
+      {/*)}*/}
       {isViewModalOpen && trajectoryData && (
         <TrajectoryDataVisualisation trajectoryData={trajectoryData} onClose={() => setIsViewModalOpen(false)} />
       )}

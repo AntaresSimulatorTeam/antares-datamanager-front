@@ -84,8 +84,8 @@ export const ImportTrajectoryModal = ({
         })}
       </RdsModal.Title>
       <RdsModal.Content>
-        <div className="flex w-full flex-col items-start gap-2">
-          <div className="w-1/2">
+        <div className="w-full items-start gap-2">
+          <div className="absolute w-[400px]">
             <SelectAndSearchableInput
               options={options}
               defaultPlaceHolder={t('studyDetails.@select_trajectory')}
@@ -95,7 +95,7 @@ export const ImportTrajectoryModal = ({
               resetField={resetField}
             />
           </div>
-          <div className="w-1/2">
+          <div className="relative w-[400px] pt-10">
             <ProgressBar statusFile={fileStatus} progressValue={progress} />
           </div>
         </div>
