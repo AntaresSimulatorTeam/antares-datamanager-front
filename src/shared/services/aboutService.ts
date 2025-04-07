@@ -1,4 +1,3 @@
-import { AuthService } from '@/shared/services/authService.ts';
 import { AppBackendInfos, AppInfo } from '@/shared/types/AppInfo';
 import { ACTUATOR_ENDPOINT } from '@/shared/const/apiEndPoint';
 import packageJson from '../../../package.json';
@@ -7,7 +6,7 @@ import { Entries } from '@/shared/types/Generic.type.ts';
 
 export const fetchBackendInfo = async (): Promise<AppInfo> => {
   const apiUrl = `${ACTUATOR_ENDPOINT}`;
-  const response = await AuthService.authFetch(apiUrl);
+  const response = await fetch(apiUrl);
   if (!response.ok) {
     throw new Error('Error fetching app info');
   }
