@@ -23,6 +23,7 @@ const getAreaLinkTableHeaders = (
   handleUpdate: (index: number, status: RowStatus, trajectoryId: number, trajectoryLabel?: string) => Promise<void>,
   handleImport: (index: number) => Promise<void>,
   handlerSearch: (index: number, value: string | undefined) => Promise<SelectOption[] | undefined>,
+  handleView: (index: number) => Promise<void>,
   error: { index: number; message: string },
   setErrorInfo: Dispatch<SetStateAction<ErrorMessageType>>,
   studyStatus: StudyStatus | undefined,
@@ -30,19 +31,24 @@ const getAreaLinkTableHeaders = (
   columnHelper.accessor('hypothesis', {
     header: t('studyDetails.@hypothesis'),
     cell: ({ getValue, row }) => {
-      const { trajectory } = row.original;
+      const { trajectory, status } = row.original;
       return (
         <div className="inline-flex w-[180px] items-center gap-2">
-          <span className={`${trajectory ? 'text-primary-600' : 'text-gray-900'}`}>{getValue()}</span>
-          {trajectory ? (
+          <span
+            className={`${trajectory && status === TRAJECTORY_SELECTION_STATUS.OK ? 'text-primary-600' : 'text-gray-900'}`}
+          >
+            {getValue()}
+          </span>
+          {trajectory && status === TRAJECTORY_SELECTION_STATUS.OK && (
             <ButtonPreview
               label={'View'}
               icon={StdIconId.Preview}
               position={'left'}
               color={row.getReadOnly() ? 'gray-700' : 'primary-600'}
               borderColor={row.getReadOnly() ? 'gray-700' : 'acc1-600'}
+              onClick={() => void handleView(row.index)}
             />
-          ) : null}
+          )}
         </div>
       );
     },
@@ -75,7 +81,7 @@ const getAreaLinkTableHeaders = (
           <SelectAndSearchableInput
             onSelect={(value: SelectOption) => {
               setErrorInfo({ index: row.index, message: '' });
-              void handleUpdate(row.index, 'success', value.id);
+              void handleUpdate(row.index, 'success', value.id, value.label);
             }}
             setSearchTerm={async (value: string | undefined) => await handlerSearch(row.index, value)}
             defaultPlaceHolder={
@@ -93,7 +99,7 @@ const getAreaLinkTableHeaders = (
             }}
             disabled={row.getReadOnly()}
           />
-          {error.message && row.index === error.index && <div className="text-error-600">{error.message}</div>}
+          {error.message && row.index === error.index && <div className="text-error-700">{error.message}</div>}
         </div>
       );
     },
@@ -113,13 +119,13 @@ const getAreaLinkTableHeaders = (
       if (status === TRAJECTORY_SELECTION_STATUS.OK)
         return (
           <div className="flex flex-1 items-end gap-1">
-            <RdsIcon name={RdsIconId.Done} color="secondary" /> {t('studyDetails.@import_status_done')}
+            <RdsIcon name={RdsIconId.Done} color="primary-600" /> {t('studyDetails.@import_status_done')}
           </div>
         );
       if (status === TRAJECTORY_SELECTION_STATUS.ERROR)
         return (
           <div className="flex flex-1 items-end gap-1">
-            <RdsIcon name={RdsIconId.Info} color="primary-error" /> {t('studyDetails.@import_status_error')}
+            <RdsIcon name={RdsIconId.Info} color="error-700" /> {t('studyDetails.@import_status_error')}
           </div>
         );
       return null;

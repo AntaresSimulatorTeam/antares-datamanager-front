@@ -16,6 +16,9 @@
     },
     "selectAnsSearchInput": {
       "@emptyList": "No result found"
+    },
+    "spinner": {
+      "label": "Loading ..."
     }
   },
   "Pegase": {
@@ -55,8 +58,13 @@
     "@created": "Created",
     "@by": "By"
   },
+  "pinnedProject": {
+    "@pinSuccess": "Project pinned successfully",
+    "@unpinSuccess": "Project unpinned successfully"
+  },
   "projectDetails": {
-    "@buttonEdit": "Edit"
+    "@buttonEdit": "Edit",
+    "@bannerProjectName": "Project: {{name}}"
   },
   "projectModal": {
     "@keyword_already_exists": "Keyword already exists",
@@ -77,6 +85,9 @@
     "@delete": "Delete"
   },
   "studyDetails": {
+    "@bannerStudyName": "Study: {{name}}",
+    "@bannerHorizon": "Horizon: {{horizon}}",
+    "@bannerCreatedBy": "By: {{createdBy}}",
     "@hypothesis": "Hypothesis",
     "@area": "Area",
     "@link": "Link",
@@ -97,6 +108,40 @@
     "@import_status_error": "Error",
     "@preview": "View",
     "@generate": "Generate",
-    "@add_trajectories_message": "Please add Areas trajectories first"
+    "@add_trajectories_message": "Please add Areas trajectories first",
+    "@error_link_trajectory_message": "Please select another LINK trajectory or delete it"
+  },
+  "trajectoryViewModal": {
+    "@title_area": "Areas",
+    "@title_link": "Links",
+    "@areaName": "Name",
+    "@powerToGas": "Power to gas",
+    "@shortTermStorage": "Short term storage",
+    "@name": "Name",
+    "@winterHpDirectMw": "Winter HP Direct MW",
+    "@winterHcDirectMw": "Winter HC Direct MW",
+    "@winterHpIndirectMw": "Winter HP Indirect MW",
+    "@winterHcIndirectMw": "Winter HC Indirect MW",
+    "@summerHpDirectMw": "Summer HP Direct MW",
+    "@summerHcDirectMw": "Summer HC Direct MW",
+    "@summerHpIndirectMw": "Summer HP Indirect MW",
+    "@summerHcIndirectMw": "Summer HC Indirect MW",
+    "@flowbasedPerimeter": "Flowbased perimeter",
+    "@hvdc": "HVDC",
+    "@specificTs": "Specific TS",
+    "@forcedOutageHvac": "Forced Outage HVAC",
+    "@hurdleCost": "Hurdle cost"
+  },
+  "about": {
+    "@title": "About",
+    "@appName": "App Name",
+    "@appDescription": "App Description",
+    "@appVersion": "App Version",
+    "@appBranch": "Git Branch",
+    "@commitId": "Git Commit ID",
+    "@time": "Git Commit Time",
+    "@information": "Information",
+    "@frontend": "Frontend",
+    "@backend": "Backend"
   }
 }

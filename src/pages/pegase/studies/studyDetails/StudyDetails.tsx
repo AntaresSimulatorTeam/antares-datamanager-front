@@ -7,7 +7,6 @@
 import { ReactNode, useState } from 'react';
 import { Location, useLocation } from 'react-router-dom';
 import StudyHeader from './StudyHeader.tsx';
-import StudyDetailsContent from './StudyDetailsContent';
 import { RdsDivider } from 'rte-design-system-react';
 import StudyNavigationMenu from '@/pages/pegase/studies/studyDetails/StudyNavigationMenu';
 import { StudyDTO } from '@/shared/types';
@@ -17,7 +16,9 @@ import { createStudy } from '@/shared/services/studyService.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { ButtonWithStdIcon } from '@/components/button/ButtonWithStdIcon.tsx';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
+import { DetailsContent } from '@/components/banner/DetailsContent.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
+import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
 
 interface StudyState {
   study: StudyDTO;
@@ -28,7 +29,7 @@ const StudyDetails = () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const location: Location<StudyState> = useLocation();
   const { t } = useTranslation();
-  const { studyStatus, AREA } = useStudy();
+  const { studyStatus, AREA, LINK } = useStudy();
   const dispatch = useStudyDispatch();
   const [isGenerating, setIsGenerating] = useState(false);
   const { study } = location.state || {};
@@ -53,7 +54,7 @@ const StudyDetails = () => {
       <StudyHeader projectName={study.project} studyName={study.name} />
       <RdsDivider />
       <div className="flex flex-col">
-        <StudyDetailsContent study={study} />
+        <DetailsContent content={study} />
       </div>
       <div className="flex gap-4 px-3 py-2">
         <div className="flex h-10 items-end self-stretch">
@@ -65,11 +66,21 @@ const StudyDetails = () => {
         <div className="flex flex-col gap-2">
           <RdsDivider />
           <div className="flex items-center gap-2 self-end">
-            {!AREA && <div className={'text-error-600'}>{t('studyDetails.@add_trajectories_message')}</div>}
+            {(!AREA || AREA?.state === TRAJECTORY_SELECTION_STATUS.ERROR) && (
+              <div className={'text-error-600'}>{t('studyDetails.@add_trajectories_message')}</div>
+            )}
+            {AREA && LINK?.state === TRAJECTORY_SELECTION_STATUS.ERROR && (
+              <div className={'text-error-600'}>{t('studyDetails.@error_link_trajectory_message')}</div>
+            )}
             <ButtonWithStdIcon
               label={t('studyDetails.@generate')}
               onClick={() => void handleGenerateStudy()}
-              disabled={!AREA || studyStatus === StudyStatus.GENERATED}
+              disabled={
+                !AREA ||
+                AREA?.state === TRAJECTORY_SELECTION_STATUS.ERROR ||
+                LINK?.state === TRAJECTORY_SELECTION_STATUS.ERROR ||
+                studyStatus === StudyStatus.GENERATED
+              }
               icon={StdIconId.CheckCircle}
               position="right"
               isLoading={isGenerating}

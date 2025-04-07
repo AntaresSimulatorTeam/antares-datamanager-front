@@ -161,3 +161,19 @@ export const getStudyTrajectories = async (
 
   return (await response.json()) as DbTrajectory[];
 };
+
+/**
+ * Retrieve study data by id
+ *
+ * @param {number} studyId - Study id
+ * @return {Promise<StudyDTO | Error>} Study object
+ */
+export const getStudyById = async (studyId: number): Promise<StudyDTO | Error> => {
+  const urlApi = `${STUDY_ENDPOINT}/${studyId}`;
+  const response = await AuthService.authFetch(urlApi);
+  if (!response.ok) {
+    throw new Error('Failed to fetch study');
+  }
+
+  return (await response.json()) as StudyDTO;
+};

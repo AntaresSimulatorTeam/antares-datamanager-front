@@ -22,7 +22,7 @@ const COMMON_HEADER_CLASSES = 'px-1 py-0.5 text-left font-semibold';
 const headerClassBuilder = <TData,>({ table, header, columnSize }: TableHeaderProps<TData>) =>
   clsx(
     COMMON_HEADER_CLASSES,
-    columnSize === 'meta' ? (header.column.columnDef.meta?.sizeClassNames ?? '') : '',
+    columnSize === 'meta' ? (header.column.columnDef.meta?.sizeClassNames ?? '') : `${header.column.columnDef.size}px`,
     table.options.columnResizeMode ? 'group relative' : '',
   );
 

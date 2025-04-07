@@ -1,3 +1,18 @@
+export interface AppBackendInfos {
+  app: {
+    name: string;
+    description: string;
+    version: string;
+  };
+  git: {
+    branch: string;
+    commit: {
+      id: string;
+      time: string;
+    };
+  };
+}
+
 export interface AppInfo {
   appName: string;
   appDescription: string;
@@ -5,4 +20,10 @@ export interface AppInfo {
   appBranch: string;
   commitId: string;
   time: string;
+}
+
+export interface AppData {
+  info: string;
+  front: string;
+  back: string;
 }

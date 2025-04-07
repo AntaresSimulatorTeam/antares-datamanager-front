@@ -33,11 +33,19 @@ const KeywordsInput = ({
   const [suggestedKeywords, setSuggestedKeywords] = useState<string[]>([]);
 
   const handleKeywordChange = async (value: string) => {
-    if (maxNbCharacters !== undefined && value.length > maxNbCharacters) {
+    if (maxNbCharacters != null && value?.length > maxNbCharacters) {
       return;
     }
+    // Remove error message when input keyword is deleted and error message (max nb or already keyword is displayed)
+    const isKeywordExist = keywords?.some((keyword) => keyword == keywordInput);
+    if (
+      (!value && errorMessage && maxNbKeywords != null && keywords?.length === maxNbKeywords) ||
+      (!value && errorMessage && isKeywordExist)
+    ) {
+      setErrorMessage('');
+    }
     setKeywordInput(value);
-    setErrorMessage(''); // Clear error message when input changes
+
     try {
       const tags = (await fetchSuggestedKeywords(value)) as string[];
       setSuggestedKeywords(tags);
@@ -78,6 +86,10 @@ const KeywordsInput = ({
 
   const handleRemoveKeyword = (index: number) => {
     setKeywords((prevKeywords) => prevKeywords.filter((_, i) => i !== index));
+    // In case of keyword is deleted, remove error message when max nb is reached or keyword already exists
+    if ((maxNbKeywords && keywords.length === maxNbKeywords) || keywordInput === keywords[index]) {
+      setErrorMessage('');
+    }
   };
 
   const shouldAddKeywordButton = (input: string): boolean => {
@@ -94,8 +106,8 @@ const KeywordsInput = ({
   };
 
   return (
-    <div className={clsx(width ?? 'w-full', 'flex min-h-18 flex-col items-start justify-start')}>
-      <div className="relative flex w-full">
+    <div className={clsx(width ?? 'w-full', 'flex min-h-22 flex-col items-start justify-start')}>
+      <div className="relative">
         <div className="flex w-full items-center gap-2">
           <div className="max-w-3/4 flex">
             <RdsInputText
@@ -116,19 +128,14 @@ const KeywordsInput = ({
               variant="transparent"
             />
           )}
+          {/* Error Message */}
+          {errorMessage && <div className="my-2 text-error-500">{errorMessage}</div>}
         </div>
 
         {/* Suggested Keywords Dropdown */}
-        {keywordInput && suggestedKeywords.length > 0 && (
+        {keywordInput && !errorMessage && suggestedKeywords.length > 0 && (
           <div
-            className="bg-white max-h-40 absolute z-10 w-full overflow-y-auto border border-gray-300"
-            style={{
-              backgroundColor: 'white', // Ensure opaque background
-              maxHeight: '100px', // Set max height for scrollbar
-              top: '100%',
-              left: 0,
-              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // Optional: add shadow for better visibility
-            }}
+            className="absolute left-0 top-8 z-50 max-h-14 w-full overflow-y-auto rounded border border-gray-300 bg-gray-w shadow-2 outline-none"
             onMouseDown={(e) => e.preventDefault()} // Prevent closing when interacting with dropdown
           >
             {suggestedKeywords.map((suggestedKeyword, index) => (
@@ -143,9 +150,6 @@ const KeywordsInput = ({
           </div>
         )}
       </div>
-
-      {/* Error Message */}
-      {errorMessage && <div className="my-2 text-error-500">{errorMessage}</div>}
 
       {/* Keywords Display and Clear All Button */}
       <div className="flex flex-wrap gap-2">
