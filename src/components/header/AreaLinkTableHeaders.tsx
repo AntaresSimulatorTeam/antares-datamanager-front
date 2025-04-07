@@ -33,7 +33,7 @@ const getAreaLinkTableHeaders = (
     cell: ({ getValue, row }) => {
       const { trajectory, status } = row.original;
       return (
-        <div className="inline-flex w-[180px] items-center gap-2">
+        <div className="inline-flex max-w-fit items-center gap-2">
           <span
             className={`${trajectory && status === TRAJECTORY_SELECTION_STATUS.OK ? 'text-primary-600' : 'text-gray-900'}`}
           >
@@ -59,7 +59,7 @@ const getAreaLinkTableHeaders = (
       const { trajectory, status } = row.original;
       const textClass = studyStatus === StudyStatus.GENERATED ? 'text-primary-600' : 'text-gray-900';
       return trajectory ? (
-        <div className="inline-flex w-[850px] space-x-2 py-3">
+        <div className="inline-flex space-x-2 py-3">
           <span className={`${textClass}`}>{trajectory.trajectoryName}</span>
           {studyStatus != StudyStatus.GENERATED && (
             <RdsIconButton
@@ -77,7 +77,7 @@ const getAreaLinkTableHeaders = (
           )}
         </div>
       ) : (
-        <div className="inline-flex w-[850px] items-center space-x-2">
+        <div className="inline-flex items-center space-x-2">
           <SelectAndSearchableInput
             onSelect={(value: SelectOption) => {
               setErrorInfo({ index: row.index, message: '' });

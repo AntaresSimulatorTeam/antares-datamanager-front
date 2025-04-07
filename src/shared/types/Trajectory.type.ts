@@ -32,7 +32,10 @@ export interface DbTrajectoryWithState extends DbTrajectory {
 
 export type AreaAndLinkRowData = {
   hypothesis: string;
-  trajectory: WithNullableFields<DbTrajectory, 'type' | 'version' | 'userName' | 'creationDate' | 'messages'> | null;
+  trajectory: WithNullableFields<
+    DbTrajectoryWithState,
+    'type' | 'version' | 'userName' | 'creationDate' | 'messages'
+  > | null;
   status: TRAJECTORY_SELECTION_STATUS;
 };
 
