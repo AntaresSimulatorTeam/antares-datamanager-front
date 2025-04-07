@@ -9,7 +9,7 @@ import { Location, useLocation } from 'react-router-dom';
 import StudyHeader from './StudyHeader.tsx';
 import { RdsDivider } from 'rte-design-system-react';
 import StudyNavigationMenu from '@/pages/pegase/studies/studyDetails/StudyNavigationMenu';
-import { StudyDTO, WarningMessage } from '@/shared/types';
+import { StudyDTO } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { createStudy } from '@/shared/services/studyService.ts';
@@ -19,6 +19,7 @@ import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { DetailsContent } from '@/components/banner/DetailsContent.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
+import { AccordionCardWithIconTitle } from '@common/layout/AccordionCardWithIconTitle.tsx';
 
 interface StudyState {
   study: StudyDTO;
@@ -28,12 +29,11 @@ const StudyDetails = () => {
   const [activeContent, setActiveContent] = useState<ReactNode>(null);
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const location: Location<StudyState> = useLocation();
+  const { study } = location.state || {};
   const { t } = useTranslation();
   const { studyStatus, AREA, LINK, messages } = useStudy();
   const dispatch = useStudyDispatch();
   const [isGenerating, setIsGenerating] = useState(false);
-  const [warningMessages, setWarningMessages] = useState<WarningMessage[]>(messages ?? []);
-  const { study } = location.state || {};
 
   const handleGenerateStudy = async () => {
     try {
@@ -62,8 +62,17 @@ const StudyDetails = () => {
           <StudyNavigationMenu onRenderActiveComponent={setActiveContent} study={study} />
         </div>
       </div>
-      <div className="flex h-full flex-col justify-between space-x-4 p-4">
-        {activeContent}
+      <div className="flex flex-col justify-between p-4">
+        <div className="flex w-full gap-4">
+          <div className="flex h-fit w-3/4">{activeContent}</div>
+          {!!messages?.length && (
+            <div className="h-1/2 w-1/4 overflow-auto rounded">
+              {messages.map((message) => (
+                <AccordionCardWithIconTitle key={`message-${message.id}`} data={message} />
+              ))}
+            </div>
+          )}
+        </div>
         <div className="flex flex-col gap-2">
           <RdsDivider />
           <div className="flex items-center gap-2 self-end">

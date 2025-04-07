@@ -106,6 +106,7 @@
     "@import_status_done": "OK",
     "@import_status_missing": "Missing",
     "@import_status_error": "Error",
+    "@import_status_warning": "Warning",
     "@preview": "View",
     "@generate": "Generate",
     "@add_trajectories_message": "Please add Areas trajectories first",

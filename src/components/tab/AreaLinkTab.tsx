@@ -148,6 +148,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
         version: null,
         userName: null,
         creationDate: null,
+        messages: [],
         state: TRAJECTORY_SELECTION_STATUS.ERROR,
       };
       //Case: area control failed and a trajectory Links is linked to the study with ok status
@@ -315,7 +316,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
   );
 
   return (
-    <div className="flex-1">
+    <div className="flex h-fit w-full">
       <StdSimpleTable
         id="example-table"
         data={data}

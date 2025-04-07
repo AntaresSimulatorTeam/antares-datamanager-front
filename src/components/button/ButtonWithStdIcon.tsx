@@ -5,21 +5,24 @@ interface ButtonWithStdIconProps {
   label: string;
   icon: StdIconId;
   position: 'left' | 'right';
-  disabled: boolean;
+  disabled?: boolean;
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
-  isLoading: boolean;
+  isLoading?: boolean;
 }
 
-export const ButtonWithStdIcon = ({ label, icon, onClick, position, disabled, isLoading }: ButtonWithStdIconProps) => {
+export const ButtonWithStdIcon = ({
+  label,
+  icon,
+  onClick,
+  position,
+  disabled = false,
+  isLoading = false,
+}: ButtonWithStdIconProps) => {
   const getButtonLabel = () => {
     if (isLoading) {
       return (
-        <div className={'max-h-3 min-w-12'}>
-          <div
-            className={
-              'inline-block h-3 w-3 animate-spin rounded-full border-2 border-gray-600 border-b-transparent p-0'
-            }
-          ></div>
+        <div className="max-h-3 min-w-12">
+          <div className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-gray-600 border-b-transparent p-0"></div>
         </div>
       );
     } else {
