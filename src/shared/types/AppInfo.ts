@@ -11,6 +11,9 @@ export interface AppBackendInfos {
       time: string;
     };
   };
+    build: {
+        time: string;
+    };
 }
 
 export interface AppInfo {

@@ -11,7 +11,7 @@ export const fetchBackendInfo = async (): Promise<AppInfo> => {
   if (!response.ok) {
     throw new Error('Error fetching app info');
   }
-  const { app, git } = (await response.json()) as AppBackendInfos;
+  const { app, git, build } = (await response.json()) as AppBackendInfos;
 
   return {
     appName: app.name,
@@ -19,7 +19,7 @@ export const fetchBackendInfo = async (): Promise<AppInfo> => {
     appVersion: app.version,
     appBranch: git.branch,
     commitId: git.commit.id,
-    time: git.commit.time,
+    time: build.time,
   };
 };
 

@@ -51,7 +51,7 @@ export const About = () => {
             <TableRow label="App Version" value={info.appVersion} />
             <TableRow label="Git Branch" value={info.appBranch} />
             <TableRow label="Git Commit ID" value={info.commitId} />
-            <TableRow label="Git Commit Time" value={info.time} />
+            <TableRow label="Build Time" value={info.time} />
           </tbody>
         </table>
       ) : (
