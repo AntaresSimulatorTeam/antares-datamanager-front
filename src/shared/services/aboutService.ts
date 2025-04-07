@@ -19,7 +19,7 @@ export const fetchBackendInfo = async (): Promise<AppInfo> => {
     appVersion: app.version,
     appBranch: git.branch,
     commitId: git.commit.id,
-    time: build.time,
+    buildTime: build.time,
   };
 };
 
@@ -31,7 +31,7 @@ export const fetchAppInfo = async () => {
       appVersion: packageJson.version,
       appBranch: GIT_INFO.branch,
       commitId: GIT_INFO.commit,
-      time: GIT_INFO.buildTime,
+      buildTime: GIT_INFO.buildTime,
     };
 
     const data = await fetchBackendInfo();

@@ -22,7 +22,7 @@ export interface AppInfo {
   appVersion: string;
   appBranch: string;
   commitId: string;
-  time: string;
+  buildTime: string;
 }
 
 export interface AppData {
