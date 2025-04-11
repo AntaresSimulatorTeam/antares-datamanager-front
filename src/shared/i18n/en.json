@@ -16,6 +16,9 @@
     },
     "selectAnsSearchInput": {
       "@emptyList": "No result found"
+    },
+    "spinner": {
+      "label": "Loading ..."
     }
   },
   "Pegase": {
@@ -26,7 +29,8 @@
     "@projet": "Project",
     "@logout": "Log out",
     "@parameters": "Parameters",
-    "@antares": "Antares"
+    "@antares": "Antares",
+    "@about": "About"
   },
   "home": {
     "@label": "Home",
@@ -127,5 +131,17 @@
     "@specificTs": "Specific TS",
     "@forcedOutageHvac": "Forced Outage HVAC",
     "@hurdleCost": "Hurdle cost"
+  },
+  "about": {
+    "@title": "About",
+    "@appName": "App Name",
+    "@appDescription": "App Description",
+    "@appVersion": "App Version",
+    "@appBranch": "Git Branch",
+    "@commitId": "Git Commit ID",
+    "@buildTime": "Build Time",
+    "@information": "Information",
+    "@frontend": "Frontend",
+    "@backend": "Backend"
   }
 }
