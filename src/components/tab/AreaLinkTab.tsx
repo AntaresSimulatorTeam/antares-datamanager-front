@@ -17,7 +17,7 @@ import {
   linkTrajectoryToStudy,
   unlinkTrajectoryFromStudy,
 } from '@/shared/services/trajectoryService.ts';
-import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE, WARNING_MESSAGE_LEVEL } from '@/shared/enum/trajectory.ts';
 import {
   AreaAndLinkRowData,
   DbTrajectory,
@@ -139,7 +139,12 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
     }
   };
 
-  const handleTrajectoryError = async (index: number, trajectoryId: number, trajectoryLabel: string) => {
+  const handleTrajectoryError = async (
+    index: number,
+    trajectoryId: number,
+    trajectoryLabel: string,
+    errorMessage?: string,
+  ) => {
     try {
       const newDbTrajectory = {
         id: trajectoryId,
@@ -148,7 +153,13 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
         version: null,
         userName: null,
         creationDate: null,
-        messages: [],
+        messages: [
+          {
+            id: Math.floor(Math.random() * 10),
+            content: errorMessage ?? 'Error',
+            level: WARNING_MESSAGE_LEVEL.ERROR_LEVEL,
+          },
+        ],
         state: TRAJECTORY_SELECTION_STATUS.ERROR,
       };
       //Case: area control failed and a trajectory Links is linked to the study with ok status
@@ -222,6 +233,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
     status: RowStatus,
     trajectoryId: number,
     trajectoryLabel?: string,
+    errorMessage?: string,
   ) => {
     try {
       if (trajectoryId != null && status === 'success') {
@@ -238,8 +250,8 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
             });
             setReadOnly({ '0': false, '1': false });
           })
-          .catch(async () => {
-            await handleTrajectoryError(index, trajectoryId, trajectoryLabel ?? '');
+          .catch(async (error: unknown) => {
+            await handleTrajectoryError(index, trajectoryId, trajectoryLabel ?? '', (error as Error).message);
           });
       }
 
@@ -249,7 +261,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
       }
 
       if (status === 'error' && trajectoryId != null && trajectoryLabel) {
-        await handleTrajectoryError(index, trajectoryId, trajectoryLabel);
+        await handleTrajectoryError(index, trajectoryId, trajectoryLabel, errorMessage);
       }
     } catch (error) {
       // Reset trajectory line to initial state
@@ -329,9 +341,9 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
       {isModalOpen && (
         <ImportTrajectoryModal
           options={optionsFS}
-          onClose={async (status, value, label) => {
+          onClose={async (status, value, label, errorMessage) => {
             if (status && value != null) {
-              await handleTrajectoryUpdate(rowIndexSelected, status, value, label);
+              await handleTrajectoryUpdate(rowIndexSelected, status, value, label, errorMessage);
             }
             toggleModal();
           }}

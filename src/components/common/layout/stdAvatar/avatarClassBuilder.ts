@@ -22,6 +22,7 @@ export const COLOR_CLASSES = {
   pink: 'bg-acc4-300',
   gray: 'bg-acc5-300',
   orange: 'bg-acc6-300',
+  red: 'bg-acc4-600',
 };
 
 export const avatarClassBuilder = (size: AvatarSize, color: AvatarColor) =>

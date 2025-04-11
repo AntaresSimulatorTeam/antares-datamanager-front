@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { ReactNode, useEffect, useState } from 'react';
+import { Dispatch, ReactNode, SetStateAction, useEffect } from 'react';
 import { RdsTabItem } from 'rte-design-system-react';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import LoadTab from '@/components/tab/LoadTab.tsx';
@@ -20,12 +20,15 @@ import { StudyDTO } from '@/shared/types';
 const StudyNavigationMenu = ({
   onRenderActiveComponent,
   study,
+  setActiveTab,
+  activeTab,
 }: {
   onRenderActiveComponent?: (content: ReactNode | null) => void;
   study: StudyDTO;
+  setActiveTab: Dispatch<SetStateAction<TRAJECTORY_TYPE>>;
+  activeTab: TRAJECTORY_TYPE;
 }) => {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState<TRAJECTORY_TYPE>(TRAJECTORY_TYPE.AREA);
 
   const renderActiveComponent = (studyData: StudyDTO): ReactNode | null => {
     switch (activeTab) {
@@ -50,10 +53,6 @@ const StudyNavigationMenu = ({
     }
   }, [activeTab, onRenderActiveComponent]);
 
-  const handleTabClick = (selectedItemName: TRAJECTORY_TYPE) => {
-    setActiveTab(selectedItemName);
-  };
-
   const tabs = [
     { name: TRAJECTORY_TYPE.AREA, label: t('studyDetails.@areas_links'), icon: StdIconId.LinkedServices },
     { name: TRAJECTORY_TYPE.LOAD, label: t('studyDetails.@load'), icon: StdIconId.BatteryChargingFull },
@@ -72,7 +71,7 @@ const StudyNavigationMenu = ({
             name={tab.name}
             label={tab.label}
             active={activeTab === tab.name}
-            onClick={() => handleTabClick(tab.name)}
+            onClick={() => setActiveTab(tab.name)}
           />
         </div>
       ))}
