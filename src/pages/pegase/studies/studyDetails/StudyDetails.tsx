@@ -103,7 +103,8 @@ const StudyDetails = () => {
                 initials={`${messagesWarning?.length ?? '0'}`}
                 size="es"
                 backgroundColor="red"
-                fullname={'Error number'}
+                fullname="Error number"
+                textColor="white"
               />
               {'Alerts'}
             </div>

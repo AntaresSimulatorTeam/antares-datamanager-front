@@ -106,4 +106,8 @@ export interface WarningMessage {
   id: number;
   content: string;
   level: WARNING_MESSAGE_LEVEL;
+  code: string;
+  generatedBy: string;
+  generatedAt: Date;
+  secondTrajectory: string;
 }

@@ -8,24 +8,30 @@ type VirtualizerListProps = {
 };
 
 export const VirtualizerList = ({ items }: VirtualizerListProps) => {
-  const parentRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
   const virtualizer = useVirtualizer({
     count: items.length,
-    getScrollElement: () => parentRef.current,
-    estimateSize: () => 100,
-    overscan: 5,
+    scrollMargin: listRef.current?.offsetTop ?? 0,
+    getScrollElement: () => listRef.current,
+    estimateSize: () => 80,
+    overscan: 7,
   });
 
+  // Kill the cache entirely to prevent weird scrolling issues. This is a hack
+  virtualizer.measurementsCache = [];
+
   return (
-    <div ref={parentRef} className="h-[600px] w-full overflow-y-auto rounded">
-      {/* The large inner element to hold all of the items */}
+    <div ref={listRef} className="h-[600px] w-full overflow-y-auto rounded-lg">
       {/*`${virtualizer.getTotalSize()}px`*/}
-      {/* Only the visible items in the virtualizer, manually positioned to be in view */}
-      {virtualizer.getVirtualItems()?.map((virtualItem) => {
-        const item: WarningMessage = items?.[virtualItem.index];
-        return <CardWithAccordion key={`message-${virtualItem.index}`} data={item} />;
-      })}
+      <div className="relative m-2 rounded-lg shadow-2" style={{ height: `${virtualizer.getTotalSize()}px` }}>
+        {virtualizer.getVirtualItems()?.map((virtualItem) => {
+          const item: WarningMessage = items?.[virtualItem.index];
+          return (
+            <CardWithAccordion key={virtualItem.index} data={item} index={virtualItem.index} nbItems={items.length} />
+          );
+        })}
+      </div>
     </div>
   );
 };
