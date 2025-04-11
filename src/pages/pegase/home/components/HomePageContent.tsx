@@ -13,7 +13,7 @@ import { useUser } from '@/store/contexts/UserContext.tsx';
 
 const HomePageContent = () => {
   const { t } = useTranslation();
-  const [searchTerm, setSearchTerm] = useState<string | undefined>('');
+  const [searchTerm, setSearchTerm] = useState<string | undefined>();
   const [activeChip, setActiveChip] = useState<boolean | null>(false);
   const { user } = useUser();
 

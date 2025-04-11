@@ -24,7 +24,7 @@ const ProjectContent = () => {
   const { t } = useTranslation();
   const intervalSize = 9;
   const { user } = useUser();
-  const [searchTerm, setSearchTerm] = useState<string | undefined>('');
+  const [searchTerm, setSearchTerm] = useState<string | undefined>();
   const [activeChip, setActiveChip] = useState<boolean | null>(false);
   const [current, setCurrent] = useState(0);
   const { count, refetch } = useFetchProjectList(searchTerm, current, intervalSize);
@@ -34,7 +34,7 @@ const ProjectContent = () => {
   const { deleteProject } = useDeleteProject();
 
   const searchProject = (value?: string | undefined) => {
-    value && setSearchTerm(value);
+    setSearchTerm(value);
   };
 
   const handleChipClick = () => {
