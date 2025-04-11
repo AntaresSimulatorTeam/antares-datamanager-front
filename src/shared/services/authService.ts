@@ -27,8 +27,6 @@ export const AuthService = {
   logout: async () => {
     try {
       const accessToken = (await userManager.getUser())?.access_token;
-      //await AuthService.revokeTokens();
-      await AuthService.removeUser();
       await userManager.signoutRedirect({
         // eslint-disable-next-line camelcase
         id_token_hint: accessToken ?? undefined,
@@ -44,7 +42,6 @@ export const AuthService = {
       console.log('Access token expired');
       try {
         const accessToken = (await userManager.getUser())?.access_token;
-        await AuthService.removeUser();
         await userManager.signoutRedirect({
           // eslint-disable-next-line camelcase
           id_token_hint: accessToken ?? undefined,
