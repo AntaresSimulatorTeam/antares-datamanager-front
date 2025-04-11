@@ -23,11 +23,10 @@ vi.mock('@/envVariables', () => ({
 describe('fetchTrajectoriesFromDB', () => {
   beforeEach(() => {
     global.fetch = vi.fn();
-    vi.clearAllMocks();
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should fetch trajectories with area type from data base', async () => {
@@ -126,11 +125,15 @@ describe('uploadTrajectory', () => {
 
   beforeEach(() => {
     global.fetch = vi.fn();
-    vi.clearAllMocks();
+    vi.stubGlobal('JSON', {
+      parse: (text: string) => ({ message: text }),
+      stringify: (text: string) => text,
+    });
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+    vi.clearAllMocks();
   });
 
   it('should add trajectory to data base', async () => {
@@ -151,9 +154,9 @@ describe('uploadTrajectory', () => {
   });
 
   it('should handle fetch failure gracefully', async () => {
-    // Failed fetch response moc
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: false,
+      text: () => 'Failed to import trajectory into data base',
     });
 
     await expect(async () =>
