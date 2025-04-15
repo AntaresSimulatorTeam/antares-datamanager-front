@@ -11,9 +11,9 @@ export interface AppBackendInfos {
       time: string;
     };
   };
-    build: {
-        time: string;
-    };
+  build: {
+    time: string;
+  };
 }
 
 export interface AppInfo {
@@ -22,7 +22,7 @@ export interface AppInfo {
   appVersion: string;
   appBranch: string;
   commitId: string;
-  buildTime: string;
+  commitTime: string;
 }
 
 export interface AppData {

@@ -137,9 +137,9 @@
     "@appName": "App Name",
     "@appDescription": "App Description",
     "@appVersion": "App Version",
-    "@appBranch": "Git Branch",
-    "@commitId": "Git Commit ID",
-    "@buildTime": "Build Time",
+    "@appBranch": "Branch",
+    "@commitId": "Commit ID",
+    "@commitTime": "Commit Time",
     "@information": "Information",
     "@frontend": "Frontend",
     "@backend": "Backend"
