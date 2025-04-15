@@ -22,15 +22,15 @@ export const COLOR_CLASSES = {
   pink: 'bg-acc4-300',
   gray: 'bg-acc5-300',
   orange: 'bg-acc6-300',
-  red: 'bg-acc4-600',
 };
 
 export const TEXT_CLASSES = {
-  white: 'text-white',
-  black: 'text-black',
+  white: 'text-gray-w',
+  black: 'text-gray-900',
 };
 
-export const avatarClassBuilder = (size: AvatarSize, color: AvatarColor, textColor?: AvatarTextColor) => clsx(
+export const avatarClassBuilder = (size: AvatarSize, color: AvatarColor, textColor?: AvatarTextColor) =>
+  clsx(
     AVATAR_CLASSES,
     AVATAR_SIZE_CLASSES[size],
     COLOR_CLASSES[color],

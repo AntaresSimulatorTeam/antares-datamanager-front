@@ -85,6 +85,7 @@
     "@delete": "Delete"
   },
   "studyDetails": {
+    "@alerts": "Alerts",
     "@bannerStudyName": "Study: {{name}}",
     "@bannerHorizon": "Horizon: {{horizon}}",
     "@bannerCreatedBy": "By: {{createdBy}}",

@@ -1,35 +1,30 @@
 import { useRef } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { WarningMessage } from '@/shared/types';
-import { CardWithAccordion } from '@common/layout/CardWithAccordion.tsx';
 
-type VirtualizerListProps = {
-  items: WarningMessage[];
+type Props<T> = {
+  items: T[];
+  isOpen: boolean;
+  renderItem: (item: T, size: string, transform: string) => React.ReactNode;
 };
 
-export const VirtualizerList = ({ items }: VirtualizerListProps) => {
+export const VirtualizerList = <T,>({ items, isOpen, renderItem }: Props<T>) => {
   const listRef = useRef<HTMLDivElement>(null);
 
   const virtualizer = useVirtualizer({
+    horizontal: true,
     count: items.length,
-    scrollMargin: listRef.current?.offsetTop ?? 0,
     getScrollElement: () => listRef.current,
-    estimateSize: () => 80,
-    overscan: 7,
+    estimateSize: () => 350,
+    gap: 20,
+    overscan: 5,
   });
 
-  // Kill the cache entirely to prevent weird scrolling issues. This is a hack
-  virtualizer.measurementsCache = [];
-
   return (
-    <div ref={listRef} className="h-[600px] w-full overflow-y-auto rounded-lg">
-      {/*`${virtualizer.getTotalSize()}px`*/}
-      <div className="relative m-2 rounded-lg shadow-2" style={{ height: `${virtualizer.getTotalSize()}px` }}>
+    <div ref={listRef} className={`mr-4 overflow-auto rounded-lg ${isOpen ? 'h-[250px] sm:h-[180px]' : '0'}`}>
+      <div className="relative m-2 h-full sm:m-0">
         {virtualizer.getVirtualItems()?.map((virtualItem) => {
-          const item: WarningMessage = items?.[virtualItem.index];
-          return (
-            <CardWithAccordion key={virtualItem.index} data={item} index={virtualItem.index} nbItems={items.length} />
-          );
+          const item: T = items?.[virtualItem.index];
+          return renderItem(item, `${virtualItem.size}px`, `translateX(${virtualItem.start}px)`);
         })}
       </div>
     </div>
