@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "feature/ANT_3040_about_page",
-  commit: "d50ce86",
-  buildTime: "2025-04-07T12:12:37.726Z"
+  branch: 'fix/ANT-3040_about_page',
+  commit: '719f620',
+  commitTime: '2025-04-15T16:19:51.712Z',
 };
