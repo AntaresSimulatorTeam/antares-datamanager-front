@@ -19,10 +19,9 @@ import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { DetailsContent } from '@/components/banner/DetailsContent.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { VirtualizerList } from '@/components/list/VirtualizerList.tsx';
 import { sortByLevel } from '@/shared/utils/trajectoryUtils.ts';
 import { WithNullableFields } from '@/shared/types/Generic.type.ts';
-import StdAvatar from '@common/layout/stdAvatar/StdAvatar.tsx';
+import { ContainerWithExpander } from '@/components/banner/ContainerWithExpander.tsx';
 
 interface StudyState {
   study: StudyDTO;
@@ -94,27 +93,14 @@ const StudyDetails = () => {
           />
         </div>
       </div>
-      <div className="flex h-full w-full flex-col justify-between p-4">
-        <div className="flex w-full gap-8">
-          <div className="flex w-3/4">{activeContent}</div>
-          <div className="w-1/4 rounded shadow-2">
-            <div className="flex w-full items-center gap-4 p-2">
-              <StdAvatar
-                initials={`${messagesWarning?.length ?? '0'}`}
-                size="es"
-                backgroundColor="red"
-                fullname="Error number"
-                textColor="white"
-              />
-              {'Alerts'}
-            </div>
-            <RdsDivider />
-            {!!messagesWarning?.length && <VirtualizerList items={messagesWarning} />}
-          </div>
+      <div className="flex h-full flex-col justify-between px-4">
+        <div className="flex w-full flex-col gap-8">
+          <ContainerWithExpander content={messagesWarning} />
+          <div className="flex w-full">{activeContent}</div>
         </div>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col">
           <RdsDivider />
-          <div className="flex items-center gap-2 self-end">
+          <div className="my-2 flex items-center gap-2 self-end">
             {(!studyState?.AREA || studyState?.AREA?.state === TRAJECTORY_SELECTION_STATUS.ERROR) && (
               <div className={'text-error-600'}>{t('studyDetails.@add_trajectories_message')}</div>
             )}
