@@ -2,6 +2,8 @@ import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter.ts';
 import { RdsButton, RdsIcon, RdsIconId, RdsTextTooltip } from 'rte-design-system-react';
 import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
+import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
+import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter.ts';
 
 export type CardDataType = {
   color: string;
