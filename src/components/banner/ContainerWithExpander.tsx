@@ -15,6 +15,7 @@ interface Props<T> {
 export const ContainerWithExpander = <T,>({ content }: Props<T>) => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
+  const color = content?.length === 0 ? 'gray' : 'orange';
 
   return (
     <div className="flex w-full rounded border-gray-600 bg-gray-200 pl-2 shadow-2 sm:pl-1">
@@ -29,7 +30,7 @@ export const ContainerWithExpander = <T,>({ content }: Props<T>) => {
             <StdAvatar
               initials={`${content?.length ?? '0'}`}
               size="es"
-              backgroundColor="orange"
+              backgroundColor={color}
               fullname=""
               textColor="white"
             />

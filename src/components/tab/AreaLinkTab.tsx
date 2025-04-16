@@ -17,7 +17,7 @@ import {
   linkTrajectoryToStudy,
   unlinkTrajectoryFromStudy,
 } from '@/shared/services/trajectoryService.ts';
-import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE, WARNING_MESSAGE_LEVEL } from '@/shared/enum/trajectory.ts';
+import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import {
   AreaAndLinkRowData,
   DbTrajectory,
@@ -34,10 +34,11 @@ import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
-import { getStatus } from '@/shared/utils/trajectoryUtils.ts';
+import { buildErrorTrajectory, getStatus } from '@/shared/utils/trajectoryUtils.ts';
 import { getStudyById, getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { TrajectoryDataVisualisation } from '@common/modal/TrajectoryDataVisualisation.tsx';
 import { generateTrajectoryViewHeader } from '@/components/header/TrajectoryLinkHeader.tsx';
+import { useUser } from '@/store/contexts/UserContext.tsx';
 
 export interface ErrorMessageType {
   index: number;
@@ -50,6 +51,7 @@ interface AreaLinkTabProps {
 
 const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
   const studyState = useStudy();
+  const { user } = useUser();
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
   const [rowIndexSelected, setRowIndexSelected] = useState<number>(0);
   const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
@@ -88,6 +90,11 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
       let trajectoryLinkResult;
       let studyData;
       try {
+        dispatch?.({
+          type: STUDY_ACTION.REMOVE_TRAJECTORY_ERROR,
+          payload: [TRAJECTORY_TYPE.AREA, TRAJECTORY_TYPE.LINK],
+        });
+
         [studyData, trajectoryAreaResult, trajectoryLinkResult] = await Promise.all([
           getStudyById(study.id),
           getStudyTrajectories(study.id, TRAJECTORY_TYPE.AREA),
@@ -146,26 +153,13 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
     errorMessage?: string,
   ) => {
     try {
-      const newDbTrajectory = {
-        id: trajectoryId,
-        trajectoryName: trajectoryLabel,
-        type: null,
-        version: null,
-        userName: null,
-        creationDate: null,
-        messages: [
-          {
-            id: Math.floor(Math.random() * 10),
-            content: errorMessage ?? 'Error',
-            level: WARNING_MESSAGE_LEVEL.ERROR_LEVEL,
-            code: 'ERROR',
-            generatedBy: 'unknown_user',
-            generatedAt: new Date(),
-            secondTrajectory: trajectoryLabel,
-          },
-        ],
-        state: TRAJECTORY_SELECTION_STATUS.ERROR,
-      };
+      const newDbTrajectory = buildErrorTrajectory(
+        index === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
+        trajectoryId,
+        trajectoryLabel,
+        errorMessage,
+        user?.profile?.sub,
+      );
       //Case: area control failed and a trajectory Links is linked to the study with ok status
       if (index === 0 && data[1]?.trajectory && data[1]?.status != TRAJECTORY_SELECTION_STATUS.ERROR) {
         await unlinkTrajectoryFromStudy(data[1].trajectory.id, study.id);

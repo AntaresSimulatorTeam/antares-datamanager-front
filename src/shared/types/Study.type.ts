@@ -30,7 +30,7 @@ export interface PaginatedResponse<T> {
 export type StudyState = {
   [key in keyof typeof TRAJECTORY_TYPE]?: WithNullableFields<
     DbTrajectoryWithState,
-    'type' | 'version' | 'userName' | 'creationDate'
+    'version' | 'userName' | 'creationDate'
   > | null;
 } & {
   studyStatus?: StudyStatus | undefined;
@@ -40,15 +40,16 @@ export type StudyState = {
 export type StudyActionType =
   | {
       type: STUDY_ACTION.ADD_TRAJECTORY_AREA;
-      payload: WithNullableFields<DbTrajectoryWithState, 'type' | 'version' | 'userName' | 'creationDate'> | null;
+      payload: WithNullableFields<DbTrajectoryWithState, 'version' | 'userName' | 'creationDate'> | null;
     }
   | {
       type: STUDY_ACTION.ADD_TRAJECTORY_LINK;
-      payload: WithNullableFields<DbTrajectoryWithState, 'type' | 'version' | 'userName' | 'creationDate'> | null;
+      payload: WithNullableFields<DbTrajectoryWithState, 'version' | 'userName' | 'creationDate'> | null;
     }
   | { type: STUDY_ACTION.ADD_TRAJECTORIES; payload: DbTrajectoryWithState[] }
   | { type: STUDY_ACTION.CLEAR_AREA_TRAJECTORY }
   | { type: STUDY_ACTION.CLEAR_AREA_AND_LINK_TRAJECTORY }
   | { type: STUDY_ACTION.SET_STUDY_STATUS; payload: StudyStatus }
   | { type: STUDY_ACTION.CLEAR_LINK_TRAJECTORY }
-  | { type: STUDY_ACTION.ADD_WARNING_MESSAGE; payload: { message: WarningMessage; type: TRAJECTORY_TYPE } };
+  | { type: STUDY_ACTION.ADD_WARNING_MESSAGE; payload: { message: WarningMessage; type: TRAJECTORY_TYPE } }
+  | { type: STUDY_ACTION.REMOVE_TRAJECTORY_ERROR; payload: TRAJECTORY_TYPE[] };

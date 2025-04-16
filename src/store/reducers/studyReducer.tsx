@@ -1,6 +1,6 @@
 import { DbTrajectory, StudyActionType, StudyState, WarningMessage } from '@/shared/types';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
-import { TRAJECTORY_TYPE, WARNING_MESSAGE_LEVEL } from '@/shared/enum/trajectory.ts';
+import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE, WARNING_MESSAGE_LEVEL } from '@/shared/enum/trajectory.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 
 const addTrajectories = (prevState: Partial<StudyState>, trajectories: DbTrajectory[]): Partial<StudyState> => {
@@ -36,6 +36,16 @@ export const addMessage = (
   return prevState;
 };
 
+const deleteErrorMessage = (prevState: Partial<StudyState>, payload: TRAJECTORY_TYPE[]) => {
+  payload.forEach((type) => {
+    if (prevState[type]?.state === TRAJECTORY_SELECTION_STATUS.ERROR) {
+      Object.assign(prevState, { [`${type}`]: null });
+    }
+  });
+
+  return { ...prevState };
+};
+
 export const studyReducer = (prevState: Partial<StudyState>, action?: StudyActionType): Partial<StudyState> => {
   if (action) {
     switch (action.type) {
@@ -49,6 +59,8 @@ export const studyReducer = (prevState: Partial<StudyState>, action?: StudyActio
         return { ...addTrajectories(prevState, action.payload) };
       case STUDY_ACTION.ADD_WARNING_MESSAGE:
         return { ...addMessage(prevState, action.payload) };
+      case STUDY_ACTION.REMOVE_TRAJECTORY_ERROR:
+        return { ...deleteErrorMessage(prevState, action.payload) };
       case STUDY_ACTION.CLEAR_AREA_TRAJECTORY:
         return { ...prevState, [`${TRAJECTORY_TYPE.AREA}`]: null };
       case STUDY_ACTION.CLEAR_LINK_TRAJECTORY:
