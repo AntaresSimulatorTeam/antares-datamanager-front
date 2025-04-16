@@ -1,5 +1,5 @@
 import { DbTrajectory, RowStatus, WarningMessage } from '@/shared/types';
-import { TRAJECTORY_SELECTION_STATUS, WARNING_MESSAGE_LEVEL } from '@/shared/enum/trajectory.ts';
+import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE, WARNING_MESSAGE_LEVEL } from '@/shared/enum/trajectory.ts';
 import { FileInputStatus } from 'rte-design-system-react';
 
 export const getTrajectoryDB = (trajectories: DbTrajectory[] | null, id: number) =>
@@ -49,3 +49,30 @@ export const sortByLevel = (a: WarningMessage, b: WarningMessage): number => {
   }
   return 0;
 };
+
+export const buildErrorTrajectory = (
+  type: TRAJECTORY_TYPE,
+  trajectoryId: number,
+  trajectoryLabel: string,
+  errorMessage?: string,
+  userName?: string,
+) => ({
+  id: trajectoryId,
+  trajectoryName: trajectoryLabel,
+  type,
+  version: null,
+  userName: null,
+  creationDate: null,
+  messages: [
+    {
+      id: Math.floor(Math.random() * 10),
+      content: errorMessage ?? 'Error',
+      level: WARNING_MESSAGE_LEVEL.ERROR_LEVEL,
+      code: 'ERROR',
+      generatedBy: userName ?? '',
+      generatedAt: new Date(),
+      secondTrajectory: trajectoryLabel,
+    },
+  ],
+  state: TRAJECTORY_SELECTION_STATUS.ERROR,
+});

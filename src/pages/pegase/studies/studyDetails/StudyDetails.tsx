@@ -41,10 +41,8 @@ const StudyDetails = () => {
 
   useEffect(() => {
     let messages: WarningMessage[] = [];
-    const trajectory: WithNullableFields<
-      DbTrajectoryWithState,
-      'type' | 'version' | 'userName' | 'creationDate'
-    > | null = studyState[activeTab as keyof typeof TRAJECTORY_TYPE] ?? null;
+    const trajectory: WithNullableFields<DbTrajectoryWithState, 'version' | 'userName' | 'creationDate'> | null =
+      studyState[activeTab as keyof typeof TRAJECTORY_TYPE] ?? null;
     if (trajectory && trajectory?.messages?.length > 0) {
       messages = trajectory.messages;
     }
