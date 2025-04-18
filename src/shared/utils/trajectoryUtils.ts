@@ -71,6 +71,7 @@ export const buildErrorTrajectory = (
       code: 'ERROR',
       generatedBy: userName ?? '',
       generatedAt: new Date(),
+      trajectory: trajectoryLabel,
       secondTrajectory: trajectoryLabel,
     },
   ],
