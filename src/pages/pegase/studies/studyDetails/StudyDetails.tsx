@@ -53,7 +53,12 @@ const StudyDetails = () => {
       if (studyState?.LINK && studyState.LINK.messages.length > 0) {
         if (messages.length > 0) {
           const temporaryMessage = messages;
-          messages = temporaryMessage.concat(studyState.LINK.messages);
+          messages = temporaryMessage.concat(
+            studyState.LINK.messages.map((message) => ({
+              ...message,
+              trajectory: studyState?.LINK?.trajectoryName ?? '',
+            })),
+          );
         } else {
           messages = studyState.LINK.messages;
         }
