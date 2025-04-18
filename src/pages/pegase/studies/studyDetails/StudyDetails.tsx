@@ -21,7 +21,7 @@ import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { WithNullableFields } from '@/shared/types/Generic.type.ts';
 import { ContainerWithExpander } from '@/components/banner/ContainerWithExpander.tsx';
-import { mockWarningMessages } from '@/shared/services/test/mocks/trajectoryMock.tsx';
+import { sortByLevel } from '@/shared/utils/trajectoryUtils.ts';
 
 interface StudyState {
   study: StudyDTO;
@@ -56,8 +56,7 @@ const StudyDetails = () => {
         }
       }
     }
-    setMessagesWarning(mockWarningMessages);
-    //setMessagesWarning(messages?.sort(sortByLevel));
+    setMessagesWarning(messages?.sort(sortByLevel));
   }, [activeTab, studyState]);
 
   const handleGenerateStudy = async () => {
