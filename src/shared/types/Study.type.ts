@@ -53,3 +53,7 @@ export type StudyActionType =
   | { type: STUDY_ACTION.CLEAR_LINK_TRAJECTORY }
   | { type: STUDY_ACTION.ADD_WARNING_MESSAGE; payload: { message: WarningMessage; type: TRAJECTORY_TYPE } }
   | { type: STUDY_ACTION.REMOVE_TRAJECTORY_ERROR; payload: TRAJECTORY_TYPE[] };
+
+export interface LocationState {
+  study: StudyDTO;
+}

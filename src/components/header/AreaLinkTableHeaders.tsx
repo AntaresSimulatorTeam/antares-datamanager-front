@@ -22,7 +22,7 @@ const getAreaLinkTableHeaders = (
   t: (value: string) => string,
   handleUpdate: (index: number, status: RowStatus, trajectoryId: number, trajectoryLabel?: string) => Promise<void>,
   handleImport: (index: number) => Promise<void>,
-  handlerSearch: (index: number, value: string | undefined) => Promise<SelectOption[] | undefined>,
+  handlerSearch: (value?: string, index?: number) => Promise<SelectOption[] | undefined>,
   handleView: (index: number) => Promise<void>,
   error: { index: number; message: string },
   setErrorInfo: Dispatch<SetStateAction<ErrorMessageType>>,
@@ -83,7 +83,7 @@ const getAreaLinkTableHeaders = (
               setErrorInfo({ index: row.index, message: '' });
               void handleUpdate(row.index, 'success', value.id, value.label);
             }}
-            setSearchTerm={async (value: string | undefined) => await handlerSearch(row.index, value)}
+            setSearchTerm={async (value?: string) => await handlerSearch(value, row.index)}
             defaultPlaceHolder={
               row.getReadOnly() ? t('studyDetails.@select_link') : t('studyDetails.@select_trajectory')
             }
@@ -92,7 +92,7 @@ const getAreaLinkTableHeaders = (
           />
           <span>or</span>
           <RdsButton
-            label={t('studyDetails.@select_file')}
+            label={t('studyDetails.@upload_file')}
             onClick={() => {
               setErrorInfo({ index: row.index, message: '' });
               void handleImport(row.index);

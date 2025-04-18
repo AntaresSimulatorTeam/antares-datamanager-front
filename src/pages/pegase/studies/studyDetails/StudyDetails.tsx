@@ -9,7 +9,7 @@ import { Location, useLocation } from 'react-router-dom';
 import StudyHeader from './StudyHeader.tsx';
 import { RdsDivider } from 'rte-design-system-react';
 import StudyNavigationMenu from '@/pages/pegase/studies/studyDetails/StudyNavigationMenu';
-import { DbTrajectoryWithState, StudyDTO, WarningMessage } from '@/shared/types';
+import { DbTrajectoryWithState, HypothesisTab, StudyDTO, WarningMessage } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { createStudy } from '@/shared/services/studyService.ts';
@@ -35,21 +35,26 @@ const StudyDetails = () => {
   const studyState = useStudy();
   const dispatch = useStudyDispatch();
   const [activeContent, setActiveContent] = useState<ReactNode>(null);
-  const [activeTab, setActiveTab] = useState<TRAJECTORY_TYPE>(TRAJECTORY_TYPE.AREA);
+  const [activeTab, setActiveTab] = useState<HypothesisTab>({
+    name: TRAJECTORY_TYPE.AREA,
+    label: t('studyDetails.@areas_links'),
+    icon: StdIconId.LinkedServices,
+    isDisabled: false,
+  });
   const [messagesWarning, setMessagesWarning] = useState<WarningMessage[] | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
     let messages: WarningMessage[] = [];
     const trajectory: WithNullableFields<DbTrajectoryWithState, 'version' | 'userName' | 'creationDate'> | null =
-      studyState[activeTab as keyof typeof TRAJECTORY_TYPE] ?? null;
+      studyState[activeTab.name as keyof typeof TRAJECTORY_TYPE] ?? null;
     if (trajectory && trajectory?.messages?.length > 0) {
       messages = trajectory.messages.map((message) => ({
         ...message,
         trajectory: trajectory.trajectoryName,
       }));
     }
-    if (activeTab === TRAJECTORY_TYPE.AREA) {
+    if (activeTab.name === TRAJECTORY_TYPE.AREA) {
       if (studyState?.LINK && studyState.LINK.messages.length > 0) {
         const linkMessage = studyState.LINK.messages.map((message) => ({
           ...message,
@@ -92,7 +97,6 @@ const StudyDetails = () => {
         <div className="flex h-10 items-end self-stretch">
           <StudyNavigationMenu
             onRenderActiveComponent={setActiveContent}
-            study={study}
             setActiveTab={setActiveTab}
             activeTab={activeTab}
           />

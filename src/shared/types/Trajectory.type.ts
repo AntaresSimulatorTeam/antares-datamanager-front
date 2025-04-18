@@ -9,6 +9,7 @@ import { FileInputStatus } from 'rte-design-system-react';
 import { WithNullableFields } from '@/shared/types/Generic.type.ts';
 // @ts-ignore
 import { AccessorKeyColumnDef } from '@tanstack/table-core/src/types.ts';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 export interface FsTrajectory {
   trajectoryName: string;
@@ -111,4 +112,11 @@ export interface WarningMessage {
   generatedAt: Date;
   trajectory: string;
   secondTrajectory: string;
+}
+
+export interface HypothesisTab {
+  name: TRAJECTORY_TYPE;
+  label: string;
+  icon: StdIconId;
+  isDisabled: boolean;
 }
