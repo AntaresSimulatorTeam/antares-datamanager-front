@@ -4,7 +4,7 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 type Props<T> = {
   items: T[];
   isOpen: boolean;
-  renderItem: (item: T, size: string, transform: string) => React.ReactNode;
+  renderItem: (item: T, size: string, transform: string, key: string) => React.ReactNode;
 };
 
 export const VirtualizerList = <T,>({ items, isOpen, renderItem }: Props<T>) => {
@@ -17,14 +17,15 @@ export const VirtualizerList = <T,>({ items, isOpen, renderItem }: Props<T>) => 
     estimateSize: () => 350,
     gap: 20,
     overscan: 5,
+    paddingStart: 5,
   });
 
   return (
-    <div ref={listRef} className={`mr-4 overflow-auto rounded-lg ${isOpen ? 'h-[250px] sm:h-[180px]' : '0'}`}>
-      <div className="relative m-2 h-full sm:m-0">
+    <div ref={listRef} className={`w-full overflow-auto rounded-lg py-1 ${isOpen ? 'h-full' : '0'}`}>
+      <div className="relative h-full w-full">
         {virtualizer.getVirtualItems()?.map((virtualItem) => {
           const item: T = items?.[virtualItem.index];
-          return renderItem(item, `${virtualItem.size}px`, `translateX(${virtualItem.start}px)`);
+          return renderItem(item, `${virtualItem.size}px`, `translateX(${virtualItem.start}px)`, `${virtualItem.key}`);
         })}
       </div>
     </div>

@@ -19,9 +19,9 @@ import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { DetailsContent } from '@/components/banner/DetailsContent.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { sortByLevel } from '@/shared/utils/trajectoryUtils.ts';
 import { WithNullableFields } from '@/shared/types/Generic.type.ts';
 import { ContainerWithExpander } from '@/components/banner/ContainerWithExpander.tsx';
+import { mockWarningMessages } from '@/shared/services/test/mocks/trajectoryMock.tsx';
 
 interface StudyState {
   study: StudyDTO;
@@ -36,7 +36,7 @@ const StudyDetails = () => {
   const dispatch = useStudyDispatch();
   const [activeContent, setActiveContent] = useState<ReactNode>(null);
   const [activeTab, setActiveTab] = useState<TRAJECTORY_TYPE>(TRAJECTORY_TYPE.AREA);
-  const [messagesWarning, setMessagesWarning] = useState<WarningMessage[] | null>(null);
+  const [messagesWarning, setMessagesWarning] = useState<WarningMessage[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
@@ -56,7 +56,8 @@ const StudyDetails = () => {
         }
       }
     }
-    setMessagesWarning(messages?.sort(sortByLevel));
+    setMessagesWarning(mockWarningMessages);
+    //setMessagesWarning(messages?.sort(sortByLevel));
   }, [activeTab, studyState]);
 
   const handleGenerateStudy = async () => {
@@ -92,7 +93,7 @@ const StudyDetails = () => {
         </div>
       </div>
       <div className="flex h-full flex-col justify-between px-4">
-        <div className="flex w-full flex-col gap-8">
+        <div className="flex h-full w-full flex-col gap-8">
           <ContainerWithExpander content={messagesWarning} />
           <div className="flex w-full">{activeContent}</div>
         </div>

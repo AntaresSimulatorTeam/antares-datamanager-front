@@ -16,6 +16,8 @@ import StdIcon from '@common/base/stdIcon/StdIcon';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useTranslation } from 'react-i18next';
 import { StudyDTO } from '@/shared/types';
+import StdAvatar from '@common/layout/stdAvatar/StdAvatar.tsx';
+import { useStudy } from '@/store/contexts/StudyContext.tsx';
 
 const StudyNavigationMenu = ({
   onRenderActiveComponent,
@@ -29,6 +31,7 @@ const StudyNavigationMenu = ({
   activeTab: TRAJECTORY_TYPE;
 }) => {
   const { t } = useTranslation();
+  const studyState = useStudy();
 
   const renderActiveComponent = (studyData: StudyDTO): ReactNode | null => {
     switch (activeTab) {
@@ -63,18 +66,30 @@ const StudyNavigationMenu = ({
 
   return (
     <div className="flex space-x-4 p-4">
-      {tabs.map((tab) => (
-        <div className="flex items-center space-x-2" key={tab.name}>
-          <StdIcon name={tab.icon} />
-          <RdsTabItem
-            key={tab.name}
-            name={tab.name}
-            label={tab.label}
-            active={activeTab === tab.name}
-            onClick={() => setActiveTab(tab.name)}
-          />
-        </div>
-      ))}
+      {tabs.map((tab) => {
+        const hasWarmingMessages = !!studyState[`${tab.name}`]?.messages?.length;
+        return (
+          <div className="flex items-center space-x-2" key={tab.name}>
+            <StdIcon name={tab.icon} />
+            <RdsTabItem
+              key={tab.name}
+              name={tab.name}
+              label={tab.label}
+              active={activeTab === tab.name}
+              onClick={() => setActiveTab(tab.name)}
+            />
+            {hasWarmingMessages && activeTab !== tab.name && (
+              <StdAvatar
+                initials={`${hasWarmingMessages ? studyState[`${tab.name}`]?.messages?.length : '0'}`}
+                size="es"
+                backgroundColor={`${!hasWarmingMessages ? 'gray' : 'orange'}`}
+                fullname=""
+                textColor="white"
+              />
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 };
