@@ -57,6 +57,7 @@ export const mockWarningMessages: WarningMessage[] = [
     code: 'LINKS_AREA_NOT_PRESENT',
     generatedBy: 'unknown_user',
     generatedAt: '2025-04-01T18:31:53.623683' as unknown as Date,
+    trajectory: 'areas_BP23_A_ref',
     secondTrajectory: 'links_BP23_A_ref',
   },
   {
@@ -66,6 +67,7 @@ export const mockWarningMessages: WarningMessage[] = [
     code: 'LINKS_AREA_NOT_PRESENT',
     generatedBy: 'unknown_user',
     generatedAt: '2025-04-01T18:31:53.623683' as unknown as Date,
+    trajectory: 'areas_BP23_A_ref',
     secondTrajectory: 'links_BP23_A_ref',
   },
   {
@@ -75,6 +77,7 @@ export const mockWarningMessages: WarningMessage[] = [
     code: 'LINKS_AREA_NOT_PRESENT',
     generatedBy: 'unknown_user',
     generatedAt: '2025-04-01T18:31:53.623683' as unknown as Date,
+    trajectory: 'areas_BP23_A_ref',
     secondTrajectory: 'links_BP23_A_ref',
   },
   {
@@ -84,6 +87,7 @@ export const mockWarningMessages: WarningMessage[] = [
     code: 'LINKS_AREA_NOT_PRESENT',
     generatedBy: 'unknown_user',
     generatedAt: '2025-04-01T18:31:53.623683' as unknown as Date,
+    trajectory: 'areas_BP23_A_ref',
     secondTrajectory: 'links_BP23_A_ref',
   },
   {
@@ -94,6 +98,7 @@ export const mockWarningMessages: WarningMessage[] = [
     code: 'LINKS_AREA_NOT_PRESENT',
     generatedBy: 'unknown_user',
     generatedAt: '2025-04-01T18:31:53.623683' as unknown as Date,
+    trajectory: 'areas_BP23_A_ref',
     secondTrajectory: 'links_BP23_A_ref',
   },
   {
@@ -103,6 +108,7 @@ export const mockWarningMessages: WarningMessage[] = [
     code: 'LINKS_AREA_NOT_PRESENT',
     generatedBy: 'unknown_user',
     generatedAt: '2025-04-01T18:31:53.623683' as unknown as Date,
+    trajectory: 'areas_BP23_A_ref',
     secondTrajectory: 'links_BP23_A_ref',
   },
   {
@@ -112,6 +118,7 @@ export const mockWarningMessages: WarningMessage[] = [
     code: 'LINKS_AREA_NOT_PRESENT',
     generatedBy: 'unknown_user',
     generatedAt: '2025-04-01T18:31:53.623683' as unknown as Date,
+    trajectory: 'areas_BP23_A_ref',
     secondTrajectory: 'links_BP23_A_ref',
   },
   {
@@ -121,6 +128,7 @@ export const mockWarningMessages: WarningMessage[] = [
     code: 'LINKS_AREA_NOT_PRESENT',
     generatedBy: 'unknown_user',
     generatedAt: '2025-04-01T18:31:53.623683' as unknown as Date,
+    trajectory: 'areas_BP23_A_ref',
     secondTrajectory: 'links_BP23_A_ref',
   },
 ];
