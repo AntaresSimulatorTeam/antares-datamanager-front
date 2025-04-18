@@ -44,7 +44,10 @@ const StudyDetails = () => {
     const trajectory: WithNullableFields<DbTrajectoryWithState, 'version' | 'userName' | 'creationDate'> | null =
       studyState[activeTab as keyof typeof TRAJECTORY_TYPE] ?? null;
     if (trajectory && trajectory?.messages?.length > 0) {
-      messages = trajectory.messages;
+      messages = trajectory.messages.map((message) => ({
+        ...message,
+        trajectory: trajectory.trajectoryName,
+      }));
     }
     if (activeTab === TRAJECTORY_TYPE.AREA) {
       if (studyState?.LINK && studyState.LINK.messages.length > 0) {

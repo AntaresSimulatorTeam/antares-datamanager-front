@@ -5,6 +5,7 @@ import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 export const convertDataToItem = <T>(data: T, t: (key: string) => string): CardDataType => {
   const {
     level = WARNING_MESSAGE_LEVEL.WARNING_LEVEL,
+    trajectory = null,
     secondTrajectory = null,
     content = null,
     generatedBy = null,
@@ -21,7 +22,7 @@ export const convertDataToItem = <T>(data: T, t: (key: string) => string): CardD
     colorBorder: level === WARNING_MESSAGE_LEVEL.WARNING_LEVEL ? 'border-acc6-500' : 'border-acc4-700',
     icon: level === WARNING_MESSAGE_LEVEL.WARNING_LEVEL ? StdIconId.Warning : StdIconId.Info,
     title,
-    subtitle: secondTrajectory,
+    subtitle: `${trajectory ?? ''} - ${secondTrajectory ?? ''}`,
     content,
     generatedBy,
     generatedAt,

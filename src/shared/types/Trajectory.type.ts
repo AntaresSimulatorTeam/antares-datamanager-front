@@ -109,5 +109,6 @@ export interface WarningMessage {
   code: string;
   generatedBy: string;
   generatedAt: Date;
+  trajectory: string;
   secondTrajectory: string;
 }
