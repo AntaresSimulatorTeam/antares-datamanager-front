@@ -3,18 +3,22 @@ import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import StdAvatar from '@common/layout/stdAvatar/StdAvatar.tsx';
 import { RdsHeading } from 'rte-design-system-react';
 import { VirtualizerList } from '@/components/list/VirtualizerList.tsx';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CardWithIconTitle } from '@common/layout/CardWithIconTitle.tsx';
 import { convertDataToItem } from '@/shared/utils/warningUtils.ts';
 
 interface Props<T> {
-  content: T[];
+  content: T[] | null;
 }
 
 export const ContainerWithExpander = <T,>({ content }: Props<T>) => {
   const { t } = useTranslation();
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(!!content?.length);
+
+  useEffect(() => {
+    setIsOpen((prev) => (content?.length === 0 ? false : prev));
+  }, [content?.length]);
 
   return (
     <div className={`flex ${isOpen ? 'h-1/3' : 'h-fit'} w-full rounded border-gray-600 bg-gray-200 py-1 pl-2 shadow-2`}>
@@ -34,7 +38,7 @@ export const ContainerWithExpander = <T,>({ content }: Props<T>) => {
           />
           <RdsHeading title={t('studyDetails.@alerts')} size="m" />
         </div>
-        {isOpen && (
+        {content && isOpen && (
           <VirtualizerList
             isOpen={isOpen}
             items={content}
