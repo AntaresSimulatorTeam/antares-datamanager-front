@@ -48,11 +48,15 @@ export const fetchProjectDetails = async (projectId: string): Promise<ProjectInf
 /**
  * Retrieve a project from a partial name of project
  *
- * @param {string} query - Partial name of a project
+ * @param {string} partialName - Partial name of a project
  * @return {Promise<string[] | Error>} - List of project name
  */
-export const fetchProjectsFromPartialName = async (query: string): Promise<string[] | Error> => {
-  const response = await AuthService.authFetch(`${PROJECT_AUTOCOMPLETE_ENDPOINT}?partialName=${query}`);
+export const fetchProjectsFromPartialName = async (partialName: string): Promise<string[] | Error> => {
+  const queryString = new URLSearchParams({
+    partialName: partialName ?? '',
+  }).toString();
+
+  const response = await AuthService.authFetch(`${PROJECT_AUTOCOMPLETE_ENDPOINT}?${queryString}`);
   if (!response.ok) {
     throw new Error('Failed to fetch projects');
   }

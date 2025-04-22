@@ -56,11 +56,15 @@ export const fetchSearchStudies = async (
 /**
  * Retrieve a list of suggested keywords from a partial name of a study
  *
- * @param {string} query - Partial name of a study
+ * @param {string} partialName - Partial name of a study
  * @return {Promise<string[] | Error>} - Promise object that represents a list of keywords
  */
-export const fetchSuggestedKeywords = async (query: string): Promise<string[] | Error> => {
-  const response = await AuthService.authFetch(`${STUDY_KEYWORDS_SEARCH_ENDPOINT}?partialName=${query}`);
+export const fetchSuggestedKeywords = async (partialName: string): Promise<string[] | Error> => {
+  const queryString = new URLSearchParams({
+    partialName: partialName ?? '',
+  }).toString();
+
+  const response = await AuthService.authFetch(`${STUDY_KEYWORDS_SEARCH_ENDPOINT}?${queryString}`);
   if (!response.ok) {
     throw new Error('Failed to fetch suggested keywords');
   }
