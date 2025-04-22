@@ -36,7 +36,7 @@ const StudyDetails = () => {
   const dispatch = useStudyDispatch();
   const [activeContent, setActiveContent] = useState<ReactNode>(null);
   const [activeTab, setActiveTab] = useState<TRAJECTORY_TYPE>(TRAJECTORY_TYPE.AREA);
-  const [messagesWarning, setMessagesWarning] = useState<WarningMessage[]>([]);
+  const [messagesWarning, setMessagesWarning] = useState<WarningMessage[] | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {

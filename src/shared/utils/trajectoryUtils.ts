@@ -72,7 +72,7 @@ export const buildErrorTrajectory = (
       generatedBy: userName ?? '',
       generatedAt: new Date(),
       trajectory: trajectoryLabel,
-      secondTrajectory: trajectoryLabel,
+      secondTrajectory: '',
     },
   ],
   state: TRAJECTORY_SELECTION_STATUS.ERROR,
