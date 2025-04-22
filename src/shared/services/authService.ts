@@ -7,7 +7,7 @@
 import { User, UserManager } from 'oidc-client-ts';
 import { config } from '@/shared/const/authConfig';
 import { isAuthenticationActive } from '@/shared/utils/authUtils.ts';
-import {notifyToast} from "@/shared/notification/notification";
+import { notifyToast } from '@/shared/notification/notification';
 
 const userManager = new UserManager(config);
 
@@ -45,8 +45,8 @@ export const AuthService = {
       const response = await fetch(url, options);
 
       if (response.status === 500) {
-        const errorData = await response.json();
-        const errorMessage = errorData.message || 'An error occurred';
+        const errorData = (await response.json()) as Error;
+        const errorMessage: string = errorData.message || 'An error occurred';
         notifyToast({
           type: 'error',
           message: errorMessage,
@@ -58,8 +58,8 @@ export const AuthService = {
       notifyToast({
         type: 'error',
         message: `${(error as Error).message}`,
-      });      throw error;
+      });
+      throw error;
     }
   },
-
 };

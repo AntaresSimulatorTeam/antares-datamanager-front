@@ -34,7 +34,15 @@ export const fetchSearchStudies = async (
     entries = Object.entries(sortBy)[0];
   }
 
-  const apiUrl = `${STUDY_SEARCH_ENDPOINT}?page=${currentPage + 1}&size=${intervalSize}&projectId=${projectId}&search=${searchTerm}&sortColumn=${entries?.[0] ?? ''}&sortDirection=${entries?.[1] ?? ''}`;
+  const queryString = new URLSearchParams({
+    page: currentPage != null ? (currentPage + 1).toString() : '',
+    size: intervalSize.toString(),
+    projectId: projectId.toString(),
+    search: searchTerm.toString(),
+    sortColumn: entries?.[0] ? entries[0].toString() : '',
+    sortDirection: entries?.[1] ? entries[1].toString() : '',
+  }).toString();
+  const apiUrl = `${STUDY_SEARCH_ENDPOINT}?${queryString}`;
 
   const response = await AuthService.authFetch(apiUrl);
   if (!response.ok) {

@@ -27,7 +27,7 @@ const ProjectContent = () => {
   const [searchTerm, setSearchTerm] = useState<string | undefined>();
   const [activeChip, setActiveChip] = useState<boolean | null>(false);
   const [current, setCurrent] = useState(0);
-  const { count, refetch } = useFetchProjectList(searchTerm, current, intervalSize);
+  const { count, refetch } = useFetchProjectList(current, intervalSize, searchTerm);
   const { navigateToProject } = useProjectNavigation();
   const { handlePinProject } = useHandlePinnedProjectList();
   const { projects } = useProject();
@@ -50,9 +50,9 @@ const ProjectContent = () => {
   const handleDeleteProject = async (projectId: string) => {
     await deleteProject(projectId);
     try {
-      await refetch(current, intervalSize, searchTerm);
+      await refetch(current, intervalSize, searchTerm ?? '');
     } catch (error) {
-       // silent handler
+      // silent handler
     }
   };
 
