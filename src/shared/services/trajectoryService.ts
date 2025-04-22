@@ -50,7 +50,13 @@ export const fetchTrajectoriesFromFS = async (
   searchTerm?: string | undefined,
   thermalCapacityArea?: string | undefined,
 ): Promise<FsTrajectory[]> => {
-  const urlApi = `${TRAJECTORY_FILE_SYSTEM_ENDPOINT}?trajectoryType=${trajectoryType}&thermalCapacityArea=${thermalCapacityArea ?? ''}&fileNameContains=${searchTerm ?? ''}`;
+  const queryString = new URLSearchParams({
+    trajectoryType: trajectoryType ?? '',
+    thermalCapacityArea: thermalCapacityArea ?? '',
+    fileNameContains: searchTerm ?? '',
+  }).toString();
+
+  const urlApi = `${TRAJECTORY_FILE_SYSTEM_ENDPOINT}?${queryString}`;
   const response = await AuthService.authFetch(urlApi);
   if (!response.ok) {
     throw new Error('Failed to fetch trajectories from file system');

@@ -49,7 +49,7 @@ describe('useFetchProjectList', () => {
       content: mockContentResponseFetchProjectApi,
       totalElements: 1,
     });
-    const { result } = renderHook(() => useFetchProjectList('mouad', 0, 9));
+    const { result } = renderHook(() => useFetchProjectList(0, 9, 'mouad'));
 
     await waitFor(() => {
       expect(projectService.fetchProjectFromSearchTerm).toHaveBeenCalledTimes(1);
@@ -60,7 +60,7 @@ describe('useFetchProjectList', () => {
   });
 
   it('fetches projects with search term', async () => {
-    renderHook(() => useFetchProjectList('test', 0, 9));
+    renderHook(() => useFetchProjectList(0, 9, 'test'));
 
     await waitFor(() => {
       expect(projectService.fetchProjectFromSearchTerm).toHaveBeenCalledTimes(1);
@@ -69,7 +69,7 @@ describe('useFetchProjectList', () => {
   });
 
   it('fetches projects with pagination', async () => {
-    renderHook(() => useFetchProjectList('', 1, 9));
+    renderHook(() => useFetchProjectList(1, 9, ''));
 
     await waitFor(() => {
       expect(projectService.fetchProjectFromSearchTerm).toHaveBeenCalledWith(1, 9, '');

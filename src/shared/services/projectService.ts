@@ -48,11 +48,15 @@ export const fetchProjectDetails = async (projectId: string): Promise<ProjectInf
 /**
  * Retrieve a project from a partial name of project
  *
- * @param {string} query - Partial name of a project
+ * @param {string} partialName - Partial name of a project
  * @return {Promise<string[] | Error>} - List of project name
  */
-export const fetchProjectsFromPartialName = async (query: string): Promise<string[] | Error> => {
-  const response = await AuthService.authFetch(`${PROJECT_AUTOCOMPLETE_ENDPOINT}?partialName=${query}`);
+export const fetchProjectsFromPartialName = async (partialName: string): Promise<string[] | Error> => {
+  const queryString = new URLSearchParams({
+    partialName: partialName ?? '',
+  }).toString();
+
+  const response = await AuthService.authFetch(`${PROJECT_AUTOCOMPLETE_ENDPOINT}?${queryString}`);
   if (!response.ok) {
     throw new Error('Failed to fetch projects');
   }
@@ -63,17 +67,22 @@ export const fetchProjectsFromPartialName = async (query: string): Promise<strin
 /**
  * Retrieve a list of project from a user name
  *
- * @param {number} current
- * @param {number} intervalSize
- * @param {string | undefined} searchTerm - Text entered by a user or user id
+ * @param {number} page
+ * @param {number} size
+ * @param {string | undefined} search - Text entered by a user or user id
  * @return {Promise<PaginatedResponse<ProjectResponse> | Error>}
  */
 export const fetchProjectFromSearchTerm = async (
-  current: number,
-  intervalSize: number,
-  searchTerm?: string,
+  page: number,
+  size: number,
+  search: string,
 ): Promise<PaginatedResponse<ProjectResponse> | Error> => {
-  const urlApi = `${PROJECT_SEARCH_ENDPOINT}?search=${searchTerm ?? ''}&page=${current != null ? current + 1 : ''}&size=${intervalSize ?? ''}`;
+  const queryString = new URLSearchParams({
+    search: search ?? '',
+    page: page != null ? (page + 1).toString() : '',
+    size: size != null ? size.toString() : '',
+  }).toString();
+  const urlApi = `${PROJECT_SEARCH_ENDPOINT}?${queryString}`;
   const response = await AuthService.authFetch(urlApi);
 
   if (!response?.ok) {
