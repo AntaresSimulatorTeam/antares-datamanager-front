@@ -85,7 +85,6 @@ const LoadTab = () => {
         id="load-table"
         data={data}
         columns={columns}
-        columnSize="meta"
         enableColumnResizing={false}
         enableReadOnly={true}
         state={{ readOnly }}
