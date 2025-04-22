@@ -109,7 +109,7 @@ const StudyNavigationMenu = ({
               onClick={() => !tab.isDisabled && setActiveTab(tab)}
               disabled={tab.isDisabled}
             />
-            {hasWarmingMessages && activeTab !== tab.name && (
+            {hasWarmingMessages && activeTab.name !== tab.name && (
               <StdAvatar
                 initials={`${hasWarmingMessages ? studyState[`${tab.name}`]?.messages?.length : '0'}`}
                 size="es"
