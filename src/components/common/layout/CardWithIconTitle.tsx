@@ -1,10 +1,12 @@
 import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter.ts';
 import { RdsButton, RdsIcon, RdsIconId, RdsTextTooltip } from 'rte-design-system-react';
+import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 export type CardDataType = {
   color: string;
   colorBorder: string;
-  icon: string;
+  icon: StdIconId;
   title: string;
   subtitle: string | null;
   content: string | null;
@@ -26,7 +28,7 @@ export const CardWithIconTitle = ({ data, size, transform, buttonLabel }: CardWi
   >
     <div className="flex items-center justify-between gap-1">
       <div className="flex items-center justify-between gap-1">
-        <RdsIcon name={data.icon} color={`${data.color}`} />
+        <StdIcon name={data.icon} color={`text-${data.color}`} />
         <span className={`text-${data.color} text-body-s`}>{data.title}</span>
       </div>
       <div className="flex">
