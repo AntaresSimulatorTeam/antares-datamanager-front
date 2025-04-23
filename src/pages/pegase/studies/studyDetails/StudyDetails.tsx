@@ -60,7 +60,10 @@ const StudyDetails = () => {
             })),
           );
         } else {
-          messages = studyState.LINK.messages;
+          messages = studyState.LINK.messages.map((message) => ({
+            ...message,
+            trajectory: studyState?.LINK?.trajectoryName ?? '',
+          }));
         }
       }
     }
