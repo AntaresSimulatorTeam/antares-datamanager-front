@@ -24,7 +24,7 @@ type CardWithIconTitleProps = {
 export const CardWithIconTitle = ({ data, size, transform, buttonLabel }: CardWithIconTitleProps) => (
   <div
     style={{ width: size, transform }}
-    className={`absolute left-0 flex h-full flex-col rounded-lg bg-gray-100 shadow-2 ${data.colorBorder} p-2`}
+    className={`absolute left-0 flex h-full flex-col justify-between rounded-lg bg-gray-100 shadow-2 ${data.colorBorder} p-2`}
   >
     <div className="flex items-center justify-between gap-1">
       <div className="flex items-center justify-between gap-1">
