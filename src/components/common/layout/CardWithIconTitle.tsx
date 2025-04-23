@@ -41,7 +41,6 @@ export const CardWithIconTitle = ({ data, size, transform, buttonLabel }: CardWi
           size="extraSmall"
           color={data.colorStatus}
         />
-        {/*<RdsButton label={buttonLabel} icon={RdsIconId.KeyboardArrowRight} size="extraSmall" variant="outlined" />*/}
       </div>
     </div>
     {data?.subtitle && (
