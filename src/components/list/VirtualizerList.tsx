@@ -18,10 +18,11 @@ export const VirtualizerList = <T,>({ items, isOpen, renderItem }: Props<T>) => 
     gap: 20,
     overscan: 5,
     paddingStart: 5,
+    paddingEnd: 5,
   });
 
   return (
-    <div ref={listRef} className={`w-full overflow-auto rounded-lg py-1 ${isOpen ? 'h-full' : '0'}`}>
+    <div ref={listRef} className={`w-full overflow-y-auto rounded-lg pb-1 ${isOpen ? 'h-full' : '0'} scrollbar-thin`}>
       <div className="relative h-full w-full">
         {virtualizer.getVirtualItems()?.map((virtualItem) => {
           const item: T = items?.[virtualItem.index];

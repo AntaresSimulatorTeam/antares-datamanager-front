@@ -51,19 +51,15 @@ const StudyDetails = () => {
     }
     if (activeTab === TRAJECTORY_TYPE.AREA) {
       if (studyState?.LINK && studyState.LINK.messages.length > 0) {
+        const linkMessage = studyState.LINK.messages.map((message) => ({
+          ...message,
+          trajectory: studyState?.LINK?.trajectoryName ?? '',
+        }));
         if (messages.length > 0) {
           const temporaryMessage = messages;
-          messages = temporaryMessage.concat(
-            studyState.LINK.messages.map((message) => ({
-              ...message,
-              trajectory: studyState?.LINK?.trajectoryName ?? '',
-            })),
-          );
+          messages = temporaryMessage.concat(linkMessage);
         } else {
-          messages = studyState.LINK.messages.map((message) => ({
-            ...message,
-            trajectory: studyState?.LINK?.trajectoryName ?? '',
-          }));
+          messages = linkMessage;
         }
       }
     }
@@ -92,7 +88,7 @@ const StudyDetails = () => {
       <div className="flex flex-col">
         <DetailsContent content={study} />
       </div>
-      <div className="flex gap-4 px-3 py-2">
+      <div className="flex gap-4 px-3 pt-2">
         <div className="flex h-10 items-end self-stretch">
           <StudyNavigationMenu
             onRenderActiveComponent={setActiveContent}

@@ -1,7 +1,6 @@
 import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import StdAvatar from '@common/layout/stdAvatar/StdAvatar.tsx';
-import { RdsHeading } from 'rte-design-system-react';
 import { VirtualizerList } from '@/components/list/VirtualizerList.tsx';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -21,7 +20,7 @@ export const ContainerWithExpander = <T,>({ content }: Props<T>) => {
   }, [content?.length]);
 
   return (
-    <div className={`flex ${isOpen ? 'h-1/3' : 'h-fit'} w-full rounded border-gray-600 bg-gray-200 py-1 pl-2 shadow-2`}>
+    <div className={`flex ${isOpen ? 'h-1/3' : 'h-fit'} w-full rounded border-gray-600 bg-gray-200 px-2 py-1 shadow-2`}>
       <div className="flex w-full max-w-fit flex-col pt-3 sm:pt-2">
         <button onClick={() => setIsOpen((prev) => !prev)}>
           <StdIcon name={isOpen ? StdIconId.KeyboardArrowUp : StdIconId.KeyboardArrowDown} />
@@ -36,7 +35,7 @@ export const ContainerWithExpander = <T,>({ content }: Props<T>) => {
             fullname=""
             textColor="white"
           />
-          <RdsHeading title={t('studyDetails.@alerts')} size="m" />
+          <span className="text-body-xl">{t('studyDetails.@alerts')}</span>
         </div>
         {content && isOpen && (
           <VirtualizerList
