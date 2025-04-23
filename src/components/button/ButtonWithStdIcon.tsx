@@ -31,9 +31,9 @@ export const ButtonWithStdIcon = ({
       case 'secondary':
         return 'acc1-600';
       case 'danger':
-        return 'text-error-700 border-error-700 hover:bg-error-700 active:bg-error-900';
+        return 'text-error-700 border-error-700 hover:border-error-700 hover:bg-error-700 active:border-error-900 active:bg-error-900';
       case 'warning':
-        return 'text-warning-500 border-warning-500 hover:bg-warning-500 active:bg-warning-900';
+        return 'text-warning-500 border-warning-500 hover:border-warning-900 hover:bg-warning-900 active:border-warning-900 active:bg-warning-900';
       case 'primary':
       default:
         return 'border-acc1-600 bg-acc1-600';
