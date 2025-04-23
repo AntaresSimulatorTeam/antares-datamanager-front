@@ -3,6 +3,7 @@ import { ACTUATOR_ENDPOINT } from '@/shared/const/apiEndPoint';
 import packageJson from '../../../package.json';
 import { GIT_INFO } from '@/gitInfo.ts';
 import { Entries } from '@/shared/types/Generic.type.ts';
+import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter.ts';
 
 export const fetchBackendInfo = async (): Promise<AppInfo> => {
   const apiUrl = `${ACTUATOR_ENDPOINT}`;
@@ -10,15 +11,18 @@ export const fetchBackendInfo = async (): Promise<AppInfo> => {
   if (!response.ok) {
     throw new Error('Error fetching app info');
   }
-  const { app, git, build } = (await response.json()) as AppBackendInfos;
+  const {
+    app,
+    git: { branch, commit },
+  } = (await response.json()) as AppBackendInfos;
 
   return {
     appName: app.name,
     appDescription: app.description,
     appVersion: app.version,
-    appBranch: git.branch,
-    commitId: git.commit.id,
-    buildTime: build.time,
+    appBranch: branch,
+    commitId: commit.id,
+    commitTime: formatDateToDDMMYYYY(commit.time, true),
   };
 };
 
@@ -30,7 +34,7 @@ export const fetchAppInfo = async () => {
       appVersion: packageJson.version,
       appBranch: GIT_INFO.branch,
       commitId: GIT_INFO.commit,
-      buildTime: GIT_INFO.buildTime,
+      commitTime: formatDateToDDMMYYYY(GIT_INFO.commitTime, true),
     };
 
     const data = await fetchBackendInfo();
