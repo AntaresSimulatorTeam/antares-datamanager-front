@@ -11,13 +11,13 @@ import { PROJECT_ACTION } from '@/shared/enum/project.ts';
 import { useProjectDispatch } from '@/store/contexts/ProjectContext.tsx';
 import { PaginatedResponse } from '@/shared/types';
 
-export const useFetchProjectList = (searchTerm: string | undefined, current: number, intervalSize: number) => {
+export const useFetchProjectList = (current: number, intervalSize: number, searchTerm?: string) => {
   const [projects, setProjects] = useState<ProjectResponse[]>([]);
   const [count, setCount] = useState(0);
   const dispatch = useProjectDispatch();
 
   const fetchProjects = useCallback(
-    async (currentPage: number, size: number, term?: string) => {
+    async (currentPage: number, size: number, term: string) => {
       try {
         const response = (await fetchProjectFromSearchTerm(
           currentPage,
@@ -39,7 +39,7 @@ export const useFetchProjectList = (searchTerm: string | undefined, current: num
   );
 
   useEffect(() => {
-    void fetchProjects(current, intervalSize, searchTerm);
+    void fetchProjects(current, intervalSize, searchTerm ?? '');
   }, [current, searchTerm, intervalSize]);
 
   return { projects, count, refetch: fetchProjects };
