@@ -10,6 +10,7 @@ import { AvatarColor, AvatarSize, AvatarTextColor } from './StdAvatar';
 export const AVATAR_CLASSES = 'avatar rounded-full border-2 border-gray-w flex items-center justify-center';
 
 export const AVATAR_SIZE_CLASSES = {
+  xs: 'w-3 h-3 text-body-xs',
   es: 'w-4 h-4 text-body-xs',
   s: 'w-6 h-6 text-body-s',
   m: 'w-8 h-8 text-body-m',
