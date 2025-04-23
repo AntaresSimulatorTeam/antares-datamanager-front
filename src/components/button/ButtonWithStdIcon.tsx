@@ -1,13 +1,19 @@
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 
+export type ButtonSize = 'extraSmall' | 'small' | 'medium';
+export type IconPosition = 'left' | 'right';
+export type ButtonColor = 'primary' | 'secondary' | 'danger' | 'warning';
+
 interface ButtonWithStdIconProps {
   label: string;
   icon: StdIconId;
-  position: 'left' | 'right';
+  position: IconPosition;
   disabled?: boolean;
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   isLoading?: boolean;
+  size?: ButtonSize;
+  color?: ButtonColor;
 }
 
 export const ButtonWithStdIcon = ({
@@ -17,7 +23,36 @@ export const ButtonWithStdIcon = ({
   position,
   disabled = false,
   isLoading = false,
+  size = 'small',
+  color = 'primary',
 }: ButtonWithStdIconProps) => {
+  const getColors = (mainColor: ButtonColor) => {
+    switch (mainColor) {
+      case 'secondary':
+        return 'acc1-600';
+      case 'danger':
+        return 'text-error-700 border-error-700 hover:bg-error-700 active:bg-error-900';
+      case 'warning':
+        return 'text-warning-500 border-warning-500 hover:bg-warning-500 active:bg-warning-900';
+      case 'primary':
+      default:
+        return 'border-acc1-600 bg-acc1-600';
+    }
+  };
+
+  const getIconColor = (mainColor: ButtonColor) => {
+    switch (mainColor) {
+      case 'secondary':
+        return 'acc1-600';
+      case 'danger':
+        return 'text-error-700 hover:text-gray-w active:text-gray-w';
+      case 'warning':
+        return 'text-warning-500 hover:text-gray-w active:text-gray-w';
+      case 'primary':
+      default:
+        return 'text-acc1-600';
+    }
+  };
   const getButtonLabel = () => {
     if (isLoading) {
       return (
@@ -27,19 +62,18 @@ export const ButtonWithStdIcon = ({
       );
     } else {
       return (
-        <>
-          {icon && position === 'left' && <StdIcon name={icon} color={`${disabled ? 'gray-700' : 'gray-w'}`} />}
-          {label && <span className={`${disabled ? 'text-gray-700' : 'text-gray-w'}`}>{label}</span>}
-          {icon && position === 'right' && (
-            <StdIcon name={icon} color={`${disabled ? 'text-gray-700' : 'text-gray-w'}`} />
-          )}
-        </>
+        <div className={`flex items-center ${disabled ? 'text-gray-700' : getIconColor(color)}`}>
+          {icon && position === 'left' && <StdIcon name={icon} />}
+          {label && <p>{label}</p>}
+          {icon && position === 'right' && <StdIcon name={icon} />}
+        </div>
       );
     }
   };
+
   return (
     <button
-      className={`inline-flex flex-row items-center gap-1 rounded border-2 p-1 ${disabled ? 'border-gray-400' : 'border-acc1-600'} ${disabled ? 'bg-gray-400' : 'bg-acc1-600'} text-center font-normal`}
+      className={`inline-flex flex-row items-center gap-1 rounded border-2 ${size === 'medium' ? 'text-body-m' : size === 'small' ? 'text-body-s' : 'text-body-xs'} ${size === 'medium' ? 'p-2' : size === 'small' ? 'p-1' : 'px-0.5 py-0'} ${disabled ? 'border-gray-400 bg-gray-400' : getColors(color)} text-center`}
       onClick={onClick}
       onMouseDown={(e) => e.preventDefault()}
       id="button-generate"

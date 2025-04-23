@@ -1,9 +1,11 @@
 import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter.ts';
-import { RdsButton, RdsIcon, RdsIconId, RdsTextTooltip } from 'rte-design-system-react';
+import { RdsIcon, RdsIconId, RdsTextTooltip } from 'rte-design-system-react';
 import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
+import { ButtonColor, ButtonWithStdIcon } from '@/components/button/ButtonWithStdIcon.tsx';
 
 export type CardDataType = {
+  colorStatus: ButtonColor;
   color: string;
   colorBorder: string;
   icon: StdIconId;
@@ -24,15 +26,22 @@ type CardWithIconTitleProps = {
 export const CardWithIconTitle = ({ data, size, transform, buttonLabel }: CardWithIconTitleProps) => (
   <div
     style={{ width: size, transform }}
-    className={`absolute left-0 flex h-full flex-col items-stretch justify-start gap-1 rounded-lg bg-gray-100 shadow-2 ${data.colorBorder} p-2`}
+    className={`absolute left-0 flex h-full flex-col items-stretch justify-start gap-1 rounded-lg border-b-4 border-transparent bg-gray-100 shadow-2 ${data.colorBorder} p-2`}
   >
     <div className="flex items-center justify-between gap-1">
       <div className="flex items-center justify-between gap-1">
-        <StdIcon name={data.icon} color={`text-${data.color}`} />
-        <span className={`text-${data.color} text-body-s`}>{data.title}</span>
+        <StdIcon name={data.icon} color={`${data.color}`} />
+        <span className={`${data.color} text-body-s`}>{data.title}</span>
       </div>
       <div className="flex">
-        <RdsButton label={buttonLabel} icon={RdsIconId.KeyboardArrowRight} size="extraSmall" variant="outlined" />
+        <ButtonWithStdIcon
+          label={buttonLabel}
+          icon={StdIconId.KeyboardArrowRight}
+          position="left"
+          size="extraSmall"
+          color={data.colorStatus}
+        />
+        {/*<RdsButton label={buttonLabel} icon={RdsIconId.KeyboardArrowRight} size="extraSmall" variant="outlined" />*/}
       </div>
     </div>
     {data?.subtitle && (

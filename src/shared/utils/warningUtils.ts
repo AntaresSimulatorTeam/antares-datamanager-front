@@ -18,8 +18,9 @@ export const convertDataToItem = <T>(data: T, t: (key: string) => string): CardD
       : t('studyDetails.@import_status_error');
 
   return {
-    color: level === WARNING_MESSAGE_LEVEL.WARNING_LEVEL ? 'warning-500' : 'error-700',
-    colorBorder: level === WARNING_MESSAGE_LEVEL.WARNING_LEVEL ? 'border-acc6-500' : 'border-acc4-700',
+    colorStatus: level === WARNING_MESSAGE_LEVEL.WARNING_LEVEL ? 'warning' : 'danger',
+    color: level === WARNING_MESSAGE_LEVEL.WARNING_LEVEL ? 'text-warning-500' : 'text-error-700',
+    colorBorder: level === WARNING_MESSAGE_LEVEL.WARNING_LEVEL ? 'hover:border-acc6-500' : 'hover:border-acc4-700',
     icon: level === WARNING_MESSAGE_LEVEL.WARNING_LEVEL ? StdIconId.Warning : StdIconId.Info,
     title,
     subtitle: `${trajectory ?? ''} ${secondTrajectory ? ' - ' : ''} ${secondTrajectory || ''}`,
