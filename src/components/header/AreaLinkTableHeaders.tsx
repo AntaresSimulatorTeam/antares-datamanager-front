@@ -7,7 +7,7 @@
 import { createColumnHelper } from '@tanstack/react-table';
 import { RdsButton, RdsIcon, RdsIconButton, RdsIconId } from 'rte-design-system-react';
 import { AreaAndLinkRowData, RowStatus, SelectOption } from '@/shared/types';
-import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
+import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 import SelectAndSearchableInput from '@/components/input/SelectAndSearchableInput.tsx';
@@ -108,24 +108,43 @@ const getAreaLinkTableHeaders = (
   columnHelper.accessor('status', {
     header: t('home.@status'),
     cell: ({ row }) => {
-      const { status } = row.original;
+      const { status, trajectory, hypothesis } = row.original;
+      const deleteButton = (
+        <RdsIconButton
+          icon={RdsIconId.Delete}
+          size="small"
+          onClick={() => {
+            setErrorInfo({ index: row.index, message: '' });
+            if (trajectory?.id) {
+              void handleUpdate(
+                row.index,
+                status === TRAJECTORY_SELECTION_STATUS.ERROR ? 'emptyError' : 'empty',
+                trajectory.id,
+              );
+            }
+          }}
+        />
+      );
       if (status === TRAJECTORY_SELECTION_STATUS.MISSING)
         return (
           <div className="flex flex-1 items-end gap-1">
             <StdIcon name={StdIconId.QuestionMark} color="text-warning-500" />{' '}
             {t('studyDetails.@import_status_missing')}
+            {trajectory?.type === TRAJECTORY_TYPE.LOAD && hypothesis !== 'OTHERS' && deleteButton}
           </div>
         );
       if (status === TRAJECTORY_SELECTION_STATUS.OK)
         return (
           <div className="flex flex-1 items-end gap-1">
             <RdsIcon name={RdsIconId.Done} color="primary-600" /> {t('studyDetails.@import_status_done')}
+            {trajectory?.type === TRAJECTORY_TYPE.LOAD && hypothesis !== 'OTHERS' && deleteButton}
           </div>
         );
       if (status === TRAJECTORY_SELECTION_STATUS.ERROR)
         return (
           <div className="flex flex-1 items-end gap-1">
             <RdsIcon name={RdsIconId.Info} color="error-700" /> {t('studyDetails.@import_status_error')}
+            {trajectory?.type === TRAJECTORY_TYPE.LOAD && hypothesis !== 'OTHERS' && deleteButton}
           </div>
         );
       return null;
