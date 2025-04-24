@@ -4,6 +4,7 @@ import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 export type ButtonSize = 'extraSmall' | 'small' | 'medium';
 export type IconPosition = 'left' | 'right';
 export type ButtonColor = 'primary' | 'secondary' | 'danger' | 'warning';
+export type ButtonVariant = 'contained' | 'outlined';
 
 interface ButtonWithStdIconProps {
   label: string;
@@ -14,6 +15,7 @@ interface ButtonWithStdIconProps {
   isLoading?: boolean;
   size?: ButtonSize;
   color?: ButtonColor;
+  variant?: ButtonVariant;
 }
 
 export const ButtonWithStdIcon = ({
@@ -25,6 +27,7 @@ export const ButtonWithStdIcon = ({
   isLoading = false,
   size = 'small',
   color = 'primary',
+  variant = 'contained',
 }: ButtonWithStdIconProps) => {
   const getColors = (mainColor: ButtonColor) => {
     switch (mainColor) {
@@ -43,14 +46,14 @@ export const ButtonWithStdIcon = ({
   const getIconColor = (mainColor: ButtonColor) => {
     switch (mainColor) {
       case 'secondary':
-        return 'acc1-600';
+        return 'text-acc1-600';
       case 'danger':
-        return 'text-error-700 hover:text-gray-w active:text-gray-w';
+        return `${variant === 'outlined' ? 'text-error-700 hover:text-gray-w active:text-gray-w' : 'text-gray-w hover:text-error-700 active:text-error-700'}`;
       case 'warning':
-        return 'text-warning-500 hover:text-gray-w active:text-gray-w';
+        return `${variant === 'outlined' ? 'text-warning-500 hover:text-gray-w active:text-gray-w' : 'text-gray-w hover:text-warning-500 active:text-warning-500'}`;
       case 'primary':
       default:
-        return 'text-acc1-600';
+        return `${variant === 'outlined' ? 'text-acc1-600 hover:text-gray-w active:text-gray-w' : 'text-gray-w'}`;
     }
   };
   const getButtonLabel = () => {

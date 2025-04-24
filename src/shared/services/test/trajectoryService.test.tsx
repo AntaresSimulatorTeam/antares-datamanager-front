@@ -213,12 +213,13 @@ describe('linkTrajectoryToStudy', () => {
     // Failed fetch response moc
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: false,
-      message: 'Failed to link a trajectory to a study',
+      json: async () =>
+        Promise.resolve({
+          message: 'Error message',
+        }),
     });
 
-    await expect(async () => linkTrajectoryToStudy(TRAJECTORY_TYPE.AREA, 100, 2)).rejects.toThrowError(
-      'Failed to link a trajectory to a study',
-    );
+    await expect(async () => linkTrajectoryToStudy(TRAJECTORY_TYPE.AREA, 100, 2)).rejects.toThrowError('Error message');
   });
 
   it('should handle exceptions during link creation', async () => {

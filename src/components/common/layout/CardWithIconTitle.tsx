@@ -26,7 +26,7 @@ type CardWithIconTitleProps = {
 export const CardWithIconTitle = ({ data, size, transform, buttonLabel }: CardWithIconTitleProps) => (
   <div
     style={{ width: size, transform }}
-    className={`absolute left-0 flex h-full flex-col items-stretch justify-start gap-0.5 rounded-lg border-b-4 border-transparent bg-gray-100 shadow-2 ${data.colorBorder} p-2`}
+    className={`absolute left-0 flex h-full flex-col justify-start gap-0.5 rounded-lg border-b-4 border-transparent bg-gray-100 shadow-2 ${data.colorBorder} px-1.5 py-1`}
   >
     <div className="flex items-center justify-between gap-1">
       <div className="flex items-center justify-between gap-1">
@@ -40,6 +40,7 @@ export const CardWithIconTitle = ({ data, size, transform, buttonLabel }: CardWi
           position="left"
           size="extraSmall"
           color={data.colorStatus}
+          variant="outlined"
         />
       </div>
     </div>
@@ -51,9 +52,9 @@ export const CardWithIconTitle = ({ data, size, transform, buttonLabel }: CardWi
       </div>
     )}
     {data?.content && (
-      <div className="flex h-full justify-start text-gray-600">
+      <div className="flex h-full justify-start text-ellipsis text-gray-600">
         <RdsTextTooltip text={data?.content} offset={5} placement="top">
-          <div className="line-clamp-2 text-start text-body-s">{data.content}</div>
+          <div className="line-clamp-2 text-ellipsis text-start text-body-xs">{data.content}</div>
         </RdsTextTooltip>
       </div>
     )}
@@ -61,12 +62,12 @@ export const CardWithIconTitle = ({ data, size, transform, buttonLabel }: CardWi
       <div className="flex gap-2 text-gray-600">
         <div className="flex items-center gap-1">
           <RdsIcon name={RdsIconId.Person} />
-          {data?.generatedBy && <span className="text-body-s">{data.generatedBy}</span>}
+          {data?.generatedBy && <span className="text-body-xs">{data.generatedBy}</span>}
         </div>
         {'|'}
         <div className="flex items-center gap-1">
           <RdsIcon name={RdsIconId.History} />
-          {data?.generatedAt && <span className="text-body-s">{formatDateToDDMMYYYY(data.generatedAt)}</span>}
+          {data?.generatedAt && <span className="text-body-xs">{formatDateToDDMMYYYY(data.generatedAt)}</span>}
         </div>
       </div>
     </div>

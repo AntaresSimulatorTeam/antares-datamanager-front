@@ -122,8 +122,10 @@ export const linkTrajectoryToStudy = async (
       'Content-Type': 'application/json',
     },
   });
+
   if (!response.ok) {
-    throw new Error(`${(response as unknown as Error).message}`);
+    const errorData = (await response.json()) as Error;
+    throw new Error(`${(errorData as unknown as Error)?.message || 'Failed to link a trajectory to study'}`);
   }
 
   return (await response.json()) as DbTrajectory;
