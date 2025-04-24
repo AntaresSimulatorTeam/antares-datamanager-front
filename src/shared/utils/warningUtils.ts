@@ -24,7 +24,7 @@ export const convertDataToItem = <T>(data: T, t: (key: string) => string): CardD
     icon: level === WARNING_MESSAGE_LEVEL.WARNING_LEVEL ? StdIconId.Warning : StdIconId.Info,
     title,
     subtitle: `${trajectory ?? ''} ${secondTrajectory ? ' - ' : ''} ${secondTrajectory || ''}`,
-    content: `${content} ${content} ${content}`,
+    content,
     generatedBy,
     generatedAt,
   };
