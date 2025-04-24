@@ -26,7 +26,7 @@ type CardWithIconTitleProps = {
 export const CardWithIconTitle = ({ data, size, transform, buttonLabel }: CardWithIconTitleProps) => (
   <div
     style={{ width: size, transform }}
-    className={`absolute left-0 flex h-full flex-col items-stretch justify-start gap-1 rounded-lg border-b-4 border-transparent bg-gray-100 shadow-2 ${data.colorBorder} p-2`}
+    className={`absolute left-0 flex h-full flex-col items-stretch justify-start gap-0.5 rounded-lg border-b-4 border-transparent bg-gray-100 shadow-2 ${data.colorBorder} p-2`}
   >
     <div className="flex items-center justify-between gap-1">
       <div className="flex items-center justify-between gap-1">
@@ -53,7 +53,7 @@ export const CardWithIconTitle = ({ data, size, transform, buttonLabel }: CardWi
     {data?.content && (
       <div className="flex h-full justify-start text-gray-600">
         <RdsTextTooltip text={data?.content} offset={5} placement="top">
-          <div className="line-clamp-1 text-start text-body-s xl:line-clamp-2">{data.content}</div>
+          <div className="line-clamp-2 text-start text-body-s">{data.content}</div>
         </RdsTextTooltip>
       </div>
     )}
