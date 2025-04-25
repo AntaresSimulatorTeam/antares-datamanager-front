@@ -5,6 +5,7 @@
  */
 
 import {
+  HYPOTHESIS_LOAD_DEFAULT,
   TRAJECTORY_DATA_BASE_ENDPOINT,
   TRAJECTORY_DATA_FILE_ENDPOINT,
   TRAJECTORY_ENDPOINT,
@@ -161,4 +162,15 @@ export const getTrajectoryDataByTypeAndId = async (
     throw new Error('Failed to fetch data trajectory');
   }
   return (await response.json()) as Types<TRAJECTORY_DATA_TYPE>[];
+};
+
+/**
+ * Fetch load default hypothesis (LOAD_OTHERS, LOAD_FR...)
+ */
+export const getDefaultLoadHypothesis = async (): Promise<{ name: string }[]> => {
+  const response = await AuthService.authFetch(HYPOTHESIS_LOAD_DEFAULT);
+  if (!response.ok) {
+    throw new Error('Failed to fetch default load hypothesis');
+  }
+  return (await response.json()) as { name: string }[];
 };
