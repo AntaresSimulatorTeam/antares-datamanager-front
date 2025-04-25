@@ -28,7 +28,7 @@ const getAreaLinkTableHeaders = (
   setErrorInfo: Dispatch<SetStateAction<ErrorMessageType>>,
   studyStatus: StudyStatus | undefined,
   tabName?: string,
-  removeRow?: (index: number) => void,
+  removeRow?: (index: number, name?: string) => void,
 ) => [
   columnHelper.accessor('hypothesis', {
     header: tabName === TRAJECTORY_TYPE.LOAD ? t('studyDetails.@area') : t('studyDetails.@hypothesis'),

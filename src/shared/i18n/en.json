@@ -109,7 +109,8 @@
     "@preview": "View",
     "@generate": "Generate",
     "@add_trajectories_message": "Please add Areas trajectories first",
-    "@error_link_trajectory_message": "Please select another LINK trajectory or delete it"
+    "@error_link_trajectory_message": "Please select another LINK trajectory or delete it",
+    "@search_area": "Search for an area"
   },
   "trajectoryViewModal": {
     "@title_area": "Areas",

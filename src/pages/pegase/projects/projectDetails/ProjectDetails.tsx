@@ -81,7 +81,7 @@ const ProjectDetails = () => {
         <DetailsContent content={projectInfo} />
       </div>
       <div className="flex gap-4 px-3 py-2">
-        <SearchBar onSearch={searchStudy} chipLabels={['']} />
+        <SearchBar onSearch={searchStudy} />
         <RdsChip
           label={t('home.@my_studies')}
           onClick={handleChipClick}

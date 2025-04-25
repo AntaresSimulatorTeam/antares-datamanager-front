@@ -22,6 +22,7 @@ import {
 import { convertToSelectionOptionType } from '@/shared/utils/formFormatter.ts';
 import StdCheckboxGroupWrapper from '@/components/forms/stdCheckboxGroup/StdCheckboxGroupWrapper.tsx';
 import StdCheckbox from '@/components/forms/stdCheckbox/StdCheckbox.tsx';
+import SearchBar from '@/pages/pegase/home/components/SearchBar.tsx';
 
 export type CheckBoxData = {
   name: string;
@@ -37,6 +38,8 @@ const LoadTab = () => {
   const [data, setData] = useState<AreaAndLinkRowData[]>([]);
   const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
+  const [defaultHypothesis, setDefaultHypothesis] = useState<CheckBoxData[]>([]);
+  const [checkedValues, setCheckedValues] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchHypothesis = async () => {
@@ -45,6 +48,7 @@ const LoadTab = () => {
           name: area.name,
           isDefault: true,
         }));
+        setDefaultHypothesis(hypothesis);
         const trajectoryAreaId = studyState[`${TRAJECTORY_TYPE.AREA}`]?.id;
         let newArea: CheckBoxData[];
         if (trajectoryAreaId) {
@@ -59,7 +63,9 @@ const LoadTab = () => {
             setAreasOptions(hypothesis);
           }
         }
+        // ajouter les areas dont une trajectoire est liée à l'étude : dans le tableau / la check box list (avec case cochée)
         //const trajectories: DbTrajectory[] = await getStudyTrajectories(study.id, TRAJECTORY_TYPE.LOAD);
+        //setCheckedValues(hypothesis.map((item) => item.name));
         setData(
           hypothesis
             .map((item) => ({
@@ -100,10 +106,14 @@ const LoadTab = () => {
     [study.horizon],
   );
 
-  const removeRow = (indexRow: number) =>
+  const removeRow = (indexRow: number, areaName?: string) => {
     setData((prev) => prev.filter((_row: AreaAndLinkRowData, index: number) => index !== indexRow));
+    if (areaName) {
+      setCheckedValues((prev) => [...prev.filter((name) => name !== areaName)]);
+    }
+  };
 
-  const addRow = (name: string) =>
+  const addRow = (name: string) => {
     setData((prev) =>
       [
         {
@@ -112,12 +122,29 @@ const LoadTab = () => {
           status: TRAJECTORY_SELECTION_STATUS.MISSING,
         },
         ...prev,
-      ].sort((a, b) => a.hypothesis.localeCompare(b.hypothesis, 'en', { ignorePunctuation: true })),
+      ].sort((a, b) => {
+        if (a.hypothesis === 'OTHERS' || b.hypothesis === 'OTHERS') {
+          return 1;
+        } else {
+          return a.hypothesis.localeCompare(b.hypothesis, 'en', { ignorePunctuation: true });
+        }
+      }),
     );
+  };
 
   const handleSelectionChange = (name: string, isChecked?: boolean, isCheckboxControl?: boolean) => {
-    if (isChecked) removeRow(data.findIndex((row) => row.hypothesis === name));
-    addRow(name);
+    console.log('=============== isCheckboxControl', isCheckboxControl);
+    if (isChecked) {
+      if (checkedValues?.includes(name)) {
+        return;
+      } else {
+        addRow(name);
+        setCheckedValues((prev) => [...prev, name]);
+      }
+    } else {
+      removeRow(data.findIndex((row) => row.hypothesis === name));
+      setCheckedValues((prev) => [...prev.filter((prevName) => prevName !== name)]);
+    }
   };
 
   const columns = useMemo(
@@ -138,39 +165,25 @@ const LoadTab = () => {
   );
 
   return (
-    <div className="flex h-fit w-full">
-      <div className="flex h-fit w-1/5">
-        <StdCheckboxGroupWrapper
-          label={'check box'}
-          name={''}
-          onChange={handleSelectionChange}
-          children={areasOptions?.map((area) => (
-            <StdCheckbox
-              key={`load-check-${area.name}`}
-              label={area.name}
-              value={area.name}
-              name={''}
-              defaultChecked={area.isDefault}
-            />
-          ))}
-          checkedValues={[]} //children={<div></div>}
-          //error={!!error}
-          //helperText={error && tDynamic(error)}
-          //checkedValues={storeValue || []}
-          //possibleValues={possibleValues}
-        />
-        {/*  <div className="flex w-full flex-wrap gap-x-4">*/}
-        {/*    {areasOptions?.map((area) => (*/}
-        {/*      <StdCheckbox*/}
-        {/*        key={`load-check-${area.name}`}*/}
-        {/*        label={area.name}*/}
-        {/*        value={area.name}*/}
-        {/*        name={''}*/}
-        {/*        defaultChecked={area.isDefault}*/}
-        {/*      />*/}
-        {/*    ))}*/}
-        {/*  </div>*/}
-        {/*</StdCheckboxGroupWrapper>*/}
+    <div className="flex h-fit w-full gap-6">
+      <div className="flex h-fit w-1/5 flex-col gap-1 overflow-y-auto rounded border-2 border-b-gray-600 p-2">
+        <div className="border-b-2 border-b-gray-600 pb-2">
+          <SearchBar onSearch={() => {}} placeholder={t('studyDetails.@search_area')} />
+        </div>
+        <StdCheckboxGroupWrapper label={''} name={''} onChange={handleSelectionChange} checkedValues={checkedValues}>
+          <div className="flex w-full flex-wrap gap-x-4">
+            {areasOptions?.map((area) => (
+              <StdCheckbox
+                key={`load-check-${area.name}`}
+                label={area.name}
+                value={area.name}
+                name={''}
+                defaultChecked={area.isDefault}
+                disabled={area.isDefault}
+              />
+            ))}
+          </div>
+        </StdCheckboxGroupWrapper>
       </div>
       <div className="flex h-fit w-4/5">
         <StdSimpleTable
