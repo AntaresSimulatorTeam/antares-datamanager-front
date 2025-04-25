@@ -35,6 +35,7 @@ const StdSimpleTable = <TData,>({
   enableRowSelection = false,
   enableMultiRowSelection = false,
   enableReadOnly = false,
+  meta = {},
   ...tableOptions
 }: StdSimpleTableProps<TData>) => {
   const table = useReactTable<TData>({
@@ -46,6 +47,7 @@ const StdSimpleTable = <TData,>({
     enableRowSelection,
     enableMultiRowSelection,
     enableReadOnly,
+    meta: { ...meta },
     ...tableOptions,
   });
 
