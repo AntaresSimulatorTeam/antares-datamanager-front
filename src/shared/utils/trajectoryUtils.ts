@@ -1,9 +1,6 @@
-import { DbTrajectory, RowStatus } from '@/shared/types';
+import { RowStatus } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
 import { FileInputStatus } from 'rte-design-system-react';
-
-export const getTrajectoryDB = (trajectories: DbTrajectory[] | null, id: number) =>
-  trajectories?.find((trajectory) => trajectory.id === id);
 
 export const getStatus = (status: RowStatus) => {
   switch (status) {

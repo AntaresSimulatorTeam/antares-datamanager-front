@@ -7,15 +7,26 @@
 import StdSimpleTable from '@common/data/stdSimpleTable/StdSimpleTable.tsx';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
-import { AreaAndLinkRowData, LocationState, SelectOption } from '@/shared/types';
+import { AreaAndLinkRowData, LocationState, SelectOption, TrajectoryAreaData } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import getAreaLinkTableHeaders from '@/components/header/AreaLinkTableHeaders.tsx';
 import { useTranslation } from 'react-i18next';
 import { useStudy } from '@/store/contexts/StudyContext.tsx';
 import { ErrorMessageType } from '@/components/tab/AreaLinkTab.tsx';
 import { useLocation } from 'react-router-dom';
-import { fetchTrajectoriesFromDB, getDefaultLoadHypothesis } from '@/shared/services/trajectoryService.ts';
+import {
+  fetchTrajectoriesFromDB,
+  getDefaultLoadHypothesis,
+  getTrajectoryDataByTypeAndId,
+} from '@/shared/services/trajectoryService.ts';
 import { convertToSelectionOptionType } from '@/shared/utils/formFormatter.ts';
+import StdCheckboxGroupWrapper from '@/components/forms/stdCheckboxGroup/StdCheckboxGroupWrapper.tsx';
+import StdCheckbox from '@/components/forms/stdCheckbox/StdCheckbox.tsx';
+
+export type CheckBoxData = {
+  name: string;
+  isDefault: boolean;
+};
 
 const LoadTab = () => {
   const { t } = useTranslation();
@@ -25,11 +36,30 @@ const LoadTab = () => {
   const [readOnly, _] = useState<ReadOnlyObject>({});
   const [data, setData] = useState<AreaAndLinkRowData[]>([]);
   const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
+  const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
 
   useEffect(() => {
     const fetchHypothesis = async () => {
       try {
-        const hypothesis = (await getDefaultLoadHypothesis()) as { name: string }[];
+        const hypothesis: CheckBoxData[] = (await getDefaultLoadHypothesis())?.map((area) => ({
+          name: area.name,
+          isDefault: true,
+        }));
+        const trajectoryAreaId = studyState[`${TRAJECTORY_TYPE.AREA}`]?.id;
+        let newArea: CheckBoxData[];
+        if (trajectoryAreaId) {
+          const areas = (await getTrajectoryDataByTypeAndId(
+            TRAJECTORY_TYPE.AREA,
+            trajectoryAreaId,
+          )) as unknown as TrajectoryAreaData[];
+          if (areas.length > 0) {
+            newArea = (areas || []).map((area) => ({ name: area.areaName, isDefault: false }));
+            setAreasOptions(hypothesis?.concat(newArea));
+          } else {
+            setAreasOptions(hypothesis);
+          }
+        }
+        //const trajectories: DbTrajectory[] = await getStudyTrajectories(study.id, TRAJECTORY_TYPE.LOAD);
         setData(
           hypothesis
             .map((item) => ({
@@ -73,6 +103,23 @@ const LoadTab = () => {
   const removeRow = (indexRow: number) =>
     setData((prev) => prev.filter((_row: AreaAndLinkRowData, index: number) => index !== indexRow));
 
+  const addRow = (name: string) =>
+    setData((prev) =>
+      [
+        {
+          hypothesis: name,
+          trajectory: null,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+        },
+        ...prev,
+      ].sort((a, b) => a.hypothesis.localeCompare(b.hypothesis, 'en', { ignorePunctuation: true })),
+    );
+
+  const handleSelectionChange = (name: string, isChecked?: boolean, isCheckboxControl?: boolean) => {
+    if (isChecked) removeRow(data.findIndex((row) => row.hypothesis === name));
+    addRow(name);
+  };
+
   const columns = useMemo(
     () =>
       getAreaLinkTableHeaders(
@@ -92,14 +139,49 @@ const LoadTab = () => {
 
   return (
     <div className="flex h-fit w-full">
-      <StdSimpleTable
-        id="load-table"
-        data={data}
-        columns={columns}
-        enableColumnResizing={false}
-        enableReadOnly={true}
-        state={{ readOnly }}
-      />
+      <div className="flex h-fit w-1/5">
+        <StdCheckboxGroupWrapper
+          label={'check box'}
+          name={''}
+          onChange={handleSelectionChange}
+          children={areasOptions?.map((area) => (
+            <StdCheckbox
+              key={`load-check-${area.name}`}
+              label={area.name}
+              value={area.name}
+              name={''}
+              defaultChecked={area.isDefault}
+            />
+          ))}
+          checkedValues={[]} //children={<div></div>}
+          //error={!!error}
+          //helperText={error && tDynamic(error)}
+          //checkedValues={storeValue || []}
+          //possibleValues={possibleValues}
+        />
+        {/*  <div className="flex w-full flex-wrap gap-x-4">*/}
+        {/*    {areasOptions?.map((area) => (*/}
+        {/*      <StdCheckbox*/}
+        {/*        key={`load-check-${area.name}`}*/}
+        {/*        label={area.name}*/}
+        {/*        value={area.name}*/}
+        {/*        name={''}*/}
+        {/*        defaultChecked={area.isDefault}*/}
+        {/*      />*/}
+        {/*    ))}*/}
+        {/*  </div>*/}
+        {/*</StdCheckboxGroupWrapper>*/}
+      </div>
+      <div className="flex h-fit w-4/5">
+        <StdSimpleTable
+          id="load-table"
+          data={data}
+          columns={columns}
+          enableColumnResizing={false}
+          enableReadOnly={true}
+          state={{ readOnly }}
+        />
+      </div>
     </div>
   );
 };
