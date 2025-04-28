@@ -18,11 +18,11 @@ import {
   fetchTrajectoriesFromDB,
   getDefaultLoadHypothesis,
   getTrajectoryDataByTypeAndId,
+  unlinkTrajectoryFromStudy,
 } from '@/shared/services/trajectoryService.ts';
 import { convertToSelectionOptionType } from '@/shared/utils/formFormatter.ts';
-import StdCheckboxGroupWrapper from '@/components/forms/stdCheckboxGroup/StdCheckboxGroupWrapper.tsx';
-import StdCheckbox from '@/components/forms/stdCheckbox/StdCheckbox.tsx';
 import SearchBar from '@/pages/pegase/home/components/SearchBar.tsx';
+import { RdsCheckbox, RdsCheckboxGroupWrapper } from 'rte-design-system-react';
 
 export type CheckBoxData = {
   name: string;
@@ -38,7 +38,6 @@ const LoadTab = () => {
   const [data, setData] = useState<AreaAndLinkRowData[]>([]);
   const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
-  const [defaultHypothesis, setDefaultHypothesis] = useState<CheckBoxData[]>([]);
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
 
   useEffect(() => {
@@ -48,7 +47,6 @@ const LoadTab = () => {
           name: area.name,
           isDefault: true,
         }));
-        setDefaultHypothesis(hypothesis);
         const trajectoryAreaId = studyState[`${TRAJECTORY_TYPE.AREA}`]?.id;
         let newArea: CheckBoxData[];
         if (trajectoryAreaId) {
@@ -57,15 +55,26 @@ const LoadTab = () => {
             trajectoryAreaId,
           )) as unknown as TrajectoryAreaData[];
           if (areas.length > 0) {
-            newArea = (areas || []).map((area) => ({ name: area.areaName, isDefault: false }));
+            newArea = areas
+              .map((area) => {
+                if (!hypothesis.some((item) => item.name === area.areaName)) {
+                  return { name: area.areaName, isDefault: false };
+                }
+              })
+              .filter(Boolean) as CheckBoxData[];
             setAreasOptions(hypothesis?.concat(newArea));
           } else {
             setAreasOptions(hypothesis);
           }
         }
-        // ajouter les areas dont une trajectoire est liée à l'étude : dans le tableau / la check box list (avec case cochée)
-        //const trajectories: DbTrajectory[] = await getStudyTrajectories(study.id, TRAJECTORY_TYPE.LOAD);
-        //setCheckedValues(hypothesis.map((item) => item.name));
+        // ajouter les trajectoires des areas est liée à l'étude : dans le tableau / la check box list (avec case cochée)
+        // const trajectoryLoad = await getStudyTrajectories(study?.id, TRAJECTORY_TYPE.LOAD);
+        // Sélectionner les area de la check box list selon les trajectoires des area liées à l'étude
+        // setCheckedValues(hypothesis.map((item) => item.name));
+        if (hypothesis.length > 1) {
+          //setCheckedValues(hypothesis.map((item) => (!item.isDefault ? item.name : null)).filter(Boolean));
+          setCheckedValues(hypothesis.map((item) => item.name));
+        }
         setData(
           hypothesis
             .map((item) => ({
@@ -106,7 +115,10 @@ const LoadTab = () => {
     [study.horizon],
   );
 
-  const removeRow = (indexRow: number, areaName?: string) => {
+  const removeRow = async (indexRow: number, areaName?: string) => {
+    if (data[indexRow]?.trajectory && data[indexRow]?.status === TRAJECTORY_SELECTION_STATUS.OK) {
+      await unlinkTrajectoryFromStudy(data[indexRow].trajectory.id, study.id);
+    }
     setData((prev) => prev.filter((_row: AreaAndLinkRowData, index: number) => index !== indexRow));
     if (areaName) {
       setCheckedValues((prev) => [...prev.filter((name) => name !== areaName)]);
@@ -120,6 +132,7 @@ const LoadTab = () => {
           hypothesis: name,
           trajectory: null,
           status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          isDefault: false,
         },
         ...prev,
       ].sort((a, b) => {
@@ -132,8 +145,7 @@ const LoadTab = () => {
     );
   };
 
-  const handleSelectionChange = (name: string, isChecked?: boolean, isCheckboxControl?: boolean) => {
-    console.log('=============== isCheckboxControl', isCheckboxControl);
+  const handleSelectionChange = async (name: string, isChecked?: boolean) => {
     if (isChecked) {
       if (checkedValues?.includes(name)) {
         return;
@@ -142,7 +154,7 @@ const LoadTab = () => {
         setCheckedValues((prev) => [...prev, name]);
       }
     } else {
-      removeRow(data.findIndex((row) => row.hypothesis === name));
+      await removeRow(data.findIndex((row) => row.hypothesis === name));
       setCheckedValues((prev) => [...prev.filter((prevName) => prevName !== name)]);
     }
   };
@@ -166,24 +178,28 @@ const LoadTab = () => {
 
   return (
     <div className="flex h-fit w-full gap-6">
-      <div className="flex h-fit w-1/5 flex-col gap-1 overflow-y-auto rounded border-2 border-b-gray-600 p-2">
+      <div className="flex max-h-full min-h-fit w-1/5 flex-col gap-2 overflow-y-auto rounded border border-gray-600 p-2">
         <div className="border-b-2 border-b-gray-600 pb-2">
           <SearchBar onSearch={() => {}} placeholder={t('studyDetails.@search_area')} />
         </div>
-        <StdCheckboxGroupWrapper label={''} name={''} onChange={handleSelectionChange} checkedValues={checkedValues}>
-          <div className="flex w-full flex-wrap gap-x-4">
-            {areasOptions?.map((area) => (
-              <StdCheckbox
-                key={`load-check-${area.name}`}
-                label={area.name}
-                value={area.name}
-                name={''}
-                defaultChecked={area.isDefault}
-                disabled={area.isDefault}
-              />
-            ))}
-          </div>
-        </StdCheckboxGroupWrapper>
+        <RdsCheckboxGroupWrapper
+          label={''}
+          name={''}
+          onChange={(value: string, status?: boolean) => void handleSelectionChange(value, status)}
+          checkedValues={checkedValues}
+        >
+          {areasOptions?.map((area) => (
+            <RdsCheckbox
+              key={`load-check-${area.name}`}
+              label={area.name}
+              value={area.name}
+              name={''}
+              defaultChecked={area.isDefault}
+              disabled={area.isDefault}
+              checked={area.isDefault}
+            />
+          ))}
+        </RdsCheckboxGroupWrapper>
       </div>
       <div className="flex h-fit w-4/5">
         <StdSimpleTable

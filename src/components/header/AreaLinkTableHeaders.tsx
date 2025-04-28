@@ -28,14 +28,14 @@ const getAreaLinkTableHeaders = (
   setErrorInfo: Dispatch<SetStateAction<ErrorMessageType>>,
   studyStatus: StudyStatus | undefined,
   tabName?: string,
-  removeRow?: (index: number, name?: string) => void,
+  removeRow?: (index: number, name?: string) => Promise<void>,
 ) => [
   columnHelper.accessor('hypothesis', {
     header: tabName === TRAJECTORY_TYPE.LOAD ? t('studyDetails.@area') : t('studyDetails.@hypothesis'),
     cell: ({ getValue, row }) => {
       const { trajectory, status } = row.original;
       return (
-        <div className="inline-flex w-[180px] items-center gap-2">
+        <div className="flex w-2/5 items-center gap-2">
           <span
             className={`${trajectory && status === TRAJECTORY_SELECTION_STATUS.OK ? 'text-primary-600' : 'text-gray-900'}`}
           >
@@ -61,7 +61,7 @@ const getAreaLinkTableHeaders = (
       const { trajectory, status } = row.original;
       const textClass = studyStatus === StudyStatus.GENERATED ? 'text-primary-600' : 'text-gray-900';
       return trajectory ? (
-        <div className="inline-flex w-[850px] space-x-2 py-3">
+        <div className="flex w-2/5 space-x-2 py-3">
           <span className={`${textClass}`}>{trajectory.trajectoryName}</span>
           {studyStatus != StudyStatus.GENERATED && (
             <RdsIconButton
@@ -79,19 +79,21 @@ const getAreaLinkTableHeaders = (
           )}
         </div>
       ) : (
-        <div className="inline-flex w-[850px] items-center space-x-2">
-          <SelectAndSearchableInput
-            onSelect={(value: SelectOption) => {
-              setErrorInfo({ index: row.index, message: '' });
-              void handleUpdate(row.index, 'success', value.id, value.label);
-            }}
-            setSearchTerm={async (value?: string) => await handlerSearch(value, row.index)}
-            defaultPlaceHolder={
-              row.getReadOnly() ? t('studyDetails.@select_link') : t('studyDetails.@select_trajectory')
-            }
-            isSearchable={true}
-            isInputDisabled={row.getReadOnly()}
-          />
+        <div className="flex w-2/5 items-center space-x-2">
+          <div className="flex min-w-fit items-center">
+            <SelectAndSearchableInput
+              onSelect={(value: SelectOption) => {
+                setErrorInfo({ index: row.index, message: '' });
+                void handleUpdate(row.index, 'success', value.id, value.label);
+              }}
+              setSearchTerm={async (value?: string) => await handlerSearch(value, row.index)}
+              defaultPlaceHolder={
+                row.getReadOnly() ? t('studyDetails.@select_link') : t('studyDetails.@select_trajectory')
+              }
+              isSearchable={true}
+              isInputDisabled={row.getReadOnly()}
+            />
+          </div>
           <span>or</span>
           <RdsButton
             label={t('studyDetails.@import_file')}
@@ -110,33 +112,37 @@ const getAreaLinkTableHeaders = (
   columnHelper.accessor('status', {
     header: t('home.@status'),
     cell: ({ row }) => {
-      const { status, isDefault } = row.original;
+      const { status, hypothesis, isDefault } = row.original;
       if (status === TRAJECTORY_SELECTION_STATUS.MISSING)
         return (
-          <div className="flex flex-1 items-end gap-1">
+          <div className="flex flex-1 items-center gap-1">
             <StdIcon name={StdIconId.QuestionMark} color="text-warning-500" />{' '}
             {t('studyDetails.@import_status_missing')}
             {tabName === TRAJECTORY_TYPE.LOAD && !isDefault && (
-              <RdsIconButton icon={RdsIconId.Delete} size="small" onClick={() => removeRow?.(row.index)} />
+              <RdsIconButton icon={RdsIconId.Delete} size="small" onClick={() => void removeRow?.(row.index, hypothesis)} />
             )}
           </div>
         );
       if (status === TRAJECTORY_SELECTION_STATUS.OK)
         return (
-          <div className="flex flex-1 items-end gap-1">
+          <div className="flex flex-1 items-center gap-1">
             <RdsIcon name={RdsIconId.Done} color="primary-600" /> {t('studyDetails.@import_status_done')}
             {tabName === TRAJECTORY_TYPE.LOAD && !isDefault && (
-              <RdsIconButton icon={RdsIconId.Delete} size="small" onClick={() => removeRow?.(row.index)} />
+              <RdsIconButton icon={RdsIconId.Delete} size="small" onClick={() => void removeRow?.(row.index, hypothesis)} />
             )}
           </div>
         );
       if (status === TRAJECTORY_SELECTION_STATUS.ERROR)
         return (
-          <div className="flex flex-1 items-end gap-1">
+          <div className="flex flex-1 items-center gap-1">
             <RdsIcon name={RdsIconId.Info} color="error-700" /> {t('studyDetails.@import_status_error')}
             {tabName === TRAJECTORY_TYPE.LOAD && !isDefault && (
               <div className="opacity-0 hover:opacity-100">
-                <RdsIconButton icon={RdsIconId.Delete} size="small" onClick={() => removeRow?.(row.index)} />
+                <RdsIconButton
+                  icon={RdsIconId.Delete}
+                  size="small"
+                  onClick={() => void removeRow?.(row.index, hypothesis)}
+                />
               </div>
             )}
           </div>
