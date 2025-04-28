@@ -22,7 +22,7 @@ import {
 } from '@/shared/services/trajectoryService.ts';
 import { convertToSelectionOptionType } from '@/shared/utils/formFormatter.ts';
 import SearchBar from '@/pages/pegase/home/components/SearchBar.tsx';
-import { RdsCheckbox, RdsCheckboxGroupWrapper } from 'rte-design-system-react';
+import { RdsCheckbox, RdsCheckboxGroupWrapper, RdsHeading } from 'rte-design-system-react';
 
 export type CheckBoxData = {
   name: string;
@@ -177,39 +177,42 @@ const LoadTab = () => {
   );
 
   return (
-    <div className="flex h-fit w-full gap-6">
-      <div className="flex max-h-full min-h-fit w-1/5 flex-col gap-2 overflow-y-auto rounded border border-gray-600 p-2">
-        <div className="border-b-2 border-b-gray-600 pb-2">
-          <SearchBar onSearch={() => {}} placeholder={t('studyDetails.@search_area')} />
+    <div className="flex h-fit w-full flex-col gap-4">
+      <RdsHeading title={t('studyDetails.@hypothesis')} size={'m'} />
+      <div className="flex h-fit w-full gap-6">
+        <div className="flex max-h-full min-h-fit w-1/5 flex-col gap-2 overflow-y-auto rounded border border-gray-400 p-2">
+          <div className="border-b border-gray-400 pb-2">
+            <SearchBar onSearch={() => {}} placeholder={t('studyDetails.@search_area')} />
+          </div>
+          <RdsCheckboxGroupWrapper
+            label={''}
+            name={''}
+            onChange={(value: string, status?: boolean) => void handleSelectionChange(value, status)}
+            checkedValues={checkedValues}
+          >
+            {areasOptions?.map((area) => (
+              <RdsCheckbox
+                key={`load-check-${area.name}`}
+                label={area.name}
+                value={area.name}
+                name={''}
+                defaultChecked={area.isDefault}
+                disabled={area.isDefault}
+                checked={area.isDefault}
+              />
+            ))}
+          </RdsCheckboxGroupWrapper>
         </div>
-        <RdsCheckboxGroupWrapper
-          label={''}
-          name={''}
-          onChange={(value: string, status?: boolean) => void handleSelectionChange(value, status)}
-          checkedValues={checkedValues}
-        >
-          {areasOptions?.map((area) => (
-            <RdsCheckbox
-              key={`load-check-${area.name}`}
-              label={area.name}
-              value={area.name}
-              name={''}
-              defaultChecked={area.isDefault}
-              disabled={area.isDefault}
-              checked={area.isDefault}
-            />
-          ))}
-        </RdsCheckboxGroupWrapper>
-      </div>
-      <div className="flex h-fit w-4/5">
-        <StdSimpleTable
-          id="load-table"
-          data={data}
-          columns={columns}
-          enableColumnResizing={false}
-          enableReadOnly={true}
-          state={{ readOnly }}
-        />
+        <div className="flex h-fit w-4/5">
+          <StdSimpleTable
+            id="load-table"
+            data={data}
+            columns={columns}
+            enableColumnResizing={false}
+            enableReadOnly={true}
+            state={{ readOnly }}
+          />
+        </div>
       </div>
     </div>
   );
