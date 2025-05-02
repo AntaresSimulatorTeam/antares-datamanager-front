@@ -94,7 +94,7 @@ const getAreaLinkTableHeaders = (
           />
           <span>or</span>
           <RdsButton
-            label={t('studyDetails.@select_file')}
+            label={t('studyDetails.@import_file')}
             onClick={() => {
               setErrorInfo({ index: row.index, message: '' });
               void handleImport(row.index);
@@ -110,13 +110,13 @@ const getAreaLinkTableHeaders = (
   columnHelper.accessor('status', {
     header: t('home.@status'),
     cell: ({ row }) => {
-      const { status, hypothesis } = row.original;
+      const { status, isDefault } = row.original;
       if (status === TRAJECTORY_SELECTION_STATUS.MISSING)
         return (
           <div className="flex flex-1 items-end gap-1">
             <StdIcon name={StdIconId.QuestionMark} color="text-warning-500" />{' '}
             {t('studyDetails.@import_status_missing')}
-            {tabName === TRAJECTORY_TYPE.LOAD && hypothesis !== 'OTHERS' && (
+            {tabName === TRAJECTORY_TYPE.LOAD && !isDefault && (
               <RdsIconButton icon={RdsIconId.Delete} size="small" onClick={() => removeRow?.(row.index)} />
             )}
           </div>
@@ -125,7 +125,7 @@ const getAreaLinkTableHeaders = (
         return (
           <div className="flex flex-1 items-end gap-1">
             <RdsIcon name={RdsIconId.Done} color="primary-600" /> {t('studyDetails.@import_status_done')}
-            {tabName === TRAJECTORY_TYPE.LOAD && hypothesis !== 'OTHERS' && (
+            {tabName === TRAJECTORY_TYPE.LOAD && !isDefault && (
               <RdsIconButton icon={RdsIconId.Delete} size="small" onClick={() => removeRow?.(row.index)} />
             )}
           </div>
@@ -134,7 +134,7 @@ const getAreaLinkTableHeaders = (
         return (
           <div className="flex flex-1 items-end gap-1">
             <RdsIcon name={RdsIconId.Info} color="error-700" /> {t('studyDetails.@import_status_error')}
-            {tabName === TRAJECTORY_TYPE.LOAD && hypothesis !== 'OTHERS' && (
+            {tabName === TRAJECTORY_TYPE.LOAD && !isDefault && (
               <div className="opacity-0 hover:opacity-100">
                 <RdsIconButton icon={RdsIconId.Delete} size="small" onClick={() => removeRow?.(row.index)} />
               </div>

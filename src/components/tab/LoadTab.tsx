@@ -22,7 +22,7 @@ const LoadTab = () => {
   const studyState = useStudy();
   const location = useLocation();
   const study = (location.state as LocationState)?.study;
-  const [readOnly, _] = useState<ReadOnlyObject>({ '0': false, '1': false });
+  const [readOnly, _] = useState<ReadOnlyObject>({});
   const [data, setData] = useState<AreaAndLinkRowData[]>([]);
   const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
 
@@ -30,12 +30,12 @@ const LoadTab = () => {
     const fetchHypothesis = async () => {
       try {
         const hypothesis = await getDefaultLoadHypothesis();
-        //const trajectories: DbTrajectory[] = await getStudyTrajectories(study.id, TRAJECTORY_TYPE.LOAD);
         setData(
           hypothesis.map((item) => ({
             hypothesis: item.name,
             trajectory: null,
             status: TRAJECTORY_SELECTION_STATUS.MISSING,
+            isDefault: true,
           })),
         );
       } catch {

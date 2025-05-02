@@ -34,6 +34,7 @@ export type AreaAndLinkRowData = {
   hypothesis: string;
   trajectory: WithNullableFields<DbTrajectory, 'type' | 'version' | 'userName' | 'creationDate'> | null;
   status: TRAJECTORY_SELECTION_STATUS;
+  isDefault?: boolean;
 };
 
 export type RowStatus = FileInputStatus | 'warning' | 'emptyError';
