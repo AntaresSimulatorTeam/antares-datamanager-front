@@ -29,7 +29,7 @@ const LoadTab = () => {
   useEffect(() => {
     const fetchHypothesis = async () => {
       try {
-        const hypothesis = await getDefaultLoadHypothesis();
+        const hypothesis = (await getDefaultLoadHypothesis()) as { name: string }[];
         setData(
           hypothesis.map((item) => ({
             hypothesis: item.name,
