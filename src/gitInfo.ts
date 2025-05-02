@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "fix/ANT-2451_special_character",
-  commit: "f852e37",
-  buildTime: "2025-04-22T16:27:05.350Z"
+  branch: "feat/ANT-2958_Display_load_hypothesis_table",
+  commit: "e1233c1",
+  commitTime: "2025-05-02T08:56:35.429Z"
 };

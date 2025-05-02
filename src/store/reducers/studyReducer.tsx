@@ -1,8 +1,11 @@
-import { DbTrajectory, StudyActionType, StudyState } from '@/shared/types';
+import { DbTrajectoryWithState, StudyActionType, StudyState } from '@/shared/types';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 
-const addTrajectories = (prevState: Partial<StudyState>, trajectories: DbTrajectory[]): Partial<StudyState> => {
+const addTrajectories = (
+  prevState: Partial<StudyState>,
+  trajectories: DbTrajectoryWithState[],
+): Partial<StudyState> => {
   const studyState = {};
   trajectories.forEach((trajectory) => Object.assign(studyState, { [`${trajectory?.type}`]: trajectory }));
   return { ...prevState, ...studyState };

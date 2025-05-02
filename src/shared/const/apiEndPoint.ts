@@ -33,3 +33,6 @@ export const TRAJECTORY_DATA_FILE_ENDPOINT = `${BASE_URL}/v1/trajectory/trajecto
 
 //ABOUT
 export const ACTUATOR_ENDPOINT = `${BASE_URL}/actuator/info`;
+
+// HYPOTHESIS
+export const HYPOTHESIS_LOAD_DEFAULT = `${BASE_URL}/v1/default_config/load`;

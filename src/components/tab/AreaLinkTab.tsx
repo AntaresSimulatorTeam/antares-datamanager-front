@@ -21,6 +21,7 @@ import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/traj
 import {
   AreaAndLinkRowData,
   DbTrajectory,
+  LocationState,
   RowStatus,
   SelectOption,
   StudyActionType,
@@ -38,18 +39,17 @@ import { getStatus } from '@/shared/utils/trajectoryUtils.ts';
 import { getStudyById, getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { TrajectoryDataVisualisation } from '@common/modal/TrajectoryDataVisualisation.tsx';
 import { generateTrajectoryViewHeader } from '@/components/header/TrajectoryLinkHeader.tsx';
+import { useLocation } from 'react-router-dom';
 
 export interface ErrorMessageType {
   index: number;
   message: string;
 }
 
-interface AreaLinkTabProps {
-  study: StudyDTO;
-}
-
-const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
+const AreaLinkTab = () => {
   const studyState = useStudy();
+  const location = useLocation();
+  const study = (location.state as LocationState)?.study;
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
   const [rowIndexSelected, setRowIndexSelected] = useState<number>(0);
   const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
@@ -101,7 +101,13 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
           const trajectoryLink = (trajectoryLinkResult as DbTrajectory[])[0] ?? null;
           dispatch?.({
             type: STUDY_ACTION.ADD_TRAJECTORIES,
-            payload: [trajectoryArea, trajectoryLink].filter(Boolean),
+            payload: [
+              trajectoryArea && { ...trajectoryArea, state: TRAJECTORY_SELECTION_STATUS.OK },
+              trajectoryLink && {
+                ...trajectoryLink,
+                state: TRAJECTORY_SELECTION_STATUS.OK,
+              },
+            ].filter(Boolean),
           });
           setData([
             {
@@ -228,7 +234,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
           .then((payload) => {
             dispatch?.({
               type: index === 0 ? STUDY_ACTION.ADD_TRAJECTORY_AREA : STUDY_ACTION.ADD_TRAJECTORY_LINK,
-              payload,
+              payload: { ...payload, state: TRAJECTORY_SELECTION_STATUS.OK },
             } as StudyActionType);
             setData((prev) => {
               prev[index].trajectory = payload as DbTrajectory;
@@ -261,7 +267,7 @@ const AreaLinkTab = ({ study }: AreaLinkTabProps) => {
   };
 
   const handleTrajectorySearch = useCallback(
-    async (index: number, value: string | undefined): Promise<SelectOption[] | undefined> => {
+    async (value?: string, index?: number): Promise<SelectOption[] | undefined> => {
       try {
         const results = await fetchTrajectoriesFromDB(
           index === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,

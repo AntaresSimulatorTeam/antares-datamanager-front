@@ -9,6 +9,7 @@ import { FileInputStatus } from 'rte-design-system-react';
 import { WithNullableFields } from '@/shared/types/Generic.type.ts';
 // @ts-ignore
 import { AccessorKeyColumnDef } from '@tanstack/table-core/src/types.ts';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 export interface FsTrajectory {
   trajectoryName: string;
@@ -33,6 +34,7 @@ export type AreaAndLinkRowData = {
   hypothesis: string;
   trajectory: WithNullableFields<DbTrajectory, 'type' | 'version' | 'userName' | 'creationDate'> | null;
   status: TRAJECTORY_SELECTION_STATUS;
+  isDefault?: boolean;
 };
 
 export type RowStatus = FileInputStatus | 'warning' | 'emptyError';
@@ -97,3 +99,10 @@ export const TrajectoryLinkDataScheme = {
   forcedOutageHvac: 'string',
   hurdleCost: 'number',
 } as const;
+
+export interface HypothesisTab {
+  name: TRAJECTORY_TYPE;
+  label: string;
+  icon: StdIconId;
+  isDisabled: boolean;
+}

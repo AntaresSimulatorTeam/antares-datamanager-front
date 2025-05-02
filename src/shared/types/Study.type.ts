@@ -50,3 +50,7 @@ export type StudyActionType =
   | { type: STUDY_ACTION.SET_STUDY_STATUS; payload: StudyStatus }
   | { type: STUDY_ACTION.CLEAR_LINK_TRAJECTORY }
   | { type: STUDY_ACTION.ADD_TRAJECTORIES; payload: DbTrajectoryWithState[] };
+
+export interface LocationState {
+  study: StudyDTO;
+}
