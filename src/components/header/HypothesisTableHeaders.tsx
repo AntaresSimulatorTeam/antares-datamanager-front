@@ -18,9 +18,14 @@ import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 
 const columnHelper = createColumnHelper<AreaAndLinkRowData>();
 
-const getAreaLinkTableHeaders = (
+const getHypothesisTableHeaders = (
   t: (value: string) => string,
-  handleUpdate: (index: number, status: RowStatus, trajectoryId: number, trajectoryLabel?: string) => Promise<void>,
+  handleUpdate: (
+    trajectoryId: number,
+    status?: RowStatus,
+    trajectoryLabel?: string | null,
+    index?: number,
+  ) => Promise<void>,
   handleImport: (index: number) => Promise<void>,
   handlerSearch: (value?: string, index?: number) => Promise<SelectOption[] | undefined>,
   handleView: (index: number) => Promise<void>,
@@ -70,9 +75,10 @@ const getAreaLinkTableHeaders = (
               onClick={() => {
                 setErrorInfo({ index: row.index, message: '' });
                 void handleUpdate(
-                  row.index,
-                  status === TRAJECTORY_SELECTION_STATUS.ERROR ? 'emptyError' : 'empty',
                   trajectory.id,
+                  status === TRAJECTORY_SELECTION_STATUS.ERROR ? 'emptyError' : 'empty',
+                  null,
+                  row.index,
                 );
               }}
             />
@@ -84,7 +90,7 @@ const getAreaLinkTableHeaders = (
             <SelectAndSearchableInput
               onSelect={(value: SelectOption) => {
                 setErrorInfo({ index: row.index, message: '' });
-                void handleUpdate(row.index, 'success', value.id, value.label);
+                void handleUpdate(value.id, 'success', value.label, row.index);
               }}
               setSearchTerm={async (value?: string) => await handlerSearch(value, row.index)}
               defaultPlaceHolder={
@@ -152,4 +158,4 @@ const getAreaLinkTableHeaders = (
   }),
 ];
 
-export default getAreaLinkTableHeaders;
+export default getHypothesisTableHeaders;

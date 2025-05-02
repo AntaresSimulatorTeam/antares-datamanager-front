@@ -73,28 +73,26 @@ const StudyDetails = () => {
           </div>
         </div>
         <div className="flex-start flex h-full flex-col px-4">{activeContent}</div>
-        <div className="sticky bottom-0 flex w-full flex-col border-t bg-gray-w p-1">
+        <div className="sticky bottom-0 flex w-full items-center justify-end gap-2 border-t bg-gray-w p-1">
           {(!AREA || AREA?.state === TRAJECTORY_SELECTION_STATUS.ERROR) && (
             <div className={'text-error-600'}>{t('studyDetails.@add_trajectories_message')}</div>
           )}
           {AREA && LINK?.state === TRAJECTORY_SELECTION_STATUS.ERROR && (
             <div className={'text-error-600'}>{t('studyDetails.@error_link_trajectory_message')}</div>
           )}
-          <div className="flex w-full justify-end">
-            <ButtonWithStdIcon
-              label={t('studyDetails.@generate')}
-              onClick={() => void handleGenerateStudy()}
-              disabled={
-                !AREA ||
-                AREA?.state === TRAJECTORY_SELECTION_STATUS.ERROR ||
-                LINK?.state === TRAJECTORY_SELECTION_STATUS.ERROR ||
-                studyStatus === StudyStatus.GENERATED
-              }
-              icon={StdIconId.CheckCircle}
-              position="right"
-              isLoading={isGenerating}
-            />
-          </div>
+          <ButtonWithStdIcon
+            label={t('studyDetails.@generate')}
+            onClick={() => void handleGenerateStudy()}
+            disabled={
+              !AREA ||
+              AREA?.state === TRAJECTORY_SELECTION_STATUS.ERROR ||
+              LINK?.state === TRAJECTORY_SELECTION_STATUS.ERROR ||
+              studyStatus === StudyStatus.GENERATED
+            }
+            icon={StdIconId.CheckCircle}
+            position="right"
+            isLoading={isGenerating}
+          />
         </div>
       </div>
     </div>
