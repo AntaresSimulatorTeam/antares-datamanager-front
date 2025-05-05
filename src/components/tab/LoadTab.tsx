@@ -31,12 +31,20 @@ const LoadTab = () => {
       try {
         const hypothesis = (await getDefaultLoadHypothesis()) as { name: string }[];
         setData(
-          hypothesis.map((item) => ({
-            hypothesis: item.name,
-            trajectory: null,
-            status: TRAJECTORY_SELECTION_STATUS.MISSING,
-            isDefault: true,
-          })),
+          hypothesis
+            .map((item) => ({
+              hypothesis: item.name,
+              trajectory: null,
+              status: TRAJECTORY_SELECTION_STATUS.MISSING,
+              isDefault: true,
+            }))
+            .sort((a, b) => {
+              if (a.hypothesis === 'OTHERS' || b.hypothesis === 'OTHERS') {
+                return 1;
+              } else {
+                return a.hypothesis.localeCompare(b.hypothesis, 'en', { ignorePunctuation: true });
+              }
+            }),
         );
       } catch {
         //silent handler
