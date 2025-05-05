@@ -8,6 +8,7 @@ export const mockDbTrajectory: DbTrajectory = {
   version: 6,
   userName: 'mouad',
   creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+  messages: [],
 };
 
 export const mockDbTrajectoryArray = [

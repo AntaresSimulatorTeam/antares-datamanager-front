@@ -9,7 +9,7 @@ import { Location, useLocation } from 'react-router-dom';
 import StudyHeader from './StudyHeader.tsx';
 import { RdsDivider } from 'rte-design-system-react';
 import StudyNavigationMenu from '@/pages/pegase/studies/studyDetails/StudyNavigationMenu';
-import { HypothesisTab, StudyDTO } from '@/shared/types';
+import { DbTrajectoryWithState, HypothesisTab, StudyDTO } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { createStudy } from '@/shared/services/studyService.ts';
@@ -74,10 +74,10 @@ const StudyDetails = () => {
         </div>
         <div className="flex-start flex h-full flex-col px-4">{activeContent}</div>
         <div className="sticky bottom-0 flex w-full items-center justify-end gap-2 border-t bg-gray-w p-1">
-          {(!AREA || AREA?.state === TRAJECTORY_SELECTION_STATUS.ERROR) && (
+          {(!AREA || (AREA as DbTrajectoryWithState)?.state === TRAJECTORY_SELECTION_STATUS.ERROR) && (
             <div className={'text-error-600'}>{t('studyDetails.@add_trajectories_message')}</div>
           )}
-          {AREA && LINK?.state === TRAJECTORY_SELECTION_STATUS.ERROR && (
+          {AREA && (LINK as DbTrajectoryWithState)?.state === TRAJECTORY_SELECTION_STATUS.ERROR && (
             <div className={'text-error-600'}>{t('studyDetails.@error_link_trajectory_message')}</div>
           )}
           <ButtonWithStdIcon
@@ -85,8 +85,8 @@ const StudyDetails = () => {
             onClick={() => void handleGenerateStudy()}
             disabled={
               !AREA ||
-              AREA?.state === TRAJECTORY_SELECTION_STATUS.ERROR ||
-              LINK?.state === TRAJECTORY_SELECTION_STATUS.ERROR ||
+              (AREA as DbTrajectoryWithState)?.state === TRAJECTORY_SELECTION_STATUS.ERROR ||
+              (LINK as DbTrajectoryWithState)?.state === TRAJECTORY_SELECTION_STATUS.ERROR ||
               studyStatus === StudyStatus.GENERATED
             }
             icon={StdIconId.CheckCircle}

@@ -157,6 +157,7 @@ const AreaLinkTab = () => {
         userName: user?.profile?.sub ?? '',
         creationDate: new Date(),
         state: TRAJECTORY_SELECTION_STATUS.ERROR,
+        messages: [],
       };
       //Case: area control failed and a trajectory Links is linked to the study with ok status
       if (index === 0 && data[1]?.trajectory && data[1]?.status != TRAJECTORY_SELECTION_STATUS.ERROR) {

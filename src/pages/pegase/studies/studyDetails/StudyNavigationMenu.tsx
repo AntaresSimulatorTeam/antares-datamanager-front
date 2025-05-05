@@ -16,7 +16,7 @@ import StdIcon from '@common/base/stdIcon/StdIcon';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useTranslation } from 'react-i18next';
 import { useStudy } from '@/store/contexts/StudyContext.tsx';
-import { HypothesisTab } from '@/shared/types';
+import { DbTrajectoryWithState, HypothesisTab } from '@/shared/types';
 
 const StudyNavigationMenu = ({
   onRenderActiveComponent,
@@ -40,7 +40,8 @@ const StudyNavigationMenu = ({
       name: TRAJECTORY_TYPE.LOAD,
       label: t('studyDetails.@load'),
       icon: StdIconId.BatteryChargingFull,
-      isDisabled: studyState[`${TRAJECTORY_TYPE.AREA}`]?.state !== TRAJECTORY_SELECTION_STATUS.OK,
+      isDisabled:
+        (studyState[`${TRAJECTORY_TYPE.AREA}`] as DbTrajectoryWithState)?.state !== TRAJECTORY_SELECTION_STATUS.OK,
     },
     {
       name: TRAJECTORY_TYPE.THERMAL_COST,
@@ -54,7 +55,7 @@ const StudyNavigationMenu = ({
 
   const isTabDisabled = (name: TRAJECTORY_TYPE) => {
     if (name === TRAJECTORY_TYPE.LOAD) {
-      return studyState[`${TRAJECTORY_TYPE.AREA}`]?.state !== TRAJECTORY_SELECTION_STATUS.OK;
+      return (studyState[`${TRAJECTORY_TYPE.AREA}`] as DbTrajectoryWithState)?.state !== TRAJECTORY_SELECTION_STATUS.OK;
     }
     return name !== TRAJECTORY_TYPE.AREA;
   };
@@ -96,18 +97,18 @@ const StudyNavigationMenu = ({
   return (
     <div className="flex space-x-4 p-4">
       {tabs.map((tab) => (
-          <div className="flex items-center space-x-2" key={tab.name}>
-            <StdIcon name={tab.icon} />
-            <RdsTabItem
-              key={tab.name}
-              name={tab.name}
-              label={tab.label}
-              active={!tab.isDisabled && activeTab.name === tab.name}
-              onClick={() => !tab.isDisabled && setActiveTab(tab)}
-              disabled={tab.isDisabled}
-            />
-          </div>
-        ))}
+        <div className="flex items-center space-x-2" key={tab.name}>
+          <StdIcon name={tab.icon} />
+          <RdsTabItem
+            key={tab.name}
+            name={tab.name}
+            label={tab.label}
+            active={!tab.isDisabled && activeTab.name === tab.name}
+            onClick={() => !tab.isDisabled && setActiveTab(tab)}
+            disabled={tab.isDisabled}
+          />
+        </div>
+      ))}
     </div>
   );
 };
