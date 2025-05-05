@@ -7,7 +7,8 @@
 import { User, UserManager } from 'oidc-client-ts';
 import { config } from '@/shared/const/authConfig';
 import { isAuthenticationActive } from '@/shared/utils/authUtils.ts';
-import { getEnvVariables } from '@/envVariables.ts';
+import { getEnvVariables } from '@/envVariables.ts
+import { notifyToast } from '@/shared/notification/notification';
 
 const userManager = new UserManager(config);
 
@@ -71,7 +72,26 @@ export const AuthService = {
         }
       }
     }
-    // Perform the fetch request
-    return await fetch(url, options);
+
+    try {
+      const response = await fetch(url, options);
+
+      if (response.status === 500) {
+        const errorData = (await response.json()) as Error;
+        const errorMessage: string = errorData.message || 'An error occurred';
+        notifyToast({
+          type: 'error',
+          message: errorMessage,
+        });
+      }
+
+      return response;
+    } catch (error) {
+      notifyToast({
+        type: 'error',
+        message: `${(error as Error).message}`,
+      });
+      throw error;
+    }
   },
 };

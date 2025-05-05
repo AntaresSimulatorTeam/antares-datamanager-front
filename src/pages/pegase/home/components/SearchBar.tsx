@@ -15,11 +15,9 @@ interface SearchBarProps {
 const SearchBar = ({ onSearch }: SearchBarProps) => {
   const { t } = useTranslation();
   return (
-    <>
-      <div>
-        <RdsSearchInput onSearch={onSearch} placeHolder={t('home.@searchBar')} variant="outlined" />
-      </div>
-    </>
+    <div>
+      <RdsSearchInput onChange={onSearch} onSearch={onSearch} placeHolder={t('home.@searchBar')} variant="outlined" />
+    </div>
   );
 };
 

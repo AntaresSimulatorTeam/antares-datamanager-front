@@ -1,15 +1,11 @@
 import { ReactNode, Reducer, useReducer } from 'react';
-import { StudyActionType, StudyDTO, StudyState } from '@/shared/types';
+import { LocationState, StudyActionType, StudyState } from '@/shared/types';
 import { studyReducer } from '@/store/reducers/studyReducer.tsx';
 import { StudyContext, StudyDispatchContext } from '@/store/contexts/StudyContext';
 import { useLocation } from 'react-router-dom';
 
 export interface StudyProviderProps {
   children: ReactNode;
-}
-
-interface LocationState {
-  study: StudyDTO;
 }
 
 export const StudyProvider = ({ children }: StudyProviderProps) => {

@@ -1,9 +1,11 @@
-import { DbTrajectory, StudyActionType, StudyState } from '@/shared/types';
+import { DbTrajectoryWithState, StudyActionType, StudyState } from '@/shared/types';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 
-const addTrajectories = (prevState: Partial<StudyState>, trajectories: DbTrajectory[]): Partial<StudyState> => {
+const addTrajectories = (
+  prevState: Partial<StudyState>,
+  trajectories: DbTrajectoryWithState[],
+): Partial<StudyState> => {
   const studyState = {};
   trajectories.forEach((trajectory) => Object.assign(studyState, { [`${trajectory?.type}`]: trajectory }));
   return { ...prevState, ...studyState };
@@ -23,8 +25,10 @@ export const studyReducer = (prevState: Partial<StudyState>, action?: StudyActio
         };
       case STUDY_ACTION.CLEAR_LINK_TRAJECTORY:
         return { ...prevState, [`${TRAJECTORY_TYPE.LINK}`]: null };
+      case STUDY_ACTION.CLEAR_AREA_AND_LINK_TRAJECTORY:
+        return { ...prevState, [`${TRAJECTORY_TYPE.AREA}`]: null, [`${TRAJECTORY_TYPE.LINK}`]: null };
       case STUDY_ACTION.SET_STUDY_STATUS:
-        return { ...prevState, studyStatus: StudyStatus.GENERATED };
+        return { ...prevState, studyStatus: action.payload };
       case STUDY_ACTION.ADD_TRAJECTORIES:
         return { ...addTrajectories(prevState, action.payload) };
       default:

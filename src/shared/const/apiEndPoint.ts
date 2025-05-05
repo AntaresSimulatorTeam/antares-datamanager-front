@@ -29,3 +29,10 @@ export const TRAJECTORY_ENDPOINT = `${BASE_URL}/v1/trajectory`;
 export const TRAJECTORY_FILE_SYSTEM_ENDPOINT = `${BASE_URL}/v1/trajectory/fs`;
 export const TRAJECTORY_DATA_BASE_ENDPOINT = `${BASE_URL}/v1/trajectory/db`;
 export const TRAJECTORY_LINK_TO_STUDY_ENDPOINT = `${BASE_URL}/v1/trajectory/link`;
+export const TRAJECTORY_DATA_FILE_ENDPOINT = `${BASE_URL}/v1/trajectory/trajectoryData`;
+
+//ABOUT
+export const ACTUATOR_ENDPOINT = `${BASE_URL}/actuator/info`;
+
+// HYPOTHESIS
+export const HYPOTHESIS_LOAD_DEFAULT = `${BASE_URL}/v1/default_config/load`;

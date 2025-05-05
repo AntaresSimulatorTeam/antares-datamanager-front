@@ -5,12 +5,14 @@
  */
 
 import {
+  HYPOTHESIS_LOAD_DEFAULT,
   TRAJECTORY_DATA_BASE_ENDPOINT,
+  TRAJECTORY_DATA_FILE_ENDPOINT,
   TRAJECTORY_ENDPOINT,
   TRAJECTORY_FILE_SYSTEM_ENDPOINT,
   TRAJECTORY_LINK_TO_STUDY_ENDPOINT,
 } from '@/shared/const/apiEndPoint.ts';
-import { DbTrajectory, FsTrajectory } from '@/shared/types';
+import { DbTrajectory, FsTrajectory, TRAJECTORY_DATA_TYPE, Types } from '@/shared/types';
 import { AuthService } from '@/shared/services/authService.ts';
 import { fetchWithProgress } from '@/shared/services/progressService.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
@@ -49,7 +51,13 @@ export const fetchTrajectoriesFromFS = async (
   searchTerm?: string | undefined,
   thermalCapacityArea?: string | undefined,
 ): Promise<FsTrajectory[]> => {
-  const urlApi = `${TRAJECTORY_FILE_SYSTEM_ENDPOINT}?trajectoryType=${trajectoryType}&thermalCapacityArea=${thermalCapacityArea ?? ''}&fileNameContains=${searchTerm ?? ''}`;
+  const queryString = new URLSearchParams({
+    trajectoryType: trajectoryType ?? '',
+    thermalCapacityArea: thermalCapacityArea ?? '',
+    fileNameContains: searchTerm ?? '',
+  }).toString();
+
+  const urlApi = `${TRAJECTORY_FILE_SYSTEM_ENDPOINT}?${queryString}`;
   const response = await AuthService.authFetch(urlApi);
   if (!response.ok) {
     throw new Error('Failed to fetch trajectories from file system');
@@ -134,4 +142,35 @@ export const unlinkTrajectoryFromStudy = async (trajectoryId: number, studyId: n
   if (!response.ok) {
     throw new Error(`${(response as unknown as Error).message}`);
   }
+};
+
+/**
+ * Fetch data of trajectory file from its type and id
+ *
+ * @param {TRAJECTORY_TYPE} trajectoryType - Trajectory type
+ * @param {number} trajectoryId - Trajectory id
+ * @return {Promise<Types<TRAJECTORY_DATA_TYPE>[]>}
+ */
+export const getTrajectoryDataByTypeAndId = async (
+  trajectoryType: TRAJECTORY_TYPE,
+  trajectoryId: number,
+): Promise<Types<TRAJECTORY_DATA_TYPE>[]> => {
+  const urlApi = `${TRAJECTORY_DATA_FILE_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryId=${trajectoryId}`;
+  const response = await AuthService.authFetch(urlApi);
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch data trajectory');
+  }
+  return (await response.json()) as Types<TRAJECTORY_DATA_TYPE>[];
+};
+
+/**
+ * Fetch load default hypothesis (LOAD_OTHERS, LOAD_FR...)
+ */
+export const getDefaultLoadHypothesis = async (): Promise<{ name: string }[]> => {
+  const response = await AuthService.authFetch(HYPOTHESIS_LOAD_DEFAULT);
+  if (!response.ok) {
+    throw new Error('Failed to fetch default load hypothesis');
+  }
+  return (await response.json()) as { name: string }[];
 };

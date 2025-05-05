@@ -16,6 +16,9 @@
     },
     "selectAnsSearchInput": {
       "@emptyList": "No result found"
+    },
+    "spinner": {
+      "label": "Loading ..."
     }
   },
   "Pegase": {
@@ -26,7 +29,8 @@
     "@projet": "Project",
     "@logout": "Log out",
     "@parameters": "Parameters",
-    "@antares": "Antares"
+    "@antares": "Antares",
+    "@about": "About"
   },
   "home": {
     "@label": "Home",
@@ -95,7 +99,7 @@
     "@trajectory": "Trajectory",
     "@select_trajectory": "Select a trajectory",
     "@select_link": "Add an area first",
-    "@select_file": "Select a file",
+    "@import_file": "Import",
     "@select_file_fs_error": "Not such files on file system",
     "@import_from_file_system": "Select {{trajectoryType}} from File System",
     "@import": "Import",
@@ -104,6 +108,40 @@
     "@import_status_error": "Error",
     "@preview": "View",
     "@generate": "Generate",
-    "@add_trajectories_message": "Please add Areas trajectories first"
+    "@add_trajectories_message": "Please add Areas trajectories first",
+    "@error_link_trajectory_message": "Please select another LINK trajectory or delete it"
+  },
+  "trajectoryViewModal": {
+    "@title_area": "Areas",
+    "@title_link": "Links",
+    "@areaName": "Name",
+    "@powerToGas": "Power to gas",
+    "@shortTermStorage": "Short term storage",
+    "@name": "Name",
+    "@winterHpDirectMw": "Winter HP Direct MW",
+    "@winterHcDirectMw": "Winter HC Direct MW",
+    "@winterHpIndirectMw": "Winter HP Indirect MW",
+    "@winterHcIndirectMw": "Winter HC Indirect MW",
+    "@summerHpDirectMw": "Summer HP Direct MW",
+    "@summerHcDirectMw": "Summer HC Direct MW",
+    "@summerHpIndirectMw": "Summer HP Indirect MW",
+    "@summerHcIndirectMw": "Summer HC Indirect MW",
+    "@flowbasedPerimeter": "Flowbased perimeter",
+    "@hvdc": "HVDC",
+    "@specificTs": "Specific TS",
+    "@forcedOutageHvac": "Forced Outage HVAC",
+    "@hurdleCost": "Hurdle cost"
+  },
+  "about": {
+    "@title": "About",
+    "@appName": "App Name",
+    "@appDescription": "App Description",
+    "@appVersion": "App Version",
+    "@appBranch": "Branch",
+    "@commitId": "Commit ID",
+    "@commitTime": "Commit Time",
+    "@information": "Information",
+    "@frontend": "Frontend",
+    "@backend": "Backend"
   }
 }

@@ -44,13 +44,22 @@ export const useStudyTableDisplay = ({
   }, []);
 
   useEffect(() => {
-    fetchSearchStudies(searchTerm, projectId, currentPage, intervalSize, sortBy)
-      .then((json) => {
-        const { content, totalElements } = json as PaginatedResponse<StudyDTO>;
+    const fetchStudyList = async () => {
+      try {
+        const { content, totalElements } = (await fetchSearchStudies(
+          searchTerm,
+          projectId,
+          currentPage,
+          intervalSize,
+          sortBy,
+        )) as PaginatedResponse<StudyDTO>;
         setRows(content);
         setCount(totalElements);
-      })
-      .catch((error: unknown) => setErrorValue(error as Error));
+      } catch (error: unknown) {
+        setErrorValue(error as Error);
+      }
+    };
+    void fetchStudyList();
   }, [currentPage, searchTerm, projectId, sortBy, reloadStudies]);
 
   return { rows, count, intervalSize, currentPage, setPage: setCurrentPage, error: errorValue };

@@ -7,7 +7,7 @@
 import { createColumnHelper } from '@tanstack/react-table';
 import { RdsButton, RdsIcon, RdsIconButton, RdsIconId } from 'rte-design-system-react';
 import { AreaAndLinkRowData, RowStatus, SelectOption } from '@/shared/types';
-import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
+import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 import SelectAndSearchableInput from '@/components/input/SelectAndSearchableInput.tsx';
@@ -22,27 +22,35 @@ const getAreaLinkTableHeaders = (
   t: (value: string) => string,
   handleUpdate: (index: number, status: RowStatus, trajectoryId: number, trajectoryLabel?: string) => Promise<void>,
   handleImport: (index: number) => Promise<void>,
-  handlerSearch: (index: number, value: string | undefined) => Promise<SelectOption[] | undefined>,
+  handlerSearch: (value?: string, index?: number) => Promise<SelectOption[] | undefined>,
+  handleView: (index: number) => Promise<void>,
   error: { index: number; message: string },
   setErrorInfo: Dispatch<SetStateAction<ErrorMessageType>>,
   studyStatus: StudyStatus | undefined,
+  tabName?: string,
+  removeRow?: (index: number) => void,
 ) => [
   columnHelper.accessor('hypothesis', {
-    header: t('studyDetails.@hypothesis'),
+    header: tabName === TRAJECTORY_TYPE.LOAD ? t('studyDetails.@area') : t('studyDetails.@hypothesis'),
     cell: ({ getValue, row }) => {
-      const { trajectory } = row.original;
+      const { trajectory, status } = row.original;
       return (
         <div className="inline-flex w-[180px] items-center gap-2">
-          <span className={`${trajectory ? 'text-primary-600' : 'text-gray-900'}`}>{getValue()}</span>
-          {trajectory ? (
+          <span
+            className={`${trajectory && status === TRAJECTORY_SELECTION_STATUS.OK ? 'text-primary-600' : 'text-gray-900'}`}
+          >
+            {getValue()}
+          </span>
+          {trajectory && status === TRAJECTORY_SELECTION_STATUS.OK && (
             <ButtonPreview
               label={'View'}
               icon={StdIconId.Preview}
               position={'left'}
               color={row.getReadOnly() ? 'gray-700' : 'primary-600'}
               borderColor={row.getReadOnly() ? 'gray-700' : 'acc1-600'}
+              onClick={() => void handleView(row.index)}
             />
-          ) : null}
+          )}
         </div>
       );
     },
@@ -57,7 +65,7 @@ const getAreaLinkTableHeaders = (
           <span className={`${textClass}`}>{trajectory.trajectoryName}</span>
           {studyStatus != StudyStatus.GENERATED && (
             <RdsIconButton
-              icon={RdsIconId.Delete}
+              icon={RdsIconId.Close}
               size="small"
               onClick={() => {
                 setErrorInfo({ index: row.index, message: '' });
@@ -75,9 +83,9 @@ const getAreaLinkTableHeaders = (
           <SelectAndSearchableInput
             onSelect={(value: SelectOption) => {
               setErrorInfo({ index: row.index, message: '' });
-              void handleUpdate(row.index, 'success', value.id);
+              void handleUpdate(row.index, 'success', value.id, value.label);
             }}
-            setSearchTerm={async (value: string | undefined) => await handlerSearch(row.index, value)}
+            setSearchTerm={async (value?: string) => await handlerSearch(value, row.index)}
             defaultPlaceHolder={
               row.getReadOnly() ? t('studyDetails.@select_link') : t('studyDetails.@select_trajectory')
             }
@@ -86,7 +94,7 @@ const getAreaLinkTableHeaders = (
           />
           <span>or</span>
           <RdsButton
-            label={t('studyDetails.@select_file')}
+            label={t('studyDetails.@import_file')}
             onClick={() => {
               setErrorInfo({ index: row.index, message: '' });
               void handleImport(row.index);
@@ -102,24 +110,35 @@ const getAreaLinkTableHeaders = (
   columnHelper.accessor('status', {
     header: t('home.@status'),
     cell: ({ row }) => {
-      const { status } = row.original;
+      const { status, isDefault } = row.original;
       if (status === TRAJECTORY_SELECTION_STATUS.MISSING)
         return (
           <div className="flex flex-1 items-end gap-1">
             <StdIcon name={StdIconId.QuestionMark} color="text-warning-500" />{' '}
             {t('studyDetails.@import_status_missing')}
+            {tabName === TRAJECTORY_TYPE.LOAD && !isDefault && (
+              <RdsIconButton icon={RdsIconId.Delete} size="small" onClick={() => removeRow?.(row.index)} />
+            )}
           </div>
         );
       if (status === TRAJECTORY_SELECTION_STATUS.OK)
         return (
           <div className="flex flex-1 items-end gap-1">
             <RdsIcon name={RdsIconId.Done} color="primary-600" /> {t('studyDetails.@import_status_done')}
+            {tabName === TRAJECTORY_TYPE.LOAD && !isDefault && (
+              <RdsIconButton icon={RdsIconId.Delete} size="small" onClick={() => removeRow?.(row.index)} />
+            )}
           </div>
         );
       if (status === TRAJECTORY_SELECTION_STATUS.ERROR)
         return (
           <div className="flex flex-1 items-end gap-1">
             <RdsIcon name={RdsIconId.Info} color="error-700" /> {t('studyDetails.@import_status_error')}
+            {tabName === TRAJECTORY_TYPE.LOAD && !isDefault && (
+              <div className="opacity-0 hover:opacity-100">
+                <RdsIconButton icon={RdsIconId.Delete} size="small" onClick={() => removeRow?.(row.index)} />
+              </div>
+            )}
           </div>
         );
       return null;

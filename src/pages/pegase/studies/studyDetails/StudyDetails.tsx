@@ -9,7 +9,7 @@ import { Location, useLocation } from 'react-router-dom';
 import StudyHeader from './StudyHeader.tsx';
 import { RdsDivider } from 'rte-design-system-react';
 import StudyNavigationMenu from '@/pages/pegase/studies/studyDetails/StudyNavigationMenu';
-import { StudyDTO } from '@/shared/types';
+import { HypothesisTab, StudyDTO } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { createStudy } from '@/shared/services/studyService.ts';
@@ -18,6 +18,7 @@ import { ButtonWithStdIcon } from '@/components/button/ButtonWithStdIcon.tsx';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { DetailsContent } from '@/components/banner/DetailsContent.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
+import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 
 interface StudyState {
   study: StudyDTO;
@@ -27,11 +28,17 @@ const StudyDetails = () => {
   const [activeContent, setActiveContent] = useState<ReactNode>(null);
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const location: Location<StudyState> = useLocation();
+  const { study } = location.state || {};
   const { t } = useTranslation();
-  const { studyStatus, AREA } = useStudy();
+  const { studyStatus, AREA, LINK } = useStudy();
   const dispatch = useStudyDispatch();
   const [isGenerating, setIsGenerating] = useState(false);
-  const { study } = location.state || {};
+  const [activeTab, setActiveTab] = useState<HypothesisTab>({
+    name: TRAJECTORY_TYPE.AREA,
+    label: t('studyDetails.@areas_links'),
+    icon: StdIconId.LinkedServices,
+    isDisabled: false,
+  });
 
   const handleGenerateStudy = async () => {
     try {
@@ -57,7 +64,11 @@ const StudyDetails = () => {
       </div>
       <div className="flex gap-4 px-3 py-2">
         <div className="flex h-10 items-end self-stretch">
-          <StudyNavigationMenu onRenderActiveComponent={setActiveContent} study={study} />
+          <StudyNavigationMenu
+            onRenderActiveComponent={setActiveContent}
+            setActiveTab={setActiveTab}
+            activeTab={activeTab}
+          />
         </div>
       </div>
       <div className="flex h-full flex-col justify-between space-x-4 p-4">
@@ -65,11 +76,21 @@ const StudyDetails = () => {
         <div className="flex flex-col gap-2">
           <RdsDivider />
           <div className="flex items-center gap-2 self-end">
-            {!AREA && <div className={'text-error-600'}>{t('studyDetails.@add_trajectories_message')}</div>}
+            {(!AREA || AREA?.state === TRAJECTORY_SELECTION_STATUS.ERROR) && (
+              <div className={'text-error-600'}>{t('studyDetails.@add_trajectories_message')}</div>
+            )}
+            {AREA && LINK?.state === TRAJECTORY_SELECTION_STATUS.ERROR && (
+              <div className={'text-error-600'}>{t('studyDetails.@error_link_trajectory_message')}</div>
+            )}
             <ButtonWithStdIcon
               label={t('studyDetails.@generate')}
               onClick={() => void handleGenerateStudy()}
-              disabled={!AREA || studyStatus === StudyStatus.GENERATED}
+              disabled={
+                !AREA ||
+                AREA?.state === TRAJECTORY_SELECTION_STATUS.ERROR ||
+                LINK?.state === TRAJECTORY_SELECTION_STATUS.ERROR ||
+                studyStatus === StudyStatus.GENERATED
+              }
               icon={StdIconId.CheckCircle}
               position="right"
               isLoading={isGenerating}

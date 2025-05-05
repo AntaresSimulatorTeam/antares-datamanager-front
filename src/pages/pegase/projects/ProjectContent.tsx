@@ -24,17 +24,17 @@ const ProjectContent = () => {
   const { t } = useTranslation();
   const intervalSize = 9;
   const { user } = useUser();
-  const [searchTerm, setSearchTerm] = useState<string | undefined>('');
+  const [searchTerm, setSearchTerm] = useState<string | undefined>();
   const [activeChip, setActiveChip] = useState<boolean | null>(false);
   const [current, setCurrent] = useState(0);
-  const { count } = useFetchProjectList(searchTerm, current, intervalSize);
+  const { count, refetch } = useFetchProjectList(current, intervalSize, searchTerm);
   const { navigateToProject } = useProjectNavigation();
   const { handlePinProject } = useHandlePinnedProjectList();
   const { projects } = useProject();
   const { deleteProject } = useDeleteProject();
 
   const searchProject = (value?: string | undefined) => {
-    value && setSearchTerm(value);
+    setSearchTerm(value);
   };
 
   const handleChipClick = () => {
@@ -44,6 +44,15 @@ const ProjectContent = () => {
     } else {
       setActiveChip(true);
       setSearchTerm(user?.profile.sub);
+    }
+  };
+
+  const handleDeleteProject = async (projectId: string) => {
+    await deleteProject(projectId);
+    try {
+      await refetch(current, intervalSize, searchTerm ?? '');
+    } catch (error) {
+      // silent handler
     }
   };
 
@@ -68,7 +77,7 @@ const ProjectContent = () => {
           const dropdownItems = [
             pinOption(false, () => void handlePinProject(project.id)),
             settingOption(() => {}, t('project.@setting')),
-            deleteOption(() => void deleteProject(project.id), t('project.@delete'), project.studies?.length > 0),
+            deleteOption(() => void handleDeleteProject(project.id), t('project.@delete'), project.studies?.length > 0),
           ];
           return (
             <PegaseCard
