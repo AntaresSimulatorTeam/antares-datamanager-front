@@ -34,6 +34,8 @@ import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import getLoadHypothesisTableHeaders from '@/components/header/LoadHypothesisTableHeader.tsx';
+import { sortKeepLastName } from '@/shared/utils/sortUtils.tsx';
+import { buildRowData, filterTrajectory } from '@/shared/utils/trajectoryUtils.ts';
 
 export type CheckBoxData = {
   name: string;
@@ -91,49 +93,30 @@ const LoadTab = () => {
         }
 
         const trajectoryLinked = (await getStudyTrajectories(study?.id, TRAJECTORY_TYPE.LOAD)) as DbTrajectory[];
-        const trajectorySelected = (studyState[TRAJECTORY_TYPE.LOAD] as DbTrajectoryWithState[]) ?? null;
-        const trajectoryLoad = trajectorySelected?.length
-          ? trajectoryLinked.concat(trajectorySelected)
-          : trajectoryLinked;
-        console.log('================== trajectoryLoad', trajectoryLoad);
 
-        const areaDataDefault: AreaAndLinkRowData[] = areaDefault?.map((area) => ({
-          hypothesis: area.name,
-          trajectory: trajectoryLoad?.find((trajectory) => trajectory.loadArea === area.name) ?? null,
-          status: TRAJECTORY_SELECTION_STATUS.MISSING,
-          isDefault: true,
-        }));
+        const areaDataDefault: AreaAndLinkRowData[] = areaDefault?.map((area) => {
+          const trajectoryArea = trajectoryLinked?.find((trajectory) => trajectory.loadArea === area.name);
+          return buildRowData(area.name, true, trajectoryArea);
+        });
 
-        const areaData = trajectoryLoad
-          .map((trajectory) => {
-            if (!areaDefault.some((item) => item.name === trajectory.loadArea)) {
-              console.log('============= trajectory', trajectory);
-              return {
-                hypothesis: trajectory.loadArea ?? '',
-                trajectory: trajectory ?? null,
-                status: trajectory ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
-                isDefault: false,
-              };
+        const emptyAreaSelected = (studyState[TRAJECTORY_TYPE.LOAD] as DbTrajectoryWithState[]) ?? [];
+        const areaData = trajectoryLinked
+          .concat(emptyAreaSelected)
+          .map((trajectory: DbTrajectory) => {
+            if (!areaDefault.some((item: CheckBoxData) => item.name === trajectory.loadArea)) {
+              return buildRowData(trajectory.loadArea as string, false, trajectory);
             }
           })
           .filter(Boolean) as AreaAndLinkRowData[];
-        console.log('================ areaData', areaData);
 
         if (areaData.length > 0) {
-          setData(
-            areaDataDefault.concat(areaData).sort((a, b) => {
-              if (a.hypothesis === 'OTHERS' || b.hypothesis === 'OTHERS') {
-                return 1;
-              } else {
-                return a.hypothesis.localeCompare(b.hypothesis, 'en', { ignorePunctuation: true });
-              }
-            }),
-          );
+          setData(sortKeepLastName(areaDataDefault.concat(areaData), 'OTHERS'));
         } else {
           setData(areaDataDefault);
         }
 
         if (areaDefault.length > 1) {
+          const trajectoryLoad = filterTrajectory(trajectoryLinked.concat(emptyAreaSelected));
           const defaultCheckList: string[] = areaDefault.map((item) => item.name);
           const checkList = trajectoryLoad
             .map((trajectory) => {
@@ -154,6 +137,10 @@ const LoadTab = () => {
     try {
       if (status === 'empty') {
         await unlinkTrajectoryFromStudy(trajectoryId, study.id);
+        dispatch?.({
+          type: STUDY_ACTION.DELETE_LOAD_TRAJECTORY,
+          payload: trajectoryId,
+        });
         setData((prev) => {
           prev[rowIndex].trajectory = null;
           prev[rowIndex].status = TRAJECTORY_SELECTION_STATUS.MISSING;
@@ -211,13 +198,15 @@ const LoadTab = () => {
     dispatch?.({
       type: STUDY_ACTION.ADD_TRAJECTORY_LOAD,
       payload: {
-        id: 2,
+        id: Math.random(),
         trajectoryName: '',
         type: TRAJECTORY_TYPE.LOAD,
         version: 0,
         userName: 'user',
         creationDate: new Date(),
         loadArea: name,
+        state: TRAJECTORY_SELECTION_STATUS.MISSING,
+        messages: [],
       },
     });
     const newData = [
@@ -228,13 +217,8 @@ const LoadTab = () => {
         isDefault: false,
       },
       ...data,
-    ].sort((a, b) => {
-      if (a.hypothesis === 'OTHERS' || b.hypothesis === 'OTHERS') {
-        return 1;
-      } else {
-        return a.hypothesis.localeCompare(b.hypothesis, 'en', { ignorePunctuation: true });
-      }
-    });
+    ];
+    setData(sortKeepLastName(newData, 'OTHERS'));
     setData(newData);
     const readOnlyIndex = newData.findIndex((line) => line.hypothesis === readOnlyArea);
     setReadOnly({ [`${readOnlyIndex}`]: true });

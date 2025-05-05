@@ -48,7 +48,7 @@ const getLoadHypothesisTableHeaders = (
     cell: ({ row, table: { options } }) => {
       const { trajectory, status } = row.original;
 
-      return trajectory && status !== TRAJECTORY_SELECTION_STATUS.MISSING ? (
+      return trajectory?.trajectoryName && status !== TRAJECTORY_SELECTION_STATUS.MISSING ? (
         <div className="flex w-3/5 items-center space-x-2">
           <LabelWithDeleteButton
             label={trajectory.trajectoryName}

@@ -46,9 +46,10 @@ export type StudyActionType =
       payload: DbTrajectoryWithState;
     }
   | { type: STUDY_ACTION.CLEAR_AREA_TRAJECTORY }
+  | { type: STUDY_ACTION.CLEAR_LINK_TRAJECTORY }
+  | { type: STUDY_ACTION.DELETE_LOAD_TRAJECTORY; payload: number }
   | { type: STUDY_ACTION.CLEAR_AREA_AND_LINK_TRAJECTORY }
   | { type: STUDY_ACTION.SET_STUDY_STATUS; payload: StudyStatus }
-  | { type: STUDY_ACTION.CLEAR_LINK_TRAJECTORY }
   | { type: STUDY_ACTION.ADD_TRAJECTORIES; payload: DbTrajectoryWithState[] };
 
 export interface LocationState {

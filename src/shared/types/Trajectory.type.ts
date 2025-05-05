@@ -23,6 +23,7 @@ export interface DbTrajectory {
   version: number;
   userName: string;
   creationDate: Date;
+  messages: [];
   loadArea?: string;
 }
 
