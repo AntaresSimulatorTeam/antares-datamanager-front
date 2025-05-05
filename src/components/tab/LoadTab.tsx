@@ -16,7 +16,6 @@ import {
   TrajectoryAreaData,
 } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import getHypothesisTableHeaders from '@/components/header/HypothesisTableHeaders.tsx';
 import { useTranslation } from 'react-i18next';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { ErrorMessageType } from '@/components/tab/AreaLinkTab.tsx';
@@ -33,6 +32,8 @@ import SearchBar from '@/pages/pegase/home/components/SearchBar.tsx';
 import { RdsCheckbox, RdsCheckboxGroupWrapper, RdsHeading } from 'rte-design-system-react';
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
+import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
+import getLoadHypothesisTableHeaders from '@/components/header/LoadHypothesisTableHeader.tsx';
 
 export type CheckBoxData = {
   name: string;
@@ -44,12 +45,13 @@ const LoadTab = () => {
   const studyState = useStudy();
   const location = useLocation();
   const study = (location.state as LocationState)?.study;
-  const [readOnly, _] = useState<ReadOnlyObject>({});
+  const dispatch = useStudyDispatch();
+  const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
+  const [readOnlyArea, setReadOnlyArea] = useState<string | null>(null);
   const [data, setData] = useState<AreaAndLinkRowData[]>([]);
   const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
-  const dispatch = useStudyDispatch();
 
   useEffect(() => {
     const fetchHypothesis = async () => {
@@ -64,27 +66,36 @@ const LoadTab = () => {
             : null;
         let newArea: CheckBoxData[];
         if (trajectoryAreaId != null) {
-          const areas = (await getTrajectoryDataByTypeAndId(
+          const trajectoryAreas = (await getTrajectoryDataByTypeAndId(
             TRAJECTORY_TYPE.AREA,
             trajectoryAreaId,
           )) as unknown as TrajectoryAreaData[];
-          if (areas.length > 0) {
-            newArea = areas
-              .map((area) => {
-                if (!areaDefault?.some((item) => item.name === area.areaName)) {
-                  return { name: area.areaName, isDefault: false };
+          if (trajectoryAreas.length > 0) {
+            let readOnlyIndex = 0;
+            newArea = trajectoryAreas
+              .map((trajectoryArea) => {
+                readOnlyIndex = areaDefault?.findIndex((item) => item.name === trajectoryArea.areaName);
+                if (readOnlyIndex < 0) {
+                  return { name: trajectoryArea.areaName, isDefault: false };
                 }
               })
               .filter(Boolean) as CheckBoxData[];
+            if (readOnlyIndex >= 0) {
+              setReadOnly({ [`${readOnlyIndex}`]: true });
+              setReadOnlyArea(areaDefault[readOnlyIndex].name);
+            }
             setAreasOptions(areaDefault?.concat(newArea));
           } else {
             setAreasOptions(areaDefault);
           }
         }
 
-        const studyTrajectory = (await getStudyTrajectories(study?.id, TRAJECTORY_TYPE.LOAD)) as DbTrajectory[];
-        const loadTrajectory = (studyState[TRAJECTORY_TYPE.LOAD] as DbTrajectoryWithState[]) ?? null;
-        const trajectoryLoad = loadTrajectory?.length ? studyTrajectory.concat(loadTrajectory) : studyTrajectory;
+        const trajectoryLinked = (await getStudyTrajectories(study?.id, TRAJECTORY_TYPE.LOAD)) as DbTrajectory[];
+        const trajectorySelected = (studyState[TRAJECTORY_TYPE.LOAD] as DbTrajectoryWithState[]) ?? null;
+        const trajectoryLoad = trajectorySelected?.length
+          ? trajectoryLinked.concat(trajectorySelected)
+          : trajectoryLinked;
+        console.log('================== trajectoryLoad', trajectoryLoad);
 
         const areaDataDefault: AreaAndLinkRowData[] = areaDefault?.map((area) => ({
           hypothesis: area.name,
@@ -96,6 +107,7 @@ const LoadTab = () => {
         const areaData = trajectoryLoad
           .map((trajectory) => {
             if (!areaDefault.some((item) => item.name === trajectory.loadArea)) {
+              console.log('============= trajectory', trajectory);
               return {
                 hypothesis: trajectory.loadArea ?? '',
                 trajectory: trajectory ?? null,
@@ -105,8 +117,21 @@ const LoadTab = () => {
             }
           })
           .filter(Boolean) as AreaAndLinkRowData[];
+        console.log('================ areaData', areaData);
 
-        setData(areaDataDefault.concat(areaData));
+        if (areaData.length > 0) {
+          setData(
+            areaDataDefault.concat(areaData).sort((a, b) => {
+              if (a.hypothesis === 'OTHERS' || b.hypothesis === 'OTHERS') {
+                return 1;
+              } else {
+                return a.hypothesis.localeCompare(b.hypothesis, 'en', { ignorePunctuation: true });
+              }
+            }),
+          );
+        } else {
+          setData(areaDataDefault);
+        }
 
         if (areaDefault.length > 1) {
           const defaultCheckList: string[] = areaDefault.map((item) => item.name);
@@ -125,31 +150,31 @@ const LoadTab = () => {
     void fetchHypothesis();
   }, []);
 
-  const handleTrajectoryUpdate = async (trajectoryId: number, status?: RowStatus) => {
+  const handleTrajectoryUpdate = async (rowIndex: number, trajectoryId: number, status?: RowStatus) => {
     try {
       if (status === 'empty') {
         await unlinkTrajectoryFromStudy(trajectoryId, study.id);
         setData((prev) => {
-          const index = prev.findIndex((item) => item?.trajectory?.id === trajectoryId);
-          if (index >= 0) {
-            prev[index].trajectory = null;
-            prev[index].status = TRAJECTORY_SELECTION_STATUS.MISSING;
-          }
-          return prev;
+          prev[rowIndex].trajectory = null;
+          prev[rowIndex].status = TRAJECTORY_SELECTION_STATUS.MISSING;
+          return [...prev];
         });
       } else if (status === 'success') {
-        const newTrajectory = (await linkTrajectoryToStudy(
-          TRAJECTORY_TYPE.LOAD,
-          trajectoryId,
-          study.id,
-        )) as DbTrajectory;
+        const newTrajectory = await linkTrajectoryToStudy(TRAJECTORY_TYPE.LOAD, trajectoryId, study.id);
+        const newTrajectoryWithState = {
+          ...newTrajectory,
+          state: TRAJECTORY_SELECTION_STATUS.OK,
+        } as DbTrajectoryWithState;
+        dispatch?.({
+          type: STUDY_ACTION.ADD_TRAJECTORY_LOAD,
+          payload: newTrajectoryWithState,
+        });
         setData((prev) => {
-          const index = prev.findIndex((item) => item.hypothesis === newTrajectory.loadArea);
-          if (index >= 0) {
-            prev[index].trajectory = newTrajectory;
-            prev[index].status = TRAJECTORY_SELECTION_STATUS.OK;
+          if (newTrajectory) {
+            prev[rowIndex].trajectory = newTrajectoryWithState;
+            prev[rowIndex].status = TRAJECTORY_SELECTION_STATUS.OK;
           }
-          return prev;
+          return [...prev];
         });
       }
     } catch {
@@ -172,13 +197,13 @@ const LoadTab = () => {
     [study.horizon],
   );
 
-  const removeRow = async (indexRow: number, areaName?: string) => {
+  const removeRow = async (indexRow: number, value?: string) => {
     if (data[indexRow]?.trajectory && data[indexRow]?.status === TRAJECTORY_SELECTION_STATUS.OK) {
       await unlinkTrajectoryFromStudy(data[indexRow].trajectory.id, study.id);
     }
     setData((prev) => prev.filter((_row: AreaAndLinkRowData, index: number) => index !== indexRow));
-    if (areaName) {
-      setCheckedValues((prev) => [...prev.filter((name) => name !== areaName)]);
+    if (value) {
+      setCheckedValues((prev) => [...prev.filter((name) => name !== value)]);
     }
   };
 
@@ -195,23 +220,24 @@ const LoadTab = () => {
         loadArea: name,
       },
     });
-    setData((prev) =>
-      [
-        {
-          hypothesis: name,
-          trajectory: null,
-          status: TRAJECTORY_SELECTION_STATUS.MISSING,
-          isDefault: false,
-        },
-        ...prev,
-      ].sort((a, b) => {
-        if (a.hypothesis === 'OTHERS' || b.hypothesis === 'OTHERS') {
-          return 1;
-        } else {
-          return a.hypothesis.localeCompare(b.hypothesis, 'en', { ignorePunctuation: true });
-        }
-      }),
-    );
+    const newData = [
+      {
+        hypothesis: name,
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+        isDefault: false,
+      },
+      ...data,
+    ].sort((a, b) => {
+      if (a.hypothesis === 'OTHERS' || b.hypothesis === 'OTHERS') {
+        return 1;
+      } else {
+        return a.hypothesis.localeCompare(b.hypothesis, 'en', { ignorePunctuation: true });
+      }
+    });
+    setData(newData);
+    const readOnlyIndex = newData.findIndex((line) => line.hypothesis === readOnlyArea);
+    setReadOnly({ [`${readOnlyIndex}`]: true });
   };
 
   const handleSelectionChange = async (name: string, isChecked?: boolean) => {
@@ -234,17 +260,14 @@ const LoadTab = () => {
 
   const columns = useMemo(
     () =>
-      getHypothesisTableHeaders(
+      getLoadHypothesisTableHeaders(
         t,
-        handleTrajectoryUpdate,
         handleFetchTrajectoriesFS,
         handleTrajectorySearch,
         handleViewTrajectory,
         errorInfo,
         setErrorInfo,
         studyState?.studyStatus,
-        TRAJECTORY_TYPE.LOAD,
-        removeRow,
       ),
     [data, studyState?.studyStatus, errorInfo],
   );
@@ -277,7 +300,20 @@ const LoadTab = () => {
           </RdsCheckboxGroupWrapper>
         </div>
         <div className="flex h-fit w-4/5">
-          <StdSimpleTable id="load-table" data={data} columns={columns} enableColumnResizing={false} />
+          <StdSimpleTable
+            id="load-table"
+            data={data}
+            columns={columns}
+            enableColumnResizing={false}
+            enableReadOnly={true}
+            state={{ readOnly }}
+            updateData={(rowIndex: number, value: unknown, status?: RowStatus) => {
+              void handleTrajectoryUpdate(rowIndex, value as number, status);
+            }}
+            removeRow={(rowIndex: number, value: unknown) => {
+              void removeRow(rowIndex, value as string);
+            }}
+          />
         </div>
       </div>
     </div>

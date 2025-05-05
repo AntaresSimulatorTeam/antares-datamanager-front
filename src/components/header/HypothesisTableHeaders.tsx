@@ -65,7 +65,7 @@ const getHypothesisTableHeaders = (
     cell: ({ row }) => {
       const { trajectory, status } = row.original;
       const textClass = studyStatus === StudyStatus.GENERATED ? 'text-primary-600' : 'text-gray-900';
-      return trajectory ? (
+      return trajectory && status !== TRAJECTORY_SELECTION_STATUS.MISSING ? (
         <div className="flex w-2/5 space-x-2 py-3">
           <span className={`${textClass}`}>{trajectory.trajectoryName}</span>
           {studyStatus != StudyStatus.GENERATED && (
@@ -94,7 +94,9 @@ const getHypothesisTableHeaders = (
               }}
               setSearchTerm={async (value?: string) => await handlerSearch(value, row.index)}
               defaultPlaceHolder={
-                row.getReadOnly() ? t('studyDetails.@select_link') : t('studyDetails.@select_trajectory')
+                row.getReadOnly() && tabName === TRAJECTORY_TYPE.AREA
+                  ? t('studyDetails.@select_link')
+                  : t('studyDetails.@select_trajectory')
               }
               isSearchable={true}
               isInputDisabled={row.getReadOnly()}
@@ -125,7 +127,11 @@ const getHypothesisTableHeaders = (
             <StdIcon name={StdIconId.QuestionMark} color="text-warning-500" />{' '}
             {t('studyDetails.@import_status_missing')}
             {tabName === TRAJECTORY_TYPE.LOAD && !isDefault && (
-              <RdsIconButton icon={RdsIconId.Delete} size="small" onClick={() => void removeRow?.(row.index, hypothesis)} />
+              <RdsIconButton
+                icon={RdsIconId.Delete}
+                size="small"
+                onClick={() => void removeRow?.(row.index, hypothesis)}
+              />
             )}
           </div>
         );
@@ -134,7 +140,11 @@ const getHypothesisTableHeaders = (
           <div className="flex flex-1 items-center gap-1">
             <RdsIcon name={RdsIconId.Done} color="primary-600" /> {t('studyDetails.@import_status_done')}
             {tabName === TRAJECTORY_TYPE.LOAD && !isDefault && (
-              <RdsIconButton icon={RdsIconId.Delete} size="small" onClick={() => void removeRow?.(row.index, hypothesis)} />
+              <RdsIconButton
+                icon={RdsIconId.Delete}
+                size="small"
+                onClick={() => void removeRow?.(row.index, hypothesis)}
+              />
             )}
           </div>
         );

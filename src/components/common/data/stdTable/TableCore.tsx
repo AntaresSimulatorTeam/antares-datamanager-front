@@ -4,10 +4,18 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { Cell, flexRender, Header, Row, Table } from '@tanstack/react-table';
+import { Cell, flexRender, Header, Row, RowData, Table } from '@tanstack/react-table';
 import { clsx } from 'clsx';
 import { tableCoreRowClassBuilder } from './tableCoreRowClassBuilder';
 import { useRdsId } from 'rte-design-system-react';
+import { RowStatus } from '@/shared/types';
+
+declare module '@tanstack/react-table' {
+  interface TableMeta<TData extends RowData> {
+    updateData?: (rowIndex: number, value: unknown, status: RowStatus) => void;
+    removeRow?: (rowIndex: number, value: unknown) => void;
+  }
+}
 
 export type ColumnSizeType = 'pixels' | 'meta';
 export type ColumnResizeMode = 'onChange' | 'onEnd';
