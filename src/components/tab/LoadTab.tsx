@@ -36,6 +36,7 @@ import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import getLoadHypothesisTableHeaders from '@/components/header/LoadHypothesisTableHeader.tsx';
 import { sortKeepLastName } from '@/shared/utils/sortUtils.tsx';
 import { buildRowData, filterTrajectory } from '@/shared/utils/trajectoryUtils.ts';
+import { AREA_OTHERS } from '@/shared/const/studyConfig.ts';
 
 export type CheckBoxData = {
   name: string;
@@ -73,7 +74,7 @@ const LoadTab = () => {
             trajectoryAreaId,
           )) as unknown as TrajectoryAreaData[];
           if (trajectoryAreas.length > 0) {
-            let readOnlyIndex = 0;
+            let readOnlyIndex = -1;
             newArea = trajectoryAreas
               .map((trajectoryArea) => {
                 readOnlyIndex = areaDefault?.findIndex((item) => item.name === trajectoryArea.areaName);
@@ -94,6 +95,11 @@ const LoadTab = () => {
 
         const trajectoryLinked = (await getStudyTrajectories(study?.id, TRAJECTORY_TYPE.LOAD)) as DbTrajectory[];
 
+        areaDefault.push({
+          name: AREA_OTHERS,
+          isDefault: true,
+        });
+
         const areaDataDefault: AreaAndLinkRowData[] = areaDefault?.map((area) => {
           const trajectoryArea = trajectoryLinked?.find((trajectory) => trajectory.loadArea === area.name);
           return buildRowData(area.name, true, trajectoryArea);
@@ -110,7 +116,7 @@ const LoadTab = () => {
           .filter(Boolean) as AreaAndLinkRowData[];
 
         if (areaData.length > 0) {
-          setData(sortKeepLastName(areaDataDefault.concat(areaData), 'OTHERS'));
+          setData(sortKeepLastName(areaDataDefault.concat(areaData), AREA_OTHERS));
         } else {
           setData(areaDataDefault);
         }
@@ -260,7 +266,7 @@ const LoadTab = () => {
     <div className="flex h-fit w-full flex-col gap-4">
       <RdsHeading title={t('studyDetails.@hypothesis')} size={'m'} />
       <div className="flex h-fit w-full gap-6">
-        <div className="flex max-h-full min-h-fit w-1/5 flex-col gap-2 overflow-y-auto rounded border border-gray-400 p-2">
+        <div className="flex max-h-full min-h-fit w-28 flex-col gap-2 overflow-y-auto rounded border border-gray-400 p-2">
           <div className="border-b border-gray-400 pb-2">
             <SearchBar onSearch={() => {}} placeholder={t('studyDetails.@search_area')} />
           </div>
@@ -283,7 +289,7 @@ const LoadTab = () => {
             ))}
           </RdsCheckboxGroupWrapper>
         </div>
-        <div className="flex h-fit w-4/5">
+        <div className="flex h-fit w-full">
           <StdSimpleTable
             id="load-table"
             data={data}

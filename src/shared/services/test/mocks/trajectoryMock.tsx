@@ -19,6 +19,7 @@ export const mockDbTrajectoryArray = [
     version: 3,
     userName: 'mouad',
     creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+    messages: [],
   },
   {
     id: 2,
@@ -27,6 +28,7 @@ export const mockDbTrajectoryArray = [
     version: 3,
     userName: 'mouad',
     creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+    messages: [],
   },
 ];
 
