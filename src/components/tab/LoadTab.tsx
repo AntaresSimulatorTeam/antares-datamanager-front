@@ -88,9 +88,9 @@ const LoadTab = () => {
               .map((trajectoryArea) => {
                 // Find default area not included in areas trajectory list
                 defaultAreaNotIncludedInList = areaDefault?.find((item) => item.name !== trajectoryArea.areaName);
-                if (!defaultAreaNotIncludedInList) {
+                if (!areaDefault?.some((item) => item.name === trajectoryArea.areaName)) {
                   return { name: trajectoryArea.areaName, isDefault: false };
-                } else {
+                } else if (defaultAreaNotIncludedInList) {
                   defaultAreaListNotIncludedInList.push(defaultAreaNotIncludedInList.name);
                 }
               })
