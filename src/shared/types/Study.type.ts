@@ -29,7 +29,7 @@ export interface PaginatedResponse<T> {
 export type StudyState = {
   [key in keyof typeof TRAJECTORY_TYPE]?: DbTrajectoryWithState | DbTrajectoryWithState[] | null;
 } & {
-  studyStatus: StudyStatus;
+  studyStatus?: StudyStatus;
 };
 
 export type StudyActionType =
