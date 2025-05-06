@@ -69,6 +69,7 @@ const LoadTab = () => {
             : null;
 
         let newArea: CheckBoxData[];
+        let defaultAreaNotIncludedInList: CheckBoxData | undefined;
         if (trajectoryAreaId != null) {
           const trajectoryAreas = (await getTrajectoryDataByTypeAndId(
             TRAJECTORY_TYPE.AREA,
@@ -77,19 +78,14 @@ const LoadTab = () => {
 
           // Build dropdown list options
           if (trajectoryAreas.length > 0) {
-            let readOnlyIndex = -1;
             newArea = trajectoryAreas
               .map((trajectoryArea) => {
-                readOnlyIndex = areaDefault?.findIndex((item) => item.name === trajectoryArea.areaName);
-                if (readOnlyIndex < 0) {
+                defaultAreaNotIncludedInList = areaDefault?.find((item) => item.name !== trajectoryArea.areaName);
+                if (defaultAreaNotIncludedInList) {
                   return { name: trajectoryArea.areaName, isDefault: false };
                 }
               })
               .filter(Boolean) as CheckBoxData[];
-            if (readOnlyIndex >= 0) {
-              setReadOnly({ [`${readOnlyIndex}`]: true });
-              setReadOnlyArea(areaDefault[readOnlyIndex].name);
-            }
             setAreasOptions(areaDefault?.concat(newArea));
           } else {
             setAreasOptions(areaDefault);
@@ -119,7 +115,17 @@ const LoadTab = () => {
           .filter(Boolean) as AreaAndLinkRowData[];
 
         if (areaData.length > 0) {
-          setData(sortKeepLastName(areaDataDefault.concat(areaData), AREA_OTHERS));
+          const dataTrajectories = areaDataDefault.concat(areaData);
+          const dataSorted = sortKeepLastName(dataTrajectories, AREA_OTHERS);
+          setData(dataSorted);
+          if (defaultAreaNotIncludedInList) {
+            // When a default area is not included in area options list, its row should have a read only state
+            const readOnlyIndex = dataSorted.findIndex(
+              (dataTrajectory) => dataTrajectory.hypothesis === defaultAreaNotIncludedInList?.name,
+            );
+            setReadOnly({ [`${readOnlyIndex}`]: true });
+            setReadOnlyArea(areaDefault[readOnlyIndex].name);
+          }
         } else {
           setData(areaDataDefault);
         }
@@ -272,7 +278,7 @@ const LoadTab = () => {
 
   return (
     <div className="flex h-fit w-full flex-col gap-4">
-      <div className="flex h-fit w-full gap-6">
+      <div className="flex h-screen w-full gap-6">
         <div className="flex h-fit w-28 flex-col gap-2 rounded border border-gray-400 p-2">
           <div className="border-b border-gray-400 pb-2">
             <SearchBar onSearch={() => {}} placeholder={t('studyDetails.@search_area')} />
