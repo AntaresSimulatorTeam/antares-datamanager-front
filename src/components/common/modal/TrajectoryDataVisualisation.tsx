@@ -26,7 +26,7 @@ export const TrajectoryDataVisualisation = ({ trajectoryData, onClose }: Traject
         {`${title}: ${trajectory.trajectoryName}`}
       </RdsModal.Title>
       <RdsModal.Content>
-        <div className="overflow-x-auto overflow-y-auto xl:max-h-[500px] xl:max-w-[1070px]">
+        <div className="overflow-auto xl:max-h-[500px] xl:max-w-[1070px]">
           <StdSimpleTable id="trajectory-data" data={data} columns={columns} enableColumnResizing={false} />
         </div>
       </RdsModal.Content>

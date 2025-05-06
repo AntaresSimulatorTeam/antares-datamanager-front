@@ -29,7 +29,7 @@ import {
 } from '@/shared/services/trajectoryService.ts';
 import { convertToSelectionOptionType } from '@/shared/utils/formFormatter.ts';
 import SearchBar from '@/pages/pegase/home/components/SearchBar.tsx';
-import { RdsCheckbox, RdsCheckboxGroupWrapper, RdsHeading } from 'rte-design-system-react';
+import { RdsCheckbox, RdsCheckboxGroupWrapper } from 'rte-design-system-react';
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
@@ -271,10 +271,9 @@ const LoadTab = () => {
   );
 
   return (
-    <div className="flex h-fit w-full flex-col gap-4">
-      <RdsHeading title={t('studyDetails.@hypothesis')} size={'m'} />
+    <div className="flex h-full max-h-fit w-full flex-col gap-4">
       <div className="flex h-fit w-full gap-6">
-        <div className="flex max-h-full min-h-fit w-28 flex-col gap-2 overflow-y-auto rounded border border-gray-400 p-2">
+        <div className="flex h-fit w-28 flex-col gap-2 rounded border border-gray-400 p-2">
           <div className="border-b border-gray-400 pb-2">
             <SearchBar onSearch={() => {}} placeholder={t('studyDetails.@search_area')} />
           </div>
