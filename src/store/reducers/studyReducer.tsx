@@ -28,12 +28,12 @@ const addLoadTrajectory = (prevState: Partial<StudyState>, payload: DbTrajectory
   };
 };
 
-const deleteLoadTrajectory = (prevState: Partial<StudyState>, payload: number) => {
+const deleteLoadTrajectory = (prevState: Partial<StudyState>, payload: string) => {
   const loadTrajectory = Array.isArray(prevState[`${TRAJECTORY_TYPE.LOAD}`])
     ? (prevState[`${TRAJECTORY_TYPE.LOAD}`] as DbTrajectoryWithState[])
     : null;
   if (loadTrajectory?.length) {
-    const index = loadTrajectory.findIndex((trajectory) => trajectory.id === payload);
+    const index = loadTrajectory.findIndex((trajectory) => trajectory.loadArea === payload);
     if (index >= 0) {
       loadTrajectory.splice(index, 1);
     }

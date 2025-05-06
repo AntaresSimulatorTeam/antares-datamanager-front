@@ -147,7 +147,7 @@ const LoadTab = () => {
         await unlinkTrajectoryFromStudy(trajectoryId, study.id);
         dispatch?.({
           type: STUDY_ACTION.DELETE_LOAD_TRAJECTORY,
-          payload: trajectoryId,
+          payload: data[rowIndex].hypothesis,
         });
         setData((prev) => {
           prev[rowIndex].trajectory = null;
@@ -193,8 +193,14 @@ const LoadTab = () => {
   );
 
   const removeRow = async (indexRow: number, value?: string) => {
-    if (data[indexRow]?.trajectory && data[indexRow]?.status === TRAJECTORY_SELECTION_STATUS.OK) {
-      await unlinkTrajectoryFromStudy(data[indexRow].trajectory.id, study.id);
+    if (data?.[indexRow]) {
+      dispatch?.({
+        type: STUDY_ACTION.DELETE_LOAD_TRAJECTORY,
+        payload: data[indexRow].hypothesis,
+      });
+      if (data[indexRow]?.trajectory && data[indexRow]?.status === TRAJECTORY_SELECTION_STATUS.OK) {
+        await unlinkTrajectoryFromStudy(data[indexRow].trajectory.id, study.id);
+      }
     }
     setData((prev) => prev.filter((_row: AreaAndLinkRowData, index: number) => index !== indexRow));
     if (value) {
