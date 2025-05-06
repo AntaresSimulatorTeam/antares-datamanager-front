@@ -58,7 +58,7 @@ const StudyDetails = () => {
   ) : (
     <div className="flex h-full w-full flex-col">
       <StudyHeader projectName={study.project} studyName={study.name} />
-      <div className="flex h-full w-full flex-col overflow-x-auto">
+      <div className="relative flex h-full w-full flex-col overflow-y-auto">
         <RdsDivider />
         <div className="flex flex-col">
           <DetailsContent content={study} />
@@ -72,27 +72,29 @@ const StudyDetails = () => {
             />
           </div>
         </div>
-        <div className="flex-start flex h-full flex-col px-4">{activeContent}</div>
-        <div className="sticky bottom-0 flex w-full items-center justify-end gap-2 border-t bg-gray-w p-1">
-          {(!AREA || (AREA as DbTrajectoryWithState)?.state === TRAJECTORY_SELECTION_STATUS.ERROR) && (
-            <div className={'text-error-600'}>{t('studyDetails.@add_trajectories_message')}</div>
-          )}
-          {AREA && (LINK as DbTrajectoryWithState)?.state === TRAJECTORY_SELECTION_STATUS.ERROR && (
-            <div className={'text-error-600'}>{t('studyDetails.@error_link_trajectory_message')}</div>
-          )}
-          <ButtonWithStdIcon
-            label={t('studyDetails.@generate')}
-            onClick={() => void handleGenerateStudy()}
-            disabled={
-              !AREA ||
-              (AREA as DbTrajectoryWithState)?.state === TRAJECTORY_SELECTION_STATUS.ERROR ||
-              (LINK as DbTrajectoryWithState)?.state === TRAJECTORY_SELECTION_STATUS.ERROR ||
-              studyStatus === StudyStatus.GENERATED
-            }
-            icon={StdIconId.CheckCircle}
-            position="right"
-            isLoading={isGenerating}
-          />
+        <div className="flex-start flex h-fit flex-col px-4">{activeContent}</div>
+        <div className="sticky bottom-0 right-0 h-fit w-full border-t bg-gray-w p-1">
+          <div className="flex h-fit items-center justify-end">
+            {(!AREA || (AREA as DbTrajectoryWithState)?.state === TRAJECTORY_SELECTION_STATUS.ERROR) && (
+              <div className="mr-1 text-error-600">{t('studyDetails.@add_trajectories_message')}</div>
+            )}
+            {AREA && (LINK as DbTrajectoryWithState)?.state === TRAJECTORY_SELECTION_STATUS.ERROR && (
+              <div className="mr-1 text-error-600">{t('studyDetails.@error_link_trajectory_message')}</div>
+            )}
+            <ButtonWithStdIcon
+              label={t('studyDetails.@generate')}
+              onClick={() => void handleGenerateStudy()}
+              disabled={
+                !AREA ||
+                (AREA as DbTrajectoryWithState)?.state === TRAJECTORY_SELECTION_STATUS.ERROR ||
+                (LINK as DbTrajectoryWithState)?.state === TRAJECTORY_SELECTION_STATUS.ERROR ||
+                studyStatus === StudyStatus.GENERATED
+              }
+              icon={StdIconId.CheckCircle}
+              position="right"
+              isLoading={isGenerating}
+            />
+          </div>
         </div>
       </div>
     </div>
