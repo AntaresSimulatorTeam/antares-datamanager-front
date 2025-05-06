@@ -35,7 +35,7 @@ import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import getLoadHypothesisTableHeaders from '@/components/header/LoadHypothesisTableHeader.tsx';
 import { sortKeepLastName } from '@/shared/utils/sortUtils.tsx';
-import { buildRowData, filterTrajectory } from '@/shared/utils/trajectoryUtils.ts';
+import { buildRowData, removeDuplicate } from '@/shared/utils/trajectoryUtils.ts';
 import { AREA_OTHERS } from '@/shared/const/studyConfig.ts';
 
 export type CheckBoxData = {
@@ -67,12 +67,15 @@ const LoadTab = () => {
           studyState && studyState?.[`${TRAJECTORY_TYPE.AREA}`]
             ? (studyState?.[`${TRAJECTORY_TYPE.AREA}`] as DbTrajectory)?.id
             : null;
+
         let newArea: CheckBoxData[];
         if (trajectoryAreaId != null) {
           const trajectoryAreas = (await getTrajectoryDataByTypeAndId(
             TRAJECTORY_TYPE.AREA,
             trajectoryAreaId,
           )) as unknown as TrajectoryAreaData[];
+
+          // Build dropdown list options
           if (trajectoryAreas.length > 0) {
             let readOnlyIndex = -1;
             newArea = trajectoryAreas
@@ -94,20 +97,20 @@ const LoadTab = () => {
         }
 
         const trajectoryLinked = (await getStudyTrajectories(study?.id, TRAJECTORY_TYPE.LOAD)) as DbTrajectory[];
-
         areaDefault.push({
           name: AREA_OTHERS,
           isDefault: true,
         });
 
+        // Build hypothesis table
         const areaDataDefault: AreaAndLinkRowData[] = areaDefault?.map((area) => {
           const trajectoryArea = trajectoryLinked?.find((trajectory) => trajectory.loadArea === area.name);
           return buildRowData(area.name, true, trajectoryArea);
         });
 
         const emptyAreaSelected = (studyState[TRAJECTORY_TYPE.LOAD] as DbTrajectoryWithState[]) ?? [];
-        const areaData = trajectoryLinked
-          .concat(emptyAreaSelected)
+        const emptyArea = removeDuplicate(trajectoryLinked.concat(emptyAreaSelected));
+        const areaData = emptyArea
           .map((trajectory: DbTrajectory) => {
             if (!areaDefault.some((item: CheckBoxData) => item.name === trajectory.loadArea)) {
               return buildRowData(trajectory.loadArea as string, false, trajectory);
@@ -121,10 +124,9 @@ const LoadTab = () => {
           setData(areaDataDefault);
         }
 
-        if (areaDefault.length > 1) {
-          const trajectoryLoad = filterTrajectory(trajectoryLinked.concat(emptyAreaSelected));
+        if (areaDefault.length > 0) {
           const defaultCheckList: string[] = areaDefault.map((item) => item.name);
-          const checkList = trajectoryLoad
+          const checkList = emptyArea
             .map((trajectory) => {
               if (trajectory.loadArea) return trajectory.loadArea;
             })
@@ -224,7 +226,7 @@ const LoadTab = () => {
       },
       ...data,
     ];
-    setData(sortKeepLastName(newData, 'OTHERS'));
+    setData(sortKeepLastName(newData, AREA_OTHERS));
     setData(newData);
     const readOnlyIndex = newData.findIndex((line) => line.hypothesis === readOnlyArea);
     setReadOnly({ [`${readOnlyIndex}`]: true });

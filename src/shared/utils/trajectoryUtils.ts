@@ -29,7 +29,7 @@ export const getBgColor = (status: FileInputStatus) => {
   }
 };
 
-export const filterTrajectory = (arr: DbTrajectory[]) =>
+export const removeDuplicate = (arr: DbTrajectory[]) =>
   arr.reduce((acc: DbTrajectory[], current: DbTrajectory) => {
     const x = acc.find((item) => item.id === current.id);
     if (!x) {
