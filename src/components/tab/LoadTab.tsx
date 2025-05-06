@@ -271,7 +271,7 @@ const LoadTab = () => {
   );
 
   return (
-    <div className="flex h-full max-h-fit w-full flex-col gap-4">
+    <div className="flex h-fit w-full flex-col gap-4">
       <div className="flex h-fit w-full gap-6">
         <div className="flex h-fit w-28 flex-col gap-2 rounded border border-gray-400 p-2">
           <div className="border-b border-gray-400 pb-2">
