@@ -9,14 +9,19 @@ import { RdsSearchInput } from 'rte-design-system-react';
 
 interface SearchBarProps {
   onSearch: (value?: string) => void;
-  chipLabels: string[];
+  placeholder?: string;
 }
 
-const SearchBar = ({ onSearch }: SearchBarProps) => {
+const SearchBar = ({ onSearch, placeholder }: SearchBarProps) => {
   const { t } = useTranslation();
   return (
     <div>
-      <RdsSearchInput onChange={onSearch} onSearch={onSearch} placeHolder={t('home.@searchBar')} variant="outlined" />
+      <RdsSearchInput
+        onChange={onSearch}
+        onSearch={onSearch}
+        placeHolder={placeholder ?? t('home.@searchBar')}
+        variant="outlined"
+      />
     </div>
   );
 };

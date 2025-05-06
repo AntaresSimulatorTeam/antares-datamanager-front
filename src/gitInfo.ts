@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "feat/ANT-2958_Display_load_hypothesis_table",
-  commit: "e1233c1",
-  commitTime: "2025-05-02T08:56:35.429Z"
+  branch: "feat/ANT-2962_load_add_area_to_list",
+  commit: "7e2c9d7",
+  commitTime: "2025-05-06T09:29:52.061Z"
 };

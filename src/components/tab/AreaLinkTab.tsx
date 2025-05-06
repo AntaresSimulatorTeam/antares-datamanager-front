@@ -7,7 +7,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import StdSimpleTable from '@common/data/stdSimpleTable/StdSimpleTable.tsx';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
-import getAreaLinkTableHeaders from '@/components/header/AreaLinkTableHeaders.tsx';
+import getHypothesisTableHeaders from '@/components/header/HypothesisTableHeaders.tsx';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { useTranslation } from 'react-i18next';
 import {
@@ -38,8 +38,9 @@ import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { getStatus } from '@/shared/utils/trajectoryUtils.ts';
 import { getStudyById, getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { TrajectoryDataVisualisation } from '@common/modal/TrajectoryDataVisualisation.tsx';
-import { generateTrajectoryViewHeader } from '@/components/header/TrajectoryLinkHeader.tsx';
+import { generateTrajectoryViewHeader } from '@/components/header/TrajectoryViewHeader.tsx';
 import { useLocation } from 'react-router-dom';
+import { useUser } from '@/store/contexts/UserContext.tsx';
 
 export interface ErrorMessageType {
   index: number;
@@ -50,14 +51,15 @@ const AreaLinkTab = () => {
   const studyState = useStudy();
   const location = useLocation();
   const study = (location.state as LocationState)?.study;
+  const { isModalOpen, toggleModal } = useNewStudyModal();
+  const dispatch = useStudyDispatch();
+  const { t } = useTranslation();
+  const { user } = useUser();
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
   const [rowIndexSelected, setRowIndexSelected] = useState<number>(0);
   const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
   const [trajectoryData, setTrajectoryData] = useState<TrajectoryViewData | undefined>();
-  const { isModalOpen, toggleModal } = useNewStudyModal();
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const dispatch = useStudyDispatch();
-  const { t } = useTranslation();
   const [data, setData] = useState<AreaAndLinkRowData[]>([
     {
       hypothesis: 'Areas',
@@ -150,11 +152,12 @@ const AreaLinkTab = () => {
       const newDbTrajectory = {
         id: trajectoryId,
         trajectoryName: trajectoryLabel,
-        type: null,
-        version: null,
-        userName: null,
-        creationDate: null,
+        type: index === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
+        version: 0,
+        userName: user?.profile?.sub ?? '',
+        creationDate: new Date(),
         state: TRAJECTORY_SELECTION_STATUS.ERROR,
+        messages: [],
       };
       //Case: area control failed and a trajectory Links is linked to the study with ok status
       if (index === 0 && data[1]?.trajectory && data[1]?.status != TRAJECTORY_SELECTION_STATUS.ERROR) {
@@ -223,10 +226,10 @@ const AreaLinkTab = () => {
   };
 
   const handleTrajectoryUpdate = async (
-    index: number,
-    status: RowStatus,
     trajectoryId: number,
-    trajectoryLabel?: string,
+    status?: RowStatus,
+    trajectoryLabel?: string | null,
+    index?: number | undefined,
   ) => {
     try {
       if (trajectoryId != null && status === 'success') {
@@ -237,30 +240,39 @@ const AreaLinkTab = () => {
               payload: { ...payload, state: TRAJECTORY_SELECTION_STATUS.OK },
             } as StudyActionType);
             setData((prev) => {
-              prev[index].trajectory = payload as DbTrajectory;
-              prev[index].status = getStatus(status);
+              if (index != null && prev[index]) {
+                prev[index].trajectory = payload as DbTrajectory;
+                prev[index].status = getStatus(status);
+              }
               return prev;
             });
             setReadOnly({ '0': false, '1': false });
           })
           .catch(async () => {
-            await handleTrajectoryError(index, trajectoryId, trajectoryLabel ?? '');
+            if (index != null) {
+              await handleTrajectoryError(index, trajectoryId, trajectoryLabel ?? '');
+            }
           });
       }
 
       // Handle deletion case for areas
-      if ((trajectoryId != null && status === 'empty') || (trajectoryId != null && status === 'emptyError')) {
+      if (
+        (index != null && trajectoryId != null && status === 'empty') ||
+        (index != null && trajectoryId != null && status === 'emptyError')
+      ) {
         await handleTrajectoryDeletion(index, status, trajectoryId);
       }
 
-      if (status === 'error' && trajectoryId != null && trajectoryLabel) {
+      if (index != null && status === 'error' && trajectoryId != null && trajectoryLabel) {
         await handleTrajectoryError(index, trajectoryId, trajectoryLabel);
       }
     } catch (error) {
       // Reset trajectory line to initial state
       setData((prev) => {
-        prev[index].trajectory = null;
-        prev[index].status = TRAJECTORY_SELECTION_STATUS.MISSING;
+        if (index != null && prev[index]) {
+          prev[index].trajectory = null;
+          prev[index].status = TRAJECTORY_SELECTION_STATUS.MISSING;
+        }
         return prev;
       });
     }
@@ -307,7 +319,7 @@ const AreaLinkTab = () => {
 
   const columns = useMemo(
     () =>
-      getAreaLinkTableHeaders(
+      getHypothesisTableHeaders(
         t,
         handleTrajectoryUpdate,
         handleFetchTrajectoriesFS,
@@ -336,7 +348,7 @@ const AreaLinkTab = () => {
           options={optionsFS}
           onClose={async (status, value, label) => {
             if (status && value != null) {
-              await handleTrajectoryUpdate(rowIndexSelected, status, value, label);
+              await handleTrajectoryUpdate(value, status, label, rowIndexSelected);
             }
             toggleModal();
           }}

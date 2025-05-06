@@ -65,7 +65,7 @@ const ProjectContent = () => {
   return (
     <div className="flex w-full flex-1 flex-col gap-3">
       <div className="flex gap-4 py-2">
-        <SearchBar onSearch={searchProject} chipLabels={['']} />
+        <SearchBar onSearch={searchProject} />
         <RdsChip
           label={t('home.@my_projects')}
           onClick={handleChipClick}

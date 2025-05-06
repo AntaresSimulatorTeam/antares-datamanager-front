@@ -9,7 +9,7 @@ import { Location, useLocation } from 'react-router-dom';
 import StudyHeader from './StudyHeader.tsx';
 import { RdsDivider } from 'rte-design-system-react';
 import StudyNavigationMenu from '@/pages/pegase/studies/studyDetails/StudyNavigationMenu';
-import { HypothesisTab, StudyDTO } from '@/shared/types';
+import { DbTrajectoryWithState, HypothesisTab, StudyDTO } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { createStudy } from '@/shared/services/studyService.ts';
@@ -56,46 +56,43 @@ const StudyDetails = () => {
       <p>Loading project details...</p>
     </div>
   ) : (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full w-full flex-col">
       <StudyHeader projectName={study.project} studyName={study.name} />
-      <RdsDivider />
-      <div className="flex flex-col">
-        <DetailsContent content={study} />
-      </div>
-      <div className="flex gap-4 px-3 py-2">
-        <div className="flex h-10 items-end self-stretch">
-          <StudyNavigationMenu
-            onRenderActiveComponent={setActiveContent}
-            setActiveTab={setActiveTab}
-            activeTab={activeTab}
-          />
+      <div className="flex h-full w-full flex-col overflow-x-auto">
+        <RdsDivider />
+        <div className="flex flex-col">
+          <DetailsContent content={study} />
         </div>
-      </div>
-      <div className="flex h-full flex-col justify-between space-x-4 p-4">
-        {activeContent}
-        <div className="flex flex-col gap-2">
-          <RdsDivider />
-          <div className="flex items-center gap-2 self-end">
-            {(!AREA || AREA?.state === TRAJECTORY_SELECTION_STATUS.ERROR) && (
-              <div className={'text-error-600'}>{t('studyDetails.@add_trajectories_message')}</div>
-            )}
-            {AREA && LINK?.state === TRAJECTORY_SELECTION_STATUS.ERROR && (
-              <div className={'text-error-600'}>{t('studyDetails.@error_link_trajectory_message')}</div>
-            )}
-            <ButtonWithStdIcon
-              label={t('studyDetails.@generate')}
-              onClick={() => void handleGenerateStudy()}
-              disabled={
-                !AREA ||
-                AREA?.state === TRAJECTORY_SELECTION_STATUS.ERROR ||
-                LINK?.state === TRAJECTORY_SELECTION_STATUS.ERROR ||
-                studyStatus === StudyStatus.GENERATED
-              }
-              icon={StdIconId.CheckCircle}
-              position="right"
-              isLoading={isGenerating}
+        <div className="flex px-3 py-2">
+          <div className="flex h-10 items-end self-stretch">
+            <StudyNavigationMenu
+              onRenderActiveComponent={setActiveContent}
+              setActiveTab={setActiveTab}
+              activeTab={activeTab}
             />
           </div>
+        </div>
+        <div className="flex-start flex h-full flex-col px-4">{activeContent}</div>
+        <div className="sticky bottom-0 flex w-full items-center justify-end gap-2 border-t bg-gray-w p-1">
+          {(!AREA || (AREA as DbTrajectoryWithState)?.state === TRAJECTORY_SELECTION_STATUS.ERROR) && (
+            <div className={'text-error-600'}>{t('studyDetails.@add_trajectories_message')}</div>
+          )}
+          {AREA && (LINK as DbTrajectoryWithState)?.state === TRAJECTORY_SELECTION_STATUS.ERROR && (
+            <div className={'text-error-600'}>{t('studyDetails.@error_link_trajectory_message')}</div>
+          )}
+          <ButtonWithStdIcon
+            label={t('studyDetails.@generate')}
+            onClick={() => void handleGenerateStudy()}
+            disabled={
+              !AREA ||
+              (AREA as DbTrajectoryWithState)?.state === TRAJECTORY_SELECTION_STATUS.ERROR ||
+              (LINK as DbTrajectoryWithState)?.state === TRAJECTORY_SELECTION_STATUS.ERROR ||
+              studyStatus === StudyStatus.GENERATED
+            }
+            icon={StdIconId.CheckCircle}
+            position="right"
+            isLoading={isGenerating}
+          />
         </div>
       </div>
     </div>

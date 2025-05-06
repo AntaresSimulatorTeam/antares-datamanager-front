@@ -1,9 +1,6 @@
-import { DbTrajectory, RowStatus } from '@/shared/types';
+import { AreaAndLinkRowData, DbTrajectory, RowStatus } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
 import { FileInputStatus } from 'rte-design-system-react';
-
-export const getTrajectoryDB = (trajectories: DbTrajectory[] | null, id: number) =>
-  trajectories?.find((trajectory) => trajectory.id === id);
 
 export const getStatus = (status: RowStatus) => {
   switch (status) {
@@ -31,3 +28,19 @@ export const getBgColor = (status: FileInputStatus) => {
       return 'bg-gray-600';
   }
 };
+
+export const removeDuplicate = (arr: DbTrajectory[]) =>
+  arr.reduce((acc: DbTrajectory[], current: DbTrajectory) => {
+    const x = acc.find((item) => item.id === current.id);
+    if (!x) {
+      acc.push(current);
+    }
+    return acc;
+  }, []);
+
+export const buildRowData = (areaName: string, isDefault: boolean, trajectory?: DbTrajectory): AreaAndLinkRowData => ({
+  hypothesis: areaName,
+  trajectory: trajectory?.trajectoryName ? trajectory : null,
+  status: trajectory?.trajectoryName ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+  isDefault,
+});
