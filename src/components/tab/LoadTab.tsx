@@ -35,7 +35,12 @@ import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import getLoadHypothesisTableHeaders from '@/components/header/LoadHypothesisTableHeader.tsx';
 import { sortKeepLastName } from '@/shared/utils/sortUtils.tsx';
-import { buildRowData, removeDuplicate } from '@/shared/utils/trajectoryUtils.ts';
+import {
+  buildEmptyRowData,
+  buildRowData,
+  removeDuplicate,
+  retrieveReadOnlyArea,
+} from '@/shared/utils/trajectoryUtils.ts';
 import { AREA_OTHERS } from '@/shared/const/studyConfig.ts';
 
 export type CheckBoxData = {
@@ -50,7 +55,7 @@ const LoadTab = () => {
   const study = (location.state as LocationState)?.study;
   const dispatch = useStudyDispatch();
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
-  const [readOnlyArea, setReadOnlyArea] = useState<string | null>(null);
+  const [readOnlyAreas, setReadOnlyAreas] = useState<string[]>([]);
   const [data, setData] = useState<AreaAndLinkRowData[]>([]);
   const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
@@ -70,6 +75,7 @@ const LoadTab = () => {
 
         let newArea: CheckBoxData[];
         let defaultAreaNotIncludedInList: CheckBoxData | undefined;
+        const defaultAreaListNotIncludedInList: string[] = [];
         if (trajectoryAreaId != null) {
           const trajectoryAreas = (await getTrajectoryDataByTypeAndId(
             TRAJECTORY_TYPE.AREA,
@@ -80,9 +86,12 @@ const LoadTab = () => {
           if (trajectoryAreas.length > 0) {
             newArea = trajectoryAreas
               .map((trajectoryArea) => {
+                // Find default area not included in areas trajectory list
                 defaultAreaNotIncludedInList = areaDefault?.find((item) => item.name !== trajectoryArea.areaName);
-                if (defaultAreaNotIncludedInList) {
+                if (!defaultAreaNotIncludedInList) {
                   return { name: trajectoryArea.areaName, isDefault: false };
+                } else {
+                  defaultAreaListNotIncludedInList.push(defaultAreaNotIncludedInList.name);
                 }
               })
               .filter(Boolean) as CheckBoxData[];
@@ -118,13 +127,10 @@ const LoadTab = () => {
           const dataTrajectories = areaDataDefault.concat(areaData);
           const dataSorted = sortKeepLastName(dataTrajectories, AREA_OTHERS);
           setData(dataSorted);
-          if (defaultAreaNotIncludedInList) {
-            // When a default area is not included in area options list, its row should have a read only state
-            const readOnlyIndex = dataSorted.findIndex(
-              (dataTrajectory) => dataTrajectory.hypothesis === defaultAreaNotIncludedInList?.name,
-            );
-            setReadOnly({ [`${readOnlyIndex}`]: true });
-            setReadOnlyArea(areaDefault[readOnlyIndex].name);
+          if (defaultAreaListNotIncludedInList.length > 0) {
+            const readOnlyRows = retrieveReadOnlyArea(dataSorted, defaultAreaListNotIncludedInList);
+            setReadOnly(readOnlyRows);
+            setReadOnlyAreas(defaultAreaListNotIncludedInList);
           }
         } else {
           setData(areaDataDefault);
@@ -217,31 +223,26 @@ const LoadTab = () => {
   const addRow = (name: string) => {
     dispatch?.({
       type: STUDY_ACTION.ADD_TRAJECTORY_LOAD,
-      payload: {
-        id: Math.random(),
-        trajectoryName: '',
-        type: TRAJECTORY_TYPE.LOAD,
-        version: 0,
-        userName: 'user',
-        creationDate: new Date(),
-        loadArea: name,
-        state: TRAJECTORY_SELECTION_STATUS.MISSING,
-        messages: [],
-      },
+      payload: buildEmptyRowData(name),
     });
-    const newData = [
-      {
-        hypothesis: name,
-        trajectory: null,
-        status: TRAJECTORY_SELECTION_STATUS.MISSING,
-        isDefault: false,
-      },
-      ...data,
-    ];
-    setData(sortKeepLastName(newData, AREA_OTHERS));
-    setData(newData);
-    const readOnlyIndex = newData.findIndex((line) => line.hypothesis === readOnlyArea);
-    setReadOnly({ [`${readOnlyIndex}`]: true });
+    const newDataSorted = sortKeepLastName(
+      [
+        {
+          hypothesis: name,
+          trajectory: null,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          isDefault: false,
+        },
+        ...data,
+      ],
+      AREA_OTHERS,
+    );
+
+    setData(newDataSorted);
+    if (readOnlyAreas.length > 0) {
+      const readOnlyRows = retrieveReadOnlyArea(newDataSorted, readOnlyAreas);
+      setReadOnly(readOnlyRows);
+    }
   };
 
   const handleSelectionChange = async (name: string, isChecked?: boolean) => {
