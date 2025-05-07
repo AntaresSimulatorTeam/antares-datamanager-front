@@ -19,8 +19,8 @@ import {
 } from '@/shared/services/trajectoryService.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import {
-  AreaAndLinkRowData,
   DbTrajectory,
+  HypothesisRowData,
   LocationState,
   RowStatus,
   SelectOption,
@@ -60,7 +60,7 @@ const AreaLinkTab = () => {
   const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
   const [trajectoryData, setTrajectoryData] = useState<TrajectoryViewData | undefined>();
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [data, setData] = useState<AreaAndLinkRowData[]>([
+  const [data, setData] = useState<HypothesisRowData[]>([
     {
       hypothesis: 'Areas',
       trajectory: null,

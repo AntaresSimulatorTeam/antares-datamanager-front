@@ -7,9 +7,9 @@
 import StdSimpleTable from '@common/data/stdSimpleTable/StdSimpleTable.tsx';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  AreaAndLinkRowData,
   DbTrajectory,
   DbTrajectoryWithState,
+  HypothesisRowData,
   LocationState,
   RowStatus,
   SelectOption,
@@ -56,7 +56,7 @@ const LoadTab = () => {
   const dispatch = useStudyDispatch();
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
   const [readOnlyAreas, setReadOnlyAreas] = useState<string[]>([]);
-  const [data, setData] = useState<AreaAndLinkRowData[]>([]);
+  const [data, setData] = useState<HypothesisRowData[]>([]);
   const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
@@ -74,7 +74,6 @@ const LoadTab = () => {
             : null;
 
         let newArea: CheckBoxData[];
-        let defaultAreaNotIncludedInList: CheckBoxData | undefined;
         const defaultAreaListNotIncludedInList: string[] = [];
         if (trajectoryAreaId != null) {
           const trajectoryAreas = (await getTrajectoryDataByTypeAndId(
@@ -86,16 +85,19 @@ const LoadTab = () => {
           if (trajectoryAreas.length > 0) {
             newArea = trajectoryAreas
               .map((trajectoryArea) => {
-                // Find default area not included in areas trajectory list
-                defaultAreaNotIncludedInList = areaDefault?.find((item) => item.name !== trajectoryArea.areaName);
                 if (!areaDefault?.some((item) => item.name === trajectoryArea.areaName)) {
                   return { name: trajectoryArea.areaName, isDefault: false };
-                } else if (defaultAreaNotIncludedInList) {
-                  defaultAreaListNotIncludedInList.push(defaultAreaNotIncludedInList.name);
                 }
               })
               .filter(Boolean) as CheckBoxData[];
             setAreasOptions(areaDefault?.concat(newArea));
+
+            // Find default area not included in areas trajectory list
+            areaDefault.forEach((defaultArea) => {
+              if (!trajectoryAreas.some((trajectoryArea) => trajectoryArea.areaName === defaultArea.name)) {
+                defaultAreaListNotIncludedInList.push(defaultArea.name);
+              }
+            });
           } else {
             setAreasOptions(areaDefault);
           }
@@ -108,7 +110,7 @@ const LoadTab = () => {
         });
 
         // Build hypothesis table
-        const areaDataDefault: AreaAndLinkRowData[] = areaDefault?.map((area) => {
+        const areaDataDefault: HypothesisRowData[] = areaDefault?.map((area) => {
           const trajectoryArea = trajectoryLinked?.find((trajectory) => trajectory.loadArea === area.name);
           return buildRowData(area.name, true, trajectoryArea);
         });
@@ -121,19 +123,15 @@ const LoadTab = () => {
               return buildRowData(trajectory.loadArea as string, false, trajectory);
             }
           })
-          .filter(Boolean) as AreaAndLinkRowData[];
+          .filter(Boolean) as HypothesisRowData[];
 
-        if (areaData.length > 0) {
-          const dataTrajectories = areaDataDefault.concat(areaData);
-          const dataSorted = sortKeepLastName(dataTrajectories, AREA_OTHERS);
-          setData(dataSorted);
-          if (defaultAreaListNotIncludedInList.length > 0) {
-            const readOnlyRows = retrieveReadOnlyArea(dataSorted, defaultAreaListNotIncludedInList);
-            setReadOnly(readOnlyRows);
-            setReadOnlyAreas(defaultAreaListNotIncludedInList);
-          }
-        } else {
-          setData(areaDataDefault);
+        const dataTrajectories =
+          areaData.length > 0 ? sortKeepLastName(areaDataDefault.concat(areaData), AREA_OTHERS) : areaDataDefault;
+        setData(dataTrajectories);
+        if (defaultAreaListNotIncludedInList.length > 0) {
+          const readOnlyRows = retrieveReadOnlyArea(dataTrajectories, defaultAreaListNotIncludedInList);
+          setReadOnly(readOnlyRows);
+          setReadOnlyAreas(defaultAreaListNotIncludedInList);
         }
 
         if (areaDefault.length > 0) {
@@ -214,7 +212,12 @@ const LoadTab = () => {
         await unlinkTrajectoryFromStudy(data[indexRow].trajectory.id, study.id);
       }
     }
-    setData((prev) => prev.filter((_row: AreaAndLinkRowData, index: number) => index !== indexRow));
+    const newDataSorted = data.filter((_row: HypothesisRowData, index: number) => index !== indexRow);
+    setData(newDataSorted);
+    if (readOnlyAreas.length > 0) {
+      const readOnlyRows = retrieveReadOnlyArea(newDataSorted, readOnlyAreas);
+      setReadOnly(readOnlyRows);
+    }
     if (value) {
       setCheckedValues((prev) => [...prev.filter((name) => name !== value)]);
     }

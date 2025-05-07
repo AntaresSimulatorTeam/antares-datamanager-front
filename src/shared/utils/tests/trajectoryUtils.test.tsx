@@ -1,10 +1,10 @@
 import { retrieveReadOnlyArea } from '../trajectoryUtils';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { AreaAndLinkRowData } from '@/shared/types';
+import { HypothesisRowData } from '@/shared/types';
 
-const defaultAreaNotInAreaTrajectoryList = ['DEkf'];
+const defaultAreaNotInAreaTrajectoryList = ['FR', 'DEkf'];
 
-const rowData: AreaAndLinkRowData[] = [
+const rowData: HypothesisRowData[] = [
   {
     hypothesis: 'FR',
     trajectory: {
@@ -67,9 +67,9 @@ const rowData: AreaAndLinkRowData[] = [
   },
 ];
 
-const rowDataTwo: AreaAndLinkRowData[] = [
+const rowDataTwo: HypothesisRowData[] = [
   {
-    hypothesis: 'FR',
+    hypothesis: 'DKke',
     trajectory: {
       id: 1,
       trajectoryName: 'LOAD_area_BP_23',
@@ -118,7 +118,7 @@ const rowDataTwo: AreaAndLinkRowData[] = [
 describe('retrieveReadOnlyArea', () => {
   it('should return an object with the row index where a default area is not included in the areas option list', () => {
     const readOnlyRows = retrieveReadOnlyArea(rowData, defaultAreaNotInAreaTrajectoryList);
-    expect(readOnlyRows).toStrictEqual({ '2': true });
+    expect(readOnlyRows).toStrictEqual({ '0': true, '2': true });
   });
 
   it('should return an empty object when all default areas are included in the areas option list', () => {

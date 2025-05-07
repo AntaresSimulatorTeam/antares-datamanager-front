@@ -1,6 +1,7 @@
-import { AreaAndLinkRowData, DbTrajectory, RowStatus } from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, RowStatus } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { FileInputStatus } from 'rte-design-system-react';
+import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 
 export const getStatus = (status: RowStatus) => {
   switch (status) {
@@ -38,7 +39,7 @@ export const removeDuplicate = (arr: DbTrajectory[]) =>
     return acc;
   }, []);
 
-export const buildRowData = (areaName: string, isDefault: boolean, trajectory?: DbTrajectory): AreaAndLinkRowData => ({
+export const buildRowData = (areaName: string, isDefault: boolean, trajectory?: DbTrajectory): HypothesisRowData => ({
   hypothesis: areaName,
   trajectory: trajectory?.trajectoryName ? trajectory : null,
   status: trajectory?.trajectoryName ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
@@ -57,16 +58,26 @@ export const buildEmptyRowData = (areaName: string) => ({
   messages: [],
 });
 
-// When a default area is not included in area options list, its row should have a read only state
-export const retrieveReadOnlyArea = (sortedData: AreaAndLinkRowData[], defaultAreasNotInAreaTrajectory: string[]) => {
-  const readOnlyIndexes: (number | null)[] = defaultAreasNotInAreaTrajectory
-    .map((areaName) => {
-      const index = sortedData.findIndex((trajectory) => areaName === trajectory.hypothesis);
-      if (index >= 0) return index;
-      return null;
-    })
-    .filter(Boolean);
+/**
+ *
+ * @param {HypothesisRowData[]} rowData
+ * @param {string[]} defaultAreasNotInAreaTrajectory
+ *
+ * @return {ReadOnlyObject}
+ */
+export const retrieveReadOnlyArea = (
+  rowData: HypothesisRowData[],
+  defaultAreasNotInAreaTrajectory: string[],
+): ReadOnlyObject => {
+  const readOnlyIndexes: (number | null)[] = defaultAreasNotInAreaTrajectory.map((areaName) => {
+    const index = rowData.findIndex((trajectory) => areaName === trajectory.hypothesis);
+    return index >= 0 ? index : null;
+  });
   const readOnlyRows = {};
-  readOnlyIndexes.forEach((readOnlyIndex) => Object.assign(readOnlyRows, { [`${readOnlyIndex}`]: true }));
+  readOnlyIndexes.forEach((readOnlyIndex) => {
+    if (readOnlyIndex != null) {
+      Object.assign(readOnlyRows, { [`${readOnlyIndex}`]: true });
+    }
+  });
   return readOnlyRows;
 };

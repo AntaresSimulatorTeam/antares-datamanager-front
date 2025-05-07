@@ -1,6 +1,6 @@
-import { AreaAndLinkRowData } from '@/shared/types';
+import { HypothesisRowData } from '@/shared/types';
 
-export const sortKeepLastName = (arr: AreaAndLinkRowData[], lastName: string): AreaAndLinkRowData[] =>
+export const sortKeepLastName = (arr: HypothesisRowData[], lastName: string): HypothesisRowData[] =>
   arr.sort((a, b) => {
     if (a.hypothesis === lastName) return 1;
     if (b.hypothesis === lastName) return -1;

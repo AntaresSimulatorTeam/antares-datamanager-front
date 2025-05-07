@@ -72,7 +72,7 @@ const StudyDetails = () => {
             />
           </div>
         </div>
-        <div className="flex-start flex h-fit flex-col px-4">{activeContent}</div>
+        <div className="flex-start flex h-full flex-col overflow-y-auto px-4">{activeContent}</div>
         <div className="sticky bottom-0 right-0 h-fit w-full border-t bg-gray-w p-1">
           <div className="flex h-fit items-center justify-end">
             {(!AREA || (AREA as DbTrajectoryWithState)?.state === TRAJECTORY_SELECTION_STATUS.ERROR) && (

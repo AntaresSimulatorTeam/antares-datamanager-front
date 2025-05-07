@@ -5,7 +5,7 @@
  */
 
 import { createColumnHelper } from '@tanstack/react-table';
-import { AreaAndLinkRowData, SelectOption } from '@/shared/types';
+import { HypothesisRowData, SelectOption } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
 import { Dispatch, SetStateAction } from 'react';
 import { ErrorMessageType } from '@/components/tab/AreaLinkTab.tsx';
@@ -15,7 +15,7 @@ import { LabelWithButtonPreview } from '@common/data/LabelWithButtonPreview.tsx'
 import { LabelWithDeleteButton } from '@common/data/LabelWithDeleteButton.tsx';
 import { SelectInputWithButton } from '@common/data/SelectInputWithButton.tsx';
 
-const columnHelper = createColumnHelper<AreaAndLinkRowData>();
+const columnHelper = createColumnHelper<HypothesisRowData>();
 
 const getLoadHypothesisTableHeaders = (
   t: (value: string) => string,

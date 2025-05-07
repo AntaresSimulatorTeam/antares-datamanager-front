@@ -31,7 +31,7 @@ export interface DbTrajectoryWithState extends DbTrajectory {
   state?: TRAJECTORY_SELECTION_STATUS;
 }
 
-export type AreaAndLinkRowData = {
+export type HypothesisRowData = {
   hypothesis: string;
   trajectory: DbTrajectoryWithState | null;
   status: TRAJECTORY_SELECTION_STATUS;
