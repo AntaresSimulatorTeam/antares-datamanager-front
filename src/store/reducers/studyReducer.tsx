@@ -58,13 +58,19 @@ export const studyReducer = (prevState: Partial<StudyState>, action?: StudyActio
         return {
           ...prevState,
           [`${TRAJECTORY_TYPE.AREA}`]: null,
+          [`${TRAJECTORY_TYPE.LOAD}`]: null,
         };
       case STUDY_ACTION.CLEAR_LINK_TRAJECTORY:
         return { ...prevState, [`${TRAJECTORY_TYPE.LINK}`]: null };
       case STUDY_ACTION.DELETE_LOAD_TRAJECTORY:
         return deleteLoadTrajectory(prevState, action.payload);
       case STUDY_ACTION.CLEAR_AREA_AND_LINK_TRAJECTORY:
-        return { ...prevState, [`${TRAJECTORY_TYPE.AREA}`]: null, [`${TRAJECTORY_TYPE.LINK}`]: null };
+        return {
+          ...prevState,
+          [`${TRAJECTORY_TYPE.AREA}`]: null,
+          [`${TRAJECTORY_TYPE.LINK}`]: null,
+          [`${TRAJECTORY_TYPE.LOAD}`]: null,
+        };
       case STUDY_ACTION.SET_STUDY_STATUS:
         return { ...prevState, studyStatus: action.payload };
       case STUDY_ACTION.ADD_TRAJECTORIES:

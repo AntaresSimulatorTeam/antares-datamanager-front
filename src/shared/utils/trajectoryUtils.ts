@@ -1,6 +1,7 @@
-import { AreaAndLinkRowData, DbTrajectory, RowStatus } from '@/shared/types';
-import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
+import { DbTrajectory, HypothesisRowData, RowStatus } from '@/shared/types';
+import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { FileInputStatus } from 'rte-design-system-react';
+import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 
 export const getStatus = (status: RowStatus) => {
   switch (status) {
@@ -38,9 +39,45 @@ export const removeDuplicate = (arr: DbTrajectory[]) =>
     return acc;
   }, []);
 
-export const buildRowData = (areaName: string, isDefault: boolean, trajectory?: DbTrajectory): AreaAndLinkRowData => ({
+export const buildRowData = (areaName: string, isDefault: boolean, trajectory?: DbTrajectory): HypothesisRowData => ({
   hypothesis: areaName,
   trajectory: trajectory?.trajectoryName ? trajectory : null,
   status: trajectory?.trajectoryName ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
   isDefault,
 });
+
+export const buildEmptyRowData = (areaName: string) => ({
+  id: Math.random(),
+  trajectoryName: '',
+  type: TRAJECTORY_TYPE.LOAD,
+  version: 0,
+  userName: 'user',
+  creationDate: new Date(),
+  loadArea: areaName,
+  state: TRAJECTORY_SELECTION_STATUS.MISSING,
+  messages: [],
+});
+
+/**
+ *
+ * @param {HypothesisRowData[]} rowData
+ * @param {string[]} defaultAreasNotInAreaTrajectory
+ *
+ * @return {ReadOnlyObject}
+ */
+export const retrieveReadOnlyArea = (
+  rowData: HypothesisRowData[],
+  defaultAreasNotInAreaTrajectory: string[],
+): ReadOnlyObject => {
+  const readOnlyIndexes: (number | null)[] = defaultAreasNotInAreaTrajectory.map((areaName) => {
+    const index = rowData.findIndex((trajectory) => areaName === trajectory.hypothesis);
+    return index >= 0 ? index : null;
+  });
+  const readOnlyRows = {};
+  readOnlyIndexes.forEach((readOnlyIndex) => {
+    if (readOnlyIndex != null) {
+      Object.assign(readOnlyRows, { [`${readOnlyIndex}`]: true });
+    }
+  });
+  return readOnlyRows;
+};

@@ -6,7 +6,7 @@
 
 import { createColumnHelper } from '@tanstack/react-table';
 import { RdsButton, RdsIcon, RdsIconButton, RdsIconId } from 'rte-design-system-react';
-import { AreaAndLinkRowData, RowStatus, SelectOption } from '@/shared/types';
+import { HypothesisRowData, RowStatus, SelectOption } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
@@ -16,7 +16,7 @@ import { Dispatch, SetStateAction } from 'react';
 import { ErrorMessageType } from '@/components/tab/AreaLinkTab.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 
-const columnHelper = createColumnHelper<AreaAndLinkRowData>();
+const columnHelper = createColumnHelper<HypothesisRowData>();
 
 const getHypothesisTableHeaders = (
   t: (value: string) => string,
