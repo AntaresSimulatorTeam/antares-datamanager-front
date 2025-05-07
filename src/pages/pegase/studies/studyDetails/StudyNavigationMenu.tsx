@@ -17,6 +17,7 @@ import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/traj
 import { useTranslation } from 'react-i18next';
 import { useStudy } from '@/store/contexts/StudyContext.tsx';
 import { DbTrajectoryWithState, HypothesisTab } from '@/shared/types';
+import StdAvatar from '@common/layout/stdAvatar/StdAvatar.tsx';
 
 const StudyNavigationMenu = ({
   onRenderActiveComponent,
@@ -96,19 +97,30 @@ const StudyNavigationMenu = ({
 
   return (
     <div className="flex space-x-4 p-4">
-      {tabs.map((tab) => (
-        <div className="flex items-center space-x-2" key={tab.name}>
-          <StdIcon name={tab.icon} />
-          <RdsTabItem
-            key={tab.name}
-            name={tab.name}
-            label={tab.label}
-            active={!tab.isDisabled && activeTab.name === tab.name}
-            onClick={() => !tab.isDisabled && setActiveTab(tab)}
-            disabled={tab.isDisabled}
-          />
-        </div>
-      ))}
+      {tabs.map((tab) => {
+        const hasWarmingMessages = !!(studyState[`${tab.name}`] as DbTrajectoryWithState)?.messages?.length;
+        return (
+          <div className="flex items-center space-x-2" key={tab.name}>
+            <StdIcon name={tab.icon} />
+            <RdsTabItem
+              key={tab.name}
+              name={tab.name}
+              label={tab.label}
+              active={activeTab.name === tab.name}
+              onClick={() => setActiveTab(tab)}
+            />
+            {hasWarmingMessages && activeTab.name !== tab.name && (
+              <StdAvatar
+                initials={`${(studyState[`${tab.name}`] as DbTrajectoryWithState)?.messages?.length}`}
+                size="es"
+                backgroundColor={`${!hasWarmingMessages ? 'gray' : 'orange'}`}
+                fullname=""
+                textColor="white"
+              />
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 };

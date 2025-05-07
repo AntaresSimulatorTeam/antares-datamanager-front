@@ -10,7 +10,7 @@ import { convertToFSSelectionOptionType } from '@/shared/utils/formFormatter.ts'
 
 interface ImportTrajectoryModalProps {
   options: SelectOption[] | undefined;
-  onClose: (status?: RowStatus, valueId?: number, valueLabel?: string) => Promise<void>;
+  onClose: (status?: RowStatus, valueId?: number, valueLabel?: string, errorMessage?: string) => Promise<void>;
   trajectoryType: TRAJECTORY_TYPE;
   studyHorizon: string;
   studyId: number;
@@ -58,9 +58,8 @@ export const ImportTrajectoryModal = ({
       setFileStatus('success');
       await onClose('success', newTrajectory.id);
     } catch (error) {
-      // TODO handle errors considered as warning ones
       setFileStatus('error');
-      void onClose('error', value.id, value.label);
+      void onClose('error', value.id, value.label, (error as Error)?.message);
     }
   };
 

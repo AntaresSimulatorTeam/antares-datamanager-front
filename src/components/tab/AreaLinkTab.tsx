@@ -35,17 +35,13 @@ import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
-import { getStatus } from '@/shared/utils/trajectoryUtils.ts';
+import { buildErrorTrajectory, getStatus } from '@/shared/utils/trajectoryUtils.ts';
 import { getStudyById, getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { TrajectoryDataVisualisation } from '@common/modal/TrajectoryDataVisualisation.tsx';
 import { generateTrajectoryViewHeader } from '@/components/header/TrajectoryViewHeader.tsx';
 import { useLocation } from 'react-router-dom';
 import { useUser } from '@/store/contexts/UserContext.tsx';
-
-export interface ErrorMessageType {
-  index: number;
-  message: string;
-}
+import { ErrorMessageType } from '@/shared/types/Generic.type.ts';
 
 const AreaLinkTab = () => {
   const studyState = useStudy();
@@ -90,6 +86,11 @@ const AreaLinkTab = () => {
       let trajectoryLinkResult;
       let studyData;
       try {
+        dispatch?.({
+          type: STUDY_ACTION.REMOVE_TRAJECTORY_ERROR,
+          payload: [TRAJECTORY_TYPE.AREA, TRAJECTORY_TYPE.LINK],
+        });
+
         [studyData, trajectoryAreaResult, trajectoryLinkResult] = await Promise.all([
           getStudyById(study.id),
           getStudyTrajectories(study.id, TRAJECTORY_TYPE.AREA),
@@ -147,18 +148,20 @@ const AreaLinkTab = () => {
     }
   };
 
-  const handleTrajectoryError = async (index: number, trajectoryId: number, trajectoryLabel: string) => {
+  const handleTrajectoryError = async (
+    index: number,
+    trajectoryId: number,
+    trajectoryLabel: string,
+    errorMessage?: string,
+  ) => {
     try {
-      const newDbTrajectory = {
-        id: trajectoryId,
-        trajectoryName: trajectoryLabel,
-        type: index === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
-        version: 0,
-        userName: user?.profile?.sub ?? '',
-        creationDate: new Date(),
-        state: TRAJECTORY_SELECTION_STATUS.ERROR,
-        messages: [],
-      };
+      const newDbTrajectory = buildErrorTrajectory(
+        index === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
+        trajectoryId,
+        trajectoryLabel,
+        errorMessage,
+        user?.profile?.sub,
+      );
       //Case: area control failed and a trajectory Links is linked to the study with ok status
       if (index === 0 && data[1]?.trajectory && data[1]?.status != TRAJECTORY_SELECTION_STATUS.ERROR) {
         await unlinkTrajectoryFromStudy(data[1].trajectory.id, study.id);
@@ -230,6 +233,7 @@ const AreaLinkTab = () => {
     status?: RowStatus,
     trajectoryLabel?: string | null,
     index?: number | undefined,
+    errorMessage?: string,
   ) => {
     try {
       if (trajectoryId != null && status === 'success') {
@@ -248,9 +252,9 @@ const AreaLinkTab = () => {
             });
             setReadOnly({ '0': false, '1': false });
           })
-          .catch(async () => {
+          .catch(async (error: unknown) => {
             if (index != null) {
-              await handleTrajectoryError(index, trajectoryId, trajectoryLabel ?? '');
+              await handleTrajectoryError(index, trajectoryId, trajectoryLabel ?? '', (error as Error).message);
             }
           });
       }
@@ -264,7 +268,7 @@ const AreaLinkTab = () => {
       }
 
       if (index != null && status === 'error' && trajectoryId != null && trajectoryLabel) {
-        await handleTrajectoryError(index, trajectoryId, trajectoryLabel);
+        await handleTrajectoryError(index, trajectoryId, trajectoryLabel, errorMessage);
       }
     } catch (error) {
       // Reset trajectory line to initial state
@@ -333,9 +337,9 @@ const AreaLinkTab = () => {
   );
 
   return (
-    <div className="flex-1">
+    <div className="flex h-fit w-full">
       <StdSimpleTable
-        id="example-table"
+        id="area-link-table"
         data={data}
         columns={columns}
         columnSize="meta"
@@ -346,9 +350,9 @@ const AreaLinkTab = () => {
       {isModalOpen && (
         <ImportTrajectoryModal
           options={optionsFS}
-          onClose={async (status, value, label) => {
+          onClose={async (status, value, label, errorMessage) => {
             if (status && value != null) {
-              await handleTrajectoryUpdate(value, status, label, rowIndexSelected);
+              await handleTrajectoryUpdate(value, status, label, rowIndexSelected, errorMessage);
             }
             toggleModal();
           }}

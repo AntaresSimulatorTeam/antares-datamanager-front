@@ -95,7 +95,9 @@ export const uploadTrajectory = async (
   );
 
   if (!(response as Response).ok) {
-    throw new Error('Failed to import trajectory into data base');
+    const errorText: string = await (response as Response).text();
+    const errorData = JSON.parse(errorText) as Error;
+    throw new Error(`${errorData?.message || errorText}`);
   }
   return (await (response as Response).json()) as DbTrajectory;
 };
@@ -122,7 +124,8 @@ export const linkTrajectoryToStudy = async (
     },
   });
   if (!response.ok) {
-    throw new Error(`${(response as unknown as Error).message}`);
+    const errorData = (await response.json()) as Error;
+    throw new Error(`${(errorData as unknown as Error)?.message || 'Failed to link a trajectory to study'}`);
   }
 
   return (await response.json()) as DbTrajectory;

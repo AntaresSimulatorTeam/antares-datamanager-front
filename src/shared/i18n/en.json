@@ -85,6 +85,7 @@
     "@delete": "Delete"
   },
   "studyDetails": {
+    "@alerts": "Alerts",
     "@bannerStudyName": "Study: {{name}}",
     "@bannerHorizon": "Horizon: {{horizon}}",
     "@bannerCreatedBy": "By: {{createdBy}}",
@@ -106,6 +107,8 @@
     "@import_status_done": "OK",
     "@import_status_missing": "Missing",
     "@import_status_error": "Error",
+    "@import_status_warning": "Warning",
+    "@skip": "Skip",
     "@preview": "View",
     "@generate": "Generate",
     "@add_trajectories_message": "Please add Areas trajectories first",

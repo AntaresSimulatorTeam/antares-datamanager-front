@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "fix/ANT-2962_handle_area_change",
-  commit: "abaa374",
-  commitTime: "2025-05-07T09:57:08.548Z"
+  branch: "feat/ANT-3023_hypothesis_table_display_warning_messages",
+  commit: "1dc9eea",
+  commitTime: "2025-05-07T12:20:45.579Z"
 };

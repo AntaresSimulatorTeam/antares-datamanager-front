@@ -13,8 +13,8 @@ import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 import SelectAndSearchableInput from '@/components/input/SelectAndSearchableInput.tsx';
 import { ButtonPreview } from '@/components/button/ButtonPreview.tsx';
 import { Dispatch, SetStateAction } from 'react';
-import { ErrorMessageType } from '@/components/tab/AreaLinkTab.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
+import { ErrorMessageType } from '@/shared/types/Generic.type.ts';
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
 

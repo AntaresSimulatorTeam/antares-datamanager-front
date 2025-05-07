@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { DbTrajectoryWithState } from '@/shared/types/Trajectory.type.ts';
+import { DbTrajectoryWithState, WarningMessage } from '@/shared/types/Trajectory.type.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
@@ -27,7 +27,7 @@ export interface PaginatedResponse<T> {
 }
 
 export type StudyState = {
-  [key in keyof typeof TRAJECTORY_TYPE]?: DbTrajectoryWithState | DbTrajectoryWithState[] | null;
+  [key in keyof typeof TRAJECTORY_TYPE]?: DbTrajectoryWithState[] | null;
 } & {
   studyStatus?: StudyStatus;
 };
@@ -50,7 +50,9 @@ export type StudyActionType =
   | { type: STUDY_ACTION.DELETE_LOAD_TRAJECTORY; payload: string }
   | { type: STUDY_ACTION.CLEAR_AREA_AND_LINK_TRAJECTORY }
   | { type: STUDY_ACTION.SET_STUDY_STATUS; payload: StudyStatus }
-  | { type: STUDY_ACTION.ADD_TRAJECTORIES; payload: DbTrajectoryWithState[] };
+  | { type: STUDY_ACTION.ADD_TRAJECTORIES; payload: DbTrajectoryWithState[] }
+  | { type: STUDY_ACTION.ADD_WARNING_MESSAGE; payload: { message: WarningMessage; type: TRAJECTORY_TYPE } }
+  | { type: STUDY_ACTION.REMOVE_TRAJECTORY_ERROR; payload: TRAJECTORY_TYPE[] };
 
 export interface LocationState {
   study: StudyDTO;

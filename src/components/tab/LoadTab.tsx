@@ -18,7 +18,6 @@ import {
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useTranslation } from 'react-i18next';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
-import { ErrorMessageType } from '@/components/tab/AreaLinkTab.tsx';
 import { useLocation } from 'react-router-dom';
 import {
   fetchTrajectoriesFromDB,
@@ -42,6 +41,7 @@ import {
   retrieveReadOnlyArea,
 } from '@/shared/utils/trajectoryUtils.ts';
 import { AREA_OTHERS } from '@/shared/const/studyConfig.ts';
+import { ErrorMessageType } from '@/shared/types/Generic.type.ts';
 
 export type CheckBoxData = {
   name: string;

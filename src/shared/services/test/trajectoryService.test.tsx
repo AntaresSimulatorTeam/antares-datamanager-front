@@ -23,15 +23,13 @@ vi.mock('@/envVariables', () => ({
 describe('fetchTrajectoriesFromDB', () => {
   beforeEach(() => {
     global.fetch = vi.fn();
-    vi.clearAllMocks();
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should fetch trajectories with area type from data base', async () => {
-    //Successful fetch response mock
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: true,
       json: async () => Promise.resolve(mockDbTrajectory),
@@ -126,11 +124,15 @@ describe('uploadTrajectory', () => {
 
   beforeEach(() => {
     global.fetch = vi.fn();
-    vi.clearAllMocks();
+    vi.stubGlobal('JSON', {
+      parse: (text: string) => ({ message: text }),
+      stringify: (text: string) => text,
+    });
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+    vi.clearAllMocks();
   });
 
   it('should add trajectory to data base', async () => {
@@ -154,6 +156,7 @@ describe('uploadTrajectory', () => {
     // Failed fetch response moc
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: false,
+      text: () => 'Failed to import trajectory into data base',
     });
 
     await expect(async () =>
@@ -207,15 +210,15 @@ describe('linkTrajectoryToStudy', () => {
   });
 
   it('should handle link failure gracefully', async () => {
-    // Failed fetch response moc
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: false,
-      message: 'Failed to link a trajectory to a study',
+      json: async () =>
+        Promise.resolve({
+          message: 'Error message',
+        }),
     });
 
-    await expect(async () => linkTrajectoryToStudy(TRAJECTORY_TYPE.AREA, 100, 2)).rejects.toThrowError(
-      'Failed to link a trajectory to a study',
-    );
+    await expect(async () => linkTrajectoryToStudy(TRAJECTORY_TYPE.AREA, 100, 2)).rejects.toThrowError('Error message');
   });
 
   it('should handle exceptions during link creation', async () => {

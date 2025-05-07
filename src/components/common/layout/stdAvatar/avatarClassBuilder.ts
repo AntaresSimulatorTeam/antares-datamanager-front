@@ -5,7 +5,7 @@
  */
 
 import { clsx } from 'clsx';
-import { AvatarColor, AvatarSize } from './StdAvatar';
+import { AvatarColor, AvatarSize, AvatarTextColor } from './StdAvatar';
 
 export const AVATAR_CLASSES = 'avatar rounded-full border-2 border-gray-w flex items-center justify-center';
 
@@ -24,5 +24,15 @@ export const COLOR_CLASSES = {
   orange: 'bg-acc6-300',
 };
 
-export const avatarClassBuilder = (size: AvatarSize, color: AvatarColor) =>
-  clsx(AVATAR_CLASSES, AVATAR_SIZE_CLASSES[size], COLOR_CLASSES[color]);
+export const TEXT_CLASSES = {
+  white: 'text-gray-w',
+  black: 'text-gray-900',
+};
+
+export const avatarClassBuilder = (size: AvatarSize, color: AvatarColor, textColor?: AvatarTextColor) =>
+  clsx(
+    AVATAR_CLASSES,
+    AVATAR_SIZE_CLASSES[size],
+    COLOR_CLASSES[color],
+    textColor ? TEXT_CLASSES[textColor] : TEXT_CLASSES.black,
+  );
