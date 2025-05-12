@@ -85,7 +85,9 @@
     "@delete": "Delete"
   },
   "studyDetails": {
-    "@alerts": "Alerts",
+    "@loadingProjects": "Loading project details...",
+    "@warnings": "Warnings",
+    "@noWarnings": "No warning message at this time",
     "@bannerStudyName": "Study: {{name}}",
     "@bannerHorizon": "Horizon: {{horizon}}",
     "@bannerCreatedBy": "By: {{createdBy}}",
@@ -99,7 +101,7 @@
     "@misc": "Misc",
     "@trajectory": "Trajectory",
     "@select_trajectory": "Select a trajectory",
-    "@select_link": "Add an area first",
+    "@select_area": "Add an area first",
     "@import_file": "Import",
     "@select_file_fs_error": "Not such files on file system",
     "@import_from_file_system": "Select {{trajectoryType}} from File System",

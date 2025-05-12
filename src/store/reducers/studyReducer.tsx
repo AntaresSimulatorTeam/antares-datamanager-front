@@ -1,14 +1,32 @@
 import { DbTrajectoryWithState, StudyActionType, StudyState, WarningMessage } from '@/shared/types';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
-import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE, WARNING_MESSAGE_LEVEL } from '@/shared/enum/trajectory.ts';
+import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
+import { WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
+
+const addAreaTrajectories = (prevState: Partial<StudyState>, trajectories: DbTrajectoryWithState[]) => {
+  const studyState = {};
+  trajectories.forEach((trajectory) => {
+    if (trajectory?.type === TRAJECTORY_TYPE.AREA) {
+      Object.assign(studyState, { [`${trajectory?.type}`]: [trajectory] });
+    } else if (trajectory?.type === TRAJECTORY_TYPE.LINK) {
+      Object.assign(studyState, { [`${trajectory?.type}`]: [trajectory] });
+    } else if (
+      !trajectories.some((traj) => traj.type === TRAJECTORY_TYPE.AREA) ||
+      !trajectories.some((traj) => traj.type === TRAJECTORY_TYPE.LINK)
+    ) {
+      Object.assign(studyState, { [`${trajectory?.type}`]: null });
+    }
+  });
+  return { ...prevState, ...studyState };
+};
 
 const addTrajectories = (
   prevState: Partial<StudyState>,
   trajectories: DbTrajectoryWithState[],
 ): Partial<StudyState> => {
   const studyState = {};
-  trajectories.forEach((trajectory) => Object.assign(studyState, { [`${trajectory?.type}`]: trajectory }));
+  trajectories.forEach((trajectory) => Object.assign(studyState, { [`${trajectory?.type}`]: [trajectory] }));
   return { ...prevState, ...studyState };
 };
 
@@ -37,16 +55,6 @@ export const addMessage = (
   }
 
   return prevState;
-};
-
-const deleteErrorMessage = (prevState: Partial<StudyState>, payload: TRAJECTORY_TYPE[]) => {
-  payload.forEach((type) => {
-    if (prevState?.[type]?.[0]?.state === TRAJECTORY_SELECTION_STATUS.ERROR) {
-      Object.assign(prevState, { [`${type}`]: null });
-    }
-  });
-
-  return { ...prevState };
 };
 
 const addLoadTrajectory = (prevState: Partial<StudyState>, payload: DbTrajectoryWithState): Partial<StudyState> => {
@@ -113,10 +121,10 @@ export const studyReducer = (prevState: Partial<StudyState>, action?: StudyActio
         };
       case STUDY_ACTION.ADD_WARNING_MESSAGE:
         return { ...addMessage(prevState, action.payload) };
-      case STUDY_ACTION.REMOVE_TRAJECTORY_ERROR:
-        return { ...deleteErrorMessage(prevState, action.payload) };
       case STUDY_ACTION.ADD_TRAJECTORIES:
         return { ...addTrajectories(prevState, action.payload) };
+      case STUDY_ACTION.ADD_AREA_TRAJECTORIES:
+        return { ...addAreaTrajectories(prevState, action.payload) };
       default:
         return prevState;
     }

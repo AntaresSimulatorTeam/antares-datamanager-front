@@ -9,7 +9,7 @@ import { Location, useLocation } from 'react-router-dom';
 import StudyHeader from './StudyHeader.tsx';
 import { RdsDivider } from 'rte-design-system-react';
 import StudyNavigationMenu from '@/pages/pegase/studies/studyDetails/StudyNavigationMenu';
-import { DbTrajectoryWithState, HypothesisTab, StudyDTO, WarningMessage } from '@/shared/types';
+import { DbTrajectory, HypothesisTab, StudyDTO, WarningMessage } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { createStudy } from '@/shared/services/studyService.ts';
@@ -18,9 +18,9 @@ import { ButtonWithStdIcon } from '@/components/button/ButtonWithStdIcon.tsx';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { DetailsContent } from '@/components/banner/DetailsContent.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
-import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { ContainerWithExpander } from '@/components/banner/ContainerWithExpander.tsx';
-import { sortByLevel } from '@/shared/utils/trajectoryUtils.ts';
+import { sortByLevel } from '@/shared/utils/warningUtils.ts';
 
 interface StudyState {
   study: StudyDTO;
@@ -41,20 +41,22 @@ const StudyDetails = () => {
     icon: StdIconId.LinkedServices,
     isDisabled: false,
   });
-  const [messagesWarning, setMessagesWarning] = useState<WarningMessage[] | null>(null);
+  const [messagesWarning, setMessagesWarning] = useState<WarningMessage[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   useEffect(() => {
     let messages: WarningMessage[] = [];
-    const trajectory: DbTrajectoryWithState[] | null =
-      studyState[activeTab.name as keyof typeof TRAJECTORY_TYPE] ?? null;
-    if (trajectory && trajectory[0]?.messages?.length > 0) {
-      messages = trajectory[0].messages.map((message) => ({
-        ...message,
-        trajectory: trajectory[0].trajectoryName,
-      }));
+    const trajectory: DbTrajectory[] | null = studyState[activeTab.name as keyof typeof TRAJECTORY_TYPE] ?? null;
+    if (trajectory && trajectory.length > 0) {
+      messages = trajectory.flatMap((item) =>
+        item.messages.map((message) => ({
+          ...message,
+          trajectory: item.trajectoryName,
+        })),
+      );
     }
     if (activeTab.name === TRAJECTORY_TYPE.AREA) {
-      if (studyState?.LINK && studyState.LINK[0].messages.length > 0) {
+      if (studyState?.LINK && studyState?.LINK?.[0]?.messages?.length > 0) {
         const linkMessage = studyState.LINK[0].messages.map((message) => ({
           ...message,
           trajectory: studyState.LINK?.[0]?.trajectoryName ?? '',
@@ -83,7 +85,7 @@ const StudyDetails = () => {
 
   return !study.id ? (
     <div className="flex h-screen items-center justify-center">
-      <p>Loading project details...</p>
+      <p>{t('studyDetails.@loadingProjects')}</p>
     </div>
   ) : (
     <div className="flex h-full w-full flex-col">
@@ -99,31 +101,25 @@ const StudyDetails = () => {
               onRenderActiveComponent={setActiveContent}
               setActiveTab={setActiveTab}
               activeTab={activeTab}
+              setErrorMessage={setErrorMessage}
             />
           </div>
         </div>
         <div className="flex-start flex h-full flex-col overflow-y-auto px-4">
           <div className="flex h-full w-full flex-col gap-8">
-            <ContainerWithExpander content={messagesWarning} />
+            <ContainerWithExpander content={messagesWarning} placeholder={t('studyDetails.@noWarnings')} />
             <div className="flex w-full">{activeContent}</div>
           </div>
           <div className="sticky bottom-0 right-0 h-fit w-full border-t bg-gray-w p-1">
             <div className="flex h-fit items-center justify-end">
-              {(!studyState.AREA || studyState.AREA[0]?.state === TRAJECTORY_SELECTION_STATUS.ERROR) && (
+              {!studyState.AREA && !errorMessage && (
                 <div className="mr-1 text-error-600">{t('studyDetails.@add_trajectories_message')}</div>
               )}
-              {studyState.AREA && studyState.LINK?.[0]?.state === TRAJECTORY_SELECTION_STATUS.ERROR && (
-                <div className="mr-1 text-error-600">{t('studyDetails.@error_link_trajectory_message')}</div>
-              )}
+              {errorMessage && <div className="mr-1 text-error-600">{errorMessage}</div>}
               <ButtonWithStdIcon
                 label={t('studyDetails.@generate')}
                 onClick={() => void handleGenerateStudy()}
-                disabled={
-                  !studyState.AREA ||
-                  studyState.AREA[0]?.state === TRAJECTORY_SELECTION_STATUS.ERROR ||
-                  studyState.LINK?.[0]?.state === TRAJECTORY_SELECTION_STATUS.ERROR ||
-                  studyState.studyStatus === StudyStatus.GENERATED
-                }
+                disabled={(!studyState.AREA && !!errorMessage) || studyState.studyStatus === StudyStatus.GENERATED}
                 icon={StdIconId.CheckCircle}
                 position="right"
                 isLoading={isGenerating}

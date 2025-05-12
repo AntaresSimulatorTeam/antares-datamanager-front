@@ -8,11 +8,11 @@ import StdSimpleTable from '@common/data/stdSimpleTable/StdSimpleTable.tsx';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   DbTrajectory,
-  DbTrajectoryWithState,
   HypothesisRowData,
   LocationState,
   RowStatus,
   SelectOption,
+  TabProps,
   TrajectoryAreaData,
 } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
@@ -48,7 +48,7 @@ export type CheckBoxData = {
   isDefault: boolean;
 };
 
-const LoadTab = () => {
+const LoadTab = ({ setErrorMessage }: TabProps) => {
   const { t } = useTranslation();
   const studyState = useStudy();
   const location = useLocation();
@@ -70,7 +70,7 @@ const LoadTab = () => {
         }));
         const trajectoryAreaId =
           studyState && studyState?.[`${TRAJECTORY_TYPE.AREA}`]
-            ? (studyState?.[`${TRAJECTORY_TYPE.AREA}`] as DbTrajectory)?.id
+            ? studyState?.[`${TRAJECTORY_TYPE.AREA}`]?.[0]?.id
             : null;
 
         let newArea: CheckBoxData[];
@@ -115,7 +115,7 @@ const LoadTab = () => {
           return buildRowData(area.name, true, trajectoryArea);
         });
 
-        const emptyAreaSelected = (studyState[TRAJECTORY_TYPE.LOAD] as DbTrajectoryWithState[]) ?? [];
+        const emptyAreaSelected = (studyState[TRAJECTORY_TYPE.LOAD] as DbTrajectory[]) ?? [];
         const emptyArea = removeDuplicate(trajectoryLinked.concat(emptyAreaSelected));
         const areaData = emptyArea
           .map((trajectory: DbTrajectory) => {
@@ -148,6 +148,7 @@ const LoadTab = () => {
       }
     };
 
+    setErrorMessage('');
     void fetchHypothesis();
   }, []);
 
@@ -166,17 +167,13 @@ const LoadTab = () => {
         });
       } else if (status === 'success') {
         const newTrajectory = await linkTrajectoryToStudy(TRAJECTORY_TYPE.LOAD, trajectoryId, study.id);
-        const newTrajectoryWithState = {
-          ...newTrajectory,
-          state: TRAJECTORY_SELECTION_STATUS.OK,
-        } as DbTrajectoryWithState;
         dispatch?.({
           type: STUDY_ACTION.ADD_TRAJECTORY_LOAD,
-          payload: newTrajectoryWithState,
+          payload: newTrajectory as DbTrajectory,
         });
         setData((prev) => {
           if (newTrajectory) {
-            prev[rowIndex].trajectory = newTrajectoryWithState;
+            prev[rowIndex].trajectory = newTrajectory as DbTrajectory;
             prev[rowIndex].status = TRAJECTORY_SELECTION_STATUS.OK;
           }
           return [...prev];

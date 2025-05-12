@@ -12,10 +12,11 @@ import {
   TRAJECTORY_FILE_SYSTEM_ENDPOINT,
   TRAJECTORY_LINK_TO_STUDY_ENDPOINT,
 } from '@/shared/const/apiEndPoint.ts';
-import { DbTrajectory, FsTrajectory, TRAJECTORY_DATA_TYPE, Types } from '@/shared/types';
+import { DbTrajectory, ErrorMessage, FsTrajectory, TRAJECTORY_DATA_TYPE, Types } from '@/shared/types';
 import { AuthService } from '@/shared/services/authService.ts';
 import { fetchWithProgress } from '@/shared/services/progressService.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { getErrorMessage } from '@/shared/utils/warningUtils.ts';
 
 /**
  * Retrieve a list of trajectories by type and horizon from database
@@ -81,7 +82,7 @@ export const uploadTrajectory = async (
   horizon: string,
   studyId: number,
   onProgress: (progress: number) => void,
-): Promise<DbTrajectory> => {
+): Promise<DbTrajectory | Error | ErrorMessage> => {
   const urlApi = `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   const [_, response] = await fetchWithProgress(
     urlApi,
@@ -95,10 +96,10 @@ export const uploadTrajectory = async (
   );
 
   if (!(response as Response).ok) {
-    const errorText: string = await (response as Response).text();
-    const errorData = JSON.parse(errorText) as Error;
-    throw new Error(`${errorData?.message || errorText}`);
+    const errorMessage = await getErrorMessage(response as Response);
+    throw new Error(`${errorMessage.message}`);
   }
+
   return (await (response as Response).json()) as DbTrajectory;
 };
 
@@ -115,7 +116,7 @@ export const linkTrajectoryToStudy = async (
   type: TRAJECTORY_TYPE,
   trajectoryId: number,
   studyId: number,
-): Promise<DbTrajectory | Error> => {
+): Promise<DbTrajectory | Error | ErrorMessage> => {
   const urlApi = `${TRAJECTORY_LINK_TO_STUDY_ENDPOINT}?type=${type}&trajectoryId=${trajectoryId}&studyId=${studyId}`;
   const response = await AuthService.authFetch(urlApi, {
     method: 'PUT',
@@ -124,8 +125,8 @@ export const linkTrajectoryToStudy = async (
     },
   });
   if (!response.ok) {
-    const errorData = (await response.json()) as Error;
-    throw new Error(`${(errorData as unknown as Error)?.message || 'Failed to link a trajectory to study'}`);
+    const errorMessage = await getErrorMessage(response);
+    throw new Error(`${errorMessage.message}`);
   }
 
   return (await response.json()) as DbTrajectory;

@@ -26,6 +26,7 @@ import {
   SelectOption,
   StudyActionType,
   StudyDTO,
+  TabProps,
   TrajectoryAreaDataScheme,
   TrajectoryLinkDataScheme,
   TrajectoryViewData,
@@ -43,7 +44,7 @@ import { useLocation } from 'react-router-dom';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { ErrorMessageType } from '@/shared/types/Generic.type.ts';
 
-const AreaLinkTab = () => {
+const AreaLinkTab = ({ setErrorMessage }: TabProps) => {
   const studyState = useStudy();
   const location = useLocation();
   const study = (location.state as LocationState)?.study;
@@ -86,11 +87,7 @@ const AreaLinkTab = () => {
       let trajectoryLinkResult;
       let studyData;
       try {
-        dispatch?.({
-          type: STUDY_ACTION.REMOVE_TRAJECTORY_ERROR,
-          payload: [TRAJECTORY_TYPE.AREA, TRAJECTORY_TYPE.LINK],
-        });
-
+        setErrorMessage('');
         [studyData, trajectoryAreaResult, trajectoryLinkResult] = await Promise.all([
           getStudyById(study.id),
           getStudyTrajectories(study.id, TRAJECTORY_TYPE.AREA),
@@ -100,18 +97,13 @@ const AreaLinkTab = () => {
           (trajectoryAreaResult as DbTrajectory[])?.length > 0 ||
           (trajectoryLinkResult as DbTrajectory[])?.length > 0
         ) {
-          const trajectoryArea = (trajectoryAreaResult as DbTrajectory[])[0] ?? null;
-          const trajectoryLink = (trajectoryLinkResult as DbTrajectory[])[0] ?? null;
+          const trajectoryArea: DbTrajectory = (trajectoryAreaResult as DbTrajectory[])[0] ?? null;
+          const trajectoryLink: DbTrajectory = (trajectoryLinkResult as DbTrajectory[])[0] ?? null;
           dispatch?.({
-            type: STUDY_ACTION.ADD_TRAJECTORIES,
-            payload: [
-              trajectoryArea && { ...trajectoryArea, state: TRAJECTORY_SELECTION_STATUS.OK },
-              trajectoryLink && {
-                ...trajectoryLink,
-                state: TRAJECTORY_SELECTION_STATUS.OK,
-              },
-            ].filter(Boolean),
+            type: STUDY_ACTION.ADD_AREA_TRAJECTORIES,
+            payload: [trajectoryArea && { ...trajectoryArea }, trajectoryLink && { ...trajectoryLink }].filter(Boolean),
           });
+
           setData([
             {
               hypothesis: 'Areas',
@@ -152,7 +144,7 @@ const AreaLinkTab = () => {
     index: number,
     trajectoryId: number,
     trajectoryLabel: string,
-    errorMessage?: string,
+    errorMessage: string,
   ) => {
     try {
       const newDbTrajectory = buildErrorTrajectory(
@@ -162,6 +154,7 @@ const AreaLinkTab = () => {
         errorMessage,
         user?.profile?.sub,
       );
+      setErrorMessage(errorMessage);
       //Case: area control failed and a trajectory Links is linked to the study with ok status
       if (index === 0 && data[1]?.trajectory && data[1]?.status != TRAJECTORY_SELECTION_STATUS.ERROR) {
         await unlinkTrajectoryFromStudy(data[1].trajectory.id, study.id);
@@ -183,10 +176,6 @@ const AreaLinkTab = () => {
           return prev;
         });
       }
-      dispatch?.({
-        type: index === 0 ? STUDY_ACTION.ADD_TRAJECTORY_AREA : STUDY_ACTION.ADD_TRAJECTORY_LINK,
-        payload: newDbTrajectory,
-      } as StudyActionType);
       setReadOnly({ '0': false, '1': false });
     } catch {
       //Silent handler
@@ -201,6 +190,7 @@ const AreaLinkTab = () => {
           await unlinkTrajectoryFromStudy(data[1].trajectory.id, study.id);
         }
       }
+      setErrorMessage(t('studyDetails.@add_trajectories_message'));
       dispatch?.({
         type: STUDY_ACTION.CLEAR_AREA_AND_LINK_TRAJECTORY,
       } as StudyActionType);
@@ -216,6 +206,7 @@ const AreaLinkTab = () => {
       if (status === 'empty') {
         await unlinkTrajectoryFromStudy(trajectoryId, study.id);
       }
+      index === 0 ? setErrorMessage(t('studyDetails.@add_trajectories_message')) : setErrorMessage('');
       dispatch?.({
         type: index === 0 ? STUDY_ACTION.CLEAR_AREA_TRAJECTORY : STUDY_ACTION.CLEAR_LINK_TRAJECTORY,
       } as StudyActionType);
@@ -237,11 +228,12 @@ const AreaLinkTab = () => {
   ) => {
     try {
       if (trajectoryId != null && status === 'success') {
+        setErrorMessage('');
         await linkTrajectoryToStudy(index === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK, trajectoryId, study.id)
           .then((payload) => {
             dispatch?.({
               type: index === 0 ? STUDY_ACTION.ADD_TRAJECTORY_AREA : STUDY_ACTION.ADD_TRAJECTORY_LINK,
-              payload: { ...payload, state: TRAJECTORY_SELECTION_STATUS.OK },
+              payload,
             } as StudyActionType);
             setData((prev) => {
               if (index != null && prev[index]) {
@@ -267,7 +259,7 @@ const AreaLinkTab = () => {
         await handleTrajectoryDeletion(index, status, trajectoryId);
       }
 
-      if (index != null && status === 'error' && trajectoryId != null && trajectoryLabel) {
+      if (index != null && status === 'error' && trajectoryId != null && trajectoryLabel && !!errorMessage) {
         await handleTrajectoryError(index, trajectoryId, trajectoryLabel, errorMessage);
       }
     } catch (error) {
