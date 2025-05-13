@@ -122,7 +122,7 @@ describe('fetchTrajectoriesFromFS', () => {
   });
 });
 
-describe.only('uploadTrajectory', () => {
+describe('uploadTrajectory', () => {
   const onProgress = vi.fn();
   const requestOptions = {
     method: 'POST',
