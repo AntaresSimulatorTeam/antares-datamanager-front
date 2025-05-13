@@ -56,10 +56,10 @@ const StudyDetails = () => {
       );
     }
     if (activeTab.name === TRAJECTORY_TYPE.AREA) {
-      if (studyState?.LINK && studyState?.LINK?.[0]?.messages?.length > 0) {
-        const linkMessage = studyState.LINK[0].messages.map((message) => ({
+      if (studyState?.LINK && (studyState?.LINK?.[0] as DbTrajectory)?.messages?.length > 0) {
+        const linkMessage = (studyState.LINK[0] as DbTrajectory).messages.map((message) => ({
           ...message,
-          trajectory: studyState.LINK?.[0]?.trajectoryName ?? '',
+          trajectory: (studyState.LINK?.[0] as DbTrajectory)?.trajectoryName ?? '',
         }));
         if (messages.length > 0) {
           const temporaryMessage = messages;

@@ -49,9 +49,9 @@ export const getErrorMessage = async (response: Response): Promise<{ message: st
   if (
     response.status === 400 &&
     'antaresErrorMessage' in errorData &&
-    errorData?.type === ERROR_MESSAGE_TYPE.BUSINESS
+    (errorData as ErrorMessage)?.type === ERROR_MESSAGE_TYPE.BUSINESS
   ) {
-    const messageText = errorData.antaresErrorMessage;
+    const messageText = (errorData as ErrorMessage).antaresErrorMessage as string;
     return { message: messageText };
   } else {
     return { message: (errorData as Error).message };
