@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "fix/ANT-2962_handle_area_change",
-  commit: "abaa374",
-  commitTime: "2025-05-07T09:57:08.548Z"
+  branch: "fix/ANT-2958_hover_delete_button",
+  commit: "1dc9eea",
+  commitTime: "2025-05-13T08:14:30.421Z"
 };

@@ -320,6 +320,9 @@ const LoadTab = () => {
             removeRow={(rowIndex: number, value: unknown) => {
               void removeRow(rowIndex, value as string);
             }}
+            //trClassName="table-td:last-child:hover:[&>button]:opacity-100"
+            //trClassName="table-td:last:hover:has-[&_button]:opacity-100"
+            trClassName="group-hover:hover:last:has-[&_button]:opacity-100"
           />
         </div>
       </div>
