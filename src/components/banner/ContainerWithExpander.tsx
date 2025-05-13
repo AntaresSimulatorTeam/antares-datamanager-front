@@ -40,7 +40,7 @@ export const ContainerWithExpander = <T,>({ content, placeholder }: Props<T>) =>
               textColor="white"
             />
           )}
-          <span className="text-body-l">{t('studyDetails.@warnings')}</span>
+          <span className="text-body-m">{t('studyDetails.@warnings')}</span>
         </div>
         {content.length > 0 && isOpen && (
           <VirtualizerList
