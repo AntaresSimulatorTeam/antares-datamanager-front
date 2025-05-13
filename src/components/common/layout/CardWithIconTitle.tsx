@@ -26,8 +26,10 @@ export const CardWithIconTitle = ({ data, size, transform, buttonLabel }: CardWi
     style={{ width: size, transform }}
     className={`absolute left-0 flex h-full flex-col justify-start gap-1 rounded-lg border-b-4 border-transparent bg-gray-100 shadow-2 ${data.colorBorder} p-2`}
   >
-    <div className="flex items-center justify-between">
-      <div className="line-clamp-2 text-ellipsis text-start text-body-s">{data.title}</div>
+    <div className="flex items-start justify-between gap-1">
+      <RdsTextTooltip text={data.title} offset={5} placement="top">
+        <div className="line-clamp-1 text-ellipsis break-all text-start text-body-s">{data.title}</div>
+      </RdsTextTooltip>
       <div className="flex">
         <ButtonWithStdIcon
           label={buttonLabel}
