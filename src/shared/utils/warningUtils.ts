@@ -1,7 +1,7 @@
 import { CardDataType } from '@common/layout/CardWithIconTitle.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
-import { ERROR_MESSAGE, WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
-import { ErrorMessage, StudyState, WarningMessage } from '@/shared/types';
+import { ERROR_MESSAGE_TYPE, WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
+import { DbTrajectory, ErrorMessage, StudyState, WarningMessage } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 
 export const sortByLevel = (a: WarningMessage, b: WarningMessage): number => {
@@ -45,14 +45,14 @@ export const convertDataToItem = <T>(data: T): CardDataType => {
 };
 
 export const getErrorMessage = async (response: Response): Promise<{ message: string }> => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const errorData = await response.json();
+  const errorData = (await response.json()) as unknown as Error | ErrorMessage;
   if (
     response.status === 400 &&
     'antaresErrorMessage' in errorData &&
-    (errorData as ErrorMessage).type === ERROR_MESSAGE.BUSINESS
+    errorData?.type === ERROR_MESSAGE_TYPE.BUSINESS
   ) {
-    return { message: (errorData as ErrorMessage).antaresErrorMessage };
+    const messageText = errorData.antaresErrorMessage;
+    return { message: messageText };
   } else {
     return { message: (errorData as Error).message };
   }
@@ -62,10 +62,11 @@ export const getMessagesNb = (studyState: Partial<StudyState>, tabName: TRAJECTO
   let warmingMessagesNb: number = 0;
   if (tabName === TRAJECTORY_TYPE.AREA) {
     warmingMessagesNb =
-      (studyState?.[`${TRAJECTORY_TYPE.AREA}`]?.[0]?.messages?.length ?? 0) +
-      (studyState?.[`${TRAJECTORY_TYPE.LINK}`]?.[0]?.messages?.length ?? 0);
+      ((studyState?.[`${TRAJECTORY_TYPE.AREA}`]?.[0] as DbTrajectory)?.messages?.length ?? 0) +
+      ((studyState?.[`${TRAJECTORY_TYPE.LINK}`]?.[0] as DbTrajectory)?.messages?.length ?? 0);
   } else if (studyState?.[`${tabName}`]) {
-    warmingMessagesNb = studyState?.[`${tabName}`]?.reduce((acc, prev) => acc + prev.messages?.length, 0) ?? 0;
+    warmingMessagesNb =
+      (studyState?.[`${tabName}`] as DbTrajectory[])?.reduce((acc, prev) => acc + prev.messages?.length, 0) ?? 0;
   }
   return warmingMessagesNb;
 };

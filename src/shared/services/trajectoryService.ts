@@ -12,7 +12,7 @@ import {
   TRAJECTORY_FILE_SYSTEM_ENDPOINT,
   TRAJECTORY_LINK_TO_STUDY_ENDPOINT,
 } from '@/shared/const/apiEndPoint.ts';
-import { DbTrajectory, ErrorMessage, FsTrajectory, TRAJECTORY_DATA_TYPE, Types } from '@/shared/types';
+import { DbTrajectory, FsTrajectory, TRAJECTORY_DATA_TYPE, Types } from '@/shared/types';
 import { AuthService } from '@/shared/services/authService.ts';
 import { fetchWithProgress } from '@/shared/services/progressService.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
@@ -82,7 +82,7 @@ export const uploadTrajectory = async (
   horizon: string,
   studyId: number,
   onProgress: (progress: number) => void,
-): Promise<DbTrajectory | Error | ErrorMessage> => {
+): Promise<DbTrajectory> => {
   const urlApi = `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   const [_, response] = await fetchWithProgress(
     urlApi,
@@ -109,14 +109,14 @@ export const uploadTrajectory = async (
  * @param {number} trajectoryId - Trajectory id
  * @param {number} studyId - Study id
  *
- * @return {Promise<DbTrajectory | Error>} - Trajectory linked to a study
+ * @return {Promise<DbTrajectory>} - Trajectory linked to a study
  */
 
 export const linkTrajectoryToStudy = async (
   type: TRAJECTORY_TYPE,
   trajectoryId: number,
   studyId: number,
-): Promise<DbTrajectory | Error | ErrorMessage> => {
+): Promise<DbTrajectory> => {
   const urlApi = `${TRAJECTORY_LINK_TO_STUDY_ENDPOINT}?type=${type}&trajectoryId=${trajectoryId}&studyId=${studyId}`;
   const response = await AuthService.authFetch(urlApi, {
     method: 'PUT',

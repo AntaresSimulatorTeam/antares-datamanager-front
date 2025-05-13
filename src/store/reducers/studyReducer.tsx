@@ -1,10 +1,10 @@
-import { DbTrajectoryWithState, StudyActionType, StudyState, WarningMessage } from '@/shared/types';
+import { DbTrajectory, StudyActionType, StudyState, WarningMessage } from '@/shared/types';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
 
-const addAreaTrajectories = (prevState: Partial<StudyState>, trajectories: DbTrajectoryWithState[]) => {
+const addAreaTrajectories = (prevState: Partial<StudyState>, trajectories: DbTrajectory[]) => {
   const studyState = {};
   trajectories.forEach((trajectory) => {
     if (trajectory?.type === TRAJECTORY_TYPE.AREA) {
@@ -21,10 +21,7 @@ const addAreaTrajectories = (prevState: Partial<StudyState>, trajectories: DbTra
   return { ...prevState, ...studyState };
 };
 
-const addTrajectories = (
-  prevState: Partial<StudyState>,
-  trajectories: DbTrajectoryWithState[],
-): Partial<StudyState> => {
+const addTrajectories = (prevState: Partial<StudyState>, trajectories: DbTrajectory[]): Partial<StudyState> => {
   const studyState = {};
   trajectories.forEach((trajectory) => Object.assign(studyState, { [`${trajectory?.type}`]: [trajectory] }));
   return { ...prevState, ...studyState };
@@ -57,9 +54,9 @@ export const addMessage = (
   return prevState;
 };
 
-const addLoadTrajectory = (prevState: Partial<StudyState>, payload: DbTrajectoryWithState): Partial<StudyState> => {
+const addLoadTrajectory = (prevState: Partial<StudyState>, payload: DbTrajectory): Partial<StudyState> => {
   const loadTrajectory = Array.isArray(prevState[`${TRAJECTORY_TYPE.LOAD}`])
-    ? (prevState[`${TRAJECTORY_TYPE.LOAD}`] as DbTrajectoryWithState[])
+    ? (prevState[`${TRAJECTORY_TYPE.LOAD}`] as DbTrajectory[])
     : null;
 
   if (loadTrajectory?.length) {
@@ -76,7 +73,7 @@ const addLoadTrajectory = (prevState: Partial<StudyState>, payload: DbTrajectory
 
 const deleteLoadTrajectory = (prevState: Partial<StudyState>, payload: string) => {
   const loadTrajectory = Array.isArray(prevState[`${TRAJECTORY_TYPE.LOAD}`])
-    ? (prevState[`${TRAJECTORY_TYPE.LOAD}`] as DbTrajectoryWithState[])
+    ? (prevState[`${TRAJECTORY_TYPE.LOAD}`] as DbTrajectory[])
     : null;
   if (loadTrajectory?.length) {
     const index = loadTrajectory.findIndex((trajectory) => trajectory.loadArea === payload);

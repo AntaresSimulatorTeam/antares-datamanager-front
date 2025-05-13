@@ -1,5 +1,6 @@
 import { DbTrajectory, WarningMessage } from '@/shared/types';
-import { TRAJECTORY_TYPE, WARNING_MESSAGE_LEVEL } from '@/shared/enum/trajectory.ts';
+import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
 
 export const mockDbTrajectory: DbTrajectory = {
   id: 1,
