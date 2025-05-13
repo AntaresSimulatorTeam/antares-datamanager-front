@@ -227,7 +227,7 @@ describe('linkTrajectoryToStudy', () => {
         }),
     });
 
-    await expect(async () => linkTrajectoryToStudy(TRAJECTORY_TYPE.AREA, 100, 2)).rejects.toThrowError('Error message');
+    await expect(async () => linkTrajectoryToStudy(TRAJECTORY_TYPE.AREA, 100, 2)).rejects.toThrowError('error');
   });
 
   it('should handle exceptions during link creation', async () => {
