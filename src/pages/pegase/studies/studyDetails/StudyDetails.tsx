@@ -56,8 +56,8 @@ const StudyDetails = () => {
       );
     }
     if (activeTab.name === TRAJECTORY_TYPE.AREA) {
-      if (studyState?.LINK && (studyState?.LINK?.[0] as DbTrajectory)?.messages?.length > 0) {
-        const linkMessage = (studyState.LINK[0] as DbTrajectory).messages.map((message) => ({
+      if (studyState?.LINK && studyState?.LINK?.[0]?.messages?.length > 0) {
+        const linkMessage = studyState.LINK[0].messages.map((message) => ({
           ...message,
           trajectory: (studyState.LINK?.[0] as DbTrajectory)?.trajectoryName ?? '',
         }));
@@ -119,7 +119,7 @@ const StudyDetails = () => {
               <ButtonWithStdIcon
                 label={t('studyDetails.@generate')}
                 onClick={() => void handleGenerateStudy()}
-                disabled={(!studyState.AREA && !!errorMessage) || studyState.studyStatus === StudyStatus.GENERATED}
+                disabled={!studyState.AREA || studyState.studyStatus === StudyStatus.GENERATED}
                 icon={StdIconId.CheckCircle}
                 position="right"
                 isLoading={isGenerating}

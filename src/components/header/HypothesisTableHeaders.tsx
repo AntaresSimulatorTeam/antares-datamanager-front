@@ -22,14 +22,15 @@ const getHypothesisTableHeaders = (
   t: (value: string) => string,
   handleUpdate: (
     trajectoryId: number,
-    status?: RowStatus,
-    trajectoryLabel?: string | null,
+    status: RowStatus,
+    trajectoryLabel?: string,
     index?: number,
+    errorMessage?: string,
   ) => Promise<void>,
   handleImport: (index: number) => Promise<void>,
   handlerSearch: (value?: string, index?: number) => Promise<SelectOption[] | undefined>,
   handleView: (index: number) => Promise<void>,
-  error: { index: number; message: string },
+  error: ErrorMessageType,
   setErrorInfo: Dispatch<SetStateAction<ErrorMessageType>>,
   studyStatus: StudyStatus | undefined,
 ) => [
@@ -75,7 +76,7 @@ const getHypothesisTableHeaders = (
                 void handleUpdate(
                   trajectory.id,
                   status === TRAJECTORY_SELECTION_STATUS.ERROR ? 'emptyError' : 'empty',
-                  null,
+                  '',
                   row.index,
                 );
               }}

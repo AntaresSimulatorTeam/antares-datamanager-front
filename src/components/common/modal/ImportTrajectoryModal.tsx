@@ -10,7 +10,7 @@ import { convertToFSSelectionOptionType } from '@/shared/utils/formFormatter.ts'
 
 interface ImportTrajectoryModalProps {
   options: SelectOption[] | undefined;
-  onClose: (status?: RowStatus, valueId?: number, valueLabel?: string, errorMessage?: string) => Promise<void>;
+  onClose: (status?: RowStatus, id?: number, label?: string, errorMessage?: string) => Promise<void>;
   trajectoryType: TRAJECTORY_TYPE;
   studyHorizon: string;
   studyId: number;

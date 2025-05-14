@@ -25,7 +25,7 @@ export const VirtualizerList = <T,>({ items, isOpen, renderItem }: Props<T>) => 
     <div ref={listRef} className={`w-full overflow-y-auto rounded-lg pb-1 ${isOpen ? 'h-full' : '0'} scrollbar-thin`}>
       <div className="relative h-full w-full">
         {virtualizer.getVirtualItems()?.map((virtualItem) => {
-          const item: T = items?.[virtualItem.index];
+          const item: T = items[virtualItem.index];
           return renderItem(item, `${virtualItem.size}px`, `translateX(${virtualItem.start}px)`, `${virtualItem.key}`);
         })}
       </div>

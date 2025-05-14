@@ -154,6 +154,7 @@ const AreaLinkTab = ({ setErrorMessage }: TabProps) => {
         errorMessage,
         user?.profile?.sub,
       );
+
       setErrorMessage(errorMessage);
       //Case: area control failed and a trajectory Links is linked to the study with ok status
       if (index === 0 && data[1]?.trajectory && data[1]?.status != TRAJECTORY_SELECTION_STATUS.ERROR) {
@@ -162,6 +163,7 @@ const AreaLinkTab = ({ setErrorMessage }: TabProps) => {
           type: STUDY_ACTION.CLEAR_LINK_TRAJECTORY,
         } as StudyActionType);
         setData((prev) => {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           prev[0].trajectory = newDbTrajectory;
           prev[0].status = TRAJECTORY_SELECTION_STATUS.ERROR;
           prev[1].trajectory = null;
@@ -171,6 +173,7 @@ const AreaLinkTab = ({ setErrorMessage }: TabProps) => {
       } else {
         //Case: links control failed and a trajectory area is linked to the study
         setData((prev) => {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           prev[index].trajectory = newDbTrajectory;
           prev[index].status = TRAJECTORY_SELECTION_STATUS.ERROR;
           return prev;
@@ -206,6 +209,7 @@ const AreaLinkTab = ({ setErrorMessage }: TabProps) => {
       if (status === 'empty') {
         await unlinkTrajectoryFromStudy(trajectoryId, study.id);
       }
+
       index === 0 ? setErrorMessage(t('studyDetails.@add_trajectories_message')) : setErrorMessage('');
       dispatch?.({
         type: index === 0 ? STUDY_ACTION.CLEAR_AREA_TRAJECTORY : STUDY_ACTION.CLEAR_LINK_TRAJECTORY,
@@ -221,9 +225,9 @@ const AreaLinkTab = ({ setErrorMessage }: TabProps) => {
 
   const handleTrajectoryUpdate = async (
     trajectoryId: number,
-    status?: RowStatus,
-    trajectoryLabel?: string | null,
-    index?: number | undefined,
+    status: RowStatus,
+    trajectoryLabel?: string,
+    index?: number,
     errorMessage?: string,
   ) => {
     try {
@@ -237,7 +241,7 @@ const AreaLinkTab = ({ setErrorMessage }: TabProps) => {
             } as StudyActionType);
             setData((prev) => {
               if (index != null && prev[index]) {
-                prev[index].trajectory = payload as DbTrajectory;
+                prev[index].trajectory = payload;
                 prev[index].status = getStatus(status);
               }
               return prev;
@@ -306,7 +310,7 @@ const AreaLinkTab = ({ setErrorMessage }: TabProps) => {
         });
         setIsViewModalOpen(true);
       } catch (error) {
-        // silent handler
+        console.error(error);
       }
     } else {
       return;
@@ -342,9 +346,9 @@ const AreaLinkTab = ({ setErrorMessage }: TabProps) => {
       {isModalOpen && (
         <ImportTrajectoryModal
           options={optionsFS}
-          onClose={async (status, value, label, errorMessage) => {
-            if (status && value != null) {
-              await handleTrajectoryUpdate(value, status, label, rowIndexSelected, errorMessage);
+          onClose={async (status?: RowStatus | undefined, id?: number, label?: string, errorMessage?: string) => {
+            if (status && id != null) {
+              await handleTrajectoryUpdate(id, status, label, rowIndexSelected, errorMessage);
             }
             toggleModal();
           }}
