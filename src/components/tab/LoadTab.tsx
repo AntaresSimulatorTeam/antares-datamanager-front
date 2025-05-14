@@ -29,7 +29,7 @@ import {
 } from '@/shared/services/trajectoryService.ts';
 import { convertToSelectionOptionType } from '@/shared/utils/formFormatter.ts';
 import SearchBar from '@/pages/pegase/home/components/SearchBar.tsx';
-import { RdsCheckbox, RdsCheckboxGroupWrapper } from 'rte-design-system-react';
+import { RdsCheckbox, RdsCheckboxGroupWrapper, RdsDivider } from 'rte-design-system-react';
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
@@ -59,6 +59,7 @@ const LoadTab = () => {
   const [data, setData] = useState<HypothesisRowData[]>([]);
   const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
+  const [areasDefaultOptions, setAreasDefaultOptions] = useState<CheckBoxData[]>([]);
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
 
   useEffect(() => {
@@ -90,6 +91,7 @@ const LoadTab = () => {
                 }
               })
               .filter(Boolean) as CheckBoxData[];
+            setAreasDefaultOptions(areaDefault);
             setAreasOptions(areaDefault?.concat(newArea));
 
             // Find default area not included in areas trajectory list
@@ -293,16 +295,19 @@ const LoadTab = () => {
             onChange={(value: string, status?: boolean) => void handleSelectionChange(value, status)}
             checkedValues={checkedValues}
           >
-            {areasOptions?.map((area) => (
-              <RdsCheckbox
-                key={`load-check-${area.name}`}
-                label={area.name}
-                value={area.name}
-                name={''}
-                defaultChecked={area.isDefault}
-                disabled={area.isDefault}
-                checked={area.isDefault}
-              />
+            {areasOptions?.map((area, index) => (
+              <div key={`${index}-${area.name}`}>
+                <RdsCheckbox
+                  key={`load-check-${area.name}`}
+                  label={area.name}
+                  value={area.name}
+                  name={''}
+                  defaultChecked={area.isDefault}
+                  disabled={area.isDefault}
+                  checked={area.isDefault}
+                />
+                {index === Math.max(areasDefaultOptions?.length - 2, 0) && <RdsDivider />}
+              </div>
             ))}
           </RdsCheckboxGroupWrapper>
         </div>
