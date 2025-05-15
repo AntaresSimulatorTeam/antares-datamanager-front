@@ -20,7 +20,6 @@ import { DetailsContent } from '@/components/banner/DetailsContent.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { ContainerWithExpander } from '@/components/banner/ContainerWithExpander.tsx';
-import { sortByLevel } from '@/shared/utils/warningUtils.ts';
 
 interface StudyState {
   study: StudyDTO;
@@ -46,12 +45,12 @@ const StudyDetails = () => {
 
   useEffect(() => {
     let messages: WarningMessage[] = [];
-    const trajectory: DbTrajectory[] | null = studyState[activeTab.name as keyof typeof TRAJECTORY_TYPE] ?? null;
-    if (trajectory && trajectory.length > 0) {
-      messages = trajectory.flatMap((item) =>
-        item.messages.map((message) => ({
+    const trajectories: DbTrajectory[] | null = studyState[activeTab.name as keyof typeof TRAJECTORY_TYPE] ?? null;
+    if (trajectories && trajectories.length > 0) {
+      messages = trajectories.flatMap((trajectory) =>
+        trajectory.messages.map((message) => ({
           ...message,
-          trajectory: item.trajectoryName,
+          trajectory: trajectory.trajectoryName,
         })),
       );
     }
@@ -62,14 +61,15 @@ const StudyDetails = () => {
           trajectory: (studyState.LINK?.[0] as DbTrajectory)?.trajectoryName ?? '',
         }));
         if (messages.length > 0) {
-          const temporaryMessage = messages;
+          const temporaryMessage: WarningMessage[] = messages;
           messages = temporaryMessage.concat(linkMessage);
+          messages.sort((a: WarningMessage, b: WarningMessage) => a.generatedAt.getTime() - b.generatedAt.getTime());
         } else {
           messages = linkMessage;
         }
       }
     }
-    setMessagesWarning(messages?.sort(sortByLevel));
+    setMessagesWarning(messages);
   }, [activeTab, studyState]);
 
   const handleGenerateStudy = async () => {
@@ -88,9 +88,9 @@ const StudyDetails = () => {
       <p>{t('studyDetails.@loadingProjects')}</p>
     </div>
   ) : (
-    <div className="flex h-full w-full flex-col">
+    <div className="flex h-full w-full flex-col pb-20">
       <StudyHeader projectName={study.project} studyName={study.name} />
-      <div className="relative flex h-full w-full flex-col overflow-y-auto">
+      <div className="relative flex h-full w-full flex-col">
         <RdsDivider />
         <div className="flex flex-col">
           <DetailsContent content={study} />
@@ -105,13 +105,13 @@ const StudyDetails = () => {
             />
           </div>
         </div>
-        <div className="flex-start flex h-full flex-col overflow-y-auto px-4">
-          <div className="flex h-full w-full flex-col gap-8">
+        <div className="flex h-full flex-col overflow-y-auto px-4">
+          <div className="flex h-full w-full flex-col gap-6">
             <ContainerWithExpander content={messagesWarning} placeholder={t('studyDetails.@noWarnings')} />
             <div className="flex w-full">{activeContent}</div>
           </div>
-          <div className="sticky bottom-0 right-0 h-fit w-full border-t bg-gray-w p-1">
-            <div className="flex h-fit items-center justify-end">
+          <div className="fixed bottom-0 right-0 w-full border-t bg-gray-w p-1">
+            <div className="flex h-fit w-full items-center justify-end">
               {!studyState.AREA && !errorMessage && (
                 <div className="mr-1 text-error-600">{t('studyDetails.@add_trajectories_message')}</div>
               )}

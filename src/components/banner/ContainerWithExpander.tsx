@@ -22,7 +22,7 @@ export const ContainerWithExpander = <T,>({ content, placeholder }: Props<T>) =>
 
   return (
     <div
-      className={`flex ${isOpen && content?.length > 0 ? 'h-1/3' : 'h-fit'} w-full rounded border-gray-600 bg-gray-200 px-2 py-1 shadow-2`}
+      className={`flex transition-[height] duration-500 ${isOpen && content?.length > 0 ? 'aspect-medium:h-2/5 aspect-wide:h-[220px]' : 'h-fit'} w-full rounded border-gray-600 bg-gray-200 px-2 py-1 shadow-2`}
     >
       <div className="flex w-full max-w-fit flex-col pt-3 sm:pt-1.5">
         <button onClick={() => setIsOpen((prev) => !prev)}>

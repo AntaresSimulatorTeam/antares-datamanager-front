@@ -1,8 +1,7 @@
-import { DbTrajectory, StudyActionType, StudyState, WarningMessage } from '@/shared/types';
+import { DbTrajectory, StudyActionType, StudyState } from '@/shared/types';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
-import { WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
 
 const addAreaTrajectories = (prevState: Partial<StudyState>, trajectories: DbTrajectory[]) => {
   const studyState = {};
@@ -25,33 +24,6 @@ const addTrajectories = (prevState: Partial<StudyState>, trajectories: DbTraject
   const studyState = {};
   trajectories.forEach((trajectory) => Object.assign(studyState, { [`${trajectory?.type}`]: [trajectory] }));
   return { ...prevState, ...studyState };
-};
-
-export const addMessage = (
-  prevState: Partial<StudyState>,
-  payload: {
-    message: WarningMessage;
-    type: TRAJECTORY_TYPE;
-  },
-): Partial<StudyState> => {
-  const { message, type } = payload;
-  if (prevState[type]) {
-    if (message.level === WARNING_MESSAGE_LEVEL.ERROR_LEVEL) {
-      prevState[type][0].messages.unshift(message);
-    }
-    if (message.level === WARNING_MESSAGE_LEVEL.WARNING_LEVEL) {
-      const indexMessage = prevState[type][0].messages.findIndex(
-        (item) => item.level === WARNING_MESSAGE_LEVEL.WARNING_LEVEL,
-      );
-      if (indexMessage < 0) {
-        prevState[type][0].messages.push(message);
-      } else {
-        prevState[type][0].messages.splice(indexMessage, 0, message);
-      }
-    }
-  }
-
-  return prevState;
 };
 
 const addLoadTrajectory = (prevState: Partial<StudyState>, payload: DbTrajectory): Partial<StudyState> => {
@@ -116,8 +88,6 @@ export const studyReducer = (prevState: Partial<StudyState>, action?: StudyActio
           [`${TRAJECTORY_TYPE.LINK}`]: null,
           [`${TRAJECTORY_TYPE.LOAD}`]: null,
         };
-      case STUDY_ACTION.ADD_WARNING_MESSAGE:
-        return { ...addMessage(prevState, action.payload) };
       case STUDY_ACTION.ADD_TRAJECTORIES:
         return { ...addTrajectories(prevState, action.payload) };
       case STUDY_ACTION.ADD_AREA_TRAJECTORIES:

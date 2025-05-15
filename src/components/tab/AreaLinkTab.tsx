@@ -163,7 +163,6 @@ const AreaLinkTab = ({ setErrorMessage }: TabProps) => {
           type: STUDY_ACTION.CLEAR_LINK_TRAJECTORY,
         } as StudyActionType);
         setData((prev) => {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           prev[0].trajectory = newDbTrajectory;
           prev[0].status = TRAJECTORY_SELECTION_STATUS.ERROR;
           prev[1].trajectory = null;
@@ -173,7 +172,6 @@ const AreaLinkTab = ({ setErrorMessage }: TabProps) => {
       } else {
         //Case: links control failed and a trajectory area is linked to the study
         setData((prev) => {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           prev[index].trajectory = newDbTrajectory;
           prev[index].status = TRAJECTORY_SELECTION_STATUS.ERROR;
           return prev;
