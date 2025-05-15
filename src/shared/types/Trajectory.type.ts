@@ -4,11 +4,12 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE, WARNING_MESSAGE_LEVEL } from '@/shared/enum/trajectory.ts';
+import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { FileInputStatus } from 'rte-design-system-react';
 // @ts-ignore
 import { AccessorKeyColumnDef } from '@tanstack/table-core/src/types.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
+import { WarningMessage } from '@/shared/types/Warning.type.ts';
 
 export interface FsTrajectory {
   trajectoryName: string;
@@ -27,13 +28,9 @@ export interface DbTrajectory {
   loadArea?: string;
 }
 
-export interface DbTrajectoryWithState extends DbTrajectory {
-  state?: TRAJECTORY_SELECTION_STATUS;
-}
-
 export type HypothesisRowData = {
   hypothesis: string;
-  trajectory: DbTrajectoryWithState | null;
+  trajectory: DbTrajectory | null;
   status: TRAJECTORY_SELECTION_STATUS;
   isDefault?: boolean;
 };
@@ -106,15 +103,4 @@ export interface HypothesisTab {
   label: string;
   icon: StdIconId;
   isDisabled: boolean;
-}
-
-export interface WarningMessage {
-  id: number;
-  content: string;
-  level: WARNING_MESSAGE_LEVEL;
-  code: string;
-  generatedBy: string;
-  generatedAt: Date;
-  trajectory: string;
-  secondTrajectory: string;
 }

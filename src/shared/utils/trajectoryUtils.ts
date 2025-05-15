@@ -2,6 +2,8 @@ import { DbTrajectory, HypothesisRowData, RowStatus } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { FileInputStatus } from 'rte-design-system-react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
+import { WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
+import { AREA_OTHERS } from '@/shared/const/studyConfig.ts';
 
 export const getStatus = (status: RowStatus) => {
   switch (status) {
@@ -30,6 +32,34 @@ export const getBgColor = (status: FileInputStatus) => {
   }
 };
 
+export const buildErrorTrajectory = (
+  type: TRAJECTORY_TYPE,
+  trajectoryId: number,
+  trajectoryLabel: string,
+  errorMessage?: string,
+  userName?: string,
+) => ({
+  id: trajectoryId,
+  trajectoryName: trajectoryLabel,
+  type,
+  version: 0,
+  userName: 'unknown_user',
+  creationDate: new Date(),
+  messages: [
+    {
+      id: Math.floor(Math.random() * 10),
+      content: errorMessage ?? 'Error',
+      level: WARNING_MESSAGE_LEVEL.ERROR_LEVEL,
+      code: 'ERROR',
+      generatedBy: userName ?? '',
+      generatedAt: new Date(),
+      trajectory: trajectoryLabel,
+      secondTrajectory: '',
+    },
+  ],
+  state: TRAJECTORY_SELECTION_STATUS.ERROR,
+});
+
 export const removeDuplicate = (arr: DbTrajectory[]) =>
   arr.reduce((acc: DbTrajectory[], current: DbTrajectory) => {
     const x = acc.find((item) => item.id === current.id);
@@ -40,7 +70,7 @@ export const removeDuplicate = (arr: DbTrajectory[]) =>
   }, []);
 
 export const buildRowData = (areaName: string, isDefault: boolean, trajectory?: DbTrajectory): HypothesisRowData => ({
-  hypothesis: areaName,
+  hypothesis: areaName === AREA_OTHERS ? 'Others areas' : areaName,
   trajectory: trajectory?.trajectoryName ? trajectory : null,
   status: trajectory?.trajectoryName ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
   isDefault,

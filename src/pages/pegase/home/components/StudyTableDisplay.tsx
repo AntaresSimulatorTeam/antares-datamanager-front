@@ -58,7 +58,7 @@ const StudyTableDisplay = ({ searchStudy, projectId, projectInfoName }: StudyTab
   };
 
   const selectedRowId = Object.keys(rowSelection)[0];
-  const selectedStatus = rows[Number.parseInt(selectedRowId || '-1')]?.status?.toUpperCase();
+  const selectedStatus = rows[Number.parseInt(selectedRowId || '-1')]?.status?.toUpperCase() as StudyStatus;
   const isDuplicateActive = selectedStatus === StudyStatus.GENERATED;
   const isDeleteActive = selectedStatus === StudyStatus.ERROR || selectedStatus === StudyStatus.IN_PROGRESS;
 
@@ -72,7 +72,7 @@ const StudyTableDisplay = ({ searchStudy, projectId, projectInfoName }: StudyTab
   const handleDeleteClick = () => {
     const selectedStudyId = rows[Number.parseInt(selectedRowId || '-1')]?.id;
     if (selectedStudyId) {
-      deleteStudy(selectedStudyId).then(() => {
+      void deleteStudy(selectedStudyId).then(() => {
         setReloadStudies(!reloadStudies); // Trigger reload after deleting
       });
     }

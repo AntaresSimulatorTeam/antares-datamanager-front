@@ -8,17 +8,17 @@ import StdSimpleTable from '@common/data/stdSimpleTable/StdSimpleTable.tsx';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   DbTrajectory,
-  DbTrajectoryWithState,
+  ErrorMessageType,
   HypothesisRowData,
   LocationState,
   RowStatus,
   SelectOption,
+  TabProps,
   TrajectoryAreaData,
 } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useTranslation } from 'react-i18next';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
-import { ErrorMessageType } from '@/components/tab/AreaLinkTab.tsx';
 import { useLocation } from 'react-router-dom';
 import {
   fetchTrajectoriesFromDB,
@@ -29,7 +29,7 @@ import {
 } from '@/shared/services/trajectoryService.ts';
 import { convertToSelectionOptionType } from '@/shared/utils/formFormatter.ts';
 import SearchBar from '@/pages/pegase/home/components/SearchBar.tsx';
-import { RdsCheckbox, RdsCheckboxGroupWrapper } from 'rte-design-system-react';
+import { RdsCheckbox, RdsCheckboxGroupWrapper, RdsDivider } from 'rte-design-system-react';
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
@@ -48,7 +48,7 @@ export type CheckBoxData = {
   isDefault: boolean;
 };
 
-const LoadTab = () => {
+const LoadTab = ({ setErrorMessage }: TabProps) => {
   const { t } = useTranslation();
   const studyState = useStudy();
   const location = useLocation();
@@ -59,6 +59,7 @@ const LoadTab = () => {
   const [data, setData] = useState<HypothesisRowData[]>([]);
   const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
+  const [areasDefaultOptions, setAreasDefaultOptions] = useState<CheckBoxData[]>([]);
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
 
   useEffect(() => {
@@ -70,7 +71,7 @@ const LoadTab = () => {
         }));
         const trajectoryAreaId =
           studyState && studyState?.[`${TRAJECTORY_TYPE.AREA}`]
-            ? (studyState?.[`${TRAJECTORY_TYPE.AREA}`] as DbTrajectory)?.id
+            ? studyState?.[`${TRAJECTORY_TYPE.AREA}`]?.[0]?.id
             : null;
 
         let newArea: CheckBoxData[];
@@ -90,6 +91,7 @@ const LoadTab = () => {
                 }
               })
               .filter(Boolean) as CheckBoxData[];
+            setAreasDefaultOptions(areaDefault);
             setAreasOptions(areaDefault?.concat(newArea));
 
             // Find default area not included in areas trajectory list
@@ -115,7 +117,7 @@ const LoadTab = () => {
           return buildRowData(area.name, true, trajectoryArea);
         });
 
-        const emptyAreaSelected = (studyState[TRAJECTORY_TYPE.LOAD] as DbTrajectoryWithState[]) ?? [];
+        const emptyAreaSelected = (studyState[TRAJECTORY_TYPE.LOAD] as DbTrajectory[]) ?? [];
         const emptyArea = removeDuplicate(trajectoryLinked.concat(emptyAreaSelected));
         const areaData = emptyArea
           .map((trajectory: DbTrajectory) => {
@@ -148,6 +150,7 @@ const LoadTab = () => {
       }
     };
 
+    setErrorMessage('');
     void fetchHypothesis();
   }, []);
 
@@ -166,17 +169,13 @@ const LoadTab = () => {
         });
       } else if (status === 'success') {
         const newTrajectory = await linkTrajectoryToStudy(TRAJECTORY_TYPE.LOAD, trajectoryId, study.id);
-        const newTrajectoryWithState = {
-          ...newTrajectory,
-          state: TRAJECTORY_SELECTION_STATUS.OK,
-        } as DbTrajectoryWithState;
         dispatch?.({
           type: STUDY_ACTION.ADD_TRAJECTORY_LOAD,
-          payload: newTrajectoryWithState,
+          payload: newTrajectory,
         });
         setData((prev) => {
           if (newTrajectory) {
-            prev[rowIndex].trajectory = newTrajectoryWithState;
+            prev[rowIndex].trajectory = newTrajectory;
             prev[rowIndex].status = TRAJECTORY_SELECTION_STATUS.OK;
           }
           return [...prev];
@@ -281,9 +280,9 @@ const LoadTab = () => {
   );
 
   return (
-    <div className="flex h-fit w-full flex-col gap-4">
-      <div className="flex h-screen w-full gap-6">
-        <div className="flex h-fit w-28 flex-col gap-2 rounded border border-gray-400 p-2">
+    <div className="flex h-full w-full flex-col gap-4">
+      <div className="flex h-full w-full gap-6">
+        <div className="flex h-fit w-28 flex-col gap-1 rounded border border-gray-400 p-2">
           <div className="border-b border-gray-400 pb-2">
             <SearchBar onSearch={() => {}} placeholder={t('studyDetails.@search_area')} />
           </div>
@@ -293,16 +292,19 @@ const LoadTab = () => {
             onChange={(value: string, status?: boolean) => void handleSelectionChange(value, status)}
             checkedValues={checkedValues}
           >
-            {areasOptions?.map((area) => (
-              <RdsCheckbox
-                key={`load-check-${area.name}`}
-                label={area.name}
-                value={area.name}
-                name={''}
-                defaultChecked={area.isDefault}
-                disabled={area.isDefault}
-                checked={area.isDefault}
-              />
+            {areasOptions?.map((area, index) => (
+              <div key={`${index}-${area.name}`} className="my-1">
+                <RdsCheckbox
+                  key={`load-checkbox-${area.name}`}
+                  label={area.name}
+                  value={area.name}
+                  name={''}
+                  defaultChecked={area.isDefault}
+                  disabled={area.isDefault}
+                  checked={area.isDefault}
+                />
+                {index === Math.max(areasDefaultOptions?.length - 2, 0) && <RdsDivider extraClasses="mt-1" />}
+              </div>
             ))}
           </RdsCheckboxGroupWrapper>
         </div>

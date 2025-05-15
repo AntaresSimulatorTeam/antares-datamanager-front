@@ -85,6 +85,9 @@
     "@delete": "Delete"
   },
   "studyDetails": {
+    "@loadingProjects": "Loading project details...",
+    "@warnings": "Warnings",
+    "@noWarnings": "No warning message at this time",
     "@bannerStudyName": "Study: {{name}}",
     "@bannerHorizon": "Horizon: {{horizon}}",
     "@bannerCreatedBy": "By: {{createdBy}}",
@@ -98,7 +101,7 @@
     "@misc": "Misc",
     "@trajectory": "Trajectory",
     "@select_trajectory": "Select a trajectory",
-    "@select_link": "Add an area first",
+    "@select_area": "Add an area first",
     "@import_file": "Import",
     "@select_file_fs_error": "Not such files on file system",
     "@import_from_file_system": "Select {{trajectoryType}} from File System",
@@ -106,6 +109,8 @@
     "@import_status_done": "OK",
     "@import_status_missing": "Missing",
     "@import_status_error": "Error",
+    "@import_status_warning": "Warning",
+    "@skip": "Skip",
     "@preview": "View",
     "@generate": "Generate",
     "@add_trajectories_message": "Please add Areas trajectories first",

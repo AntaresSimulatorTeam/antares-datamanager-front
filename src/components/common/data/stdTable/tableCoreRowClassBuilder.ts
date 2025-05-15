@@ -8,7 +8,8 @@ import clsx from 'clsx';
 
 export const STRIPED_CLASSES = 'even:bg-primary-200';
 export const SELECTED_ROW_CLASSES = 'bg-primary-100';
-export const READONLY_ROW_CLASSES = 'pointer-events-none bg-gray-300 [&_div]:text-gray-600 [&_span]:text-gray-600 ';
+export const READONLY_ROW_CLASSES =
+  'pointer-events-none bg-gray-300 [&_div]:text-gray-600 [&_span]:text-gray-600 [&_svg]:text-gray-600';
 export const READONLY_SELECTED_ROW_CLASSES = 'hover:bg-gray-100';
 
 export const tableCoreRowClassBuilder = (

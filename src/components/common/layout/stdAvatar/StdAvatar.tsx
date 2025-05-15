@@ -8,21 +8,23 @@ import { avatarClassBuilder } from './avatarClassBuilder';
 import { AVATAR_COLORS } from '../stdAvatarGroup/avatarTools';
 import { RdsTextTooltip, useRdsId } from 'rte-design-system-react';
 
+export type AvatarSize = 'es' | 's' | 'm';
+export type AvatarColor = (typeof AVATAR_COLORS)[number];
+export type AvatarTextColor = 'black' | 'white';
+
 type StdAvatarProps = {
   initials: string;
   size: AvatarSize;
   backgroundColor: AvatarColor;
   fullname: string;
   id?: string;
+  textColor?: AvatarTextColor;
 };
-
-export type AvatarSize = 'es' | 's' | 'm';
-export type AvatarColor = (typeof AVATAR_COLORS)[number];
 
 const OFFSET_HOVER_HEIGHT = 5;
 
-const StdAvatar = ({ initials, size, backgroundColor, fullname, id: propsId }: StdAvatarProps) => {
-  const avatarClasses = avatarClassBuilder(size, backgroundColor);
+const StdAvatar = ({ initials, size, backgroundColor, fullname, id: propsId, textColor }: StdAvatarProps) => {
+  const avatarClasses = avatarClassBuilder(size, backgroundColor, textColor);
   const id = useRdsId('avatar', propsId);
 
   return (

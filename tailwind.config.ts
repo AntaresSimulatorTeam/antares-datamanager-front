@@ -25,8 +25,10 @@ export default {
       sm: '1024px',
       md: '1280px',
       lg: '1440px',
-      xl: '1280px',
+      xl: '1680px',
       '2xl': '1920px',
+      'aspect-medium': { raw: '(min-aspect-ratio: 16/10) and (max-aspect-ratio: 16/9)' },
+      'aspect-wide': { raw: '(min-aspect-ratio: 16/9)' },
     },
     colors: {
       primary: {

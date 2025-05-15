@@ -41,9 +41,11 @@ export const CellWithStatus = ({ status, isDeletable, onClick }: CellWithStatusP
   };
 
   return (
-    <div className="flex flex-1 items-center gap-1">
+    <div className="flex flex-none items-center justify-start gap-1">
       {getIcon(status)}
-      {isDeletable && <RdsIconButton icon={RdsIconId.Delete} size="small" onClick={() => void onClick?.()} />}
+      <div className={`${isDeletable ? 'pointer-events-auto visible' : 'pointer-events-none invisible'}`}>
+        <RdsIconButton icon={RdsIconId.Delete} size="small" onClick={() => void onClick?.()} />
+      </div>
     </div>
   );
 };

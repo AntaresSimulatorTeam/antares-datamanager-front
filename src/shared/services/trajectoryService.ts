@@ -16,6 +16,7 @@ import { DbTrajectory, FsTrajectory, TRAJECTORY_DATA_TYPE, Types } from '@/share
 import { AuthService } from '@/shared/services/authService.ts';
 import { fetchWithProgress } from '@/shared/services/progressService.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { getErrorMessage } from '@/shared/utils/warningUtils.ts';
 
 /**
  * Retrieve a list of trajectories by type and horizon from database
@@ -95,8 +96,10 @@ export const uploadTrajectory = async (
   );
 
   if (!(response as Response).ok) {
-    throw new Error('Failed to import trajectory into data base');
+    const errorMessage = await getErrorMessage(response as Response);
+    throw new Error(`${errorMessage.message}`);
   }
+
   return (await (response as Response).json()) as DbTrajectory;
 };
 
@@ -106,14 +109,14 @@ export const uploadTrajectory = async (
  * @param {number} trajectoryId - Trajectory id
  * @param {number} studyId - Study id
  *
- * @return {Promise<DbTrajectory | Error>} - Trajectory linked to a study
+ * @return {Promise<DbTrajectory>} - Trajectory linked to a study
  */
 
 export const linkTrajectoryToStudy = async (
   type: TRAJECTORY_TYPE,
   trajectoryId: number,
   studyId: number,
-): Promise<DbTrajectory | Error> => {
+): Promise<DbTrajectory> => {
   const urlApi = `${TRAJECTORY_LINK_TO_STUDY_ENDPOINT}?type=${type}&trajectoryId=${trajectoryId}&studyId=${studyId}`;
   const response = await AuthService.authFetch(urlApi, {
     method: 'PUT',
@@ -122,7 +125,8 @@ export const linkTrajectoryToStudy = async (
     },
   });
   if (!response.ok) {
-    throw new Error(`${(response as unknown as Error).message}`);
+    const errorMessage = await getErrorMessage(response);
+    throw new Error(`${errorMessage.message}`);
   }
 
   return (await response.json()) as DbTrajectory;

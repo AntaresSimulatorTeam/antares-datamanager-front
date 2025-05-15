@@ -13,20 +13,26 @@ import EnrTab from '@/components/tab/EnrTab.tsx';
 import MiscTab from '@/components/tab/MiscLinkTab.tsx';
 import AreaLinkTab from '@/components/tab/AreaLinkTab.tsx';
 import StdIcon from '@common/base/stdIcon/StdIcon';
-import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useTranslation } from 'react-i18next';
 import { useStudy } from '@/store/contexts/StudyContext.tsx';
-import { DbTrajectoryWithState, HypothesisTab } from '@/shared/types';
+import { HypothesisTab } from '@/shared/types';
+import StdAvatar from '@common/layout/stdAvatar/StdAvatar.tsx';
+import { getMessagesNb } from '@/shared/utils/warningUtils.ts';
+
+type StudyNavigationMenuProps = {
+  onRenderActiveComponent?: (content: ReactNode | null) => void;
+  setActiveTab: Dispatch<SetStateAction<HypothesisTab>>;
+  activeTab: HypothesisTab;
+  setErrorMessage: Dispatch<SetStateAction<string>>;
+};
 
 const StudyNavigationMenu = ({
   onRenderActiveComponent,
   setActiveTab,
   activeTab,
-}: {
-  onRenderActiveComponent?: (content: ReactNode | null) => void;
-  setActiveTab: Dispatch<SetStateAction<HypothesisTab>>;
-  activeTab: HypothesisTab;
-}) => {
+  setErrorMessage,
+}: StudyNavigationMenuProps) => {
   const { t } = useTranslation();
   const studyState = useStudy();
   const [tabs, setTabs] = useState<HypothesisTab[]>([
@@ -40,8 +46,7 @@ const StudyNavigationMenu = ({
       name: TRAJECTORY_TYPE.LOAD,
       label: t('studyDetails.@load'),
       icon: StdIconId.BatteryChargingFull,
-      isDisabled:
-        (studyState[`${TRAJECTORY_TYPE.AREA}`] as DbTrajectoryWithState)?.state !== TRAJECTORY_SELECTION_STATUS.OK,
+      isDisabled: !!studyState[`${TRAJECTORY_TYPE.AREA}`]?.[0],
     },
     {
       name: TRAJECTORY_TYPE.THERMAL_COST,
@@ -53,19 +58,12 @@ const StudyNavigationMenu = ({
     { name: TRAJECTORY_TYPE.MISC, label: t('studyDetails.@misc'), icon: StdIconId.Category, isDisabled: true },
   ]);
 
-  const isTabDisabled = (name: TRAJECTORY_TYPE) => {
-    if (name === TRAJECTORY_TYPE.LOAD) {
-      return (studyState[`${TRAJECTORY_TYPE.AREA}`] as DbTrajectoryWithState)?.state !== TRAJECTORY_SELECTION_STATUS.OK;
-    }
-    return name !== TRAJECTORY_TYPE.AREA;
-  };
-
   const renderActiveComponent = (): ReactNode | null => {
     switch (activeTab.name) {
       case TRAJECTORY_TYPE.AREA:
-        return <AreaLinkTab />;
+        return <AreaLinkTab setErrorMessage={setErrorMessage} />;
       case TRAJECTORY_TYPE.LOAD:
-        return <LoadTab />;
+        return <LoadTab setErrorMessage={setErrorMessage} />;
       case TRAJECTORY_TYPE.THERMAL_COST:
         return <ThermalTab />;
       case TRAJECTORY_TYPE.ENR:
@@ -75,6 +73,13 @@ const StudyNavigationMenu = ({
       default:
         return null;
     }
+  };
+
+  const isTabDisabled = (name: TRAJECTORY_TYPE) => {
+    if (name === TRAJECTORY_TYPE.LOAD) {
+      return !studyState[`${TRAJECTORY_TYPE.AREA}`]?.[0];
+    }
+    return name !== TRAJECTORY_TYPE.AREA;
   };
 
   useEffect(() => {
@@ -89,6 +94,7 @@ const StudyNavigationMenu = ({
   useEffect(() => {
     if (onRenderActiveComponent) {
       if (!activeTab.isDisabled) {
+        setErrorMessage('');
         onRenderActiveComponent(renderActiveComponent());
       }
     }
@@ -96,19 +102,31 @@ const StudyNavigationMenu = ({
 
   return (
     <div className="flex space-x-4 p-4">
-      {tabs.map((tab) => (
-        <div className="flex items-center space-x-2" key={tab.name}>
-          <StdIcon name={tab.icon} />
-          <RdsTabItem
-            key={tab.name}
-            name={tab.name}
-            label={tab.label}
-            active={!tab.isDisabled && activeTab.name === tab.name}
-            onClick={() => !tab.isDisabled && setActiveTab(tab)}
-            disabled={tab.isDisabled}
-          />
-        </div>
-      ))}
+      {tabs.map((tab) => {
+        const warmingMessagesNb = getMessagesNb(studyState, tab.name);
+        return (
+          <div className="flex items-center space-x-2" key={tab.name}>
+            <StdIcon name={tab.icon} />
+            <RdsTabItem
+              key={tab.name}
+              name={tab.name}
+              label={tab.label}
+              active={activeTab.name === tab.name}
+              disabled={tab.isDisabled}
+              onClick={() => setActiveTab(tab)}
+            />
+            {warmingMessagesNb > 0 && activeTab.name !== tab.name && (
+              <StdAvatar
+                initials={`${warmingMessagesNb}`}
+                size="es"
+                backgroundColor="orange"
+                fullname=""
+                textColor="white"
+              />
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 };
