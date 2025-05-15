@@ -14,7 +14,6 @@ import {
   RowStatus,
   SelectOption,
   TabProps,
-  TrajectoryAreaData,
 } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useTranslation } from 'react-i18next';
@@ -23,7 +22,6 @@ import { useLocation } from 'react-router-dom';
 import {
   fetchTrajectoriesFromDB,
   getDefaultLoadHypothesis,
-  getTrajectoryDataByTypeAndId,
   linkTrajectoryToStudy,
   unlinkTrajectoryFromStudy,
 } from '@/shared/services/trajectoryService.ts';
@@ -77,10 +75,172 @@ const LoadTab = ({ setErrorMessage }: TabProps) => {
         let newArea: CheckBoxData[];
         const defaultAreaListNotIncludedInList: string[] = [];
         if (trajectoryAreaId != null) {
-          const trajectoryAreas = (await getTrajectoryDataByTypeAndId(
-            TRAJECTORY_TYPE.AREA,
-            trajectoryAreaId,
-          )) as unknown as TrajectoryAreaData[];
+          // const trajectoryAreas = (await getTrajectoryDataByTypeAndId(
+          //   TRAJECTORY_TYPE.AREA,
+          //   trajectoryAreaId,
+          // )) as unknown as TrajectoryAreaData[];
+          const trajectoryAreas = [
+            {
+              areaName: 'AT',
+              powerToGas: 'true',
+              shortTermStorage: 'true',
+            },
+            {
+              areaName: 'BE',
+              powerToGas: 'true',
+              shortTermStorage: 'true',
+            },
+            {
+              areaName: 'CH',
+              powerToGas: 'true',
+              shortTermStorage: 'true',
+            },
+            {
+              areaName: 'CZ',
+              powerToGas: 'true',
+              shortTermStorage: 'true',
+            },
+            {
+              areaName: 'DE',
+              powerToGas: 'true',
+              shortTermStorage: 'true',
+            },
+            {
+              areaName: 'DEkf',
+              powerToGas: 'true',
+              shortTermStorage: 'true',
+            },
+            {
+              areaName: 'DKe',
+              powerToGas: 'true',
+              shortTermStorage: 'true',
+            },
+            {
+              areaName: 'DKw',
+              powerToGas: 'true',
+              shortTermStorage: 'true',
+            },
+            {
+              areaName: 'DKkf',
+              powerToGas: 'true',
+              shortTermStorage: 'true',
+            },
+            {
+              areaName: 'ES',
+              powerToGas: 'true',
+              shortTermStorage: 'true',
+            },
+            {
+              areaName: 'FR',
+              powerToGas: 'true',
+              shortTermStorage: 'true',
+            },
+            {
+              areaName: 'IE',
+              powerToGas: 'false',
+              shortTermStorage: 'true',
+            },
+            {
+              areaName: 'ITca',
+              powerToGas: 'true',
+              shortTermStorage: 'true',
+            },
+            {
+              areaName: 'ITcn',
+              powerToGas: 'true',
+              shortTermStorage: 'true',
+            },
+            {
+              areaName: 'ITcs',
+              powerToGas: 'true',
+              shortTermStorage: 'false',
+            },
+            {
+              areaName: 'ITn',
+              powerToGas: 'true',
+              shortTermStorage: 'true',
+            },
+            {
+              areaName: 'ITs',
+              powerToGas: 'true',
+              shortTermStorage: 'true',
+            },
+            {
+              areaName: 'ITsar',
+              powerToGas: 'true',
+              shortTermStorage: 'true',
+            },
+            {
+              areaName: 'ITsic',
+              powerToGas: 'true',
+              shortTermStorage: 'true',
+            },
+            {
+              areaName: 'LU',
+              powerToGas: 'true',
+              shortTermStorage: 'true',
+            },
+            {
+              areaName: 'NL',
+              powerToGas: 'true',
+              shortTermStorage: 'false',
+            },
+            {
+              areaName: 'NOm',
+              powerToGas: 'true',
+              shortTermStorage: 'false',
+            },
+            {
+              areaName: 'NOn',
+              powerToGas: 'true',
+              shortTermStorage: 'true',
+            },
+            {
+              areaName: 'NOs',
+              powerToGas: 'true',
+              shortTermStorage: 'true',
+            },
+            {
+              areaName: 'PL',
+              powerToGas: 'true',
+              shortTermStorage: 'true',
+            },
+            {
+              areaName: 'PT',
+              powerToGas: 'true',
+              shortTermStorage: 'true',
+            },
+            {
+              areaName: 'SE1',
+              powerToGas: 'true',
+              shortTermStorage: 'true',
+            },
+            {
+              areaName: 'SE2',
+              powerToGas: 'true',
+              shortTermStorage: 'false',
+            },
+            {
+              areaName: 'SE3',
+              powerToGas: 'false',
+              shortTermStorage: 'true',
+            },
+            {
+              areaName: 'SE4',
+              powerToGas: 'true',
+              shortTermStorage: 'true',
+            },
+            {
+              areaName: 'UKgb',
+              powerToGas: 'true',
+              shortTermStorage: 'false',
+            },
+            {
+              areaName: 'UKni',
+              powerToGas: 'true',
+              shortTermStorage: 'true',
+            },
+          ];
 
           // Build dropdown list options
           if (trajectoryAreas.length > 0) {
