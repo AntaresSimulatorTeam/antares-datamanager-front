@@ -105,7 +105,7 @@ const StudyDetails = () => {
             />
           </div>
         </div>
-        <div className="flex h-full flex-col overflow-y-auto px-4">
+        <div className="relative flex flex-1 flex-col overflow-y-auto px-4">
           <div className="flex h-full w-full flex-col gap-6">
             <ContainerWithExpander content={messagesWarning} placeholder={t('studyDetails.@noWarnings')} />
             <div className="flex w-full">{activeContent}</div>
