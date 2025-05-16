@@ -90,15 +90,19 @@ const skipTrajectoryMessage = (
         // @ts-ignore
         if (prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages.length > 0 && newMessageSkipped) {
           // Remove message skipped
-          prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages.splice(messageSkippedIndex, 1);
-          const messageIndex = prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages.findIndex(
-            (message) =>
-              message.isAck &&
-              new Date(message.generatedAt)?.getTime() > new Date(newMessageSkipped.generatedAt)?.getTime(),
-          );
-          if (messageIndex && messageIndex >= 0 && newMessageSkipped) {
-            // Add skipped message at the end position
-            prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages.splice(messageIndex, 0, newMessageSkipped);
+          if (messageSkippedIndex !== 0) {
+            prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages.splice(messageSkippedIndex, 1);
+            const messageIndex = prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages.findIndex(
+              (message) =>
+                message.isAck &&
+                new Date(message.generatedAt)?.getTime() > new Date(newMessageSkipped.generatedAt)?.getTime(),
+            );
+            if (messageIndex && messageIndex >= 0 && newMessageSkipped) {
+              // Add skipped message at the end position
+              prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages.splice(messageIndex, 0, newMessageSkipped);
+            }
+          } else if (messageSkippedIndex === 0) {
+            prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages.splice(0, 1, newMessageSkipped);
           }
         }
       }
