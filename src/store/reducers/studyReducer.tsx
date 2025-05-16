@@ -81,16 +81,16 @@ const skipTrajectoryMessage = (
       );
       if (messageSkippedIndex && messageSkippedIndex >= 0) {
         const messageSkipped = prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages[messageSkippedIndex];
-        const messages = prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages;
-        if (messages && messages.length > 0 && messageSkipped) {
+        // @ts-ignore
+        if (prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages.length > 0 && messageSkipped) {
           // Remove message skipped
           prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages.splice(messageSkippedIndex, 1);
-          const messageIndex = messages.findIndex(
+          const messageIndex = prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages.findIndex(
             (message) =>
               message.isAck &&
               new Date(message.generatedAt)?.getTime() > new Date(messageSkipped.generatedAt)?.getTime(),
           );
-          if (messageIndex >= 0 && messageSkipped) {
+          if (messageIndex && messageIndex >= 0 && messageSkipped) {
             // Add skipped message at the end position
             prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages.splice(messageIndex, 0, messageSkipped);
           }
