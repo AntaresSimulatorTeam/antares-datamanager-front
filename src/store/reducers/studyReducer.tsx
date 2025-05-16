@@ -82,6 +82,7 @@ const skipTrajectoryMessage = (
       if (messageSkippedIndex && messageSkippedIndex >= 0) {
         const messageSkipped = prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages[messageSkippedIndex];
         const messages = prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages;
+        console.log('==================== messageSkipped', messageSkipped);
         if (messages && messages.length > 0 && messageSkipped) {
           const messageIndex = messages.findIndex(
             (message) => message.isAck && message.generatedAt.getTime() < messageSkipped.generatedAt.getTime(),
