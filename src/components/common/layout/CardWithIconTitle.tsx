@@ -57,7 +57,7 @@ export const CardWithIconTitle = ({ data, size, transform, buttonLabel }: CardWi
           {'|'}
           <div className="flex items-center gap-1">
             <RdsIcon name={RdsIconId.History} />
-            {data?.generatedAt && <span className="text-body-xs">{formatDateToDDMMYYYY(data.generatedAt)}</span>}
+            {data?.generatedAt && <span className="text-body-xs">{formatDateToDDMMYYYY(data.generatedAt, true)}</span>}
           </div>
         </div>
       </div>
