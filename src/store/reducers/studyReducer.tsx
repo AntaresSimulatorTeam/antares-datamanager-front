@@ -60,6 +60,38 @@ const deleteLoadTrajectory = (prevState: Partial<StudyState>, payload: string) =
   return prevState;
 };
 
+const skipTrajectoryMessage = (
+  prevState: Partial<StudyState>,
+  payload: {
+    id: number;
+    trajectoryType: TRAJECTORY_TYPE;
+    trajectoryId: number;
+  },
+) => {
+  const { id, trajectoryType, trajectoryId } = payload;
+  let trajectoryIndex = 0;
+  // @ts-ignore
+  if (!!prevState?.[`${trajectoryType}`] && prevState?.[`${trajectoryType}`]?.length > 1) {
+    trajectoryIndex = prevState[`${trajectoryType}`]?.findIndex(
+      (trajectory) => trajectory.id === trajectoryId,
+    ) as number;
+  }
+  if (trajectoryIndex >= 0) {
+    const messageSkippedIndex = prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages.findIndex(
+      (message) => message.id === id,
+    );
+    if (messageSkippedIndex && messageSkippedIndex >= 0) {
+      prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages.splice(messageSkippedIndex, 1);
+      const messageSkipped = prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages[messageSkippedIndex];
+      const messagesNb = prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages?.length ?? 0;
+      if (messagesNb > 0 && messageSkipped) {
+        prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages.splice(messagesNb, 0, messageSkipped);
+      }
+    }
+  }
+  return prevState;
+};
+
 export const studyReducer = (prevState: Partial<StudyState>, action?: StudyActionType): Partial<StudyState> => {
   if (action) {
     switch (action.type) {
@@ -92,6 +124,8 @@ export const studyReducer = (prevState: Partial<StudyState>, action?: StudyActio
         return { ...addTrajectories(prevState, action.payload) };
       case STUDY_ACTION.ADD_AREA_TRAJECTORIES:
         return { ...addAreaTrajectories(prevState, action.payload) };
+      case STUDY_ACTION.SKIP_MESSAGE:
+        return { ...skipTrajectoryMessage(prevState, action.payload) };
       default:
         return prevState;
     }

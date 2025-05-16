@@ -20,6 +20,7 @@ import { DetailsContent } from '@/components/banner/DetailsContent.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { ContainerWithExpander } from '@/components/banner/ContainerWithExpander.tsx';
+import { discardWarningMessage } from '@/shared/services/warningService.ts';
 
 interface StudyState {
   study: StudyDTO;
@@ -50,7 +51,10 @@ const StudyDetails = () => {
       messages = trajectories.flatMap((trajectory) =>
         trajectory.messages.map((message) => ({
           ...message,
+          trajectoryId: trajectory.id,
+          trajectoryType: activeTab.name,
           trajectory: trajectory.trajectoryName,
+          onClickItem: discardWarningMessage,
         })),
       );
     }
@@ -58,18 +62,15 @@ const StudyDetails = () => {
       if (studyState?.LINK && studyState?.LINK?.[0]?.messages?.length > 0) {
         const linkMessage = studyState.LINK[0].messages.map((message) => ({
           ...message,
+          trajectoryId: studyState?.LINK?.[0].id,
+          trajectoryType: TRAJECTORY_TYPE.LINK,
           trajectory: (studyState.LINK?.[0] as DbTrajectory)?.trajectoryName ?? '',
+          onClickItem: discardWarningMessage,
         }));
-        if (messages.length > 0) {
-          const temporaryMessage: WarningMessage[] = messages;
-          messages = temporaryMessage.concat(linkMessage);
-          messages.sort((a: WarningMessage, b: WarningMessage) => a.generatedAt.getTime() - b.generatedAt.getTime());
-        } else {
-          messages = linkMessage;
-        }
+        messages = messages.length > 0 ? messages.concat(linkMessage) : linkMessage;
       }
     }
-    setMessagesWarning(messages);
+    setMessagesWarning(messages.sort((a, b) => Number(a.isAck) - Number(b.isAck)));
   }, [activeTab, studyState]);
 
   const handleGenerateStudy = async () => {

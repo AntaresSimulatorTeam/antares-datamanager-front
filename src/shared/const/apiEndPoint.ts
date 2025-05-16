@@ -36,3 +36,6 @@ export const ACTUATOR_ENDPOINT = `${BASE_URL}/actuator/info`;
 
 // HYPOTHESIS
 export const HYPOTHESIS_LOAD_DEFAULT = `${BASE_URL}/v1/default_config/load`;
+
+// WARNING
+export const WARNING_MESSAGE_SKIP = `${BASE_URL}/v1/warnings`;

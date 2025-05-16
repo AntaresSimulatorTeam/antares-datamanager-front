@@ -1,7 +1,6 @@
-import { CardDataType } from '@common/layout/CardWithIconTitle.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { ERROR_MESSAGE_TYPE, WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
-import { DbTrajectory, ErrorMessage, StudyState, WarningMessage } from '@/shared/types';
+import { CardDataType, DbTrajectory, ErrorMessage, StudyState, WarningMessage } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 
 export const sortByLevel = (a: WarningMessage, b: WarningMessage): number => {
@@ -24,23 +23,33 @@ export const sortByLevel = (a: WarningMessage, b: WarningMessage): number => {
 
 export const convertDataToItem = <T>(data: T): CardDataType => {
   const {
-    level = WARNING_MESSAGE_LEVEL.WARNING_LEVEL,
+    id = null,
     trajectory = null,
     secondTrajectory = null,
     content = null,
     generatedBy = null,
     generatedAt = null,
+    isAck = false,
+    onClickItem = null,
+    trajectoryType = null,
+    trajectoryId = null,
   } = data || {};
 
   return {
-    colorStatus: level === WARNING_MESSAGE_LEVEL.WARNING_LEVEL ? 'warning' : 'danger',
-    color: level === WARNING_MESSAGE_LEVEL.WARNING_LEVEL ? 'text-warning-500' : 'text-error-700',
-    colorBorder: level === WARNING_MESSAGE_LEVEL.WARNING_LEVEL ? 'hover:border-acc6-500' : 'hover:border-acc4-700',
-    icon: level === WARNING_MESSAGE_LEVEL.WARNING_LEVEL ? StdIconId.Warning : StdIconId.Info,
+    code: '',
+    colorStatus: 'warning',
+    color: 'text-warning-500',
+    colorBorder: 'hover:border-b-acc6-500',
+    icon: StdIconId.Warning,
     title: `${trajectory ?? ''} ${secondTrajectory ? ' - ' : ''} ${secondTrajectory || ''}`,
+    trajectoryId,
+    trajectoryType,
+    id,
     content,
     generatedBy,
     generatedAt,
+    isAck,
+    onClickItem,
   };
 };
 

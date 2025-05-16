@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "fix/ANT-2962_handle_sort_when_add_row",
-  commit: "40f128e",
-  commitTime: "2025-05-15T15:05:32.517Z"
+  branch: "feat/ANT-3222_warning_message_skip_feature",
+  commit: "5111d10",
+  commitTime: "2025-05-16T14:46:48.653Z"
 };
