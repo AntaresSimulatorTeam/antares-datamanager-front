@@ -71,21 +71,28 @@ const skipTrajectoryMessage = (
   const { id, trajectoryType, trajectoryId } = payload;
   let trajectoryIndex = 0;
   // @ts-ignore
-  if (!!prevState?.[`${trajectoryType}`] && prevState?.[`${trajectoryType}`]?.length > 1) {
+  if (prevState?.[`${trajectoryType}`]?.length >= 1) {
     trajectoryIndex = prevState[`${trajectoryType}`]?.findIndex(
       (trajectory) => trajectory.id === trajectoryId,
     ) as number;
-  }
-  if (trajectoryIndex >= 0) {
-    const messageSkippedIndex = prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages.findIndex(
-      (message) => message.id === id,
-    );
-    if (messageSkippedIndex && messageSkippedIndex >= 0) {
-      prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages.splice(messageSkippedIndex, 1);
-      const messageSkipped = prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages[messageSkippedIndex];
-      const messagesNb = prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages?.length ?? 0;
-      if (messagesNb > 0 && messageSkipped) {
-        prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages.splice(messagesNb, 0, messageSkipped);
+    if (trajectoryIndex >= 0) {
+      const messageSkippedIndex = prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages.findIndex(
+        (message) => message.id === id,
+      );
+      if (messageSkippedIndex && messageSkippedIndex >= 0) {
+        const messageSkipped = prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages[messageSkippedIndex];
+        const messages = prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages;
+        if (messages && messages.length > 0 && messageSkipped) {
+          const messageIndex = messages.findIndex(
+            (message) => message.isAck && message.generatedAt.getTime() < messageSkipped.generatedAt.getTime(),
+          );
+          // Remove message skipped
+          prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages.splice(messageSkippedIndex, 1);
+          if (messageIndex >= 0 && messageSkipped) {
+            // Add skipped message at the end position
+            prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages.splice(messageIndex, 0, messageSkipped);
+          }
+        }
       }
     }
   }
