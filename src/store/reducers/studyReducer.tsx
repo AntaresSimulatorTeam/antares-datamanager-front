@@ -1,4 +1,4 @@
-import { DbTrajectory, StudyActionType, StudyState } from '@/shared/types';
+import { DbTrajectory, StudyActionType, StudyState, WarningMessage } from '@/shared/types';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
@@ -80,19 +80,25 @@ const skipTrajectoryMessage = (
         (message) => message.id === id,
       );
       if (messageSkippedIndex && messageSkippedIndex >= 0) {
-        const messageSkipped = prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages[messageSkippedIndex];
+        const messageSkipped = prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages[
+          messageSkippedIndex
+        ] as WarningMessage;
+        const newMessageSkipped = {
+          ...messageSkipped,
+          isAck: true,
+        };
         // @ts-ignore
-        if (prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages.length > 0 && messageSkipped) {
+        if (prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages.length > 0 && newMessageSkipped) {
           // Remove message skipped
           prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages.splice(messageSkippedIndex, 1);
           const messageIndex = prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages.findIndex(
             (message) =>
               message.isAck &&
-              new Date(message.generatedAt)?.getTime() > new Date(messageSkipped.generatedAt)?.getTime(),
+              new Date(message.generatedAt)?.getTime() > new Date(newMessageSkipped.generatedAt)?.getTime(),
           );
-          if (messageIndex && messageIndex >= 0 && messageSkipped) {
+          if (messageIndex && messageIndex >= 0 && newMessageSkipped) {
             // Add skipped message at the end position
-            prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages.splice(messageIndex, 0, messageSkipped);
+            prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages.splice(messageIndex, 0, newMessageSkipped);
           }
         }
       }
