@@ -84,7 +84,9 @@ const skipTrajectoryMessage = (
         const messages = prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages;
         if (messages && messages.length > 0 && messageSkipped) {
           const messageIndex = messages.findIndex(
-            (message) => message.isAck && message.generatedAt?.getTime() < messageSkipped.generatedAt?.getTime(),
+            (message) =>
+              message.isAck &&
+              new Date(message.generatedAt)?.getTime() > new Date(messageSkipped.generatedAt)?.getTime(),
           );
           // Remove message skipped
           prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages.splice(messageSkippedIndex, 1);
