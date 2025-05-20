@@ -1,4 +1,4 @@
-import { DbTrajectory, StudyActionType, StudyState, WarningMessage } from '@/shared/types';
+import { DbTrajectory, StudyActionType, StudyState } from '@/shared/types';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
@@ -60,55 +60,52 @@ const deleteLoadTrajectory = (prevState: Partial<StudyState>, payload: string) =
   return prevState;
 };
 
-const skipTrajectoryMessage = (
+export const skipTrajectoryMessage = (
   prevState: Partial<StudyState>,
   payload: {
     id: number;
     trajectoryType: TRAJECTORY_TYPE;
     trajectoryId: number;
   },
-) => {
+): Partial<StudyState> => {
   const { id, trajectoryType, trajectoryId } = payload;
-  let trajectoryIndex = 0;
-  // @ts-ignore
-  if (prevState?.[`${trajectoryType}`]?.length >= 1) {
-    trajectoryIndex = prevState[`${trajectoryType}`]?.findIndex(
-      (trajectory) => trajectory.id === trajectoryId,
-    ) as number;
-    if (trajectoryIndex >= 0) {
-      const messageSkippedIndex = prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages.findIndex(
-        (message) => message.id === id,
-      );
-      if (messageSkippedIndex && messageSkippedIndex >= 0) {
-        const messageSkipped = prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages[
-          messageSkippedIndex
-        ] as WarningMessage;
-        const newMessageSkipped = {
-          ...messageSkipped,
-          isAck: true,
-        };
-        // @ts-ignore
-        if (prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages.length > 0 && newMessageSkipped) {
-          // Remove message skipped
-          if (messageSkippedIndex !== 0) {
-            prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages.splice(messageSkippedIndex, 1);
-            const messageIndex = prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages.findIndex(
-              (message) =>
-                message.isAck &&
-                new Date(message.generatedAt)?.getTime() > new Date(newMessageSkipped.generatedAt)?.getTime(),
-            );
-            if (messageIndex && messageIndex >= 0 && newMessageSkipped) {
-              // Add skipped message at the end position
-              prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages.splice(messageIndex, 0, newMessageSkipped);
-            }
-          } else if (messageSkippedIndex === 0) {
-            prevState[`${trajectoryType}`]?.[trajectoryIndex]?.messages.splice(0, 1, newMessageSkipped);
-          }
-        }
-      }
-    }
-  }
-  return prevState;
+  const trajectories = prevState[trajectoryType];
+
+  if (!Array.isArray(trajectories)) return prevState;
+
+  const trajectoryIndex = trajectories.findIndex((t) => t.id === trajectoryId);
+  if (trajectoryIndex < 0) return prevState;
+
+  const trajectory = trajectories[trajectoryIndex];
+  const messages = trajectory.messages || [];
+
+  const messageIndex = messages.findIndex((m) => m.id === id);
+  if (messageIndex < 0) return prevState;
+
+  const skippedMessage = {
+    ...messages[messageIndex],
+    isAck: true,
+  };
+
+
+  const newMessages = [...messages];
+  newMessages.splice(messageIndex, 1);
+
+
+  newMessages.push(skippedMessage);
+
+  const newTrajectory = {
+    ...trajectory,
+    messages: newMessages,
+  };
+
+  const newTrajectoryArray = [...trajectories];
+  newTrajectoryArray[trajectoryIndex] = newTrajectory;
+
+  return {
+    ...prevState,
+    [trajectoryType]: newTrajectoryArray,
+  };
 };
 
 export const studyReducer = (prevState: Partial<StudyState>, action?: StudyActionType): Partial<StudyState> => {
