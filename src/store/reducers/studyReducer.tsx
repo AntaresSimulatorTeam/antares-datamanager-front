@@ -60,6 +60,54 @@ const deleteLoadTrajectory = (prevState: Partial<StudyState>, payload: string) =
   return prevState;
 };
 
+export const skipTrajectoryMessage = (
+  prevState: Partial<StudyState>,
+  payload: {
+    id: number;
+    trajectoryType: TRAJECTORY_TYPE;
+    trajectoryId: number;
+  },
+): Partial<StudyState> => {
+  const { id, trajectoryType, trajectoryId } = payload;
+  const trajectories = prevState[trajectoryType];
+
+  if (!Array.isArray(trajectories)) return prevState;
+
+  const trajectoryIndex = trajectories.findIndex((t) => t.id === trajectoryId);
+  if (trajectoryIndex < 0) return prevState;
+
+  const trajectory = trajectories[trajectoryIndex];
+  const messages = trajectory.messages || [];
+
+  const messageIndex = messages.findIndex((m) => m.id === id);
+  if (messageIndex < 0) return prevState;
+
+  const skippedMessage = {
+    ...messages[messageIndex],
+    isAck: true,
+  };
+
+
+  const newMessages = [...messages];
+  newMessages.splice(messageIndex, 1);
+
+
+  newMessages.push(skippedMessage);
+
+  const newTrajectory = {
+    ...trajectory,
+    messages: newMessages,
+  };
+
+  const newTrajectoryArray = [...trajectories];
+  newTrajectoryArray[trajectoryIndex] = newTrajectory;
+
+  return {
+    ...prevState,
+    [trajectoryType]: newTrajectoryArray,
+  };
+};
+
 export const studyReducer = (prevState: Partial<StudyState>, action?: StudyActionType): Partial<StudyState> => {
   if (action) {
     switch (action.type) {
@@ -92,6 +140,8 @@ export const studyReducer = (prevState: Partial<StudyState>, action?: StudyActio
         return { ...addTrajectories(prevState, action.payload) };
       case STUDY_ACTION.ADD_AREA_TRAJECTORIES:
         return { ...addAreaTrajectories(prevState, action.payload) };
+      case STUDY_ACTION.SKIP_MESSAGE:
+        return { ...skipTrajectoryMessage(prevState, action.payload) };
       default:
         return prevState;
     }

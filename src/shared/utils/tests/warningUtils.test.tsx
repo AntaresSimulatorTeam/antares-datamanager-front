@@ -15,6 +15,7 @@ describe('sortByLevel', () => {
         generatedAt: '2025-04-01T18:31:53.623683' as unknown as Date,
         trajectory: 'areas_BP23_A_ref',
         secondTrajectory: 'links_BP23_A_ref',
+        isAck: false,
       },
       {
         id: 7,
@@ -25,6 +26,7 @@ describe('sortByLevel', () => {
         generatedAt: '2025-04-01T18:31:53.623683' as unknown as Date,
         trajectory: 'areas_BP23_A_ref',
         secondTrajectory: 'links_BP23_A_ref',
+        isAck: false,
       },
       {
         id: 1,
@@ -36,6 +38,7 @@ describe('sortByLevel', () => {
         generatedAt: '2025-04-01T18:31:53.623683' as unknown as Date,
         trajectory: 'areas_BP23_A_ref',
         secondTrajectory: 'links_BP23_A_ref',
+        isAck: false,
       },
       {
         id: 2,
@@ -46,6 +49,7 @@ describe('sortByLevel', () => {
         generatedAt: '2025-04-01T18:31:53.623683' as unknown as Date,
         trajectory: 'areas_BP23_A_ref',
         secondTrajectory: 'links_BP23_A_ref',
+        isAck: false,
       },
       {
         id: 4,
@@ -56,6 +60,7 @@ describe('sortByLevel', () => {
         generatedAt: '2025-04-01T18:31:53.623683' as unknown as Date,
         trajectory: 'areas_BP23_A_ref',
         secondTrajectory: 'links_BP23_A_ref',
+        isAck: false,
       },
       {
         id: 5,
@@ -67,6 +72,7 @@ describe('sortByLevel', () => {
         generatedAt: '2025-04-01T18:31:53.623683' as unknown as Date,
         trajectory: 'areas_BP23_A_ref',
         secondTrajectory: 'links_BP23_A_ref',
+        isAck: false,
       },
       {
         id: 6,
@@ -77,6 +83,7 @@ describe('sortByLevel', () => {
         generatedAt: '2025-04-01T18:31:53.623683' as unknown as Date,
         trajectory: 'areas_BP23_A_ref',
         secondTrajectory: 'links_BP23_A_ref',
+        isAck: false,
       },
       {
         id: 8,
@@ -87,6 +94,7 @@ describe('sortByLevel', () => {
         generatedAt: '2025-04-01T18:31:53.623683' as unknown as Date,
         trajectory: 'areas_BP23_A_ref',
         secondTrajectory: 'links_BP23_A_ref',
+        isAck: false,
       },
     ]);
   });

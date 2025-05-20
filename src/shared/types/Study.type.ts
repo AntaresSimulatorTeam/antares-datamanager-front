@@ -53,7 +53,8 @@ export type StudyActionType =
   | { type: STUDY_ACTION.DELETE_LOAD_TRAJECTORY; payload: string }
   | { type: STUDY_ACTION.CLEAR_AREA_AND_LINK_TRAJECTORY }
   | { type: STUDY_ACTION.SET_STUDY_STATUS; payload: StudyStatus }
-  | { type: STUDY_ACTION.ADD_WARNING_MESSAGE; payload: { message: WarningMessage; type: TRAJECTORY_TYPE } };
+  | { type: STUDY_ACTION.ADD_WARNING_MESSAGE; payload: { message: WarningMessage; type: TRAJECTORY_TYPE } }
+  | { type: STUDY_ACTION.SKIP_MESSAGE; payload: { id: number; trajectoryType: TRAJECTORY_TYPE; trajectoryId: number } };
 
 export interface LocationState {
   study: StudyDTO;

@@ -55,6 +55,7 @@ export const buildErrorTrajectory = (
       generatedAt: new Date(),
       trajectory: trajectoryLabel,
       secondTrajectory: '',
+      isAck: false,
     },
   ],
   state: TRAJECTORY_SELECTION_STATUS.ERROR,
