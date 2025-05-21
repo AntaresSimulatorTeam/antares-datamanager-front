@@ -5,6 +5,7 @@
  */
 
 import { DbTrajectory, FsTrajectory, SelectOption } from '@/shared/types';
+import {TRAJECTORY_TYPE} from "@/shared/enum/trajectory.ts";
 
 export const convertToSelectionOptionType = (trajectories: DbTrajectory[]): SelectOption[] =>
   trajectories.map((trajectory) => ({
@@ -15,5 +16,5 @@ export const convertToSelectionOptionType = (trajectories: DbTrajectory[]): Sele
 export const convertToFSSelectionOptionType = (options: FsTrajectory[]): SelectOption[] =>
   options.map((option, indexTrajectory) => ({
     id: indexTrajectory,
-    label: option.trajectoryName ? option.trajectoryName.substring(0, option.trajectoryName.lastIndexOf('.')) : '',
+    label: (option.trajectoryName && option.type != TRAJECTORY_TYPE.LOAD) ? option.trajectoryName.substring(0, option.trajectoryName.lastIndexOf('.')) : option.trajectoryName,
   }));

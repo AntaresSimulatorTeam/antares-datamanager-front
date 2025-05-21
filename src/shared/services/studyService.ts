@@ -4,12 +4,12 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { DbTrajectory, PaginatedResponse, StudyDTO } from '@/shared/types';
-import { STUDY_GENERATE_ENDPOINT, STUDY_SEARCH_ENDPOINT, TRAJECTORY_ENDPOINT } from '@/shared/const/apiEndPoint';
-import { STUDY_ENDPOINT, STUDY_KEYWORDS_SEARCH_ENDPOINT } from '@/shared/const/apiEndPoint.ts';
-import { notifyToast } from '@/shared/notification/notification.tsx';
-import { AuthService } from '@/shared/services/authService.ts';
-import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import {DbTrajectory, PaginatedResponse, StudyDTO} from '@/shared/types';
+import {STUDY_GENERATE_ENDPOINT, STUDY_SEARCH_ENDPOINT, TRAJECTORY_ENDPOINT} from '@/shared/const/apiEndPoint';
+import {STUDY_ENDPOINT, STUDY_KEYWORDS_SEARCH_ENDPOINT} from '@/shared/const/apiEndPoint.ts';
+import {notifyToast} from '@/shared/notification/notification.tsx';
+import {AuthService} from '@/shared/services/authService.ts';
+import {TRAJECTORY_TYPE} from '@/shared/enum/trajectory.ts';
 
 /**
  * Retrieve a list of studies from a term
@@ -23,34 +23,34 @@ import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
  * @return {Promise<PaginatedResponse<StudyDTO> | Error>} - Promise object that represents a list of studies
  */
 export const fetchSearchStudies = async (
-  searchTerm: string = '',
-  projectId: string = '',
-  currentPage: number = 0,
-  intervalSize: number = 0,
-  sortBy?: { [key: string]: 'asc' | 'desc' },
+    searchTerm: string = '',
+    projectId: string = '',
+    currentPage: number = 0,
+    intervalSize: number = 0,
+    sortBy?: { [key: string]: 'asc' | 'desc' },
 ): Promise<PaginatedResponse<StudyDTO> | Error> => {
-  let entries: [string, 'asc' | 'desc'] | null = null;
-  if (sortBy && JSON.stringify(sortBy) !== '{}') {
-    entries = Object.entries(sortBy)[0];
-  }
+    let entries: [string, 'asc' | 'desc'] | null = null;
+    if (sortBy && JSON.stringify(sortBy) !== '{}') {
+        entries = Object.entries(sortBy)[0];
+    }
 
-  const queryString = new URLSearchParams({
-    page: currentPage != null ? (currentPage + 1).toString() : '',
-    size: intervalSize.toString(),
-    projectId: projectId.toString(),
-    search: searchTerm.toString(),
-    sortColumn: entries?.[0] ? entries[0].toString() : '',
-    sortDirection: entries?.[1] ? entries[1].toString() : '',
-  }).toString();
-  const apiUrl = `${STUDY_SEARCH_ENDPOINT}?${queryString}`;
+    const queryString = new URLSearchParams({
+        page: currentPage != null ? (currentPage + 1).toString() : '',
+        size: intervalSize.toString(),
+        projectId: projectId.toString(),
+        search: searchTerm.toString(),
+        sortColumn: entries?.[0] ? entries[0].toString() : '',
+        sortDirection: entries?.[1] ? entries[1].toString() : '',
+    }).toString();
+    const apiUrl = `${STUDY_SEARCH_ENDPOINT}?${queryString}`;
 
-  const response = await AuthService.authFetch(apiUrl);
-  if (!response.ok) {
-    throw new Error('Failed to fetch user studies');
-  }
-  const json = (await response.json()) as PaginatedResponse<StudyDTO>;
+    const response = await AuthService.authFetch(apiUrl);
+    if (!response.ok) {
+        throw new Error('Failed to fetch user studies');
+    }
+    const json = (await response.json()) as PaginatedResponse<StudyDTO>;
 
-  return { content: json.content, totalElements: json.totalElements };
+    return {content: json.content, totalElements: json.totalElements};
 };
 
 /**
@@ -60,15 +60,15 @@ export const fetchSearchStudies = async (
  * @return {Promise<string[] | Error>} - Promise object that represents a list of keywords
  */
 export const fetchSuggestedKeywords = async (partialName: string): Promise<string[] | Error> => {
-  const queryString = new URLSearchParams({
-    partialName: partialName ?? '',
-  }).toString();
+    const queryString = new URLSearchParams({
+        partialName: partialName ?? '',
+    }).toString();
 
-  const response = await AuthService.authFetch(`${STUDY_KEYWORDS_SEARCH_ENDPOINT}?${queryString}`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch suggested keywords');
-  }
-  return (await response.json()) as string[];
+    const response = await AuthService.authFetch(`${STUDY_KEYWORDS_SEARCH_ENDPOINT}?${queryString}`);
+    if (!response.ok) {
+        throw new Error('Failed to fetch suggested keywords');
+    }
+    return (await response.json()) as string[];
 };
 
 /**
@@ -114,24 +114,24 @@ export const saveStudy = async (studyData: Omit<StudyDTO, 'id' | 'status' | 'cre
  * @return {Promise<void | Error>}
  */
 export const deleteStudy = async (id: number): Promise<void | Error> => {
-  try {
-    const response = await AuthService.authFetch(`${STUDY_ENDPOINT}/${id}`, {
-      method: 'DELETE',
-    });
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText);
+    try {
+        const response = await AuthService.authFetch(`${STUDY_ENDPOINT}/${id}`, {
+            method: 'DELETE',
+        });
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText);
+        }
+        notifyToast({
+            type: 'success',
+            message: 'Study deleted successfully',
+        });
+    } catch (error: unknown) {
+        notifyToast({
+            type: 'error',
+            message: `${(error as Error).message}`,
+        });
     }
-    notifyToast({
-      type: 'success',
-      message: 'Study deleted successfully',
-    });
-  } catch (error: unknown) {
-    notifyToast({
-      type: 'error',
-      message: `${(error as Error).message}`,
-    });
-  }
 };
 
 /**
@@ -140,16 +140,16 @@ export const deleteStudy = async (id: number): Promise<void | Error> => {
  * @param {number} id - Study id
  */
 export const createStudy = async (id: number) => {
-  const urlApi = `${STUDY_GENERATE_ENDPOINT}?id=${id}`;
-  const response = await AuthService.authFetch(urlApi, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-  if (!response.ok) {
-    throw new Error('Failed to generate a study');
-  }
+    const urlApi = `${STUDY_GENERATE_ENDPOINT}?id=${id}`;
+    const response = await AuthService.authFetch(urlApi, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+    if (!response.ok) {
+        throw new Error('Failed to generate a study');
+    }
 };
 
 /**
@@ -181,11 +181,11 @@ export const getStudyTrajectories = async (
  * @return {Promise<StudyDTO | Error>} Study object
  */
 export const getStudyById = async (studyId: number): Promise<StudyDTO | Error> => {
-  const urlApi = `${STUDY_ENDPOINT}/${studyId}`;
-  const response = await AuthService.authFetch(urlApi);
-  if (!response.ok) {
-    throw new Error('Failed to fetch study');
-  }
+    const urlApi = `${STUDY_ENDPOINT}/${studyId}`;
+    const response = await AuthService.authFetch(urlApi);
+    if (!response.ok) {
+        throw new Error('Failed to fetch study');
+    }
 
-  return (await response.json()) as StudyDTO;
+    return (await response.json()) as StudyDTO;
 };

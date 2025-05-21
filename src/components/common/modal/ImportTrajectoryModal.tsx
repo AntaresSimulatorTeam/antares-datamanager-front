@@ -14,6 +14,7 @@ interface ImportTrajectoryModalProps {
   trajectoryType: TRAJECTORY_TYPE;
   studyHorizon: string;
   studyId: number;
+  area?: string;
 }
 
 export const ImportTrajectoryModal = ({
@@ -22,6 +23,7 @@ export const ImportTrajectoryModal = ({
   trajectoryType,
   studyHorizon,
   studyId,
+    area,
 }: ImportTrajectoryModalProps) => {
   const { t } = useTranslation();
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
@@ -51,6 +53,7 @@ export const ImportTrajectoryModal = ({
         value.label,
         studyHorizon,
         studyId,
+        area,
         (progressValue: number) => {
           setProgress(+progressValue?.toFixed(0));
         },
@@ -79,7 +82,7 @@ export const ImportTrajectoryModal = ({
     <RdsModal size="small">
       <RdsModal.Title onClose={() => void onClose()} icon="Upload">
         {t('studyDetails.@import_from_file_system', {
-          trajectoryType: trajectoryType === TRAJECTORY_TYPE.AREA ? 'areas' : 'links',
+          trajectoryType: trajectoryType ,
         })}
       </RdsModal.Title>
       <RdsModal.Content>
