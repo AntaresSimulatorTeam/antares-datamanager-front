@@ -130,26 +130,12 @@ describe('saveStudy', () => {
   });
 
   it('should throw an error message', async () => {
-    // Failed fetch response moc
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: false,
-      text: () => 'error',
+      text: () => Promise.resolve('{"antaresErrorMessage":"A study with the same name already exists."}'),
     });
 
-    const result = await saveStudy(mockStudy);
-    expect(result).toEqual(undefined);
-  });
-
-  it('should handle fetch failure and display a notification', async () => {
-    // Failed fetch response moc
-    global.fetch = vi.fn().mockRejectedValueOnce(new Error('Failed to create study'));
-
-    await saveStudy(mockStudy);
-
-    expect(notifyToast).toHaveBeenCalledWith({
-      type: 'error',
-      message: 'Failed to create study',
-    });
+    await expect(saveStudy(mockStudy)).rejects.toThrow('A study with the same name already exists.');
   });
 });
 
