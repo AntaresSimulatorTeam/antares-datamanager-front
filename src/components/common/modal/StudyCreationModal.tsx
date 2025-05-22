@@ -13,6 +13,7 @@ import ProjectInput from '@/components/input/ProjectInput.tsx';
 import { saveStudy } from '@/shared/services/studyService';
 import { StudyDTO } from '@/shared/types';
 import { useUser } from '@/store/contexts/UserContext.tsx';
+import { notifyToast } from '@/shared/notification/notification';
 
 interface StudyCreationModalProps {
   isOpen?: boolean;
@@ -29,7 +30,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
   projectInfoName,
 }) => {
   const { t } = useTranslation();
-  const [studyName, setStudyName] = useState<string>('');
+  const [studyName, setStudyName] = useState<string>(study?.name || '');
   const [horizon, setHorizon] = useState<string>(study?.horizon ? study.horizon.substring(0, 4) : '');
   const [projectName, setProjectName] = useState<string>(study?.project || projectInfoName || '');
   const [keywords, setKeywords] = useState<string[]>(study?.keywords || []);
@@ -38,7 +39,16 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
   const [errorMessage, setErrorMessage] = useState<string>('');
   const { user } = useUser();
 
+
   const saveStudyHandler = async () => {
+
+    if (study && studyName.trim() === study.name.trim()) {
+      notifyToast({
+        type: 'error',
+        message: 'A study with the same name already exists for the given project',
+      });
+      return;
+    }
     const studyData = {
       name: studyName,
       createdBy: user?.profile.sub,
@@ -48,14 +58,18 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
       trajectoryIds,
     };
 
+  try {
     await saveStudy(studyData);
-    // Clear form fields
     setReloadStudies((prev) => !prev); // Trigger reload after successful save
     setStudyName('');
     setProjectName('');
     setHorizon('');
     setKeywords([]);
     onClose();
+  } catch {
+    // Modal remains open if error occurred
+  }
+
   };
 
   const validateForm = () => {

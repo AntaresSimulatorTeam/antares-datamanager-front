@@ -10,6 +10,7 @@ import { STUDY_ENDPOINT, STUDY_KEYWORDS_SEARCH_ENDPOINT } from '@/shared/const/a
 import { notifyToast } from '@/shared/notification/notification.tsx';
 import { AuthService } from '@/shared/services/authService.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { handleBackendErrorToast } from '../utils/errrorHandler';
 
 /**
  * Retrieve a list of studies from a term
@@ -76,36 +77,30 @@ export const fetchSuggestedKeywords = async (partialName: string): Promise<strin
  * Display toast if creation succeeds or fails
  *
  * @param {Omit<StudyDTO, 'id' | 'status' | 'creationDate'>} studyData - Partial study data
- * @return {Promise<void | Error>}
+ * @return {Promise<void>}
  */
-export const saveStudy = async (studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate'>): Promise<void | Error> => {
-  try {
-    const response = await AuthService.authFetch(`${STUDY_ENDPOINT}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(studyData),
-    });
-    if (!response.ok) {
-      const errorText = await response.text();
-      const errorData = JSON.parse(errorText) as Error;
-      throw new Error(`${errorData.message || errorText}`);
-    }
-    notifyToast({
-      type: 'success',
-      message: 'Study created successfully',
-    });
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      notifyToast({
-        type: 'error',
-        message: `${error.message}`,
-      });
-    }
-  }
-};
+export const saveStudy = async (
+  studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate'>
+): Promise<void> => {
+  const response = await AuthService.authFetch(`${STUDY_ENDPOINT}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(studyData),
+  });
 
+  if (!response.ok) {
+    const errorText = await response.text();
+    const errorMessage = handleBackendErrorToast(errorText);
+    throw new Error(errorMessage);
+  }
+
+  notifyToast({
+    type: 'success',
+    message: 'Study created successfully',
+  });
+};
 /**
  * Delete a study
  * Display toast if deletion succeeds or fails
@@ -120,7 +115,8 @@ export const deleteStudy = async (id: number): Promise<void | Error> => {
     });
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(errorText);
+      const errorMessage = handleBackendErrorToast(errorText);
+      throw new Error(errorMessage);
     }
     notifyToast({
       type: 'success',
