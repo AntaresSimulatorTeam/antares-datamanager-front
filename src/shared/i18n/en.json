@@ -104,7 +104,7 @@
     "@select_area": "Add an area first",
     "@import_file": "Import",
     "@select_file_fs_error": "Not such files on file system",
-    "@import_from_file_system": "Select {{trajectoryType}} from File System",
+    "@import_from_file_system": "Select {{area}} {{trajectoryType}} from File System",
     "@import": "Import",
     "@import_status_done": "OK",
     "@import_status_missing": "Missing",
