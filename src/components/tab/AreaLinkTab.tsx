@@ -287,6 +287,7 @@ const AreaLinkTab = ({ setErrorMessage }: TabProps) => {
           index === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
           study.horizon,
           value,
+            '',
         );
         return convertToSelectionOptionType(results);
       } catch {

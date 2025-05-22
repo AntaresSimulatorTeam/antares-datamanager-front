@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "feature/ANT_2961_import_load_trajectory",
-  commit: "1472553",
-  commitTime: "2025-05-22T11:24:27.274Z"
+  branch: "feature/search_load_trajectory_by_area_db",
+  commit: "c8f4065",
+  commitTime: "2025-05-22T18:51:23.340Z"
 };

@@ -14,13 +14,14 @@ import { LabelWithButtonPreview } from '@common/data/LabelWithButtonPreview.tsx'
 import { LabelWithDeleteButton } from '@common/data/LabelWithDeleteButton.tsx';
 import { SelectInputWithButton } from '@common/data/SelectInputWithButton.tsx';
 import { ErrorMessageType } from '@/shared/types/Generic.type.ts';
+import {AREA_OTHERS} from "@/shared/const/studyConfig.ts";
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
 
 const getLoadHypothesisTableHeaders = (
   t: (value: string) => string,
   handleImport: (index: number) => Promise<void>,
-  handlerSearch: (value?: string) => Promise<SelectOption[] | undefined>,
+  handlerSearch: (value?: string, area?: string) => Promise<SelectOption[] | undefined>,
   handleView: (index: number) => Promise<void>,
   error: ErrorMessageType,
   setErrorInfo: Dispatch<SetStateAction<ErrorMessageType>>,
@@ -70,7 +71,7 @@ const getLoadHypothesisTableHeaders = (
               setErrorInfo({ index: row.index, message: '' });
               void options?.meta?.updateData?.(row.index, value.id, 'success');
             }}
-            onSearch={async (value?: string) => await handlerSearch(value)}
+            onSearch={async (value?: string) => await handlerSearch(value, row.original.hypothesis === 'Others areas' ? AREA_OTHERS : row.original.hypothesis)}
             onClickButton={() => {
               setErrorInfo({ index: row.index, message: '' });
               void handleImport(row.index);

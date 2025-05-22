@@ -111,10 +111,6 @@ const LoadTab = ({ setErrorMessage }: TabProps) => {
         }
 
         const trajectoryLinked = (await getStudyTrajectories(study?.id, TRAJECTORY_TYPE.LOAD)) as DbTrajectory[];
-        areaDefault.push({
-          name: AREA_OTHERS,
-          isDefault: true,
-        });
 
         // Build hypothesis table
         const areaDataDefault: HypothesisRowData[] = areaDefault?.map((area) => {
@@ -205,9 +201,9 @@ const LoadTab = ({ setErrorMessage }: TabProps) => {
   const handleViewTrajectory = async () => Promise.resolve();
 
   const handleTrajectorySearch = useCallback(
-    async (value?: string): Promise<SelectOption[] | undefined> => {
+    async (value?: string, area?: string): Promise<SelectOption[] | undefined> => {
       try {
-        const results = await fetchTrajectoriesFromDB(TRAJECTORY_TYPE.LOAD, study.horizon, value);
+        const results = await fetchTrajectoriesFromDB(TRAJECTORY_TYPE.LOAD, study.horizon, value, area);
         return convertToSelectionOptionType(results);
       } catch {
         // silent handler
@@ -301,6 +297,7 @@ const LoadTab = ({ setErrorMessage }: TabProps) => {
           <div className="border-b border-gray-400 pb-2">
             <SearchBar onSearch={() => {}} placeholder={t('studyDetails.@search_area')} />
           </div>
+          <div style={{ maxHeight: 200, overflowY: 'auto' }}>
           <RdsCheckboxGroupWrapper
             label={''}
             name={''}
@@ -322,6 +319,7 @@ const LoadTab = ({ setErrorMessage }: TabProps) => {
               </div>
             ))}
           </RdsCheckboxGroupWrapper>
+          </div>
         </div>
         <div className="flex h-fit w-full">
           <StdSimpleTable

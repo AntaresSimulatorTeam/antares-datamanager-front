@@ -25,14 +25,16 @@ import {notifyToast} from "@/shared/notification/notification.tsx";
  * @param {TRAJECTORY_TYPE} trajectoryType - Partial name of a study
  * @param {string} horizon - Horizon value (ex: 2020-2021)
  * @param {string | undefined} fileName - Autocompletion - filter trajectories by file name
+ * @param {string | undefined} area - To use just in thermal capacity case
  * @returns {Promise<DbTrajectory[]>} - Promise object that represents a list of trajectories
  */
 export const fetchTrajectoriesFromDB = async (
     trajectoryType: string,
     horizon: string,
     fileName?: string,
+    area?: string,
 ): Promise<DbTrajectory[]> => {
-    const urlApi = `${TRAJECTORY_DATA_BASE_ENDPOINT}?trajectoryType=${trajectoryType}&horizon=${horizon}&fileNameContains=${fileName ?? ''}`;
+    const urlApi = `${TRAJECTORY_DATA_BASE_ENDPOINT}?trajectoryType=${trajectoryType}&horizon=${horizon}&fileNameContains=${fileName ?? ''}&loadArea=${area ?? ''}`;
     const response = await AuthService.authFetch(urlApi);
     if (!response.ok) {
         throw new Error('Failed to fetch trajectories from data base');
