@@ -49,7 +49,7 @@ describe('fetchTrajectoriesFromDB', () => {
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledTimes(1);
       expect(global.fetch).toHaveBeenCalledWith(
-        `https://mockapi.com/v1/trajectory/db?trajectoryType=AREA&horizon=2023-2024&fileNameContains=`,
+        `https://mockapi.com/v1/trajectory/db?trajectoryType=AREA&horizon=2023-2024&fileNameContains=&loadArea=`,
         {},
       );
       expect(result).toEqual(mockDbTrajectory);
@@ -150,7 +150,7 @@ describe('uploadTrajectory', () => {
       json: async () => Promise.resolve(mockDbTrajectory),
     });
 
-    await uploadTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026', 2, onProgress);
+    await uploadTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026', 2,'FR', onProgress);
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledTimes(1);
@@ -178,7 +178,7 @@ describe('uploadTrajectory', () => {
     });
 
     await expect(async () =>
-      uploadTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026', 2, onProgress),
+      uploadTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026', 2,'FR', onProgress),
     ).rejects.toThrowError('error message 400');
   });
 });

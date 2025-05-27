@@ -21,13 +21,13 @@ import { useTranslation } from 'react-i18next';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { useLocation } from 'react-router-dom';
 import {
-  fetchTrajectoriesFromDB,
+  fetchTrajectoriesFromDB, fetchTrajectoriesFromFS,
   getDefaultLoadHypothesis,
   getTrajectoryDataByTypeAndId,
   linkTrajectoryToStudy,
   unlinkTrajectoryFromStudy,
 } from '@/shared/services/trajectoryService.ts';
-import { convertToSelectionOptionType } from '@/shared/utils/formFormatter.ts';
+import {convertToFSSelectionOptionType, convertToSelectionOptionType} from '@/shared/utils/formFormatter.ts';
 import SearchBar from '@/pages/pegase/home/components/SearchBar.tsx';
 import { RdsCheckbox, RdsCheckboxGroupWrapper, RdsDivider } from 'rte-design-system-react';
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
@@ -42,6 +42,8 @@ import {
   retrieveReadOnlyArea,
 } from '@/shared/utils/trajectoryUtils.ts';
 import { AREA_OTHERS } from '@/shared/const/studyConfig.ts';
+import {ImportTrajectoryModal} from "@common/modal/ImportTrajectoryModal.tsx";
+import {useNewStudyModal} from "@/hooks/useNewStudyModal.ts";
 
 export type CheckBoxData = {
   name: string;
@@ -61,6 +63,9 @@ const LoadTab = ({ setErrorMessage }: TabProps) => {
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
   const [areasDefaultOptions, setAreasDefaultOptions] = useState<CheckBoxData[]>([]);
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
+  const { isModalOpen, toggleModal } = useNewStudyModal();
+  const [rowIndexSelected, setRowIndexSelected] = useState<number>(0);
+  const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
 
   useEffect(() => {
     const fetchHypothesis = async () => {
@@ -106,10 +111,6 @@ const LoadTab = ({ setErrorMessage }: TabProps) => {
         }
 
         const trajectoryLinked = (await getStudyTrajectories(study?.id, TRAJECTORY_TYPE.LOAD)) as DbTrajectory[];
-        areaDefault.push({
-          name: AREA_OTHERS,
-          isDefault: true,
-        });
 
         // Build hypothesis table
         const areaDataDefault: HypothesisRowData[] = areaDefault?.map((area) => {
@@ -186,13 +187,23 @@ const LoadTab = ({ setErrorMessage }: TabProps) => {
     }
   };
 
-  const handleFetchTrajectoriesFS = async () => Promise.resolve();
+  const handleFetchTrajectoriesFS = async (index: number) => {
+    try {
+      const results = await fetchTrajectoriesFromFS(TRAJECTORY_TYPE.LOAD);
+      setOptionsFS(convertToFSSelectionOptionType(results));
+      toggleModal();
+    } catch (error) {
+      setErrorInfo({ index, message: t('studyDetails.@select_file_fs_error') });
+    } finally {
+      setRowIndexSelected(index);
+    }
+  };
   const handleViewTrajectory = async () => Promise.resolve();
 
   const handleTrajectorySearch = useCallback(
-    async (value?: string): Promise<SelectOption[] | undefined> => {
+    async (value?: string, area?: string): Promise<SelectOption[] | undefined> => {
       try {
-        const results = await fetchTrajectoriesFromDB(TRAJECTORY_TYPE.LOAD, study.horizon, value);
+        const results = await fetchTrajectoriesFromDB(TRAJECTORY_TYPE.LOAD, study.horizon, value, area);
         return convertToSelectionOptionType(results);
       } catch {
         // silent handler
@@ -286,6 +297,7 @@ const LoadTab = ({ setErrorMessage }: TabProps) => {
           <div className="border-b border-gray-400 pb-2">
             <SearchBar onSearch={() => {}} placeholder={t('studyDetails.@search_area')} />
           </div>
+          <div style={{ maxHeight: 200, overflowY: 'auto' }}>
           <RdsCheckboxGroupWrapper
             label={''}
             name={''}
@@ -307,6 +319,7 @@ const LoadTab = ({ setErrorMessage }: TabProps) => {
               </div>
             ))}
           </RdsCheckboxGroupWrapper>
+          </div>
         </div>
         <div className="flex h-fit w-full">
           <StdSimpleTable
@@ -324,6 +337,21 @@ const LoadTab = ({ setErrorMessage }: TabProps) => {
             }}
           />
         </div>
+        {isModalOpen && (
+            <ImportTrajectoryModal
+                options={optionsFS}
+                onClose={async (status?: RowStatus | undefined, id?: number) => {
+                  if (status && id != null) {
+                    await handleTrajectoryUpdate(rowIndexSelected, id, status);
+                  }
+                  toggleModal();
+                }}
+                trajectoryType={TRAJECTORY_TYPE.LOAD}
+                studyHorizon={study.horizon}
+                studyId={study.id}
+                area={data[rowIndexSelected]?.hypothesis}
+            />
+        )}
       </div>
     </div>
   );

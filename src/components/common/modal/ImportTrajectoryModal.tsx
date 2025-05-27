@@ -7,6 +7,7 @@ import { DbTrajectory, RowStatus, SelectOption } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { fetchTrajectoriesFromFS, uploadTrajectory } from '@/shared/services/trajectoryService.ts';
 import { convertToFSSelectionOptionType } from '@/shared/utils/formFormatter.ts';
+import {AREA_OTHERS} from "@/shared/const/studyConfig.ts";
 
 interface ImportTrajectoryModalProps {
   options: SelectOption[] | undefined;
@@ -14,6 +15,7 @@ interface ImportTrajectoryModalProps {
   trajectoryType: TRAJECTORY_TYPE;
   studyHorizon: string;
   studyId: number;
+  area?: string;
 }
 
 export const ImportTrajectoryModal = ({
@@ -22,6 +24,7 @@ export const ImportTrajectoryModal = ({
   trajectoryType,
   studyHorizon,
   studyId,
+    area,
 }: ImportTrajectoryModalProps) => {
   const { t } = useTranslation();
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
@@ -51,6 +54,7 @@ export const ImportTrajectoryModal = ({
         value.label,
         studyHorizon,
         studyId,
+        area  === 'Others areas' ? AREA_OTHERS : area,
         (progressValue: number) => {
           setProgress(+progressValue?.toFixed(0));
         },
@@ -79,7 +83,8 @@ export const ImportTrajectoryModal = ({
     <RdsModal size="small">
       <RdsModal.Title onClose={() => void onClose()} icon="Upload">
         {t('studyDetails.@import_from_file_system', {
-          trajectoryType: trajectoryType === TRAJECTORY_TYPE.AREA ? 'areas' : 'links',
+          trajectoryType: trajectoryType ,
+          area: area,
         })}
       </RdsModal.Title>
       <RdsModal.Content>
