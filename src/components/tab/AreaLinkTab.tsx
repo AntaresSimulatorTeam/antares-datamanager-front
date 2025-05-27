@@ -43,6 +43,7 @@ import { generateTrajectoryViewHeader } from '@/components/header/TrajectoryView
 import { useLocation } from 'react-router-dom';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { ErrorMessageType } from '@/shared/types/Generic.type.ts';
+import { computeReadOnlyState } from '@/shared/utils/computeReadOnlyState';
 
 const AreaLinkTab = ({ setErrorMessage }: TabProps) => {
   const studyState = useStudy();
@@ -72,14 +73,26 @@ const AreaLinkTab = ({ setErrorMessage }: TabProps) => {
 
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({ '0': false, '1': false });
 
+  // useEffect(() => {
+  //   setReadOnly({
+  //     '0': false,
+  //     '1':
+  //       !data[0]?.trajectory ||
+  //       data[0]?.status === TRAJECTORY_SELECTION_STATUS.ERROR ||
+  //       (!studyState[`${TRAJECTORY_TYPE.LINK}`] && studyState?.studyStatus === StudyStatus.GENERATED)
+  //   });
+  // }, [data[0]?.trajectory, data[0]?.status, studyState?.studyStatus]);
+
+  const areaTrajectory = data[0]?.trajectory;
+  const areaStatus = data[0]?.status;
+  const studyStatus = studyState.studyStatus!;
+  const hasLinkTrajectory = !!studyState?.[TRAJECTORY_TYPE.LINK];
+
   useEffect(() => {
-    setReadOnly({
-      '0': false,
-      '1':
-        !data[0].trajectory ||
-        (!studyState[`${TRAJECTORY_TYPE.LINK}`] && studyState?.studyStatus === StudyStatus.GENERATED),
-    });
-  }, [studyState?.studyStatus]);
+    setReadOnly(
+      computeReadOnlyState(areaTrajectory, areaStatus, studyStatus, hasLinkTrajectory)
+    );
+  }, [areaTrajectory, areaStatus, studyStatus, hasLinkTrajectory]);
 
   useEffect(() => {
     const getTrajectories = async () => {
@@ -308,7 +321,7 @@ const AreaLinkTab = ({ setErrorMessage }: TabProps) => {
         });
         setIsViewModalOpen(true);
       } catch (error) {
-        console.error(error);
+        //Silent error
       }
     } else {
       return;
