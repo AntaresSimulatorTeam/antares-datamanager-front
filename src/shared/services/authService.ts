@@ -7,7 +7,7 @@
 import { User, UserManager } from 'oidc-client-ts';
 import { config } from '@/shared/const/authConfig';
 import { isAuthenticationActive } from '@/shared/utils/authUtils.ts';
-import { getEnvVariables } from '@/envVariables.ts
+import { getEnvVariables } from '@/envVariables.ts';
 import { notifyToast } from '@/shared/notification/notification';
 
 const userManager = new UserManager(config);
