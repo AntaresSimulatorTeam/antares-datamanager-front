@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "feature/search_load_trajectory_by_area_db",
-  commit: "c8f4065",
-  commitTime: "2025-05-22T18:51:23.340Z"
+  branch: "develop",
+  commit: "5e38b47",
+  commitTime: "2025-05-27T19:24:56.267Z"
 };
