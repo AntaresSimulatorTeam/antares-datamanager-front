@@ -7,6 +7,7 @@
 import { User, UserManager } from 'oidc-client-ts';
 import { config } from '@/shared/const/authConfig';
 import { isAuthenticationActive } from '@/shared/utils/authUtils.ts';
+import { getEnvVariables } from '@/envVariables.ts
 import { notifyToast } from '@/shared/notification/notification';
 
 const userManager = new UserManager(config);
@@ -14,14 +15,45 @@ const userManager = new UserManager(config);
 export const AuthService = {
   login: async () => await userManager.signinRedirect(),
   refresh: () => userManager.signinSilent(),
-  logout: () => userManager.signoutRedirect(),
   getUser: async (): Promise<User | null> => await userManager.getUser(),
-  handleCallback: () => userManager.signinRedirectCallback(),
+  handleCallback: async () => await userManager.signinRedirectCallback(),
+  revokeTokens: async () => await userManager.revokeTokens(),
+  removeUser: async () => await userManager.removeUser(),
 
   getAccessToken: async (): Promise<string | null> => {
     const user = await userManager.getUser();
     return user?.access_token || null;
   },
+
+  logout: async () => {
+    try {
+      const accessToken = (await userManager.getUser())?.access_token;
+      await userManager.signoutRedirect({
+        // eslint-disable-next-line camelcase
+        id_token_hint: accessToken ?? undefined,
+      });
+      window.location.href = getEnvVariables('VITE_OAUTH2_REDIRECT_URL');
+    } catch {
+      // silent handler
+    }
+  },
+
+  addAccessTokenExpired: () =>
+    userManager.events.addAccessTokenExpired(async () => {
+      console.log('Access token expired');
+      try {
+        const accessToken = (await userManager.getUser())?.access_token;
+        await userManager.signoutRedirect({
+          // eslint-disable-next-line camelcase
+          id_token_hint: accessToken ?? undefined,
+        });
+        window.location.href = getEnvVariables('VITE_OAUTH2_REDIRECT_URL');
+      } catch {
+        // silent handler
+      }
+    }),
+
+  //removeAccessTokenExpired: () => userManager.events.removeAccessTokenExpired(),
 
   authFetch: async (url: string, options: RequestInit = {}): Promise<Response> => {
     if (isAuthenticationActive()) {
