@@ -36,6 +36,7 @@ const getHypothesisTableHeaders = (
 ) => [
   columnHelper.accessor('hypothesis', {
     header: t('studyDetails.@hypothesis'),
+    size: 50,
     cell: ({ getValue, row }) => {
       const { trajectory, status } = row.original;
       return (
@@ -61,11 +62,12 @@ const getHypothesisTableHeaders = (
   }),
   columnHelper.accessor('trajectory', {
     header: t('studyDetails.@trajectory'),
+    size: 300,
     cell: ({ row }) => {
       const { trajectory, status } = row.original;
       const textClass = studyStatus === StudyStatus.GENERATED ? 'text-primary-600' : 'text-gray-900';
       return trajectory && status !== TRAJECTORY_SELECTION_STATUS.MISSING ? (
-        <div className="flex w-2/5 space-x-2 py-3">
+        <div className="flex w-full space-x-2 py-3">
           <span className={`${textClass}`}>{trajectory.trajectoryName}</span>
           {studyStatus != StudyStatus.GENERATED && (
             <RdsIconButton
@@ -84,7 +86,7 @@ const getHypothesisTableHeaders = (
           )}
         </div>
       ) : (
-        <div className="flex w-2/5 items-center space-x-2">
+        <div className="flex w-full items-center space-x-2">
           <div className="flex min-w-fit items-center">
             <SelectAndSearchableInput
               onSelect={(value: SelectOption) => {

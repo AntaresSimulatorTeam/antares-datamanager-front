@@ -17,7 +17,7 @@ export const LabelWithButtonPreview = ({
   onClick,
   hasPreview = true,
 }: LabelWithButtonPreviewProps) => (
-  <div className={'flex w-2/3 items-center justify-between'}>
+  <>
     <span className={`${status === TRAJECTORY_SELECTION_STATUS.OK ? 'text-primary-600' : 'text-gray-900'}`}>
       {value}
     </span>
@@ -31,5 +31,5 @@ export const LabelWithButtonPreview = ({
         onClick={() => void onClick?.()}
       />
     )}
-  </div>
+  </>
 );

@@ -9,7 +9,7 @@ interface LabelWithDeleteButtonProps {
 export const LabelWithDeleteButton = ({ label, isDeletable, onClick }: LabelWithDeleteButtonProps) => {
   const textClass = !isDeletable ? 'text-primary-600' : 'text-gray-900';
   return (
-    <div className="flex h-full justify-start gap-2 py-2.5">
+    <div className="flex h-full w-auto justify-start gap-2 py-2.5">
       <span className={`${textClass}`}>{label}</span>
       {isDeletable && <RdsIconButton icon={RdsIconId.Close} size="small" onClick={() => void onClick?.()} />}
     </div>
