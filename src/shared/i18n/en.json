@@ -150,6 +150,11 @@
     "@frontend": "Frontend",
     "@backend": "Backend"
   },
+  "horizonInput":{
+    "@validYearError": "Horizon must be between 2000 and 9999",
+    "@horizonPlaceholder": "Enter a year",
+    "@requiredHorizon": "Horizon is required"
+  },
   "deletionModal": {
     "@title": "Are you sure you want to delete this area ?",
     "@content": "This action will delete the associated trajectory. Please confirm you wish to proceed."

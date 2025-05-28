@@ -8,7 +8,7 @@ import React, { useEffect, useState } from 'react';
 import { RdsButton, RdsIconId, RdsInputText, RdsModal } from 'rte-design-system-react';
 import { useTranslation } from 'react-i18next';
 import KeywordsInput from '@/components/input/KeywordsInput.tsx';
-import HorizonInput from '@/components/input/HorizonInput.tsx';
+import HorizonInput from '@/components/input/HorizonInput';
 import ProjectInput from '@/components/input/ProjectInput.tsx';
 import { saveStudy } from '@/shared/services/studyService';
 import { StudyDTO } from '@/shared/types';
@@ -31,14 +31,13 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
 }) => {
   const { t } = useTranslation();
   const [studyName, setStudyName] = useState<string>(study?.name || '');
-  const [horizon, setHorizon] = useState<string>(study?.horizon ? study.horizon.substring(0, 4) : '');
+  const [horizon, setHorizon] = useState<string>('');
   const [projectName, setProjectName] = useState<string>(study?.project || projectInfoName || '');
   const [keywords, setKeywords] = useState<string[]>(study?.keywords || []);
   const [trajectoryIds] = useState<number[]>(study?.trajectoryIds || []);
   const [isFormValid, setIsFormValid] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string>('');
   const { user } = useUser();
-
+  const [isHorizonValid, setIsHorizonValid] = useState(false);
 
   const saveStudyHandler = async () => {
 
@@ -72,39 +71,23 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
 
   };
 
-  const validateForm = () => {
-    if (studyName && projectName && horizon && !errorMessage) {
-      setIsFormValid(true);
-    } else {
-      setIsFormValid(false);
-    }
-  };
-
   useEffect(() => {
+    const validateForm = () => {
+      if (studyName && projectName && horizon && isHorizonValid) {
+        setIsFormValid(true);
+      } else {
+        setIsFormValid(false);
+      }
+    };
     validateForm();
-  }, [studyName, projectName, horizon, keywords, errorMessage]);
-
-  const validateHorizon = (year: string) => {
-    const currentYear = new Date().getFullYear();
-    const selectedYear = parseInt(year);
-    if (selectedYear < currentYear) {
-      setErrorMessage('Horizon must be a year greater than the current year');
-    } else if (selectedYear > 2100) {
-      setErrorMessage('Horizon must be a year less than or equal to 2100');
-    } else {
-      setErrorMessage('');
-    }
-  };
+  }, [studyName, projectName, horizon, keywords, isHorizonValid]);
 
   const handleHorizonChange = (value: string) => {
-    const numericRegex = /^[0-9]*$/;
-    if (!numericRegex.test(value)) {
-      setErrorMessage('Please enter a valid year');
-      setHorizon('');
-    } else {
-      setHorizon(value);
-      validateHorizon(value);
-    }
+   setHorizon(value)
+  };
+
+  const handleHorizonValidityChange = (valid: boolean) => {
+    setIsHorizonValid(valid);
   };
 
   return (
@@ -131,7 +114,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
               </div>
             )}
           </div>
-          <HorizonInput value={horizon} onChange={handleHorizonChange} required />
+          <HorizonInput horizon={horizon} onChange={handleHorizonChange}  onValidChange={handleHorizonValidityChange} required />
           <KeywordsInput
             keywords={keywords}
             setKeywords={setKeywords}

@@ -84,5 +84,11 @@
     "@import_status_missing": "Missing",
     "@import_status_error": "Error",
     "@generate": "Générer"
+  },
+  "horizonInput":{
+    "@validYearError": "Horizon doit être un numéro entre 2000 et 99999",
+    "@horizon_placeholder": "Horizon",
+    "@requiredHorizon": "Reinsegner un horizon est obligatoire"
+
   }
 }
