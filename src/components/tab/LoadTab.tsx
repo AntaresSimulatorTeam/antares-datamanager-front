@@ -21,13 +21,14 @@ import { useTranslation } from 'react-i18next';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { useLocation } from 'react-router-dom';
 import {
-  fetchTrajectoriesFromDB, fetchTrajectoriesFromFS,
+  fetchTrajectoriesFromDB,
+  fetchTrajectoriesFromFS,
   getDefaultLoadHypothesis,
   getTrajectoryDataByTypeAndId,
   linkTrajectoryToStudy,
   unlinkTrajectoryFromStudy,
 } from '@/shared/services/trajectoryService.ts';
-import {convertToFSSelectionOptionType, convertToSelectionOptionType} from '@/shared/utils/formFormatter.ts';
+import { convertToFSSelectionOptionType, convertToSelectionOptionType } from '@/shared/utils/formFormatter.ts';
 import SearchBar from '@/pages/pegase/home/components/SearchBar.tsx';
 import { RdsCheckbox, RdsCheckboxGroupWrapper, RdsDivider } from 'rte-design-system-react';
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
@@ -42,8 +43,9 @@ import {
   retrieveReadOnlyArea,
 } from '@/shared/utils/trajectoryUtils.ts';
 import { AREA_OTHERS } from '@/shared/const/studyConfig.ts';
-import {ImportTrajectoryModal} from "@common/modal/ImportTrajectoryModal.tsx";
-import {useNewStudyModal} from "@/hooks/useNewStudyModal.ts";
+import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
+import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
+import { DeletionModal } from '@common/modal/DeletionModal.tsx';
 
 export type CheckBoxData = {
   name: string;
@@ -64,8 +66,10 @@ const LoadTab = ({ setErrorMessage }: TabProps) => {
   const [areasDefaultOptions, setAreasDefaultOptions] = useState<CheckBoxData[]>([]);
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
   const { isModalOpen, toggleModal } = useNewStudyModal();
+  const [isDeletionModalOpen, setIsDeletionModalOpen] = useState(false);
   const [rowIndexSelected, setRowIndexSelected] = useState<number>(0);
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
+  const [rowToDelete, setRowToDelete] = useState<{ index: number; value?: string } | null>(null);
 
   useEffect(() => {
     const fetchHypothesis = async () => {
@@ -111,6 +115,10 @@ const LoadTab = ({ setErrorMessage }: TabProps) => {
         }
 
         const trajectoryLinked = (await getStudyTrajectories(study?.id, TRAJECTORY_TYPE.LOAD)) as DbTrajectory[];
+        areaDefault.push({
+          name: AREA_OTHERS,
+          isDefault: true,
+        });
 
         // Build hypothesis table
         const areaDataDefault: HypothesisRowData[] = areaDefault?.map((area) => {
@@ -212,7 +220,7 @@ const LoadTab = ({ setErrorMessage }: TabProps) => {
     [study.horizon],
   );
 
-  const removeRow = async (indexRow: number, value?: string) => {
+  const handleRemoveRow = async (indexRow: number, value?: string) => {
     if (data?.[indexRow]) {
       dispatch?.({
         type: STUDY_ACTION.DELETE_LOAD_TRAJECTORY,
@@ -230,6 +238,15 @@ const LoadTab = ({ setErrorMessage }: TabProps) => {
     }
     if (value) {
       setCheckedValues((prev) => [...prev.filter((name) => name !== value)]);
+    }
+  };
+
+  const removeRow = async (indexRow: number, valueToDelete?: string) => {
+    if (data[indexRow].trajectory) {
+      setRowToDelete({ index: indexRow, value: valueToDelete });
+      setIsDeletionModalOpen(true);
+    } else {
+      await handleRemoveRow(indexRow, valueToDelete);
     }
   };
 
@@ -297,7 +314,6 @@ const LoadTab = ({ setErrorMessage }: TabProps) => {
           <div className="border-b border-gray-400 pb-2">
             <SearchBar onSearch={() => {}} placeholder={t('studyDetails.@search_area')} />
           </div>
-          <div style={{ maxHeight: 200, overflowY: 'auto' }}>
           <RdsCheckboxGroupWrapper
             label={''}
             name={''}
@@ -319,7 +335,6 @@ const LoadTab = ({ setErrorMessage }: TabProps) => {
               </div>
             ))}
           </RdsCheckboxGroupWrapper>
-          </div>
         </div>
         <div className="flex h-fit w-full">
           <StdSimpleTable
@@ -338,19 +353,30 @@ const LoadTab = ({ setErrorMessage }: TabProps) => {
           />
         </div>
         {isModalOpen && (
-            <ImportTrajectoryModal
-                options={optionsFS}
-                onClose={async (status?: RowStatus | undefined, id?: number) => {
-                  if (status && id != null) {
-                    await handleTrajectoryUpdate(rowIndexSelected, id, status);
-                  }
-                  toggleModal();
-                }}
-                trajectoryType={TRAJECTORY_TYPE.LOAD}
-                studyHorizon={study.horizon}
-                studyId={study.id}
-                area={data[rowIndexSelected]?.hypothesis}
-            />
+          <ImportTrajectoryModal
+            options={optionsFS}
+            onClose={async (status?: RowStatus | undefined, id?: number) => {
+              if (status && id != null) {
+                await handleTrajectoryUpdate(rowIndexSelected, id, status);
+              }
+              toggleModal();
+            }}
+            trajectoryType={TRAJECTORY_TYPE.LOAD}
+            studyHorizon={study.horizon}
+            studyId={study.id}
+            area={data[rowIndexSelected]?.hypothesis}
+          />
+        )}
+        {isDeletionModalOpen && (
+          <DeletionModal
+            onClose={() => setIsDeletionModalOpen(false)}
+            handleDeletionRow={async () => {
+              if (rowToDelete) {
+                await handleRemoveRow(rowToDelete.index, rowToDelete?.value);
+                setIsDeletionModalOpen(false);
+              }
+            }}
+          />
         )}
       </div>
     </div>

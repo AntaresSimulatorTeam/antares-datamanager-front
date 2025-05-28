@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "develop",
-  commit: "5e38b47",
-  commitTime: "2025-05-27T19:24:56.267Z"
+  branch: "feat/ANT-3248_LOAD_handle_trajectory_link_deletion",
+  commit: "1b767fc",
+  commitTime: "2025-05-28T08:41:49.808Z"
 };

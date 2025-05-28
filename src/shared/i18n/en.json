@@ -149,5 +149,9 @@
     "@information": "Information",
     "@frontend": "Frontend",
     "@backend": "Backend"
+  },
+  "deletionModal": {
+    "@title": "Are you sure you want to delete this area ?",
+    "@content": "This action will delete the associated trajectory. Please confirm you wish to proceed."
   }
 }
