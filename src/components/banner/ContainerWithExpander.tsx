@@ -57,7 +57,7 @@ export const ContainerWithExpander = <T,>({ content, placeholder }: Props<T>) =>
             )}
           />
         )}
-        {content.length === 0 && isOpen && <div className="mb-2 text-body-l text-gray-600">{placeholder}</div>}
+        {content.length === 0 && isOpen && <div className="mb-2 text-body-s text-gray-600">{placeholder}</div>}
       </div>
     </div>
   );

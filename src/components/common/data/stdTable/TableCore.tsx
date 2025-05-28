@@ -57,7 +57,10 @@ const headerDivStyleBuilder = <TData,>({ table, header }: TableHeaderProps<TData
 const TableHeader = <TData,>(props: TableHeaderProps<TData>) => {
   const { table, header, columnSize } = props;
   return (
-    <th className={headerClassBuilder(props)} style={columnSize === 'pixels' ? { width: header.getSize() } : undefined}>
+    <th
+      className={headerClassBuilder(props)}
+      style={columnSize === 'pixels' || header.getSize() != null ? { width: header.getSize() } : undefined}
+    >
       <span>{header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}</span>
       {table.options.columnResizeMode && (
         <div
