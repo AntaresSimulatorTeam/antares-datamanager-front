@@ -5,19 +5,18 @@
  */
 
 import {
-    HYPOTHESIS_LOAD_DEFAULT,
-    TRAJECTORY_DATA_BASE_ENDPOINT,
-    TRAJECTORY_DATA_FILE_ENDPOINT,
-    TRAJECTORY_ENDPOINT,
-    TRAJECTORY_FILE_SYSTEM_ENDPOINT,
-    TRAJECTORY_LINK_TO_STUDY_ENDPOINT,
+  HYPOTHESIS_LOAD_DEFAULT,
+  TRAJECTORY_DATA_BASE_ENDPOINT,
+  TRAJECTORY_DATA_FILE_ENDPOINT,
+  TRAJECTORY_ENDPOINT,
+  TRAJECTORY_FILE_SYSTEM_ENDPOINT,
+  TRAJECTORY_LINK_TO_STUDY_ENDPOINT,
 } from '@/shared/const/apiEndPoint.ts';
-import {DbTrajectory, FsTrajectory, TRAJECTORY_DATA_TYPE, Types} from '@/shared/types';
-import {AuthService} from '@/shared/services/authService.ts';
-import {fetchWithProgress} from '@/shared/services/progressService.ts';
-import {TRAJECTORY_TYPE} from '@/shared/enum/trajectory.ts';
-import {getErrorMessage} from '@/shared/utils/warningUtils.ts';
-import {notifyToast} from "@/shared/notification/notification.tsx";
+import { DbTrajectory, FsTrajectory, TRAJECTORY_DATA_TYPE, Types } from '@/shared/types';
+import { AuthService } from '@/shared/services/authService.ts';
+import { fetchWithProgress } from '@/shared/services/progressService.ts';
+import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { BackendError } from '@/shared/utils/errrorHandler.ts';
 
 /**
  * Retrieve a list of trajectories by type and horizon from database
@@ -29,17 +28,17 @@ import {notifyToast} from "@/shared/notification/notification.tsx";
  * @returns {Promise<DbTrajectory[]>} - Promise object that represents a list of trajectories
  */
 export const fetchTrajectoriesFromDB = async (
-    trajectoryType: string,
-    horizon: string,
-    fileName?: string,
-    area?: string,
+  trajectoryType: string,
+  horizon: string,
+  fileName?: string,
+  area?: string,
 ): Promise<DbTrajectory[]> => {
-    const urlApi = `${TRAJECTORY_DATA_BASE_ENDPOINT}?trajectoryType=${trajectoryType}&horizon=${horizon}&fileNameContains=${fileName ?? ''}&loadArea=${area ?? ''}`;
-    const response = await AuthService.authFetch(urlApi);
-    if (!response.ok) {
-        throw new Error('Failed to fetch trajectories from data base');
-    }
-    return (await response.json()) as DbTrajectory[];
+  const urlApi = `${TRAJECTORY_DATA_BASE_ENDPOINT}?trajectoryType=${trajectoryType}&horizon=${horizon}&fileNameContains=${fileName ?? ''}&loadArea=${area ?? ''}`;
+  const response = await AuthService.authFetch(urlApi);
+  if (!(response as Response).ok) {
+    throw new Error('Failed to fetch trajectories from data base');
+  }
+  return (await (response as Response).json()) as DbTrajectory[];
 };
 
 /**
@@ -51,22 +50,22 @@ export const fetchTrajectoriesFromDB = async (
  * @returns {Promise<FsTrajectory[]>} - Promise object that represents a list of trajectories
  */
 export const fetchTrajectoriesFromFS = async (
-    trajectoryType: string,
-    searchTerm?: string | undefined,
-    thermalCapacityArea?: string | undefined,
+  trajectoryType: string,
+  searchTerm?: string | undefined,
+  thermalCapacityArea?: string | undefined,
 ): Promise<FsTrajectory[]> => {
-    const queryString = new URLSearchParams({
-        trajectoryType: trajectoryType ?? '',
-        thermalCapacityArea: thermalCapacityArea ?? '',
-        fileNameContains: searchTerm ?? '',
-    }).toString();
+  const queryString = new URLSearchParams({
+    trajectoryType: trajectoryType ?? '',
+    thermalCapacityArea: thermalCapacityArea ?? '',
+    fileNameContains: searchTerm ?? '',
+  }).toString();
 
-    const urlApi = `${TRAJECTORY_FILE_SYSTEM_ENDPOINT}?${queryString}`;
-    const response = await AuthService.authFetch(urlApi);
-    if (!response.ok) {
-        throw new Error('Failed to fetch trajectories from file system');
-    }
-    return (await response.json()) as FsTrajectory[];
+  const urlApi = `${TRAJECTORY_FILE_SYSTEM_ENDPOINT}?${queryString}`;
+  const response = await AuthService.authFetch(urlApi);
+  if (!(response as Response).ok) {
+    throw new Error('Failed to fetch trajectories from file system');
+  }
+  return (await (response as Response).json()) as FsTrajectory[];
 };
 
 /**
@@ -81,36 +80,30 @@ export const fetchTrajectoriesFromFS = async (
  * @returns {Promise<DbTrajectory>} - Promise object that represents a trajectory inserted into database
  */
 export const uploadTrajectory = async (
-    trajectoryType: string,
-    trajectoryName: string,
-    horizon: string,
-    studyId: number,
-    area: string | undefined,
-    onProgress: (progress: number) => void,
+  trajectoryType: TRAJECTORY_TYPE,
+  trajectoryName: string,
+  horizon: string,
+  studyId: number,
+  area: string | undefined,
+  onProgress: (progress: number) => void,
 ): Promise<DbTrajectory> => {
-    const urlApi = `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
-    const urlLoadApi = `${TRAJECTORY_ENDPOINT}/load?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
-    const [_, response] = await fetchWithProgress(
-        trajectoryType === TRAJECTORY_TYPE.LOAD ? urlLoadApi : urlApi,
-        {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        },
-        onProgress,
-    );
+  const urlApi = `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
+  const urlLoadApi = `${TRAJECTORY_ENDPOINT}/load?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
+  const response = await fetchWithProgress(
+    trajectoryType === TRAJECTORY_TYPE.LOAD ? urlLoadApi : urlApi,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+    onProgress,
+  );
 
-    if (!(response as Response).ok) {
-        const errorMessage = await getErrorMessage(response as Response);
-        notifyToast({
-            type: 'error',
-            message: `${errorMessage.message}`,
-        });
-
-        throw new Error(`${errorMessage.message}`);
-    }
-    return (await (response as Response).json()) as DbTrajectory;
+  if (!(response as Response).ok) {
+    throw response;
+  }
+  return (await (response as Response).json()) as DbTrajectory;
 };
 
 /**
@@ -123,23 +116,24 @@ export const uploadTrajectory = async (
  */
 
 export const linkTrajectoryToStudy = async (
-    type: TRAJECTORY_TYPE,
-    trajectoryId: number,
-    studyId: number,
+  type: TRAJECTORY_TYPE,
+  trajectoryId: number,
+  studyId: number,
 ): Promise<DbTrajectory> => {
-    const urlApi = `${TRAJECTORY_LINK_TO_STUDY_ENDPOINT}?type=${type}&trajectoryId=${trajectoryId}&studyId=${studyId}`;
-    const response = await AuthService.authFetch(urlApi, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    });
-    if (!response.ok) {
-        const errorMessage = await getErrorMessage(response);
-        throw new Error(`${errorMessage.message}`);
-    }
+  const urlApi = `${TRAJECTORY_LINK_TO_STUDY_ENDPOINT}?type=${type}&trajectoryId=${trajectoryId}&studyId=${studyId}`;
+  const response = await AuthService.authFetch(urlApi, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  if (!(response as Response).ok) {
+    const errorText = await (response as Response).text();
+    const errorMessage = JSON.parse(errorText) as BackendError;
+    throw new Error(errorMessage?.antaresErrorMessage);
+  }
 
-    return (await response.json()) as DbTrajectory;
+  return (await (response as Response).json()) as DbTrajectory;
 };
 
 /**
@@ -149,13 +143,13 @@ export const linkTrajectoryToStudy = async (
  * @param {number} studyId - Study id
  */
 export const unlinkTrajectoryFromStudy = async (trajectoryId: number, studyId: number) => {
-    const urlApi = `${TRAJECTORY_LINK_TO_STUDY_ENDPOINT}?trajectoryId=${trajectoryId}&studyId=${studyId}`;
-    const response = await AuthService.authFetch(urlApi, {
-        method: 'DELETE',
-    });
-    if (!response.ok) {
-        throw new Error(`${(response as unknown as Error).message}`);
-    }
+  const urlApi = `${TRAJECTORY_LINK_TO_STUDY_ENDPOINT}?trajectoryId=${trajectoryId}&studyId=${studyId}`;
+  const response = await AuthService.authFetch(urlApi, {
+    method: 'DELETE',
+  });
+  if (!(response as Response).ok) {
+    throw new Error(`${(response as unknown as BackendError).antaresErrorMessage}`);
+  }
 };
 
 /**
@@ -166,25 +160,25 @@ export const unlinkTrajectoryFromStudy = async (trajectoryId: number, studyId: n
  * @return {Promise<Types<TRAJECTORY_DATA_TYPE>[]>}
  */
 export const getTrajectoryDataByTypeAndId = async (
-    trajectoryType: TRAJECTORY_TYPE,
-    trajectoryId: number,
+  trajectoryType: TRAJECTORY_TYPE,
+  trajectoryId: number,
 ): Promise<Types<TRAJECTORY_DATA_TYPE>[]> => {
-    const urlApi = `${TRAJECTORY_DATA_FILE_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryId=${trajectoryId}`;
-    const response = await AuthService.authFetch(urlApi);
+  const urlApi = `${TRAJECTORY_DATA_FILE_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryId=${trajectoryId}`;
+  const response = await AuthService.authFetch(urlApi);
 
-    if (!response.ok) {
-        throw new Error('Failed to fetch data trajectory');
-    }
-    return (await response.json()) as Types<TRAJECTORY_DATA_TYPE>[];
+  if (!(response as Response).ok) {
+    throw new Error('Failed to fetch data trajectory');
+  }
+  return (await (response as Response).json()) as Types<TRAJECTORY_DATA_TYPE>[];
 };
 
 /**
  * Fetch load default hypothesis (LOAD_OTHERS, LOAD_FR...)
  */
 export const getDefaultLoadHypothesis = async (): Promise<{ name: string }[]> => {
-    const response = await AuthService.authFetch(HYPOTHESIS_LOAD_DEFAULT);
-    if (!response.ok) {
-        throw new Error('Failed to fetch default load hypothesis');
-    }
-    return (await response.json()) as { name: string }[];
+  const response = await AuthService.authFetch(HYPOTHESIS_LOAD_DEFAULT);
+  if (!(response as Response).ok) {
+    throw new Error('Failed to fetch default load hypothesis');
+  }
+  return (await (response as Response).json()) as { name: string }[];
 };

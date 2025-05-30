@@ -1,36 +1,23 @@
-import { FileInputStatus, RdsButton, RdsIconId, RdsModal } from 'rte-design-system-react';
+import { RdsButton, RdsIconId, RdsModal } from 'rte-design-system-react';
 import SelectAndSearchableInput from '@/components/input/SelectAndSearchableInput.tsx';
 import { useTranslation } from 'react-i18next';
 import { useCallback, useState } from 'react';
-import { ProgressBar } from '@/components/forms/ProgressBar.tsx';
-import { DbTrajectory, RowStatus, SelectOption } from '@/shared/types';
+import { SelectOption } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { fetchTrajectoriesFromFS, uploadTrajectory } from '@/shared/services/trajectoryService.ts';
+import { fetchTrajectoriesFromFS } from '@/shared/services/trajectoryService.ts';
 import { convertToFSSelectionOptionType } from '@/shared/utils/formFormatter.ts';
-import { AREA_OTHERS } from '@/shared/const/studyConfig.ts';
 
 interface ImportTrajectoryModalProps {
   options: SelectOption[] | undefined;
-  onClose: (status?: RowStatus, id?: number, label?: string, errorMessage?: string) => Promise<void>;
+  onClose: (value?: SelectOption) => Promise<void>;
   trajectoryType: TRAJECTORY_TYPE;
-  studyHorizon: string;
-  studyId: number;
   area?: string;
 }
 
-export const ImportTrajectoryModal = ({
-  options,
-  onClose,
-  trajectoryType,
-  studyHorizon,
-  studyId,
-  area,
-}: ImportTrajectoryModalProps) => {
+export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, area }: ImportTrajectoryModalProps) => {
   const { t } = useTranslation();
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [trajectorySelected, setTrajectorySelected] = useState<SelectOption | null>(null);
-  const [fileStatus, setFileStatus] = useState<FileInputStatus>('empty');
-  const [progress, setProgress] = useState(0);
 
   const handleSelectOption = (value: SelectOption | null) => {
     if (value) {
@@ -41,30 +28,6 @@ export const ImportTrajectoryModal = ({
 
   const resetField = () => {
     setTrajectorySelected(null);
-    setFileStatus('empty');
-  };
-
-  const handleImportTrajectory = async (value: SelectOption) => {
-    setFileStatus('loading');
-    setIsButtonDisabled(true);
-    let newTrajectory: DbTrajectory;
-    try {
-      newTrajectory = await uploadTrajectory(
-        trajectoryType,
-        value.label,
-        studyHorizon,
-        studyId,
-        area === 'Others areas' ? AREA_OTHERS : area,
-        (progressValue: number) => {
-          setProgress(+progressValue?.toFixed(0));
-        },
-      );
-      setFileStatus('success');
-      await onClose('success', newTrajectory.id);
-    } catch (error) {
-      setFileStatus('error');
-      void onClose('error', value.id, value.label, (error as Error)?.message);
-    }
   };
 
   const handleSearchTerm = useCallback(
@@ -88,20 +51,15 @@ export const ImportTrajectoryModal = ({
         })}
       </RdsModal.Title>
       <RdsModal.Content>
-        <div className="w-full items-start gap-2">
-          <div className="absolute z-10 w-[400px]">
-            <SelectAndSearchableInput
-              options={options}
-              defaultPlaceHolder={t('studyDetails.@select_trajectory')}
-              onSelect={handleSelectOption}
-              isSearchable={true}
-              setSearchTerm={handleSearchTerm}
-              resetField={resetField}
-            />
-          </div>
-          <div className="relative w-[400px] pt-10">
-            <ProgressBar statusFile={fileStatus} progressValue={progress} />
-          </div>
+        <div className="w-1/2">
+          <SelectAndSearchableInput
+            options={options}
+            defaultPlaceHolder={t('studyDetails.@select_trajectory')}
+            onSelect={handleSelectOption}
+            isSearchable={true}
+            setSearchTerm={handleSearchTerm}
+            resetField={resetField}
+          />
         </div>
       </RdsModal.Content>
       <RdsModal.Footer>
@@ -109,7 +67,7 @@ export const ImportTrajectoryModal = ({
         <RdsButton
           icon={RdsIconId.Add}
           label={t('studyDetails.@import')}
-          onClick={() => trajectorySelected && void handleImportTrajectory(trajectorySelected)}
+          onClick={() => trajectorySelected && void onClose(trajectorySelected)}
           variant="contained"
           color="primary"
           disabled={isButtonDisabled}

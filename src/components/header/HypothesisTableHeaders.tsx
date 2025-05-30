@@ -5,26 +5,27 @@
  */
 
 import { createColumnHelper } from '@tanstack/react-table';
-import { RdsButton, RdsIcon, RdsIconButton, RdsIconId } from 'rte-design-system-react';
+import { FileInputStatus, RdsButton, RdsIconButton, RdsIconId } from 'rte-design-system-react';
 import { HypothesisRowData, RowStatus, SelectOption } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
-import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 import SelectAndSearchableInput from '@/components/input/SelectAndSearchableInput.tsx';
 import { ButtonPreview } from '@/components/button/ButtonPreview.tsx';
 import { Dispatch, SetStateAction } from 'react';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { ErrorMessageType } from '@/shared/types/Generic.type.ts';
+import { ProgressBar } from '@/components/forms/ProgressBar.tsx';
+import { CellWithStatus } from '@common/data/CellWithStatus.tsx';
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
 
 const getHypothesisTableHeaders = (
   t: (value: string) => string,
   handleUpdate: (
+    index: number,
     trajectoryId: number,
     status: RowStatus,
     trajectoryLabel?: string,
-    index?: number,
     errorMessage?: string,
   ) => Promise<void>,
   handleImport: (index: number) => Promise<void>,
@@ -33,6 +34,9 @@ const getHypothesisTableHeaders = (
   error: ErrorMessageType,
   setErrorInfo: Dispatch<SetStateAction<ErrorMessageType>>,
   studyStatus: StudyStatus | undefined,
+  progress: number,
+  fileStatus: FileInputStatus,
+  rowIndexSelected: number,
 ) => [
   columnHelper.accessor('hypothesis', {
     header: t('studyDetails.@hypothesis'),
@@ -76,10 +80,10 @@ const getHypothesisTableHeaders = (
               onClick={() => {
                 setErrorInfo({ index: row.index, message: '' });
                 void handleUpdate(
+                  row.index,
                   trajectory.id,
                   status === TRAJECTORY_SELECTION_STATUS.ERROR ? 'emptyError' : 'empty',
                   '',
-                  row.index,
                 );
               }}
             />
@@ -91,7 +95,7 @@ const getHypothesisTableHeaders = (
             <SelectAndSearchableInput
               onSelect={(value: SelectOption) => {
                 setErrorInfo({ index: row.index, message: '' });
-                void handleUpdate(value.id, 'success', value.label, row.index);
+                void handleUpdate(row.index, value.id, 'success', value.label);
               }}
               setSearchTerm={async (value?: string) => await handlerSearch(value, row.index)}
               defaultPlaceHolder={
@@ -119,27 +123,12 @@ const getHypothesisTableHeaders = (
   columnHelper.accessor('status', {
     header: t('home.@status'),
     cell: ({ row }) => {
-      const { status } = row.original;
-      if (status === TRAJECTORY_SELECTION_STATUS.MISSING)
-        return (
-          <div className="flex flex-1 items-center gap-1">
-            <StdIcon name={StdIconId.QuestionMark} color="text-warning-500" />{' '}
-            {t('studyDetails.@import_status_missing')}
-          </div>
-        );
-      if (status === TRAJECTORY_SELECTION_STATUS.OK)
-        return (
-          <div className="flex flex-1 items-center gap-1">
-            <RdsIcon name={RdsIconId.Done} color="primary-600" /> {t('studyDetails.@import_status_done')}
-          </div>
-        );
-      if (status === TRAJECTORY_SELECTION_STATUS.ERROR)
-        return (
-          <div className="flex flex-1 items-center gap-1">
-            <RdsIcon name={RdsIconId.Info} color="error-700" /> {t('studyDetails.@import_status_error')}
-          </div>
-        );
-      return null;
+      const { status, trajectory } = row.original;
+      return progress > 0 && fileStatus === 'loading' && rowIndexSelected === row.index ? (
+        <ProgressBar statusFile={fileStatus} progressValue={progress} />
+      ) : (
+        <CellWithStatus status={status} isDeletable={false} message={trajectory?.messages?.[0]?.content} />
+      );
     },
   }),
 ];

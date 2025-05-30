@@ -63,7 +63,7 @@ const StudyNavigationMenu = ({
       case TRAJECTORY_TYPE.AREA:
         return <AreaLinkTab setErrorMessage={setErrorMessage} />;
       case TRAJECTORY_TYPE.LOAD:
-        return <LoadTab setErrorMessage={setErrorMessage} />;
+        return <LoadTab />;
       case TRAJECTORY_TYPE.THERMAL_COST:
         return <ThermalTab />;
       case TRAJECTORY_TYPE.ENR:

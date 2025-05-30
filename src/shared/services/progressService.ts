@@ -1,4 +1,5 @@
 import { AuthService } from '@/shared/services/authService.ts';
+import { BackendError } from '@/shared/utils/errrorHandler.ts';
 
 const simulateProgress = async (duration: number, onProgress: (value: number) => void) =>
   new Promise((resolve) => {
@@ -24,10 +25,12 @@ export const fetchWithProgress = async (
   url: string,
   options: RequestInit = {},
   onProgress: (value: number) => void,
-): Promise<[unknown, Response | Error]> => {
-  const duration = 1000; // Simulate 2 seconds progress
+): Promise<Response | BackendError | void> => {
+  const duration = 2000;
   const progressPromise = simulateProgress(duration, onProgress);
   const fetchPromise = AuthService.authFetch(url, options);
 
-  return await Promise.all([progressPromise, fetchPromise]);
+  return progressPromise
+    .then(() => fetchPromise.then((result) => result).catch((error: BackendError) => error))
+    .catch((error: BackendError) => error);
 };

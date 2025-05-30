@@ -10,7 +10,7 @@ import { STUDY_ENDPOINT, STUDY_KEYWORDS_SEARCH_ENDPOINT } from '@/shared/const/a
 import { notifyToast } from '@/shared/notification/notification.tsx';
 import { AuthService } from '@/shared/services/authService.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { handleBackendErrorToast } from '../utils/errrorHandler';
+import { BackendError } from '../utils/errrorHandler';
 
 /**
  * Retrieve a list of studies from a term
@@ -79,9 +79,7 @@ export const fetchSuggestedKeywords = async (partialName: string): Promise<strin
  * @param {Omit<StudyDTO, 'id' | 'status' | 'creationDate'>} studyData - Partial study data
  * @return {Promise<void>}
  */
-export const saveStudy = async (
-  studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate'>
-): Promise<void> => {
+export const saveStudy = async (studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate'>): Promise<void> => {
   const response = await AuthService.authFetch(`${STUDY_ENDPOINT}`, {
     method: 'POST',
     headers: {
@@ -92,8 +90,8 @@ export const saveStudy = async (
 
   if (!response.ok) {
     const errorText = await response.text();
-    const errorMessage = handleBackendErrorToast(errorText);
-    throw new Error(errorMessage);
+    const errorMessage = JSON.parse(errorText) as BackendError;
+    throw new Error(errorMessage?.antaresErrorMessage);
   }
 
   notifyToast({
@@ -115,8 +113,8 @@ export const deleteStudy = async (id: number): Promise<void | Error> => {
     });
     if (!response.ok) {
       const errorText = await response.text();
-      const errorMessage = handleBackendErrorToast(errorText);
-      throw new Error(errorMessage);
+      const errorMessage = JSON.parse(errorText) as Partial<BackendError>;
+      throw new Error(errorMessage?.antaresErrorMessage);
     }
     notifyToast({
       type: 'success',
@@ -125,7 +123,7 @@ export const deleteStudy = async (id: number): Promise<void | Error> => {
   } catch (error: unknown) {
     notifyToast({
       type: 'error',
-      message: `${(error as Error).message}`,
+      message: `${(error as BackendError).antaresErrorMessage}`,
     });
   }
 };

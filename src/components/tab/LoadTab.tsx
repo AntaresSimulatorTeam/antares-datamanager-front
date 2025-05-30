@@ -13,7 +13,6 @@ import {
   LocationState,
   RowStatus,
   SelectOption,
-  TabProps,
   TrajectoryAreaData,
 } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
@@ -27,10 +26,11 @@ import {
   getTrajectoryDataByTypeAndId,
   linkTrajectoryToStudy,
   unlinkTrajectoryFromStudy,
+  uploadTrajectory,
 } from '@/shared/services/trajectoryService.ts';
 import { convertToFSSelectionOptionType, convertToSelectionOptionType } from '@/shared/utils/formFormatter.ts';
 import SearchBar from '@/pages/pegase/home/components/SearchBar.tsx';
-import { RdsCheckbox, RdsCheckboxGroupWrapper, RdsDivider } from 'rte-design-system-react';
+import { FileInputStatus, RdsCheckbox, RdsCheckboxGroupWrapper, RdsDivider } from 'rte-design-system-react';
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
@@ -38,6 +38,7 @@ import getLoadHypothesisTableHeaders from '@/components/header/LoadHypothesisTab
 import { sortKeepLastName } from '@/shared/utils/sortUtils.tsx';
 import {
   buildEmptyRowData,
+  buildErrorTrajectory,
   buildRowData,
   removeDuplicate,
   retrieveReadOnlyArea,
@@ -46,15 +47,18 @@ import { AREA_OTHERS } from '@/shared/const/studyConfig.ts';
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { DeletionModal } from '@common/modal/DeletionModal.tsx';
+import { useUser } from '@/store/contexts/UserContext.tsx';
+import { BackendError } from '@/shared/utils/errrorHandler.ts';
 
 export type CheckBoxData = {
   name: string;
   isDefault: boolean;
 };
 
-const LoadTab = ({ setErrorMessage }: TabProps) => {
+const LoadTab = () => {
   const { t } = useTranslation();
   const studyState = useStudy();
+  const { user } = useUser();
   const location = useLocation();
   const study = (location.state as LocationState)?.study;
   const dispatch = useStudyDispatch();
@@ -70,6 +74,8 @@ const LoadTab = ({ setErrorMessage }: TabProps) => {
   const [rowIndexSelected, setRowIndexSelected] = useState<number>(0);
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
   const [rowToDelete, setRowToDelete] = useState<{ index: number; value?: string } | null>(null);
+  const [progress, setProgress] = useState(0);
+  const [fileStatus, setFileStatus] = useState<FileInputStatus>('empty');
 
   useEffect(() => {
     const fetchHypothesis = async () => {
@@ -159,14 +165,33 @@ const LoadTab = ({ setErrorMessage }: TabProps) => {
       }
     };
 
-    setErrorMessage('');
     void fetchHypothesis();
   }, []);
 
-  const handleTrajectoryUpdate = async (rowIndex: number, trajectoryId: number, status?: RowStatus) => {
+  const handleFetchTrajectoriesFS = async (index: number) => {
     try {
-      if (status === 'empty') {
-        await unlinkTrajectoryFromStudy(trajectoryId, study.id);
+      const results = await fetchTrajectoriesFromFS(TRAJECTORY_TYPE.LOAD);
+      setOptionsFS(convertToFSSelectionOptionType(results));
+      toggleModal();
+    } catch (error) {
+      setErrorInfo({ index, message: t('studyDetails.@select_file_fs_error') });
+    } finally {
+      setRowIndexSelected(index);
+    }
+  };
+
+  const handleTrajectoryUpdate = async (
+    rowIndex: number,
+    trajectoryId: number,
+    status?: RowStatus,
+    trajectoryLabel?: string,
+    errorMessage?: string,
+  ) => {
+    try {
+      if (status === 'empty' || status === 'emptyError') {
+        if (status === 'empty') {
+          await unlinkTrajectoryFromStudy(trajectoryId, study.id);
+        }
         dispatch?.({
           type: STUDY_ACTION.DELETE_LOAD_TRAJECTORY,
           payload: data[rowIndex].hypothesis,
@@ -190,23 +215,54 @@ const LoadTab = ({ setErrorMessage }: TabProps) => {
           return [...prev];
         });
       }
+      if (rowIndex != null && status === 'error' && trajectoryId != null && trajectoryLabel && !!errorMessage) {
+        const newDbTrajectory = buildErrorTrajectory(
+          TRAJECTORY_TYPE.LOAD,
+          trajectoryId,
+          trajectoryLabel,
+          errorMessage,
+          user?.profile?.sub,
+        );
+        setData((prev) => {
+          prev[rowIndex].trajectory = newDbTrajectory;
+          prev[rowIndex].status = TRAJECTORY_SELECTION_STATUS.ERROR;
+          return prev;
+        });
+      }
     } catch {
       // Silent handler
     }
   };
 
-  const handleFetchTrajectoriesFS = async (index: number) => {
+  const handleImportTrajectory = async (value: SelectOption) => {
+    setFileStatus('loading');
+    let newTrajectory: DbTrajectory;
     try {
-      const results = await fetchTrajectoriesFromFS(TRAJECTORY_TYPE.LOAD);
-      setOptionsFS(convertToFSSelectionOptionType(results));
-      toggleModal();
+      newTrajectory = await uploadTrajectory(
+        TRAJECTORY_TYPE.LOAD,
+        value.label,
+        study.horizon,
+        study.id,
+        data[rowIndexSelected]?.hypothesis === 'Others areas' ? AREA_OTHERS : data[rowIndexSelected]?.hypothesis,
+        (progressValue: number) => {
+          setProgress(+progressValue?.toFixed(0));
+        },
+      );
+      setFileStatus('success');
+      if (newTrajectory.id != null) {
+        await handleTrajectoryUpdate(rowIndexSelected, newTrajectory.id, 'success', newTrajectory.trajectoryName);
+      }
     } catch (error) {
-      setErrorInfo({ index, message: t('studyDetails.@select_file_fs_error') });
-    } finally {
-      setRowIndexSelected(index);
+      setFileStatus('error');
+      await handleTrajectoryUpdate(
+        rowIndexSelected,
+        value.id,
+        'error',
+        value.label,
+        (error as BackendError)?.antaresErrorMessage,
+      );
     }
   };
-  const handleViewTrajectory = async () => Promise.resolve();
 
   const handleTrajectorySearch = useCallback(
     async (value?: string, area?: string): Promise<SelectOption[] | undefined> => {
@@ -242,7 +298,7 @@ const LoadTab = ({ setErrorMessage }: TabProps) => {
   };
 
   const removeRow = async (indexRow: number, valueToDelete?: string) => {
-    if (data[indexRow].trajectory) {
+    if (data[indexRow].trajectory && data[indexRow].status === TRAJECTORY_SELECTION_STATUS.OK) {
       setRowToDelete({ index: indexRow, value: valueToDelete });
       setIsDeletionModalOpen(true);
     } else {
@@ -299,12 +355,14 @@ const LoadTab = ({ setErrorMessage }: TabProps) => {
         t,
         handleFetchTrajectoriesFS,
         handleTrajectorySearch,
-        handleViewTrajectory,
         errorInfo,
         setErrorInfo,
         studyState?.studyStatus,
+        progress,
+        fileStatus,
+        rowIndexSelected,
       ),
-    [data, studyState?.studyStatus, errorInfo],
+    [data, studyState?.studyStatus, errorInfo, progress, fileStatus],
   );
 
   return (
@@ -355,15 +413,13 @@ const LoadTab = ({ setErrorMessage }: TabProps) => {
         {isModalOpen && (
           <ImportTrajectoryModal
             options={optionsFS}
-            onClose={async (status?: RowStatus | undefined, id?: number) => {
-              if (status && id != null) {
-                await handleTrajectoryUpdate(rowIndexSelected, id, status);
-              }
+            onClose={async (value?: SelectOption) => {
               toggleModal();
+              if (value != null) {
+                await handleImportTrajectory(value);
+              }
             }}
             trajectoryType={TRAJECTORY_TYPE.LOAD}
-            studyHorizon={study.horizon}
-            studyId={study.id}
             area={data[rowIndexSelected]?.hypothesis}
           />
         )}
