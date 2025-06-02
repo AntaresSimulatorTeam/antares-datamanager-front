@@ -10,11 +10,16 @@ import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import {
   fetchTrajectoriesFromDB,
   fetchTrajectoriesFromFS,
+  getTrajectoryDataByTypeAndId,
   linkTrajectoryToStudy,
   unlinkTrajectoryFromStudy,
   uploadTrajectory,
 } from '@/shared/services/trajectoryService.ts';
-import { mockDbTrajectory, mockFsTrajectoryArray } from '@/shared/services/test/mocks/trajectoryMock.tsx';
+import {
+  mockDbTrajectory,
+  mockFsTrajectoryArray,
+  trajectoryAreaData,
+} from '@/shared/services/test/mocks/trajectoryMock.tsx';
 import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
 import { AuthService } from '@/shared/services/authService.ts';
 
@@ -175,7 +180,7 @@ describe('linkTrajectoryToStudy', () => {
       json: async () => Promise.resolve(mockDbTrajectory),
     } as Response);
 
-    await linkTrajectoryToStudy(TRAJECTORY_TYPE.AREA, 100, 2);
+    const result = await linkTrajectoryToStudy(TRAJECTORY_TYPE.AREA, 100, 2);
 
     await waitFor(() => {
       expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
@@ -183,6 +188,7 @@ describe('linkTrajectoryToStudy', () => {
         `https://mockapi.com/v1/trajectory/link?type=AREA&trajectoryId=100&studyId=2`,
         requestOptions,
       );
+      expect(result).toEqual(mockDbTrajectory);
     });
   });
 
@@ -237,6 +243,41 @@ describe('unlinkTrajectoryFromStudy', () => {
 
     await expect(async () => unlinkTrajectoryFromStudy(100, 2)).rejects.toThrowError(
       'Failed to unlink trajectory to study',
+    );
+  });
+});
+
+describe('getTrajectoryDataByTypeAndId', () => {
+  beforeEach(() => {
+    global.fetch = vi.fn();
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should fetch trajectory data', async () => {
+    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => Promise.resolve(trajectoryAreaData),
+    } as Response);
+
+    const result = await getTrajectoryDataByTypeAndId(TRAJECTORY_TYPE.AREA, 2);
+
+    await waitFor(() => {
+      expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
+      expect(AuthService.authFetch).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/trajectory/trajectoryData?trajectoryType=AREA&trajectoryId=2',
+      );
+      expect(result).toEqual(trajectoryAreaData);
+    });
+  });
+
+  it('should throw error when data fetching failed', async () => {
+    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({});
+
+    await expect(async () => getTrajectoryDataByTypeAndId(TRAJECTORY_TYPE.LINK, 5)).rejects.toThrowError(
+      'Failed to fetch data trajectory',
     );
   });
 });
