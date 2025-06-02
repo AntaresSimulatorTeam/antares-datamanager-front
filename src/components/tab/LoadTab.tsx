@@ -48,7 +48,6 @@ import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { DeletionModal } from '@common/modal/DeletionModal.tsx';
 import { useUser } from '@/store/contexts/UserContext.tsx';
-import { BackendError } from '@/shared/utils/errrorHandler.ts';
 
 export type CheckBoxData = {
   name: string;
@@ -254,7 +253,7 @@ const LoadTab = () => {
       }
     } catch (error) {
       setFileStatus('error');
-      await handleTrajectoryUpdate(rowIndexSelected, value.id, 'error', value.label, (error as BackendError)?.message);
+      await handleTrajectoryUpdate(rowIndexSelected, value.id, 'error', value.label, (error as Error)?.message);
     }
   };
 
