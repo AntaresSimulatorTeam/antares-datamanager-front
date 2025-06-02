@@ -51,7 +51,7 @@ export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, area }
         })}
       </RdsModal.Title>
       <RdsModal.Content>
-        <div className="w-1/2">
+        <div className="absolute z-10 w-1/2">
           <SelectAndSearchableInput
             options={options}
             defaultPlaceHolder={t('studyDetails.@select_trajectory')}
