@@ -56,7 +56,7 @@ export const AuthService = {
 
   //removeAccessTokenExpired: () => userManager.events.removeAccessTokenExpired(),
 
-  authFetch: async (url: string, options: RequestInit = {}): Promise<Response | BackendError | void> => {
+  authFetch: async (url: string, options: RequestInit = {}): Promise<Response | void> => {
     if (isAuthenticationActive()) {
       const token = await AuthService.getAccessToken();
       if (token) {
