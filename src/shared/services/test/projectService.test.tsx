@@ -13,12 +13,20 @@ import {
 } from '@/shared/services/projectService';
 import { vi } from 'vitest';
 import { waitFor } from '@testing-library/react';
-import { mockProjectInfo, mockProjectInfoArray } from '@/shared/services/test/mocks/projectMock.tsx';
+import {
+  mockProjectCreation,
+  mockProjectInfo,
+  mockProjectInfoArray,
+  projectData,
+} from '@/shared/services/test/mocks/projectMock.tsx';
+import { AuthService } from '@/shared/services/authService.ts';
+import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
 
 vi.mock('@/shared/notification/notification');
 vi.mock('@/envVariables', () => ({
   getEnvVariables: vi.fn(() => 'https://mockapi.com'),
 }));
+vi.mock('@/shared/services/authService');
 
 const projectId = '123';
 
@@ -37,28 +45,25 @@ describe('deleteProjectById', () => {
   });
 
   it('should delete a pinned project from pinned project list', async () => {
-    global.fetch = vi.fn().mockResolvedValueOnce({
+    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
       ok: true,
-    });
+    } as Response);
 
     await deleteProjectById(projectId);
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-      expect(global.fetch).toHaveBeenCalledWith(`https://mockapi.com/v1/project/${projectId}`, {
+      expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
+      expect(AuthService.authFetch).toHaveBeenCalledWith(`https://mockapi.com/v1/project/${projectId}`, {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
       });
     });
   });
 
   it('should handle delete failure gracefully', async () => {
-    // Failed fetch response moc
-    global.fetch = vi.fn().mockResolvedValueOnce({
-      ok: false,
-      text: () => 'Failed to delete project',
+    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
+      antaresErrorMessage: 'Failed to delete project',
+      date: new Date(),
+      type: ERROR_MESSAGE_TYPE.BUSINESS,
     });
 
     await expect(async () => deleteProjectById(projectId)).rejects.toThrowError('Failed to delete project');
@@ -75,35 +80,28 @@ describe('fetchProjectDetails', () => {
   });
 
   it('should fetch project details', async () => {
-    //Successful fetch response mock
-    global.fetch = vi.fn().mockResolvedValueOnce({
+    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
       ok: true,
       json: async () => Promise.resolve(mockProjectInfo),
-    });
+    } as Response);
 
     const result = await fetchProjectDetails(projectId);
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-      expect(global.fetch).toHaveBeenCalledWith(`https://mockapi.com/v1/project/${projectId}`, {});
+      expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
+      expect(AuthService.authFetch).toHaveBeenCalledWith(`https://mockapi.com/v1/project/${projectId}`);
       expect(result).toEqual(mockProjectInfo);
     });
   });
 
   it('should handle fetch failure gracefully', async () => {
-    // Failed fetch response moc
-    global.fetch = vi.fn().mockResolvedValueOnce({
-      ok: false,
+    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
+      antaresErrorMessage: 'Failed to fetch project details',
+      date: new Date(),
+      type: ERROR_MESSAGE_TYPE.BUSINESS,
     });
 
     await expect(async () => fetchProjectDetails(projectId)).rejects.toThrowError('Failed to fetch project details');
-  });
-
-  it('should handle exceptions during fetch', async () => {
-    //Fetch throwing an error mock
-    global.fetch = vi.fn().mockRejectedValueOnce(new Error('Network error'));
-
-    await expect(async () => fetchProjectDetails(projectId)).rejects.toThrowError('Network error');
   });
 });
 
@@ -122,26 +120,27 @@ describe('fetchProjectsFromPartialName', () => {
   });
 
   it('should search projects by partial name', async () => {
-    global.fetch = vi.fn().mockResolvedValueOnce({
+    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
       ok: true,
-      json: () => Promise.resolve(mockProjectInfoArray),
-    });
+      json: async () => Promise.resolve(mockProjectInfoArray),
+    } as Response);
 
     const result = await fetchProjectsFromPartialName('name');
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-      expect(global.fetch).toHaveBeenCalledWith('https://mockapi.com/v1/project/autocomplete?partialName=name', {});
+      expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
+      expect(AuthService.authFetch).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/project/autocomplete?partialName=name',
+      );
       expect(result).toEqual(['Bilan prévisionnel 2023', 'Bilan prévisionnel 2019']);
     });
   });
 
   it('should handle fetch projects failure gracefully', async () => {
-    // Failed fetch response moc
-    //vi.stubGlobal('JSON', { parse: (text: string) => text });
-    global.fetch = vi.fn().mockResolvedValueOnce({
-      ok: false,
-      text: async () => Promise.resolve('Failed to fetch projects'),
+    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
+      antaresErrorMessage: 'Failed to fetch projects',
+      date: new Date(),
+      type: ERROR_MESSAGE_TYPE.BUSINESS,
     });
 
     await expect(async () => fetchProjectsFromPartialName('name')).rejects.toThrowError('Failed to fetch projects');
@@ -163,17 +162,17 @@ describe('fetchProjectFromSearchTerm', () => {
   });
 
   it('should search projects by search term', async () => {
-    global.fetch = vi.fn().mockResolvedValueOnce({
+    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
       ok: true,
-      json: () => Promise.resolve(mockProjectInfoArray),
-    });
+      json: async () => Promise.resolve(mockProjectInfoArray),
+    } as Response);
+
     const result = await fetchProjectFromSearchTerm(3, 10, 'searchTerm');
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
+      expect(AuthService.authFetch).toHaveBeenCalledWith(
         'https://mockapi.com/v1/project/search?search=searchTerm&page=4&size=10',
-        {},
       );
       expect(result).toHaveLength(2);
       expect(result).toEqual(mockProjectInfoArray);
@@ -181,9 +180,10 @@ describe('fetchProjectFromSearchTerm', () => {
   });
 
   it('should handle search by term failure gracefully', async () => {
-    global.fetch = vi.fn().mockResolvedValueOnce({
-      ok: false,
-      text: async () => Promise.resolve('Failed to search projects'),
+    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
+      antaresErrorMessage: 'Failed to search projects',
+      date: new Date(),
+      type: ERROR_MESSAGE_TYPE.BUSINESS,
     });
 
     await expect(async () => fetchProjectFromSearchTerm(3, 10, 'searchTerm')).rejects.toThrowError(
@@ -193,8 +193,6 @@ describe('fetchProjectFromSearchTerm', () => {
 });
 
 describe('createProject', () => {
-  const projectData = { name: 'Bilan prévisionnel 2050', description: '', tags: ['tag1'] };
-
   beforeEach(() => {
     global.fetch = vi.fn();
     vi.stubGlobal('JSON', {
@@ -209,38 +207,29 @@ describe('createProject', () => {
   });
 
   it('should create de project', async () => {
-    const creationResponse = {
-      id: 107,
-      name: projectData.name,
-      createdBy: 'pegase',
-      creationDate: '2025-01-30T10:32:10.631003175',
-      studies: [],
-      tags: projectData.tags,
-      description: projectData.description,
-    };
-    global.fetch = vi.fn().mockResolvedValueOnce({
+    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
       ok: true,
-      json: () => Promise.resolve(creationResponse),
-    });
+      json: async () => Promise.resolve(mockProjectCreation),
+    } as Response);
 
     const result = await createProject(projectData);
 
-    expect(global.fetch).toHaveBeenCalledTimes(1);
-    expect(global.fetch).toHaveBeenCalledWith(`https://mockapi.com/v1/project`, {
+    expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
+    expect(AuthService.authFetch).toHaveBeenCalledWith(`https://mockapi.com/v1/project`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(projectData),
     });
-    expect(result).toEqual(creationResponse);
+    expect(result).toEqual(mockProjectCreation);
   });
 
   it('should handle delete failure gracefully', async () => {
-    // Failed fetch response moc
-    global.fetch = vi.fn().mockResolvedValueOnce({
-      ok: false,
-      text: () => 'Failed to create project',
+    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
+      antaresErrorMessage: 'Failed to create project',
+      date: new Date(),
+      type: ERROR_MESSAGE_TYPE.BUSINESS,
     });
 
     await expect(async () => createProject(projectData)).rejects.toThrowError('Failed to create project');

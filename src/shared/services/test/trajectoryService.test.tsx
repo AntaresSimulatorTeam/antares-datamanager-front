@@ -15,19 +15,13 @@ import {
   uploadTrajectory,
 } from '@/shared/services/trajectoryService.ts';
 import { mockDbTrajectory, mockFsTrajectoryArray } from '@/shared/services/test/mocks/trajectoryMock.tsx';
-import { getErrorMessage } from '@/shared/utils/warningUtils.ts';
 import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
+import { AuthService } from '@/shared/services/authService.ts';
 
 vi.mock('@/envVariables', () => ({
   getEnvVariables: vi.fn(() => 'https://mockapi.com'),
 }));
-vi.mock('@/shared/utils/warningUtils', () => ({
-  getErrorMessage: vi.fn(async () =>
-    Promise.resolve({
-      message: 'error',
-    }),
-  ),
-}));
+vi.mock('@/shared/services/authService');
 
 describe('fetchTrajectoriesFromDB', () => {
   beforeEach(() => {
@@ -39,35 +33,28 @@ describe('fetchTrajectoriesFromDB', () => {
   });
 
   it('should fetch trajectories with area type from data base', async () => {
-    global.fetch = vi.fn().mockResolvedValueOnce({
+    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
       ok: true,
       json: async () => Promise.resolve(mockDbTrajectory),
-    });
+    } as Response);
 
     const result = await fetchTrajectoriesFromDB(TRAJECTORY_TYPE.AREA, '2023-2024');
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
+      expect(AuthService.authFetch).toHaveBeenCalledWith(
         `https://mockapi.com/v1/trajectory/db?trajectoryType=AREA&horizon=2023-2024&fileNameContains=&loadArea=`,
-        {},
       );
       expect(result).toEqual(mockDbTrajectory);
     });
   });
 
   it('should handle fetch failure gracefully', async () => {
-    global.fetch = vi.fn().mockResolvedValueOnce({
-      ok: false,
+    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
+      antaresErrorMessage: 'Failed to fetch trajectories from data base',
+      date: new Date(),
+      type: ERROR_MESSAGE_TYPE.BUSINESS,
     });
-
-    await expect(async () => fetchTrajectoriesFromDB(TRAJECTORY_TYPE.AREA, '2023-2024')).rejects.toThrowError(
-      'Failed to fetch trajectories from data base',
-    );
-  });
-
-  it('should handle exceptions during fetch', async () => {
-    global.fetch = vi.fn().mockRejectedValueOnce(new Error('Failed to fetch trajectories from data base'));
 
     await expect(async () => fetchTrajectoriesFromDB(TRAJECTORY_TYPE.AREA, '2023-2024')).rejects.toThrowError(
       'Failed to fetch trajectories from data base',
@@ -78,43 +65,35 @@ describe('fetchTrajectoriesFromDB', () => {
 describe('fetchTrajectoriesFromFS', () => {
   beforeEach(() => {
     global.fetch = vi.fn();
-    vi.clearAllMocks();
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should fetch trajectories with area type from file system', async () => {
-    global.fetch = vi.fn().mockResolvedValueOnce({
+    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
       ok: true,
       json: async () => Promise.resolve(mockFsTrajectoryArray),
-    });
+    } as Response);
 
     const result = await fetchTrajectoriesFromFS(TRAJECTORY_TYPE.AREA);
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
+      expect(AuthService.authFetch).toHaveBeenCalledWith(
         `https://mockapi.com/v1/trajectory/fs?trajectoryType=AREA&thermalCapacityArea=&fileNameContains=`,
-        {},
       );
       expect(result).toEqual(mockFsTrajectoryArray);
     });
   });
 
   it('should handle fetch failure gracefully', async () => {
-    global.fetch = vi.fn().mockResolvedValueOnce({
-      ok: false,
+    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
+      antaresErrorMessage: 'Failed to fetch trajectories from file system',
+      date: new Date(),
+      type: ERROR_MESSAGE_TYPE.BUSINESS,
     });
-
-    await expect(async () => fetchTrajectoriesFromFS(TRAJECTORY_TYPE.AREA)).rejects.toThrowError(
-      'Failed to fetch trajectories from file system',
-    );
-  });
-
-  it('should handle exceptions during fetch', async () => {
-    global.fetch = vi.fn().mockRejectedValueOnce(new Error('Failed to fetch trajectories from file system'));
 
     await expect(async () => fetchTrajectoriesFromFS(TRAJECTORY_TYPE.AREA)).rejects.toThrowError(
       'Failed to fetch trajectories from file system',
@@ -144,17 +123,17 @@ describe('uploadTrajectory', () => {
     vi.clearAllMocks();
   });
 
-  it('should add trajectory to data base', async () => {
-    global.fetch = vi.fn().mockResolvedValueOnce({
+  it('should import trajectory to data base', async () => {
+    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
       ok: true,
       json: async () => Promise.resolve(mockDbTrajectory),
-    });
+    } as Response);
 
-    await uploadTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026', 2,'FR', onProgress);
+    await uploadTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026', 2, 'FR', onProgress);
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
+      expect(AuthService.authFetch).toHaveBeenCalledWith(
         `https://mockapi.com/v1/trajectory?trajectoryType=AREA&trajectoryToUse=area_BP_23_v6&horizon=2025-2026&studyId=2`,
         requestOptions,
       );
@@ -162,24 +141,15 @@ describe('uploadTrajectory', () => {
   });
 
   it('should handle fetch failure gracefully', async () => {
-    global.fetch = vi.fn().mockResolvedValueOnce({
-      ok: false,
-      status: 400,
-      json: async () =>
-        Promise.resolve({
-          antaresErrorMessage: 'error message 400',
-          errorMessageArguments: [],
-          date: new Date(),
-          type: ERROR_MESSAGE_TYPE.BUSINESS,
-        }),
-    });
-    vi.mocked(getErrorMessage).mockResolvedValueOnce({
-      message: 'error message 400',
+    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
+      antaresErrorMessage: 'Failed to import trajectory to data base',
+      date: new Date(),
+      type: ERROR_MESSAGE_TYPE.BUSINESS,
     });
 
     await expect(async () =>
-      uploadTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026', 2,'FR', onProgress),
-    ).rejects.toThrowError('error message 400');
+      uploadTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026', 2, 'FR', onProgress),
+    ).rejects.toThrowError('Failed to import trajectory to data base');
   });
 });
 
@@ -193,25 +163,23 @@ describe('linkTrajectoryToStudy', () => {
 
   beforeEach(() => {
     global.fetch = vi.fn();
-    vi.clearAllMocks();
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should link a trajectory to a study', async () => {
-    //Successful fetch response mock
-    global.fetch = vi.fn().mockResolvedValueOnce({
+    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
       ok: true,
       json: async () => Promise.resolve(mockDbTrajectory),
-    });
+    } as Response);
 
     await linkTrajectoryToStudy(TRAJECTORY_TYPE.AREA, 100, 2);
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
+      expect(AuthService.authFetch).toHaveBeenCalledWith(
         `https://mockapi.com/v1/trajectory/link?type=AREA&trajectoryId=100&studyId=2`,
         requestOptions,
       );
@@ -219,22 +187,15 @@ describe('linkTrajectoryToStudy', () => {
   });
 
   it('should handle link failure gracefully', async () => {
-    global.fetch = vi.fn().mockResolvedValueOnce({
-      ok: false,
-      json: async () =>
-        Promise.resolve({
-          message: 'Error message',
-        }),
+    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
+      antaresErrorMessage: 'Failed to link trajectory to study',
+      date: new Date(),
+      type: ERROR_MESSAGE_TYPE.BUSINESS,
     });
 
-    await expect(async () => linkTrajectoryToStudy(TRAJECTORY_TYPE.AREA, 100, 2)).rejects.toThrowError('error');
-  });
-
-  it('should handle exceptions during link creation', async () => {
-    //Fetch throwing an error mock
-    global.fetch = vi.fn().mockRejectedValueOnce(new Error('Network error'));
-
-    await expect(async () => linkTrajectoryToStudy(TRAJECTORY_TYPE.AREA, 100, 2)).rejects.toThrowError('Network error');
+    await expect(async () => linkTrajectoryToStudy(TRAJECTORY_TYPE.AREA, 100, 2)).rejects.toThrowError(
+      'Failed to link trajectory to study',
+    );
   });
 });
 
@@ -245,19 +206,22 @@ describe('unlinkTrajectoryFromStudy', () => {
 
   beforeEach(() => {
     global.fetch = vi.fn();
-    vi.restoreAllMocks();
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
   });
 
   it('should unlink a trajectory from a study', async () => {
-    global.fetch = vi.fn().mockResolvedValueOnce({
+    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
       ok: true,
-    });
+    } as Response);
 
     await unlinkTrajectoryFromStudy(100, 2);
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
+      expect(AuthService.authFetch).toHaveBeenCalledWith(
         'https://mockapi.com/v1/trajectory/link?trajectoryId=100&studyId=2',
         requestOptions,
       );
@@ -265,9 +229,14 @@ describe('unlinkTrajectoryFromStudy', () => {
   });
 
   it('should handle exceptions during unlink', async () => {
-    //Fetch throwing an error mock
-    global.fetch = vi.fn().mockRejectedValueOnce(new Error('Network error'));
+    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
+      antaresErrorMessage: 'Failed to unlink trajectory to study',
+      date: new Date(),
+      type: ERROR_MESSAGE_TYPE.BUSINESS,
+    });
 
-    await expect(async () => unlinkTrajectoryFromStudy(100, 2)).rejects.toThrowError('Network error');
+    await expect(async () => unlinkTrajectoryFromStudy(100, 2)).rejects.toThrowError(
+      'Failed to unlink trajectory to study',
+    );
   });
 });

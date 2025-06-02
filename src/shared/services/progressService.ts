@@ -27,10 +27,12 @@ export const fetchWithProgress = async (
   onProgress: (value: number) => void,
 ): Promise<Response | BackendError | void> => {
   const duration = 2000;
-  const progressPromise = simulateProgress(duration, onProgress);
-  const fetchPromise = AuthService.authFetch(url, options);
 
-  return progressPromise
-    .then(() => fetchPromise.then((result) => result).catch((error: BackendError) => error))
-    .catch((error: BackendError) => error);
+  try {
+    await simulateProgress(duration, onProgress);
+    const response = await AuthService.authFetch(url, options);
+    return response;
+  } catch (error) {
+    throw new Error(`${(error as BackendError)?.antaresErrorMessage}`);
+  }
 };

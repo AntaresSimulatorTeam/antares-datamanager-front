@@ -25,20 +25,21 @@ import { BackendError } from '@/shared/utils/errrorHandler.ts';
  * @param {string} horizon - Horizon value (ex: 2020-2021)
  * @param {string | undefined} fileName - Autocompletion - filter trajectories by file name
  * @param {string | undefined} area - To use just in thermal capacity case
- * @returns {Promise<DbTrajectory[]>} - Promise object that represents a list of trajectories
+ * @returns {Promise<DbTrajectory[] | Error>} - Promise object that represents a list of trajectories
  */
 export const fetchTrajectoriesFromDB = async (
   trajectoryType: string,
   horizon: string,
   fileName?: string,
   area?: string,
-): Promise<DbTrajectory[]> => {
+): Promise<DbTrajectory[] | Error> => {
   const urlApi = `${TRAJECTORY_DATA_BASE_ENDPOINT}?trajectoryType=${trajectoryType}&horizon=${horizon}&fileNameContains=${fileName ?? ''}&loadArea=${area ?? ''}`;
-  const response = await AuthService.authFetch(urlApi);
-  if (!(response as Response).ok) {
+  try {
+    const response = await AuthService.authFetch(urlApi);
+    return (await (response as Response).json()) as DbTrajectory[];
+  } catch {
     throw new Error('Failed to fetch trajectories from data base');
   }
-  return (await (response as Response).json()) as DbTrajectory[];
 };
 
 /**
@@ -47,13 +48,13 @@ export const fetchTrajectoriesFromDB = async (
  * @param {TRAJECTORY_TYPE} trajectoryType - Partial name of a study
  * @param {string | undefined} thermalCapacityArea - To use just in thermal capacity case
  * @param {string | undefined} searchTerm - Autocompletion - filter trajectories by file name
- * @returns {Promise<FsTrajectory[]>} - Promise object that represents a list of trajectories
+ * @returns {Promise<FsTrajectory[] | Error>} - Promise object that represents a list of trajectories
  */
 export const fetchTrajectoriesFromFS = async (
   trajectoryType: string,
   searchTerm?: string | undefined,
   thermalCapacityArea?: string | undefined,
-): Promise<FsTrajectory[]> => {
+): Promise<FsTrajectory[] | Error> => {
   const queryString = new URLSearchParams({
     trajectoryType: trajectoryType ?? '',
     thermalCapacityArea: thermalCapacityArea ?? '',
@@ -61,11 +62,12 @@ export const fetchTrajectoriesFromFS = async (
   }).toString();
 
   const urlApi = `${TRAJECTORY_FILE_SYSTEM_ENDPOINT}?${queryString}`;
-  const response = await AuthService.authFetch(urlApi);
-  if (!(response as Response).ok) {
+  try {
+    const response = await AuthService.authFetch(urlApi);
+    return (await (response as Response).json()) as FsTrajectory[];
+  } catch {
     throw new Error('Failed to fetch trajectories from file system');
   }
-  return (await (response as Response).json()) as FsTrajectory[];
 };
 
 /**
@@ -77,7 +79,7 @@ export const fetchTrajectoriesFromFS = async (
  * @param {number} studyId - Study id
  * @param {(progress: number) => void} onProgress - Set progress value
  * @param {string | undefined} area - Area to use in thermal capacity case
- * @returns {Promise<DbTrajectory>} - Promise object that represents a trajectory inserted into database
+ * @returns {Promise<DbTrajectory | Error>} - Promise object that represents a trajectory inserted into database
  */
 export const uploadTrajectory = async (
   trajectoryType: TRAJECTORY_TYPE,
@@ -86,24 +88,24 @@ export const uploadTrajectory = async (
   studyId: number,
   area: string | undefined,
   onProgress: (progress: number) => void,
-): Promise<DbTrajectory> => {
+): Promise<DbTrajectory | Error> => {
   const urlApi = `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   const urlLoadApi = `${TRAJECTORY_ENDPOINT}/load?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
-  const response = await fetchWithProgress(
-    trajectoryType === TRAJECTORY_TYPE.LOAD ? urlLoadApi : urlApi,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+  try {
+    const response = await fetchWithProgress(
+      trajectoryType === TRAJECTORY_TYPE.LOAD ? urlLoadApi : urlApi,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       },
-    },
-    onProgress,
-  );
-
-  if (!(response as Response).ok) {
-    throw response;
+      onProgress,
+    );
+    return (await (response as Response).json()) as DbTrajectory;
+  } catch (error) {
+    throw new Error(`${(error as Error)?.message}`);
   }
-  return (await (response as Response).json()) as DbTrajectory;
 };
 
 /**
@@ -112,28 +114,27 @@ export const uploadTrajectory = async (
  * @param {number} trajectoryId - Trajectory id
  * @param {number} studyId - Study id
  *
- * @return {Promise<DbTrajectory>} - Trajectory linked to a study
+ * @return {Promise<DbTrajectory | Error>} - Trajectory linked to a study
  */
 
 export const linkTrajectoryToStudy = async (
   type: TRAJECTORY_TYPE,
   trajectoryId: number,
   studyId: number,
-): Promise<DbTrajectory> => {
+): Promise<DbTrajectory | Error> => {
   const urlApi = `${TRAJECTORY_LINK_TO_STUDY_ENDPOINT}?type=${type}&trajectoryId=${trajectoryId}&studyId=${studyId}`;
-  const response = await AuthService.authFetch(urlApi, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-  if (!(response as Response).ok) {
-    const errorText = await (response as Response).text();
-    const errorMessage = JSON.parse(errorText) as BackendError;
-    throw new Error(errorMessage?.antaresErrorMessage);
-  }
+  try {
+    const response = await AuthService.authFetch(urlApi, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
-  return (await (response as Response).json()) as DbTrajectory;
+    return (await (response as Response).json()) as DbTrajectory;
+  } catch (error) {
+    throw new Error((error as BackendError)?.antaresErrorMessage);
+  }
 };
 
 /**
@@ -142,13 +143,14 @@ export const linkTrajectoryToStudy = async (
  * @param {number} trajectoryId - Trajectory id
  * @param {number} studyId - Study id
  */
-export const unlinkTrajectoryFromStudy = async (trajectoryId: number, studyId: number) => {
+export const unlinkTrajectoryFromStudy = async (trajectoryId: number, studyId: number): Promise<void | Error> => {
   const urlApi = `${TRAJECTORY_LINK_TO_STUDY_ENDPOINT}?trajectoryId=${trajectoryId}&studyId=${studyId}`;
-  const response = await AuthService.authFetch(urlApi, {
-    method: 'DELETE',
-  });
-  if (!(response as Response).ok) {
-    throw new Error(`${(response as unknown as BackendError).antaresErrorMessage}`);
+  try {
+    await AuthService.authFetch(urlApi, {
+      method: 'DELETE',
+    });
+  } catch (error) {
+    throw new Error(`${(error as BackendError)?.antaresErrorMessage}`);
   }
 };
 

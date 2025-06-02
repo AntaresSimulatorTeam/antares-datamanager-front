@@ -8,80 +8,95 @@ import { fetchPinnedProjects, pinProject, unpinProject } from '../pinnedProjectS
 import { vi } from 'vitest';
 import { waitFor } from '@testing-library/react';
 import { mockResponse, mockResponseArray } from '@/shared/services/test/mocks/pinnedProjectMock.tsx';
+import { AuthService } from '@/shared/services/authService.ts';
+import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
 
 vi.mock('@/shared/notification/notification');
 vi.mock('@/envVariables', () => ({
   getEnvVariables: vi.fn(() => 'https://mockapi.com'),
 }));
+vi.mock('@/shared/services/authService');
+
 const projectId = 'test-project-id';
 const userId = 'testUser';
 
 describe('pinProject', () => {
   beforeEach(() => {
     global.fetch = vi.fn();
-    vi.clearAllMocks();
+    vi.stubGlobal('JSON', {
+      parse: (text: string) => ({ message: text }),
+      stringify: (text: string) => text,
+    });
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+    vi.clearAllMocks();
   });
 
   it('should successfully pin a project and call notifyToast with success', async () => {
-    const mockResponseApi = { ok: true, json: async () => Promise.resolve(mockResponse) }; // Simulate successful fetch response
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockResponseApi);
+    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => Promise.resolve(mockResponse),
+    } as Response);
 
     const response = await pinProject(projectId, userId);
 
-    // Check fetch call
-    expect(fetch).toHaveBeenCalledWith('https://mockapi.com/v1/project/pin?userId=testUser&projectId=test-project-id', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-    });
+    expect(AuthService.authFetch).toHaveBeenCalledWith(
+      'https://mockapi.com/v1/project/pin?userId=testUser&projectId=test-project-id',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      },
+    );
     expect(response).toEqual(mockResponse);
   });
 
   it('should handle pin project error ', async () => {
-    global.fetch = vi.fn().mockResolvedValueOnce({
-      ok: false,
-      json: async () =>
-        Promise.resolve({
-          message: 'Error message',
-        }),
+    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
+      antaresErrorMessage: 'Failed to pin project',
+      date: new Date(),
+      type: ERROR_MESSAGE_TYPE.BUSINESS,
     });
 
-    await expect(async () => pinProject(projectId, userId)).rejects.toThrowError('Error message');
+    await expect(async () => pinProject(projectId, userId)).rejects.toThrowError('Failed to pin project');
   });
 });
 
 describe('fetchPinnedProjects', () => {
   beforeEach(() => {
     global.fetch = vi.fn();
-    vi.clearAllMocks();
+    vi.stubGlobal('JSON', {
+      parse: (text: string) => ({ message: text }),
+      stringify: (text: string) => text,
+    });
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+    vi.clearAllMocks();
   });
 
   it('should fetch pinned project list', async () => {
-    global.fetch = vi.fn().mockResolvedValueOnce({
+    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
       ok: true,
       json: async () => Promise.resolve(mockResponseArray),
-    });
+    } as Response);
 
     const result = await fetchPinnedProjects(userId);
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-      expect(global.fetch).toHaveBeenCalledWith(`https://mockapi.com/v1/project/pinned?userId=${userId}`, {});
+      expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
+      expect(AuthService.authFetch).toHaveBeenCalledWith(`https://mockapi.com/v1/project/pinned?userId=${userId}`);
       expect(result).toEqual(mockResponseArray);
     });
   });
 
   it('should handle fetch failure gracefully', async () => {
-    // Failed fetch response moc
-    global.fetch = vi.fn().mockResolvedValueOnce({
-      ok: false,
+    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
+      antaresErrorMessage: 'Failed to fetch project details',
+      date: new Date(),
+      type: ERROR_MESSAGE_TYPE.BUSINESS,
     });
 
     await expect(async () => fetchPinnedProjects(userId)).rejects.toThrowError('Failed to fetch project details');
@@ -91,23 +106,22 @@ describe('fetchPinnedProjects', () => {
 describe('unpinProject', () => {
   beforeEach(() => {
     global.fetch = vi.fn();
-    vi.clearAllMocks();
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should unpin project from pinned project list', async () => {
-    global.fetch = vi.fn().mockResolvedValueOnce({
+    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
       ok: true,
-    });
+    } as Response);
 
     await unpinProject(projectId, userId);
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
+      expect(AuthService.authFetch).toHaveBeenCalledWith(
         `https://mockapi.com/v1/project/unpin?userId=${userId}&projectId=${projectId}`,
         {
           method: 'PUT',
@@ -120,12 +134,12 @@ describe('unpinProject', () => {
   });
 
   it('should handle fetch failure gracefully', async () => {
-    // Failed fetch response moc
-    global.fetch = vi.fn().mockResolvedValueOnce({
-      ok: false,
-      text: async () => Promise.resolve('Error message'),
+    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
+      antaresErrorMessage: 'Failed to unpin project',
+      date: new Date(),
+      type: ERROR_MESSAGE_TYPE.BUSINESS,
     });
 
-    await expect(async () => unpinProject(projectId, userId)).rejects.toThrowError('Error message');
+    await expect(async () => unpinProject(projectId, userId)).rejects.toThrowError('Failed to unpin project');
   });
 });

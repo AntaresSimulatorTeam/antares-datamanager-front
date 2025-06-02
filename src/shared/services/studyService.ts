@@ -30,28 +30,33 @@ export const fetchSearchStudies = async (
   intervalSize: number = 0,
   sortBy?: { [key: string]: 'asc' | 'desc' },
 ): Promise<PaginatedResponse<StudyDTO> | Error> => {
-  let entries: [string, 'asc' | 'desc'] | null = null;
-  if (sortBy && JSON.stringify(sortBy) !== '{}') {
-    entries = Object.entries(sortBy)[0];
-  }
+  try {
+    let entries: [string, 'asc' | 'desc'] | null = null;
+    if (sortBy && JSON.stringify(sortBy) !== '{}') {
+      entries = Object.entries(sortBy)[0];
+    }
 
-  const queryString = new URLSearchParams({
-    page: currentPage != null ? (currentPage + 1).toString() : '',
-    size: intervalSize.toString(),
-    projectId: projectId.toString(),
-    search: searchTerm.toString(),
-    sortColumn: entries?.[0] ? entries[0].toString() : '',
-    sortDirection: entries?.[1] ? entries[1].toString() : '',
-  }).toString();
-  const apiUrl = `${STUDY_SEARCH_ENDPOINT}?${queryString}`;
+    const queryString = new URLSearchParams({
+      page: currentPage != null ? (currentPage + 1).toString() : '',
+      size: intervalSize.toString(),
+      projectId: projectId.toString(),
+      search: searchTerm.toString(),
+      sortColumn: entries?.[0] ? entries[0].toString() : '',
+      sortDirection: entries?.[1] ? entries[1].toString() : '',
+    }).toString();
+    const apiUrl = `${STUDY_SEARCH_ENDPOINT}?${queryString}`;
 
-  const response = await AuthService.authFetch(apiUrl);
-  if (!response.ok) {
+    const response = await AuthService.authFetch(apiUrl);
+
+    if (!(response as Response).ok) {
+      throw new Error('Failed to fetch user studies');
+    }
+    const json = (await (response as Response).json()) as PaginatedResponse<StudyDTO>;
+
+    return { content: json.content, totalElements: json.totalElements };
+  } catch (error) {
     throw new Error('Failed to fetch user studies');
   }
-  const json = (await response.json()) as PaginatedResponse<StudyDTO>;
-
-  return { content: json.content, totalElements: json.totalElements };
 };
 
 /**
@@ -65,11 +70,12 @@ export const fetchSuggestedKeywords = async (partialName: string): Promise<strin
     partialName: partialName ?? '',
   }).toString();
 
-  const response = await AuthService.authFetch(`${STUDY_KEYWORDS_SEARCH_ENDPOINT}?${queryString}`);
-  if (!response.ok) {
+  try {
+    const response = await AuthService.authFetch(`${STUDY_KEYWORDS_SEARCH_ENDPOINT}?${queryString}`);
+    return (await (response as Response).json()) as string[];
+  } catch {
     throw new Error('Failed to fetch suggested keywords');
   }
-  return (await response.json()) as string[];
 };
 
 /**
@@ -77,27 +83,25 @@ export const fetchSuggestedKeywords = async (partialName: string): Promise<strin
  * Display toast if creation succeeds or fails
  *
  * @param {Omit<StudyDTO, 'id' | 'status' | 'creationDate'>} studyData - Partial study data
- * @return {Promise<void>}
+ * @return {Promise<void | Error>}
  */
-export const saveStudy = async (studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate'>): Promise<void> => {
-  const response = await AuthService.authFetch(`${STUDY_ENDPOINT}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(studyData),
-  });
+export const saveStudy = async (studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate'>): Promise<void | Error> => {
+  try {
+    await AuthService.authFetch(`${STUDY_ENDPOINT}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(studyData),
+    });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    const errorMessage = JSON.parse(errorText) as BackendError;
-    throw new Error(errorMessage?.antaresErrorMessage);
+    notifyToast({
+      type: 'success',
+      message: 'Study created successfully',
+    });
+  } catch (error) {
+    throw new Error((error as BackendError)?.antaresErrorMessage);
   }
-
-  notifyToast({
-    type: 'success',
-    message: 'Study created successfully',
-  });
 };
 /**
  * Delete a study
@@ -108,14 +112,9 @@ export const saveStudy = async (studyData: Omit<StudyDTO, 'id' | 'status' | 'cre
  */
 export const deleteStudy = async (id: number): Promise<void | Error> => {
   try {
-    const response = await AuthService.authFetch(`${STUDY_ENDPOINT}/${id}`, {
+    await AuthService.authFetch(`${STUDY_ENDPOINT}/${id}`, {
       method: 'DELETE',
     });
-    if (!response.ok) {
-      const errorText = await response.text();
-      const errorMessage = JSON.parse(errorText) as Partial<BackendError>;
-      throw new Error(errorMessage?.antaresErrorMessage);
-    }
     notifyToast({
       type: 'success',
       message: 'Study deleted successfully',
@@ -135,13 +134,14 @@ export const deleteStudy = async (id: number): Promise<void | Error> => {
  */
 export const createStudy = async (id: number) => {
   const urlApi = `${STUDY_GENERATE_ENDPOINT}?id=${id}`;
-  const response = await AuthService.authFetch(urlApi, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-  if (!response.ok) {
+  try {
+    await AuthService.authFetch(urlApi, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  } catch {
     throw new Error('Failed to generate a study');
   }
 };
@@ -160,12 +160,13 @@ export const getStudyTrajectories = async (
 ): Promise<DbTrajectory[] | Error> => {
   const urlApi = `${TRAJECTORY_ENDPOINT}?studyId=${studyId}&trajectoryType=${trajectoryType ?? ''}`;
 
-  const response = await AuthService.authFetch(urlApi);
-  if (!response.ok) {
+  try {
+    const response = await AuthService.authFetch(urlApi);
+
+    return (await (response as Response).json()) as DbTrajectory[];
+  } catch (error) {
     throw new Error('Failed to fetch trajectories linked to studies');
   }
-
-  return (await response.json()) as DbTrajectory[];
 };
 
 /**
@@ -177,9 +178,9 @@ export const getStudyTrajectories = async (
 export const getStudyById = async (studyId: number): Promise<StudyDTO | Error> => {
   const urlApi = `${STUDY_ENDPOINT}/${studyId}`;
   const response = await AuthService.authFetch(urlApi);
-  if (!response.ok) {
+  if (!(response as Response).ok) {
     throw new Error('Failed to fetch study');
   }
 
-  return (await response.json()) as StudyDTO;
+  return (await (response as Response).json()) as StudyDTO;
 };
