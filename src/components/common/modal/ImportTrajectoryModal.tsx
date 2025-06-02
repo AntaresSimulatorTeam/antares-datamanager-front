@@ -51,28 +51,44 @@ export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, area }
         })}
       </RdsModal.Title>
       <RdsModal.Content>
-        <div className="absolute z-10 w-1/2">
-          <SelectAndSearchableInput
-            options={options}
-            defaultPlaceHolder={t('studyDetails.@select_trajectory')}
-            onSelect={handleSelectOption}
-            isSearchable={true}
-            setSearchTerm={handleSearchTerm}
-            resetField={resetField}
-          />
+        <div className="flex h-full flex-col">
+          <div className="absolute z-10">
+            <div className="w-[400px]">
+              <SelectAndSearchableInput
+                options={options ? [...options, ...options] : options}
+                defaultPlaceHolder={t('studyDetails.@select_trajectory')}
+                onSelect={handleSelectOption}
+                isSearchable={true}
+                setSearchTerm={handleSearchTerm}
+                resetField={resetField}
+              />
+            </div>
+          </div>
+          <div className="relative flex w-full justify-end gap-1 pt-8">
+            <RdsButton label="Cancel" onClick={() => void onClose()} color="secondary" />
+            <RdsButton
+              icon={RdsIconId.Add}
+              label={t('studyDetails.@import')}
+              onClick={() => trajectorySelected && void onClose(trajectorySelected)}
+              variant="contained"
+              color="primary"
+              disabled={isButtonDisabled}
+            />
+          </div>
         </div>
       </RdsModal.Content>
-      <RdsModal.Footer>
-        <RdsButton label="Cancel" onClick={() => void onClose()} color="secondary" />
-        <RdsButton
-          icon={RdsIconId.Add}
-          label={t('studyDetails.@import')}
-          onClick={() => trajectorySelected && void onClose(trajectorySelected)}
-          variant="contained"
-          color="primary"
-          disabled={isButtonDisabled}
-        />
-      </RdsModal.Footer>
+      <RdsModal.Footer></RdsModal.Footer>
+      {/*<RdsModal.Footer>*/}
+      {/*  <RdsButton label="Cancel" onClick={() => void onClose()} color="secondary" />*/}
+      {/*  <RdsButton*/}
+      {/*    icon={RdsIconId.Add}*/}
+      {/*    label={t('studyDetails.@import')}*/}
+      {/*    onClick={() => trajectorySelected && void onClose(trajectorySelected)}*/}
+      {/*    variant="contained"*/}
+      {/*    color="primary"*/}
+      {/*    disabled={isButtonDisabled}*/}
+      {/*  />*/}
+      {/*</RdsModal.Footer>*/}
     </RdsModal>
   );
 };
