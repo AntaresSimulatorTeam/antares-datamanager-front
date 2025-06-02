@@ -352,13 +352,7 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
       }
     } catch (error) {
       setFileStatus('error');
-      await handleTrajectoryUpdate(
-        rowIndexSelected,
-        value.id,
-        'error',
-        value.label,
-        (error as BackendError)?.antaresErrorMessage,
-      );
+      await handleTrajectoryUpdate(rowIndexSelected, value.id, 'error', value.label, (error as BackendError)?.message);
     }
   };
 
