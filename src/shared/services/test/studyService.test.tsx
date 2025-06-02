@@ -107,11 +107,10 @@ describe('fetchSuggestedKeywords', () => {
 describe('saveStudy', () => {
   beforeEach(() => {
     global.fetch = vi.fn();
-    vi.clearAllMocks();
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should create a study', async () => {
@@ -136,14 +135,19 @@ describe('saveStudy', () => {
     });
   });
 
-  it('should throw an error message', async () => {
+  it('should display a toast with the backend error message', async () => {
     vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
       antaresErrorMessage: 'A study with the same name already exists',
       date: new Date(),
       type: ERROR_MESSAGE_TYPE.BUSINESS,
     });
 
-    await expect(saveStudy(mockStudy)).rejects.toThrow('A study with the same name already exists');
+    await saveStudy(mockStudy);
+
+    expect(notifyToast).toHaveBeenCalledWith({
+      type: 'error',
+      message: 'A study with the same name already exists',
+    });
   });
 });
 

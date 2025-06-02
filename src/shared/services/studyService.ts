@@ -83,9 +83,9 @@ export const fetchSuggestedKeywords = async (partialName: string): Promise<strin
  * Display toast if creation succeeds or fails
  *
  * @param {Omit<StudyDTO, 'id' | 'status' | 'creationDate'>} studyData - Partial study data
- * @return {Promise<void | Error>}
+ * @return {Promise<void>}
  */
-export const saveStudy = async (studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate'>): Promise<void | Error> => {
+export const saveStudy = async (studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate'>): Promise<void> => {
   try {
     await AuthService.authFetch(`${STUDY_ENDPOINT}`, {
       method: 'POST',
@@ -100,7 +100,10 @@ export const saveStudy = async (studyData: Omit<StudyDTO, 'id' | 'status' | 'cre
       message: 'Study created successfully',
     });
   } catch (error) {
-    throw new Error((error as BackendError)?.antaresErrorMessage);
+    notifyToast({
+      type: 'error',
+      message: (error as BackendError).antaresErrorMessage ?? '',
+    });
   }
 };
 /**
