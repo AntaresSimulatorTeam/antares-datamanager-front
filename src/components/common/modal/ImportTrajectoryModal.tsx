@@ -55,7 +55,7 @@ export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, area }
           <div className="absolute z-10">
             <div className="w-[400px]">
               <SelectAndSearchableInput
-                options={options ? [...options, ...options] : options}
+                options={options}
                 defaultPlaceHolder={t('studyDetails.@select_trajectory')}
                 onSelect={handleSelectOption}
                 isSearchable={true}
