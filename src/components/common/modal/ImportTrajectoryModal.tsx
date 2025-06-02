@@ -64,7 +64,7 @@ export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, area }
               />
             </div>
           </div>
-          <div className="relative flex w-full justify-end gap-1 pt-8">
+          <div className="relative flex w-full justify-end gap-1 pb-2 pt-8">
             <RdsButton label="Cancel" onClick={() => void onClose()} color="secondary" />
             <RdsButton
               icon={RdsIconId.Add}
@@ -77,18 +77,6 @@ export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, area }
           </div>
         </div>
       </RdsModal.Content>
-      <RdsModal.Footer></RdsModal.Footer>
-      {/*<RdsModal.Footer>*/}
-      {/*  <RdsButton label="Cancel" onClick={() => void onClose()} color="secondary" />*/}
-      {/*  <RdsButton*/}
-      {/*    icon={RdsIconId.Add}*/}
-      {/*    label={t('studyDetails.@import')}*/}
-      {/*    onClick={() => trajectorySelected && void onClose(trajectorySelected)}*/}
-      {/*    variant="contained"*/}
-      {/*    color="primary"*/}
-      {/*    disabled={isButtonDisabled}*/}
-      {/*  />*/}
-      {/*</RdsModal.Footer>*/}
     </RdsModal>
   );
 };
