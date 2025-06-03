@@ -15,6 +15,19 @@ import { StudyDTO } from '@/shared/types';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { notifyToast } from '@/shared/notification/notification';
 
+
+/**
+ * Validate a string with a maxLength parameter
+ * @param {string} text - text to be validated
+ * @param {number} maxLength - maximum number of characters
+ * @returns {boolean} - true if maximum number is respected
+ */
+const validateMaxLength = (text: string, maxLength: number): boolean => {
+  const trimmedText = text.trim();
+  return trimmedText.length <= maxLength;
+};
+
+
 interface StudyCreationModalProps {
   isOpen?: boolean;
   onClose: () => void;
@@ -22,6 +35,9 @@ interface StudyCreationModalProps {
   setReloadStudies: React.Dispatch<React.SetStateAction<boolean>>;
   projectInfoName?: string;
 }
+
+const MAX_STUDY_NAME_LENGTH = 75;
+
 
 const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
   onClose,
@@ -38,6 +54,13 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
   const [isFormValid, setIsFormValid] = useState(false);
   const { user } = useUser();
   const [isHorizonValid, setIsHorizonValid] = useState(false);
+
+  const handleStudyNameChange = (value: string) => {
+    if (validateMaxLength(value, MAX_STUDY_NAME_LENGTH)) {
+      setStudyName(value || '');
+    }
+  };
+
 
   const saveStudyHandler = async () => {
 
@@ -102,10 +125,11 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
               <RdsInputText
                 label={t('studyModal.@input_name')}
                 value={studyName}
-                onChange={(value) => setStudyName(value || '')}
+                onChange={handleStudyNameChange}
                 variant="outlined"
                 placeHolder={t('studyModal.@study_creation_placeholder')}
                 required
+                maxLength={75}
               />
             </div>
             {study && (

@@ -53,13 +53,11 @@ const HorizonInput: React.FC<YearInputProps> = ({
     return true;
   };
 
-
+  //Only 4 digits allowed
   const handleInputChange = (text: string) => {
-    // Allow only digits, max 4 characters
     const filtered = text.replace(/\D/g, '').slice(0, 4);
     onChange(filtered);
 
-    // Don't validate partial input (less than 4 digits)
     if (filtered.length === 4) {
       validate(filtered);
     } else {
@@ -82,6 +80,7 @@ const HorizonInput: React.FC<YearInputProps> = ({
         placeHolder={t('horizonInput.@horizonPlaceholder')}
         variant="outlined"
         required={required}
+        maxLength={4}
       />
       {errorMessage && <div className="my-2 text-error-500">{errorMessage}</div>}
     </div>
