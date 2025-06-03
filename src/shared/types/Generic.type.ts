@@ -1,4 +1,3 @@
-import { Dispatch, SetStateAction } from 'react';
 import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
 
 export type Entries<T> = {
@@ -20,7 +19,3 @@ export interface ErrorMessage {
   date: Date;
   type: ERROR_MESSAGE_TYPE;
 }
-
-export type TabProps = {
-  setErrorMessage: Dispatch<SetStateAction<string>>;
-};

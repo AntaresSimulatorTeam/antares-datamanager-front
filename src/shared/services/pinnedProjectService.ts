@@ -7,28 +7,27 @@
 import { PROJECT_PIN_ENDPOINT, PROJECT_PINNED_ENDPOINT, PROJECT_UNPIN_ENDPOINT } from '@/shared/const/apiEndPoint';
 import { ProjectInfo } from '@/shared/types/Project.type.ts';
 import { AuthService } from '@/shared/services/authService.ts';
+import { BackendError } from '@/shared/utils/errrorHandler.ts';
 
 /**
  * Retrieve pinned projects list by user id
  *
  * @param {string | undefined} userId - User id
- * @returns {Promise<ProjectInfo[] | Error>} - Promise object that represents a list of projects
+ * @returns {Promise<ProjectInfo[]>} - Promise object that represents a list of projects
  */
-export const fetchPinnedProjects = async (userId: string | undefined): Promise<ProjectInfo[] | Error> => {
+export const fetchPinnedProjects = async (userId: string | undefined): Promise<ProjectInfo[]> => {
   const apiUrl = `${PROJECT_PINNED_ENDPOINT}?userId=${userId}`;
-
-  const response = await AuthService.authFetch(apiUrl);
-
-  if (!response?.ok) {
+  try {
+    const response = await AuthService.authFetch(apiUrl);
+    const json = (await (response as Response).json()) as Partial<ProjectInfo>[];
+    return json.map((project: Partial<ProjectInfo>) => ({
+      ...project,
+      projectId: project.id?.toString(),
+      pinned: project.pinned ?? true,
+    })) as ProjectInfo[];
+  } catch {
     throw new Error('Failed to fetch project details');
   }
-
-  const json = (await response.json()) as Partial<ProjectInfo>[];
-  return json.map((project: Partial<ProjectInfo>) => ({
-    ...project,
-    projectId: project.id?.toString(),
-    pinned: project.pinned ?? true,
-  })) as ProjectInfo[];
 };
 
 /**
@@ -39,25 +38,22 @@ export const fetchPinnedProjects = async (userId: string | undefined): Promise<P
  * @param {string} projectId - Project id
  * @param {string | undefined} userId
  *
- * @return {Promise<ProjectInfo | Error>} - Object that describes a project
+ * @return {Promise<ProjectInfo>} - Object that describes a project
  */
 
-export const pinProject = async (projectId: string, userId: string | undefined): Promise<ProjectInfo | Error> => {
+export const pinProject = async (projectId: string, userId: string | undefined): Promise<ProjectInfo> => {
   const apiUrl = `${PROJECT_PIN_ENDPOINT}?userId=${userId}&projectId=${projectId}`;
-
-  const response = await AuthService.authFetch(apiUrl, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-
-  if (!response.ok) {
-    const error = (await response.json()) as Error;
-    throw new Error(`${error.message}`);
+  try {
+    const response = await AuthService.authFetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return (await (response as Response).json()) as ProjectInfo;
+  } catch (error) {
+    throw new Error(`${(error as BackendError)?.antaresErrorMessage}`);
   }
-
-  return (await response.json()) as ProjectInfo;
 };
 
 /**
@@ -66,18 +62,17 @@ export const pinProject = async (projectId: string, userId: string | undefined):
  * @param {string} projectId
  * @param {string | undefined} userId
  */
-export const unpinProject = async (projectId: string, userId: string | undefined) => {
+export const unpinProject = async (projectId: string, userId: string | undefined): Promise<void> => {
   const apiUrl = `${PROJECT_UNPIN_ENDPOINT}?userId=${userId}&projectId=${projectId}`;
 
-  const response = await AuthService.authFetch(apiUrl, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`${errorText}`);
+  try {
+    await AuthService.authFetch(apiUrl, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  } catch (error) {
+    throw new Error(`${(error as BackendError)?.antaresErrorMessage}`);
   }
 };

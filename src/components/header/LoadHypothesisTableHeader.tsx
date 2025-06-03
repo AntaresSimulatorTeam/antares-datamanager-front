@@ -15,6 +15,8 @@ import { LabelWithDeleteButton } from '@common/data/LabelWithDeleteButton.tsx';
 import { SelectInputWithButton } from '@common/data/SelectInputWithButton.tsx';
 import { ErrorMessageType } from '@/shared/types/Generic.type.ts';
 import { AREA_OTHERS } from '@/shared/const/studyConfig.ts';
+import { ProgressBar } from '@/components/forms/ProgressBar.tsx';
+import { FileInputStatus } from 'rte-design-system-react';
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
 
@@ -22,10 +24,12 @@ const getLoadHypothesisTableHeaders = (
   t: (value: string) => string,
   handleImport: (index: number) => Promise<void>,
   handlerSearch: (value?: string, area?: string) => Promise<SelectOption[] | undefined>,
-  handleView: (index: number) => Promise<void>,
   error: ErrorMessageType,
   setErrorInfo: Dispatch<SetStateAction<ErrorMessageType>>,
   studyStatus: StudyStatus | undefined,
+  progress: number,
+  fileStatus: FileInputStatus,
+  rowIndexSelected: number,
 ) => [
   columnHelper.accessor('hypothesis', {
     header: t('studyDetails.@area'),
@@ -33,13 +37,7 @@ const getLoadHypothesisTableHeaders = (
     cell: ({ getValue, row }) => {
       const { status } = row.original;
       return (
-        <LabelWithButtonPreview
-          value={getValue()}
-          status={status}
-          isReadOnly={row.getReadOnly()}
-          onClick={() => void handleView(row.index)}
-          hasPreview={false}
-        />
+        <LabelWithButtonPreview value={getValue()} status={status} isReadOnly={row.getReadOnly()} hasPreview={false} />
       );
     },
   }),
@@ -92,12 +90,15 @@ const getLoadHypothesisTableHeaders = (
   columnHelper.accessor('status', {
     header: t('home.@status'),
     cell: ({ row, table: { options } }) => {
-      const { status, hypothesis, isDefault } = row.original;
-      return (
+      const { status, hypothesis, isDefault, trajectory } = row.original;
+      return progress > 0 && fileStatus === 'loading' && rowIndexSelected === row.index ? (
+        <ProgressBar statusFile={fileStatus} progressValue={progress} />
+      ) : (
         <CellWithStatus
           status={status}
           isDeletable={!isDefault}
           onClick={() => void options?.meta?.removeRow?.(row.index, hypothesis)}
+          message={trajectory?.messages?.[0]?.content}
         />
       );
     },

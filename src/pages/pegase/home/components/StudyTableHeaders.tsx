@@ -17,6 +17,7 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
   columnHelper.display({
     id: 'radioColumn',
     header: '',
+    size: 50,
     cell: ({ row }) => (
       <div className={`${row.getIsSelected() ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
         <RdsRadioButton
@@ -53,6 +54,7 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
 
   columnHelper.accessor('project', {
     header: t('home.@project'),
+    size: 250,
   }),
 
   columnHelper.accessor('status', {
@@ -65,8 +67,7 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
 
   columnHelper.accessor('keywords', {
     header: t('home.@keywords'),
-    minSize: 500,
-    size: 500,
+    size: 400,
     cell: ({ getValue, row }) => (
       <div className="flex h-3 w-32">
         <RdsTagList id={`pegase-tags-${row.id}`} tags={getValue()} />

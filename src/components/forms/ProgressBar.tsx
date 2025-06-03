@@ -1,4 +1,4 @@
-import { getBgColor } from '@/shared/utils/trajectoryUtils';
+import { getBgColor } from '@/shared/utils/trajectoryUtils.ts';
 
 export type FileInputStatus = 'loading' | 'success' | 'error' | 'empty';
 

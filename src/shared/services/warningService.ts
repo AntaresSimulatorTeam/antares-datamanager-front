@@ -1,10 +1,10 @@
 import { WARNING_MESSAGE_SKIP } from '@/shared/const/apiEndPoint.ts';
 import { AuthService } from '@/shared/services/authService.ts';
-import { getErrorMessage } from '@/shared/utils/warningUtils.ts';
 import { StudyActionType } from '@/shared/types';
 import { Dispatch } from 'react';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { BackendError } from '@/shared/utils/errrorHandler.ts';
 
 /**
  * Discard warning message
@@ -19,9 +19,8 @@ export const skipMessage = async (id: number): Promise<void> => {
       'Content-Type': 'application/json',
     },
   });
-  if (!response.ok) {
-    const errorMessage = await getErrorMessage(response);
-    throw new Error(`${errorMessage.message}`);
+  if (!(response as Response).ok) {
+    throw new Error(`${(response as BackendError).antaresErrorMessage}`);
   }
 };
 

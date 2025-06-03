@@ -67,13 +67,11 @@ const SelectAndSearchableInput = ({
 
   const handleClickOnKeyboard = async (event: MouseEvent<HTMLButtonElement>) => {
     try {
-      if (setSearchTerm) {
-        const results = await setSearchTerm();
-        if (results && results.length > 0) {
-          setOptionsSelection(results);
-        } else {
-          setOptionsSelection([]);
-        }
+      const results = await setSearchTerm?.();
+      if (results && results.length > 0) {
+        setOptionsSelection(results);
+      } else {
+        setOptionsSelection([]);
       }
     } finally {
       setIsDropdownOpen((prev) => !prev);

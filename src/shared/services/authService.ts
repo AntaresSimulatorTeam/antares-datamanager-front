@@ -9,6 +9,8 @@ import { config } from '@/shared/const/authConfig';
 import { isAuthenticationActive } from '@/shared/utils/authUtils.ts';
 import { getEnvVariables } from '@/envVariables.ts';
 import { notifyToast } from '@/shared/notification/notification';
+import { BackendError } from '@/shared/utils/errrorHandler.ts';
+import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
 
 const userManager = new UserManager(config);
 
@@ -40,7 +42,6 @@ export const AuthService = {
 
   addAccessTokenExpired: () =>
     userManager.events.addAccessTokenExpired(async () => {
-      console.log('Access token expired');
       try {
         const accessToken = (await userManager.getUser())?.access_token;
         await userManager.signoutRedirect({
@@ -55,7 +56,7 @@ export const AuthService = {
 
   //removeAccessTokenExpired: () => userManager.events.removeAccessTokenExpired(),
 
-  authFetch: async (url: string, options: RequestInit = {}): Promise<Response> => {
+  authFetch: async (url: string, options: RequestInit = {}): Promise<Response | void> => {
     if (isAuthenticationActive()) {
       const token = await AuthService.getAccessToken();
       if (token) {
@@ -73,25 +74,20 @@ export const AuthService = {
       }
     }
 
-    try {
-      const response = await fetch(url, options);
+    const response = await fetch(url, options);
 
-      if (response.status === 500) {
-        const errorData = (await response.json()) as Error;
-        const errorMessage: string = errorData.message || 'An error occurred';
+    if (!response.ok) {
+      const errorData = (await response.json()) as BackendError;
+      if (errorData.type === ERROR_MESSAGE_TYPE.BUSINESS) {
+        throw errorData;
+      } else {
         notifyToast({
           type: 'error',
-          message: errorMessage,
+          message: errorData?.antaresErrorMessage || 'An error occurred',
         });
       }
-
+    } else {
       return response;
-    } catch (error) {
-      notifyToast({
-        type: 'error',
-        message: `${(error as Error).message}`,
-      });
-      throw error;
     }
   },
 };

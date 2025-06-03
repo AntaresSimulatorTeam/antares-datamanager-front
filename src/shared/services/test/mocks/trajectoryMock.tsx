@@ -143,3 +143,31 @@ export const mockWarningMessages: WarningMessage[] = [
     isAck: false,
   },
 ];
+
+export const trajectoryAreaData = [
+  {
+    areaName: 'CH',
+    powerToGas: 'false',
+    shortTermStorage: 'false',
+  },
+  {
+    areaName: 'BR',
+    powerToGas: 'false',
+    shortTermStorage: 'false',
+  },
+  {
+    areaName: 'ES',
+    powerToGas: 'true',
+    shortTermStorage: 'false',
+  },
+  {
+    areaName: 'IE',
+    powerToGas: 'false',
+    shortTermStorage: 'true',
+  },
+  {
+    areaName: 'ITcs',
+    powerToGas: 'false',
+    shortTermStorage: 'false',
+  },
+];

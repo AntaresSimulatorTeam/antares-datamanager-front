@@ -33,3 +33,15 @@ export const mockProjectInfoArray: ProjectInfo[] = [
     studies: [],
   },
 ];
+
+export const projectData = { name: 'Bilan prévisionnel 2050', description: '', tags: ['tag1'] };
+
+export const mockProjectCreation = {
+  id: 107,
+  name: projectData.name,
+  createdBy: 'pegase',
+  creationDate: '2025-01-30T10:32:10.631003175',
+  studies: [],
+  tags: projectData.tags,
+  description: projectData.description,
+};

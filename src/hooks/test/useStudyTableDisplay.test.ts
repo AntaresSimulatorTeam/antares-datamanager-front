@@ -7,6 +7,7 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { useStudyTableDisplay } from '@/hooks/useStudyTableDisplay';
 import { vi } from 'vitest';
+import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
 
 vi.mock('@/envVariables', () => ({
   getEnvVariables: vi.fn(() => 'https://mockapi.com'),
@@ -15,7 +16,6 @@ vi.mock('@/envVariables', () => ({
 describe('useStudyTableDisplay', () => {
   beforeEach(() => {
     global.fetch = vi.fn();
-    vi.restoreAllMocks();
   });
 
   afterEach(() => {
@@ -66,7 +66,7 @@ describe('useStudyTableDisplay', () => {
       );
     });
 
-    await act(async () => {
+    act(() => {
       renderHook(() => useStudyTableDisplay({ searchTerm: 'mouad', sortBy: { project: 'asc' }, reloadStudies: false }));
     });
 
@@ -78,7 +78,15 @@ describe('useStudyTableDisplay', () => {
   });
 
   it('handles fetch error correctly', async () => {
-    global.fetch = vi.fn().mockRejectedValue(new Error('Fetch error'));
+    global.fetch = vi.fn().mockRejectedValue({
+      ok: false,
+      json: async () =>
+        Promise.resolve({
+          antaresErrorMessage: 'Error message',
+          date: new Date(),
+          type: ERROR_MESSAGE_TYPE.BUSINESS,
+        }),
+    });
 
     const { result } = renderHook(() =>
       useStudyTableDisplay({ searchTerm: 'test', sortBy: { status: 'desc' }, reloadStudies: true }),
@@ -109,7 +117,7 @@ describe('useStudyTableDisplay', () => {
 
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => mockResponse,
+      json: async () => Promise.resolve(mockResponse),
     });
 
     const { result } = renderHook(() =>
