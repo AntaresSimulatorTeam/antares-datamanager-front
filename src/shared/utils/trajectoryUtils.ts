@@ -89,6 +89,16 @@ export const buildEmptyRowData = (areaName: string) => ({
   messages: [],
 });
 
+export const buildReadOnlyRow = (indexes: (number | null)[]): ReadOnlyObject => {
+  const readOnlyRows = {};
+  indexes.forEach((readOnlyIndex) => {
+    if (readOnlyIndex != null) {
+      Object.assign(readOnlyRows, { [`${readOnlyIndex}`]: true });
+    }
+  });
+  return readOnlyRows;
+};
+
 /**
  *
  * @param {HypothesisRowData[]} rowData
@@ -110,5 +120,5 @@ export const retrieveReadOnlyArea = (
       Object.assign(readOnlyRows, { [`${readOnlyIndex}`]: true });
     }
   });
-  return readOnlyRows;
+  return buildReadOnlyRow(readOnlyIndexes);
 };

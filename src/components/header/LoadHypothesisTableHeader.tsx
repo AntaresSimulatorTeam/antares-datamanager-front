@@ -96,7 +96,7 @@ const getLoadHypothesisTableHeaders = (
       ) : (
         <CellWithStatus
           status={status}
-          isDeletable={!isDefault}
+          isDeletable={!isDefault && !(studyStatus === StudyStatus.GENERATED)}
           onClick={() => void options?.meta?.removeRow?.(row.index, hypothesis)}
           message={trajectory?.messages?.[0]?.content}
         />
