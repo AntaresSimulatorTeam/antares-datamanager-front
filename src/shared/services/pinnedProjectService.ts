@@ -13,9 +13,9 @@ import { BackendError } from '@/shared/utils/errrorHandler.ts';
  * Retrieve pinned projects list by user id
  *
  * @param {string | undefined} userId - User id
- * @returns {Promise<ProjectInfo[] | BackendError>} - Promise object that represents a list of projects
+ * @returns {Promise<ProjectInfo[]>} - Promise object that represents a list of projects
  */
-export const fetchPinnedProjects = async (userId: string | undefined): Promise<ProjectInfo[] | BackendError> => {
+export const fetchPinnedProjects = async (userId: string | undefined): Promise<ProjectInfo[]> => {
   const apiUrl = `${PROJECT_PINNED_ENDPOINT}?userId=${userId}`;
   try {
     const response = await AuthService.authFetch(apiUrl);
@@ -38,13 +38,10 @@ export const fetchPinnedProjects = async (userId: string | undefined): Promise<P
  * @param {string} projectId - Project id
  * @param {string | undefined} userId
  *
- * @return {Promise<ProjectInfo | BackendError>} - Object that describes a project
+ * @return {Promise<ProjectInfo>} - Object that describes a project
  */
 
-export const pinProject = async (
-  projectId: string,
-  userId: string | undefined,
-): Promise<ProjectInfo | BackendError> => {
+export const pinProject = async (projectId: string, userId: string | undefined): Promise<ProjectInfo> => {
   const apiUrl = `${PROJECT_PIN_ENDPOINT}?userId=${userId}&projectId=${projectId}`;
   try {
     const response = await AuthService.authFetch(apiUrl, {
@@ -65,7 +62,7 @@ export const pinProject = async (
  * @param {string} projectId
  * @param {string | undefined} userId
  */
-export const unpinProject = async (projectId: string, userId: string | undefined) => {
+export const unpinProject = async (projectId: string, userId: string | undefined): Promise<void> => {
   const apiUrl = `${PROJECT_UNPIN_ENDPOINT}?userId=${userId}&projectId=${projectId}`;
 
   try {
