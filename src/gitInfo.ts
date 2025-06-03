@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "feat/ANT-3249_LOAB-tab_handle_display_business_error",
-  commit: "0a4b63c",
-  commitTime: "2025-06-02T14:53:58.848Z"
+  branch: "feat/ANT-3181_trajectory_load_handle_study_generated",
+  commit: "0397a07",
+  commitTime: "2025-06-03T07:34:52.158Z"
 };

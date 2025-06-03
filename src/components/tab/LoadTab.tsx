@@ -39,6 +39,7 @@ import { sortKeepLastName } from '@/shared/utils/sortUtils.tsx';
 import {
   buildEmptyRowData,
   buildErrorTrajectory,
+  buildReadOnlyRow,
   buildRowData,
   removeDuplicate,
   retrieveReadOnlyArea,
@@ -48,6 +49,7 @@ import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { DeletionModal } from '@common/modal/DeletionModal.tsx';
 import { useUser } from '@/store/contexts/UserContext.tsx';
+import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 
 export type CheckBoxData = {
   name: string;
@@ -144,7 +146,11 @@ const LoadTab = () => {
         const dataTrajectories =
           areaData.length > 0 ? sortKeepLastName(areaDataDefault.concat(areaData), AREA_OTHERS) : areaDataDefault;
         setData(dataTrajectories);
-        if (defaultAreaListNotIncludedInList.length > 0) {
+        const isStudyGenerated =
+          studyState.studyStatus === StudyStatus.GENERATED || study.status === StudyStatus.GENERATED;
+        if (isStudyGenerated) {
+          setReadOnly(buildReadOnlyRow([...dataTrajectories.keys()]));
+        } else if (defaultAreaListNotIncludedInList.length > 0 && !isStudyGenerated) {
           const readOnlyRows = retrieveReadOnlyArea(dataTrajectories, defaultAreaListNotIncludedInList);
           setReadOnly(readOnlyRows);
           setReadOnlyAreas(defaultAreaListNotIncludedInList);
@@ -379,8 +385,16 @@ const LoadTab = () => {
                   value={area.name}
                   name={''}
                   defaultChecked={area.isDefault}
-                  disabled={area.isDefault}
-                  checked={area.isDefault}
+                  disabled={
+                    area.isDefault ||
+                    studyState.studyStatus === StudyStatus.GENERATED ||
+                    study.status === StudyStatus.GENERATED
+                  }
+                  checked={
+                    area.isDefault ||
+                    studyState.studyStatus === StudyStatus.GENERATED ||
+                    study.status === StudyStatus.GENERATED
+                  }
                 />
                 {index === Math.max(areasDefaultOptions?.length - 2, 0) && <RdsDivider extraClasses="mt-1" />}
               </div>

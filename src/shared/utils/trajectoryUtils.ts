@@ -89,6 +89,16 @@ export const buildEmptyRowData = (areaName: string) => ({
   messages: [],
 });
 
+export const buildReadOnlyRow = (indexes: (number | null)[]): ReadOnlyObject => {
+  const readOnlyRows = {};
+  indexes.forEach((readOnlyIndex) => {
+    if (readOnlyIndex != null) {
+      Object.assign(readOnlyRows, { [`${readOnlyIndex}`]: true });
+    }
+  });
+  return readOnlyRows;
+};
+
 /**
  *
  * @param {HypothesisRowData[]} rowData
@@ -104,11 +114,5 @@ export const retrieveReadOnlyArea = (
     const index = rowData.findIndex((trajectory) => areaName === trajectory.hypothesis);
     return index >= 0 ? index : null;
   });
-  const readOnlyRows = {};
-  readOnlyIndexes.forEach((readOnlyIndex) => {
-    if (readOnlyIndex != null) {
-      Object.assign(readOnlyRows, { [`${readOnlyIndex}`]: true });
-    }
-  });
-  return readOnlyRows;
+  return buildReadOnlyRow(readOnlyIndexes);
 };
