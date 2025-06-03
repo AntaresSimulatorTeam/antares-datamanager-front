@@ -135,7 +135,7 @@ export const deleteStudy = async (id: number): Promise<void> => {
  *
  * @param {number} id - Study id
  */
-export const createStudy = async (id: number) => {
+export const createStudy = async (id: number): Promise<void> => {
   const urlApi = `${STUDY_GENERATE_ENDPOINT}?id=${id}`;
   try {
     await AuthService.authFetch(urlApi, {
@@ -180,10 +180,10 @@ export const getStudyTrajectories = async (
  */
 export const getStudyById = async (studyId: number): Promise<StudyDTO> => {
   const urlApi = `${STUDY_ENDPOINT}/${studyId}`;
-  const response = await AuthService.authFetch(urlApi);
-  if (!(response as Response).ok) {
+  try {
+    const response = await AuthService.authFetch(urlApi);
+    return (await (response as Response).json()) as StudyDTO;
+  } catch {
     throw new Error('Failed to fetch study');
   }
-
-  return (await (response as Response).json()) as StudyDTO;
 };

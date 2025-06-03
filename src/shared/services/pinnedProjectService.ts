@@ -62,7 +62,7 @@ export const pinProject = async (projectId: string, userId: string | undefined):
  * @param {string} projectId
  * @param {string | undefined} userId
  */
-export const unpinProject = async (projectId: string, userId: string | undefined) => {
+export const unpinProject = async (projectId: string, userId: string | undefined): Promise<void> => {
   const apiUrl = `${PROJECT_UNPIN_ENDPOINT}?userId=${userId}&projectId=${projectId}`;
 
   try {
