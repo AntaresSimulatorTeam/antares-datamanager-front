@@ -77,6 +77,9 @@ const LoadTab = () => {
   const [rowToDelete, setRowToDelete] = useState<{ index: number; value?: string } | null>(null);
   const [progress, setProgress] = useState(0);
   const [fileStatus, setFileStatus] = useState<FileInputStatus>('empty');
+  const [isStudyGenerated, _] = useState(
+    studyState.studyStatus === StudyStatus.GENERATED || study.status === StudyStatus.GENERATED,
+  );
 
   useEffect(() => {
     const fetchHypothesis = async () => {
@@ -146,8 +149,7 @@ const LoadTab = () => {
         const dataTrajectories =
           areaData.length > 0 ? sortKeepLastName(areaDataDefault.concat(areaData), AREA_OTHERS) : areaDataDefault;
         setData(dataTrajectories);
-        const isStudyGenerated =
-          studyState.studyStatus === StudyStatus.GENERATED || study.status === StudyStatus.GENERATED;
+
         if (isStudyGenerated) {
           setReadOnly(buildReadOnlyRow([...dataTrajectories.keys()]));
         } else if (defaultAreaListNotIncludedInList.length > 0 && !isStudyGenerated) {
@@ -385,16 +387,8 @@ const LoadTab = () => {
                   value={area.name}
                   name={''}
                   defaultChecked={area.isDefault}
-                  disabled={
-                    area.isDefault ||
-                    studyState.studyStatus === StudyStatus.GENERATED ||
-                    study.status === StudyStatus.GENERATED
-                  }
-                  checked={
-                    area.isDefault ||
-                    studyState.studyStatus === StudyStatus.GENERATED ||
-                    study.status === StudyStatus.GENERATED
-                  }
+                  disabled={area.isDefault || isStudyGenerated}
+                  checked={area.isDefault || isStudyGenerated}
                 />
                 {index === Math.max(areasDefaultOptions?.length - 2, 0) && <RdsDivider extraClasses="mt-1" />}
               </div>

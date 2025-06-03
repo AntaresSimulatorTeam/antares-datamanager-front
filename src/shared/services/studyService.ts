@@ -19,9 +19,9 @@ import { BackendError } from '../utils/errrorHandler';
  * @param {string} projectId - Project id related to a study
  * @param {number} currentPage - Current page number
  * @param {number} intervalSize - Number of items per page
- * @param {{ [key: string]: 'asc' | 'desc' })} sortBy - Object that describes the sorting type (ascending or descending) of a column
+ * @param {{ [key: string]: 'asc' | 'desc' }} sortBy - Object that describes the sorting type (ascending or descending) of a column
  *
- * @return {Promise<PaginatedResponse<StudyDTO> | Error>} - Promise object that represents a list of studies
+ * @return {Promise<PaginatedResponse<StudyDTO>>} - Promise object that represents a list of studies
  */
 export const fetchSearchStudies = async (
   searchTerm: string = '',
@@ -29,7 +29,7 @@ export const fetchSearchStudies = async (
   currentPage: number = 0,
   intervalSize: number = 0,
   sortBy?: { [key: string]: 'asc' | 'desc' },
-): Promise<PaginatedResponse<StudyDTO> | Error> => {
+): Promise<PaginatedResponse<StudyDTO>> => {
   try {
     let entries: [string, 'asc' | 'desc'] | null = null;
     if (sortBy && JSON.stringify(sortBy) !== '{}') {
@@ -63,9 +63,9 @@ export const fetchSearchStudies = async (
  * Retrieve a list of suggested keywords from a partial name of a study
  *
  * @param {string} partialName - Partial name of a study
- * @return {Promise<string[] | Error>} - Promise object that represents a list of keywords
+ * @return {Promise<string[]>} - Promise object that represents a list of keywords
  */
-export const fetchSuggestedKeywords = async (partialName: string): Promise<string[] | Error> => {
+export const fetchSuggestedKeywords = async (partialName: string): Promise<string[]> => {
   const queryString = new URLSearchParams({
     partialName: partialName ?? '',
   }).toString();
@@ -111,9 +111,9 @@ export const saveStudy = async (studyData: Omit<StudyDTO, 'id' | 'status' | 'cre
  * Display toast if deletion succeeds or fails
  *
  * @param {number} id - Study id
- * @return {Promise<void | Error>}
+ * @return {Promise<void>}
  */
-export const deleteStudy = async (id: number): Promise<void | Error> => {
+export const deleteStudy = async (id: number): Promise<void> => {
   try {
     await AuthService.authFetch(`${STUDY_ENDPOINT}/${id}`, {
       method: 'DELETE',
@@ -154,13 +154,13 @@ export const createStudy = async (id: number) => {
  * @param {number} studyId - Study id
  * @param {TRAJECTORY_TYPE} trajectoryType - Trajectory type
  *
- * @return {Promise<DbTrajectory[] | Error>} Array of trajectories (data base trajectories)
+ * @return {Promise<DbTrajectory[]>} Array of trajectories (data base trajectories)
  */
 
 export const getStudyTrajectories = async (
   studyId: number,
   trajectoryType?: TRAJECTORY_TYPE,
-): Promise<DbTrajectory[] | Error> => {
+): Promise<DbTrajectory[]> => {
   const urlApi = `${TRAJECTORY_ENDPOINT}?studyId=${studyId}&trajectoryType=${trajectoryType ?? ''}`;
 
   try {
@@ -176,9 +176,9 @@ export const getStudyTrajectories = async (
  * Retrieve study data by id
  *
  * @param {number} studyId - Study id
- * @return {Promise<StudyDTO | Error>} Study object
+ * @return {Promise<StudyDTO>} Study object
  */
-export const getStudyById = async (studyId: number): Promise<StudyDTO | Error> => {
+export const getStudyById = async (studyId: number): Promise<StudyDTO> => {
   const urlApi = `${STUDY_ENDPOINT}/${studyId}`;
   const response = await AuthService.authFetch(urlApi);
   if (!(response as Response).ok) {

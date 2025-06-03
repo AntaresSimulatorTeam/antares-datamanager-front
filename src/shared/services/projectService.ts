@@ -13,9 +13,9 @@ import { BackendError } from '@/shared/utils/errrorHandler.ts';
  * Delete project
  *
  * @param {string} projectId
- * @return {Promise<void | Error>}
+ * @return {Promise<void>}
  */
-export const deleteProjectById = async (projectId: string): Promise<void | Error> => {
+export const deleteProjectById = async (projectId: string): Promise<void> => {
   try {
     await AuthService.authFetch(`${PROJECT_ENDPOINT}/${projectId}`, {
       method: 'DELETE',
@@ -29,9 +29,9 @@ export const deleteProjectById = async (projectId: string): Promise<void | Error
  * Retrieve details of a project
  *
  * @param {string} projectId - Project id
- * @return {Promise<ProjectInfo | Error>} - Project details
+ * @return {Promise<ProjectInfo>} - Project details
  */
-export const fetchProjectDetails = async (projectId: string): Promise<ProjectInfo | Error> => {
+export const fetchProjectDetails = async (projectId: string): Promise<ProjectInfo> => {
   try {
     const response = await AuthService.authFetch(`${PROJECT_ENDPOINT}/${projectId}`);
 
@@ -45,9 +45,9 @@ export const fetchProjectDetails = async (projectId: string): Promise<ProjectInf
  * Retrieve a project from a partial name of project
  *
  * @param {string} partialName - Partial name of a project
- * @return {Promise<string[] | Error>} - List of project name
+ * @return {Promise<string[]>} - List of project name
  */
-export const fetchProjectsFromPartialName = async (partialName: string): Promise<string[] | Error> => {
+export const fetchProjectsFromPartialName = async (partialName: string): Promise<string[]> => {
   const queryString = new URLSearchParams({
     partialName: partialName ?? '',
   }).toString();
@@ -67,13 +67,13 @@ export const fetchProjectsFromPartialName = async (partialName: string): Promise
  * @param {number} page
  * @param {number} size
  * @param {string | undefined} search - Text entered by a user or user id
- * @return {Promise<PaginatedResponse<ProjectResponse> | Error>}
+ * @return {Promise<PaginatedResponse<ProjectResponse>>}
  */
 export const fetchProjectFromSearchTerm = async (
   page: number,
   size: number,
   search: string,
-): Promise<PaginatedResponse<ProjectResponse> | Error> => {
+): Promise<PaginatedResponse<ProjectResponse>> => {
   const queryString = new URLSearchParams({
     search: search ?? '',
     page: page != null ? (page + 1).toString() : '',
@@ -93,11 +93,11 @@ export const fetchProjectFromSearchTerm = async (
  * Create a new project
  *
  * @param {Pick<ProjectInfo, 'name' | 'description' | 'tags'>} projectData - Body data request
- * @return {Promise<ProjectResponse | Error>}
+ * @return {Promise<ProjectResponse>}
  */
 export const createProject = async (
   projectData: Pick<ProjectInfo, 'name' | 'description' | 'tags'>,
-): Promise<ProjectResponse | Error> => {
+): Promise<ProjectResponse> => {
   try {
     const response = await AuthService.authFetch(`${PROJECT_ENDPOINT}`, {
       method: 'POST',
