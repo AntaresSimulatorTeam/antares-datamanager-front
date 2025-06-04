@@ -14,18 +14,8 @@ import { saveStudy } from '@/shared/services/studyService';
 import { StudyDTO } from '@/shared/types';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { notifyToast } from '@/shared/notification/notification';
-
-
-/**
- * Validate a string with a maxLength parameter
- * @param {string} text - text to be validated
- * @param {number} maxLength - maximum number of characters
- * @returns {boolean} - true if maximum number is respected
- */
-const validateMaxLength = (text: string, maxLength: number): boolean => {
-  const trimmedText = text.trim();
-  return trimmedText.length <= maxLength;
-};
+import { validateMaxLength } from '@/shared/utils/validateMaxTextLength';
+import { MAX_STUDY_NAME_LENGTH } from '@/shared/const/studyConfig';
 
 
 interface StudyCreationModalProps {
@@ -35,8 +25,6 @@ interface StudyCreationModalProps {
   setReloadStudies: React.Dispatch<React.SetStateAction<boolean>>;
   projectInfoName?: string;
 }
-
-const MAX_STUDY_NAME_LENGTH = 75;
 
 
 const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
