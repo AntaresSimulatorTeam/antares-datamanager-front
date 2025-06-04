@@ -37,7 +37,7 @@ export const fetchProjectDetails = async (projectId: string): Promise<ProjectInf
 
     return (await (response as Response).json()) as ProjectInfo;
   } catch (error) {
-    throw new Error('Failed to fetch project details');
+    throw new Error((error as BackendError).antaresErrorMessage);
   }
 };
 

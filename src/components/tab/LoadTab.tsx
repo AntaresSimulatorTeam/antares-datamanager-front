@@ -48,6 +48,7 @@ import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { DeletionModal } from '@common/modal/DeletionModal.tsx';
 import { useUser } from '@/store/contexts/UserContext.tsx';
+import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 
 export type CheckBoxData = {
   name: string;
@@ -75,6 +76,21 @@ const LoadTab = () => {
   const [rowToDelete, setRowToDelete] = useState<{ index: number; value?: string } | null>(null);
   const [progress, setProgress] = useState(0);
   const [fileStatus, setFileStatus] = useState<FileInputStatus>('empty');
+  const [isStudyGenerated, _] = useState(
+    studyState.studyStatus === StudyStatus.GENERATED || study.status === StudyStatus.GENERATED,
+  );
+
+  const setReadOnlyForGeneratedStudy = (rows: HypothesisRowData[]) => {
+    const areaWithoutTrajectory = rows.map((row) => {
+      if (row.trajectory == null) {
+        return row.hypothesis;
+      } else {
+        return null;
+      }
+    });
+    const readOnlyRows = retrieveReadOnlyArea(rows, areaWithoutTrajectory.filter(Boolean) as string[]);
+    setReadOnly(readOnlyRows);
+  };
 
   useEffect(() => {
     const fetchHypothesis = async () => {
@@ -119,7 +135,7 @@ const LoadTab = () => {
           }
         }
 
-        const trajectoryLinked = (await getStudyTrajectories(study?.id, TRAJECTORY_TYPE.LOAD)) as DbTrajectory[];
+        const trajectoryLinked = await getStudyTrajectories(study?.id, TRAJECTORY_TYPE.LOAD);
         areaDefault.push({
           name: AREA_OTHERS,
           isDefault: true,
@@ -144,7 +160,9 @@ const LoadTab = () => {
         const dataTrajectories =
           areaData.length > 0 ? sortKeepLastName(areaDataDefault.concat(areaData), AREA_OTHERS) : areaDataDefault;
         setData(dataTrajectories);
-        if (defaultAreaListNotIncludedInList.length > 0) {
+        if (isStudyGenerated) {
+          setReadOnlyForGeneratedStudy(dataTrajectories);
+        } else if (defaultAreaListNotIncludedInList.length > 0 && !isStudyGenerated) {
           const readOnlyRows = retrieveReadOnlyArea(dataTrajectories, defaultAreaListNotIncludedInList);
           setReadOnly(readOnlyRows);
           setReadOnlyAreas(defaultAreaListNotIncludedInList);
@@ -166,6 +184,10 @@ const LoadTab = () => {
 
     void fetchHypothesis();
   }, []);
+
+  useEffect(() => {
+    setReadOnlyForGeneratedStudy(data);
+  }, [studyState.studyStatus, study?.status]);
 
   const handleFetchTrajectoriesFS = async (index: number) => {
     try {
@@ -379,8 +401,8 @@ const LoadTab = () => {
                   value={area.name}
                   name={''}
                   defaultChecked={area.isDefault}
-                  disabled={area.isDefault}
-                  checked={area.isDefault}
+                  disabled={area.isDefault || isStudyGenerated}
+                  checked={area.isDefault || isStudyGenerated}
                 />
                 {index === Math.max(areasDefaultOptions?.length - 2, 0) && <RdsDivider extraClasses="mt-1" />}
               </div>

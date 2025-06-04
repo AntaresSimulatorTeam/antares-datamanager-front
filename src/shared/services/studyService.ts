@@ -144,8 +144,8 @@ export const createStudy = async (id: number): Promise<void> => {
         'Content-Type': 'application/json',
       },
     });
-  } catch {
-    throw new Error('Failed to generate a study');
+  } catch (error) {
+    throw new Error((error as BackendError).antaresErrorMessage);
   }
 };
 
@@ -168,7 +168,7 @@ export const getStudyTrajectories = async (
 
     return (await (response as Response).json()) as DbTrajectory[];
   } catch (error) {
-    throw new Error('Failed to fetch trajectories linked to studies');
+    throw new Error((error as BackendError).antaresErrorMessage);
   }
 };
 
@@ -183,7 +183,7 @@ export const getStudyById = async (studyId: number): Promise<StudyDTO> => {
   try {
     const response = await AuthService.authFetch(urlApi);
     return (await (response as Response).json()) as StudyDTO;
-  } catch {
-    throw new Error('Failed to fetch study');
+  } catch (error) {
+    throw new Error((error as BackendError).antaresErrorMessage);
   }
 };

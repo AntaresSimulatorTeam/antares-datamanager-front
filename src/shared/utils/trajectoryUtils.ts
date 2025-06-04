@@ -89,26 +89,27 @@ export const buildEmptyRowData = (areaName: string) => ({
   messages: [],
 });
 
-/**
- *
- * @param {HypothesisRowData[]} rowData
- * @param {string[]} defaultAreasNotInAreaTrajectory
- *
- * @return {ReadOnlyObject}
- */
-export const retrieveReadOnlyArea = (
-  rowData: HypothesisRowData[],
-  defaultAreasNotInAreaTrajectory: string[],
-): ReadOnlyObject => {
-  const readOnlyIndexes: (number | null)[] = defaultAreasNotInAreaTrajectory.map((areaName) => {
-    const index = rowData.findIndex((trajectory) => areaName === trajectory.hypothesis);
-    return index >= 0 ? index : null;
-  });
+export const buildReadOnlyRow = (indexes: (number | null)[]): ReadOnlyObject => {
   const readOnlyRows = {};
-  readOnlyIndexes.forEach((readOnlyIndex) => {
+  indexes.forEach((readOnlyIndex) => {
     if (readOnlyIndex != null) {
       Object.assign(readOnlyRows, { [`${readOnlyIndex}`]: true });
     }
   });
   return readOnlyRows;
+};
+
+/**
+ *
+ * @param {HypothesisRowData[]} rowData
+ * @param {string[]} itemsToReadOnly - Items that should be in read only state
+ *
+ * @return {ReadOnlyObject}
+ */
+export const retrieveReadOnlyArea = (rowData: HypothesisRowData[], itemsToReadOnly: string[]): ReadOnlyObject => {
+  const readOnlyIndexes: (number | null)[] = itemsToReadOnly.map((areaName) => {
+    const index = rowData.findIndex((trajectory) => areaName === trajectory.hypothesis);
+    return index >= 0 ? index : null;
+  });
+  return buildReadOnlyRow(readOnlyIndexes);
 };
