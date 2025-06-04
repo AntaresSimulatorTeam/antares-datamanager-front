@@ -69,10 +69,9 @@ const getHypothesisTableHeaders = (
     size: 300,
     cell: ({ row }) => {
       const { trajectory, status } = row.original;
-      const textClass = studyStatus === StudyStatus.GENERATED ? 'text-primary-600' : 'text-gray-900';
       return trajectory && status !== TRAJECTORY_SELECTION_STATUS.MISSING ? (
         <div className="flex w-full space-x-2 py-3">
-          <span className={`${textClass}`}>{trajectory.trajectoryName}</span>
+          <span className="text-gray-900">{trajectory.trajectoryName}</span>
           {studyStatus != StudyStatus.GENERATED && (
             <RdsIconButton
               icon={RdsIconId.Close}

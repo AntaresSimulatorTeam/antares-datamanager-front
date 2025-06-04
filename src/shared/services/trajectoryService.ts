@@ -37,8 +37,8 @@ export const fetchTrajectoriesFromDB = async (
   try {
     const response = await AuthService.authFetch(urlApi);
     return (await (response as Response).json()) as DbTrajectory[];
-  } catch {
-    throw new Error('Failed to fetch trajectories from data base');
+  } catch (error) {
+    throw new Error((error as BackendError).antaresErrorMessage);
   }
 };
 
@@ -65,8 +65,8 @@ export const fetchTrajectoriesFromFS = async (
   try {
     const response = await AuthService.authFetch(urlApi);
     return (await (response as Response).json()) as FsTrajectory[];
-  } catch {
-    throw new Error('Failed to fetch trajectories from file system');
+  } catch (error) {
+    throw new Error((error as BackendError).antaresErrorMessage);
   }
 };
 
@@ -170,8 +170,8 @@ export const getTrajectoryDataByTypeAndId = async (
   try {
     const response = await AuthService.authFetch(urlApi);
     return (await (response as Response).json()) as Types<TRAJECTORY_DATA_TYPE>[];
-  } catch {
-    throw new Error('Failed to fetch data trajectory');
+  } catch (error) {
+    throw new Error((error as BackendError).antaresErrorMessage);
   }
 };
 
@@ -183,7 +183,7 @@ export const getDefaultLoadHypothesis = async (): Promise<{ name: string }[]> =>
   try {
     const response = await AuthService.authFetch(HYPOTHESIS_LOAD_DEFAULT);
     return (await (response as Response).json()) as { name: string }[];
-  } catch {
-    throw new Error('Failed to fetch default load hypothesis');
+  } catch (error) {
+    throw new Error((error as BackendError).antaresErrorMessage);
   }
 };

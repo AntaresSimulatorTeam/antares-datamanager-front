@@ -9,8 +9,8 @@ import { config } from '@/shared/const/authConfig';
 import { isAuthenticationActive } from '@/shared/utils/authUtils.ts';
 import { getEnvVariables } from '@/envVariables.ts';
 import { notifyToast } from '@/shared/notification/notification';
-import { BackendError } from '@/shared/utils/errrorHandler.ts';
 import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
+import { BackendError } from '@/shared/utils/errrorHandler.ts';
 
 const userManager = new UserManager(config);
 
@@ -85,6 +85,7 @@ export const AuthService = {
           type: 'error',
           message: errorData?.antaresErrorMessage || 'An error occurred',
         });
+        throw new Error();
       }
     } else {
       return response;

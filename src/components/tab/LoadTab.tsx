@@ -39,7 +39,6 @@ import { sortKeepLastName } from '@/shared/utils/sortUtils.tsx';
 import {
   buildEmptyRowData,
   buildErrorTrajectory,
-  buildReadOnlyRow,
   buildRowData,
   removeDuplicate,
   retrieveReadOnlyArea,
@@ -80,6 +79,18 @@ const LoadTab = () => {
   const [isStudyGenerated, _] = useState(
     studyState.studyStatus === StudyStatus.GENERATED || study.status === StudyStatus.GENERATED,
   );
+
+  const setReadOnlyForGeneratedStudy = (rows: HypothesisRowData[]) => {
+    const areaWithoutTrajectory = rows.map((row) => {
+      if (row.trajectory == null) {
+        return row.hypothesis;
+      } else {
+        return null;
+      }
+    });
+    const readOnlyRows = retrieveReadOnlyArea(rows, areaWithoutTrajectory.filter(Boolean) as string[]);
+    setReadOnly(readOnlyRows);
+  };
 
   useEffect(() => {
     const fetchHypothesis = async () => {
@@ -150,7 +161,7 @@ const LoadTab = () => {
           areaData.length > 0 ? sortKeepLastName(areaDataDefault.concat(areaData), AREA_OTHERS) : areaDataDefault;
         setData(dataTrajectories);
         if (isStudyGenerated) {
-          setReadOnly(buildReadOnlyRow([...dataTrajectories.keys()]));
+          setReadOnlyForGeneratedStudy(dataTrajectories);
         } else if (defaultAreaListNotIncludedInList.length > 0 && !isStudyGenerated) {
           const readOnlyRows = retrieveReadOnlyArea(dataTrajectories, defaultAreaListNotIncludedInList);
           setReadOnly(readOnlyRows);
@@ -173,6 +184,10 @@ const LoadTab = () => {
 
     void fetchHypothesis();
   }, []);
+
+  useEffect(() => {
+    setReadOnlyForGeneratedStudy(data);
+  }, [studyState.studyStatus, study?.status]);
 
   const handleFetchTrajectoriesFS = async (index: number) => {
     try {

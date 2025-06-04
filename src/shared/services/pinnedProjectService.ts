@@ -25,8 +25,8 @@ export const fetchPinnedProjects = async (userId: string | undefined): Promise<P
       projectId: project.id?.toString(),
       pinned: project.pinned ?? true,
     })) as ProjectInfo[];
-  } catch {
-    throw new Error('Failed to fetch project details');
+  } catch (error) {
+    throw new Error((error as BackendError).antaresErrorMessage);
   }
 };
 

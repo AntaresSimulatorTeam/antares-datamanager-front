@@ -274,7 +274,11 @@ describe('getTrajectoryDataByTypeAndId', () => {
   });
 
   it('should throw error when data fetching failed', async () => {
-    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({});
+    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
+      antaresErrorMessage: 'Failed to fetch data trajectory',
+      date: new Date(),
+      type: ERROR_MESSAGE_TYPE.BUSINESS,
+    });
 
     await expect(async () => getTrajectoryDataByTypeAndId(TRAJECTORY_TYPE.LINK, 5)).rejects.toThrowError(
       'Failed to fetch data trajectory',
