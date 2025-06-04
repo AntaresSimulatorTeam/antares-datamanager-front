@@ -39,11 +39,12 @@ import { buildErrorTrajectory, getStatus } from '@/shared/utils/trajectoryUtils.
 import { getStudyById, getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { TrajectoryDataVisualisation } from '@common/modal/TrajectoryDataVisualisation.tsx';
 import { generateTrajectoryViewHeader } from '@/components/header/TrajectoryViewHeader.tsx';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { ErrorMessageType } from '@/shared/types/Generic.type.ts';
 import { computeReadOnlyState } from '@/shared/utils/computeReadOnlyState';
 import { FileInputStatus } from 'rte-design-system-react';
+import { notifyAlert } from '@/shared/notification/notification.tsx';
 
 interface AreaLinkTabProps {
   setErrorMessage: Dispatch<SetStateAction<string>>;
@@ -57,6 +58,7 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
   const dispatch = useStudyDispatch();
   const { t } = useTranslation();
   const { user } = useUser();
+  const navigate = useNavigate();
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
   const [rowIndexSelected, setRowIndexSelected] = useState<number>(0);
   const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
@@ -186,6 +188,15 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
         );
       }
       setReadOnly({ '0': false, '1': false });
+      const alertMessage = `Error: ${trajectoryLabel} cannot be saved for ${index === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK}`;
+      notifyAlert({
+        message: alertMessage,
+        type: 'error',
+        action: {
+          label: 'View Log',
+          onClick: () => void navigate('/logs'),
+        },
+      });
     } catch {
       //Silent handler
     }
