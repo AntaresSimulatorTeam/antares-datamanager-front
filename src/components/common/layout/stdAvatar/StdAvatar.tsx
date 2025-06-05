@@ -19,19 +19,32 @@ type StdAvatarProps = {
   fullname: string;
   id?: string;
   textColor?: AvatarTextColor;
+  hasToolTip?: boolean;
 };
 
 const OFFSET_HOVER_HEIGHT = 5;
 
-const StdAvatar = ({ initials, size, backgroundColor, fullname, id: propsId, textColor }: StdAvatarProps) => {
+const StdAvatar = ({
+  initials,
+  size,
+  backgroundColor,
+  fullname,
+  id: propsId,
+  textColor,
+  hasToolTip = true,
+}: StdAvatarProps) => {
   const avatarClasses = avatarClassBuilder(size, backgroundColor, textColor);
   const id = useRdsId('avatar', propsId);
 
-  return (
+  return hasToolTip ? (
     <div role="figure" id={id} className={'avatar overflow-visible'}>
       <RdsTextTooltip text={fullname} offset={OFFSET_HOVER_HEIGHT} placement="top">
         <p className={avatarClasses}>{initials}</p>
       </RdsTextTooltip>
+    </div>
+  ) : (
+    <div role="figure" id={id} className={'avatar overflow-visible'}>
+      <p className={avatarClasses}>{initials}</p>
     </div>
   );
 };

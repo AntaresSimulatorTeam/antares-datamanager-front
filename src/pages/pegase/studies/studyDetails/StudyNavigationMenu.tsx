@@ -122,6 +122,7 @@ const StudyNavigationMenu = ({
                 backgroundColor="orange"
                 fullname=""
                 textColor="white"
+                hasToolTip={false}
               />
             )}
           </div>

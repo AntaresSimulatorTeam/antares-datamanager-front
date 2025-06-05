@@ -201,6 +201,26 @@ const LoadTab = () => {
     }
   };
 
+  const handleTrajectoryError = (
+    rowIndex: number,
+    trajectoryId: number,
+    trajectoryLabel: string,
+    errorMessage: string,
+  ) => {
+    const newDbTrajectory = buildErrorTrajectory(
+      TRAJECTORY_TYPE.LOAD,
+      trajectoryId,
+      trajectoryLabel,
+      errorMessage,
+      user?.profile?.sub,
+    );
+    setData((prev) => {
+      prev[rowIndex].trajectory = newDbTrajectory;
+      prev[rowIndex].status = TRAJECTORY_SELECTION_STATUS.ERROR;
+      return prev;
+    });
+  };
+
   const handleTrajectoryUpdate = async (
     rowIndex: number,
     trajectoryId: number,
@@ -237,21 +257,12 @@ const LoadTab = () => {
         });
       }
       if (rowIndex != null && status === 'error' && trajectoryId != null && trajectoryLabel && !!errorMessage) {
-        const newDbTrajectory = buildErrorTrajectory(
-          TRAJECTORY_TYPE.LOAD,
-          trajectoryId,
-          trajectoryLabel,
-          errorMessage,
-          user?.profile?.sub,
-        );
-        setData((prev) => {
-          prev[rowIndex].trajectory = newDbTrajectory;
-          prev[rowIndex].status = TRAJECTORY_SELECTION_STATUS.ERROR;
-          return prev;
-        });
+        handleTrajectoryError(rowIndex, trajectoryId, trajectoryLabel, errorMessage);
       }
-    } catch {
-      // Silent handler
+    } catch (error) {
+      if (rowIndex != null) {
+        handleTrajectoryError(rowIndex, trajectoryId, trajectoryLabel ?? '', (error as Error).message);
+      }
     }
   };
 

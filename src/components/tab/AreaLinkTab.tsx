@@ -26,7 +26,6 @@ import {
   RowStatus,
   SelectOption,
   StudyActionType,
-  StudyDTO,
   TrajectoryAreaDataScheme,
   TrajectoryLinkDataScheme,
   TrajectoryViewData,
@@ -44,7 +43,6 @@ import { useLocation } from 'react-router-dom';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { ErrorMessageType } from '@/shared/types/Generic.type.ts';
 import { computeReadOnlyState } from '@/shared/utils/computeReadOnlyState';
-import { BackendError } from '@/shared/utils/errrorHandler.ts';
 import { FileInputStatus } from 'rte-design-system-react';
 
 interface AreaLinkTabProps {
@@ -101,12 +99,9 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
           getStudyTrajectories(study.id, TRAJECTORY_TYPE.AREA),
           getStudyTrajectories(study.id, TRAJECTORY_TYPE.LINK),
         ]);
-        if (
-          (trajectoryAreaResult as DbTrajectory[])?.length > 0 ||
-          (trajectoryLinkResult as DbTrajectory[])?.length > 0
-        ) {
-          const trajectoryArea: DbTrajectory = (trajectoryAreaResult as DbTrajectory[])[0] ?? null;
-          const trajectoryLink: DbTrajectory = (trajectoryLinkResult as DbTrajectory[])[0] ?? null;
+        if (trajectoryAreaResult?.length > 0 || trajectoryLinkResult?.length > 0) {
+          const trajectoryArea: DbTrajectory = trajectoryAreaResult[0] ?? null;
+          const trajectoryLink: DbTrajectory = trajectoryLinkResult[0] ?? null;
           dispatch?.({
             type: STUDY_ACTION.ADD_AREA_TRAJECTORIES,
             payload: [trajectoryArea && { ...trajectoryArea }, trajectoryLink && { ...trajectoryLink }].filter(Boolean),
@@ -126,7 +121,7 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
           ]);
           setReadOnly({
             '0': false,
-            '1': !trajectoryArea || (!trajectoryLink && (studyData as StudyDTO)?.status === StudyStatus.GENERATED),
+            '1': !trajectoryArea || (!trajectoryLink && studyData?.status === StudyStatus.GENERATED),
           });
         }
       } catch {
@@ -238,35 +233,23 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
     try {
       if (trajectoryId != null && status === 'success') {
         setErrorMessage('');
-        await linkTrajectoryToStudy(
+        const newTrajectory = await linkTrajectoryToStudy(
           rowIndex === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
           trajectoryId,
           study.id,
-        )
-          .then((payload) => {
-            dispatch?.({
-              type: rowIndex === 0 ? STUDY_ACTION.ADD_TRAJECTORY_AREA : STUDY_ACTION.ADD_TRAJECTORY_LINK,
-              payload,
-            } as StudyActionType);
-            setData((prev) => {
-              if (rowIndex != null && prev[rowIndex]) {
-                prev[rowIndex].trajectory = payload;
-                prev[rowIndex].status = getStatus(status);
-              }
-              return prev;
-            });
-            setReadOnly({ '0': false, '1': false });
-          })
-          .catch(async (error: unknown) => {
-            if (rowIndex != null) {
-              await handleTrajectoryError(
-                rowIndex,
-                trajectoryId,
-                trajectoryLabel ?? '',
-                (error as BackendError).antaresErrorMessage,
-              );
-            }
-          });
+        );
+        dispatch?.({
+          type: rowIndex === 0 ? STUDY_ACTION.ADD_TRAJECTORY_AREA : STUDY_ACTION.ADD_TRAJECTORY_LINK,
+          payload: newTrajectory,
+        });
+        setData((prev) => {
+          if (rowIndex != null && prev[rowIndex]) {
+            prev[rowIndex].trajectory = newTrajectory;
+            prev[rowIndex].status = getStatus(status);
+          }
+          return prev;
+        });
+        setReadOnly({ '0': false, '1': false });
       }
 
       // Handle deletion case for areas
@@ -281,14 +264,9 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
         await handleTrajectoryError(rowIndex, trajectoryId, trajectoryLabel, errorMessage);
       }
     } catch (error) {
-      // Reset trajectory line to initial state
-      setData((prev) => {
-        if (rowIndex != null && prev[rowIndex]) {
-          prev[rowIndex].trajectory = null;
-          prev[rowIndex].status = TRAJECTORY_SELECTION_STATUS.MISSING;
-        }
-        return prev;
-      });
+      if (rowIndex != null) {
+        await handleTrajectoryError(rowIndex, trajectoryId, trajectoryLabel ?? '', (error as Error).message);
+      }
     }
   };
 

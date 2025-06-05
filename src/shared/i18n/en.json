@@ -115,7 +115,8 @@
     "@generate": "Generate",
     "@add_trajectories_message": "Please add Areas trajectories first",
     "@error_link_trajectory_message": "Please select another LINK trajectory or delete it",
-    "@search_area": "Search area"
+    "@search_area": "Search area",
+    "@or": "or"
   },
   "trajectoryViewModal": {
     "@title_area": "Areas",
@@ -150,7 +151,7 @@
     "@frontend": "Frontend",
     "@backend": "Backend"
   },
-  "horizonInput":{
+  "horizonInput": {
     "@validYearError": "Horizon must be between 2000 and 9999",
     "@horizonPlaceholder": "Enter a year",
     "@requiredHorizon": "Horizon is required"
