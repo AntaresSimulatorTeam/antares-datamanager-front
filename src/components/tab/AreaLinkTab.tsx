@@ -190,10 +190,11 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
       setReadOnly({ '0': false, '1': false });
       const alertMessage = `Error: ${trajectoryLabel} cannot be saved for ${index === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK}`;
       notifyAlert({
+        icon: 'Close',
         message: alertMessage,
         type: 'error',
         action: {
-          label: 'View Log',
+          label: t('studyDetails.@viewLog'),
           onClick: () => void navigate('/logs'),
         },
       });

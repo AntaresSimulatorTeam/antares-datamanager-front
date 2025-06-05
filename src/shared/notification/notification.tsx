@@ -5,7 +5,7 @@
  */
 
 import { Id, toast } from 'react-toastify';
-import { RdsAlert, RdsBanner, RdsToast, ToastAction } from 'rte-design-system-react';
+import { RdsAlert, RdsBanner, RdsIconIdKey, RdsToast, ToastAction } from 'rte-design-system-react';
 import { v4 as uuidv4 } from 'uuid';
 import { DisplayStatus } from '../types/common/DisplayStatus.type';
 
@@ -15,6 +15,7 @@ export type NotifyProps = {
   id?: string | number;
   message: string;
   type: DisplayStatus;
+  icon?: RdsIconIdKey;
 };
 
 export type NotifyWithActionProps = NotifyProps & {
@@ -45,13 +46,16 @@ export const dismissToast = (id?: Id) => toast.dismiss({ containerId: ToastConta
  * Show an alert with a message, a type and an action
  * @returns The id of the alert
  */
-export const notifyAlert = ({ message, type, action, id }: NotifyWithActionProps) => {
+export const notifyAlert = ({ message, type, action, id, icon }: NotifyWithActionProps) => {
   const toastId = id ?? uuidv4();
-  return toast(<RdsAlert message={message} status={type} action={action} onClose={() => toast.dismiss(toastId)} />, {
-    toastId,
-    containerId: AlertContainerId,
-    type,
-  });
+  return toast(
+    <RdsAlert message={message} status={type} action={action} onClose={() => toast.dismiss(toastId)} icon={icon} />,
+    {
+      toastId,
+      containerId: AlertContainerId,
+      type,
+    },
+  );
 };
 
 /**
