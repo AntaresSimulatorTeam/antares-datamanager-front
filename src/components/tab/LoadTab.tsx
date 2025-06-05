@@ -214,11 +214,17 @@ const LoadTab = () => {
       errorMessage,
       user?.profile?.sub,
     );
-    setData((prev) => {
-      prev[rowIndex].trajectory = newDbTrajectory;
-      prev[rowIndex].status = TRAJECTORY_SELECTION_STATUS.ERROR;
-      return prev;
-    });
+    setData((prev) =>
+      prev.map((item, index) =>
+        index === rowIndex
+          ? {
+              ...item,
+              trajectory: newDbTrajectory,
+              status: TRAJECTORY_SELECTION_STATUS.ERROR,
+            }
+          : item,
+      ),
+    );
   };
 
   const handleTrajectoryUpdate = async (
@@ -237,24 +243,34 @@ const LoadTab = () => {
           type: STUDY_ACTION.DELETE_LOAD_TRAJECTORY,
           payload: data[rowIndex].hypothesis,
         });
-        setData((prev) => {
-          prev[rowIndex].trajectory = null;
-          prev[rowIndex].status = TRAJECTORY_SELECTION_STATUS.MISSING;
-          return [...prev];
-        });
+        setData((prev) =>
+          prev.map((item, index) =>
+            index === rowIndex
+              ? {
+                  ...item,
+                  trajectory: null,
+                  status: TRAJECTORY_SELECTION_STATUS.MISSING,
+                }
+              : item,
+          ),
+        );
       } else if (status === 'success') {
         const newTrajectory = await linkTrajectoryToStudy(TRAJECTORY_TYPE.LOAD, trajectoryId, study.id);
         dispatch?.({
           type: STUDY_ACTION.ADD_TRAJECTORY_LOAD,
           payload: newTrajectory,
         });
-        setData((prev) => {
-          if (newTrajectory) {
-            prev[rowIndex].trajectory = newTrajectory;
-            prev[rowIndex].status = TRAJECTORY_SELECTION_STATUS.OK;
-          }
-          return [...prev];
-        });
+        setData((prev) =>
+          prev.map((item, index) =>
+            index === rowIndex
+              ? {
+                  ...item,
+                  trajectory: newTrajectory,
+                  status: TRAJECTORY_SELECTION_STATUS.OK,
+                }
+              : item,
+          ),
+        );
       }
       if (rowIndex != null && status === 'error' && trajectoryId != null && trajectoryLabel && !!errorMessage) {
         handleTrajectoryError(rowIndex, trajectoryId, trajectoryLabel, errorMessage);
