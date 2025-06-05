@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "feat/ANT-3181-bis_LOAD_study_generated",
-  commit: "9d423c1",
-  commitTime: "2025-06-04T13:04:58.113Z"
+  branch: "feat/ANT-3181-ter_load_study_generated_handle_row_display",
+  commit: "e9094d1",
+  commitTime: "2025-06-04T15:50:13.384Z"
 };

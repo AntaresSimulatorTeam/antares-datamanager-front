@@ -54,7 +54,7 @@ const StudyDetails = () => {
           trajectoryId: trajectory.id,
           trajectoryType: activeTab.name,
           trajectory: trajectory.trajectoryName,
-          onClickItem: discardWarningMessage,
+          onClickItem: studyState.studyStatus !== StudyStatus.GENERATED ? discardWarningMessage : null,
         })),
       );
     }
@@ -65,7 +65,7 @@ const StudyDetails = () => {
           trajectoryId: studyState?.LINK?.[0].id,
           trajectoryType: TRAJECTORY_TYPE.LINK,
           trajectory: (studyState.LINK?.[0] as DbTrajectory)?.trajectoryName ?? '',
-          onClickItem: discardWarningMessage,
+          onClickItem: studyState.studyStatus !== StudyStatus.GENERATED ? discardWarningMessage : null,
         }));
         messages = messages.length > 0 ? messages.concat(linkMessage) : linkMessage;
       }
