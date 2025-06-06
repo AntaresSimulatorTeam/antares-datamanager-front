@@ -26,6 +26,7 @@ export interface DbTrajectory {
   creationDate: Date;
   messages: WarningMessage[];
   loadArea?: string;
+  state?: TRAJECTORY_SELECTION_STATUS;
 }
 
 export type HypothesisRowData = {
