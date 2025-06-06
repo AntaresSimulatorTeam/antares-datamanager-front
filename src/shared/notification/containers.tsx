@@ -37,12 +37,11 @@ export const PegaseAlertContainer = () => (
     position="bottom-right"
     limit={50}
     autoClose={false}
-    stacked
     className="!bottom-8"
     style={{ width: '600px' }}
     hideProgressBar
     closeOnClick={true}
-    icon={() => <StdIcon name={StdIconId.Close} filledColor={true} color={'red'} />}
+    icon={() => <StdIcon name={StdIconId.Close} />}
   />
 );
 
