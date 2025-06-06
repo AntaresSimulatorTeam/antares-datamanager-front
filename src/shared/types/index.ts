@@ -9,6 +9,7 @@ export * from './common/StdBase.type';
 export * from './common/Tailwind.type';
 export * from './common/User.type';
 export * from './common/UserSettings.type';
+export * from './common/DisplayStatus.type';
 export * from './Study.type.ts';
 export * from './Project.type.ts';
 export * from './Trajectory.type.ts';
