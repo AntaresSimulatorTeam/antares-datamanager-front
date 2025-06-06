@@ -8,6 +8,7 @@ interface SelectInputWithButtonProps {
   onSearch: (value?: string) => Promise<SelectOption[] | undefined>;
   isDisabled: boolean;
   onClickButton?: () => void;
+  placeHolder?: string;
 }
 
 export const SelectInputWithButton = ({
@@ -15,6 +16,7 @@ export const SelectInputWithButton = ({
   onSearch,
   onClickButton,
   isDisabled,
+  placeHolder,
 }: SelectInputWithButtonProps) => {
   const { t } = useTranslation();
 
@@ -23,11 +25,11 @@ export const SelectInputWithButton = ({
       <SelectAndSearchableInput
         onSelect={(value: SelectOption) => void onSelect(value)}
         setSearchTerm={async (value?: string) => await onSearch(value)}
-        defaultPlaceHolder={t('studyDetails.@select_trajectory')}
+        defaultPlaceHolder={placeHolder ?? t('studyDetails.@select_trajectory')}
         isSearchable={true}
         isInputDisabled={isDisabled}
       />
-      <span>or</span>
+      <span>{t('studyDetails.@or')}</span>
       <RdsButton label={t('studyDetails.@import_file')} onClick={() => onClickButton?.()} disabled={isDisabled} />
     </div>
   );

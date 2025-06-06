@@ -5,17 +5,18 @@
  */
 
 import { createColumnHelper } from '@tanstack/react-table';
-import { FileInputStatus, RdsButton, RdsIconButton, RdsIconId } from 'rte-design-system-react';
+import { FileInputStatus } from 'rte-design-system-react';
 import { HypothesisRowData, RowStatus, SelectOption } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
-import SelectAndSearchableInput from '@/components/input/SelectAndSearchableInput.tsx';
 import { ButtonPreview } from '@/components/button/ButtonPreview.tsx';
 import { Dispatch, SetStateAction } from 'react';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { ErrorMessageType } from '@/shared/types/Generic.type.ts';
 import { ProgressBar } from '@/components/forms/ProgressBar.tsx';
 import { CellWithStatus } from '@common/data/CellWithStatus.tsx';
+import { LabelWithDeleteButton } from '@common/data/LabelWithDeleteButton.tsx';
+import { SelectInputWithButton } from '@common/data/SelectInputWithButton.tsx';
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
 
@@ -67,53 +68,42 @@ const getHypothesisTableHeaders = (
   columnHelper.accessor('trajectory', {
     header: t('studyDetails.@trajectory'),
     size: 300,
-    cell: ({ row }) => {
-      const { trajectory, status } = row.original;
+    cell: ({ row: { original, index, getReadOnly } }) => {
+      const { trajectory, status } = original;
       return trajectory && status !== TRAJECTORY_SELECTION_STATUS.MISSING ? (
-        <div className="flex w-full space-x-2 py-3">
-          <span className="text-gray-900">{trajectory.trajectoryName}</span>
-          {studyStatus != StudyStatus.GENERATED && (
-            <RdsIconButton
-              icon={RdsIconId.Close}
-              size="small"
-              onClick={() => {
-                setErrorInfo({ index: row.index, message: '' });
-                void handleUpdate(
-                  row.index,
-                  trajectory.id,
-                  status === TRAJECTORY_SELECTION_STATUS.ERROR ? 'emptyError' : 'empty',
-                  '',
-                );
-              }}
-            />
-          )}
+        <div className="flex w-full items-center gap-2">
+          <LabelWithDeleteButton
+            label={trajectory.trajectoryName}
+            isDeletable={!(studyStatus === StudyStatus.GENERATED)}
+            onClick={() => {
+              setErrorInfo({ index, message: '' });
+              void handleUpdate(
+                index,
+                trajectory.id,
+                status === TRAJECTORY_SELECTION_STATUS.ERROR ? 'emptyError' : 'empty',
+                '',
+              );
+            }}
+          />
         </div>
       ) : (
-        <div className="flex w-full items-center space-x-2">
-          <div className="flex min-w-fit items-center">
-            <SelectAndSearchableInput
-              onSelect={(value: SelectOption) => {
-                setErrorInfo({ index: row.index, message: '' });
-                void handleUpdate(row.index, value.id, 'success', value.label);
-              }}
-              setSearchTerm={async (value?: string) => await handlerSearch(value, row.index)}
-              defaultPlaceHolder={
-                !row.getReadOnly() ? t('studyDetails.@select_area') : t('studyDetails.@select_trajectory')
-              }
-              isSearchable={true}
-              isInputDisabled={row.getReadOnly()}
-            />
-          </div>
-          <span>or</span>
-          <RdsButton
-            label={t('studyDetails.@import_file')}
-            onClick={() => {
-              setErrorInfo({ index: row.index, message: '' });
-              void handleImport(row.index);
+        <div className="flex w-full items-center justify-start gap-2">
+          <SelectInputWithButton
+            onSelect={(value: SelectOption) => {
+              setErrorInfo({ index, message: '' });
+              void handleUpdate(index, value.id, 'success', value.label);
             }}
-            disabled={row.getReadOnly()}
+            onSearch={async (value?: string) => await handlerSearch(value, index)}
+            placeHolder={
+              getReadOnly() && index === 1 ? t('studyDetails.@select_area') : t('studyDetails.@select_trajectory')
+            }
+            onClickButton={() => {
+              setErrorInfo({ index, message: '' });
+              void handleImport(index);
+            }}
+            isDisabled={getReadOnly()}
           />
-          {error.message && row.index === error.index && <div className="text-error-700">{error.message}</div>}
+          {error.message && index === error.index && <div className="text-error-700">{error.message}</div>}
         </div>
       );
     },

@@ -26,7 +26,6 @@ import {
   RowStatus,
   SelectOption,
   StudyActionType,
-  StudyDTO,
   TrajectoryAreaDataScheme,
   TrajectoryLinkDataScheme,
   TrajectoryViewData,
@@ -44,7 +43,6 @@ import { useLocation } from 'react-router-dom';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { ErrorMessageType } from '@/shared/types/Generic.type.ts';
 import { computeReadOnlyState } from '@/shared/utils/computeReadOnlyState';
-import { BackendError } from '@/shared/utils/errrorHandler.ts';
 import { FileInputStatus } from 'rte-design-system-react';
 
 interface AreaLinkTabProps {
@@ -101,12 +99,9 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
           getStudyTrajectories(study.id, TRAJECTORY_TYPE.AREA),
           getStudyTrajectories(study.id, TRAJECTORY_TYPE.LINK),
         ]);
-        if (
-          (trajectoryAreaResult as DbTrajectory[])?.length > 0 ||
-          (trajectoryLinkResult as DbTrajectory[])?.length > 0
-        ) {
-          const trajectoryArea: DbTrajectory = (trajectoryAreaResult as DbTrajectory[])[0] ?? null;
-          const trajectoryLink: DbTrajectory = (trajectoryLinkResult as DbTrajectory[])[0] ?? null;
+        if (trajectoryAreaResult?.length > 0 || trajectoryLinkResult?.length > 0) {
+          const trajectoryArea: DbTrajectory = trajectoryAreaResult[0] ?? null;
+          const trajectoryLink: DbTrajectory = trajectoryLinkResult[0] ?? null;
           dispatch?.({
             type: STUDY_ACTION.ADD_AREA_TRAJECTORIES,
             payload: [trajectoryArea && { ...trajectoryArea }, trajectoryLink && { ...trajectoryLink }].filter(Boolean),
@@ -126,7 +121,7 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
           ]);
           setReadOnly({
             '0': false,
-            '1': !trajectoryArea || (!trajectoryLink && (studyData as StudyDTO)?.status === StudyStatus.GENERATED),
+            '1': !trajectoryArea || (!trajectoryLink && studyData?.status === StudyStatus.GENERATED),
           });
         }
       } catch {
@@ -149,14 +144,14 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
   };
 
   const handleTrajectoryError = async (
-    index: number,
+    rowIndex: number,
     trajectoryId: number,
     trajectoryLabel: string,
     errorMessage?: string,
   ) => {
     try {
       const newDbTrajectory = buildErrorTrajectory(
-        index === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
+        rowIndex === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
         trajectoryId,
         trajectoryLabel,
         errorMessage,
@@ -164,7 +159,7 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
       );
 
       //Case: area control failed and a trajectory Links is linked to the study with ok status
-      if (index === 0 && data[1]?.trajectory && data[1]?.status != TRAJECTORY_SELECTION_STATUS.ERROR) {
+      if (rowIndex === 0 && data[1]?.trajectory && data[1]?.status != TRAJECTORY_SELECTION_STATUS.ERROR) {
         await unlinkTrajectoryFromStudy(data[1].trajectory.id, study.id);
         dispatch?.({
           type: STUDY_ACTION.CLEAR_LINK_TRAJECTORY,
@@ -178,11 +173,17 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
         });
       } else {
         //Case: links control failed and a trajectory area is linked to the study
-        setData((prev) => {
-          prev[index].trajectory = newDbTrajectory;
-          prev[index].status = TRAJECTORY_SELECTION_STATUS.ERROR;
-          return prev;
-        });
+        setData((prev) =>
+          prev.map((item, index) =>
+            index === rowIndex
+              ? {
+                  ...item,
+                  trajectory: newDbTrajectory,
+                  status: TRAJECTORY_SELECTION_STATUS.ERROR,
+                }
+              : item,
+          ),
+        );
       }
       setReadOnly({ '0': false, '1': false });
     } catch {
@@ -190,8 +191,8 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
     }
   };
 
-  const handleTrajectoryDeletion = async (index: number, status: RowStatus, trajectoryId: number) => {
-    if (index === 0 && data[1].trajectory) {
+  const handleTrajectoryDeletion = async (rowIndex: number, status: RowStatus, trajectoryId: number) => {
+    if (rowIndex === 0 && data[1].trajectory) {
       if (status === 'empty') {
         await unlinkTrajectoryFromStudy(trajectoryId, study.id);
         if (data[1]?.status != TRAJECTORY_SELECTION_STATUS.ERROR) {
@@ -202,29 +203,31 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
       dispatch?.({
         type: STUDY_ACTION.CLEAR_AREA_AND_LINK_TRAJECTORY,
       } as StudyActionType);
-      setData((prev) => {
-        prev[0].trajectory = null;
-        prev[0].status = TRAJECTORY_SELECTION_STATUS.MISSING;
-        prev[1].trajectory = null;
-        prev[1].status = TRAJECTORY_SELECTION_STATUS.MISSING;
-        return prev;
-      });
+      setData((prev) =>
+        prev.map((item) => ({ ...item, trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING })),
+      );
       setReadOnly({ '0': false, '1': true });
     } else {
       if (status === 'empty') {
         await unlinkTrajectoryFromStudy(trajectoryId, study.id);
       }
 
-      index === 0 ? setErrorMessage(t('studyDetails.@add_trajectories_message')) : setErrorMessage('');
+      rowIndex === 0 ? setErrorMessage(t('studyDetails.@add_trajectories_message')) : setErrorMessage('');
       dispatch?.({
-        type: index === 0 ? STUDY_ACTION.CLEAR_AREA_TRAJECTORY : STUDY_ACTION.CLEAR_LINK_TRAJECTORY,
+        type: rowIndex === 0 ? STUDY_ACTION.CLEAR_AREA_TRAJECTORY : STUDY_ACTION.CLEAR_LINK_TRAJECTORY,
       } as StudyActionType);
-      setData((prev) => {
-        prev[index].trajectory = null;
-        prev[index].status = TRAJECTORY_SELECTION_STATUS.MISSING;
-        return prev;
-      });
-      setReadOnly({ '0': false, '1': index === 0 });
+      setData((prev) =>
+        prev.map((item, index) =>
+          index === rowIndex
+            ? {
+                ...item,
+                trajectory: null,
+                status: TRAJECTORY_SELECTION_STATUS.MISSING,
+              }
+            : item,
+        ),
+      );
+      setReadOnly({ '0': false, '1': rowIndex === 0 });
     }
   };
 
@@ -238,35 +241,27 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
     try {
       if (trajectoryId != null && status === 'success') {
         setErrorMessage('');
-        await linkTrajectoryToStudy(
+        const newTrajectory = await linkTrajectoryToStudy(
           rowIndex === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
           trajectoryId,
           study.id,
-        )
-          .then((payload) => {
-            dispatch?.({
-              type: rowIndex === 0 ? STUDY_ACTION.ADD_TRAJECTORY_AREA : STUDY_ACTION.ADD_TRAJECTORY_LINK,
-              payload,
-            } as StudyActionType);
-            setData((prev) => {
-              if (rowIndex != null && prev[rowIndex]) {
-                prev[rowIndex].trajectory = payload;
-                prev[rowIndex].status = getStatus(status);
-              }
-              return prev;
-            });
-            setReadOnly({ '0': false, '1': false });
-          })
-          .catch(async (error: unknown) => {
-            if (rowIndex != null) {
-              await handleTrajectoryError(
-                rowIndex,
-                trajectoryId,
-                trajectoryLabel ?? '',
-                (error as BackendError).antaresErrorMessage,
-              );
-            }
-          });
+        );
+        dispatch?.({
+          type: rowIndex === 0 ? STUDY_ACTION.ADD_TRAJECTORY_AREA : STUDY_ACTION.ADD_TRAJECTORY_LINK,
+          payload: newTrajectory,
+        });
+        setData((prev) =>
+          prev.map((item, index) =>
+            index === rowIndex
+              ? {
+                  ...item,
+                  trajectory: newTrajectory,
+                  status: getStatus(status),
+                }
+              : item,
+          ),
+        );
+        setReadOnly({ '0': false, '1': false });
       }
 
       // Handle deletion case for areas
@@ -281,14 +276,9 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
         await handleTrajectoryError(rowIndex, trajectoryId, trajectoryLabel, errorMessage);
       }
     } catch (error) {
-      // Reset trajectory line to initial state
-      setData((prev) => {
-        if (rowIndex != null && prev[rowIndex]) {
-          prev[rowIndex].trajectory = null;
-          prev[rowIndex].status = TRAJECTORY_SELECTION_STATUS.MISSING;
-        }
-        return prev;
-      });
+      if (rowIndex != null) {
+        await handleTrajectoryError(rowIndex, trajectoryId, trajectoryLabel ?? '', (error as Error).message);
+      }
     }
   };
 
@@ -337,7 +327,7 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
     let newTrajectory: DbTrajectory;
     try {
       newTrajectory = await uploadTrajectory(
-        TRAJECTORY_TYPE.LOAD,
+        rowIndexSelected === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
         value.label,
         study.horizon,
         study.id,
