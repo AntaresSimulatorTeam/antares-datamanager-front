@@ -38,13 +38,15 @@ export const buildErrorTrajectory = (
   trajectoryLabel: string,
   errorMessage?: string,
   userName?: string,
-) => ({
+  area?: string,
+): DbTrajectory => ({
   id: trajectoryId,
   trajectoryName: trajectoryLabel,
   type,
   version: 0,
   userName: 'unknown_user',
   creationDate: new Date(),
+  loadArea: area,
   messages: [
     {
       id: Math.floor(Math.random() * 10),
