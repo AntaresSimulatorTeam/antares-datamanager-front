@@ -327,7 +327,7 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
     let newTrajectory: DbTrajectory;
     try {
       newTrajectory = await uploadTrajectory(
-        TRAJECTORY_TYPE.LOAD,
+        rowIndexSelected === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
         value.label,
         study.horizon,
         study.id,
