@@ -1,13 +1,13 @@
 import { render, screen } from '@testing-library/react';
 
-import { noop } from '@/shared/utils/defaultUtils';
-import { StdIconId } from '@/shared/utils/mappings/common/iconMaps';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import StdAlert from '../StdAlert';
 
 const TEST_MESSAGE = 'Label';
 const TEST_ICON = StdIconId.Add;
 const TEST_CLOSE_ICON = StdIconId.Close;
 const TEST_ID = 'my-alert';
+const noop = () => {};
 const TEST_ACTION = {
   label: 'test-action',
   onClick: noop,

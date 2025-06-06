@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 
-import { StdIconId } from '@/shared/utils/mappings/common/iconMaps';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import StdButton from '../StdButton';
 
 const TEST_LABEL = 'Label';
