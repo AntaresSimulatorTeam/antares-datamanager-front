@@ -24,12 +24,13 @@ export interface StdAlertProps {
   icon?: StdIconId;
   onClose?: () => void;
   action?: AlertAction;
+  filledIcon?: boolean;
 }
 
-const ICON_SIZE = 24;
+const ICON_SIZE = 20;
 
-const StdAlert = ({ message, id: propsId, status = 'info', icon, onClose, action }: StdAlertProps) => {
-  const { containerClasses, iconClasses, textClasses } = alertClassBuilder(status);
+const StdAlert = ({ message, id: propsId, status = 'info', icon, onClose, action, filledIcon }: StdAlertProps) => {
+  const { containerClasses, iconClasses, textClasses } = alertClassBuilder(status, filledIcon);
   const id = useRdsId('alert', propsId);
   return (
     <div id={id} className={containerClasses} role="alert">
@@ -40,10 +41,10 @@ const StdAlert = ({ message, id: propsId, status = 'info', icon, onClose, action
       <div className="flex min-w-fit items-center gap-1">
         {action && (
           <StdButton
-            variant="transparent"
+            variant="outlined"
             onClick={action.onClick}
             size="small"
-            color="secondary"
+            color={status === 'error' ? 'danger' : 'secondary'}
             label={action.label}
             aria-label={action.label}
           />

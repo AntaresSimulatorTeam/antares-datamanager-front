@@ -9,7 +9,8 @@ import { ReactNode } from 'react';
 import { Flip, ToastContainer, ToastContainerProps, useToast, useToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './containers.css';
-import { RdsIcon, RdsIconId } from 'rte-design-system-react';
+import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 type NotificationContainerProps = ToastContainerProps;
 
@@ -37,14 +38,11 @@ export const PegaseAlertContainer = () => (
     limit={50}
     autoClose={false}
     stacked
-    className="!bottom-8 text-gray-900"
-    toastClassName="!bg-gray-w !bg-white !font-nunito font-normal text-black"
-    bodyClassName="!bg-gray-w !bg-white !font-nunito font-normal text-black"
-    toastStyle={{ backgroundColor: 'white !important' }}
-    style={{ width: '500px', color: 'black' }}
+    className="!bottom-8"
+    style={{ width: '600px' }}
     hideProgressBar
     closeOnClick={true}
-    icon={() => <RdsIcon name={RdsIconId.Close} color="secondary" />}
+    icon={() => <StdIcon name={StdIconId.Close} filledColor={true} color={'red'} />}
   />
 );
 
