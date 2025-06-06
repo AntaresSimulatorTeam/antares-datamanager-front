@@ -5,16 +5,20 @@
  */
 
 import { Id, toast } from 'react-toastify';
-import { RdsAlert, RdsBanner, RdsToast, ToastAction } from 'rte-design-system-react';
+import { RdsBanner, RdsToast, ToastAction } from 'rte-design-system-react';
 import { v4 as uuidv4 } from 'uuid';
-import { DisplayStatus } from '../types/common/DisplayStatus.type';
+import { DisplayStatus } from '@/shared/types';
 
 import { AlertContainerId, BannerContainerId, ToastContainerId } from './containers';
+import StdAlert from '@common/layout/stdAlert/StdAlert.tsx';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 export type NotifyProps = {
   id?: string | number;
   message: string;
   type: DisplayStatus;
+  icon?: StdIconId;
+  filledIcon?: boolean;
 };
 
 export type NotifyWithActionProps = NotifyProps & {
@@ -45,13 +49,23 @@ export const dismissToast = (id?: Id) => toast.dismiss({ containerId: ToastConta
  * Show an alert with a message, a type and an action
  * @returns The id of the alert
  */
-export const notifyAlert = ({ message, type, action, id }: NotifyWithActionProps) => {
+export const notifyAlert = ({ message, type, action, id, icon, filledIcon }: NotifyWithActionProps) => {
   const toastId = id ?? uuidv4();
-  return toast(<RdsAlert message={message} status={type} action={action} onClose={() => toast.dismiss(toastId)} />, {
-    toastId,
-    containerId: AlertContainerId,
-    type,
-  });
+  return toast(
+    <StdAlert
+      message={message}
+      status={type}
+      action={action}
+      onClose={() => toast.dismiss(toastId)}
+      icon={icon}
+      filledIcon={filledIcon}
+    />,
+    {
+      toastId,
+      containerId: AlertContainerId,
+      type,
+    },
+  );
 };
 
 /**

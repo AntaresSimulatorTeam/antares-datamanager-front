@@ -13,14 +13,13 @@ import { menuBottomData, menuTopData } from '@/routes';
 import { UserSettingsContext } from '@/store/contexts/UserSettingsContext';
 import { THEME_COLOR } from '@/shared/types';
 import ThemeHandler from '@common/handler/ThemeHandler';
-import { PegaseToastContainer } from '@/shared/notification/containers';
+import { PegaseAlertContainer, PegaseToastContainer } from '@/shared/notification/containers';
 import { PEGASE_NAVBAR_ID } from '@/shared/constants';
 import { translateMenuItemLabel } from '@/shared/utils/textUtils';
 import { navBarConfig } from '@/shared/const/navBarConfig';
 import { useTranslation } from 'react-i18next';
 import { StudyProvider } from '@/store/contexts/StudyProvider';
 import { RdsNavbar } from 'rte-design-system-react';
-
 
 const MainContent = () => {
   const { t } = useTranslation();
@@ -30,6 +29,7 @@ const MainContent = () => {
       <UserSettingsContext.Provider initialState={{ theme: THEME_COLOR.LIGHT }}>
         <ThemeHandler />
         <PegaseToastContainer />
+        <PegaseAlertContainer />
         <RdsNavbar
           id={PEGASE_NAVBAR_ID}
           topItems={translateMenuItemLabel(menuTopData, t)}

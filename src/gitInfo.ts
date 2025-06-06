@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "fix/ANT-3317_LOAD_tooltip_and_error_message",
-  commit: "12145bd",
-  commitTime: "2025-06-06T08:33:09.040Z"
+  branch: "feat/ANT-3325_Erreur_display_notification",
+  commit: "7f5161c",
+  commitTime: "2025-06-06T13:53:06.543Z"
 };

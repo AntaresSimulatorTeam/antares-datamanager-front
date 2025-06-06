@@ -8,11 +8,11 @@ import { ToastProps } from 'node_modules/react-toastify/dist/types';
 import { ReactNode } from 'react';
 import { Flip, ToastContainer, ToastContainerProps, useToast, useToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
-// must be after react-toastify import
-import 'react-toastify/dist/ReactToastify.css';
 import './containers.css';
-type NotificationContainerProps = Omit<ToastContainerProps, 'className' | 'toastClassName'>;
+import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
+
+type NotificationContainerProps = ToastContainerProps;
 
 export const NotificationContainer = (props: NotificationContainerProps) => (
   <ToastContainer {...props} closeButton={false} icon={false} />
@@ -35,11 +35,13 @@ export const PegaseAlertContainer = () => (
   <NotificationContainer
     containerId={AlertContainerId}
     position="bottom-right"
-    limit={3}
+    limit={50}
     autoClose={false}
-    stacked
-    style={{ width: '500px' }}
+    className="!bottom-8"
+    style={{ width: '600px' }}
     hideProgressBar
+    closeOnClick={true}
+    icon={() => <StdIcon name={StdIconId.Close} />}
   />
 );
 

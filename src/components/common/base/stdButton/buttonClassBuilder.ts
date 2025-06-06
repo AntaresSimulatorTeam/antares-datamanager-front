@@ -58,7 +58,7 @@ export const VARIANT_CLASSES_DISABLED = {
   transparent: 'text-gray-500 border border-transparent cursor-not-allowed pointer-events-none',
 };
 
-export const LABEL_CLASSES_COMMON = 'inline-flex capitalize-first line-clamp-1 text-nowrap';
+export const LABEL_CLASSES_COMMON = 'inline-flex capitalize-first line-clamp-1 text-nowrap font-normal';
 export const LABEL_CLASSES_PADDING_SIZE = {
   extraSmall: 'px-0.25 py-0.25',
   small: 'px-0.5 py-0.25',
