@@ -39,13 +39,11 @@ import { buildErrorTrajectory, getStatus } from '@/shared/utils/trajectoryUtils.
 import { getStudyById, getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { TrajectoryDataVisualisation } from '@common/modal/TrajectoryDataVisualisation.tsx';
 import { generateTrajectoryViewHeader } from '@/components/header/TrajectoryViewHeader.tsx';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { ErrorMessageType } from '@/shared/types/Generic.type.ts';
 import { computeReadOnlyState } from '@/shared/utils/computeReadOnlyState';
 import { FileInputStatus } from 'rte-design-system-react';
-import { notifyAlert } from '@/shared/notification/notification.tsx';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 interface AreaLinkTabProps {
   setErrorMessage: Dispatch<SetStateAction<string>>;
@@ -59,7 +57,7 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
   const dispatch = useStudyDispatch();
   const { t } = useTranslation();
   const { user } = useUser();
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
   const [rowIndexSelected, setRowIndexSelected] = useState<number>(0);
   const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
@@ -189,17 +187,18 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
         );
       }
       setReadOnly({ '0': false, '1': false });
-      const alertMessage = `Error: ${trajectoryLabel} cannot be saved for ${rowIndex === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK}`;
-      notifyAlert({
-        icon: StdIconId.Close,
-        message: alertMessage,
-        type: 'error',
-        filledIcon: true,
-        action: {
-          label: t('studyDetails.@viewLog'),
-          onClick: () => void navigate('/logs'),
-        },
-      });
+      // TODO : Do not remove - uncomment
+      //const alertMessage = `Error: ${trajectoryLabel} cannot be saved for ${rowIndex === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK}`;
+      // notifyAlert({
+      //   icon: StdIconId.Close,
+      //   message: alertMessage,
+      //   type: 'error',
+      //   filledIcon: true,
+      //   action: {
+      //     label: t('studyDetails.@viewLog'),
+      //     onClick: () => void navigate('/logs'),
+      //   },
+      // });
     } catch {
       //Silent handler
     }
