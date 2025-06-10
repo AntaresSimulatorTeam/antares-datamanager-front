@@ -37,4 +37,6 @@ export interface CardDataType
         dispatch: React.Dispatch<StudyActionType>,
       ) => Promise<void>)
     | null;
+  buttonLabel: string;
+  buttonTooltipText: string;
 }

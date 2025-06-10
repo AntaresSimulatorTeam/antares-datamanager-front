@@ -48,13 +48,7 @@ export const ContainerWithExpander = <T,>({ content, placeholder }: Props<T>) =>
             isOpen={isOpen}
             items={content}
             renderItem={(contentItem, size, transform, key) => (
-              <CardWithIconTitle
-                key={key}
-                data={convertDataToItem(contentItem)}
-                size={size}
-                transform={transform}
-                buttonLabel={t('studyDetails.@skip')}
-              />
+              <CardWithIconTitle key={key} data={convertDataToItem(contentItem, t)} size={size} transform={transform} />
             )}
           />
         )}

@@ -1,6 +1,6 @@
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
-import { ERROR_MESSAGE_TYPE, WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
-import { CardDataType, DbTrajectory, ErrorMessage, StudyState, WarningMessage } from '@/shared/types';
+import { WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
+import { CardDataType, DbTrajectory, StudyState, WarningMessage } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 
 export const sortByLevel = (a: WarningMessage, b: WarningMessage): number => {
@@ -21,7 +21,7 @@ export const sortByLevel = (a: WarningMessage, b: WarningMessage): number => {
   return 0;
 };
 
-export const convertDataToItem = <T>(data: T): CardDataType => {
+export const convertDataToItem = <T>(data: T, t: (value: string) => string): CardDataType => {
   const {
     id = null,
     trajectory = null,
@@ -42,6 +42,8 @@ export const convertDataToItem = <T>(data: T): CardDataType => {
     colorBorder: 'hover:border-b-acc6-500',
     icon: StdIconId.Warning,
     title: `${trajectory ?? ''} ${secondTrajectory ? ' - ' : ''} ${secondTrajectory || ''}`,
+    buttonLabel: isAck ? t('studyDetails.@skipped') : t('studyDetails.@skip'),
+    buttonTooltipText: t('studyDetails.@warningButtonTooltip'),
     trajectoryId,
     trajectoryType,
     id,
@@ -51,20 +53,6 @@ export const convertDataToItem = <T>(data: T): CardDataType => {
     isAck,
     onClickItem,
   };
-};
-
-export const getErrorMessage = async (response: Response): Promise<{ message: string }> => {
-  const errorData = (await response.json()) as unknown as Error | ErrorMessage;
-  if (
-    response.status === 400 &&
-    'antaresErrorMessage' in errorData &&
-    errorData?.type === ERROR_MESSAGE_TYPE.BUSINESS
-  ) {
-    const messageText = errorData.antaresErrorMessage;
-    return { message: messageText };
-  } else {
-    return { message: (errorData as Error).message };
-  }
 };
 
 export const getMessagesNb = (studyState: Partial<StudyState>, tabName: TRAJECTORY_TYPE): number => {
