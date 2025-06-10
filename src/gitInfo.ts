@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "fix/ANT-3325_notification_alert_newest_on_top",
-  commit: "48118bb",
-  commitTime: "2025-06-06T14:33:04.314Z"
+  branch: "fix/ANT-3325-remove_notification_alert",
+  commit: "824ffd9",
+  commitTime: "2025-06-10T08:38:16.909Z"
 };
