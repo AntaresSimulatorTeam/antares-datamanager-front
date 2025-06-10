@@ -156,7 +156,7 @@
     "@validYearError": "Horizon must be between 2000 and 9999",
     "@horizonPlaceholder": "Enter a year",
     "@requiredHorizon": "Horizon is required",
-    "@errorMessage": "Wrong horizon"
+    "@errorMessage": "An error occurred"
   },
   "deletionModal": {
     "@title": "Are you sure you want to delete this area ?",
