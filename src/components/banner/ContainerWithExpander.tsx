@@ -38,6 +38,7 @@ export const ContainerWithExpander = <T,>({ content, placeholder }: Props<T>) =>
               backgroundColor={content?.length === 0 ? 'gray' : 'orange'}
               fullname=""
               textColor="white"
+              hasToolTip={false}
             />
           )}
           <span className="text-body-m">{t('studyDetails.@warnings')}</span>
