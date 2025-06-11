@@ -26,14 +26,14 @@
     "mutative": "^1.0.6",
     "oidc-client-ts": "^3.1.0",
     "postcss": "^8.4.39",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
     "react-i18next": "^15.0.3",
     "react-router-dom": "^7.0.2",
     "react-toastify": "^10.0.5",
     "rte-design-system-react": "^0.1.1",
     "uuid": "^11.0.3",
-    "vite-plugin-top-level-await": "^1.4.4"
+    "vite-plugin-top-level-await": "1.5.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.4.6",
@@ -43,7 +43,8 @@
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^7.13.1",
     "@typescript-eslint/parser": "^7.13.1",
-    "@vitejs/plugin-react": "^4.3.1",
+    "@vitejs/plugin-react": "4.5.1",
+    "@swc/core": "1.11.31",
     "@vitest/coverage-v8": "^2.1.6",
     "cypress": "^13.13.1",
     "eslint": "^8.57.0",
