@@ -112,6 +112,8 @@
     "@import_status_error": "Error",
     "@import_status_warning": "Warning",
     "@skip": "Skip",
+    "@skipped": "Skipped",
+    "@warningButtonTooltip": "You cannot reset this warning",
     "@preview": "View",
     "@generate": "Generate",
     "@add_trajectories_message": "Please add Areas trajectories first",

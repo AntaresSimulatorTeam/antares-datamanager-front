@@ -9,10 +9,9 @@ interface CardWithIconTitleProps {
   data: CardDataType;
   size: string;
   transform: string;
-  buttonLabel: string;
 }
 
-export const CardWithIconTitle = ({ data, size, transform, buttonLabel }: CardWithIconTitleProps) => {
+export const CardWithIconTitle = ({ data, size, transform }: CardWithIconTitleProps) => {
   const dispatch = useStudyDispatch();
 
   return (
@@ -25,9 +24,9 @@ export const CardWithIconTitle = ({ data, size, transform, buttonLabel }: CardWi
           <div className="line-clamp-1 text-ellipsis break-all text-start text-body-s">{data.title}</div>
         </RdsTextTooltip>
         {data.onClickItem != null && (
-          <div className="flex">
+          <RdsTextTooltip text={data.buttonTooltipText} offset={5} placement="left">
             <ButtonWithStdIcon
-              label={buttonLabel}
+              label={data.buttonLabel}
               icon={StdIconId.KeyboardArrowRight}
               position="left"
               size="extraSmall"
@@ -40,7 +39,7 @@ export const CardWithIconTitle = ({ data, size, transform, buttonLabel }: CardWi
                 }
               }}
             />
-          </div>
+          </RdsTextTooltip>
         )}
       </div>
       {data?.content && (
