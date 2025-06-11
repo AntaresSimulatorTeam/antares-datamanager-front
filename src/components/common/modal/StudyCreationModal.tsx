@@ -17,7 +17,6 @@ import { notifyToast } from '@/shared/notification/notification';
 import { validateMaxLength } from '@/shared/utils/validateMaxTextLength';
 import { MAX_STUDY_NAME_LENGTH } from '@/shared/const/studyConfig';
 
-
 interface StudyCreationModalProps {
   isOpen?: boolean;
   onClose: () => void;
@@ -25,7 +24,6 @@ interface StudyCreationModalProps {
   setReloadStudies: React.Dispatch<React.SetStateAction<boolean>>;
   projectInfoName?: string;
 }
-
 
 const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
   onClose,
@@ -35,7 +33,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
 }) => {
   const { t } = useTranslation();
   const [studyName, setStudyName] = useState<string>(study?.name || '');
-  const [horizon, setHorizon] = useState<string>('');
+  const [horizon, setHorizon] = useState<string>(study?.horizon || '');
   const [projectName, setProjectName] = useState<string>(study?.project || projectInfoName || '');
   const [keywords, setKeywords] = useState<string[]>(study?.keywords || []);
   const [trajectoryIds] = useState<number[]>(study?.trajectoryIds || []);
@@ -49,9 +47,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
     }
   };
 
-
   const saveStudyHandler = async () => {
-
     if (study && studyName.trim() === study.name.trim()) {
       notifyToast({
         type: 'error',
@@ -68,18 +64,17 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
       trajectoryIds,
     };
 
-  try {
-    await saveStudy(studyData);
-    setReloadStudies((prev) => !prev); // Trigger reload after successful save
-    setStudyName('');
-    setProjectName('');
-    setHorizon('');
-    setKeywords([]);
-    onClose();
-  } catch {
-    // Modal remains open if error occurred
-  }
-
+    try {
+      await saveStudy(studyData);
+      setReloadStudies((prev) => !prev); // Trigger reload after successful save
+      setStudyName('');
+      setProjectName('');
+      setHorizon('');
+      setKeywords([]);
+      onClose();
+    } catch {
+      // Modal remains open if error occurred
+    }
   };
 
   useEffect(() => {
@@ -94,7 +89,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
   }, [studyName, projectName, horizon, keywords, isHorizonValid]);
 
   const handleHorizonChange = (value: string) => {
-   setHorizon(value)
+    setHorizon(value);
   };
 
   const handleHorizonValidityChange = (valid: boolean) => {
@@ -126,7 +121,12 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
               </div>
             )}
           </div>
-          <HorizonInput horizon={horizon} onChange={handleHorizonChange}  onValidChange={handleHorizonValidityChange} required />
+          <HorizonInput
+            horizon={horizon}
+            onChange={handleHorizonChange}
+            onValidChange={handleHorizonValidityChange}
+            required
+          />
           <KeywordsInput
             keywords={keywords}
             setKeywords={setKeywords}
