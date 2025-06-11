@@ -5,7 +5,7 @@
  */
 
 import { afterEach, beforeEach, describe, expectTypeOf, it, Mock, vi } from 'vitest';
-import { act, Queries, renderHook, RenderHookOptions } from '@testing-library/react';
+import { Queries, renderHook, RenderHookOptions, waitFor } from '@testing-library/react';
 import { Router, useNavigate } from 'react-router-dom';
 import { useProjectNavigation } from '@/hooks/useProjectNavigation';
 import { ReactNode } from 'react';
@@ -37,7 +37,7 @@ describe('useProjectNavigation', () => {
     vi.clearAllMocks();
   });
 
-  it('should return navigateToProject function and call navigate with the right parameters value', () => {
+  it('should return navigateToProject function and call navigate with the right parameters value', async () => {
     const mockNavigate = vi.fn().mockImplementation((to) => to);
     mockUseNavigation.mockImplementationOnce(() => mockNavigate);
 
@@ -52,8 +52,8 @@ describe('useProjectNavigation', () => {
 
     expectTypeOf(result.current.navigateToProject).toBeFunction();
 
-    act(() => {
-      result.current.navigateToProject('project123', 'projectName');
+    await waitFor(() => {
+      void result.current.navigateToProject('project123', 'projectName');
     });
 
     expect(mockNavigate).toHaveBeenCalledWith(`/project/${encodeURIComponent('projectName')}`, {

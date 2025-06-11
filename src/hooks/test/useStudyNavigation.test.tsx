@@ -5,29 +5,17 @@
  */
 
 import { afterEach, beforeEach, describe, expectTypeOf, it, Mock, vi } from 'vitest';
-import { act, Queries, renderHook, RenderHookOptions } from '@testing-library/react';
+import { Queries, renderHook, RenderHookOptions, waitFor } from '@testing-library/react';
 import { useStudyNavigation } from '@/hooks/useStudyNavigation.ts';
 import { Router, useNavigate } from 'react-router-dom';
 import { ReactNode } from 'react';
-import { StudyStatus } from '@/shared/types/common/StudyStatus.type';
+import { mockStudy } from '@/shared/services/test/mocks/studyMock.tsx';
 
 const mockNavigator = {
   createHref: vi.fn(),
   go: vi.fn(),
   push: vi.fn(),
   replace: vi.fn(),
-};
-
-const mockStudy = {
-  id: 1,
-  name: 'BP_ref_1',
-  createdBy: 'Isaac Asimov',
-  creationDate: new Date('Janvier 18'),
-  keywords: ['covid', 'silence'],
-  project: 'Bilan previsionnel 2027',
-  status: StudyStatus.GENERATED,
-  horizon: '2020_2024',
-  trajectoryIds: [2],
 };
 
 vi.mock('react-router-dom', async (importOriginal) => {
@@ -50,7 +38,7 @@ describe('useStudyNavigation', () => {
     vi.clearAllMocks();
   });
 
-  it('should return navigateToStudy function and call navigate with the right parameters value', () => {
+  it('should return navigateToStudy function and call navigate with the right parameters value', async () => {
     const mockNavigate = vi.fn().mockImplementation(vi.fn());
     mockUseNavigation.mockImplementationOnce(() => mockNavigate);
 
@@ -65,8 +53,8 @@ describe('useStudyNavigation', () => {
 
     expectTypeOf(result.current.navigateToStudy).toBeFunction();
 
-    act(() => {
-      result.current.navigateToStudy(mockStudy);
+    await waitFor(() => {
+      void result.current.navigateToStudy(mockStudy);
     });
 
     expect(mockNavigate).toHaveBeenCalledWith(`/study/${encodeURIComponent(mockStudy.name)}`, {
