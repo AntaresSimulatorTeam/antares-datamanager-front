@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "fix/devin_miroir",
-  commit: "60f4713",
-  commitTime: "2025-06-12T06:23:54.256Z"
+  branch: "feat/ANT-3157_study_page_handle_back_navigation",
+  commit: "f0001b8",
+  commitTime: "2025-06-11T14:05:04.462Z"
 };
