@@ -9,14 +9,9 @@ interface YearInputProps {
   onValidChange?: (isValid: boolean) => void;
 }
 
-const HorizonInput: React.FC<YearInputProps> = ({
-  horizon,
-  onChange,
-  required = true,
-  onValidChange,
-}) => {
+const HorizonInput: React.FC<YearInputProps> = ({ horizon, onChange, required = true, onValidChange }) => {
   const { t } = useTranslation();
-  const [errorMessage, setErrorMessage] =  useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   const validate = (value?: string): boolean => {
     if (!value || value.trim() === '') {
@@ -32,7 +27,6 @@ const HorizonInput: React.FC<YearInputProps> = ({
     }
 
     const trimmedValue = value.trim();
-
 
     if (!/^\d{4}$/.test(trimmedValue)) {
       setErrorMessage(t('horizonInput.@validYearError'));
@@ -82,10 +76,11 @@ const HorizonInput: React.FC<YearInputProps> = ({
         required={required}
         maxLength={4}
       />
-      {errorMessage && <div className="my-2 text-error-500">{errorMessage}</div>}
+      <div className={`text-error-500 ${errorMessage ? 'opacity-100' : 'opacity-0'}`}>
+        {errorMessage || t('horizonInput.@errorMessage')}
+      </div>
     </div>
   );
 };
 
 export default HorizonInput;
-
