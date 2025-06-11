@@ -17,6 +17,7 @@ export interface StudyDTO {
   creationDate: Date;
   keywords: string[];
   project: string;
+  projectId: string;
   status: StudyStatus;
   horizon: string;
   trajectoryIds: number[];
@@ -56,6 +57,6 @@ export type StudyActionType =
   | { type: STUDY_ACTION.ADD_WARNING_MESSAGE; payload: { message: WarningMessage; type: TRAJECTORY_TYPE } }
   | { type: STUDY_ACTION.SKIP_MESSAGE; payload: { id: number; trajectoryType: TRAJECTORY_TYPE; trajectoryId: number } };
 
-export interface LocationState {
+export interface LocationStudy {
   study: StudyDTO;
 }

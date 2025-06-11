@@ -63,8 +63,7 @@ const StudyTableDisplay = ({ searchStudy, projectId, projectInfoName }: StudyTab
   const isDeleteActive = selectedStatus === StudyStatus.ERROR || selectedStatus === StudyStatus.IN_PROGRESS;
 
   const handleDuplicate = () => {
-    const selectedStudy = rows[Number.parseInt(selectedRowId || '-1')];
-    setSelectedStudy(selectedStudy);
+    setSelectedStudy(rows[Number.parseInt(selectedRowId || '-1')]);
     toggleModal();
     setReloadStudies(!reloadStudies); // Trigger reload after deleting
   };
@@ -76,11 +75,6 @@ const StudyTableDisplay = ({ searchStudy, projectId, projectInfoName }: StudyTab
         setReloadStudies(!reloadStudies); // Trigger reload after deleting
       });
     }
-  };
-
-  const handleRowClick = () => {
-    const selectedStudy = rows[Number.parseInt(selectedRowId || '-1')];
-    navigateToStudy(selectedStudy);
   };
 
   const handleModalClose = () => {
@@ -116,7 +110,11 @@ const StudyTableDisplay = ({ searchStudy, projectId, projectInfoName }: StudyTab
         <div className="flex gap-2">
           {selectedRowId !== undefined ? (
             <>
-              <RdsButton label={t('study.@open')} onClick={handleRowClick} variant="outlined" />
+              <RdsButton
+                label={t('study.@open')}
+                onClick={() => void navigateToStudy(rows[Number.parseInt(selectedRowId || '-1')])}
+                variant="outlined"
+              />
               <RdsButton
                 label={t('study.@duplicate')}
                 onClick={handleDuplicate}

@@ -10,11 +10,14 @@ import { useCallback } from 'react';
 export const useProjectNavigation = () => {
   const navigate = useNavigate();
 
-  const navigateToProject = useCallback((projectId: string, projectName: string) => {
-    navigate(`/project/${encodeURIComponent(projectName)}`, {
-      state: { projectId },
-    });
-  }, []);
+  const navigateToProject = useCallback(
+    async (id: string, name: string) => {
+      await navigate(`/project/${encodeURIComponent(name)}`, {
+        state: { projectId: id },
+      });
+    },
+    [navigate],
+  );
 
   return { navigateToProject };
 };

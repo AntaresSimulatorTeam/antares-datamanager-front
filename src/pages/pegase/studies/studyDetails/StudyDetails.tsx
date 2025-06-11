@@ -86,11 +86,11 @@ const StudyDetails = () => {
 
   return !study.id ? (
     <div className="flex h-screen items-center justify-center">
-      <p>{t('studyDetails.@loadingProjects')}</p>
+      <p>{t('studyDetails.@loading')}</p>
     </div>
   ) : (
     <div className="flex h-full w-full flex-col pb-20">
-      <StudyHeader projectName={study.project} studyName={study.name} />
+      <StudyHeader study={study} />
       <div className="relative flex h-full w-full flex-col">
         <RdsDivider />
         <div className="flex flex-col">

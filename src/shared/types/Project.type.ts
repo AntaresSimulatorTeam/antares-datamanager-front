@@ -47,3 +47,7 @@ export interface ProjectState {
   projects: ProjectInfo[];
   pinnedProjects: ProjectInfo[];
 }
+
+export interface LocationProject {
+  projectId: string;
+}

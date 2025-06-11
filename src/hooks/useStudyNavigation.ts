@@ -11,8 +11,8 @@ import { useCallback } from 'react';
 export const useStudyNavigation = () => {
   const navigate = useNavigate();
 
-  const navigateToStudy = useCallback((study: StudyDTO) => {
-    navigate(`/study/${encodeURIComponent(study.name)}`, {
+  const navigateToStudy = useCallback(async (study: StudyDTO) => {
+    await navigate(`/study/${encodeURIComponent(study.name)}`, {
       state: { study },
     });
   }, []);
