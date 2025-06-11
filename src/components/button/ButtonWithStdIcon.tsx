@@ -73,6 +73,7 @@ export const ButtonWithStdIcon = ({
       );
     }
   };
+
   return (
     <button
       className={`inline-flex flex-row items-center gap-1 rounded border-2 ${size === 'medium' ? 'text-body-m' : size === 'small' ? 'text-body-s' : 'text-body-xs'} ${size === 'medium' ? 'p-2' : size === 'small' ? 'p-1' : 'px-0.5 py-0'} ${disabled ? 'border-gray-400 bg-gray-400' : getColors(color)} text-center`}
