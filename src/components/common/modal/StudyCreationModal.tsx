@@ -33,13 +33,19 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
 }) => {
   const { t } = useTranslation();
   const [studyName, setStudyName] = useState<string>(study?.name || '');
-  const [horizon, setHorizon] = useState<string>(study?.horizon || '');
   const [projectName, setProjectName] = useState<string>(study?.project || projectInfoName || '');
   const [keywords, setKeywords] = useState<string[]>(study?.keywords || []);
   const [trajectoryIds] = useState<number[]>(study?.trajectoryIds || []);
   const [isFormValid, setIsFormValid] = useState(false);
   const { user } = useUser();
   const [isHorizonValid, setIsHorizonValid] = useState(false);
+
+  const [horizon, setHorizon] = useState<string>(() => {
+    const rawHorizon = study?.horizon || '';
+    const years = rawHorizon.match(/\d{4}/g)?.map(Number) || [];
+    const maxYear = years.length ? Math.max(...years) : '';
+    return maxYear.toString();
+  });
 
   const handleStudyNameChange = (value: string) => {
     if (validateMaxLength(value, MAX_STUDY_NAME_LENGTH)) {
