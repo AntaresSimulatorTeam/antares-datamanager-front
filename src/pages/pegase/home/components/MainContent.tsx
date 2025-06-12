@@ -14,27 +14,23 @@ import { UserSettingsContext } from '@/store/contexts/UserSettingsContext';
 import { THEME_COLOR } from '@/shared/types';
 import ThemeHandler from '@common/handler/ThemeHandler';
 import { PegaseAlertContainer, PegaseToastContainer } from '@/shared/notification/containers';
-import { PEGASE_NAVBAR_ID } from '@/shared/constants';
-import { translateMenuItemLabel } from '@/shared/utils/textUtils';
 import { navBarConfig } from '@/shared/const/navBarConfig';
-import { useTranslation } from 'react-i18next';
 import { StudyProvider } from '@/store/contexts/StudyProvider';
-import { RdsNavbar } from 'rte-design-system-react';
+import StdNavbar from '@common/layout/stdNavbar/StdNavbar.tsx';
+import { translateMenuItemLabel } from '@/shared/utils/textUtils.ts';
+import { useTranslation } from 'react-i18next';
 
 const MainContent = () => {
   const { t } = useTranslation();
-
   return (
     <div className="flex h-screen w-screen dark:bg-gray-900 dark:text-gray-200">
       <UserSettingsContext.Provider initialState={{ theme: THEME_COLOR.LIGHT }}>
         <ThemeHandler />
         <PegaseToastContainer />
         <PegaseAlertContainer />
-        <RdsNavbar
-          id={PEGASE_NAVBAR_ID}
+        <StdNavbar
           topItems={translateMenuItemLabel(menuTopData, t)}
           bottomItems={translateMenuItemLabel(menuBottomData, t)}
-          headerLink={'/'}
           config={navBarConfig}
         />
         <div className="flex h-full w-full flex-col">
@@ -60,5 +56,4 @@ const MainContent = () => {
     </div>
   );
 };
-
 export default MainContent;

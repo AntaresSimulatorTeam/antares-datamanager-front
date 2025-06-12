@@ -5,21 +5,51 @@
  */
 
 import { APP_NAME } from '@/shared/constants.ts';
-import { HeaderStyleConfig } from 'rte-design-system-react';
+import { NavbarConfig } from '@common/layout/stdNavbar/StdNavbar.tsx';
 
-export const navBarConfig = {
+// export const navBarConfig = {
+//   header: {
+//     variant: 'logo',
+//     versionTextColor: 'gray-600',
+//     appName: APP_NAME,
+//     appVersion: `v${import.meta.env.VITE_APP_VERSION}`,
+//     as: 'a',
+//     //headerLink: '/',
+//     headerId: 'main-nav-bar-controller',
+//     logoConfig: {
+//       logoExpandedHref: 'brand/logo_antares_pegase_light_expand.svg',
+//       logoExpandedId: 'appIcon-collapsed-id',
+//       logoCollapsedHref: 'brand/logo_antares_pegase_light_collapse.svg',
+//       logoCollapsedId: 'appIcon-expanded-id',
+//     },
+//   } as HeaderStyleTextConfig,
+// };
+
+export const navBarConfig: NavbarConfig = {
   header: {
-    variant: 'logo',
-    versionTextColor: 'gray-600',
     appName: APP_NAME,
     appVersion: `v${import.meta.env.VITE_APP_VERSION}`,
-    headerLink: '/',
-    headerId: 'main-nav-bar-controller',
+    variant: 'logo',
     logoConfig: {
       logoExpandedHref: 'brand/logo_antares_pegase_light_expand.svg',
-      logoExpandedId: 'appIcon-collapsed-id',
       logoCollapsedHref: 'brand/logo_antares_pegase_light_collapse.svg',
-      logoCollapsedId: 'appIcon-expanded-id',
     },
-  } as HeaderStyleConfig,
+    versionTextColor: 'gray-600',
+    as: 'a',
+    to: '/',
+  },
+  itemContent: {
+    main: 'gray-800',
+    hover: 'gray-900',
+    active: 'gray-900',
+    selected: 'gray-900',
+  },
+  itemBackground: {
+    main: 'gray-50',
+    hover: 'gray-300',
+    active: 'gray-400',
+    selected: 'gray-400',
+  },
+  separatorColor: 'gray-700',
+  textColor: 'gray-800',
 };

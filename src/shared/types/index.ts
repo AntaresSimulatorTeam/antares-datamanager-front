@@ -17,3 +17,5 @@ export * from './Input.type.ts';
 export * from './Warning.type.ts';
 export * from './Generic.type.ts';
 export * from './Breadcrumb.type.ts';
+export * from './NavBar.type.ts';
+export * from './TailwindColorClass.type.ts';
