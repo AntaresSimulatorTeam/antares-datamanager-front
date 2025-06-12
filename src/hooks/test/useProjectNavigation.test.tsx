@@ -9,6 +9,7 @@ import { Queries, renderHook, RenderHookOptions, waitFor } from '@testing-librar
 import { Router, useNavigate } from 'react-router-dom';
 import { useProjectNavigation } from '@/hooks/useProjectNavigation';
 import { ReactNode } from 'react';
+import { notifyToast } from '@/shared/notification/notification.tsx';
 
 const mockNavigator = {
   createHref: vi.fn(),
@@ -24,6 +25,7 @@ vi.mock('react-router-dom', async (importOriginal) => {
     useNavigate: vi.fn(),
   };
 });
+vi.mock('@/shared/notification/notification');
 
 describe('useProjectNavigation', () => {
   const mockUseNavigation = useNavigate as Mock<typeof useNavigate>;
@@ -38,7 +40,7 @@ describe('useProjectNavigation', () => {
   });
 
   it('should return navigateToProject function and call navigate with the right parameters value', async () => {
-    const mockNavigate = vi.fn().mockImplementation((to) => to);
+    const mockNavigate = vi.fn().mockImplementation(() => {});
     mockUseNavigation.mockImplementationOnce(() => mockNavigate);
 
     const wrapper = ({ children }: { children: ReactNode }) => (
@@ -58,6 +60,34 @@ describe('useProjectNavigation', () => {
 
     expect(mockNavigate).toHaveBeenCalledWith(`/project/${encodeURIComponent('projectName')}`, {
       state: { projectId: 'project123' },
+    });
+  });
+
+  it('should redirect to current page when navigate function throw an error', async () => {
+    const mockNavigate = vi.fn().mockRejectedValueOnce({ message: 'Error during navigation' });
+    mockUseNavigation.mockImplementationOnce(() => mockNavigate);
+
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <Router location={{ pathname: '/', state: { studyId: '123' } }} navigator={mockNavigator}>
+        {children}
+      </Router>
+    );
+    const { result } = renderHook(() => useProjectNavigation(), {
+      wrapper,
+    } as RenderHookOptions<HTMLElement, Queries>);
+
+    expectTypeOf(result.current.navigateToProject).toBeFunction();
+
+    await waitFor(() => {
+      void result.current.navigateToProject('project123', 'projectName');
+    });
+
+    expect(mockNavigate).toHaveBeenCalledWith('/', {
+      state: { studyId: '123' },
+    });
+    expect(notifyToast).toHaveBeenCalledWith({
+      type: 'error',
+      message: 'Error during navigation',
     });
   });
 });
