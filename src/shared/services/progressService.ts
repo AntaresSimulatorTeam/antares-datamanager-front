@@ -32,6 +32,6 @@ export const fetchWithProgress = async (
     await simulateProgress(duration, onProgress);
     return (await AuthService.authFetch(url, options)) as Response;
   } catch (error) {
-    throw new Error((error as BackendError)?.antaresErrorMessage);
+    throw new Error((error as BackendError)?.antaresErrorMessage ?? '');
   }
 };
