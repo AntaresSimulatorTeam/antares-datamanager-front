@@ -22,7 +22,7 @@ export type PseudoClass =
   | 'before:'
   | '[&.active]:';
 
-export type TailwindPrefix = 'text' | 'bg' | 'border' | 'outline';
+export type TailwindPrefix = 'text' | 'bg' | 'border' | 'outline' | 'border-l' | 'border-r' | 'border-t' | 'border-b';
 
 export type Delay = 0 | 75 | 100 | 150 | 200 | 300 | 500 | 700 | 1000;
 

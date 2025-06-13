@@ -48,7 +48,8 @@ export const navbarClassBuilder = (
     expanded ? NAVBAR_EXPANDED_CLASSES : NAVBAR_COLLAPSED_CLASSES,
   );
 
-export const NAVBAR_ITEM_BASE_CLASSES = 'mx-1 flex items-center gap-1 truncate rounded p-1 text-button-s font-semibold';
+export const NAVBAR_ITEM_BASE_CLASSES =
+  'border-l-2 border-transparent m-1 flex items-center gap-1 truncate rounded p-1 text-button-s font-semibold';
 export const NAVBAR_ITEM_FOCUS_CLASSES = 'focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-0';
 
 export const NAVBAR_ITEM_COMMON_CLASSES = clsx(NAVBAR_ITEM_BASE_CLASSES, NAVBAR_ITEM_FOCUS_CLASSES);
@@ -62,9 +63,9 @@ export const navbarItemClassBuilder = (
 ) => {
   const navbarItemStatusClasses = clsx(
     buildColorClass('bg', itemBackgroundConfig?.main || DEFAULT_BACKGROUND_CONFIG.main),
-    buildColorClass('bg', itemBackgroundConfig?.hover || DEFAULT_BACKGROUND_CONFIG.hover, 'hover:'),
+    buildColorClass('border-b', itemBackgroundConfig?.hover || DEFAULT_BACKGROUND_CONFIG.hover, 'hover:'),
     buildColorClass('text', itemContentConfig?.hover || DEFAULT_CONTENT_CONFIG.hover, 'hover:'),
-    buildColorClass('bg', itemBackgroundConfig?.active || DEFAULT_BACKGROUND_CONFIG.active, 'active:'),
+    buildColorClass('border-b', itemBackgroundConfig?.active || DEFAULT_BACKGROUND_CONFIG.active, 'active:'),
     buildColorClass('text', itemContentConfig?.active || DEFAULT_CONTENT_CONFIG.active, 'active:'),
     buildColorClass('bg', itemBackgroundConfig?.active || DEFAULT_BACKGROUND_CONFIG.active, '[&.active]:'),
     buildColorClass('text', itemContentConfig?.active || DEFAULT_CONTENT_CONFIG.active, '[&.active]:'),
