@@ -27,7 +27,7 @@ export const About = () => {
   }, []);
 
   return (
-    <div className="flex h-1/2 w-full flex-col items-start justify-center gap-4">
+    <div className="flex h-1/2 w-full flex-col items-start justify-center gap-4 p-3">
       <RdsHeading title={t('about.@title')} />
       {info && !isLoadingInfo ? (
         <div className="w-3/4">
