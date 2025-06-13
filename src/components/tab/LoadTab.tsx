@@ -254,7 +254,7 @@ const LoadTab = () => {
           await unlinkTrajectoryFromStudy(trajectoryId, study.id);
         }
         dispatch?.({
-          type: STUDY_ACTION.DELETE_LOAD_TRAJECTORY,
+          type: STUDY_ACTION.EMPTY_LOAD_TRAJECTORY,
           payload: data[rowIndex].hypothesis,
         });
         setData((prev) =>
@@ -279,10 +279,10 @@ const LoadTab = () => {
           }
         });
 
-        if (newTrajectory) {
+        if (newTrajectory && newTrajectory.loadArea) {
           dispatch?.({
-            type: STUDY_ACTION.ADD_TRAJECTORY_LOAD,
-            payload: newTrajectory,
+            type: STUDY_ACTION.UPDATE_LOAD_TRAJECTORY,
+            payload: { loadArea: newTrajectory.loadArea, trajectoryName: newTrajectory.trajectoryName },
           });
         }
         setData((prev) =>
