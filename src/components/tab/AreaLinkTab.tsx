@@ -292,7 +292,7 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
         await handleTrajectoryDeletion(rowIndex, status, trajectoryId);
       }
 
-      if (rowIndex != null && status === 'error' && trajectoryId != null && trajectoryLabel && !!errorMessage) {
+      if (rowIndex != null && status === 'error' && trajectoryId != null && trajectoryLabel) {
         await handleTrajectoryError(rowIndex, trajectoryId, trajectoryLabel, errorMessage);
       }
     } catch (error) {
