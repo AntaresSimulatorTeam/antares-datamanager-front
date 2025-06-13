@@ -105,7 +105,7 @@ export const uploadTrajectory = async (
 
     return (await response.json()) as DbTrajectory;
   } catch (error) {
-    throw new Error(`${(error as Error)?.message}`);
+    throw new Error((error as Error)?.message ?? '');
   }
 };
 
