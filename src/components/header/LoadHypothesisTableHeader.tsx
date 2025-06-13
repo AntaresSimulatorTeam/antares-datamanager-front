@@ -98,7 +98,7 @@ const getLoadHypothesisTableHeaders = (
           status={status}
           isDeletable={!isDefault && !(studyStatus === StudyStatus.GENERATED)}
           onClick={() => void options?.meta?.removeRow?.(row.index, hypothesis)}
-          message={trajectory?.messages?.[0]?.content}
+          message={trajectory?.messages?.[0]?.content ?? ''}
         />
       );
     },
