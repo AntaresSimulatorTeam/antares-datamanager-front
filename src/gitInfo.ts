@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "fix/duplicate_higher_scenario",
-  commit: "9fddf5f",
-  commitTime: "2025-06-12T07:30:45.753Z"
+  branch: "fix/ANT-3319_warnings_use_get_trajectory_api_to_fetch_right_warning",
+  commit: "e5b3dce",
+  commitTime: "2025-06-13T10:41:19.768Z"
 };

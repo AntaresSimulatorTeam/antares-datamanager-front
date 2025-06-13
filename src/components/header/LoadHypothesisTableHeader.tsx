@@ -72,7 +72,7 @@ const getLoadHypothesisTableHeaders = (
             onSearch={async (value?: string) =>
               await handlerSearch(
                 value,
-                row.original.hypothesis === 'Others areas' ? AREA_OTHERS : row.original.hypothesis,
+                row.original.hypothesis === 'Other areas' ? AREA_OTHERS : row.original.hypothesis,
               )
             }
             onClickButton={() => {
