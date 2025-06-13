@@ -13,43 +13,32 @@ interface CardWithIconTitleProps {
 
 export const CardWithIconTitle = ({ data, size, transform }: CardWithIconTitleProps) => {
   const dispatch = useStudyDispatch();
+  const getButtonWithIcon = () => (
+    <ButtonWithStdIcon
+      label={data.buttonLabel}
+      icon={StdIconId.KeyboardArrowRight}
+      position="left"
+      size="extraSmall"
+      color={data.colorStatus}
+      variant="outlined"
+      disabled={data.isAck}
+      onClick={() => {
+        if (data.id != null && data.onClickItem && dispatch) {
+          void data.onClickItem?.(data.id, data.trajectoryType, data.trajectoryId, dispatch);
+        }
+      }}
+    />
+  );
+
   const getButton = () => {
     if (data.isAck) {
       return (
         <RdsTextTooltip text={data.buttonTooltipText} offset={5} placement="left">
-          <ButtonWithStdIcon
-            label={data.buttonLabel}
-            icon={StdIconId.KeyboardArrowRight}
-            position="left"
-            size="extraSmall"
-            color={data.colorStatus}
-            variant="outlined"
-            disabled={data.isAck}
-            onClick={() => {
-              if (data.id != null && data.onClickItem && dispatch) {
-                void data.onClickItem?.(data.id, data.trajectoryType, data.trajectoryId, dispatch);
-              }
-            }}
-          />
+          {getButtonWithIcon()}
         </RdsTextTooltip>
       );
     } else {
-      return (
-        <ButtonWithStdIcon
-          label={data.buttonLabel}
-          icon={StdIconId.KeyboardArrowRight}
-          position="left"
-          size="extraSmall"
-          color={data.colorStatus}
-          variant="outlined"
-          disabled={data.isAck}
-          onClick={() => {
-            if (data.id != null && data.onClickItem && dispatch) {
-              void data.onClickItem?.(data.id, data.trajectoryType, data.trajectoryId, dispatch);
-            }
-          }}
-        />
-      );
+      return getButtonWithIcon();
     }
   };
 
