@@ -21,11 +21,11 @@ jobs:
         with:
           node-version: 20
       
-       -name: Override registry for @antares
+      - name: Override registry for @antares
         run: npm config set @antares:registry=https://registry.npmjs.org/
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Run tests and generate coverage
         run: npm run coverage
