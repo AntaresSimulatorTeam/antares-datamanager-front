@@ -137,6 +137,12 @@ const LoadTab = () => {
         }
 
         const trajectoryLinked = await getStudyTrajectories(study?.id, TRAJECTORY_TYPE.LOAD);
+        if (trajectoryLinked?.length > 0) {
+          dispatch?.({
+            type: STUDY_ACTION.ADD_TRAJECTORIES_LOAD,
+            payload: trajectoryLinked,
+          });
+        }
         areaDefault.push({
           name: AREA_OTHERS,
           isDefault: true,
@@ -255,7 +261,7 @@ const LoadTab = () => {
         }
         dispatch?.({
           type: STUDY_ACTION.EMPTY_LOAD_TRAJECTORY,
-          payload: data[rowIndex].hypothesis,
+          payload: data[rowIndex].hypothesis === 'Other areas' ? AREA_OTHERS : data[rowIndex].hypothesis,
         });
         setData((prev) =>
           prev.map((item, index) =>
@@ -278,11 +284,15 @@ const LoadTab = () => {
             return trajectory.loadArea === data[rowIndex].hypothesis;
           }
         });
-
         if (newTrajectory && newTrajectory.loadArea) {
+          const isDefaultAreaNotInState =
+            areasDefaultOptions?.some((area) => area.name === newTrajectory.loadArea) &&
+            !studyState?.[`${TRAJECTORY_TYPE.LOAD}`]?.some(
+              (trajectory) => trajectory.loadArea === newTrajectory.loadArea,
+            );
           dispatch?.({
-            type: STUDY_ACTION.UPDATE_LOAD_TRAJECTORY,
-            payload: { loadArea: newTrajectory.loadArea, trajectoryName: newTrajectory.trajectoryName },
+            type: isDefaultAreaNotInState ? STUDY_ACTION.ADD_TRAJECTORY_LOAD : STUDY_ACTION.UPDATE_LOAD_TRAJECTORY,
+            payload: newTrajectory,
           });
         }
         setData((prev) =>
