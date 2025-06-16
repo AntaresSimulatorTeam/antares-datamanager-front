@@ -73,7 +73,7 @@ export const removeDuplicate = (arr: DbTrajectory[]) =>
   }, []);
 
 export const buildRowData = (areaName: string, isDefault: boolean, trajectory?: DbTrajectory): HypothesisRowData => ({
-  hypothesis: areaName === AREA_OTHERS ? 'Others areas' : areaName,
+  hypothesis: areaName === AREA_OTHERS ? 'Other areas' : areaName,
   trajectory: trajectory?.trajectoryName ? trajectory : null,
   status: trajectory?.trajectoryName ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
   isDefault,

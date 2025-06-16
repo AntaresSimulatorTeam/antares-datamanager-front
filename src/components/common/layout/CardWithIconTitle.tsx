@@ -1,9 +1,9 @@
 import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter.ts';
 import { RdsIcon, RdsIconId, RdsTextTooltip } from 'rte-design-system-react';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
-import { ButtonWithStdIcon } from '@/components/button/ButtonWithStdIcon.tsx';
 import { useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { CardDataType } from '@/shared/types';
+import { ButtonWithStdIcon } from '@/components/button/ButtonWithStdIcon.tsx';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 interface CardWithIconTitleProps {
   data: CardDataType;
@@ -13,6 +13,34 @@ interface CardWithIconTitleProps {
 
 export const CardWithIconTitle = ({ data, size, transform }: CardWithIconTitleProps) => {
   const dispatch = useStudyDispatch();
+  const getButtonWithIcon = () => (
+    <ButtonWithStdIcon
+      label={data.buttonLabel}
+      icon={StdIconId.KeyboardArrowRight}
+      position="left"
+      size="extraSmall"
+      color={data.colorStatus}
+      variant="outlined"
+      disabled={data.isAck}
+      onClick={() => {
+        if (data.id != null && data.onClickItem && dispatch) {
+          void data.onClickItem?.(data.id, data.trajectoryType, data.trajectoryId, dispatch);
+        }
+      }}
+    />
+  );
+
+  const getButton = () => {
+    if (data.isAck) {
+      return (
+        <RdsTextTooltip text={data.buttonTooltipText} offset={5} placement="left">
+          {getButtonWithIcon()}
+        </RdsTextTooltip>
+      );
+    } else {
+      return getButtonWithIcon();
+    }
+  };
 
   return (
     <div
@@ -23,24 +51,7 @@ export const CardWithIconTitle = ({ data, size, transform }: CardWithIconTitlePr
         <RdsTextTooltip text={data.title} offset={5} placement="top">
           <div className="line-clamp-1 text-ellipsis break-all text-start text-body-s">{data.title}</div>
         </RdsTextTooltip>
-        {data.onClickItem != null && (
-          <RdsTextTooltip text={data.buttonTooltipText} offset={5} placement="left">
-            <ButtonWithStdIcon
-              label={data.buttonLabel}
-              icon={StdIconId.KeyboardArrowRight}
-              position="left"
-              size="extraSmall"
-              color={data.colorStatus}
-              variant="outlined"
-              disabled={data.isAck}
-              onClick={() => {
-                if (data.id != null && data.onClickItem && dispatch) {
-                  void data.onClickItem?.(data.id, data.trajectoryType, data.trajectoryId, dispatch);
-                }
-              }}
-            />
-          </RdsTextTooltip>
-        )}
+        {data.onClickItem != null && getButton()}
       </div>
       {data?.content && (
         <div className="flex h-full text-ellipsis text-gray-600">

@@ -254,22 +254,29 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
     try {
       if (trajectoryId != null && status === 'success') {
         setErrorMessage('');
-        const newTrajectory = await linkTrajectoryToStudy(
+        await linkTrajectoryToStudy(
           rowIndex === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
           trajectoryId,
           study.id,
         );
-        dispatch?.({
-          type: rowIndex === 0 ? STUDY_ACTION.ADD_TRAJECTORY_AREA : STUDY_ACTION.ADD_TRAJECTORY_LINK,
-          payload: newTrajectory,
-        });
+        const newTrajectories = await getStudyTrajectories(
+          study.id,
+          rowIndex === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
+        );
+        const newTrajectory = newTrajectories?.[0];
+        if (newTrajectory) {
+          dispatch?.({
+            type: rowIndex === 0 ? STUDY_ACTION.ADD_TRAJECTORY_AREA : STUDY_ACTION.ADD_TRAJECTORY_LINK,
+            payload: newTrajectory,
+          });
+        }
         setData((prev) =>
           prev.map((item, index) =>
             index === rowIndex
               ? {
                   ...item,
-                  trajectory: newTrajectory,
-                  status: getStatus(status),
+                  trajectory: newTrajectory ?? null,
+                  status: getStatus(newTrajectory ? status : 'empty'),
                 }
               : item,
           ),
@@ -285,7 +292,7 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
         await handleTrajectoryDeletion(rowIndex, status, trajectoryId);
       }
 
-      if (rowIndex != null && status === 'error' && trajectoryId != null && trajectoryLabel && !!errorMessage) {
+      if (rowIndex != null && status === 'error' && trajectoryId != null && trajectoryLabel) {
         await handleTrajectoryError(rowIndex, trajectoryId, trajectoryLabel, errorMessage);
       }
     } catch (error) {
