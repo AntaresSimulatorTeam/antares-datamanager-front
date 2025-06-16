@@ -30,13 +30,6 @@ const addLoadTrajectory = (prevState: Partial<StudyState>, payload: DbTrajectory
   const loadTrajectory = Array.isArray(prevState[`${TRAJECTORY_TYPE.LOAD}`])
     ? (prevState[`${TRAJECTORY_TYPE.LOAD}`] as DbTrajectory[])
     : null;
-
-  if (loadTrajectory?.length) {
-    const index = loadTrajectory.findIndex((trajectory) => trajectory.loadArea === payload.loadArea);
-    if (index >= 0) {
-      loadTrajectory.splice(index, 1, payload);
-    }
-  }
   return {
     ...prevState,
     [`${TRAJECTORY_TYPE.LOAD}`]: loadTrajectory?.length ? [...loadTrajectory, payload] : [payload],
@@ -57,6 +50,59 @@ const deleteLoadTrajectory = (prevState: Partial<StudyState>, payload: string) =
       [`${TRAJECTORY_TYPE.LOAD}`]: [...loadTrajectory],
     };
   }
+  return prevState;
+};
+
+const updateLoadTrajectory = (
+  prevState: Partial<StudyState>,
+  payload: { loadArea: string; trajectoryName: string },
+) => {
+  const loadTrajectory = Array.isArray(prevState[`${TRAJECTORY_TYPE.LOAD}`])
+    ? (prevState[`${TRAJECTORY_TYPE.LOAD}`] as DbTrajectory[])
+    : null;
+  if (loadTrajectory?.length) {
+    const newLoadTrajectories = loadTrajectory.map((trajectory) => {
+      if (trajectory.loadArea === payload.loadArea) {
+        return {
+          ...trajectory,
+          trajectoryName: payload.trajectoryName,
+        };
+      } else {
+        return trajectory;
+      }
+    });
+
+    return {
+      ...prevState,
+      [`${TRAJECTORY_TYPE.LOAD}`]: [...newLoadTrajectories],
+    };
+  }
+
+  return prevState;
+};
+
+const emptyLoadTrajectory = (prevState: Partial<StudyState>, payload: string) => {
+  const loadTrajectory = Array.isArray(prevState[`${TRAJECTORY_TYPE.LOAD}`])
+    ? (prevState[`${TRAJECTORY_TYPE.LOAD}`] as DbTrajectory[])
+    : null;
+  if (loadTrajectory?.length) {
+    const newLoadTrajectories = loadTrajectory.map((trajectory) => {
+      if (trajectory.loadArea === payload) {
+        return {
+          ...trajectory,
+          trajectoryName: '',
+        };
+      } else {
+        return trajectory;
+      }
+    });
+
+    return {
+      ...prevState,
+      [`${TRAJECTORY_TYPE.LOAD}`]: [...newLoadTrajectories],
+    };
+  }
+
   return prevState;
 };
 
@@ -87,11 +133,8 @@ export const skipTrajectoryMessage = (
     isAck: true,
   };
 
-
   const newMessages = [...messages];
   newMessages.splice(messageIndex, 1);
-
-
   newMessages.push(skippedMessage);
 
   const newTrajectory = {
@@ -129,6 +172,10 @@ export const studyReducer = (prevState: Partial<StudyState>, action?: StudyActio
         return { ...prevState, [`${TRAJECTORY_TYPE.LINK}`]: null };
       case STUDY_ACTION.DELETE_LOAD_TRAJECTORY:
         return deleteLoadTrajectory(prevState, action.payload);
+      case STUDY_ACTION.UPDATE_LOAD_TRAJECTORY:
+        return updateLoadTrajectory(prevState, action.payload);
+      case STUDY_ACTION.EMPTY_LOAD_TRAJECTORY:
+        return emptyLoadTrajectory(prevState, action.payload);
       case STUDY_ACTION.CLEAR_AREA_AND_LINK_TRAJECTORY:
         return {
           ...prevState,

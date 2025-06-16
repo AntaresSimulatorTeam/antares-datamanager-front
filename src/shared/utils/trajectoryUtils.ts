@@ -65,7 +65,7 @@ export const buildErrorTrajectory = (
 
 export const removeDuplicate = (arr: DbTrajectory[]) =>
   arr.reduce((acc: DbTrajectory[], current: DbTrajectory) => {
-    const x = acc.find((item) => item.id === current.id);
+    const x = acc.find((item) => item.loadArea === current.loadArea);
     if (!x) {
       acc.push(current);
     }
