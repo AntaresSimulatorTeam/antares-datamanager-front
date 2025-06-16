@@ -2,6 +2,7 @@ import { DbTrajectory, StudyActionType, StudyState } from '@/shared/types';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
+import { removeDuplicate } from '@/shared/utils/trajectoryUtils.ts';
 
 const addAreaTrajectories = (prevState: Partial<StudyState>, trajectories: DbTrajectory[]) => {
   const studyState = {};
@@ -30,9 +31,16 @@ const addLoadTrajectories = (prevState: Partial<StudyState>, payload: DbTrajecto
   const loadTrajectory = Array.isArray(prevState[`${TRAJECTORY_TYPE.LOAD}`])
     ? (prevState[`${TRAJECTORY_TYPE.LOAD}`] as DbTrajectory[])
     : null;
+  if (loadTrajectory && loadTrajectory?.length > 0) {
+    const arrayWithoutDuplicate = removeDuplicate([...loadTrajectory, ...payload]);
+    return {
+      ...prevState,
+      [`${TRAJECTORY_TYPE.LOAD}`]: arrayWithoutDuplicate,
+    };
+  }
   return {
     ...prevState,
-    [`${TRAJECTORY_TYPE.LOAD}`]: loadTrajectory?.length ? [...loadTrajectory, ...payload] : [...payload],
+    [`${TRAJECTORY_TYPE.LOAD}`]: [...payload],
   };
 };
 const addLoadTrajectory = (prevState: Partial<StudyState>, payload: DbTrajectory): Partial<StudyState> => {
