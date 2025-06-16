@@ -278,12 +278,18 @@ const LoadTab = () => {
             return trajectory.loadArea === data[rowIndex].hypothesis;
           }
         });
-        console.log('==================== newTrajectory', newTrajectory);
         if (newTrajectory && newTrajectory.loadArea) {
-          dispatch?.({
-            type: STUDY_ACTION.UPDATE_LOAD_TRAJECTORY,
-            payload: { loadArea: newTrajectory.loadArea, trajectoryName: newTrajectory.trajectoryName },
-          });
+          if (areasDefaultOptions?.some((area) => area.name === newTrajectory.loadArea)) {
+            dispatch?.({
+              type: STUDY_ACTION.ADD_TRAJECTORY_LOAD,
+              payload: newTrajectory,
+            });
+          } else {
+            dispatch?.({
+              type: STUDY_ACTION.UPDATE_LOAD_TRAJECTORY,
+              payload: { loadArea: newTrajectory.loadArea, trajectoryName: newTrajectory.trajectoryName },
+            });
+          }
         }
         setData((prev) =>
           prev.map((item, index) =>

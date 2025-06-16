@@ -79,7 +79,7 @@ export const buildRowData = (areaName: string, isDefault: boolean, trajectory?: 
   isDefault,
 });
 
-export const buildEmptyRowData = (areaName: string) => ({
+export const buildEmptyRowData = (areaName: string): DbTrajectory => ({
   id: Math.random(),
   trajectoryName: '',
   type: TRAJECTORY_TYPE.LOAD,
