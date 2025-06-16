@@ -255,7 +255,7 @@ const LoadTab = () => {
         }
         dispatch?.({
           type: STUDY_ACTION.EMPTY_LOAD_TRAJECTORY,
-          payload: data[rowIndex].hypothesis,
+          payload: data[rowIndex].hypothesis === 'Other areas' ? AREA_OTHERS : data[rowIndex].hypothesis,
         });
         setData((prev) =>
           prev.map((item, index) =>
