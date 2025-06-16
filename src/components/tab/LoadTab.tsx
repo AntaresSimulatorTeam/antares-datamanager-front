@@ -279,22 +279,15 @@ const LoadTab = () => {
           }
         });
         if (newTrajectory && newTrajectory.loadArea) {
-          if (
+          const isDefaultAreaNotInState =
             areasDefaultOptions?.some((area) => area.name === newTrajectory.loadArea) &&
             !studyState?.[`${TRAJECTORY_TYPE.LOAD}`]?.some(
               (trajectory) => trajectory.loadArea === newTrajectory.loadArea,
-            )
-          ) {
-            dispatch?.({
-              type: STUDY_ACTION.ADD_TRAJECTORY_LOAD,
-              payload: newTrajectory,
-            });
-          } else {
-            dispatch?.({
-              type: STUDY_ACTION.UPDATE_LOAD_TRAJECTORY,
-              payload: { loadArea: newTrajectory.loadArea, trajectoryName: newTrajectory.trajectoryName },
-            });
-          }
+            );
+          dispatch?.({
+            type: isDefaultAreaNotInState ? STUDY_ACTION.ADD_TRAJECTORY_LOAD : STUDY_ACTION.UPDATE_LOAD_TRAJECTORY,
+            payload: newTrajectory,
+          });
         }
         setData((prev) =>
           prev.map((item, index) =>

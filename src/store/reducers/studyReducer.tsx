@@ -53,10 +53,7 @@ const deleteLoadTrajectory = (prevState: Partial<StudyState>, payload: string) =
   return prevState;
 };
 
-const updateLoadTrajectory = (
-  prevState: Partial<StudyState>,
-  payload: { loadArea: string; trajectoryName: string },
-) => {
+const updateLoadTrajectory = (prevState: Partial<StudyState>, payload: DbTrajectory) => {
   const loadTrajectory = Array.isArray(prevState[`${TRAJECTORY_TYPE.LOAD}`])
     ? (prevState[`${TRAJECTORY_TYPE.LOAD}`] as DbTrajectory[])
     : null;
@@ -65,7 +62,8 @@ const updateLoadTrajectory = (
       if (trajectory.loadArea === payload.loadArea) {
         return {
           ...trajectory,
-          trajectoryName: payload.trajectoryName,
+          trajectoryName: payload?.trajectoryName,
+          messages: payload?.messages,
         };
       } else {
         return trajectory;
