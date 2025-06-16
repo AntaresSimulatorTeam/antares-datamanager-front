@@ -279,7 +279,12 @@ const LoadTab = () => {
           }
         });
         if (newTrajectory && newTrajectory.loadArea) {
-          if (areasDefaultOptions?.some((area) => area.name === newTrajectory.loadArea)) {
+          if (
+            areasDefaultOptions?.some((area) => area.name === newTrajectory.loadArea) &&
+            !studyState?.[`${TRAJECTORY_TYPE.LOAD}`]?.some(
+              (trajectory) => trajectory.loadArea === newTrajectory.loadArea,
+            )
+          ) {
             dispatch?.({
               type: STUDY_ACTION.ADD_TRAJECTORY_LOAD,
               payload: newTrajectory,
