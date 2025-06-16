@@ -137,6 +137,12 @@ const LoadTab = () => {
         }
 
         const trajectoryLinked = await getStudyTrajectories(study?.id, TRAJECTORY_TYPE.LOAD);
+        if (trajectoryLinked?.length > 0) {
+          dispatch?.({
+            type: STUDY_ACTION.ADD_TRAJECTORIES_LOAD,
+            payload: trajectoryLinked,
+          });
+        }
         areaDefault.push({
           name: AREA_OTHERS,
           isDefault: true,

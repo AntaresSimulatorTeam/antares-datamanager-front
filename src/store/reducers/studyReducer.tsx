@@ -26,6 +26,11 @@ const addTrajectories = (prevState: Partial<StudyState>, trajectories: DbTraject
   return { ...prevState, ...studyState };
 };
 
+const addLoadTrajectories = (prevState: Partial<StudyState>, payload: DbTrajectory[]): Partial<StudyState> => ({
+  ...prevState,
+  [`${TRAJECTORY_TYPE.LOAD}`]: [...payload],
+});
+
 const addLoadTrajectory = (prevState: Partial<StudyState>, payload: DbTrajectory): Partial<StudyState> => {
   const loadTrajectory = Array.isArray(prevState[`${TRAJECTORY_TYPE.LOAD}`])
     ? (prevState[`${TRAJECTORY_TYPE.LOAD}`] as DbTrajectory[])
@@ -159,8 +164,6 @@ export const studyReducer = (prevState: Partial<StudyState>, action?: StudyActio
         return { ...prevState, [`${TRAJECTORY_TYPE.AREA}`]: [action.payload] };
       case STUDY_ACTION.ADD_TRAJECTORY_LINK:
         return { ...prevState, [`${TRAJECTORY_TYPE.LINK}`]: [action.payload] };
-      case STUDY_ACTION.ADD_TRAJECTORY_LOAD:
-        return addLoadTrajectory(prevState, action.payload);
       case STUDY_ACTION.CLEAR_AREA_TRAJECTORY:
         return {
           ...prevState,
@@ -169,6 +172,10 @@ export const studyReducer = (prevState: Partial<StudyState>, action?: StudyActio
         };
       case STUDY_ACTION.CLEAR_LINK_TRAJECTORY:
         return { ...prevState, [`${TRAJECTORY_TYPE.LINK}`]: null };
+      case STUDY_ACTION.ADD_TRAJECTORY_LOAD:
+        return addLoadTrajectory(prevState, action.payload);
+      case STUDY_ACTION.ADD_TRAJECTORIES_LOAD:
+        return addLoadTrajectories(prevState, action.payload);
       case STUDY_ACTION.DELETE_LOAD_TRAJECTORY:
         return deleteLoadTrajectory(prevState, action.payload);
       case STUDY_ACTION.UPDATE_LOAD_TRAJECTORY:
