@@ -91,6 +91,7 @@ const emptyLoadTrajectory = (prevState: Partial<StudyState>, payload: string) =>
         return {
           ...trajectory,
           trajectoryName: '',
+          messages: [],
         };
       } else {
         return trajectory;
