@@ -26,11 +26,15 @@ const addTrajectories = (prevState: Partial<StudyState>, trajectories: DbTraject
   return { ...prevState, ...studyState };
 };
 
-const addLoadTrajectories = (prevState: Partial<StudyState>, payload: DbTrajectory[]): Partial<StudyState> => ({
-  ...prevState,
-  [`${TRAJECTORY_TYPE.LOAD}`]: [...payload],
-});
-
+const addLoadTrajectories = (prevState: Partial<StudyState>, payload: DbTrajectory[]): Partial<StudyState> => {
+  const loadTrajectory = Array.isArray(prevState[`${TRAJECTORY_TYPE.LOAD}`])
+    ? (prevState[`${TRAJECTORY_TYPE.LOAD}`] as DbTrajectory[])
+    : null;
+  return {
+    ...prevState,
+    [`${TRAJECTORY_TYPE.LOAD}`]: loadTrajectory?.length ? [...loadTrajectory, ...payload] : [...payload],
+  };
+};
 const addLoadTrajectory = (prevState: Partial<StudyState>, payload: DbTrajectory): Partial<StudyState> => {
   const loadTrajectory = Array.isArray(prevState[`${TRAJECTORY_TYPE.LOAD}`])
     ? (prevState[`${TRAJECTORY_TYPE.LOAD}`] as DbTrajectory[])
