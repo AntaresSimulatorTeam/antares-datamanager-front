@@ -278,7 +278,7 @@ const LoadTab = () => {
             return trajectory.loadArea === data[rowIndex].hypothesis;
           }
         });
-
+        console.log('==================== newTrajectory', newTrajectory);
         if (newTrajectory && newTrajectory.loadArea) {
           dispatch?.({
             type: STUDY_ACTION.UPDATE_LOAD_TRAJECTORY,
