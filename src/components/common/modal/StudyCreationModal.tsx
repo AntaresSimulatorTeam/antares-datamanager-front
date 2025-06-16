@@ -85,14 +85,28 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
 
   useEffect(() => {
     const validateForm = () => {
-      if (studyName && projectName && horizon && isHorizonValid) {
-        setIsFormValid(true);
+      const isDuplicateMode = Boolean(study);
+      const originalName = study?.name || '';
+      const nameChanged = studyName.trim() !== originalName.trim();
+
+      if (isDuplicateMode) {
+        if (isHorizonValid || nameChanged) {
+          setIsFormValid(true);
+        } else {
+          setIsFormValid(false);
+        }
       } else {
-        setIsFormValid(false);
+        if (studyName && projectName && horizon && isHorizonValid) {
+          setIsFormValid(true);
+        } else {
+          setIsFormValid(false);
+        }
       }
     };
     validateForm();
-  }, [studyName, projectName, horizon, keywords, isHorizonValid]);
+  }, [study, studyName, projectName, horizon, keywords, isHorizonValid]);
+
+
 
   const handleHorizonChange = (value: string) => {
     setHorizon(value);
