@@ -479,8 +479,8 @@ const LoadTab = () => {
             enableColumnResizing={false}
             enableReadOnly={true}
             state={{ readOnly }}
-            updateData={(rowIndex: number, value: unknown, status?: RowStatus) => {
-              void handleTrajectoryUpdate(rowIndex, value as number, status);
+            updateData={(rowIndex: number, value: unknown, status?: RowStatus, label?: string) => {
+              void handleTrajectoryUpdate(rowIndex, value as number, status, label);
             }}
             removeRow={(rowIndex: number, value: unknown) => {
               void removeRow(rowIndex, value as string);

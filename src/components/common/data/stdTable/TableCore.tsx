@@ -12,7 +12,7 @@ import { RowStatus } from '@/shared/types';
 
 declare module '@tanstack/react-table' {
   interface TableMeta<TData extends RowData> {
-    updateData?: (rowIndex: number, value: unknown, status: RowStatus) => void;
+    updateData?: (rowIndex: number, value: unknown, status: RowStatus, label?: string) => void;
     removeRow?: (rowIndex: number, value: unknown) => void;
   }
 }

@@ -17,7 +17,7 @@ import { RowStatus } from '@/shared/types';
 
 export type StdSimpleTableProps<TData> = {
   getCoreRowModel?: (table: Table<TData>) => () => RowModel<TData>;
-  updateData?: (rowIndex: number, value: unknown, status?: RowStatus) => void;
+  updateData?: (rowIndex: number, value: unknown, status?: RowStatus, label?: string) => void;
   removeRow?: (rowIndex: number, value: unknown) => void;
 } & Omit<TableCoreProps<TData>, 'table'> &
   Omit<TableOptions<TData>, 'getCoreRowModel'>;

@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "feat/ANT-3157_study_page_handle_back_navigation",
-  commit: "34495ad",
-  commitTime: "2025-06-12T09:28:57.663Z"
+  branch: "fix/ANT-3388_LOAD_select_list_display_trajectory_name_error",
+  commit: "480dd2c",
+  commitTime: "2025-06-17T15:01:17.674Z"
 };
