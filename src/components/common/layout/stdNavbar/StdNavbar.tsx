@@ -53,10 +53,6 @@ export type HeaderStyleConfig<E extends ElementType = AnchorDefaultAsType> =
   | HeaderStyleTextConfig<E>;
 
 export type ItemStyleConfig = {
-  // main: TailwindColorClass;
-  // hover?: TailwindColorClass;
-  // active?: TailwindColorClass;
-  // selected?: TailwindColorClass;
   mainText: TailwindUtilityColorClass<'text'>;
   hoverText?: TailwindUtilityColorClass<'text', 'hover:'>;
   activeText?: TailwindUtilityColorClass<'text', 'active:'>;

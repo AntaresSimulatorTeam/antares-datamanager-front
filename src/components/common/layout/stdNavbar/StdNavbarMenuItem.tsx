@@ -27,7 +27,7 @@ const StdNavbarMenuItem = ({ item, expanded = true, selected = false, itemsStyle
   return (
     <Link to={path} className={navbarMenuItemClasses} key={key} {...otherProps}>
       <div>
-        <StdIcon name={icon} />
+        <StdIcon name={icon} height={24} width={24} />
       </div>
       {expanded && label}
     </Link>
