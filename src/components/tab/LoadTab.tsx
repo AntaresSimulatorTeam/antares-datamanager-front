@@ -137,6 +137,12 @@ const LoadTab = () => {
         }
 
         const trajectoryLinked = await getStudyTrajectories(study?.id, TRAJECTORY_TYPE.LOAD);
+        if (trajectoryLinked?.length > 0) {
+          dispatch?.({
+            type: STUDY_ACTION.ADD_TRAJECTORIES_LOAD,
+            payload: trajectoryLinked,
+          });
+        }
         areaDefault.push({
           name: AREA_OTHERS,
           isDefault: true,
@@ -254,8 +260,8 @@ const LoadTab = () => {
           await unlinkTrajectoryFromStudy(trajectoryId, study.id);
         }
         dispatch?.({
-          type: STUDY_ACTION.DELETE_LOAD_TRAJECTORY,
-          payload: data[rowIndex].hypothesis,
+          type: STUDY_ACTION.EMPTY_LOAD_TRAJECTORY,
+          payload: data[rowIndex].hypothesis === 'Other areas' ? AREA_OTHERS : data[rowIndex].hypothesis,
         });
         setData((prev) =>
           prev.map((item, index) =>
@@ -269,18 +275,33 @@ const LoadTab = () => {
           ),
         );
       } else if (status === 'success') {
-        const newTrajectory = await linkTrajectoryToStudy(TRAJECTORY_TYPE.LOAD, trajectoryId, study.id);
-        dispatch?.({
-          type: STUDY_ACTION.ADD_TRAJECTORY_LOAD,
-          payload: newTrajectory,
+        await linkTrajectoryToStudy(TRAJECTORY_TYPE.LOAD, trajectoryId, study.id);
+        const newTrajectories = await getStudyTrajectories(study.id, TRAJECTORY_TYPE.LOAD);
+        const newTrajectory = newTrajectories?.find((trajectory) => {
+          if (data[rowIndex].hypothesis === 'Other areas') {
+            return trajectory.loadArea === AREA_OTHERS;
+          } else {
+            return trajectory.loadArea === data[rowIndex].hypothesis;
+          }
         });
+        if (newTrajectory && newTrajectory.loadArea) {
+          const isDefaultAreaNotInState =
+            areasDefaultOptions?.some((area) => area.name === newTrajectory.loadArea) &&
+            !studyState?.[`${TRAJECTORY_TYPE.LOAD}`]?.some(
+              (trajectory) => trajectory.loadArea === newTrajectory.loadArea,
+            );
+          dispatch?.({
+            type: isDefaultAreaNotInState ? STUDY_ACTION.ADD_TRAJECTORY_LOAD : STUDY_ACTION.UPDATE_LOAD_TRAJECTORY,
+            payload: newTrajectory,
+          });
+        }
         setData((prev) =>
           prev.map((item, index) =>
             index === rowIndex
               ? {
                   ...item,
-                  trajectory: newTrajectory,
-                  status: TRAJECTORY_SELECTION_STATUS.OK,
+                  trajectory: newTrajectory ?? null,
+                  status: newTrajectory ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
                 }
               : item,
           ),
@@ -305,7 +326,7 @@ const LoadTab = () => {
         value.label,
         study.horizon,
         study.id,
-        data[rowIndexSelected]?.hypothesis === 'Others areas' ? AREA_OTHERS : data[rowIndexSelected]?.hypothesis,
+        data[rowIndexSelected]?.hypothesis === 'Other areas' ? AREA_OTHERS : data[rowIndexSelected]?.hypothesis,
         (progressValue: number) => {
           setProgress(+progressValue?.toFixed(0));
         },

@@ -72,7 +72,7 @@ const getLoadHypothesisTableHeaders = (
             onSearch={async (value?: string) =>
               await handlerSearch(
                 value,
-                row.original.hypothesis === 'Others areas' ? AREA_OTHERS : row.original.hypothesis,
+                row.original.hypothesis === 'Other areas' ? AREA_OTHERS : row.original.hypothesis,
               )
             }
             onClickButton={() => {
@@ -98,7 +98,7 @@ const getLoadHypothesisTableHeaders = (
           status={status}
           isDeletable={!isDefault && !(studyStatus === StudyStatus.GENERATED)}
           onClick={() => void options?.meta?.removeRow?.(row.index, hypothesis)}
-          message={trajectory?.messages?.[0]?.content}
+          message={trajectory?.messages?.[0]?.content ?? ''}
         />
       );
     },

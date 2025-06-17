@@ -65,7 +65,7 @@ export const buildErrorTrajectory = (
 
 export const removeDuplicate = (arr: DbTrajectory[]) =>
   arr.reduce((acc: DbTrajectory[], current: DbTrajectory) => {
-    const x = acc.find((item) => item.id === current.id);
+    const x = acc.find((item) => item.loadArea === current.loadArea);
     if (!x) {
       acc.push(current);
     }
@@ -73,13 +73,13 @@ export const removeDuplicate = (arr: DbTrajectory[]) =>
   }, []);
 
 export const buildRowData = (areaName: string, isDefault: boolean, trajectory?: DbTrajectory): HypothesisRowData => ({
-  hypothesis: areaName === AREA_OTHERS ? 'Others areas' : areaName,
+  hypothesis: areaName === AREA_OTHERS ? 'Other areas' : areaName,
   trajectory: trajectory?.trajectoryName ? trajectory : null,
   status: trajectory?.trajectoryName ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
   isDefault,
 });
 
-export const buildEmptyRowData = (areaName: string) => ({
+export const buildEmptyRowData = (areaName: string): DbTrajectory => ({
   id: Math.random(),
   trajectoryName: '',
   type: TRAJECTORY_TYPE.LOAD,

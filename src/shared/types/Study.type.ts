@@ -52,6 +52,9 @@ export type StudyActionType =
   | { type: STUDY_ACTION.CLEAR_AREA_TRAJECTORY }
   | { type: STUDY_ACTION.CLEAR_LINK_TRAJECTORY }
   | { type: STUDY_ACTION.DELETE_LOAD_TRAJECTORY; payload: string }
+  | { type: STUDY_ACTION.EMPTY_LOAD_TRAJECTORY; payload: string }
+  | { type: STUDY_ACTION.UPDATE_LOAD_TRAJECTORY; payload: DbTrajectory }
+  | { type: STUDY_ACTION.ADD_TRAJECTORIES_LOAD; payload: DbTrajectory[] }
   | { type: STUDY_ACTION.CLEAR_AREA_AND_LINK_TRAJECTORY }
   | { type: STUDY_ACTION.SET_STUDY_STATUS; payload: StudyStatus }
   | { type: STUDY_ACTION.ADD_WARNING_MESSAGE; payload: { message: WarningMessage; type: TRAJECTORY_TYPE } }
