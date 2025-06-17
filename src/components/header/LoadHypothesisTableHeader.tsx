@@ -67,7 +67,7 @@ const getLoadHypothesisTableHeaders = (
           <SelectInputWithButton
             onSelect={(value: SelectOption) => {
               setErrorInfo({ index: row.index, message: '' });
-              void options?.meta?.updateData?.(row.index, value.id, 'success');
+              void options?.meta?.updateData?.(row.index, value.id, 'success', value.label);
             }}
             onSearch={async (value?: string) =>
               await handlerSearch(
