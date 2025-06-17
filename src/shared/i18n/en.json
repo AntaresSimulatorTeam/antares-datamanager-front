@@ -64,7 +64,8 @@
   },
   "projectDetails": {
     "@buttonEdit": "Edit",
-    "@bannerProjectName": "Project: {{name}}"
+    "@bannerProjectName": "Project: {{name}}",
+    "@loading": "Loading project details..."
   },
   "projectModal": {
     "@keyword_already_exists": "Keyword already exists",
@@ -85,7 +86,7 @@
     "@delete": "Delete"
   },
   "studyDetails": {
-    "@loadingProjects": "Loading project details...",
+    "@loading": "Loading study details...",
     "@warnings": "Warnings",
     "@noWarnings": "No warning message at this time",
     "@bannerStudyName": "Study: {{name}}",

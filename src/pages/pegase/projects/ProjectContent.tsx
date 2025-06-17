@@ -56,10 +56,6 @@ const ProjectContent = () => {
     }
   };
 
-  const handleCardClick = (projectId: string, projectName: string) => {
-    navigateToProject(projectId, projectName);
-  };
-
   const { settingOption, deleteOption, pinOption } = useDropdownOptions();
 
   return (
@@ -84,7 +80,7 @@ const ProjectContent = () => {
               key={project.id}
               title={project.name}
               dropdownOptions={dropdownItems}
-              onClick={() => handleCardClick(project.id, project.name)}
+              onClick={() => void navigateToProject(project.id, project.name)}
               id={project.id}
             >
               <div className="flex flex-col items-start justify-between">

@@ -35,7 +35,7 @@ const PinnedProjectCards = () => {
               deleteOption(() => void deleteProject(project.id), t('project.@delete'), project.studies?.length > 0),
             ]}
             id={project.id}
-            onClick={() => navigateToProject(project.id, project.name)}
+            onClick={() => void navigateToProject(project.id, project.name)}
             icons={
               <div className="text-primary-600">
                 <RdsIcon name={RdsIconId.PushPin} />{' '}

@@ -22,7 +22,7 @@ import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/traj
 import {
   DbTrajectory,
   HypothesisRowData,
-  LocationState,
+  LocationStudy,
   RowStatus,
   SelectOption,
   StudyActionType,
@@ -52,7 +52,7 @@ interface AreaLinkTabProps {
 const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
   const studyState = useStudy();
   const location = useLocation();
-  const study = (location.state as LocationState)?.study;
+  const study = (location.state as LocationStudy)?.study;
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const dispatch = useStudyDispatch();
   const { t } = useTranslation();

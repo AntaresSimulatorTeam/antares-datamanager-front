@@ -16,3 +16,4 @@ export * from './Trajectory.type.ts';
 export * from './Input.type.ts';
 export * from './Warning.type.ts';
 export * from './Generic.type.ts';
+export * from './Breadcrumb.type.ts';

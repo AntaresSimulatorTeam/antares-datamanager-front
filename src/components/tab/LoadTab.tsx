@@ -10,7 +10,7 @@ import {
   DbTrajectory,
   ErrorMessageType,
   HypothesisRowData,
-  LocationState,
+  LocationStudy,
   RowStatus,
   SelectOption,
   TrajectoryAreaData,
@@ -60,7 +60,7 @@ const LoadTab = () => {
   const studyState = useStudy();
   const { user } = useUser();
   const location = useLocation();
-  const study = (location.state as LocationState)?.study;
+  const study = (location.state as LocationStudy)?.study;
   const dispatch = useStudyDispatch();
   //const navigate = useNavigate();
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});

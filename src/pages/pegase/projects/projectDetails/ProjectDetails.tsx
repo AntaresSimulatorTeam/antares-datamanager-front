@@ -15,6 +15,7 @@ import { RdsChip, RdsDivider } from 'rte-design-system-react';
 import { fetchProjectDetails } from '@/shared/services/projectService.ts';
 import DetailsContent from '@/components/banner/DetailsContent.tsx';
 import { useUser } from '@/store/contexts/UserContext.tsx';
+import { LocationProject } from '@/shared/types';
 
 const ProjectDetails = () => {
   const { t } = useTranslation();
@@ -38,12 +39,12 @@ const ProjectDetails = () => {
 
   const [projectInfo, setProjectDetails] = useState<ProjectInfo>({} as ProjectInfo);
   const location = useLocation();
-  const projectId = location.state?.projectId as string | null;
+  const projectId = (location.state as LocationProject)?.projectId as string | null;
 
   useEffect(() => {
     const getProjectDetails = async (id: string) => {
       try {
-        const data = (await fetchProjectDetails(id)) as ProjectInfo;
+        const data = await fetchProjectDetails(id);
 
         setProjectDetails({
           id: data.id,
@@ -66,12 +67,9 @@ const ProjectDetails = () => {
     }
   }, [projectId, projectInfo.id]);
 
-  /**
-   * Check if projectInfo is available before rendering the page
-   */
   return !projectInfo.id ? (
     <div className="flex h-screen items-center justify-center">
-      <p>Loading project details...</p>
+      <p>{t('projectDetails.@loading')}</p>
     </div>
   ) : (
     <div className="flex flex-col">

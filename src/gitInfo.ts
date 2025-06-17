@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "fix/load_kepp_empty_area",
-  commit: "21744ef",
-  commitTime: "2025-06-16T13:50:55.520Z"
+  branch: "feat/ANT-3157_study_page_handle_back_navigation",
+  commit: "34495ad",
+  commitTime: "2025-06-12T09:28:57.663Z"
 };
