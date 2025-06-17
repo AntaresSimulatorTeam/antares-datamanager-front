@@ -1,3 +1,5 @@
+import { TailwindColorClass } from '@/shared/types/TailwindColorClass.type.ts';
+
 export type ZIndex =
   | 'z-auto'
   | 'z-0'
@@ -12,7 +14,8 @@ export type ZIndex =
   | '-z-20'
   | '-z-50';
 
-export type PseudoClass =
+type PseudoClass =
+  | ''
   | 'hover:'
   | 'active:'
   | 'focus:'
@@ -22,10 +25,18 @@ export type PseudoClass =
   | 'before:'
   | '[&.active]:';
 
-export type TailwindPrefix = 'text' | 'bg' | 'border' | 'outline' | 'border-l' | 'border-r' | 'border-t' | 'border-b';
+type TailwindPrefix = 'text' | 'bg' | 'border' | 'outline';
 
-export type Delay = 0 | 75 | 100 | 150 | 200 | 300 | 500 | 700 | 1000;
+type Delay = 0 | 75 | 100 | 150 | 200 | 300 | 500 | 700 | 1000;
+export type TailwindDelayClass = `delay-${Delay}`;
 
-export type Duration = 0 | 75 | 100 | 150 | 200 | 300 | 500 | 700 | 1000;
+type Duration = 0 | 75 | 100 | 150 | 200 | 300 | 500 | 700 | 1000;
+export type TailwindDurationClass = `duration-${Duration}`;
 
-export type Rotate = 0 | 1 | 2 | 3 | 6 | 12 | 45 | 90 | 180;
+type Rotate = 0 | 1 | 2 | 3 | 6 | 12 | 45 | 90 | 180;
+export type TailwindRotateClass = `rotate-${Rotate}`;
+
+export type TailwindUtilityColorClass<
+  Prefix extends TailwindPrefix,
+  TPseudoClass extends PseudoClass = '',
+> = `${TPseudoClass}${Prefix}-${TailwindColorClass}`;

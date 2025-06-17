@@ -7,16 +7,17 @@ import StdNavbarController from './StdNavbarController';
 import StdNavbarLogoHeader from './StdNavbarLogoHeader';
 import StdNavbarMenu from './StdNavbarMenu';
 import StdNavbarTextHeader from './StdNavbarTextHeader';
-import { navbarClassBuilder } from './navbarClassBuilder';
+import { navbarClassBuilder } from './navbarClassBuilder.ts';
 import { NavbarContextProvider } from '@/store/contexts/navbarContext.tsx';
 import { MenuNavItem } from '@/shared/types';
+import { TailwindUtilityColorClass } from '@/shared/types/Tailwind.type.ts';
 
 export type NavbarConfig<E extends ElementType = AnchorDefaultAsType> = {
   header: HeaderStyleConfig<E>;
   itemContent?: ItemStyleConfig;
-  itemBackground?: ItemStyleConfig;
-  separatorColor?: TailwindColorClass;
-  textColor?: TailwindColorClass;
+  itemBackground?: ItemBackgroundStyleConfig;
+  separatorColor?: TailwindUtilityColorClass<'border'>;
+  textColor?: TailwindUtilityColorClass<'text'>;
 };
 
 export type LogoConfig = {
@@ -52,10 +53,24 @@ export type HeaderStyleConfig<E extends ElementType = AnchorDefaultAsType> =
   | HeaderStyleTextConfig<E>;
 
 export type ItemStyleConfig = {
-  main: TailwindColorClass;
-  hover?: TailwindColorClass;
-  active?: TailwindColorClass;
-  selected?: TailwindColorClass;
+  // main: TailwindColorClass;
+  // hover?: TailwindColorClass;
+  // active?: TailwindColorClass;
+  // selected?: TailwindColorClass;
+  mainText: TailwindUtilityColorClass<'text'>;
+  hoverText?: TailwindUtilityColorClass<'text', 'hover:'>;
+  activeText?: TailwindUtilityColorClass<'text', 'active:'>;
+  activeTextExplicit?: TailwindUtilityColorClass<'text', '[&.active]:'>;
+  selectedText?: TailwindUtilityColorClass<'text', '[&]:'>;
+  focusVisibleText?: TailwindUtilityColorClass<'outline', 'focus-visible:'>;
+};
+
+export type ItemBackgroundStyleConfig = {
+  mainBg: TailwindUtilityColorClass<'bg'>;
+  hoverBg?: TailwindUtilityColorClass<'bg', 'hover:'>;
+  activeBg?: TailwindUtilityColorClass<'bg', 'active:'>;
+  activeBgExplicit?: TailwindUtilityColorClass<'bg', '[&.active]:'>;
+  selectedBg?: TailwindUtilityColorClass<'bg', '[&]:'>;
 };
 
 export type StdNavbarProps<E extends ElementType = AnchorDefaultAsType> = PropsWithChildren<{
@@ -77,7 +92,7 @@ const StdNavbar = <E extends ElementType = AnchorDefaultAsType>({
     setExpanded((oldExpanded) => !oldExpanded);
   };
 
-  const backgroundColor = config.itemBackground?.main;
+  const backgroundColor = config.itemBackground?.mainBg;
   const { separatorColor, textColor, itemContent, itemBackground } = config;
 
   const navbarClasses = navbarClassBuilder(expanded, backgroundColor, separatorColor, textColor);

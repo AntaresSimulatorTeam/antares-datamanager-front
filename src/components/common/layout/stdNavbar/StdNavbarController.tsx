@@ -1,6 +1,6 @@
 import StdIcon from '../../base/stdIcon/StdIcon';
-import { ItemStyleConfig } from './StdNavbar';
-import { navbarControllerClassBuilder } from './navbarClassBuilder';
+import { ItemBackgroundStyleConfig, ItemStyleConfig } from './StdNavbar';
+import { navbarControllerClassBuilder } from './navbarClassBuilder.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 type StdNavbarControllerProps = {
@@ -9,7 +9,7 @@ type StdNavbarControllerProps = {
   expanded?: boolean;
   itemsStyleConfig: {
     itemContent?: ItemStyleConfig;
-    itemBackground?: ItemStyleConfig;
+    itemBackground?: ItemBackgroundStyleConfig;
   };
 };
 

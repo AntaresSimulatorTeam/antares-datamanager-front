@@ -1,9 +1,7 @@
-import { TailwindColorClass } from '@/shared/types/TailwindColorClass.type';
-import { buildColorClass } from '@/shared/utils/tailwindClass';
 import { clsx } from 'clsx';
-import { HeaderStyleConfig, ItemStyleConfig } from './StdNavbar';
+import { HeaderStyleConfig, ItemBackgroundStyleConfig, ItemStyleConfig } from './StdNavbar';
 import { AnchorDefaultAsType } from '@common/base/element.type.ts';
-import { ElementType } from 'react';
+import { TailwindUtilityColorClass } from '@/shared/types/Tailwind.type.ts';
 
 export const NAVBAR_BASE_CLASSES =
   'flex-none flex flex-col border-r text-left gap-2 h-screen transition-all ease-out duration-300';
@@ -16,40 +14,42 @@ export const NAVBAR_COLOR_CLASSES = {
 export const NAVBAR_EXPANDED_CLASSES = 'w-28 px-1';
 export const NAVBAR_COLLAPSED_CLASSES = 'w-8 items-center';
 
-export const DEFAULT_BACKGROUND_CONFIG: Required<ItemStyleConfig> = {
-  main: 'gray-w',
-  hover: 'gray-w',
-  active: 'gray-w',
-  selected: 'gray-w',
+export const DEFAULT_BACKGROUND_CONFIG: Required<ItemBackgroundStyleConfig> = {
+  mainBg: 'bg-gray-100',
+  hoverBg: 'hover:bg-gray-200',
+  activeBg: 'active:bg-gray-300',
+  selectedBg: '[&]:bg-gray-300',
+  activeBgExplicit: '[&.active]:bg-gray-300',
 } as const;
 
 export const DEFAULT_CONTENT_CONFIG: Required<ItemStyleConfig> = {
-  main: 'gray-700',
-  hover: 'gray-900',
-  active: 'gray-900',
-  selected: 'gray-900',
+  mainText: 'text-gray-700',
+  hoverText: 'hover:text-gray-900',
+  activeText: 'active:text-gray-900',
+  selectedText: '[&]:text-gray-900',
+  focusVisibleText: 'focus-visible:outline-gray-900',
+  activeTextExplicit: '[&.active]:text-gray-900',
 } as const;
 
-export const DEFAULT_SEPARATOR_COLOR: TailwindColorClass = 'gray-300';
+export const DEFAULT_SEPARATOR_COLOR = 'border-gray-200';
 
-export const DEFAULT_TEXT_COLOR = 'gray-900';
+export const DEFAULT_TEXT_COLOR = 'text-gray-900';
 
 export const navbarClassBuilder = (
   expanded: boolean,
-  backgroundColor?: TailwindColorClass,
-  separatorColor?: TailwindColorClass,
-  textColor?: TailwindColorClass,
+  backgroundColor?: TailwindUtilityColorClass<'bg'>,
+  separatorColor?: TailwindUtilityColorClass<'border'>,
+  textColor?: TailwindUtilityColorClass<'text'>,
 ) =>
   clsx(
     NAVBAR_BASE_CLASSES,
-    buildColorClass('text', textColor || DEFAULT_TEXT_COLOR),
-    buildColorClass('bg', backgroundColor || DEFAULT_CONTENT_CONFIG.main),
-    buildColorClass('border', separatorColor || DEFAULT_SEPARATOR_COLOR),
+    textColor || DEFAULT_TEXT_COLOR,
+    backgroundColor || DEFAULT_BACKGROUND_CONFIG.mainBg,
+    separatorColor || DEFAULT_SEPARATOR_COLOR,
     expanded ? NAVBAR_EXPANDED_CLASSES : NAVBAR_COLLAPSED_CLASSES,
   );
 
-export const NAVBAR_ITEM_BASE_CLASSES =
-  'border-l-2 border-transparent m-1 flex items-center gap-1 truncate rounded p-1 text-button-s font-semibold';
+export const NAVBAR_ITEM_BASE_CLASSES = 'mx-1 flex items-center gap-1 truncate rounded p-1 text-button-s font-semibold';
 export const NAVBAR_ITEM_FOCUS_CLASSES = 'focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-0';
 
 export const NAVBAR_ITEM_COMMON_CLASSES = clsx(NAVBAR_ITEM_BASE_CLASSES, NAVBAR_ITEM_FOCUS_CLASSES);
@@ -58,25 +58,20 @@ export const NAVBAR_ITEM_COLLAPSED_CLASSES = 'w-fit';
 export const navbarItemClassBuilder = (
   selected: boolean,
   expanded: boolean,
-  itemBackgroundConfig?: ItemStyleConfig,
+  itemBackgroundConfig?: ItemBackgroundStyleConfig,
   itemContentConfig?: ItemStyleConfig,
 ) => {
   const navbarItemStatusClasses = clsx(
-    buildColorClass('bg', itemBackgroundConfig?.main || DEFAULT_BACKGROUND_CONFIG.main),
-    buildColorClass('border-b', itemBackgroundConfig?.hover || DEFAULT_BACKGROUND_CONFIG.hover, 'hover:'),
-    buildColorClass('text', itemContentConfig?.hover || DEFAULT_CONTENT_CONFIG.hover, 'hover:'),
-    buildColorClass('border-b', itemBackgroundConfig?.active || DEFAULT_BACKGROUND_CONFIG.active, 'active:'),
-    buildColorClass('text', itemContentConfig?.active || DEFAULT_CONTENT_CONFIG.active, 'active:'),
-    buildColorClass('bg', itemBackgroundConfig?.active || DEFAULT_BACKGROUND_CONFIG.active, '[&.active]:'),
-    buildColorClass('text', itemContentConfig?.active || DEFAULT_CONTENT_CONFIG.active, '[&.active]:'),
+    itemBackgroundConfig?.mainBg || DEFAULT_BACKGROUND_CONFIG.mainBg,
+    itemBackgroundConfig?.hoverBg || DEFAULT_BACKGROUND_CONFIG.hoverBg,
+    itemContentConfig?.hoverText || DEFAULT_CONTENT_CONFIG.hoverText,
+    itemBackgroundConfig?.activeBg || DEFAULT_BACKGROUND_CONFIG.activeBg,
+    itemContentConfig?.activeText || DEFAULT_CONTENT_CONFIG.activeText,
+    itemBackgroundConfig?.activeBgExplicit || DEFAULT_BACKGROUND_CONFIG.activeBgExplicit,
+    itemContentConfig?.activeTextExplicit || DEFAULT_CONTENT_CONFIG.activeTextExplicit,
   );
 
-  const navbarItemFocusExtraClasses = buildColorClass(
-    'outline',
-    itemContentConfig?.hover || DEFAULT_CONTENT_CONFIG.hover,
-    'focus-visible:',
-  );
-
+  const navbarItemFocusExtraClasses = itemContentConfig?.focusVisibleText || DEFAULT_CONTENT_CONFIG.focusVisibleText;
   const navbarItemBaseClasses = clsx(NAVBAR_ITEM_COMMON_CLASSES, navbarItemStatusClasses, navbarItemFocusExtraClasses);
   const expandedClasses = !expanded ? NAVBAR_ITEM_COLLAPSED_CLASSES : '';
 
@@ -84,19 +79,19 @@ export const navbarItemClassBuilder = (
     return clsx(
       navbarItemBaseClasses,
       expandedClasses,
-      buildColorClass('bg', itemBackgroundConfig?.selected || DEFAULT_BACKGROUND_CONFIG.selected, '[&]:'),
-      buildColorClass('text', itemContentConfig?.selected || DEFAULT_CONTENT_CONFIG.selected, '[&]:'),
+      itemBackgroundConfig?.selectedBg || DEFAULT_BACKGROUND_CONFIG.selectedBg,
+      itemContentConfig?.selectedText || DEFAULT_CONTENT_CONFIG.selectedText,
     );
   }
 
   return clsx(navbarItemBaseClasses, expandedClasses);
 };
 
-export const NAVBAR_CONTROLLER_BASE_CLASSES = 'w-fill mb-2';
+export const NAVBAR_CONTROLLER_BASE_CLASSES = 'w-(--fill-available) mb-2 cursor-pointer';
 
 export const navbarControllerClassBuilder = (
   expanded: boolean,
-  itemBackgroundConfig?: ItemStyleConfig,
+  itemBackgroundConfig?: ItemBackgroundStyleConfig,
   itemContentConfig?: ItemStyleConfig,
 ) =>
   clsx(
@@ -110,29 +105,23 @@ export const VERSIONS_CLASSES = {
   logo: 'self-end text-heading-xs',
 };
 
-export const DEFAULT_TWO_LETTERS_BACKGROUND = 'primary-600';
-export const DEFAULT_TWO_LETTERS_TEXT = 'gray-w';
+export const DEFAULT_TWO_LETTERS_BACKGROUND = 'bg-primary-600';
+export const DEFAULT_TWO_LETTERS_TEXT = 'text-gray-w';
 
-export const navbarHeaderClassBuilder = <E extends ElementType = AnchorDefaultAsType>(
+export const navbarHeaderClassBuilder = <E extends React.ElementType = AnchorDefaultAsType>(
   headerConfig: HeaderStyleConfig<E>,
 ) => {
   if (headerConfig.variant === 'text') {
     return {
       twoLettersClasses: clsx(
         TWO_LETTERS_CLASSES,
-        buildColorClass('bg', headerConfig.twoLettersBackground || DEFAULT_TWO_LETTERS_BACKGROUND),
-        buildColorClass('text', headerConfig.twoLettersColor || DEFAULT_TWO_LETTERS_TEXT),
+        headerConfig.twoLettersBackground || DEFAULT_TWO_LETTERS_BACKGROUND,
+        headerConfig.twoLettersColor || DEFAULT_TWO_LETTERS_TEXT,
       ),
-      versionClasses: clsx(
-        VERSIONS_CLASSES[headerConfig.variant],
-        buildColorClass('text', headerConfig.versionTextColor),
-      ),
+      versionClasses: clsx(VERSIONS_CLASSES[headerConfig.variant], headerConfig.versionTextColor),
     };
   }
   return {
-    versionClasses: clsx(
-      VERSIONS_CLASSES[headerConfig.variant],
-      buildColorClass('text', headerConfig.versionTextColor),
-    ),
+    versionClasses: clsx(VERSIONS_CLASSES[headerConfig.variant], headerConfig.versionTextColor),
   };
 };

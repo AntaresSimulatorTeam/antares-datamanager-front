@@ -1,7 +1,7 @@
 import { MenuNavItem } from '@/shared/types';
 import StdIcon from '../../base/stdIcon/StdIcon';
-import { ItemStyleConfig } from './StdNavbar';
-import { navbarItemClassBuilder } from './navbarClassBuilder';
+import { ItemBackgroundStyleConfig, ItemStyleConfig } from './StdNavbar';
+import { navbarItemClassBuilder } from './navbarClassBuilder.ts';
 import { Link } from 'react-router-dom';
 
 type StdNavbarMenuItemProps = {
@@ -10,7 +10,7 @@ type StdNavbarMenuItemProps = {
   selected?: boolean;
   itemsStyleConfig: {
     itemContent?: ItemStyleConfig;
-    itemBackground?: ItemStyleConfig;
+    itemBackground?: ItemBackgroundStyleConfig;
   };
   currentItemKey?: string;
 };

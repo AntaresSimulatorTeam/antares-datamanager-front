@@ -1,6 +1,6 @@
 import { clsx } from 'clsx';
 import { HeaderStyleTextConfig } from './StdNavbar';
-import { navbarHeaderClassBuilder } from './navbarClassBuilder';
+import { navbarHeaderClassBuilder } from './navbarClassBuilder.ts';
 import { AnchorDefaultAsType } from '@common/base/element.type.ts';
 import { ElementType } from 'react';
 

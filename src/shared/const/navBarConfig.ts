@@ -7,24 +7,6 @@
 import { APP_NAME } from '@/shared/constants.ts';
 import { NavbarConfig } from '@common/layout/stdNavbar/StdNavbar.tsx';
 
-// export const navBarConfig = {
-//   header: {
-//     variant: 'logo',
-//     versionTextColor: 'gray-600',
-//     appName: APP_NAME,
-//     appVersion: `v${import.meta.env.VITE_APP_VERSION}`,
-//     as: 'a',
-//     //headerLink: '/',
-//     headerId: 'main-nav-bar-controller',
-//     logoConfig: {
-//       logoExpandedHref: 'brand/logo_antares_pegase_light_expand.svg',
-//       logoExpandedId: 'appIcon-collapsed-id',
-//       logoCollapsedHref: 'brand/logo_antares_pegase_light_collapse.svg',
-//       logoCollapsedId: 'appIcon-expanded-id',
-//     },
-//   } as HeaderStyleTextConfig,
-// };
-
 export const navBarConfig: NavbarConfig = {
   header: {
     appName: APP_NAME,
@@ -39,17 +21,18 @@ export const navBarConfig: NavbarConfig = {
     to: '/',
   },
   itemContent: {
-    main: 'gray-800',
-    hover: 'primary-500',
-    active: 'gray-900',
-    selected: 'gray-900',
+    mainText: 'text-gray-800',
+    hoverText: 'hover:text-gray-800',
+    activeText: 'active:text-gray-800',
+    selectedText: '[&]:text-gray-800',
   },
   itemBackground: {
-    main: 'gray-w',
-    hover: 'primary-500',
-    active: 'gray-w',
-    selected: 'gray-w',
+    mainBg: 'bg-gray-w',
+    hoverBg: 'hover:bg-acc1-100',
+    activeBg: 'active:bg-acc1-400',
+    activeBgExplicit: '[&.active]:bg-acc1-400',
+    selectedBg: '[&]:bg-acc1-400',
   },
-  separatorColor: 'gray-700',
-  textColor: 'gray-800',
+  separatorColor: 'border-transparent',
+  textColor: 'text-gray-800',
 };

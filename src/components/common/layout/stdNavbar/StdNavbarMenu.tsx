@@ -1,4 +1,4 @@
-import { ItemStyleConfig } from './StdNavbar';
+import { ItemBackgroundStyleConfig, ItemStyleConfig } from './StdNavbar';
 import StdNavbarMenuItem from './StdNavbarMenuItem';
 import { MenuNavItem } from '@/shared/types';
 
@@ -7,7 +7,7 @@ type StdNavbarMenuProps = {
   expanded?: boolean;
   itemsStyleConfig?: {
     itemContent?: ItemStyleConfig;
-    itemBackground?: ItemStyleConfig;
+    itemBackground?: ItemBackgroundStyleConfig;
   };
   currentItemKey?: string;
 };
