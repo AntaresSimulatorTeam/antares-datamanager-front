@@ -18,7 +18,7 @@ import {
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useTranslation } from 'react-i18next';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   fetchTrajectoriesFromDB,
   fetchTrajectoriesFromFS,
@@ -49,6 +49,8 @@ import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { DeletionModal } from '@common/modal/DeletionModal.tsx';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
+import { notifyAlert } from '@/shared/notification/notification.tsx';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 export type CheckBoxData = {
   name: string;
@@ -62,7 +64,7 @@ const LoadTab = () => {
   const location = useLocation();
   const study = (location.state as LocationStudy)?.study;
   const dispatch = useStudyDispatch();
-  //const navigate = useNavigate();
+  const navigate = useNavigate();
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
   const [readOnlyAreas, setReadOnlyAreas] = useState<string[]>([]);
   const [data, setData] = useState<HypothesisRowData[]>([]);
@@ -234,17 +236,16 @@ const LoadTab = () => {
       ),
     );
 
-    // TODO : Do not remove - uncomment
-    // notifyAlert({
-    //   icon: StdIconId.Close,
-    //   message: `Error: ${trajectoryLabel} cannot be saved for ${data[rowIndex]?.hypothesis}`,
-    //   type: 'error',
-    //   filledIcon: true,
-    //   action: {
-    //     label: t('studyDetails.@viewLog'),
-    //     onClick: () => void navigate('/logs'),
-    //   },
-    // });
+    notifyAlert({
+      icon: StdIconId.Close,
+      message: `Error: ${trajectoryLabel} cannot be saved for ${data[rowIndex]?.hypothesis}`,
+      type: 'error',
+      filledIcon: true,
+      action: {
+        label: t('studyDetails.@viewLog'),
+        onClick: () => void navigate('/logs'),
+      },
+    });
   };
 
   const handleTrajectoryUpdate = async (
