@@ -77,7 +77,7 @@ const LoadTab = () => {
   const [rowToDelete, setRowToDelete] = useState<{ index: number; value?: string } | null>(null);
   const [progress, setProgress] = useState(0);
   const [fileStatus, setFileStatus] = useState<FileInputStatus>('empty');
-  const [isStudyGenerated, _] = useState(
+  const [isStudyGenerated, setIsStudyGenerated] = useState(
     studyState.studyStatus === StudyStatus.GENERATED || study.status === StudyStatus.GENERATED,
   );
 
@@ -193,7 +193,10 @@ const LoadTab = () => {
   }, []);
 
   useEffect(() => {
-    setReadOnlyForGeneratedStudy(data);
+    if (studyState.studyStatus === StudyStatus.GENERATED || study?.status === StudyStatus.GENERATED) {
+      setIsStudyGenerated(true);
+      setReadOnlyForGeneratedStudy(data);
+    }
   }, [studyState.studyStatus, study?.status]);
 
   const handleFetchTrajectoriesFS = async (index: number) => {
