@@ -20,7 +20,6 @@ export type StdCheckboxProps = {
   error?: boolean;
   delayDebounce?: number;
   indeterminate?: boolean;
-  checked?: boolean;
 };
 
 const StdCheckbox = ({
@@ -36,7 +35,6 @@ const StdCheckbox = ({
   error = false,
   required = false,
   indeterminate,
-  checked = false,
 }: StdCheckboxProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -64,7 +62,6 @@ const StdCheckbox = ({
         name={name}
         disabled={disabled}
         defaultChecked={defaultChecked}
-        checked={checked}
         onChange={handleOnChange}
         onMouseDown={(e) => e.preventDefault()}
         onBlur={onBlur}

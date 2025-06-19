@@ -21,7 +21,6 @@ import { ThermalOptions } from '@/mocks/data/list/names';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { buildRowWithSubRowsData, retrieveReadOnlyArea } from '@/shared/utils/trajectoryUtils.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
-import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 
 const ThermalTab = () => {
   const { t } = useTranslation();
