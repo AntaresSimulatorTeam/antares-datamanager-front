@@ -1,4 +1,4 @@
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
+import { StdIconId } from '@/shared/utils/mappings/common/iconMaps';
 import {
   ACTIVE_CLASSES,
   BORDER_CLASSES,
