@@ -97,7 +97,7 @@
     "@link": "Link",
     "@areas_links": "Areas & Links",
     "@load": "Load",
-    "@thermal": "thermal",
+    "@thermal": "Thermal",
     "@enr": "ENR",
     "@misc": "Misc",
     "@trajectory": "Trajectory",
@@ -121,6 +121,10 @@
     "@search_area": "Search area",
     "@or": "or",
     "@viewLog": "View Log"
+  },
+  "thermal": {
+    "@installedPower": "Installed Power",
+    "@parameters": "Parameters"
   },
   "trajectoryViewModal": {
     "@title_area": "Areas",

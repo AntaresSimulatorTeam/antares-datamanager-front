@@ -84,13 +84,7 @@ const LoadTab = () => {
   );
 
   const setReadOnlyForGeneratedStudy = (rows: HypothesisRowData[]) => {
-    const areaWithoutTrajectory = rows.map((row) => {
-      if (row.trajectory == null) {
-        return row.hypothesis;
-      } else {
-        return null;
-      }
-    });
+    const areaWithoutTrajectory = rows.map((row) => (row.trajectory == null ? row.hypothesis : null));
     const readOnlyRows = retrieveReadOnlyArea(rows, areaWithoutTrajectory.filter(Boolean) as string[]);
     setReadOnly(readOnlyRows);
   };
@@ -458,6 +452,7 @@ const LoadTab = () => {
             name={''}
             onChange={(value: string, status?: boolean) => void handleSelectionChange(value, status)}
             checkedValues={checkedValues}
+            disabled={isStudyGenerated}
           >
             {areasOptions?.map((area, index) => (
               <div key={`${index}-${area.name}`} className="my-1">
@@ -467,8 +462,8 @@ const LoadTab = () => {
                   value={area.name}
                   name={''}
                   defaultChecked={area.isDefault}
-                  disabled={area.isDefault || isStudyGenerated}
-                  checked={area.isDefault || isStudyGenerated}
+                  disabled={area.isDefault}
+                  checked={area.isDefault}
                 />
                 {index === Math.max(areasDefaultOptions?.length - 2, 0) && <RdsDivider extraClasses="mt-1" />}
               </div>

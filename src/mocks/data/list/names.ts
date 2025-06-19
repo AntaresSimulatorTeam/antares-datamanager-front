@@ -209,3 +209,16 @@ export const LIST_FIRSTNAME = [
   'Enzo',
   'Imran',
 ];
+
+export const ThermalOptions = [
+  'Additional power',
+  'Biomass',
+  'CCGT',
+  'CHP',
+  'Coal',
+  'DSR',
+  'Nuclear',
+  'Other',
+  'Reserves',
+  'Storage battery',
+];

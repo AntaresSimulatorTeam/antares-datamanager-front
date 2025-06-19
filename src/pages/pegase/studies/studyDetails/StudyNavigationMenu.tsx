@@ -49,10 +49,10 @@ const StudyNavigationMenu = ({
       isDisabled: !!studyState[`${TRAJECTORY_TYPE.AREA}`]?.[0],
     },
     {
-      name: TRAJECTORY_TYPE.THERMAL_COST,
+      name: TRAJECTORY_TYPE.THERMAL_CAPACITY,
       label: t('studyDetails.@thermal'),
       icon: StdIconId.LocalFireDepartment,
-      isDisabled: true,
+      isDisabled: !!studyState[`${TRAJECTORY_TYPE.AREA}`]?.[0],
     },
     { name: TRAJECTORY_TYPE.ENR, label: t('studyDetails.@enr'), icon: StdIconId.EnergySavingsLeaf, isDisabled: true },
     { name: TRAJECTORY_TYPE.MISC, label: t('studyDetails.@misc'), icon: StdIconId.Category, isDisabled: true },
@@ -64,7 +64,7 @@ const StudyNavigationMenu = ({
         return <AreaLinkTab setErrorMessage={setErrorMessage} />;
       case TRAJECTORY_TYPE.LOAD:
         return <LoadTab />;
-      case TRAJECTORY_TYPE.THERMAL_COST:
+      case TRAJECTORY_TYPE.THERMAL_CAPACITY:
         return <ThermalTab />;
       case TRAJECTORY_TYPE.ENR:
         return <EnrTab />;
@@ -75,18 +75,11 @@ const StudyNavigationMenu = ({
     }
   };
 
-  const isTabDisabled = (name: TRAJECTORY_TYPE) => {
-    if (name === TRAJECTORY_TYPE.LOAD) {
-      return !studyState[`${TRAJECTORY_TYPE.AREA}`]?.[0];
-    }
-    return name !== TRAJECTORY_TYPE.AREA;
-  };
-
   useEffect(() => {
     setTabs((prev) =>
       prev.map((tab) => ({
         ...tab,
-        isDisabled: isTabDisabled(tab.name),
+        isDisabled: !studyState[`${TRAJECTORY_TYPE.AREA}`]?.[0],
       })),
     );
   }, [studyState]);
