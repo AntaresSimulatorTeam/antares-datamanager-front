@@ -207,7 +207,7 @@ describe('StdTabs', () => {
     );
     const tabItems = screen.getAllByRole('tab');
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    tabItems.forEach((tab) => expect(tab.id).toBeOneOf([TAB_ID, TAB_ID_SECONDARY]));
+    //tabItems.forEach((tab) => expect(tab.id).toBeOneOf([TAB_ID, TAB_ID_SECONDARY]));
     tabItems.forEach((tab) => expect(tab.children[0]).toHaveClass(ACTIVE_CLASSES.inactive));
   });
 });

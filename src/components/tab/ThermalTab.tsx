@@ -23,12 +23,11 @@ import { ThermalOptions } from '@/mocks/data/list/names';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { retrieveReadOnlyArea } from '@/shared/utils/trajectoryUtils.ts';
 
-type ThermalOptions = 'POWER' | 'PARAMETERS';
-
 const ThermalTab = () => {
   const { t } = useTranslation();
   const studyState = useStudy();
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
+  const [nestedCheckedValues, setNestedCheckedValues] = useState<string[]>([]);
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
   const [areasDefaultOptions, setAreasDefaultOptions] = useState<CheckBoxData[]>([]);
   const [defaultData, setDefaultData] = useState<HypothesisRowData[]>([]);
@@ -47,10 +46,6 @@ const ThermalTab = () => {
   const [rowIndexSelected] = useState(0);
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
 
-  const handleSelectionChange = async (value: string, status?: boolean) => {
-    console.log('================= value', value, status);
-    return Promise.resolve();
-  };
   const handleFetchTrajectoriesFS = async () => Promise.resolve();
   const handleTrajectorySearch = (value?: string, area?: string) => {
     console.log('================= area', area, value);
@@ -179,7 +174,7 @@ const ThermalTab = () => {
           <StdCheckboxGroupWrapper
             label={''}
             name={''}
-            onChange={(value: string, status?: boolean) => void handleSelectionChange(value, status)}
+            onChange={(value: string) => setCheckedValues((prev) => [...prev, value])}
             checkedValues={checkedValues}
           >
             {areasOptions?.map((area, index) => (
@@ -191,8 +186,8 @@ const ThermalTab = () => {
                   name={''}
                   defaultChecked={area.isDefault}
                   disabled={area.isDefault}
-                  checkedValues={[]}
-                  handleSelection={() => Promise.resolve()}
+                  checkedValues={nestedCheckedValues}
+                  handleSelection={(value: string) => setNestedCheckedValues((prev) => [...prev, value])}
                   options={ThermalOptions}
                 />
                 {index === Math.max(areasDefaultOptions?.length - 2, 0) && <RdsDivider extraClasses="mt-1" />}
