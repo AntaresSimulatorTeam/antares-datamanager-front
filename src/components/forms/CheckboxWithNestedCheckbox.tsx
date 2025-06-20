@@ -119,7 +119,7 @@ const CheckboxWithNestedCheckbox = ({
           <StdCheckboxGroupWrapper
             label={''}
             name={''}
-            onChange={(checkedValue: string) => void handleSelection(checkedValue)}
+            onChange={(checkedValue: string) => handleSelection(checkedValue)}
             checkedValues={checkedValues}
             possibleValues={options}
           >
