@@ -1,7 +1,7 @@
 import { clsx } from 'clsx';
 
 export const COMMON_CHECKBOX_CLASSES =
-  'box-content h-1.5 w-1.5 flex items-center rounded-xs border peer-not-indeterminate:peer-checked:[&_.done-icon]:block peer-indeterminate:checked:[&_.indeterminate-icon]:block';
+  'box-content h-1.5 w-1.5 flex items-center rounded-xs border peer-checked:[&_.done-icon]:block checked:[&_.indeterminate-icon]:block';
 
 export const CHECKED_CLASSES =
   'peer-checked:bg-primary-600 peer-checked:border-primary-600 group-hover:peer-checked:bg-primary-700 group-hover:peer-checked:border-primary-700 group-active:peer-checked:bg-primary-900 group-active:peer-checked:border-primary-900 peer-focus-visible:peer-checked:outline-primary-900 peer-focus-visible:peer-checked:outline-primary-900';

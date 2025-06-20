@@ -27,7 +27,6 @@ const ThermalTab = () => {
   const { t } = useTranslation();
   const studyState = useStudy();
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
-  const [nestedCheckedValues, setNestedCheckedValues] = useState<string[]>([]);
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
   const [areasDefaultOptions, setAreasDefaultOptions] = useState<CheckBoxData[]>([]);
   const [defaultData, setDefaultData] = useState<HypothesisRowData[]>([]);
@@ -186,8 +185,7 @@ const ThermalTab = () => {
                   name={''}
                   defaultChecked={area.isDefault}
                   disabled={area.isDefault}
-                  checkedValues={nestedCheckedValues}
-                  handleSelection={(value: string) => setNestedCheckedValues((prev) => [...prev, value])}
+                  handleSelection={async () => Promise.resolve()}
                   options={ThermalOptions}
                 />
                 {index === Math.max(areasDefaultOptions?.length - 2, 0) && <RdsDivider extraClasses="mt-1" />}

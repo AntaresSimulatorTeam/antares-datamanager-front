@@ -24,8 +24,7 @@ export type CheckboxWithNestedCheckboxProps = {
   delayDebounce?: number;
   indeterminate?: boolean;
   options: string[];
-  handleSelection: (value: string) => void;
-  checkedValues: string[];
+  handleSelection: (value: string) => Promise<void>;
 };
 
 const CheckboxWithNestedCheckbox = ({
@@ -44,10 +43,10 @@ const CheckboxWithNestedCheckbox = ({
   indeterminate,
   options,
   handleSelection,
-  checkedValues,
 }: CheckboxWithNestedCheckboxProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [checkedValues, setCheckedValues] = useState<string[]>([]);
 
   useEffect(() => {
     if (inputRef.current) {
@@ -61,6 +60,17 @@ const CheckboxWithNestedCheckbox = ({
 
   const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     void onChange?.(event.target.checked);
+  };
+
+  const onHandleSelection = (valueChecked: string) => {
+    setCheckedValues((prev) => {
+      if (prev.includes(valueChecked)) {
+        return [...prev.filter((checkedValue) => checkedValue !== valueChecked)];
+      } else {
+        return [...prev, valueChecked];
+      }
+    });
+    void handleSelection?.(valueChecked);
   };
 
   return (
@@ -109,7 +119,7 @@ const CheckboxWithNestedCheckbox = ({
           <StdCheckboxGroupWrapper
             label={''}
             name={''}
-            onChange={(checkedValue: string) => handleSelection(checkedValue)}
+            onChange={(checkedValue: string) => void onHandleSelection(checkedValue)}
             checkedValues={checkedValues}
             possibleValues={options}
           >
