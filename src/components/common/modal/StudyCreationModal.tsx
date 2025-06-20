@@ -10,12 +10,13 @@ import { useTranslation } from 'react-i18next';
 import KeywordsInput from '@/components/input/KeywordsInput.tsx';
 import HorizonInput from '@/components/input/HorizonInput';
 import ProjectInput from '@/components/input/ProjectInput.tsx';
-import { saveStudy } from '@/shared/services/studyService';
+import { saveStudy, duplicateStudy } from '@/shared/services/studyService';
 import { StudyDTO } from '@/shared/types';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { notifyToast } from '@/shared/notification/notification';
 import { validateMaxLength } from '@/shared/utils/validateMaxTextLength';
 import { MAX_STUDY_NAME_LENGTH } from '@/shared/const/studyConfig';
+import { BackendError } from '@/shared/utils/errrorHandler';
 
 interface StudyCreationModalProps {
   isOpen?: boolean;
@@ -39,6 +40,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
   const [isFormValid, setIsFormValid] = useState(false);
   const { user } = useUser();
   const [isHorizonValid, setIsHorizonValid] = useState(false);
+  const [duplicateErrorMessage, setDuplicateErrorMessage] = useState<string>('');
 
   const [horizon, setHorizon] = useState<string>(() => {
     const rawHorizon = study?.horizon || '';
@@ -50,8 +52,13 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
   const handleStudyNameChange = (value: string) => {
     if (validateMaxLength(value, MAX_STUDY_NAME_LENGTH)) {
       setStudyName(value || '');
+      // Clear duplication error message when study name changes
+      if (duplicateErrorMessage) {
+        setDuplicateErrorMessage('');
+      }
     }
   };
+
 
   const saveStudyHandler = async () => {
     if (study && studyName.trim() === study.name.trim()) {
@@ -61,6 +68,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
       });
       return;
     }
+
     const studyData = {
       name: studyName,
       createdBy: user?.profile.sub,
@@ -78,8 +86,51 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
       setHorizon('');
       setKeywords([]);
       onClose();
-    } catch {
-      // Modal remains open if error occurred
+    } catch (error) {
+      // Handle errors with toast notification
+      notifyToast({
+        type: 'error',
+        message: (error as BackendError).antaresErrorMessage || 'Error creating study',
+      });
+    }
+  };
+
+  const duplicateStudyHandler = async () => {
+    // Clear any previous error messages
+    setDuplicateErrorMessage('');
+
+    if (study && studyName.trim() === study.name.trim()) {
+      notifyToast({
+        type: 'error',
+        message: 'A study with the same name already exists for the given project',
+      });
+      return;
+    }
+
+    const studyData = {
+      name: studyName,
+      createdBy: user?.profile.sub,
+      keywords,
+      project: projectName,
+      horizon,
+      trajectoryIds,
+    };
+
+    try {
+      await duplicateStudy(studyData);
+      setReloadStudies((prev) => !prev);
+      setStudyName('');
+      setProjectName('');
+      setHorizon('');
+      setKeywords([]);
+      onClose();
+    } catch (error) {
+
+      let errorMsg = (error as BackendError).antaresErrorMessage || 'Error duplicating study';
+
+      errorMsg = errorMsg.replace(/:\s+/g, ': ');
+
+      setDuplicateErrorMessage(errorMsg);
     }
   };
 
@@ -110,10 +161,22 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
 
   const handleHorizonChange = (value: string) => {
     setHorizon(value);
+    // Clear duplication error message when horizon changes
+    if (duplicateErrorMessage) {
+      setDuplicateErrorMessage('');
+    }
   };
 
   const handleHorizonValidityChange = (valid: boolean) => {
     setIsHorizonValid(valid);
+  };
+
+  const handleProjectNameChange = (value: string) => {
+    setProjectName(value);
+    // Clear duplication error message when project name changes
+    if (duplicateErrorMessage) {
+      setDuplicateErrorMessage('');
+    }
   };
 
   return (
@@ -137,7 +200,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
             </div>
             {study && (
               <div className="w-1/2">
-                <ProjectInput value={projectName} onChange={setProjectName} required />
+                <ProjectInput value={projectName} onChange={handleProjectNameChange} required />
               </div>
             )}
           </div>
@@ -146,6 +209,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
             onChange={handleHorizonChange}
             onValidChange={handleHorizonValidityChange}
             required
+            customErrorMessage={study ? duplicateErrorMessage : undefined}
           />
           <KeywordsInput
             keywords={keywords}
@@ -161,7 +225,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
         <RdsButton
           icon={study ? RdsIconId.ContentCopy : RdsIconId.Add}
           label={study ? t('study.@duplicate') : t('studyModal.@button_create')}
-          onClick={() => void saveStudyHandler()}
+          onClick={() => void (study ? duplicateStudyHandler() : saveStudyHandler())}
           variant="contained"
           color="primary"
           disabled={!isFormValid}
