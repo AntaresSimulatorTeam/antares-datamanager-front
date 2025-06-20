@@ -9,8 +9,7 @@ import StdNavbarMenu from './StdNavbarMenu';
 import StdNavbarTextHeader from './StdNavbarTextHeader';
 import { navbarClassBuilder } from './navbarClassBuilder.ts';
 import { NavbarContextProvider } from '@/store/contexts/navbarContext.tsx';
-import { MenuNavItem } from '@/shared/types';
-import { TailwindUtilityColorClass } from '@/shared/types/Tailwind.type.ts';
+import { MenuNavItem, TailwindUtilityColorClass } from '@/shared/types';
 
 export type NavbarConfig<E extends ElementType = AnchorDefaultAsType> = {
   header: HeaderStyleConfig<E>;

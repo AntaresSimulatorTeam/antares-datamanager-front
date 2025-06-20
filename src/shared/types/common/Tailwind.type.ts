@@ -1,8 +1,4 @@
-/*
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
+import { TailwindColorClass } from '@/shared/types/TailwindColorClass.type.ts';
 
 export type ZIndex =
   | 'z-auto'
@@ -18,8 +14,29 @@ export type ZIndex =
   | '-z-20'
   | '-z-50';
 
+export type PseudoClass =
+  | ''
+  | 'hover:'
+  | 'active:'
+  | 'focus:'
+  | 'focus-visible:'
+  | '[&]:'
+  | 'after:'
+  | 'before:'
+  | '[&.active]:';
+
+export type TailwindPrefix = 'text' | 'bg' | 'border' | 'outline';
+
 export type Delay = 0 | 75 | 100 | 150 | 200 | 300 | 500 | 700 | 1000;
+export type TailwindDelayClass = `delay-${Delay}`;
 
 export type Duration = 0 | 75 | 100 | 150 | 200 | 300 | 500 | 700 | 1000;
+export type TailwindDurationClass = `duration-${Duration}`;
 
 export type Rotate = 0 | 1 | 2 | 3 | 6 | 12 | 45 | 90 | 180;
+export type TailwindRotateClass = `rotate-${Rotate}`;
+
+export type TailwindUtilityColorClass<
+  Prefix extends TailwindPrefix,
+  TPseudoClass extends PseudoClass = '',
+> = `${TPseudoClass}${Prefix}-${TailwindColorClass}`;

@@ -1,7 +1,7 @@
 import { clsx } from 'clsx';
 import { HeaderStyleConfig, ItemBackgroundStyleConfig, ItemStyleConfig } from './StdNavbar';
 import { AnchorDefaultAsType } from '@common/base/element.type.ts';
-import { TailwindUtilityColorClass } from '@/shared/types/Tailwind.type.ts';
+import { TailwindUtilityColorClass } from '@/shared/types';
 
 export const NAVBAR_BASE_CLASSES =
   'flex-none flex flex-col border-r text-left gap-2 h-screen transition-all ease-out duration-300';
