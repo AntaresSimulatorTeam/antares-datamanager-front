@@ -31,6 +31,7 @@ export const PegaseHypothesisTable = ({
   handleSearch,
   handleImport,
 }: PegaseHypothesisTableProps) => {
+  const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
   const { t } = useTranslation();
   const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
   const [expanded, setExpanded] = useState<ExpandedState>({});
