@@ -13,12 +13,14 @@ import {
 } from '@tanstack/react-table';
 import TableCore, { TableCoreProps } from '../stdTable/TableCore';
 import { ReadOnlyFeature } from '@common/data/stdTable/features/readOnly.ts';
-import { RowStatus } from '@/shared/types';
+import { RowStatus, SelectOption } from '@/shared/types';
 
 export type StdSimpleTableProps<TData> = {
   getCoreRowModel?: (table: Table<TData>) => () => RowModel<TData>;
   updateData?: (rowIndex: number, value: unknown, status?: RowStatus, label?: string) => void;
   removeRow?: (rowIndex: number, value: unknown) => void;
+  search?: (value?: string, area?: string) => Promise<SelectOption[] | undefined>;
+  import?: (index: number) => Promise<void>;
 } & Omit<TableCoreProps<TData>, 'table'> &
   Omit<TableOptions<TData>, 'getCoreRowModel'>;
 

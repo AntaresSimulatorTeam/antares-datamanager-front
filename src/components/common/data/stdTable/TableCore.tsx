@@ -8,12 +8,14 @@ import { Cell, flexRender, Header, Row, RowData, Table } from '@tanstack/react-t
 import { clsx } from 'clsx';
 import { tableCoreRowClassBuilder } from './tableCoreRowClassBuilder';
 import { useRdsId } from 'rte-design-system-react';
-import { RowStatus } from '@/shared/types';
+import { RowStatus, SelectOption } from '@/shared/types';
 
 declare module '@tanstack/react-table' {
   interface TableMeta<TData extends RowData> {
     updateData?: (rowIndex: number, value: unknown, status: RowStatus, label?: string) => void;
     removeRow?: (rowIndex: number, value: unknown) => void;
+    search?: (value?: string, area?: string) => Promise<SelectOption[] | undefined>;
+    import?: (index: number) => Promise<void>;
   }
 }
 

@@ -6,22 +6,22 @@
 
 import SearchBar from '@/pages/pegase/home/components/SearchBar.tsx';
 import { FileInputStatus, RdsDivider } from 'rte-design-system-react';
-import StdSimpleTable from '@common/data/stdSimpleTable/StdSimpleTable.tsx';
-import { ErrorMessageType, HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
+import { HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CheckBoxData } from '@/components/tab/LoadTab.tsx';
 import StdTabs from '@common/layout/stdTabs/StdTabs.tsx';
 import StdTabItem from '@common/layout/stdTabs/StdTabItem.tsx';
 import { getDefaultLoadHypothesis, getTrajectoryDataByTypeAndId } from '@/shared/services/trajectoryService.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import getNestedHypothesisTableHeaders from '@/components/header/NestedHypothesisTableHeaders.tsx';
 import { useStudy } from '@/store/contexts/StudyContext.tsx';
 import StdCheckboxGroupWrapper from '@common/forms/stdCheckboxGroup/StdCheckboxGroupWrapper.tsx';
 import CheckboxWithNestedCheckbox from '@/components/forms/CheckboxWithNestedCheckbox.tsx';
 import { ThermalOptions } from '@/mocks/data/list/names';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { retrieveReadOnlyArea } from '@/shared/utils/trajectoryUtils.ts';
+import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
+import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 
 const ThermalTab = () => {
   const { t } = useTranslation();
@@ -41,7 +41,6 @@ const ThermalTab = () => {
   const [usedBy, setUsing] = useState<TRAJECTORY_TYPE>(TRAJECTORY_TYPE.THERMAL_CAPACITY);
   const [progress] = useState(0);
   const [fileStatus] = useState<FileInputStatus>('empty');
-  const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
   const [rowIndexSelected] = useState(0);
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
 
@@ -58,10 +57,9 @@ const ThermalTab = () => {
           name: area.name,
           isDefault: true,
         }));
-        const trajectoryAreaId =
-          studyState && studyState?.[`${TRAJECTORY_TYPE.AREA}`]
-            ? studyState?.[`${TRAJECTORY_TYPE.AREA}`]?.[0]?.id
-            : null;
+        const trajectoryAreaId = studyState?.[`${TRAJECTORY_TYPE.AREA}`]
+          ? studyState?.[`${TRAJECTORY_TYPE.AREA}`]?.[0]?.id
+          : null;
 
         if (trajectoryAreaId != null) {
           const trajectoryAreas = (await getTrajectoryDataByTypeAndId(
@@ -116,38 +114,6 @@ const ThermalTab = () => {
     void fetchHypothesis();
   }, []);
 
-  const defaultColumns = useMemo(
-    () =>
-      getNestedHypothesisTableHeaders(
-        t,
-        handleFetchTrajectoriesFS,
-        handleTrajectorySearch,
-        errorInfo,
-        setErrorInfo,
-        studyState?.studyStatus,
-        progress,
-        fileStatus,
-        rowIndexSelected,
-      ),
-    [defaultData],
-  );
-
-  const columns = useMemo(
-    () =>
-      getNestedHypothesisTableHeaders(
-        t,
-        handleFetchTrajectoriesFS,
-        handleTrajectorySearch,
-        errorInfo,
-        setErrorInfo,
-        studyState?.studyStatus,
-        progress,
-        fileStatus,
-        rowIndexSelected,
-      ),
-    [data],
-  );
-
   return (
     <div className="flex h-full w-full flex-col gap-4">
       <StdTabs
@@ -195,26 +161,29 @@ const ThermalTab = () => {
         </div>
         <div className="flex w-full flex-col gap-6">
           {areasDefaultOptions.length > 0 && (
-            <div className="flex h-fit w-full">
-              <StdSimpleTable
-                id="default-thermal-table"
-                data={defaultData}
-                columns={defaultColumns}
-                enableColumnResizing={false}
-                enableReadOnly={true}
-                state={{ readOnly }}
-              />
-            </div>
-          )}
-          <div className="flex h-fit w-full">
-            <StdSimpleTable
-              id="thermal-table"
-              data={data}
-              columns={columns}
-              enableColumnResizing={false}
-              enableReadOnly={true}
+            <PegaseHypothesisTable
+              id="default-thermal-table"
+              data={defaultData}
+              fileStatus={fileStatus}
+              studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
+              readOnly={readOnly}
+              progress={progress}
+              indexSelected={rowIndexSelected}
+              handleSearch={handleTrajectorySearch}
+              handleImport={handleFetchTrajectoriesFS}
             />
-          </div>
+          )}
+          <PegaseHypothesisTable
+            id="main-thermal-table"
+            data={data}
+            fileStatus={fileStatus}
+            studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
+            readOnly={readOnly}
+            progress={progress}
+            indexSelected={rowIndexSelected}
+            handleSearch={handleTrajectorySearch}
+            handleImport={handleFetchTrajectoriesFS}
+          />
         </div>
       </div>
     </div>

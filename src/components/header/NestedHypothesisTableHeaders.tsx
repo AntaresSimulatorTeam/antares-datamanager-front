@@ -22,8 +22,6 @@ const columnHelper = createColumnHelper<HypothesisRowData>();
 
 const getNestedHypothesisTableHeaders = (
   t: (value: string) => string,
-  handleImport: (index: number) => Promise<void>,
-  handlerSearch: (value?: string, area?: string) => Promise<SelectOption[] | undefined>,
   error: ErrorMessageType,
   setErrorInfo: Dispatch<SetStateAction<ErrorMessageType>>,
   studyStatus: StudyStatus | undefined,
@@ -70,14 +68,14 @@ const getNestedHypothesisTableHeaders = (
               void options?.meta?.updateData?.(row.index, value.id, 'success', value.label);
             }}
             onSearch={async (value?: string) =>
-              await handlerSearch(
+              options?.meta?.search?.(
                 value,
                 row.original.hypothesis === 'Other areas' ? AREA_OTHERS : row.original.hypothesis,
               )
             }
             onClickButton={() => {
               setErrorInfo({ index: row.index, message: '' });
-              void handleImport(row.index);
+              void options?.meta?.import?.(row.index);
             }}
             isDisabled={row.getReadOnly()}
           />
