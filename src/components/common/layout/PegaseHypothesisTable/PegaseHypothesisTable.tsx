@@ -38,7 +38,7 @@ export const PegaseHypothesisTable = ({
   const columns = useMemo(
     () =>
       getExpandableHypothesisTableHeaders(t, errorInfo, setErrorInfo, studyState, progress, fileStatus, indexSelected),
-    [data, errorInfo, studyState, progress, fileStatus, indexSelected],
+    [t, errorInfo, studyState, progress, fileStatus, indexSelected],
   );
 
   return (
