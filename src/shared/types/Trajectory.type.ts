@@ -36,6 +36,10 @@ export type HypothesisRowData = {
   isDefault?: boolean;
 };
 
+export interface HypothesisRowDataWithNestedRow extends HypothesisRowData {
+  subRows: HypothesisRowDataWithNestedRow[] | null;
+}
+
 export type RowStatus = FileInputStatus | 'warning' | 'emptyError';
 
 export interface TrajectoryViewData {

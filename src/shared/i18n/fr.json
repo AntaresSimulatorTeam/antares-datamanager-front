@@ -85,6 +85,10 @@
     "@import_status_error": "Error",
     "@generate": "Générer"
   },
+  "thermal": {
+    "@installedPower": "Capacités installées",
+    "@parameters": "Paramètres"
+  },
   "horizonInput":{
     "@validYearError": "Horizon doit être un numéro entre 2000 et 99999",
     "@horizon_placeholder": "Horizon",
