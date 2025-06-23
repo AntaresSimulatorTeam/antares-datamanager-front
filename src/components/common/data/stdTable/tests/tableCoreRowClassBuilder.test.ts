@@ -27,7 +27,7 @@ describe('tableCoreRowClassBuilder function', () => {
 
   it('should have the expected additional "tr" classes', () => {
     expect(
-      tableCoreRowClassBuilder(false, false, false, READONLY_SELECTED_ROW_CLASSES).includes(
+      tableCoreRowClassBuilder(false, false, false, false, false, READONLY_SELECTED_ROW_CLASSES).includes(
         READONLY_SELECTED_ROW_CLASSES,
       ),
     ).toBe(true);
