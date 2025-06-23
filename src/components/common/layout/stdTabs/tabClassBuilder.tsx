@@ -1,4 +1,4 @@
-import { StdIconId } from '@/shared/utils/mappings/common/iconMaps';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import { clsx } from 'clsx';
 import { TabItemType } from './StdTabItem';
 
