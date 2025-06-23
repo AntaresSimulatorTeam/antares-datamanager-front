@@ -50,7 +50,6 @@ export const PegaseHypothesisTable = ({
   updateData,
   columnHeader,
 }: PegaseHypothesisTableProps) => {
-  const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
   const { t } = useTranslation();
   const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
   const [expanded, setExpanded] = useState<ExpandedState>(
