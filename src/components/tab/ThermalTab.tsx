@@ -109,6 +109,18 @@ const ThermalTab = () => {
     void fetchHypothesis();
   }, []);
 
+  const handleSelectionChange = (name: string, isChecked?: boolean) => {
+    console.log('================= name', name);
+    if (isChecked) {
+      if (checkedValues?.includes(name)) {
+        return;
+      } else {
+        //addRow(name);
+        setCheckedValues((prev) => [...prev, name]);
+      }
+    }
+  };
+
   return (
     <div className="flex h-full w-full flex-col gap-4">
       <StdTabs
@@ -134,7 +146,7 @@ const ThermalTab = () => {
           <StdCheckboxGroupWrapper
             label={''}
             name={''}
-            onChange={(value: string) => setCheckedValues((prev) => [...prev, value])}
+            onChange={(value: string, isChecked?: boolean) => handleSelectionChange(value, isChecked)}
             checkedValues={checkedValues}
           >
             {areasOptions?.map((area, index) => (
@@ -146,7 +158,7 @@ const ThermalTab = () => {
                   name={''}
                   defaultChecked={area.isDefault}
                   disabled={area.isDefault}
-                  handleSelection={async () => Promise.resolve()}
+                  handleSelection={(value: string, isChecked?: boolean) => handleSelectionChange(value, isChecked)}
                   options={ThermalOptions}
                 />
                 {index === Math.max(areasDefaultOptions?.length - 2, 0) && <RdsDivider extraClasses="mt-1" />}

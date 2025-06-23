@@ -24,7 +24,7 @@ export type CheckboxWithNestedCheckboxProps = {
   delayDebounce?: number;
   indeterminate?: boolean;
   options: string[];
-  handleSelection: (value: string) => Promise<void>;
+  handleSelection: (value: string) => void;
 };
 
 const CheckboxWithNestedCheckbox = ({

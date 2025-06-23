@@ -450,7 +450,7 @@ const LoadTab = () => {
           <RdsCheckboxGroupWrapper
             label={''}
             name={''}
-            onChange={(value: string, status?: boolean) => void handleSelectionChange(value, status)}
+            onChange={(value: string, isChecked?: boolean) => void handleSelectionChange(value, isChecked)}
             checkedValues={checkedValues}
             disabled={isStudyGenerated}
           >
