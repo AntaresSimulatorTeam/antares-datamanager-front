@@ -111,7 +111,7 @@ const StudyDetails = () => {
             <ContainerWithExpander content={messagesWarning} placeholder={t('studyDetails.@noWarnings')} />
             <div className="flex w-full">{activeContent}</div>
           </div>
-          <div className="fixed bottom-0 right-0 -z-20 w-full border-t bg-gray-w px-1 py-1.5">
+          <div className="fixed bottom-0 right-0 w-full border-t bg-gray-w px-1 py-1.5">
             <div className="flex h-fit w-full items-center justify-end">
               {!studyState.AREA && !errorMessage && (
                 <div className="mr-1 text-error-600">{t('studyDetails.@add_trajectories_message')}</div>
