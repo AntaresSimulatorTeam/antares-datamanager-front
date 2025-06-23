@@ -16,11 +16,12 @@ import { getDefaultLoadHypothesis, getTrajectoryDataByTypeAndId } from '@/shared
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useStudy } from '@/store/contexts/StudyContext.tsx';
 import StdCheckboxGroupWrapper from '@common/forms/stdCheckboxGroup/StdCheckboxGroupWrapper.tsx';
-import CheckboxWithNestedCheckbox from '@/components/forms/CheckboxWithNestedCheckbox.tsx';
+import { CheckboxWithNestedCheckbox } from '@/components/forms/CheckboxWithNestedCheckbox.tsx';
 import { ThermalOptions } from '@/mocks/data/list/names';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { buildRowWithSubRowsData, retrieveReadOnlyArea } from '@/shared/utils/trajectoryUtils.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
+import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 
 const ThermalTab = () => {
   const { t } = useTranslation();

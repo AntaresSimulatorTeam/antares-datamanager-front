@@ -7,7 +7,7 @@ import StdRequiredIndicator from '@common/forms/stdRequiredIndicator/StdRequired
 import StdCheckboxGroupWrapper from '@common/forms/stdCheckboxGroup/StdCheckboxGroupWrapper.tsx';
 import StdCheckbox from '@common/forms/stdCheckbox/StdCheckbox.tsx';
 
-export type CheckboxWithNestedCheckboxProps = {
+type CheckboxWithNestedCheckboxProps = {
   label?: string;
   checkboxControl?: boolean;
   value?: Exclude<string, 'checkbox_control'>;
@@ -26,7 +26,7 @@ export type CheckboxWithNestedCheckboxProps = {
   onHandleNestedSelection: (value: string, isChecked?: boolean, parentValue?: string) => void;
 };
 
-const CheckboxWithNestedCheckbox = ({
+export const CheckboxWithNestedCheckbox = ({
   name,
   value,
   label,
@@ -42,7 +42,6 @@ const CheckboxWithNestedCheckbox = ({
   required = false,
   indeterminate,
   options,
-  handleSelection,
 }: CheckboxWithNestedCheckboxProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -59,12 +58,6 @@ const CheckboxWithNestedCheckbox = ({
   const id = useStdId('nested-cbox', propsId);
 
   const handleNestedSelection = (valueChecked: string, isChecked?: boolean) => {
-    console.log('================= onHandleNestedSelection');
-  const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    void onChange?.(event.target.checked);
-  };
-
-  const onHandleSelection = (valueChecked: string) => {
     setCheckedValues((prev) => {
       if (prev.includes(valueChecked)) {
         return [...prev.filter((checkedValue) => checkedValue !== valueChecked)];
@@ -138,5 +131,3 @@ const CheckboxWithNestedCheckbox = ({
     </div>
   );
 };
-
-export default CheckboxWithNestedCheckbox;
