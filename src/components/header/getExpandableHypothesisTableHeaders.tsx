@@ -5,7 +5,7 @@
  */
 
 import { createColumnHelper } from '@tanstack/react-table';
-import { HypothesisRowData, SelectOption } from '@/shared/types';
+import { HypothesisRowDataWithNestedRow, SelectOption } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
 import { Dispatch, SetStateAction } from 'react';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
@@ -17,10 +17,12 @@ import { ErrorMessageType } from '@/shared/types/Generic.type.ts';
 import { AREA_OTHERS } from '@/shared/const/studyConfig.ts';
 import { ProgressBar } from '@/components/forms/ProgressBar.tsx';
 import { FileInputStatus } from 'rte-design-system-react';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
+import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 
-const columnHelper = createColumnHelper<HypothesisRowData>();
+const columnHelper = createColumnHelper<HypothesisRowDataWithNestedRow>();
 
-const getNestedHypothesisTableHeaders = (
+const getExpandableHypothesisTableHeaders = (
   t: (value: string) => string,
   error: ErrorMessageType,
   setErrorInfo: Dispatch<SetStateAction<ErrorMessageType>>,
@@ -35,7 +37,24 @@ const getNestedHypothesisTableHeaders = (
     cell: ({ getValue, row }) => {
       const { status } = row.original;
       return (
-        <LabelWithButtonPreview value={getValue()} status={status} isReadOnly={row.getReadOnly()} hasPreview={false} />
+        <div className="flex gap-1">
+          {row.getCanExpand() && (
+            <button onClick={row.getToggleExpandedHandler()} style={{ cursor: 'pointer' }}>
+              {row.getIsExpanded() ? (
+                <StdIcon name={StdIconId.KeyboardArrowDown} />
+              ) : (
+                <StdIcon name={StdIconId.KeyboardArrowRight} />
+              )}
+            </button>
+          )}
+          <LabelWithButtonPreview
+            value={getValue()}
+            status={status}
+            isReadOnly={row.getReadOnly()}
+            hasPreview={false}
+            canExpand={row.getCanExpand()}
+          />
+        </div>
       );
     },
   }),
@@ -103,4 +122,4 @@ const getNestedHypothesisTableHeaders = (
   }),
 ];
 
-export default getNestedHypothesisTableHeaders;
+export default getExpandableHypothesisTableHeaders;
