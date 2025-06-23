@@ -4,13 +4,15 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { RdsIconIdKey } from 'rte-design-system-react';
+import { ComponentType } from 'react';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 export type MenuNavItem = {
   key: string;
   label: string;
   path: string;
-  icon: RdsIconIdKey;
+  icon: StdIconId;
   id?: string;
-  component: React.ComponentType;
+  as: 'a';
+  component: ComponentType;
 };

@@ -5,21 +5,34 @@
  */
 
 import { APP_NAME } from '@/shared/constants.ts';
-import { HeaderStyleConfig } from 'rte-design-system-react';
+import { NavbarConfig } from '@common/layout/stdNavbar/StdNavbar.tsx';
 
-export const navBarConfig = {
+export const navBarConfig: NavbarConfig = {
   header: {
-    variant: 'logo',
-    versionTextColor: 'gray-600',
     appName: APP_NAME,
     appVersion: `v${import.meta.env.VITE_APP_VERSION}`,
-    headerLink: '/',
-    headerId: 'main-nav-bar-controller',
+    variant: 'logo',
     logoConfig: {
       logoExpandedHref: 'brand/logo_antares_pegase_light_expand.svg',
-      logoExpandedId: 'appIcon-collapsed-id',
       logoCollapsedHref: 'brand/logo_antares_pegase_light_collapse.svg',
-      logoCollapsedId: 'appIcon-expanded-id',
     },
-  } as HeaderStyleConfig,
+    versionTextColor: 'gray-600',
+    as: 'a',
+    to: '/',
+  },
+  itemContent: {
+    mainText: 'text-gray-800',
+    hoverText: 'hover:text-gray-800',
+    activeText: 'active:text-gray-800',
+    selectedText: '[&]:text-gray-800',
+  },
+  itemBackground: {
+    mainBg: 'bg-gray-w',
+    hoverBg: 'hover:bg-acc1-100',
+    activeBg: 'active:bg-acc1-400',
+    activeBgExplicit: '[&.active]:bg-acc1-400',
+    selectedBg: '[&]:bg-acc1-400',
+  },
+  separatorColor: 'border-transparent',
+  textColor: 'text-gray-800',
 };

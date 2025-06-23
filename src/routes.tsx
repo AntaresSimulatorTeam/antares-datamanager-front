@@ -7,7 +7,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { lazy } from 'react';
 import { MenuNavItem } from './shared/types';
-import { RdsIconId } from 'rte-design-system-react';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 const Settings = lazy(() => import('./pages/pegase/settings/Settings'));
 const HomePage = lazy(() => import('./pages/pegase/home/HomePage'));
@@ -23,7 +23,8 @@ export const menuTopData: MenuNavItem[] = [
     key: 'home',
     label: 'home.@label',
     path: '/',
-    icon: RdsIconId.Home,
+    as: 'a',
+    icon: StdIconId.Home,
     component: HomePage,
   },
   {
@@ -31,7 +32,8 @@ export const menuTopData: MenuNavItem[] = [
     key: 'project',
     label: 'page.@projet',
     path: '/projects',
-    icon: RdsIconId.Folder,
+    as: 'a',
+    icon: StdIconId.Folder,
     component: ProjectsPage,
   },
   {
@@ -39,7 +41,8 @@ export const menuTopData: MenuNavItem[] = [
     key: 'logs',
     label: 'page.@logs',
     path: '/logs',
-    icon: RdsIconId.ReceiptLong,
+    as: 'a',
+    icon: StdIconId.ReceiptLong,
     component: LogsPage,
   },
   {
@@ -47,7 +50,8 @@ export const menuTopData: MenuNavItem[] = [
     key: 'parameters',
     label: 'page.@parameters',
     path: '/parameters',
-    icon: RdsIconId.Settings,
+    as: 'a',
+    icon: StdIconId.Settings,
     component: Settings,
   },
   {
@@ -55,7 +59,8 @@ export const menuTopData: MenuNavItem[] = [
     key: 'antares',
     label: 'page.@antares',
     path: '/antares',
-    icon: RdsIconId.Apps,
+    as: 'a',
+    icon: StdIconId.Apps,
     component: AntaresPage,
   },
   {
@@ -63,7 +68,8 @@ export const menuTopData: MenuNavItem[] = [
     key: 'about',
     label: 'page.@about',
     path: '/about',
-    icon: RdsIconId.Info,
+    as: 'a',
+    icon: StdIconId.Info,
     component: About,
   },
 ];
@@ -73,7 +79,8 @@ export const menuBottomData: MenuNavItem[] = [
     key: 'logout',
     label: 'page.@logout',
     path: '/logout',
-    icon: RdsIconId.Logout,
+    as: 'a',
+    icon: StdIconId.Logout,
     component: LogoutPage,
   },
 ];

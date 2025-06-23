@@ -7,7 +7,10 @@
 import React, { useRef, useState } from 'react';
 import { RdsTextTooltip, useCallOnResize } from 'rte-design-system-react';
 
-type StdTextTooltipProps = { text: string; id: string | undefined } & React.HTMLProps<HTMLSpanElement>;
+type StdTextTooltipProps = {
+  text: string;
+  id: string | undefined;
+} & React.HTMLProps<HTMLSpanElement>;
 
 const DEFAULT_OFFSET = 8;
 
