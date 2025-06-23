@@ -46,7 +46,7 @@ const CheckboxWithNestedCheckbox = ({
 }: CheckboxWithNestedCheckboxProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [checkedValues, setCheckedValues] = useState<string[]>([]);
+  const [checkedValues, setCheckedValues] = useState<string[]>(disabled ? options : []);
 
   useEffect(() => {
     if (inputRef.current) {

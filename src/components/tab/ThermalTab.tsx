@@ -6,7 +6,7 @@
 
 import SearchBar from '@/pages/pegase/home/components/SearchBar.tsx';
 import { FileInputStatus, RdsDivider } from 'rte-design-system-react';
-import { HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
+import { HypothesisRowDataWithNestedRow, TrajectoryAreaData } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import { CheckBoxData } from '@/components/tab/LoadTab.tsx';
@@ -19,7 +19,7 @@ import StdCheckboxGroupWrapper from '@common/forms/stdCheckboxGroup/StdCheckboxG
 import CheckboxWithNestedCheckbox from '@/components/forms/CheckboxWithNestedCheckbox.tsx';
 import { ThermalOptions } from '@/mocks/data/list/names';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
-import { retrieveReadOnlyArea } from '@/shared/utils/trajectoryUtils.ts';
+import { buildRowWithSubRowsData, retrieveReadOnlyArea } from '@/shared/utils/trajectoryUtils.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 
@@ -29,13 +29,14 @@ const ThermalTab = () => {
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
   const [areasDefaultOptions, setAreasDefaultOptions] = useState<CheckBoxData[]>([]);
-  const [defaultData, setDefaultData] = useState<HypothesisRowData[]>([]);
-  const [data] = useState<HypothesisRowData[]>([
+  const [defaultData, setDefaultData] = useState<HypothesisRowDataWithNestedRow[]>([]);
+  const [data] = useState<HypothesisRowDataWithNestedRow[]>([
     {
       hypothesis: 'Other areas',
       trajectory: null,
       status: TRAJECTORY_SELECTION_STATUS.MISSING,
-      isDefault: true,
+      isDefault: false,
+      subRows: null,
     },
   ]);
   const [usedBy, setUsing] = useState<TRAJECTORY_TYPE>(TRAJECTORY_TYPE.THERMAL_CAPACITY);
@@ -73,12 +74,7 @@ const ThermalTab = () => {
             setAreasDefaultOptions(areaDefault);
             setCheckedValues(areaDefault.map((item) => item.name));
             // Hypothesis table => set data
-            const areaDefaultData = areaDefault.map((area) => ({
-              hypothesis: area.name,
-              trajectory: null,
-              status: TRAJECTORY_SELECTION_STATUS.MISSING,
-              isDefault: true,
-            }));
+            const areaDefaultData = buildRowWithSubRowsData(areaDefault);
             setDefaultData(areaDefaultData);
             // Hypothesis table => set read only
             // Find default area not included in areas trajectory list

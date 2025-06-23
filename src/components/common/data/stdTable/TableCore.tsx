@@ -9,6 +9,7 @@ import { clsx } from 'clsx';
 import { tableCoreRowClassBuilder } from './tableCoreRowClassBuilder';
 import { useRdsId } from 'rte-design-system-react';
 import { RowStatus, SelectOption } from '@/shared/types';
+import { Fragment } from 'react';
 
 declare module '@tanstack/react-table' {
   interface TableMeta<TData extends RowData> {
@@ -83,7 +84,7 @@ type TableDataCellProps<TData> = {
 
 const TableDataCell = <TData,>({ cell }: TableDataCellProps<TData>) => (
   <td className="text-left">
-    <div className="px-1 py-0.5">{flexRender(cell.column.columnDef.cell, cell.getContext())}</div>
+    <div className="px-1">{flexRender(cell.column.columnDef.cell, cell.getContext())}</div>
   </td>
 );
 
@@ -96,7 +97,7 @@ export type TableCoreProps<TData> = {
   table: Table<TData>;
 };
 
-const ROW_CLASSES = '[&_tr]:border-b [&_tr]:border-gray-400 [&_tr]:text-body-s';
+const ROW_CLASSES = '[&_tr]:border-b [&_tr]:border-b-gray-400 [&_tr]:text-body-s';
 const tableClassBuilder = <TData,>(table: Table<TData>) =>
   clsx(table.options.columnResizeMode ? 'w-fit' : 'w-full', ROW_CLASSES);
 
@@ -131,16 +132,25 @@ const TableCore = <TData,>({ table, id: propId, striped, trClassName, columnSize
       </thead>
       <tbody>
         {table.getRowModel().rows.map((row) => (
-          <tr
-            key={row.id}
-            className={tableCoreRowClassBuilder(striped, row.getIsSelected(), row.getReadOnly?.(), trClassName)}
-            onClick={handleToggleRow(row)}
-            aria-readonly={row.getReadOnly?.()}
-          >
-            {row.getVisibleCells().map((cell) => (
-              <TableDataCell key={cell.id} cell={cell} />
-            ))}
-          </tr>
+          <Fragment key={row.id}>
+            <tr
+              key={row.id}
+              className={tableCoreRowClassBuilder(
+                striped,
+                row.getIsSelected(),
+                row.getReadOnly?.(),
+                row.getCanExpand(),
+                row.getParentRow()?.getCanExpand(),
+                trClassName,
+              )}
+              onClick={handleToggleRow(row)}
+              aria-readonly={row.getReadOnly?.()}
+            >
+              {row.getVisibleCells().map((cell) => (
+                <TableDataCell key={cell.id} cell={cell} />
+              ))}
+            </tr>
+          </Fragment>
         ))}
       </tbody>
     </table>

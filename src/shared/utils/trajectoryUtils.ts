@@ -4,6 +4,7 @@ import { FileInputStatus } from 'rte-design-system-react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
 import { AREA_OTHERS } from '@/shared/const/studyConfig.ts';
+import { ThermalOptions } from '@/mocks/data/list/names.ts';
 
 export const getStatus = (status: RowStatus) => {
   switch (status) {
@@ -90,6 +91,21 @@ export const buildEmptyRowData = (areaName: string): DbTrajectory => ({
   state: TRAJECTORY_SELECTION_STATUS.MISSING,
   messages: [],
 });
+
+export const buildRowWithSubRowsData = (array: { name: string }[]) =>
+  array.map((area) => ({
+    hypothesis: area.name,
+    trajectory: null,
+    status: TRAJECTORY_SELECTION_STATUS.MISSING,
+    isDefault: true,
+    subRows: ThermalOptions.map((option) => ({
+      hypothesis: option,
+      trajectory: null,
+      status: TRAJECTORY_SELECTION_STATUS.MISSING,
+      isDefault: true,
+      subRows: null,
+    })),
+  }));
 
 export const buildReadOnlyRow = (indexes: (number | null)[]): ReadOnlyObject => {
   const readOnlyRows = {};

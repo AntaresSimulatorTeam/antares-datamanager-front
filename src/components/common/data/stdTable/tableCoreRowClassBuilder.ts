@@ -11,19 +11,23 @@ export const SELECTED_ROW_CLASSES = 'bg-primary-100';
 export const READONLY_ROW_CLASSES =
   'pointer-events-none bg-gray-300 [&_div]:text-gray-600 [&_span]:text-gray-600 [&_svg]:text-gray-600';
 export const READONLY_SELECTED_ROW_CLASSES = 'hover:bg-gray-100';
+export const EXPANDABLE_ROW_CLASSES = 'border-l-2 border-l-primary-400';
 
 export const tableCoreRowClassBuilder = (
   isStriped?: boolean,
   isSelected?: boolean,
   isReadOnly?: boolean,
+  isExpandable?: boolean,
+  parentRowCanExpand?: boolean,
   trClassNames?: string,
 ) =>
   clsx(
     {
       group: true,
       [STRIPED_CLASSES]: isStriped,
-      [SELECTED_ROW_CLASSES]: isSelected,
+      [SELECTED_ROW_CLASSES]: isSelected || (!isExpandable && parentRowCanExpand),
       [READONLY_ROW_CLASSES]: isReadOnly,
+      [EXPANDABLE_ROW_CLASSES]: isExpandable,
       [READONLY_SELECTED_ROW_CLASSES]: !isReadOnly && !isSelected,
     },
     trClassNames,
