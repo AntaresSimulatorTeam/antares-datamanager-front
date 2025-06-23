@@ -36,6 +36,11 @@ const getExpandableHypothesisTableHeaders = (
     size: 50,
     cell: ({ getValue, row }) => {
       const { status } = row.original;
+      const getAlignment = () => {
+        if (row.depth === 0 && !row.getCanExpand()) return 'pl-1';
+        if (row.depth === 0 && row.getCanExpand()) return 'pl-0';
+        return 'pl-4';
+      };
       return (
         <div className="flex gap-1">
           {row.getCanExpand() && (
@@ -52,7 +57,7 @@ const getExpandableHypothesisTableHeaders = (
             status={status}
             isReadOnly={row.getReadOnly()}
             hasPreview={false}
-            canExpand={row.getCanExpand()}
+            alignment={getAlignment()}
           />
         </div>
       );

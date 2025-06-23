@@ -8,7 +8,7 @@ interface LabelWithButtonPreviewProps {
   isReadOnly: boolean;
   onClick?: () => void;
   hasPreview?: boolean;
-  canExpand?: boolean;
+  alignment?: string;
 }
 
 export const LabelWithButtonPreview = ({
@@ -17,9 +17,9 @@ export const LabelWithButtonPreview = ({
   isReadOnly,
   onClick,
   hasPreview = true,
-  canExpand = false,
+  alignment = '',
 }: LabelWithButtonPreviewProps) => (
-  <div className={`${canExpand ? 'pl-0' : 'pl-4'}`}>
+  <div className={`${alignment}`}>
     <span className={`${status === TRAJECTORY_SELECTION_STATUS.OK ? 'text-primary-600' : 'text-gray-900'}`}>
       {value}
     </span>

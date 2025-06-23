@@ -5,7 +5,7 @@ import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { useTranslation } from 'react-i18next';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { FileInputStatus } from 'rte-design-system-react';
-import getExpandableHypothesisTableHeaders from '@/components/header/getExpandableHypothesisTableHeaders.tsx';
+import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
 
 interface PegaseHypothesisTableProps {
   id: string;
