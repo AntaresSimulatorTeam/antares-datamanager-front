@@ -158,7 +158,8 @@ const ThermalTab = () => {
                   name={''}
                   defaultChecked={area.isDefault}
                   disabled={area.isDefault}
-                  handleSelection={(value: string, isChecked?: boolean) => handleSelectionChange(value, isChecked)}
+                  onChange={handleSelectionChange}
+                  onHandleNestedSelection={handleSelectionChange}
                   options={ThermalOptions}
                 />
                 {index === Math.max(areasDefaultOptions?.length - 2, 0) && <RdsDivider extraClasses="mt-1" />}
