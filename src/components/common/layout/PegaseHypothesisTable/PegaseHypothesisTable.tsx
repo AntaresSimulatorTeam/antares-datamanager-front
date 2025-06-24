@@ -33,12 +33,13 @@ export const PegaseHypothesisTable = ({
 }: PegaseHypothesisTableProps) => {
   const { t } = useTranslation();
   const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
-  const [expanded, setExpanded] = useState<ExpandedState>({});
+  const isDefaultData: boolean = data.every((item) => item.isDefault);
+  const [expanded, setExpanded] = useState<ExpandedState>(isDefaultData ? {} : true);
 
   const columns = useMemo(
     () =>
       getExpandableHypothesisTableHeaders(t, errorInfo, setErrorInfo, studyState, progress, fileStatus, indexSelected),
-    [t, errorInfo, studyState, progress, fileStatus, indexSelected],
+    [errorInfo, fileStatus, indexSelected, progress, studyState, t],
   );
 
   return (

@@ -9,7 +9,7 @@ import StdNavbarMenu from './StdNavbarMenu';
 import StdNavbarTextHeader from './StdNavbarTextHeader';
 import { navbarClassBuilder } from './navbarClassBuilder.ts';
 import { NavbarContextProvider } from '@/store/contexts/navbarContext.tsx';
-import { MenuNavItem, TailwindUtilityColorClass } from '@/shared/types';
+import { MenuNavItem, TailwindUtilityColorClass, ZIndex } from '@/shared/types';
 
 export type NavbarConfig<E extends ElementType = AnchorDefaultAsType> = {
   header: HeaderStyleConfig<E>;
@@ -17,6 +17,7 @@ export type NavbarConfig<E extends ElementType = AnchorDefaultAsType> = {
   itemBackground?: ItemBackgroundStyleConfig;
   separatorColor?: TailwindUtilityColorClass<'border'>;
   textColor?: TailwindUtilityColorClass<'text'>;
+  zIndex?: ZIndex;
 };
 
 export type LogoConfig = {
@@ -88,13 +89,13 @@ const StdNavbar = <E extends ElementType = AnchorDefaultAsType>({
   };
 
   const backgroundColor = config.itemBackground?.mainBg;
-  const { separatorColor, textColor, itemContent, itemBackground } = config;
+  const { separatorColor, textColor, itemContent, itemBackground, zIndex } = config;
 
   const navbarClasses = navbarClassBuilder(expanded, backgroundColor, separatorColor, textColor);
   const controllerLabel = expanded ? t('components.navbar.@minimize') : t('components.navbar.@expand');
 
   return (
-    <nav className={navbarClasses} aria-label={config.header.appName}>
+    <nav className={`${navbarClasses} ${zIndex}`} aria-label={config.header.appName}>
       {config.header.variant === 'text' ? (
         <StdNavbarTextHeader expanded={expanded} headerConfig={config.header} />
       ) : (

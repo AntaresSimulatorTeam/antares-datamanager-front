@@ -35,4 +35,5 @@ export const navBarConfig: NavbarConfig = {
   },
   separatorColor: 'border-transparent',
   textColor: 'text-gray-800',
+  zIndex: 'z-50',
 };

@@ -37,7 +37,7 @@ import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import getLoadHypothesisTableHeaders from '@/components/header/LoadHypothesisTableHeader.tsx';
 import { sortKeepLastName } from '@/shared/utils/sortUtils.tsx';
 import {
-  buildEmptyRowData,
+  buildEmptyTrajectory,
   buildErrorTrajectory,
   buildRowData,
   removeDuplicate,
@@ -384,7 +384,7 @@ const LoadTab = () => {
   const addRow = (name: string) => {
     dispatch?.({
       type: STUDY_ACTION.ADD_TRAJECTORY_LOAD,
-      payload: buildEmptyRowData(name),
+      payload: buildEmptyTrajectory(name, TRAJECTORY_TYPE.LOAD),
     });
     const newDataSorted = sortKeepLastName(
       [

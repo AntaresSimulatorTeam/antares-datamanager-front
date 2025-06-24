@@ -15,22 +15,23 @@ import StdTabItem from '@common/layout/stdTabs/StdTabItem.tsx';
 import { getDefaultLoadHypothesis, getTrajectoryDataByTypeAndId } from '@/shared/services/trajectoryService.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useStudy } from '@/store/contexts/StudyContext.tsx';
-import StdCheckboxGroupWrapper from '@common/forms/stdCheckboxGroup/StdCheckboxGroupWrapper.tsx';
 import { CheckboxWithNestedCheckbox } from '@/components/forms/CheckboxWithNestedCheckbox.tsx';
 import { ThermalOptions } from '@/mocks/data/list/names';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { buildRowWithSubRowsData, retrieveReadOnlyArea } from '@/shared/utils/trajectoryUtils.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
+import { sortKeepLastName } from '@/shared/utils/sortUtils.tsx';
+import { AREA_OTHERS } from '@/shared/const/studyConfig.ts';
 
 const ThermalTab = () => {
   const { t } = useTranslation();
   const studyState = useStudy();
-  const [checkedValues, setCheckedValues] = useState<string[]>([]);
-  const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
+  const [checkedValues, setCheckedValues] = useState<{ name: string; subOptions: string[] }[]>([]);
   const [areasDefaultOptions, setAreasDefaultOptions] = useState<CheckBoxData[]>([]);
   const [defaultData, setDefaultData] = useState<HypothesisRowDataWithNestedRow[]>([]);
-  const [data] = useState<HypothesisRowDataWithNestedRow[]>([
+  const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
+  const [data, setData] = useState<HypothesisRowDataWithNestedRow[]>([
     {
       hypothesis: 'Other areas',
       trajectory: null,
@@ -72,7 +73,12 @@ const ThermalTab = () => {
           if (areaDefault.length > 0) {
             // Checkbox list
             setAreasDefaultOptions(areaDefault);
-            setCheckedValues(areaDefault.map((item) => item.name));
+            setCheckedValues(
+              areaDefault.map((item) => ({
+                name: item.name,
+                subOptions: ThermalOptions,
+              })),
+            );
             // Hypothesis table => set data
             const areaDefaultData = buildRowWithSubRowsData(areaDefault);
             setDefaultData(areaDefaultData);
@@ -110,14 +116,82 @@ const ThermalTab = () => {
     void fetchHypothesis();
   }, []);
 
-  const handleSelectionChange = (name: string, isChecked?: boolean) => {
-    console.log('================= name', name);
+  const addRow = (value: string, isParentChecked: boolean, parentValue?: string) => {
+    let dataToAdd: HypothesisRowDataWithNestedRow[] = [];
+    const newValueRow = {
+      hypothesis: value,
+      trajectory: null,
+      status: TRAJECTORY_SELECTION_STATUS.MISSING,
+      isDefault: false,
+      subRows: null,
+    };
+    // Add child to the checked parent
+    if (parentValue && isParentChecked) {
+      dataToAdd = data.map((item) => {
+        if (item.hypothesis === parentValue) {
+          return {
+            ...item,
+            subRows: !item.subRows
+              ? [newValueRow]
+              : [...item.subRows, newValueRow].sort((a, b) => a.hypothesis.localeCompare(b.hypothesis)),
+          };
+        } else {
+          return item;
+        }
+      });
+    } else if (parentValue && !isParentChecked) {
+      // Add Row for parent and row for child
+      dataToAdd = [
+        {
+          ...newValueRow,
+          hypothesis: parentValue,
+          subRows: [newValueRow],
+        },
+        ...data,
+      ];
+    } else {
+      dataToAdd = [newValueRow, ...data];
+    }
+    const newDataSorted = sortKeepLastName(dataToAdd, AREA_OTHERS);
+    setData(newDataSorted as HypothesisRowDataWithNestedRow[]);
+  };
+
+  const removeRow = (value: string, parentValue?: string) => {
+    let dataToRemove: HypothesisRowDataWithNestedRow[] = [];
+    if (parentValue) {
+      // Remove technology line of the proper parent and uncheck box
+      dataToRemove = data.map((item) => {
+        if (item.hypothesis === parentValue) {
+          const itemsSubRows = item.subRows
+            ? [...item.subRows.filter((subRow) => subRow.hypothesis !== value)].sort((a, b) =>
+                a.hypothesis.localeCompare(b.hypothesis),
+              )
+            : item.subRows;
+          return {
+            ...item,
+            subRows: itemsSubRows?.length ? itemsSubRows : null,
+          };
+        } else {
+          return item;
+        }
+      });
+    } else {
+      dataToRemove = data.filter((item) => item.hypothesis !== value);
+    }
+    setData(dataToRemove);
+  };
+
+  const handleSelectionChange = (value: string, isChecked: boolean, parentValue?: string) => {
     if (isChecked) {
-      if (checkedValues?.includes(name)) {
-        return;
-      } else {
-        //addRow(name);
-        setCheckedValues((prev) => [...prev, name]);
+      addRow(value, parentValue ? checkedValues.includes(parentValue) : false, parentValue);
+      //setCheckedValues((prev) => [...prev, parentValue ?? value]);
+    } else {
+      removeRow(value, parentValue);
+      setCheckedValues((prev) => [...prev.filter((checkedValue) => checkedValue !== value)]);
+      if (value && !parentValue) {
+        // remove area and unchecked all child
+        console.log('=================== value', value);
+        console.log('=================== parentValue', parentValue);
       }
     }
   };
@@ -144,29 +218,22 @@ const ThermalTab = () => {
           <div className="border-b border-gray-400 pb-2">
             <SearchBar onSearch={() => {}} placeholder={t('studyDetails.@search_area')} />
           </div>
-          <StdCheckboxGroupWrapper
-            label={''}
-            name={''}
-            onChange={(value: string, isChecked?: boolean) => handleSelectionChange(value, isChecked)}
-            checkedValues={checkedValues}
-          >
-            {areasOptions?.map((area, index) => (
-              <div key={`${index}-${area.name}`} className="my-1">
-                <CheckboxWithNestedCheckbox
-                  key={`nested-checkbox-${area.name}`}
-                  label={area.name}
-                  value={area.name}
-                  name={''}
-                  defaultChecked={area.isDefault}
-                  disabled={area.isDefault}
-                  onChange={handleSelectionChange}
-                  onHandleNestedSelection={handleSelectionChange}
-                  options={ThermalOptions}
-                />
-                {index === Math.max(areasDefaultOptions?.length - 2, 0) && <RdsDivider extraClasses="mt-1" />}
-              </div>
-            ))}
-          </StdCheckboxGroupWrapper>
+          {areasOptions?.map((area, index) => (
+            <div key={`${index}-${area.name}`}>
+              <CheckboxWithNestedCheckbox
+                key={`nested-checkbox-${area.name}`}
+                label={area.name}
+                value={area.name}
+                name={''}
+                defaultChecked={area.isDefault}
+                disabled={area.isDefault}
+                onChange={handleSelectionChange}
+                onHandleNestedSelection={handleSelectionChange}
+                options={ThermalOptions}
+              />
+              {index === Math.max(areasDefaultOptions?.length - 2, 0) && <RdsDivider extraClasses="mt-1" />}
+            </div>
+          ))}
         </div>
         <div className="flex w-full flex-col gap-6">
           {areasDefaultOptions.length > 0 && (

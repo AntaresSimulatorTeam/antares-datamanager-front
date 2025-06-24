@@ -37,8 +37,7 @@ const getExpandableHypothesisTableHeaders = (
     cell: ({ getValue, row }) => {
       const { status } = row.original;
       const getAlignment = () => {
-        if (row.depth === 0 && !row.getCanExpand()) return 'pl-1';
-        if (row.depth === 0 && row.getCanExpand()) return 'pl-0';
+        if (row.depth === 0) return !row.getCanExpand() ? 'pl-1' : 'pl-0';
         return 'pl-4';
       };
       return (

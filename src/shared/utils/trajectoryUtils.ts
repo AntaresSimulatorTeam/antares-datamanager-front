@@ -80,10 +80,10 @@ export const buildRowData = (areaName: string, isDefault: boolean, trajectory?: 
   isDefault,
 });
 
-export const buildEmptyRowData = (areaName: string): DbTrajectory => ({
+export const buildEmptyTrajectory = (areaName: string, type: TRAJECTORY_TYPE): DbTrajectory => ({
   id: Math.random(),
   trajectoryName: '',
-  type: TRAJECTORY_TYPE.LOAD,
+  type,
   version: 0,
   userName: 'user',
   creationDate: new Date(),
