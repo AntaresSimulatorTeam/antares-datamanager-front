@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "fix/button",
-  commit: "29b7dbd",
-  commitTime: "2025-06-23T17:33:20.975Z"
+  branch: "fix/study_duplication_add_study_id",
+  commit: "47874cb",
+  commitTime: "2025-06-24T17:10:23.965Z"
 };
