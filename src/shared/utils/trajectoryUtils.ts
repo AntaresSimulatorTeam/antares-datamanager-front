@@ -1,4 +1,10 @@
-import { DbTrajectory, HypothesisRowData, RowStatus } from '@/shared/types';
+import {
+  DbTrajectory,
+  HypothesisRowData,
+  HypothesisRowDataWithNestedRow,
+  NestedCheckedType,
+  RowStatus,
+} from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { FileInputStatus } from 'rte-design-system-react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
@@ -131,3 +137,65 @@ export const retrieveReadOnlyArea = (rowData: HypothesisRowData[], itemsToReadOn
   });
   return buildReadOnlyRow(readOnlyIndexes);
 };
+
+export const addNestedRow = (
+  data: HypothesisRowDataWithNestedRow[],
+  newRow: HypothesisRowDataWithNestedRow,
+  parentValue?: string,
+) =>
+  data.map((item) => {
+    if (item.hypothesis === parentValue) {
+      return {
+        ...item,
+        subRows: !item.subRows
+          ? [newRow]
+          : [...item.subRows, newRow].sort((a, b) => a.hypothesis.localeCompare(b.hypothesis)),
+      };
+    } else {
+      return item;
+    }
+  });
+
+export const checkNestedValue = (checkedValues: NestedCheckedType[], value: string, parentValue?: string) =>
+  checkedValues.map((item) => {
+    if (item.name === parentValue) {
+      return {
+        ...item,
+        subOptions:
+          item.subOptions && !item.subOptions.includes(value)
+            ? [...item.subOptions, value].sort((a, b) => a.localeCompare(b))
+            : [value],
+      };
+    } else {
+      return item;
+    }
+  });
+
+export const removeThermalRow = (data: HypothesisRowDataWithNestedRow[], value: string, parentValue: string) =>
+  data.map((item) => {
+    if (item.hypothesis === parentValue) {
+      const itemsSubRows = item.subRows
+        ? [...item.subRows.filter((subRow) => subRow.hypothesis !== value)].sort((a, b) =>
+            a.hypothesis.localeCompare(b.hypothesis),
+          )
+        : item.subRows;
+      return {
+        ...item,
+        subRows: itemsSubRows?.length ? itemsSubRows : null,
+      };
+    } else {
+      return item;
+    }
+  });
+
+export const unCheckNestedValue = (checkedValues: NestedCheckedType[], value: string, parentValue?: string) =>
+  checkedValues.map((item) => {
+    if (item.name === parentValue) {
+      return {
+        ...item,
+        subOptions: item.subOptions && item.subOptions.filter((subOption) => subOption !== value),
+      };
+    } else {
+      return item;
+    }
+  });

@@ -1,6 +1,6 @@
 import { useStdId } from '@/hooks/common/useStdId';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
-import { useRef, useState } from 'react';
+import { ChangeEvent, useRef, useState } from 'react';
 import { checkboxClassBuilder } from '@common/forms/stdCheckbox/checkboxClassBuilder.ts';
 import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 import StdRequiredIndicator from '@common/forms/stdRequiredIndicator/StdRequiredIndicator.tsx';
@@ -21,7 +21,8 @@ type CheckboxWithNestedCheckboxProps = {
   required?: boolean;
   error?: boolean;
   options: string[];
-  onHandleNestedSelection: (value: string, checked: boolean, parentValue?: string) => void;
+  checkedValues?: { name: string; subOptions: string[] | null }[];
+  onHandleSelection: (value: string, checked: boolean, parentValue?: string) => void;
 };
 
 export const CheckboxWithNestedCheckbox = ({
@@ -29,26 +30,18 @@ export const CheckboxWithNestedCheckbox = ({
   value,
   label,
   disabled = false,
-  defaultChecked,
   checkboxControl,
-  onHandleNestedSelection,
+  onHandleSelection,
   id: propsId,
   error = false,
   required = false,
   options,
+  checkedValues,
 }: CheckboxWithNestedCheckboxProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [checkedValues, setCheckedValues] = useState<string[]>(disabled ? options : []);
   const id = useStdId('nested-cbox', propsId);
   const { containerClasses, inputClasses, labelClasses } = checkboxClassBuilder(disabled, error);
-
-  const handleNestedSelection = (valueChecked: string, isChecked?: boolean) => {
-    setCheckedValues((prev) =>
-      !isChecked ? [...prev.filter((checkedValue) => checkedValue !== valueChecked)] : [...prev, valueChecked],
-    );
-    onHandleNestedSelection?.(valueChecked, isChecked ?? false, value);
-  };
 
   return (
     <div className="flex flex-col justify-center">
@@ -62,12 +55,10 @@ export const CheckboxWithNestedCheckbox = ({
               type="checkbox"
               name={name}
               disabled={disabled}
-              defaultChecked={defaultChecked}
-              //checked={}
+              checked={checkedValues?.some((checkedValue) => checkedValue.name === value)}
               onMouseDown={(e) => e.preventDefault()}
-              //onChange={(event: ChangeEvent<HTMLInputElement>) => onChange?.(event.target.value, event.target.checked)}
-              onBlur={(event: React.FocusEvent<HTMLInputElement>) =>
-                handleNestedSelection(event.target.value, event.target.checked)
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                onHandleSelection?.(event.target.value, event.target.checked)
               }
               value={checkboxControl ? 'checkbox_control' : value}
             />
@@ -98,8 +89,10 @@ export const CheckboxWithNestedCheckbox = ({
           <StdCheckboxGroupWrapper
             label={''}
             name={''}
-            onChange={(valueChecked: string, isChecked?: boolean) => handleNestedSelection(valueChecked, isChecked)}
-            checkedValues={checkedValues}
+            onChange={(valueChecked: string, isChecked?: boolean) =>
+              onHandleSelection?.(valueChecked, isChecked ?? false, value)
+            }
+            checkedValues={checkedValues?.find((checkedValue) => checkedValue.name === value)?.subOptions ?? []}
             possibleValues={options}
           >
             {options?.map((option, index) => (
