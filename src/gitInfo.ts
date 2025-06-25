@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "fix/ANT-3392_duplication_study_add_study_id",
-  commit: "12cac9d",
-  commitTime: "2025-06-30T11:24:39.660Z"
+  branch: "feat/ANT-3402_THERMAL_handle_add_row_to_hypothesis_table",
+  commit: "cda7d8b",
+  commitTime: "2025-06-25T17:27:37.451Z"
 };
