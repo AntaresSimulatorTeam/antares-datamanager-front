@@ -212,7 +212,7 @@ const ThermalTab = () => {
                 checkedValues={checkedValues}
                 options={ThermalOptions}
               />
-              {index === Math.max(areasDefaultOptions?.length - 2, 0) && <RdsDivider extraClasses="mt-1" />}
+              {index === Math.max(areasDefaultOptions?.length - 1, 0) && <RdsDivider extraClasses="mt-1" />}
             </div>
           ))}
         </div>
