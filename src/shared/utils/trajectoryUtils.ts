@@ -188,12 +188,17 @@ export const removeThermalRow = (data: HypothesisRowDataWithNestedRow[], value: 
     }
   });
 
-export const unCheckNestedValue = (checkedValues: NestedCheckedType[], value: string, parentValue?: string) =>
+export const unCheckNestedValue = (
+  checkedValues: NestedCheckedType[],
+  value: string,
+  parentValue?: string,
+): NestedCheckedType[] =>
   checkedValues.map((item) => {
     if (item.name === parentValue) {
+      const subOptions = item?.subOptions?.filter((subOption) => subOption !== value);
       return {
         ...item,
-        subOptions: item?.subOptions?.filter((subOption) => subOption !== value),
+        subOptions: subOptions?.length ? subOptions : null,
       };
     } else {
       return item;

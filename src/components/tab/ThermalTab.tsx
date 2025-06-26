@@ -64,51 +64,48 @@ const ThermalTab = () => {
   };
 
   useEffect(() => {
-    const fetchHypothesis = async () => {
+    const fetchHypothesis = () => {
       try {
         // Handle default areas (checkbox list and hypothesis table)
-        if (areaDefault.length > 0) {
-          // Checkbox list
-          setAreasDefaultOptions(areaDefault);
-          setCheckedValues(
-            areaDefault.map((item) => ({
-              name: item.name,
-              subOptions: ThermalOptions,
-            })),
-          );
-          // Hypothesis table => set data
-          const areaDefaultData = buildRowWithSubRowsData(areaDefault);
-          setDefaultData(areaDefaultData);
-          // Hypothesis table => set read only
-          // Find default area not included in areas trajectory list
-          const defaultAreaListNotIncludedInList: string[] = [];
-          areaDefault.forEach((defaultArea) => {
-            if (!trajectoryAreas.some((trajectoryArea) => trajectoryArea.areaName === defaultArea.name)) {
-              defaultAreaListNotIncludedInList.push(defaultArea.name);
-            }
-          });
-          setReadOnly(retrieveReadOnlyArea(areaDefaultData, defaultAreaListNotIncludedInList));
-        }
+        // Checkbox list
+        setAreasDefaultOptions(areaDefault);
+        setCheckedValues(
+          areaDefault.map((item) => ({
+            name: item.name,
+            subOptions: ThermalOptions,
+          })),
+        );
+        // Hypothesis table => set data
+        const areaDefaultData = buildRowWithSubRowsData(areaDefault);
+        setDefaultData(areaDefaultData);
+        // Hypothesis table => set read only
+        // Find default area not included in areas trajectory list
+        const defaultAreaListNotIncludedInList: string[] = [];
+        areaDefault.forEach((defaultArea) => {
+          if (!trajectoryAreas.some((trajectoryArea) => trajectoryArea.areaName === defaultArea.name)) {
+            defaultAreaListNotIncludedInList.push(defaultArea.name);
+          }
+        });
+        setReadOnly(retrieveReadOnlyArea(areaDefaultData, defaultAreaListNotIncludedInList));
+
         // Handle areas from trajectory AREA
         // Build checkbox list options
-        if (trajectoryAreas.length > 0) {
-          let newArea: CheckBoxData[] = [];
-          newArea = trajectoryAreas
-            .map((trajectoryArea) => {
-              if (!areaDefault?.some((item) => item.name === trajectoryArea.areaName)) {
-                return { name: trajectoryArea.areaName, isDefault: false };
-              }
-            })
-            .filter(Boolean) as CheckBoxData[];
-          setAreasOptions(areaDefault?.concat(newArea));
-        } else if (areaDefault.length > 0) {
-          setAreasOptions(areaDefault);
-        }
+        let newArea: CheckBoxData[] = [];
+        newArea = trajectoryAreas
+          .map((trajectoryArea) => {
+            if (!areaDefault?.some((item) => item.name === trajectoryArea.areaName)) {
+              return { name: trajectoryArea.areaName, isDefault: false };
+            }
+          })
+          .filter(Boolean) as CheckBoxData[];
+        setAreasOptions(newArea.length > 0 ? areaDefault?.concat(newArea) : areaDefault);
       } catch {
         // Silent handler
       }
     };
-    void fetchHypothesis();
+    if (areaDefault.length > 0 && trajectoryAreas.length > 0) {
+      void fetchHypothesis();
+    }
   }, [areaDefault, trajectoryAreas]);
 
   const addRow = (value: string, isParentChecked: boolean, parentValue?: string) => {
@@ -123,7 +120,7 @@ const ThermalTab = () => {
     // Add child to the checked parent
     if (parentValue && isParentChecked) {
       dataToAdd = addNestedRow(data, newRow, parentValue);
-      setCheckedValues((prev) => checkNestedValue(prev, value, parentValue));
+      setCheckedValues((prev) => (prev.length > 0 ? checkNestedValue(prev, value, parentValue) : prev));
     } else if (parentValue && !isParentChecked) {
       // Add Row for parent and row for child
       dataToAdd = [
@@ -161,7 +158,7 @@ const ThermalTab = () => {
     let dataToRemove: HypothesisRowDataWithNestedRow[] = [];
     if (parentValue) {
       dataToRemove = removeThermalRow(data, value, parentValue);
-      setCheckedValues((prev) => unCheckNestedValue(prev, value, parentValue));
+      setCheckedValues((prev) => (prev.length > 0 ? unCheckNestedValue(prev, value, parentValue) : prev));
     } else {
       dataToRemove = data.filter((item) => item.hypothesis !== value);
       setCheckedValues((prev) => [...prev.filter((checkedValue) => checkedValue.name !== value)]);
@@ -171,9 +168,8 @@ const ThermalTab = () => {
 
   const handleSelectionChange = (value: string, isChecked: boolean, parentValue?: string) => {
     if (isChecked) {
-      const isParentChecked = parentValue
-        ? checkedValues.some((checkedValue) => checkedValue.name === parentValue)
-        : false;
+      const isParentChecked =
+        parentValue && checkedValues ? checkedValues.some((checkedValue) => checkedValue.name === parentValue) : false;
       addRow(value, isParentChecked, parentValue);
     } else {
       removeRow(value, parentValue);
