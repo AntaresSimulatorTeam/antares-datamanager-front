@@ -193,7 +193,7 @@ export const unCheckNestedValue = (checkedValues: NestedCheckedType[], value: st
     if (item.name === parentValue) {
       return {
         ...item,
-        subOptions: item.subOptions && item.subOptions.filter((subOption) => subOption !== value),
+        subOptions: item?.subOptions?.filter((subOption) => subOption !== value),
       };
     } else {
       return item;
