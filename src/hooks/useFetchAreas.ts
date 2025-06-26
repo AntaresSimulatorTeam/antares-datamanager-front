@@ -37,15 +37,15 @@ export const useFetchAreas = (studyId?: number, trajectoryType?: TRAJECTORY_TYPE
             )) as unknown as TrajectoryAreaData[];
             setTrajectoryAreas(areas);
           }
-        }
-        if (id && type) {
-          const trajectoryLinkedToStudy = await getStudyTrajectories(id, type);
-          dispatch?.({
-            type: type === TRAJECTORY_TYPE.LOAD ? STUDY_ACTION.ADD_TRAJECTORIES_LOAD : STUDY_ACTION.ADD_TRAJECTORIES,
-            payload: trajectoryLinkedToStudy,
-          });
-          setTrajectoryLinked(trajectoryLinkedToStudy);
-          setEmptyAreas(removeDuplicate(trajectoryLinked.concat(emptyAreaSelected)));
+          if (type) {
+            const trajectoryLinkedToStudy = await getStudyTrajectories(id, type);
+            dispatch?.({
+              type: type === TRAJECTORY_TYPE.LOAD ? STUDY_ACTION.ADD_TRAJECTORIES_LOAD : STUDY_ACTION.ADD_TRAJECTORIES,
+              payload: trajectoryLinkedToStudy,
+            });
+            setTrajectoryLinked(trajectoryLinkedToStudy);
+            setEmptyAreas(removeDuplicate(trajectoryLinked.concat(emptyAreaSelected)));
+          }
         }
       } catch {
         // Silent handler
