@@ -76,7 +76,7 @@ export const CheckboxWithNestedCheckbox = ({
               {label} {required && <StdRequiredIndicator />}
             </span>
           </div>
-          <button onClick={() => !isReadOnly && setIsOpen((prev) => !prev)}>
+          <button onClick={() => setIsOpen((prev) => !prev)}>
             <StdIcon
               name={isOpen ? StdIconId.KeyboardArrowDown : StdIconId.KeyboardArrowRight}
               color="text-gray-800"
