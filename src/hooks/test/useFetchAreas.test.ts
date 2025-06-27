@@ -25,6 +25,7 @@ vi.mock('@/store/contexts/StudyContext', async (importOriginal) => {
 describe('useFetchAreas', () => {
   const mockUseStudy = useStudy as Mock<typeof useStudy>;
   vi.mocked(trajectoryService.getDefaultLoadHypothesis).mockResolvedValueOnce(mockDefaultArea);
+  vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArray);
   vi.mocked(trajectoryService.getTrajectoryDataByTypeAndId).mockResolvedValueOnce(
     mockTrajectoryAreaData as unknown as TrajectoryLinkData[],
   );
