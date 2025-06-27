@@ -87,7 +87,11 @@
   },
   "thermal": {
     "@installedPower": "Capacités installées",
-    "@parameters": "Paramètres"
+    "@parameters": "Paramètres",
+    "@parametersTechnical": "Paramètres techniques",
+    "@parametersEconomic": "Paramètres économiques",
+    "@costs": "Coûts",
+    "@economics": "Economics"
   },
   "horizonInput":{
     "@validYearError": "Horizon doit être un numéro entre 2000 et 99999",

@@ -60,7 +60,7 @@ const StudyNavigationMenu = ({
     setTabs((prev) =>
       prev.map((tab) => ({
         ...tab,
-        isDisabled: !studyState[`${TRAJECTORY_TYPE.AREA}`]?.[0],
+        isDisabled: tab.name !== TRAJECTORY_TYPE.AREA && !studyState[`${TRAJECTORY_TYPE.AREA}`]?.[0],
       })),
     );
   }, [studyState]);

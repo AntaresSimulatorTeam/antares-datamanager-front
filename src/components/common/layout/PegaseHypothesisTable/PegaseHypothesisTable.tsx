@@ -18,6 +18,7 @@ interface PegaseHypothesisTableProps {
     progress: number,
     fileStatus: FileInputStatus,
     indexSelected: number,
+    columnHeader?: string,
   ) => TableOptions<HypothesisRowData>['columns'];
   studyState: StudyStatus;
   readOnly?: ReadOnlyObject;
@@ -29,6 +30,7 @@ interface PegaseHypothesisTableProps {
   isReadOnlyEnable?: boolean;
   removeRow?: (value: string, rowIndex?: number) => void | Promise<void>;
   updateData?: (rowIndex: number, value: unknown, status?: RowStatus, label?: string) => void;
+  columnHeader?: string;
 }
 type ExpandedState = true | Record<string, boolean>;
 
@@ -46,6 +48,7 @@ export const PegaseHypothesisTable = ({
   isReadOnlyEnable = false,
   removeRow,
   updateData,
+  columnHeader,
 }: PegaseHypothesisTableProps) => {
   const { t } = useTranslation();
   const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
@@ -54,8 +57,8 @@ export const PegaseHypothesisTable = ({
   );
 
   const columns: TableOptions<HypothesisRowData>['columns'] = useMemo(
-    () => getTableHeaders(t, errorInfo, setErrorInfo, studyState, progress, fileStatus, indexSelected),
-    [errorInfo, fileStatus, indexSelected, progress, studyState, t],
+    () => getTableHeaders(t, errorInfo, setErrorInfo, studyState, progress, fileStatus, indexSelected, columnHeader),
+    [errorInfo, fileStatus, indexSelected, progress, studyState, t, columnHeader],
   );
 
   const onHandleImport = async (index: number) => {

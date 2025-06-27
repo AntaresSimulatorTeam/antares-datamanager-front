@@ -9,7 +9,7 @@ import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
 import { HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
 import { buildRowData, retrieveReadOnlyArea } from '@/shared/utils/trajectoryUtils.ts';
-import getLoadHypothesisTableHeaders from '@/components/header/LoadHypothesisTableHeader.tsx';
+import getEditableHypothesisTableHeaders from '@/components/header/EditableHypothesisTableHeaders.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
@@ -28,13 +28,13 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
   const [defaultData, setDefaultData] = useState<HypothesisRowData[]>([]);
   const data: HypothesisRowData[] = [
     {
-      hypothesis: 'Costs',
+      hypothesis: t('thermal.@costs'),
       trajectory: null,
       status: TRAJECTORY_SELECTION_STATUS.MISSING,
       isDefault: true,
     },
     {
-      hypothesis: 'Economics',
+      hypothesis: t('thermal.@economics'),
       trajectory: null,
       status: TRAJECTORY_SELECTION_STATUS.MISSING,
       isDefault: true,
@@ -123,7 +123,8 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
           <PegaseHypothesisTable
             id="default-parameters-table"
             data={defaultData}
-            getTableHeaders={getLoadHypothesisTableHeaders}
+            getTableHeaders={getEditableHypothesisTableHeaders}
+            columnHeader={t('thermal.@parametersTechnical')}
             fileStatus={fileStatus}
             studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
             readOnly={readOnly}
@@ -138,7 +139,8 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
           <PegaseHypothesisTable
             id="default-parameters-table"
             data={data}
-            getTableHeaders={getLoadHypothesisTableHeaders}
+            getTableHeaders={getEditableHypothesisTableHeaders}
+            columnHeader={t('thermal.@parametersEconomic')}
             fileStatus={fileStatus}
             studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
             progress={progress}

@@ -20,7 +20,7 @@ import { FileInputStatus } from 'rte-design-system-react';
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
 
-const getLoadHypothesisTableHeaders = (
+const getEditableHypothesisTableHeaders = (
   t: (value: string) => string,
   error: ErrorMessageType,
   setErrorInfo: Dispatch<SetStateAction<ErrorMessageType>>,
@@ -28,9 +28,10 @@ const getLoadHypothesisTableHeaders = (
   progress: number,
   fileStatus: FileInputStatus,
   rowIndexSelected: number,
+  columnHeader?: string,
 ) => [
   columnHelper.accessor('hypothesis', {
-    header: t('studyDetails.@area'),
+    header: columnHeader || t('studyDetails.@area'),
     size: 50,
     cell: ({ getValue, row }) => {
       const { status } = row.original;
@@ -103,4 +104,4 @@ const getLoadHypothesisTableHeaders = (
   }),
 ];
 
-export default getLoadHypothesisTableHeaders;
+export default getEditableHypothesisTableHeaders;

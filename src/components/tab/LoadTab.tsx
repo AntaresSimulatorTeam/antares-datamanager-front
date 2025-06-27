@@ -30,7 +30,7 @@ import { FileInputStatus, RdsCheckbox, RdsCheckboxGroupWrapper, RdsDivider } fro
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
-import getLoadHypothesisTableHeaders from '@/components/header/LoadHypothesisTableHeader.tsx';
+import getEditableHypothesisTableHeaders from '@/components/header/EditableHypothesisTableHeaders.tsx';
 import { sortKeepLastName } from '@/shared/utils/sortUtils.tsx';
 import {
   buildEmptyTrajectory,
@@ -441,7 +441,7 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
           <PegaseHypothesisTable
             id="load-table"
             data={data}
-            getTableHeaders={getLoadHypothesisTableHeaders}
+            getTableHeaders={getEditableHypothesisTableHeaders}
             fileStatus={fileStatus}
             studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
             readOnly={readOnly}
