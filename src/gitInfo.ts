@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "feat/ANT-3399_THERMAL_handle_parameters_tab_initialization",
-  commit: "a629c7e",
-  commitTime: "2025-06-27T14:37:23.996Z"
+  branch: "feat/ANT-3484_THERMAL_parameters_add_delete_row",
+  commit: "9c15acf",
+  commitTime: "2025-06-27T14:47:43.354Z"
 };
