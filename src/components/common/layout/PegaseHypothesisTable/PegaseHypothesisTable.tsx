@@ -86,6 +86,7 @@ export const PegaseHypothesisTable = ({
         search={(value?: string, area?: string) => handleSearch(value, area)}
         importData={async (index: number) => await onHandleImport(index)}
         removeRow={(value: string, rowIndex?: number) => {
+          console.log('============== removeRow');
           void removeRow?.(value, rowIndex);
         }}
         updateData={(rowIndex: number, value: unknown, status?: RowStatus, label?: string) =>
