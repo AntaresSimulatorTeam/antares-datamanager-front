@@ -14,3 +14,20 @@ export const sortKeepLastName = (arr: HypothesisRowData[], lastName: string): Hy
       return -1;
     return a.hypothesis.localeCompare(b.hypothesis, 'en', { ignorePunctuation: true });
   });
+
+export const sortDefaultFirstPosition = (arr: HypothesisRowData[], lastName: string): HypothesisRowData[] =>
+  arr.sort((a, b) => {
+    if (a.isDefault && !b.isDefault) return 0;
+    if (!a.isDefault && b.isDefault) return 0;
+    if (
+      a.hypothesis.toUpperCase().includes(lastName.toUpperCase()) &&
+      !b.hypothesis.toUpperCase().includes(lastName.toUpperCase())
+    )
+      return 3;
+    if (
+      b.hypothesis.toUpperCase().includes(lastName.toUpperCase()) &&
+      !a.hypothesis.toUpperCase().includes(lastName.toUpperCase())
+    )
+      return -3;
+    return 0;
+  });

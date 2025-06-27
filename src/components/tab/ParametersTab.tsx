@@ -1,11 +1,9 @@
 import SearchBar from '@/pages/pegase/home/components/SearchBar.tsx';
 import { FileInputStatus, RdsDivider } from 'rte-design-system-react';
-import StdCheckboxGroupWrapper from '@common/forms/stdCheckboxGroup/StdCheckboxGroupWrapper.tsx';
 import { useTranslation } from 'react-i18next';
-import StdCheckbox from '@common/forms/stdCheckbox/StdCheckbox.tsx';
 import { CheckBoxData } from '@/components/tab/LoadTab.tsx';
 import { useEffect, useState } from 'react';
-import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
+import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
 import { buildRowData, retrieveReadOnlyArea } from '@/shared/utils/trajectoryUtils.ts';
@@ -14,6 +12,9 @@ import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { useStudy } from '@/store/contexts/StudyContext.tsx';
+import StdCheckboxGroupWrapper from '@common/forms/stdCheckboxGroup/StdCheckboxGroupWrapper.tsx';
+import StdCheckbox from '@common/forms/stdCheckbox/StdCheckbox.tsx';
+import { sortDefaultFirstPosition } from '@/shared/utils/sortUtils.tsx';
 
 interface ParametersTabProps {
   defaultAreas: CheckBoxData[];
@@ -44,6 +45,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
   const [fileStatus] = useState<FileInputStatus>('empty');
   const [rowIndexSelected] = useState(0);
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
+  const [readOnlyAreas, setReadOnlyAreas] = useState<string[]>([]);
 
   useEffect(() => {
     let newArea: CheckBoxData[] = [];
@@ -73,21 +75,35 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
     setDefaultData(areaDefaultData);
 
     setReadOnly(retrieveReadOnlyArea(areaDefaultData, defaultAreaListNotIncludedInList));
+    setReadOnlyAreas(defaultAreaListNotIncludedInList);
   }, [areas, defaultAreas]);
 
-  const handleSelectionChange = (value: string, isChecked: boolean) => {
-    if (isChecked) {
-      setCheckedValues((prev) => [...prev, value]);
-    } else {
-      setCheckedValues((prev) => [...prev.filter((checkedValue) => checkedValue !== value)]);
+  const addRow = (value: string) => {
+    const newRow: HypothesisRowData = {
+      hypothesis: value,
+      trajectory: null,
+      status: TRAJECTORY_SELECTION_STATUS.MISSING,
+      isDefault: false,
+    };
+    setCheckedValues((prev) => [...prev, value]);
+    const newDataSorted = sortDefaultFirstPosition([...defaultData, newRow], OTHER_AREAS_LABEL);
+    setDefaultData(newDataSorted);
+    if (readOnlyAreas.length > 0) {
+      const readOnlyRows = retrieveReadOnlyArea(newDataSorted, readOnlyAreas);
+      setReadOnly(readOnlyRows);
     }
+  };
+
+  const removeRow = (value: string) => {
+    setCheckedValues((prev) => [...prev.filter((checkedValue) => checkedValue !== value)]);
+    setDefaultData((prev) => [...prev.filter((itemData) => itemData.hypothesis !== value)]);
   };
 
   const handleSelectionChange = (value: string, isChecked: boolean) => {
     if (isChecked) {
-      setCheckedValues((prev) => [...prev, value]);
+      addRow(value);
     } else {
-      setCheckedValues((prev) => [...prev.filter((checkedValue) => checkedValue !== value)]);
+      removeRow(value);
     }
   };
 
@@ -108,12 +124,12 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
           name={''}
           checkedValues={checkedValues}
           disabled={false}
-          onChange={(value: string, isChecked?: boolean) => void handleSelectionChange(value, isChecked ?? false)}
+          onChange={(value: string, isChecked?: boolean) => handleSelectionChange(value, isChecked ?? false)}
         >
           {areaDefault?.map((area, index) => (
             <div key={`${index}-${area.name}`} className="my-1">
               <StdCheckbox
-                key={`nested-checkbox-${area.name}`}
+                key={`parameter-checkbox-${area.name}`}
                 label={area.name}
                 value={area.name}
                 name={''}
@@ -141,6 +157,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
             handleSearch={handleTrajectorySearch}
             handleImport={handleFetchTrajectoriesFS}
             isReadOnlyEnable={true}
+            removeRow={removeRow}
           />
         )}
         <div className="flex h-fit w-full">
