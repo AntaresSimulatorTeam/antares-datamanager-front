@@ -14,7 +14,7 @@ import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useTranslation } from 'react-i18next';
 import { useStudy } from '@/store/contexts/StudyContext.tsx';
-import { HypothesisTab, LocationStudy } from '@/shared/types';
+import { HypothesisTab } from '@/shared/types';
 import StdAvatar from '@common/layout/stdAvatar/StdAvatar.tsx';
 import { getMessagesNb } from '@/shared/utils/warningUtils.ts';
 import { ThermalMenu } from '@/components/menu/ThermalMenu.tsx';
