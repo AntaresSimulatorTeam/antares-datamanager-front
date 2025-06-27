@@ -14,6 +14,7 @@ type CheckboxWithNestedCheckboxProps = {
   name: string;
   id?: string;
   disabled?: boolean;
+  isReadOnly?: boolean;
   checked?: boolean;
   defaultChecked?: boolean;
   onChange?: (value: string, checked: boolean) => void;
@@ -30,6 +31,7 @@ export const CheckboxWithNestedCheckbox = ({
   value,
   label,
   disabled = false,
+  isReadOnly = false,
   checkboxControl,
   onHandleSelection,
   id: propsId,
@@ -74,7 +76,7 @@ export const CheckboxWithNestedCheckbox = ({
               {label} {required && <StdRequiredIndicator />}
             </span>
           </div>
-          <button onClick={() => !disabled && setIsOpen((prev) => !prev)}>
+          <button onClick={() => !isReadOnly && setIsOpen((prev) => !prev)}>
             <StdIcon
               name={isOpen ? StdIconId.KeyboardArrowDown : StdIconId.KeyboardArrowRight}
               color="text-gray-800"

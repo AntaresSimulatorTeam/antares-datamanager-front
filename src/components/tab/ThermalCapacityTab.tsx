@@ -186,6 +186,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
               name={''}
               defaultChecked={area.isDefault}
               disabled={area.isDefault}
+              isReadOnly={readOnly[index]}
               onChange={handleSelectionChange}
               onHandleSelection={handleSelectionChange}
               checkedValues={checkedValues}
