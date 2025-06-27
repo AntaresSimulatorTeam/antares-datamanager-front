@@ -109,3 +109,8 @@ export interface HypothesisTab {
   icon: StdIconId;
   isDisabled: boolean;
 }
+
+export interface NestedCheckedType {
+  name: string;
+  subOptions: string[] | null;
+}

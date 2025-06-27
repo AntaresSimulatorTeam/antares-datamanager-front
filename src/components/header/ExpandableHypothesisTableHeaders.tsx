@@ -37,8 +37,7 @@ const getExpandableHypothesisTableHeaders = (
     cell: ({ getValue, row }) => {
       const { status } = row.original;
       const getAlignment = () => {
-        if (row.depth === 0 && !row.getCanExpand()) return 'pl-1';
-        if (row.depth === 0 && row.getCanExpand()) return 'pl-0';
+        if (row.depth === 0) return !row.getCanExpand() ? 'pl-1' : 'pl-0';
         return 'pl-4';
       };
       return (
@@ -112,14 +111,17 @@ const getExpandableHypothesisTableHeaders = (
   columnHelper.accessor('status', {
     header: t('home.@status'),
     cell: ({ row, table: { options } }) => {
-      const { status, hypothesis, isDefault, trajectory } = row.original;
+      const { status, isDefault, trajectory, hypothesis } = row.original;
       return progress > 0 && fileStatus === 'loading' && rowIndexSelected === row.index ? (
         <ProgressBar statusFile={fileStatus} progressValue={progress} />
       ) : (
         <CellWithStatus
           status={status}
           isDeletable={!isDefault && !(studyStatus === StudyStatus.GENERATED)}
-          onClick={() => void options?.meta?.removeRow?.(row.index, hypothesis)}
+          onClick={() => {
+            const parentRow = row.getParentRow();
+            void options?.meta?.removeRow?.(row.depth === 1 && parentRow ? parentRow.index : row.index, hypothesis);
+          }}
           message={trajectory?.messages?.[0]?.content ?? ''}
         />
       );

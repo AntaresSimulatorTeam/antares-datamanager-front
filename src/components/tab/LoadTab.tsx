@@ -13,7 +13,6 @@ import {
   LocationStudy,
   RowStatus,
   SelectOption,
-  TrajectoryAreaData,
 } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useTranslation } from 'react-i18next';
@@ -22,8 +21,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import {
   fetchTrajectoriesFromDB,
   fetchTrajectoriesFromFS,
-  getDefaultLoadHypothesis,
-  getTrajectoryDataByTypeAndId,
   linkTrajectoryToStudy,
   unlinkTrajectoryFromStudy,
   uploadTrajectory,
@@ -37,10 +34,9 @@ import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import getLoadHypothesisTableHeaders from '@/components/header/LoadHypothesisTableHeader.tsx';
 import { sortKeepLastName } from '@/shared/utils/sortUtils.tsx';
 import {
-  buildEmptyRowData,
+  buildEmptyTrajectory,
   buildErrorTrajectory,
   buildRowData,
-  removeDuplicate,
   retrieveReadOnlyArea,
 } from '@/shared/utils/trajectoryUtils.ts';
 import { AREA_OTHERS } from '@/shared/const/studyConfig.ts';
@@ -51,6 +47,7 @@ import { useUser } from '@/store/contexts/UserContext.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { notifyAlert } from '@/shared/notification/notification.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
+import { useFetchAreas } from '@/hooks/useFetchAreas.ts';
 
 export type CheckBoxData = {
   name: string;
@@ -82,6 +79,7 @@ const LoadTab = () => {
   const [isStudyGenerated, setIsStudyGenerated] = useState(
     studyState.studyStatus === StudyStatus.GENERATED || study.status === StudyStatus.GENERATED,
   );
+  const { areaDefault, trajectoryAreas, trajectoryLinked, emptyAreas } = useFetchAreas(study?.id, TRAJECTORY_TYPE.LOAD);
 
   const setReadOnlyForGeneratedStudy = (rows: HypothesisRowData[]) => {
     const areaWithoutTrajectory = rows.map((row) => (row.trajectory == null ? row.hypothesis : null));
@@ -90,90 +88,68 @@ const LoadTab = () => {
   };
 
   useEffect(() => {
-    const fetchHypothesis = async () => {
+    const fetchHypothesis = () => {
       try {
-        const areaDefault: CheckBoxData[] = (await getDefaultLoadHypothesis())?.map((area) => ({
-          name: area.name,
-          isDefault: true,
-        }));
-        const trajectoryAreaId =
-          studyState && studyState?.[`${TRAJECTORY_TYPE.AREA}`]
-            ? studyState?.[`${TRAJECTORY_TYPE.AREA}`]?.[0]?.id
-            : null;
-
-        let newArea: CheckBoxData[];
         const defaultAreaListNotIncludedInList: string[] = [];
-        if (trajectoryAreaId != null) {
-          const trajectoryAreas = (await getTrajectoryDataByTypeAndId(
-            TRAJECTORY_TYPE.AREA,
-            trajectoryAreaId,
-          )) as unknown as TrajectoryAreaData[];
-
-          // Build dropdown list options
-          if (trajectoryAreas.length > 0) {
-            newArea = trajectoryAreas
-              .map((trajectoryArea) => {
-                if (!areaDefault?.some((item) => item.name === trajectoryArea.areaName)) {
-                  return { name: trajectoryArea.areaName, isDefault: false };
-                }
-              })
-              .filter(Boolean) as CheckBoxData[];
-            setAreasDefaultOptions(areaDefault);
-            setAreasOptions(areaDefault?.concat(newArea));
-
-            // Find default area not included in areas trajectory list
-            areaDefault.forEach((defaultArea) => {
-              if (!trajectoryAreas.some((trajectoryArea) => trajectoryArea.areaName === defaultArea.name)) {
-                defaultAreaListNotIncludedInList.push(defaultArea.name);
+        // Build dropdown list options
+        if (trajectoryAreas.length > 0) {
+          const newArea = trajectoryAreas
+            .map((trajectoryArea) => {
+              if (!areaDefault?.some((item) => item.name === trajectoryArea.areaName)) {
+                return { name: trajectoryArea.areaName, isDefault: false };
               }
-            });
-          } else {
-            setAreasOptions(areaDefault);
-          }
-        }
+            })
+            .filter(Boolean) as CheckBoxData[];
+          setAreasDefaultOptions(areaDefault);
+          setAreasOptions(areaDefault?.concat(newArea));
 
-        const trajectoryLinked = await getStudyTrajectories(study?.id, TRAJECTORY_TYPE.LOAD);
-        if (trajectoryLinked?.length > 0) {
-          dispatch?.({
-            type: STUDY_ACTION.ADD_TRAJECTORIES_LOAD,
-            payload: trajectoryLinked,
-          });
-        }
-        areaDefault.push({
-          name: AREA_OTHERS,
-          isDefault: true,
-        });
-
-        // Build hypothesis table
-        const areaDataDefault: HypothesisRowData[] = areaDefault?.map((area) => {
-          const trajectoryArea = trajectoryLinked?.find((trajectory) => trajectory.loadArea === area.name);
-          return buildRowData(area.name, true, trajectoryArea);
-        });
-
-        const emptyAreaSelected = (studyState[TRAJECTORY_TYPE.LOAD] as DbTrajectory[]) ?? [];
-        const emptyArea = removeDuplicate(trajectoryLinked.concat(emptyAreaSelected));
-        const areaData = emptyArea
-          .map((trajectory: DbTrajectory) => {
-            if (!areaDefault.some((item: CheckBoxData) => item.name === trajectory.loadArea)) {
-              return buildRowData(trajectory.loadArea as string, false, trajectory);
+          // Find default area not included in areas trajectory list
+          areaDefault.forEach((defaultArea) => {
+            if (!trajectoryAreas.some((trajectoryArea) => trajectoryArea.areaName === defaultArea.name)) {
+              defaultAreaListNotIncludedInList.push(defaultArea.name);
             }
-          })
-          .filter(Boolean) as HypothesisRowData[];
+          });
+        } else {
+          setAreasOptions(areaDefault);
+        }
 
-        const dataTrajectories =
-          areaData.length > 0 ? sortKeepLastName(areaDataDefault.concat(areaData), AREA_OTHERS) : areaDataDefault;
-        setData(dataTrajectories);
-        if (isStudyGenerated) {
-          setReadOnlyForGeneratedStudy(dataTrajectories);
-        } else if (defaultAreaListNotIncludedInList.length > 0 && !isStudyGenerated) {
-          const readOnlyRows = retrieveReadOnlyArea(dataTrajectories, defaultAreaListNotIncludedInList);
-          setReadOnly(readOnlyRows);
-          setReadOnlyAreas(defaultAreaListNotIncludedInList);
+        const areaDefaultOther = [
+          ...areaDefault,
+          {
+            name: AREA_OTHERS,
+            isDefault: true,
+          },
+        ];
+        if (areaDefaultOther.length > 0) {
+          // Build hypothesis table
+          const areaDataDefault: HypothesisRowData[] = areaDefaultOther?.map((area) => {
+            const trajectoryArea = trajectoryLinked?.find((trajectory) => trajectory.loadArea === area.name);
+            return buildRowData(area.name, true, trajectoryArea);
+          });
+          const areaData = emptyAreas
+            .map((trajectory: DbTrajectory) => {
+              if (!areaDefaultOther.some((item: CheckBoxData) => item.name === trajectory.loadArea)) {
+                return buildRowData(trajectory.loadArea as string, false, trajectory);
+              }
+            })
+            .filter(Boolean) as HypothesisRowData[];
+
+          const dataTrajectories =
+            areaData.length > 0 ? sortKeepLastName(areaDataDefault.concat(areaData), AREA_OTHERS) : areaDataDefault;
+          setData(dataTrajectories);
+
+          if (isStudyGenerated) {
+            setReadOnlyForGeneratedStudy(dataTrajectories);
+          } else if (defaultAreaListNotIncludedInList.length > 0 && !isStudyGenerated) {
+            const readOnlyRows = retrieveReadOnlyArea(dataTrajectories, defaultAreaListNotIncludedInList);
+            setReadOnly(readOnlyRows);
+            setReadOnlyAreas(defaultAreaListNotIncludedInList);
+          }
         }
 
         if (areaDefault.length > 0) {
           const defaultCheckList: string[] = areaDefault.map((item) => item.name);
-          const checkList = emptyArea
+          const checkList = emptyAreas
             .map((trajectory) => {
               if (trajectory.loadArea) return trajectory.loadArea;
             })
@@ -186,7 +162,7 @@ const LoadTab = () => {
     };
 
     void fetchHypothesis();
-  }, []);
+  }, [areaDefault, trajectoryAreas, trajectoryLinked, emptyAreas]);
 
   useEffect(() => {
     if (studyState.studyStatus === StudyStatus.GENERATED || study?.status === StudyStatus.GENERATED) {
@@ -384,7 +360,7 @@ const LoadTab = () => {
   const addRow = (name: string) => {
     dispatch?.({
       type: STUDY_ACTION.ADD_TRAJECTORY_LOAD,
-      payload: buildEmptyRowData(name),
+      payload: buildEmptyTrajectory(name, TRAJECTORY_TYPE.LOAD),
     });
     const newDataSorted = sortKeepLastName(
       [
@@ -450,7 +426,7 @@ const LoadTab = () => {
           <RdsCheckboxGroupWrapper
             label={''}
             name={''}
-            onChange={(value: string, status?: boolean) => void handleSelectionChange(value, status)}
+            onChange={(value: string, isChecked?: boolean) => void handleSelectionChange(value, isChecked)}
             checkedValues={checkedValues}
             disabled={isStudyGenerated}
           >
@@ -465,7 +441,7 @@ const LoadTab = () => {
                   disabled={area.isDefault}
                   checked={area.isDefault}
                 />
-                {index === Math.max(areasDefaultOptions?.length - 2, 0) && <RdsDivider extraClasses="mt-1" />}
+                {index === Math.max(areasDefaultOptions?.length - 1, 0) && <RdsDivider extraClasses="mt-1" />}
               </div>
             ))}
           </RdsCheckboxGroupWrapper>

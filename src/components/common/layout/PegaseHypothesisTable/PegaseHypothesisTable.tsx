@@ -17,6 +17,7 @@ interface PegaseHypothesisTableProps {
   indexSelected: number;
   handleSearch: (value?: string, area?: string) => Promise<SelectOption[] | undefined>;
   handleImport: (index: number) => Promise<void>;
+  removeRow?: (value: string, parentValue?: string) => void;
 }
 type ExpandedState = true | Record<string, boolean>;
 
@@ -30,15 +31,18 @@ export const PegaseHypothesisTable = ({
   indexSelected,
   handleSearch,
   handleImport,
+  removeRow,
 }: PegaseHypothesisTableProps) => {
   const { t } = useTranslation();
   const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
-  const [expanded, setExpanded] = useState<ExpandedState>({});
+  const [expanded, setExpanded] = useState<ExpandedState>(
+    data.every((item) => item.isDefault && item.subRows) ? {} : true,
+  );
 
   const columns = useMemo(
     () =>
       getExpandableHypothesisTableHeaders(t, errorInfo, setErrorInfo, studyState, progress, fileStatus, indexSelected),
-    [t, errorInfo, studyState, progress, fileStatus, indexSelected],
+    [errorInfo, fileStatus, indexSelected, progress, studyState, t],
   );
 
   return (
@@ -51,9 +55,12 @@ export const PegaseHypothesisTable = ({
         enableReadOnly={true}
         state={{ readOnly, expanded }}
         onExpandedChange={setExpanded}
+        getSubRows={(originalRow) => originalRow.subRows ?? undefined}
         search={(value?: string, area?: string) => handleSearch(value, area)}
         import={(index: number) => handleImport(index)}
-        getSubRows={(originalRow) => originalRow.subRows ?? undefined}
+        removeRow={(rowIndex: number, value: unknown) => {
+          removeRow?.(value as string, data[rowIndex]?.hypothesis === value ? undefined : data[rowIndex].hypothesis);
+        }}
       />
     </div>
   );

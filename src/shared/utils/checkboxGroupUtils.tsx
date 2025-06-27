@@ -98,7 +98,7 @@ export const prepareCheckboxes = (
   currentValues: string[],
   possibleValues: string[],
   name: string,
-  handleChange: (value: string, isChecked?: boolean, isCheckboxControl?: boolean) => void,
+  handleChange?: (value: string, isChecked?: boolean, isCheckboxControl?: boolean) => void,
   disabled?: boolean,
 ): ReactNode[] =>
   React.Children.toArray(children).map((child, idx) => {
@@ -118,7 +118,7 @@ export const prepareCheckboxes = (
           indeterminate={child.props.checkboxControl && getIndeterminate(currentValues, possibleValues)}
           checked={getCheckState(currentValues, possibleValues, child.props.value, child.props.checkboxControl)}
           disabled={disabled || child.props.disabled}
-          onChange={(value?: boolean) => handleChange(child.props.value ?? '', value, child.props.checkboxControl)}
+          onChange={(value?: boolean) => handleChange?.(child.props.value ?? '', value, child.props.checkboxControl)}
         />
       );
     }

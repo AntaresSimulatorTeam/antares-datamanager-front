@@ -18,7 +18,7 @@ import {
 import {
   mockDbTrajectory,
   mockFsTrajectoryArray,
-  trajectoryAreaData,
+  mockTrajectoryAreaData,
 } from '@/shared/services/test/mocks/trajectoryMock.tsx';
 import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
 import { AuthService } from '@/shared/services/authService.ts';
@@ -259,7 +259,7 @@ describe('getTrajectoryDataByTypeAndId', () => {
   it('should fetch trajectory data', async () => {
     vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
       ok: true,
-      json: async () => Promise.resolve(trajectoryAreaData),
+      json: async () => Promise.resolve(mockTrajectoryAreaData),
     } as Response);
 
     const result = await getTrajectoryDataByTypeAndId(TRAJECTORY_TYPE.AREA, 2);
@@ -269,7 +269,7 @@ describe('getTrajectoryDataByTypeAndId', () => {
       expect(AuthService.authFetch).toHaveBeenCalledWith(
         'https://mockapi.com/v1/trajectory/trajectoryData?trajectoryType=AREA&trajectoryId=2',
       );
-      expect(result).toEqual(trajectoryAreaData);
+      expect(result).toEqual(mockTrajectoryAreaData);
     });
   });
 

@@ -5,7 +5,7 @@
  */
 
 import { useCallback, useEffect } from 'react';
-import { ProjectActionType, ProjectInfo } from '@/shared/types/Project.type';
+import { ProjectActionType } from '@/shared/types/Project.type';
 import { fetchPinnedProjects, pinProject, unpinProject } from '@/shared/services/pinnedProjectService';
 import { v4 as uuidv4 } from 'uuid';
 import { notifyToast } from '@/shared/notification/notification.tsx';
@@ -21,7 +21,7 @@ export const useHandlePinnedProjectList = () => {
 
   const getPinnedProjects = useCallback(async () => {
     try {
-      const projects = (await fetchPinnedProjects(user?.profile.sub)) as ProjectInfo[];
+      const projects = await fetchPinnedProjects(user?.profile.sub);
       if (projects?.length) {
         dispatch?.({
           type: PROJECT_ACTION.INIT_PINNED_PROJECT_LIST,

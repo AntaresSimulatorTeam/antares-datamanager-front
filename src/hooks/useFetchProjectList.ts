@@ -9,7 +9,6 @@ import { ProjectActionType, ProjectResponse } from '@/shared/types/Project.type.
 import { fetchProjectFromSearchTerm } from '@/shared/services/projectService.ts';
 import { PROJECT_ACTION } from '@/shared/enum/project.ts';
 import { useProjectDispatch } from '@/store/contexts/ProjectContext.tsx';
-import { PaginatedResponse } from '@/shared/types';
 
 export const useFetchProjectList = (current: number, intervalSize: number, searchTerm?: string) => {
   const [projects, setProjects] = useState<ProjectResponse[]>([]);
@@ -19,11 +18,7 @@ export const useFetchProjectList = (current: number, intervalSize: number, searc
   const fetchProjects = useCallback(
     async (currentPage: number, size: number, term: string) => {
       try {
-        const response = (await fetchProjectFromSearchTerm(
-          currentPage,
-          size,
-          term,
-        )) as PaginatedResponse<ProjectResponse>;
+        const response = await fetchProjectFromSearchTerm(currentPage, size, term);
 
         dispatch?.({
           type: PROJECT_ACTION.INIT_PROJECT_LIST,

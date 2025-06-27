@@ -17,7 +17,7 @@ export type StdCheckboxGroupItem = {
 export type StdCheckboxGroupProps = {
   name: string;
   children: ReactNode | ReactNode[];
-  onChange: (value: string, status?: boolean, isCheckboxControl?: boolean) => void;
+  onChange?: (value: string, isChecked?: boolean, isCheckboxControl?: boolean) => void;
   checkedValues: string[];
   id?: string;
   label?: string;

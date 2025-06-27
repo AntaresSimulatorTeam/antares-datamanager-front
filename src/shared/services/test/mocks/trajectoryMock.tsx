@@ -1,4 +1,4 @@
-import { DbTrajectory, WarningMessage } from '@/shared/types';
+import { DbTrajectory, TrajectoryAreaData, WarningMessage } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
 
@@ -10,6 +10,7 @@ export const mockDbTrajectory: DbTrajectory = {
   userName: 'mouad',
   creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
   messages: [],
+  loadArea: 'AT',
 };
 
 export const mockDbTrajectoryArray = [
@@ -21,6 +22,7 @@ export const mockDbTrajectoryArray = [
     userName: 'mouad',
     creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
     messages: [],
+    loadArea: 'AT',
   },
   {
     id: 2,
@@ -30,6 +32,7 @@ export const mockDbTrajectoryArray = [
     userName: 'mouad',
     creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
     messages: [],
+    loadArea: 'BE',
   },
 ];
 
@@ -144,7 +147,7 @@ export const mockWarningMessages: WarningMessage[] = [
   },
 ];
 
-export const trajectoryAreaData = [
+export const mockTrajectoryAreaData: TrajectoryAreaData[] = [
   {
     areaName: 'CH',
     powerToGas: 'false',
@@ -171,3 +174,5 @@ export const trajectoryAreaData = [
     shortTermStorage: 'false',
   },
 ];
+
+export const mockDefaultArea = [{ name: 'FR' }];
