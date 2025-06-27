@@ -1,8 +1,6 @@
 import SearchBar from '@/pages/pegase/home/components/SearchBar.tsx';
 import { FileInputStatus, RdsDivider } from 'rte-design-system-react';
-import StdCheckboxGroupWrapper from '@common/forms/stdCheckboxGroup/StdCheckboxGroupWrapper.tsx';
 import { useTranslation } from 'react-i18next';
-import StdCheckbox from '@common/forms/stdCheckbox/StdCheckbox.tsx';
 import { CheckBoxData } from '@/components/tab/LoadTab.tsx';
 import { useEffect, useState } from 'react';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
@@ -14,6 +12,8 @@ import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { useStudy } from '@/store/contexts/StudyContext.tsx';
+import StdCheckboxGroupWrapper from '@common/forms/stdCheckboxGroup/StdCheckboxGroupWrapper.tsx';
+import StdCheckbox from '@common/forms/stdCheckbox/StdCheckbox.tsx';
 import { sortDefaultFirstPosition } from '@/shared/utils/sortUtils.tsx';
 
 interface ParametersTabProps {
@@ -104,14 +104,6 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
       addRow(value);
     } else {
       removeRow(value);
-    }
-  };
-
-  const handleSelectionChange = (value: string, isChecked: boolean) => {
-    if (isChecked) {
-      setCheckedValues((prev) => [...prev, value]);
-    } else {
-      setCheckedValues((prev) => [...prev.filter((checkedValue) => checkedValue !== value)]);
     }
   };
 
