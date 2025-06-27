@@ -14,13 +14,12 @@ import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useTranslation } from 'react-i18next';
 import { useStudy } from '@/store/contexts/StudyContext.tsx';
-import { HypothesisTab, LocationStudy } from '@/shared/types';
+import { HypothesisTab } from '@/shared/types';
 import StdAvatar from '@common/layout/stdAvatar/StdAvatar.tsx';
 import { getMessagesNb } from '@/shared/utils/warningUtils.ts';
 import { ThermalMenu } from '@/components/menu/ThermalMenu.tsx';
 import { getStudyMenu } from '@/shared/utils/trajectoryUtils.ts';
 import { useFetchAreas } from '@/hooks/useFetchAreas.ts';
-import { useLocation } from 'react-router-dom';
 
 type StudyNavigationMenuProps = {
   onRenderActiveComponent?: (content: ReactNode | null) => void;
@@ -38,9 +37,7 @@ const StudyNavigationMenu = ({
   const { t } = useTranslation();
   const studyState = useStudy();
   const [tabs, setTabs] = useState<HypothesisTab[]>(getStudyMenu(t, !!studyState[`${TRAJECTORY_TYPE.AREA}`]?.[0]));
-  const location = useLocation();
-  const study = (location.state as LocationStudy)?.study;
-  const { areaDefault, trajectoryAreas } = useFetchAreas(study?.id);
+  const { areaDefault, trajectoryAreas } = useFetchAreas(studyState[`${TRAJECTORY_TYPE.AREA}`]?.[0]);
 
   const renderActiveComponent = (): ReactNode | null => {
     switch (activeTab.name) {

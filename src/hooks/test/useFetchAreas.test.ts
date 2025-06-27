@@ -4,7 +4,6 @@ import { useStudy } from '@/store/contexts/StudyContext.tsx';
 import { StudyState, TrajectoryLinkData } from '@/shared/types';
 import { renderHook, waitFor } from '@testing-library/react';
 import * as trajectoryService from '@/shared/services/trajectoryService.ts';
-import * as studyService from '@/shared/services/studyService.ts';
 import {
   mockDbTrajectory,
   mockDbTrajectoryArray,
@@ -26,7 +25,6 @@ vi.mock('@/store/contexts/StudyContext', async (importOriginal) => {
 describe('useFetchAreas', () => {
   const mockUseStudy = useStudy as Mock<typeof useStudy>;
   vi.mocked(trajectoryService.getDefaultLoadHypothesis).mockResolvedValueOnce(mockDefaultArea);
-  vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArray);
   vi.mocked(trajectoryService.getTrajectoryDataByTypeAndId).mockResolvedValueOnce(
     mockTrajectoryAreaData as unknown as TrajectoryLinkData[],
   );
@@ -42,12 +40,10 @@ describe('useFetchAreas', () => {
   });
 
   it('should call all api', async () => {
-    const { result } = renderHook(() => useFetchAreas(5));
+    const { result } = renderHook(() => useFetchAreas(mockDbTrajectory));
 
     await waitFor(() => {
       expect(trajectoryService.getDefaultLoadHypothesis).toHaveBeenCalledTimes(1);
-      expect(studyService.getStudyTrajectories).toHaveBeenCalledTimes(1);
-      expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.AREA);
       expect(trajectoryService.getTrajectoryDataByTypeAndId).toHaveBeenCalledTimes(1);
       expect(trajectoryService.getTrajectoryDataByTypeAndId).toHaveBeenCalledWith(TRAJECTORY_TYPE.AREA, 1);
       expect(result.current.areaDefault).toEqual([
@@ -60,12 +56,11 @@ describe('useFetchAreas', () => {
     });
   });
 
-  it('should not call "getStudyTrajectories" and "getTrajectoryDataByTypeAndId" when id is not provided', async () => {
-    const { result } = renderHook(() => useFetchAreas(5));
+  it('should not call "getTrajectoryDataByTypeAndId" when no trajectory of AREA type isn\'t provided', async () => {
+    const { result } = renderHook(() => useFetchAreas());
 
     await waitFor(() => {
-      expect(studyService.getStudyTrajectories).toHaveBeenCalledTimes(1);
-      expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.AREA);
+      expect(trajectoryService.getTrajectoryDataByTypeAndId).toHaveBeenCalledTimes(0);
       expect(result.current.trajectoryAreas).toEqual([]);
     });
   });
