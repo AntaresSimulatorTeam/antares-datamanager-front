@@ -4,8 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { createColumnHelper } from '@tanstack/react-table';
-import { HypothesisRowDataWithNestedRow, SelectOption } from '@/shared/types';
+import { createColumnHelper, TableOptions } from '@tanstack/react-table';
+import { HypothesisRowData, SelectOption } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
 import { Dispatch, SetStateAction } from 'react';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
@@ -20,7 +20,17 @@ import { FileInputStatus } from 'rte-design-system-react';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 
-const columnHelper = createColumnHelper<HypothesisRowDataWithNestedRow>();
+const columnHelper = createColumnHelper<HypothesisRowData>();
+
+export interface ExpandableHypothesisTableHeadersProps {
+  t: (value: string) => string;
+  error: ErrorMessageType;
+  setErrorInfo: Dispatch<SetStateAction<ErrorMessageType>>;
+  studyStatus: StudyStatus | undefined;
+  progress: number;
+  fileStatus: FileInputStatus;
+  indexSelected: number;
+}
 
 const getExpandableHypothesisTableHeaders = (
   t: (value: string) => string,
@@ -29,8 +39,8 @@ const getExpandableHypothesisTableHeaders = (
   studyStatus: StudyStatus | undefined,
   progress: number,
   fileStatus: FileInputStatus,
-  rowIndexSelected: number,
-) => [
+  indexSelected: number,
+): TableOptions<HypothesisRowData>['columns'] => [
   columnHelper.accessor('hypothesis', {
     header: t('studyDetails.@area'),
     size: 50,
@@ -52,7 +62,7 @@ const getExpandableHypothesisTableHeaders = (
             </button>
           )}
           <LabelWithButtonPreview
-            value={getValue()}
+            value={getValue() as string}
             status={status}
             isReadOnly={row.getReadOnly()}
             hasPreview={false}
@@ -112,7 +122,7 @@ const getExpandableHypothesisTableHeaders = (
     header: t('home.@status'),
     cell: ({ row, table: { options } }) => {
       const { status, isDefault, trajectory, hypothesis } = row.original;
-      return progress > 0 && fileStatus === 'loading' && rowIndexSelected === row.index ? (
+      return progress > 0 && fileStatus === 'loading' && indexSelected === row.index ? (
         <ProgressBar statusFile={fileStatus} progressValue={progress} />
       ) : (
         <CellWithStatus

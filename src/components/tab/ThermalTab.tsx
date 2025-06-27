@@ -6,13 +6,11 @@
 
 import SearchBar from '@/pages/pegase/home/components/SearchBar.tsx';
 import { FileInputStatus, RdsDivider } from 'rte-design-system-react';
-import { HypothesisRowDataWithNestedRow, LocationStudy, NestedCheckedType } from '@/shared/types';
+import { HypothesisRowData, NestedCheckedType, TrajectoryAreaData } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import { CheckBoxData } from '@/components/tab/LoadTab.tsx';
-import StdTabs from '@common/layout/stdTabs/StdTabs.tsx';
-import StdTabItem from '@common/layout/stdTabs/StdTabItem.tsx';
-import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
 import { useStudy } from '@/store/contexts/StudyContext.tsx';
 import { CheckboxWithNestedCheckbox } from '@/components/forms/CheckboxWithNestedCheckbox.tsx';
 import { ThermalOptions } from '@/mocks/data/list/names';
@@ -25,23 +23,24 @@ import {
   retrieveReadOnlyArea,
   unCheckNestedValue,
 } from '@/shared/utils/trajectoryUtils.ts';
-import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { sortKeepLastName } from '@/shared/utils/sortUtils.tsx';
 import { AREA_OTHERS } from '@/shared/const/studyConfig.ts';
-import { useFetchAreas } from '@/hooks/useFetchAreas.ts';
-import { useLocation } from 'react-router-dom';
+import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
+import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
 
-const ThermalTab = () => {
+interface ThermalTabProps {
+  defaultAreas: CheckBoxData[];
+  areas: TrajectoryAreaData[];
+}
+
+const ThermalTab = ({ defaultAreas, areas }: ThermalTabProps) => {
   const { t } = useTranslation();
-  const location = useLocation();
-  const study = (location.state as LocationStudy)?.study;
   const studyState = useStudy();
   const [checkedValues, setCheckedValues] = useState<NestedCheckedType[]>([]);
-  const [areasDefaultOptions, setAreasDefaultOptions] = useState<CheckBoxData[]>([]);
-  const [defaultData, setDefaultData] = useState<HypothesisRowDataWithNestedRow[]>([]);
+  const [defaultData, setDefaultData] = useState<HypothesisRowData[]>([]);
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
-  const [data, setData] = useState<HypothesisRowDataWithNestedRow[]>([
+  const [data, setData] = useState<HypothesisRowData[]>([
     {
       hypothesis: 'Other areas',
       trajectory: null,
@@ -50,12 +49,10 @@ const ThermalTab = () => {
       subRows: null,
     },
   ]);
-  const [usedBy, setUsing] = useState<TRAJECTORY_TYPE>(TRAJECTORY_TYPE.THERMAL_CAPACITY);
   const [progress] = useState(0);
   const [fileStatus] = useState<FileInputStatus>('empty');
   const [rowIndexSelected] = useState(0);
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
-  const { areaDefault, trajectoryAreas } = useFetchAreas(study?.id);
 
   const handleFetchTrajectoriesFS = async () => Promise.resolve();
   const handleTrajectorySearch = (value?: string, area?: string) => {
@@ -68,21 +65,20 @@ const ThermalTab = () => {
       try {
         // Handle default areas (checkbox list and hypothesis table)
         // Checkbox list
-        setAreasDefaultOptions(areaDefault);
         setCheckedValues(
-          areaDefault.map((item) => ({
+          defaultAreas.map((item) => ({
             name: item.name,
             subOptions: ThermalOptions,
           })),
         );
         // Hypothesis table => set data
-        const areaDefaultData = buildRowWithSubRowsData(areaDefault);
+        const areaDefaultData = buildRowWithSubRowsData(defaultAreas);
         setDefaultData(areaDefaultData);
         // Hypothesis table => set read only
         // Find default area not included in areas trajectory list
         const defaultAreaListNotIncludedInList: string[] = [];
-        areaDefault.forEach((defaultArea) => {
-          if (!trajectoryAreas.some((trajectoryArea) => trajectoryArea.areaName === defaultArea.name)) {
+        defaultAreas.forEach((defaultArea) => {
+          if (!areas.some((trajectoryArea) => trajectoryArea.areaName === defaultArea.name)) {
             defaultAreaListNotIncludedInList.push(defaultArea.name);
           }
         });
@@ -91,26 +87,24 @@ const ThermalTab = () => {
         // Handle areas from trajectory AREA
         // Build checkbox list options
         let newArea: CheckBoxData[] = [];
-        newArea = trajectoryAreas
+        newArea = areas
           .map((trajectoryArea) => {
-            if (!areaDefault?.some((item) => item.name === trajectoryArea.areaName)) {
+            if (!defaultAreas?.some((item) => item.name === trajectoryArea.areaName)) {
               return { name: trajectoryArea.areaName, isDefault: false };
             }
           })
           .filter(Boolean) as CheckBoxData[];
-        setAreasOptions(newArea.length > 0 ? areaDefault?.concat(newArea) : areaDefault);
+        setAreasOptions(newArea.length > 0 ? defaultAreas?.concat(newArea) : defaultAreas);
       } catch {
         // Silent handler
       }
     };
-    if (areaDefault.length > 0 && trajectoryAreas.length > 0) {
-      void fetchHypothesis();
-    }
-  }, [areaDefault, trajectoryAreas]);
+    void fetchHypothesis();
+  }, []);
 
   const addRow = (value: string, isParentChecked: boolean, parentValue?: string) => {
-    let dataToAdd: HypothesisRowDataWithNestedRow[] = [];
-    const newRow: HypothesisRowDataWithNestedRow = {
+    let dataToAdd: HypothesisRowData[] = [];
+    const newRow: HypothesisRowData = {
       hypothesis: value,
       trajectory: null,
       status: TRAJECTORY_SELECTION_STATUS.MISSING,
@@ -151,11 +145,12 @@ const ThermalTab = () => {
       ]);
     }
     const newDataSorted = sortKeepLastName(dataToAdd, AREA_OTHERS);
-    setData(newDataSorted as HypothesisRowDataWithNestedRow[]);
+    setData(newDataSorted);
   };
 
-  const removeRow = (value: string, parentValue?: string) => {
-    let dataToRemove: HypothesisRowDataWithNestedRow[] = [];
+  const removeRow = (value: string, rowIndex?: number) => {
+    const parentValue = rowIndex && data[rowIndex]?.hypothesis == value ? data[rowIndex].hypothesis : undefined;
+    let dataToRemove: HypothesisRowData[] = [];
     if (parentValue) {
       dataToRemove = removeThermalRow(data, value, parentValue);
       setCheckedValues((prev) => (prev.length > 0 ? unCheckNestedValue(prev, value, parentValue) : prev));
@@ -172,67 +167,40 @@ const ThermalTab = () => {
         parentValue && checkedValues ? checkedValues.some((checkedValue) => checkedValue.name === parentValue) : false;
       addRow(value, isParentChecked, parentValue);
     } else {
-      removeRow(value, parentValue);
+      removeRow(value);
     }
   };
 
   return (
-    <div className="flex h-full w-full flex-col gap-4">
-      <StdTabs
-        renderPrimary={(item) => (
-          <StdTabItem
-            key={item.name}
-            active={usedBy === item.name}
-            onClick={(selected) => setUsing(selected as TRAJECTORY_TYPE)}
-            name={item.name}
-            label={item.label}
-          />
-        )}
-        items={[
-          { name: TRAJECTORY_TYPE.THERMAL_CAPACITY, label: t('thermal.@installedPower') },
-          { name: TRAJECTORY_TYPE.THERMAL_PARAMETER, label: t('thermal.@parameters') },
-        ]}
-      />
-      <div className="flex h-full w-full gap-6">
-        <div className="flex h-fit w-28 flex-col gap-1 rounded border border-gray-400 p-2">
-          <div className="border-b border-gray-400 pb-2">
-            <SearchBar onSearch={() => {}} placeholder={t('studyDetails.@search_area')} />
-          </div>
-          {areasOptions?.map((area, index) => (
-            <div key={`${index}-${area.name}`}>
-              <CheckboxWithNestedCheckbox
-                key={`nested-checkbox-${area.name}`}
-                label={area.name}
-                value={area.name}
-                name={''}
-                defaultChecked={area.isDefault}
-                disabled={area.isDefault}
-                onChange={handleSelectionChange}
-                onHandleSelection={handleSelectionChange}
-                checkedValues={checkedValues}
-                options={ThermalOptions}
-              />
-              {index === Math.max(areasDefaultOptions?.length - 1, 0) && <RdsDivider extraClasses="mt-1" />}
-            </div>
-          ))}
+    <div className="flex h-full w-full gap-6">
+      <div className="flex h-fit w-28 flex-col gap-1 rounded border border-gray-400 p-2">
+        <div className="border-b border-gray-400 pb-2">
+          <SearchBar onSearch={() => {}} placeholder={t('studyDetails.@search_area')} />
         </div>
-        <div className="flex w-full flex-col gap-6">
-          {areasDefaultOptions.length > 0 && (
-            <PegaseHypothesisTable
-              id="default-thermal-table"
-              data={defaultData}
-              fileStatus={fileStatus}
-              studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
-              readOnly={readOnly}
-              progress={progress}
-              indexSelected={rowIndexSelected}
-              handleSearch={handleTrajectorySearch}
-              handleImport={handleFetchTrajectoriesFS}
+        {areasOptions?.map((area, index) => (
+          <div key={`${index}-${area.name}`}>
+            <CheckboxWithNestedCheckbox
+              key={`nested-checkbox-${area.name}`}
+              label={area.name}
+              value={area.name}
+              name={''}
+              defaultChecked={area.isDefault}
+              disabled={area.isDefault}
+              onChange={handleSelectionChange}
+              onHandleSelection={handleSelectionChange}
+              checkedValues={checkedValues}
+              options={ThermalOptions}
             />
-          )}
+            {index === Math.max(defaultAreas?.length - 1, 0) && <RdsDivider extraClasses="mt-1" />}
+          </div>
+        ))}
+      </div>
+      <div className="flex w-full flex-col gap-6">
+        {defaultAreas.length > 0 && (
           <PegaseHypothesisTable
-            id="main-thermal-table"
-            data={data}
+            id="default-thermal-table"
+            data={defaultData}
+            getTableHeaders={getExpandableHypothesisTableHeaders}
             fileStatus={fileStatus}
             studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
             readOnly={readOnly}
@@ -240,9 +208,23 @@ const ThermalTab = () => {
             indexSelected={rowIndexSelected}
             handleSearch={handleTrajectorySearch}
             handleImport={handleFetchTrajectoriesFS}
-            removeRow={removeRow}
+            isReadOnlyEnable={true}
           />
-        </div>
+        )}
+        <PegaseHypothesisTable
+          id="main-thermal-table"
+          data={data}
+          getTableHeaders={getExpandableHypothesisTableHeaders}
+          fileStatus={fileStatus}
+          studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
+          readOnly={readOnly}
+          progress={progress}
+          indexSelected={rowIndexSelected}
+          handleSearch={handleTrajectorySearch}
+          handleImport={handleFetchTrajectoriesFS}
+          removeRow={removeRow}
+          isReadOnlyEnable={true}
+        />
       </div>
     </div>
   );

@@ -19,9 +19,9 @@ import { RowStatus, SelectOption } from '@/shared/types';
 export type StdSimpleTableProps<TData> = {
   getCoreRowModel?: (table: Table<TData>) => () => RowModel<TData>;
   getExpandedRowModel?: (table: Table<TData>) => () => RowModel<TData>;
-  getSubRows?: (originalRow: TData & { subRows: TData }) => TData[] | undefined;
+  getSubRows?: (originalRow: TData) => TData[] | undefined;
   updateData?: (rowIndex: number, value: unknown, status?: RowStatus, label?: string) => void;
-  removeRow?: (rowIndex: number, value: unknown) => void;
+  removeRow?: (value: string, rowIndex?: number) => void | Promise<void>;
   search?: (value?: string, area?: string) => Promise<SelectOption[] | undefined>;
   import?: (index: number) => Promise<void>;
 } & Omit<TableCoreProps<TData>, 'table'> &

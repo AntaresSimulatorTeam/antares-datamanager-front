@@ -1,29 +1,41 @@
 import StdSimpleTable from '@common/data/stdSimpleTable/StdSimpleTable.tsx';
-import { useMemo, useState } from 'react';
-import { ErrorMessageType, HypothesisRowDataWithNestedRow, SelectOption } from '@/shared/types';
+import { Dispatch, SetStateAction, useMemo, useState } from 'react';
+import { ErrorMessageType, HypothesisRowData, RowStatus, SelectOption } from '@/shared/types';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { useTranslation } from 'react-i18next';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { FileInputStatus } from 'rte-design-system-react';
-import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
+import { TableOptions } from '@tanstack/react-table';
 
 interface PegaseHypothesisTableProps {
   id: string;
-  data: HypothesisRowDataWithNestedRow[];
+  data: HypothesisRowData[];
+  getTableHeaders: (
+    t: (key: string) => string,
+    errorInfo: ErrorMessageType,
+    setErrorInfo: Dispatch<SetStateAction<ErrorMessageType>>,
+    studyState: StudyStatus,
+    progress: number,
+    fileStatus: FileInputStatus,
+    indexSelected: number,
+  ) => TableOptions<HypothesisRowData>['columns'];
   studyState: StudyStatus;
-  readOnly: ReadOnlyObject;
+  readOnly?: ReadOnlyObject;
   progress: number;
   fileStatus: FileInputStatus;
   indexSelected: number;
   handleSearch: (value?: string, area?: string) => Promise<SelectOption[] | undefined>;
   handleImport: (index: number) => Promise<void>;
-  removeRow?: (value: string, parentValue?: string) => void;
+  isReadOnlyEnable?: boolean;
+  removeRow?: (value: string, rowIndex?: number) => void | Promise<void>;
+  updateData?: (rowIndex: number, value: unknown, status?: RowStatus, label?: string) => void;
 }
 type ExpandedState = true | Record<string, boolean>;
 
 export const PegaseHypothesisTable = ({
   id,
   data,
+  getTableHeaders,
   readOnly,
   progress,
   studyState,
@@ -31,19 +43,29 @@ export const PegaseHypothesisTable = ({
   indexSelected,
   handleSearch,
   handleImport,
+  isReadOnlyEnable = false,
   removeRow,
+  updateData,
 }: PegaseHypothesisTableProps) => {
   const { t } = useTranslation();
   const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
   const [expanded, setExpanded] = useState<ExpandedState>(
-    data.every((item) => item.isDefault && item.subRows) ? {} : true,
+    data.every((item) => item.isDefault && item?.subRows) ? {} : true,
   );
 
-  const columns = useMemo(
-    () =>
-      getExpandableHypothesisTableHeaders(t, errorInfo, setErrorInfo, studyState, progress, fileStatus, indexSelected),
+  const columns: TableOptions<HypothesisRowData>['columns'] = useMemo(
+    () => getTableHeaders(t, errorInfo, setErrorInfo, studyState, progress, fileStatus, indexSelected),
     [errorInfo, fileStatus, indexSelected, progress, studyState, t],
   );
+
+  const onHandleImport = async (index: number) => {
+    try {
+      console.log('============== onHandleImport');
+      return await handleImport(index);
+    } catch {
+      setErrorInfo({ index, message: t('studyDetails.@select_file_fs_error') });
+    }
+  };
 
   return (
     <div className="flex h-fit w-full">
@@ -52,15 +74,18 @@ export const PegaseHypothesisTable = ({
         data={data}
         columns={columns}
         enableColumnResizing={false}
-        enableReadOnly={true}
-        state={{ readOnly, expanded }}
+        enableReadOnly={isReadOnlyEnable}
+        state={isReadOnlyEnable ? { readOnly, expanded } : { expanded }}
         onExpandedChange={setExpanded}
         getSubRows={(originalRow) => originalRow.subRows ?? undefined}
         search={(value?: string, area?: string) => handleSearch(value, area)}
-        import={(index: number) => handleImport(index)}
-        removeRow={(rowIndex: number, value: unknown) => {
-          removeRow?.(value as string, data[rowIndex]?.hypothesis === value ? undefined : data[rowIndex].hypothesis);
+        import={async (index: number) => await onHandleImport(index)}
+        removeRow={(value: string, rowIndex?: number) => {
+          void removeRow?.(value, rowIndex);
         }}
+        updateData={(rowIndex: number, value: unknown, status?: RowStatus, label?: string) =>
+          void updateData?.(rowIndex, value, status, label)
+        }
       />
     </div>
   );

@@ -4,15 +4,14 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import StdSimpleTable from '@common/data/stdSimpleTable/StdSimpleTable.tsx';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   DbTrajectory,
-  ErrorMessageType,
   HypothesisRowData,
   LocationStudy,
   RowStatus,
   SelectOption,
+  TrajectoryAreaData,
 } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useTranslation } from 'react-i18next';
@@ -47,14 +46,20 @@ import { useUser } from '@/store/contexts/UserContext.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { notifyAlert } from '@/shared/notification/notification.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
-import { useFetchAreas } from '@/hooks/useFetchAreas.ts';
+import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
+import { useFetchTrajectoriesLinked } from '@/hooks/useFetchTrajectoriesLinked.ts';
 
 export type CheckBoxData = {
   name: string;
   isDefault: boolean;
 };
 
-const LoadTab = () => {
+interface LoadTabProps {
+  defaultAreas: CheckBoxData[];
+  areas: TrajectoryAreaData[];
+}
+
+const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
   const { t } = useTranslation();
   const studyState = useStudy();
   const { user } = useUser();
@@ -65,7 +70,6 @@ const LoadTab = () => {
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
   const [readOnlyAreas, setReadOnlyAreas] = useState<string[]>([]);
   const [data, setData] = useState<HypothesisRowData[]>([]);
-  const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
   const [areasDefaultOptions, setAreasDefaultOptions] = useState<CheckBoxData[]>([]);
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
@@ -79,7 +83,7 @@ const LoadTab = () => {
   const [isStudyGenerated, setIsStudyGenerated] = useState(
     studyState.studyStatus === StudyStatus.GENERATED || study.status === StudyStatus.GENERATED,
   );
-  const { areaDefault, trajectoryAreas, trajectoryLinked, emptyAreas } = useFetchAreas(study?.id, TRAJECTORY_TYPE.LOAD);
+  const { trajectoryLinked, emptyAreas } = useFetchTrajectoriesLinked(study?.id, TRAJECTORY_TYPE.LOAD);
 
   const setReadOnlyForGeneratedStudy = (rows: HypothesisRowData[]) => {
     const areaWithoutTrajectory = rows.map((row) => (row.trajectory == null ? row.hypothesis : null));
@@ -92,29 +96,29 @@ const LoadTab = () => {
       try {
         const defaultAreaListNotIncludedInList: string[] = [];
         // Build dropdown list options
-        if (trajectoryAreas.length > 0) {
-          const newArea = trajectoryAreas
+        if (areas.length > 0) {
+          const newArea = areas
             .map((trajectoryArea) => {
-              if (!areaDefault?.some((item) => item.name === trajectoryArea.areaName)) {
+              if (!defaultAreas?.some((item) => item.name === trajectoryArea.areaName)) {
                 return { name: trajectoryArea.areaName, isDefault: false };
               }
             })
             .filter(Boolean) as CheckBoxData[];
-          setAreasDefaultOptions(areaDefault);
-          setAreasOptions(areaDefault?.concat(newArea));
+          setAreasDefaultOptions(defaultAreas);
+          setAreasOptions(defaultAreas?.concat(newArea));
 
           // Find default area not included in areas trajectory list
-          areaDefault.forEach((defaultArea) => {
-            if (!trajectoryAreas.some((trajectoryArea) => trajectoryArea.areaName === defaultArea.name)) {
+          defaultAreas.forEach((defaultArea) => {
+            if (!areas.some((trajectoryArea) => trajectoryArea.areaName === defaultArea.name)) {
               defaultAreaListNotIncludedInList.push(defaultArea.name);
             }
           });
         } else {
-          setAreasOptions(areaDefault);
+          setAreasOptions(defaultAreas);
         }
 
         const areaDefaultOther = [
-          ...areaDefault,
+          ...defaultAreas,
           {
             name: AREA_OTHERS,
             isDefault: true,
@@ -147,8 +151,8 @@ const LoadTab = () => {
           }
         }
 
-        if (areaDefault.length > 0) {
-          const defaultCheckList: string[] = areaDefault.map((item) => item.name);
+        if (defaultAreas.length > 0) {
+          const defaultCheckList: string[] = defaultAreas.map((item) => item.name);
           const checkList = emptyAreas
             .map((trajectory) => {
               if (trajectory.loadArea) return trajectory.loadArea;
@@ -162,7 +166,7 @@ const LoadTab = () => {
     };
 
     void fetchHypothesis();
-  }, [areaDefault, trajectoryAreas, trajectoryLinked, emptyAreas]);
+  }, [trajectoryLinked, emptyAreas]);
 
   useEffect(() => {
     if (studyState.studyStatus === StudyStatus.GENERATED || study?.status === StudyStatus.GENERATED) {
@@ -176,8 +180,6 @@ const LoadTab = () => {
       const results = await fetchTrajectoriesFromFS(TRAJECTORY_TYPE.LOAD);
       setOptionsFS(convertToFSSelectionOptionType(results));
       toggleModal();
-    } catch (error) {
-      setErrorInfo({ index, message: t('studyDetails.@select_file_fs_error') });
     } finally {
       setRowIndexSelected(index);
     }
@@ -327,8 +329,8 @@ const LoadTab = () => {
     [study.horizon],
   );
 
-  const handleRemoveRow = async (indexRow: number, value?: string) => {
-    if (data?.[indexRow]) {
+  const handleRemoveRow = async (value?: string, indexRow?: number) => {
+    if (indexRow && data?.[indexRow]) {
       dispatch?.({
         type: STUDY_ACTION.DELETE_LOAD_TRAJECTORY,
         payload: data[indexRow].hypothesis,
@@ -348,12 +350,12 @@ const LoadTab = () => {
     }
   };
 
-  const removeRow = async (indexRow: number, valueToDelete?: string) => {
-    if (data[indexRow].trajectory && data[indexRow].status === TRAJECTORY_SELECTION_STATUS.OK) {
+  const removeRow = async (valueToDelete?: string, indexRow?: number) => {
+    if (indexRow && data[indexRow].trajectory && data[indexRow].status === TRAJECTORY_SELECTION_STATUS.OK) {
       setRowToDelete({ index: indexRow, value: valueToDelete });
       setIsDeletionModalOpen(true);
     } else {
-      await handleRemoveRow(indexRow, valueToDelete);
+      await handleRemoveRow(valueToDelete, indexRow);
     }
   };
 
@@ -392,29 +394,16 @@ const LoadTab = () => {
       }
     } else {
       try {
-        await removeRow(data.findIndex((row) => row.hypothesis === name));
+        await removeRow(
+          name,
+          data.findIndex((row) => row.hypothesis === name),
+        );
         setCheckedValues((prev) => [...prev.filter((prevName) => prevName !== name)]);
       } catch {
         // Silent handler
       }
     }
   };
-
-  const columns = useMemo(
-    () =>
-      getLoadHypothesisTableHeaders(
-        t,
-        handleFetchTrajectoriesFS,
-        handleTrajectorySearch,
-        errorInfo,
-        setErrorInfo,
-        studyState?.studyStatus,
-        progress,
-        fileStatus,
-        rowIndexSelected,
-      ),
-    [data, studyState?.studyStatus, errorInfo, progress, fileStatus],
-  );
 
   return (
     <div className="flex h-full w-full flex-col gap-4">
@@ -447,19 +436,22 @@ const LoadTab = () => {
           </RdsCheckboxGroupWrapper>
         </div>
         <div className="flex h-fit w-full">
-          <StdSimpleTable
+          <PegaseHypothesisTable
             id="load-table"
             data={data}
-            columns={columns}
-            enableColumnResizing={false}
-            enableReadOnly={true}
-            state={{ readOnly }}
-            updateData={(rowIndex: number, value: unknown, status?: RowStatus, label?: string) => {
-              void handleTrajectoryUpdate(rowIndex, value as number, status, label);
-            }}
-            removeRow={(rowIndex: number, value: unknown) => {
-              void removeRow(rowIndex, value as string);
-            }}
+            getTableHeaders={getLoadHypothesisTableHeaders}
+            fileStatus={fileStatus}
+            studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
+            readOnly={readOnly}
+            progress={progress}
+            indexSelected={rowIndexSelected}
+            handleSearch={handleTrajectorySearch}
+            handleImport={handleFetchTrajectoriesFS}
+            removeRow={(value: string, rowIndex?: number) => void removeRow(value, rowIndex)}
+            updateData={(rowIndex: number, value: unknown, status?: RowStatus, label?: string) =>
+              void handleTrajectoryUpdate(rowIndex, value as number, status, label)
+            }
+            isReadOnlyEnable={true}
           />
         </div>
         {isModalOpen && (
@@ -480,7 +472,7 @@ const LoadTab = () => {
             onClose={() => setIsDeletionModalOpen(false)}
             handleDeletionRow={async () => {
               if (rowToDelete) {
-                await handleRemoveRow(rowToDelete.index, rowToDelete?.value);
+                await handleRemoveRow(rowToDelete?.value, rowToDelete.index);
                 setIsDeletionModalOpen(false);
               }
             }}

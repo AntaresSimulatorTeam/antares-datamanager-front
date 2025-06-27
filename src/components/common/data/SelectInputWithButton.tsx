@@ -7,7 +7,7 @@ interface SelectInputWithButtonProps {
   onSelect: (value: SelectOption) => void;
   onSearch: (value?: string) => Promise<SelectOption[] | undefined>;
   isDisabled: boolean;
-  onClickButton?: () => void;
+  onClickButton?: () => void | Promise<void>;
   placeHolder?: string;
 }
 

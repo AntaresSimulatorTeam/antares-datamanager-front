@@ -22,8 +22,6 @@ const columnHelper = createColumnHelper<HypothesisRowData>();
 
 const getLoadHypothesisTableHeaders = (
   t: (value: string) => string,
-  handleImport: (index: number) => Promise<void>,
-  handlerSearch: (value?: string, area?: string) => Promise<SelectOption[] | undefined>,
   error: ErrorMessageType,
   setErrorInfo: Dispatch<SetStateAction<ErrorMessageType>>,
   studyStatus: StudyStatus | undefined,
@@ -70,14 +68,14 @@ const getLoadHypothesisTableHeaders = (
               void options?.meta?.updateData?.(row.index, value.id, 'success', value.label);
             }}
             onSearch={async (value?: string) =>
-              await handlerSearch(
+              await options?.meta?.search?.(
                 value,
                 row.original.hypothesis === 'Other areas' ? AREA_OTHERS : row.original.hypothesis,
               )
             }
-            onClickButton={() => {
+            onClickButton={async () => {
               setErrorInfo({ index: row.index, message: '' });
-              void handleImport(row.index);
+              await options?.meta?.import?.(row.index);
             }}
             isDisabled={row.getReadOnly()}
           />
@@ -97,7 +95,7 @@ const getLoadHypothesisTableHeaders = (
         <CellWithStatus
           status={status}
           isDeletable={!isDefault && !(studyStatus === StudyStatus.GENERATED)}
-          onClick={() => void options?.meta?.removeRow?.(row.index, hypothesis)}
+          onClick={() => void options?.meta?.removeRow?.(hypothesis, row.index)}
           message={trajectory?.messages?.[0]?.content ?? ''}
         />
       );

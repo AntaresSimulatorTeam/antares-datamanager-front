@@ -6,19 +6,21 @@
 
 import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from 'react';
 import { RdsTabItem } from 'rte-design-system-react';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import LoadTab from '@/components/tab/LoadTab.tsx';
-import ThermalTab from '@/components/tab/ThermalTab.tsx';
 import EnrTab from '@/components/tab/EnrTab.tsx';
 import MiscTab from '@/components/tab/MiscLinkTab.tsx';
 import AreaLinkTab from '@/components/tab/AreaLinkTab.tsx';
-import StdIcon from '@common/base/stdIcon/StdIcon';
+import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useTranslation } from 'react-i18next';
 import { useStudy } from '@/store/contexts/StudyContext.tsx';
-import { HypothesisTab } from '@/shared/types';
+import { HypothesisTab, LocationStudy } from '@/shared/types';
 import StdAvatar from '@common/layout/stdAvatar/StdAvatar.tsx';
 import { getMessagesNb } from '@/shared/utils/warningUtils.ts';
+import { ThermalMenu } from '@/components/menu/ThermalMenu.tsx';
+import { getStudyMenu } from '@/shared/utils/trajectoryUtils.ts';
+import { useFetchAreas } from '@/hooks/useFetchAreas.ts';
+import { useLocation } from 'react-router-dom';
 
 type StudyNavigationMenuProps = {
   onRenderActiveComponent?: (content: ReactNode | null) => void;
@@ -35,37 +37,19 @@ const StudyNavigationMenu = ({
 }: StudyNavigationMenuProps) => {
   const { t } = useTranslation();
   const studyState = useStudy();
-  const [tabs, setTabs] = useState<HypothesisTab[]>([
-    {
-      name: TRAJECTORY_TYPE.AREA,
-      label: t('studyDetails.@areas_links'),
-      icon: StdIconId.LinkedServices,
-      isDisabled: false,
-    },
-    {
-      name: TRAJECTORY_TYPE.LOAD,
-      label: t('studyDetails.@load'),
-      icon: StdIconId.BatteryChargingFull,
-      isDisabled: !!studyState[`${TRAJECTORY_TYPE.AREA}`]?.[0],
-    },
-    {
-      name: TRAJECTORY_TYPE.THERMAL_CAPACITY,
-      label: t('studyDetails.@thermal'),
-      icon: StdIconId.LocalFireDepartment,
-      isDisabled: !!studyState[`${TRAJECTORY_TYPE.AREA}`]?.[0],
-    },
-    { name: TRAJECTORY_TYPE.ENR, label: t('studyDetails.@enr'), icon: StdIconId.EnergySavingsLeaf, isDisabled: true },
-    { name: TRAJECTORY_TYPE.MISC, label: t('studyDetails.@misc'), icon: StdIconId.Category, isDisabled: true },
-  ]);
+  const [tabs, setTabs] = useState<HypothesisTab[]>(getStudyMenu(t, !!studyState[`${TRAJECTORY_TYPE.AREA}`]?.[0]));
+  const location = useLocation();
+  const study = (location.state as LocationStudy)?.study;
+  const { areaDefault, trajectoryAreas } = useFetchAreas(study?.id);
 
   const renderActiveComponent = (): ReactNode | null => {
     switch (activeTab.name) {
       case TRAJECTORY_TYPE.AREA:
         return <AreaLinkTab setErrorMessage={setErrorMessage} />;
       case TRAJECTORY_TYPE.LOAD:
-        return <LoadTab />;
+        return <LoadTab defaultAreas={areaDefault} areas={trajectoryAreas} />;
       case TRAJECTORY_TYPE.THERMAL_CAPACITY:
-        return <ThermalTab />;
+        return <ThermalMenu defaultAreas={areaDefault} areas={trajectoryAreas} />;
       case TRAJECTORY_TYPE.ENR:
         return <EnrTab />;
       case TRAJECTORY_TYPE.MISC:
