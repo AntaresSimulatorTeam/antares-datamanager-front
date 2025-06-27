@@ -38,7 +38,7 @@ import {
   buildRowData,
   retrieveReadOnlyArea,
 } from '@/shared/utils/trajectoryUtils.ts';
-import { AREA_OTHERS } from '@/shared/const/studyConfig.ts';
+import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { DeletionModal } from '@common/modal/DeletionModal.tsx';
@@ -120,7 +120,7 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
         const areaDefaultOther = [
           ...defaultAreas,
           {
-            name: AREA_OTHERS,
+            name: OTHER_AREAS,
             isDefault: true,
           },
         ];
@@ -139,7 +139,9 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
             .filter(Boolean) as HypothesisRowData[];
 
           const dataTrajectories =
-            areaData.length > 0 ? sortKeepLastName(areaDataDefault.concat(areaData), AREA_OTHERS) : areaDataDefault;
+            areaData.length > 0
+              ? sortKeepLastName(areaDataDefault.concat(areaData), OTHER_AREAS_LABEL)
+              : areaDataDefault;
           setData(dataTrajectories);
 
           if (isStudyGenerated) {
@@ -237,7 +239,7 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
         }
         dispatch?.({
           type: STUDY_ACTION.EMPTY_LOAD_TRAJECTORY,
-          payload: data[rowIndex].hypothesis === 'Other areas' ? AREA_OTHERS : data[rowIndex].hypothesis,
+          payload: data[rowIndex].hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : data[rowIndex].hypothesis,
         });
         setData((prev) =>
           prev.map((item, index) =>
@@ -254,8 +256,8 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
         await linkTrajectoryToStudy(TRAJECTORY_TYPE.LOAD, trajectoryId, study.id);
         const newTrajectories = await getStudyTrajectories(study.id, TRAJECTORY_TYPE.LOAD);
         const newTrajectory = newTrajectories?.find((trajectory) => {
-          if (data[rowIndex].hypothesis === 'Other areas') {
-            return trajectory.loadArea === AREA_OTHERS;
+          if (data[rowIndex].hypothesis === OTHER_AREAS_LABEL) {
+            return trajectory.loadArea === OTHER_AREAS;
           } else {
             return trajectory.loadArea === data[rowIndex].hypothesis;
           }
@@ -302,7 +304,7 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
         value.label,
         study.horizon,
         study.id,
-        data[rowIndexSelected]?.hypothesis === 'Other areas' ? AREA_OTHERS : data[rowIndexSelected]?.hypothesis,
+        data[rowIndexSelected]?.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : data[rowIndexSelected]?.hypothesis,
         (progressValue: number) => {
           setProgress(+progressValue?.toFixed(0));
         },
@@ -374,7 +376,7 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
         },
         ...data,
       ],
-      AREA_OTHERS,
+      OTHER_AREAS_LABEL,
     );
 
     setData(newDataSorted);

@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import StdCheckbox from '@common/forms/stdCheckbox/StdCheckbox.tsx';
 import { CheckBoxData } from '@/components/tab/LoadTab.tsx';
 import { useEffect, useState } from 'react';
-import { AREA_OTHERS } from '@/shared/const/studyConfig.ts';
+import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
 import { HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
 import { buildRowData, retrieveReadOnlyArea } from '@/shared/utils/trajectoryUtils.ts';
@@ -24,7 +24,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
   const { t } = useTranslation();
   const studyState = useStudy();
   const [areaDefault, setAreaDefault] = useState<CheckBoxData[]>([...defaultAreas]);
-  const [checkedValues] = useState<string[]>(areaDefault.map((area) => area.name));
+  const [checkedValues, setCheckedValues] = useState<string[]>(areaDefault.map((area) => area.name));
   const [defaultData, setDefaultData] = useState<HypothesisRowData[]>([]);
   const data: HypothesisRowData[] = [
     {
@@ -66,7 +66,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
     const areaDefaultData = [
       ...defaultAreas,
       {
-        name: AREA_OTHERS,
+        name: OTHER_AREAS,
         isDefault: true,
       },
     ].map((area) => buildRowData(area.name, area.isDefault));
@@ -74,6 +74,14 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
 
     setReadOnly(retrieveReadOnlyArea(areaDefaultData, defaultAreaListNotIncludedInList));
   }, []);
+
+  const handleSelectionChange = (value: string, isChecked: boolean) => {
+    if (isChecked) {
+      setCheckedValues((prev) => [...prev, value]);
+    } else {
+      setCheckedValues((prev) => [...prev.filter((checkedValue) => checkedValue !== value)]);
+    }
+  };
 
   const handleTrajectorySearch = async () => Promise.resolve([]);
   const handleFetchTrajectoriesFS = async (index: number) => {
@@ -87,7 +95,13 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
         <div className="border-b border-gray-400 pb-2">
           <SearchBar onSearch={() => {}} placeholder={t('studyDetails.@search_area')} />
         </div>
-        <StdCheckboxGroupWrapper label={''} name={''} checkedValues={checkedValues} disabled={false}>
+        <StdCheckboxGroupWrapper
+          label={''}
+          name={''}
+          checkedValues={checkedValues}
+          disabled={false}
+          onChange={(value: string, isChecked?: boolean) => void handleSelectionChange(value, isChecked ?? false)}
+        >
           {areaDefault?.map((area, index) => (
             <div key={`${index}-${area.name}`} className="my-1">
               <StdCheckbox
@@ -97,6 +111,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
                 name={''}
                 defaultChecked={area.isDefault}
                 disabled={area.isDefault}
+                checked={area.isDefault}
               />
               {index === Math.max(defaultAreas?.length - 1, 0) && <RdsDivider extraClasses="mt-1" />}
             </div>

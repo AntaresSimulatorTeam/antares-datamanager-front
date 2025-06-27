@@ -14,7 +14,7 @@ import { LabelWithButtonPreview } from '@common/data/LabelWithButtonPreview.tsx'
 import { LabelWithDeleteButton } from '@common/data/LabelWithDeleteButton.tsx';
 import { SelectInputWithButton } from '@common/data/SelectInputWithButton.tsx';
 import { ErrorMessageType } from '@/shared/types/Generic.type.ts';
-import { AREA_OTHERS } from '@/shared/const/studyConfig.ts';
+import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { ProgressBar } from '@/components/forms/ProgressBar.tsx';
 import { FileInputStatus } from 'rte-design-system-react';
 
@@ -70,7 +70,7 @@ const getLoadHypothesisTableHeaders = (
             onSearch={async (value?: string) =>
               await options?.meta?.search?.(
                 value,
-                row.original.hypothesis === 'Other areas' ? AREA_OTHERS : row.original.hypothesis,
+                row.original.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : row.original.hypothesis,
               )
             }
             onClickButton={async () => {

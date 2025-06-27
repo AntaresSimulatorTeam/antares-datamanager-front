@@ -3,7 +3,7 @@ import StdTabItem from '@common/layout/stdTabs/StdTabItem.tsx';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useTranslation } from 'react-i18next';
 import { ReactNode, useState } from 'react';
-import ThermalTab from '@/components/tab/ThermalTab.tsx';
+import ThermalCapacityTab from '@/components/tab/ThermalCapacityTab.tsx';
 import { ParametersTab } from '@/components/tab/ParametersTab.tsx';
 import { CheckBoxData } from '@/components/tab/LoadTab.tsx';
 import { TrajectoryAreaData } from '@/shared/types';
@@ -17,7 +17,7 @@ export const ThermalMenu = ({ defaultAreas, areas }: ThermalMenuProps) => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<TRAJECTORY_TYPE>(TRAJECTORY_TYPE.THERMAL_CAPACITY);
   const [activeComponent, setActiveComponent] = useState<ReactNode>(
-    <ThermalTab defaultAreas={defaultAreas} areas={areas} />,
+    <ThermalCapacityTab defaultAreas={defaultAreas} areas={areas} />,
   );
 
   const renderActiveComponent = (tab: TRAJECTORY_TYPE): void => {
@@ -26,7 +26,7 @@ export const ThermalMenu = ({ defaultAreas, areas }: ThermalMenuProps) => {
         return setActiveComponent(<ParametersTab defaultAreas={defaultAreas} areas={areas} />);
       case TRAJECTORY_TYPE.THERMAL_CAPACITY:
       default:
-        return setActiveComponent(<ThermalTab defaultAreas={defaultAreas} areas={areas} />);
+        return setActiveComponent(<ThermalCapacityTab defaultAreas={defaultAreas} areas={areas} />);
     }
   };
 

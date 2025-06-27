@@ -25,7 +25,7 @@ import {
 } from '@/shared/utils/trajectoryUtils.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { sortKeepLastName } from '@/shared/utils/sortUtils.tsx';
-import { AREA_OTHERS } from '@/shared/const/studyConfig.ts';
+import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
 
@@ -34,7 +34,7 @@ interface ThermalTabProps {
   areas: TrajectoryAreaData[];
 }
 
-const ThermalTab = ({ defaultAreas, areas }: ThermalTabProps) => {
+const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
   const { t } = useTranslation();
   const studyState = useStudy();
   const [checkedValues, setCheckedValues] = useState<NestedCheckedType[]>([]);
@@ -42,7 +42,7 @@ const ThermalTab = ({ defaultAreas, areas }: ThermalTabProps) => {
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
   const [data, setData] = useState<HypothesisRowData[]>([
     {
-      hypothesis: 'Other areas',
+      hypothesis: OTHER_AREAS_LABEL,
       trajectory: null,
       status: TRAJECTORY_SELECTION_STATUS.MISSING,
       isDefault: true,
@@ -144,7 +144,7 @@ const ThermalTab = ({ defaultAreas, areas }: ThermalTabProps) => {
         },
       ]);
     }
-    const newDataSorted = sortKeepLastName(dataToAdd, AREA_OTHERS);
+    const newDataSorted = sortKeepLastName(dataToAdd, OTHER_AREAS_LABEL);
     setData(newDataSorted);
   };
 
@@ -223,11 +223,10 @@ const ThermalTab = ({ defaultAreas, areas }: ThermalTabProps) => {
           handleSearch={handleTrajectorySearch}
           handleImport={handleFetchTrajectoriesFS}
           removeRow={removeRow}
-          isReadOnlyEnable={true}
         />
       </div>
     </div>
   );
 };
 
-export default ThermalTab;
+export default ThermalCapacityTab;

@@ -14,7 +14,7 @@ import { LabelWithButtonPreview } from '@common/data/LabelWithButtonPreview.tsx'
 import { LabelWithDeleteButton } from '@common/data/LabelWithDeleteButton.tsx';
 import { SelectInputWithButton } from '@common/data/SelectInputWithButton.tsx';
 import { ErrorMessageType } from '@/shared/types/Generic.type.ts';
-import { AREA_OTHERS } from '@/shared/const/studyConfig.ts';
+import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { ProgressBar } from '@/components/forms/ProgressBar.tsx';
 import { FileInputStatus } from 'rte-design-system-react';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
@@ -103,7 +103,7 @@ const getExpandableHypothesisTableHeaders = (
             onSearch={async (value?: string) =>
               options?.meta?.search?.(
                 value,
-                row.original.hypothesis === 'Other areas' ? AREA_OTHERS : row.original.hypothesis,
+                row.original.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : row.original.hypothesis,
               )
             }
             onClickButton={() => {
@@ -130,7 +130,7 @@ const getExpandableHypothesisTableHeaders = (
           isDeletable={!isDefault && !(studyStatus === StudyStatus.GENERATED)}
           onClick={() => {
             const parentRow = row.getParentRow();
-            void options?.meta?.removeRow?.(row.depth === 1 && parentRow ? parentRow.index : row.index, hypothesis);
+            void options?.meta?.removeRow?.(hypothesis, row.depth === 1 && parentRow ? parentRow.index : row.index);
           }}
           message={trajectory?.messages?.[0]?.content ?? ''}
         />

@@ -3,7 +3,7 @@ import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/traj
 import { FileInputStatus } from 'rte-design-system-react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
-import { AREA_OTHERS } from '@/shared/const/studyConfig.ts';
+import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { ThermalOptions } from '@/mocks/data/list/names.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
@@ -75,7 +75,7 @@ export const removeDuplicate = (arr: DbTrajectory[]) =>
   }, []);
 
 export const buildRowData = (areaName: string, isDefault: boolean, trajectory?: DbTrajectory): HypothesisRowData => ({
-  hypothesis: areaName === AREA_OTHERS ? 'Other areas' : areaName,
+  hypothesis: areaName === OTHER_AREAS ? OTHER_AREAS_LABEL : areaName,
   trajectory: trajectory?.trajectoryName ? trajectory : null,
   status: trajectory?.trajectoryName ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
   isDefault,

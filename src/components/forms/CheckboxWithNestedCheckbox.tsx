@@ -74,7 +74,7 @@ export const CheckboxWithNestedCheckbox = ({
               {label} {required && <StdRequiredIndicator />}
             </span>
           </div>
-          <button onClick={() => setIsOpen((prev) => !prev)}>
+          <button onClick={() => !disabled && setIsOpen((prev) => !prev)}>
             <StdIcon
               name={isOpen ? StdIconId.KeyboardArrowDown : StdIconId.KeyboardArrowRight}
               color="text-gray-800"
@@ -92,6 +92,7 @@ export const CheckboxWithNestedCheckbox = ({
             onChange={(valueChecked: string, isChecked?: boolean) =>
               onHandleSelection?.(valueChecked, isChecked ?? false, value)
             }
+            disabled={disabled}
             checkedValues={checkedValues?.find((checkedValue) => checkedValue.name === value)?.subOptions ?? []}
             possibleValues={options}
           >
