@@ -148,8 +148,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
     setData(newDataSorted);
   };
 
-  const removeRow = (value: string, rowIndex?: number) => {
-    const parentValue = rowIndex && data[rowIndex]?.hypothesis == value ? data[rowIndex].hypothesis : undefined;
+  const removeRow = (value: string, parentValue?: string) => {
     let dataToRemove: HypothesisRowData[] = [];
     if (parentValue) {
       dataToRemove = removeThermalRow(data, value, parentValue);
@@ -167,7 +166,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
         parentValue && checkedValues ? checkedValues.some((checkedValue) => checkedValue.name === parentValue) : false;
       addRow(value, isParentChecked, parentValue);
     } else {
-      removeRow(value);
+      removeRow(value, parentValue);
     }
   };
 
@@ -223,7 +222,11 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
           indexSelected={rowIndexSelected}
           handleSearch={handleTrajectorySearch}
           handleImport={handleFetchTrajectoriesFS}
-          removeRow={removeRow}
+          removeRow={(value: string, rowIndex?: number) => {
+            const parentValue =
+              rowIndex != null && !(data[rowIndex]?.hypothesis === value) ? data[rowIndex].hypothesis : undefined;
+            removeRow(value, parentValue);
+          }}
         />
       </div>
     </div>

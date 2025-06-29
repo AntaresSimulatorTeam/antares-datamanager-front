@@ -52,7 +52,7 @@ export const CellWithStatus = ({ status, isDeletable, onClick, message }: CellWi
     <div className="flex items-center justify-start gap-1">
       {getIcon(status)}
       <div className={`${isDeletable ? 'pointer-events-auto visible' : 'pointer-events-none invisible'}`}>
-        <RdsIconButton icon={RdsIconId.Delete} size="small" onClick={() => void onClick?.()} />
+        <RdsIconButton icon={RdsIconId.Delete} size="small" onClick={() => onClick?.()} />
       </div>
     </div>
   );
