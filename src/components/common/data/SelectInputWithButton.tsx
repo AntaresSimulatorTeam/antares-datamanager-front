@@ -30,7 +30,7 @@ export const SelectInputWithButton = ({
         isInputDisabled={isDisabled}
       />
       <span>{t('studyDetails.@or')}</span>
-      <RdsButton label={t('studyDetails.@import_file')} onClick={() => onClickButton?.()} disabled={isDisabled} />
+      <RdsButton label={t('studyDetails.@import_file')} onClick={() => void onClickButton?.()} disabled={isDisabled} />
     </div>
   );
 };

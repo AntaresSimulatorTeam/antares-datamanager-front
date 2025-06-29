@@ -108,7 +108,7 @@ const getExpandableHypothesisTableHeaders = (
             }
             onClickButton={() => {
               setErrorInfo({ index: row.index, message: '' });
-              void options?.meta?.import?.(row.index);
+              void options?.meta?.importData?.(row.index);
             }}
             isDisabled={row.getReadOnly()}
           />

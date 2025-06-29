@@ -63,8 +63,7 @@ export const PegaseHypothesisTable = ({
 
   const onHandleImport = async (index: number) => {
     try {
-      console.log('============== onHandleImport');
-      return await handleImport(index);
+      await handleImport(index);
     } catch {
       setErrorInfo({ index, message: t('studyDetails.@select_file_fs_error') });
     }
@@ -82,7 +81,7 @@ export const PegaseHypothesisTable = ({
         onExpandedChange={setExpanded}
         getSubRows={(originalRow) => originalRow.subRows ?? undefined}
         search={(value?: string, area?: string) => handleSearch(value, area)}
-        import={async (index: number) => await onHandleImport(index)}
+        importData={async (index: number) => await onHandleImport(index)}
         removeRow={(value: string, rowIndex?: number) => {
           void removeRow?.(value, rowIndex);
         }}

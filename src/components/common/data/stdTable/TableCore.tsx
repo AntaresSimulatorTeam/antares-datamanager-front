@@ -16,7 +16,7 @@ declare module '@tanstack/react-table' {
     updateData?: (rowIndex: number, value: unknown, status: RowStatus, label?: string) => void;
     removeRow?: (value: string, rowIndex?: number) => void | Promise<void>;
     search?: (value?: string, area?: string) => Promise<SelectOption[] | undefined>;
-    import?: (index: number) => Promise<void>;
+    importData?: (index: number) => Promise<void>;
   }
 }
 

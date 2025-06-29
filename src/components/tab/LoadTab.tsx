@@ -177,7 +177,7 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
     }
   }, [studyState.studyStatus, study?.status]);
 
-  const handleFetchTrajectoriesFS = async (index: number) => {
+  const handleFetchTrajectoriesFS = async (index: number): Promise<void> => {
     try {
       const results = await fetchTrajectoriesFromFS(TRAJECTORY_TYPE.LOAD);
       setOptionsFS(convertToFSSelectionOptionType(results));
@@ -448,7 +448,7 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
             progress={progress}
             indexSelected={rowIndexSelected}
             handleSearch={handleTrajectorySearch}
-            handleImport={handleFetchTrajectoriesFS}
+            handleImport={async (index: number) => await handleFetchTrajectoriesFS(index)}
             removeRow={(value: string, rowIndex?: number) => void removeRow(value, rowIndex)}
             updateData={(rowIndex: number, value: unknown, status?: RowStatus, label?: string) =>
               void handleTrajectoryUpdate(rowIndex, value as number, status, label)

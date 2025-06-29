@@ -76,7 +76,7 @@ const getEditableHypothesisTableHeaders = (
             }
             onClickButton={async () => {
               setErrorInfo({ index: row.index, message: '' });
-              await options?.meta?.import?.(row.index);
+              await options?.meta?.importData?.(row.index);
             }}
             isDisabled={row.getReadOnly()}
           />
