@@ -86,7 +86,7 @@ export const fetchSuggestedKeywords = async (partialName: string): Promise<strin
  * @return {Promise<void>}
  */
 export const saveStudy = async (
-  studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate' | 'projectId'>,
+  studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate' | 'projectId'> & { id: number | undefined },
 ): Promise<void> => {
   try {
     await AuthService.authFetch(`${STUDY_ENDPOINT}`, {

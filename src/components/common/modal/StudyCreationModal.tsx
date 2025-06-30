@@ -62,6 +62,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
       return;
     }
     const studyData = {
+      id: study?.id,
       name: studyName,
       createdBy: user?.profile.sub,
       keywords,
@@ -105,8 +106,6 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
     };
     validateForm();
   }, [study, studyName, projectName, horizon, keywords, isHorizonValid]);
-
-
 
   const handleHorizonChange = (value: string) => {
     setHorizon(value);
