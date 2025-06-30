@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "feat/ANT-3402_THERMAL_handle_add_row_to_hypothesis_table",
-  commit: "52e4f7c",
-  commitTime: "2025-06-26T09:11:49.130Z"
+  branch: "feat/ANT-3399_THERMAL_handle_parameters_tab_initialization",
+  commit: "57799cc",
+  commitTime: "2025-06-30T10:38:51.842Z"
 };

@@ -1,0 +1,76 @@
+import { beforeEach, describe, Mock, vi } from 'vitest';
+import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
+import { StudyState } from '@/shared/types';
+import { renderHook, waitFor } from '@testing-library/react';
+import * as studyService from '@/shared/services/studyService.ts';
+import { mockDbTrajectory, mockDbTrajectoryArray } from '@/shared/services/test/mocks/trajectoryMock.tsx';
+import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { STUDY_ACTION } from '@/shared/enum/study.ts';
+import { useFetchTrajectoriesLinked } from '@/hooks/useFetchTrajectoriesLinked.ts';
+
+vi.mock('@/shared/services/trajectoryService');
+vi.mock('@/shared/services/studyService');
+vi.mock('@/store/contexts/StudyContext', async (importOriginal) => {
+  const actual: Mock = await importOriginal();
+  return {
+    ...actual,
+    useStudy: vi.fn(),
+    useStudyDispatch: vi.fn(() => ({
+      dispatch: vi.fn(),
+    })),
+  };
+});
+
+describe('useFetchTrajectoriesLinked', () => {
+  const mockUseStudyDispatch = useStudyDispatch as Mock<typeof useStudyDispatch>;
+  const mockUseStudy = useStudy as Mock<typeof useStudy>;
+  const mockDispatch = vi.fn().mockImplementation(vi.fn());
+  vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArray);
+  mockUseStudyDispatch.mockReturnValue(mockDispatch);
+
+  beforeEach(() => {
+    global.fetch = vi.fn();
+    mockUseStudy.mockImplementation(
+      () => ({ ['AREA']: [mockDbTrajectory], ['LOAD']: mockDbTrajectoryArray }) as Partial<StudyState>,
+    );
+  });
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('should call all api', async () => {
+    const { result } = renderHook(() => useFetchTrajectoriesLinked(5, TRAJECTORY_TYPE.LOAD));
+
+    await waitFor(() => {
+      expect(studyService.getStudyTrajectories).toHaveBeenCalledTimes(1);
+      expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.LOAD);
+      expect(mockDispatch).toHaveBeenCalledTimes(1);
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: STUDY_ACTION.ADD_TRAJECTORIES_LOAD,
+        payload: mockDbTrajectoryArray,
+      });
+      expect(result.current.trajectoryLinked).toEqual(mockDbTrajectoryArray);
+      expect(result.current.emptyAreas).toEqual(mockDbTrajectoryArray);
+    });
+  });
+
+  it('should not call api if only study id is provided', async () => {
+    const { result } = renderHook(() => useFetchTrajectoriesLinked(5));
+
+    await waitFor(() => {
+      expect(studyService.getStudyTrajectories).toHaveBeenCalledTimes(0);
+      expect(result.current.trajectoryLinked).toEqual([]);
+      expect(result.current.emptyAreas).toEqual([]);
+    });
+  });
+
+  it('should not call api when no arguments area provided', async () => {
+    const { result } = renderHook(() => useFetchTrajectoriesLinked());
+
+    await waitFor(() => {
+      expect(studyService.getStudyTrajectories).toHaveBeenCalledTimes(0);
+      expect(result.current.trajectoryLinked).toEqual([]);
+      expect(result.current.emptyAreas).toEqual([]);
+    });
+  });
+});

@@ -8,7 +8,7 @@ import { ReactNode, useEffect, useState } from 'react';
 import { Location, useLocation } from 'react-router-dom';
 import StudyHeader from './StudyHeader.tsx';
 import { RdsDivider } from 'rte-design-system-react';
-import StudyNavigationMenu from '@/pages/pegase/studies/studyDetails/StudyNavigationMenu';
+import StudyNavigationMenu from '@/components/menu/StudyNavigationMenu.tsx';
 import { DbTrajectory, HypothesisTab, StudyDTO, WarningMessage } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';

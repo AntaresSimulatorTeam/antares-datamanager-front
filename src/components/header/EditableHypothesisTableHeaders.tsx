@@ -14,25 +14,24 @@ import { LabelWithButtonPreview } from '@common/data/LabelWithButtonPreview.tsx'
 import { LabelWithDeleteButton } from '@common/data/LabelWithDeleteButton.tsx';
 import { SelectInputWithButton } from '@common/data/SelectInputWithButton.tsx';
 import { ErrorMessageType } from '@/shared/types/Generic.type.ts';
-import { AREA_OTHERS } from '@/shared/const/studyConfig.ts';
+import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { ProgressBar } from '@/components/forms/ProgressBar.tsx';
 import { FileInputStatus } from 'rte-design-system-react';
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
 
-const getLoadHypothesisTableHeaders = (
+const getEditableHypothesisTableHeaders = (
   t: (value: string) => string,
-  handleImport: (index: number) => Promise<void>,
-  handlerSearch: (value?: string, area?: string) => Promise<SelectOption[] | undefined>,
   error: ErrorMessageType,
   setErrorInfo: Dispatch<SetStateAction<ErrorMessageType>>,
   studyStatus: StudyStatus | undefined,
   progress: number,
   fileStatus: FileInputStatus,
   rowIndexSelected: number,
+  columnHeader?: string,
 ) => [
   columnHelper.accessor('hypothesis', {
-    header: t('studyDetails.@area'),
+    header: columnHeader || t('studyDetails.@area'),
     size: 50,
     cell: ({ getValue, row }) => {
       const { status } = row.original;
@@ -70,14 +69,14 @@ const getLoadHypothesisTableHeaders = (
               void options?.meta?.updateData?.(row.index, value.id, 'success', value.label);
             }}
             onSearch={async (value?: string) =>
-              await handlerSearch(
+              await options?.meta?.search?.(
                 value,
-                row.original.hypothesis === 'Other areas' ? AREA_OTHERS : row.original.hypothesis,
+                row.original.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : row.original.hypothesis,
               )
             }
-            onClickButton={() => {
+            onClickButton={async () => {
               setErrorInfo({ index: row.index, message: '' });
-              void handleImport(row.index);
+              await options?.meta?.importData?.(row.index);
             }}
             isDisabled={row.getReadOnly()}
           />
@@ -97,7 +96,7 @@ const getLoadHypothesisTableHeaders = (
         <CellWithStatus
           status={status}
           isDeletable={!isDefault && !(studyStatus === StudyStatus.GENERATED)}
-          onClick={() => void options?.meta?.removeRow?.(row.index, hypothesis)}
+          onClick={() => void options?.meta?.removeRow?.(hypothesis, row.index)}
           message={trajectory?.messages?.[0]?.content ?? ''}
         />
       );
@@ -105,4 +104,4 @@ const getLoadHypothesisTableHeaders = (
   }),
 ];
 
-export default getLoadHypothesisTableHeaders;
+export default getEditableHypothesisTableHeaders;

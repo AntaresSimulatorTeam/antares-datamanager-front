@@ -34,11 +34,8 @@ export type HypothesisRowData = {
   trajectory: DbTrajectory | null;
   status: TRAJECTORY_SELECTION_STATUS;
   isDefault?: boolean;
+  subRows?: HypothesisRowData[] | null;
 };
-
-export interface HypothesisRowDataWithNestedRow extends HypothesisRowData {
-  subRows: HypothesisRowDataWithNestedRow[] | null;
-}
 
 export type RowStatus = FileInputStatus | 'warning' | 'emptyError';
 
@@ -103,11 +100,14 @@ export const TrajectoryLinkDataScheme = {
   hurdleCost: 'number',
 } as const;
 
-export interface HypothesisTab {
-  name: TRAJECTORY_TYPE;
-  label: string;
+export interface HypothesisTab extends Tab {
   icon: StdIconId;
   isDisabled: boolean;
+}
+
+export interface Tab {
+  name: TRAJECTORY_TYPE;
+  label: string;
 }
 
 export interface NestedCheckedType {

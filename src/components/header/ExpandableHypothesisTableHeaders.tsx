@@ -4,8 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { createColumnHelper } from '@tanstack/react-table';
-import { HypothesisRowDataWithNestedRow, SelectOption } from '@/shared/types';
+import { createColumnHelper, TableOptions } from '@tanstack/react-table';
+import { HypothesisRowData, SelectOption } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
 import { Dispatch, SetStateAction } from 'react';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
@@ -14,13 +14,23 @@ import { LabelWithButtonPreview } from '@common/data/LabelWithButtonPreview.tsx'
 import { LabelWithDeleteButton } from '@common/data/LabelWithDeleteButton.tsx';
 import { SelectInputWithButton } from '@common/data/SelectInputWithButton.tsx';
 import { ErrorMessageType } from '@/shared/types/Generic.type.ts';
-import { AREA_OTHERS } from '@/shared/const/studyConfig.ts';
+import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { ProgressBar } from '@/components/forms/ProgressBar.tsx';
 import { FileInputStatus } from 'rte-design-system-react';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 
-const columnHelper = createColumnHelper<HypothesisRowDataWithNestedRow>();
+const columnHelper = createColumnHelper<HypothesisRowData>();
+
+export interface ExpandableHypothesisTableHeadersProps {
+  t: (value: string) => string;
+  error: ErrorMessageType;
+  setErrorInfo: Dispatch<SetStateAction<ErrorMessageType>>;
+  studyStatus: StudyStatus | undefined;
+  progress: number;
+  fileStatus: FileInputStatus;
+  indexSelected: number;
+}
 
 const getExpandableHypothesisTableHeaders = (
   t: (value: string) => string,
@@ -29,8 +39,8 @@ const getExpandableHypothesisTableHeaders = (
   studyStatus: StudyStatus | undefined,
   progress: number,
   fileStatus: FileInputStatus,
-  rowIndexSelected: number,
-) => [
+  indexSelected: number,
+): TableOptions<HypothesisRowData>['columns'] => [
   columnHelper.accessor('hypothesis', {
     header: t('studyDetails.@area'),
     size: 50,
@@ -52,7 +62,7 @@ const getExpandableHypothesisTableHeaders = (
             </button>
           )}
           <LabelWithButtonPreview
-            value={getValue()}
+            value={getValue() as string}
             status={status}
             isReadOnly={row.getReadOnly()}
             hasPreview={false}
@@ -93,12 +103,12 @@ const getExpandableHypothesisTableHeaders = (
             onSearch={async (value?: string) =>
               options?.meta?.search?.(
                 value,
-                row.original.hypothesis === 'Other areas' ? AREA_OTHERS : row.original.hypothesis,
+                row.original.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : row.original.hypothesis,
               )
             }
             onClickButton={() => {
               setErrorInfo({ index: row.index, message: '' });
-              void options?.meta?.import?.(row.index);
+              void options?.meta?.importData?.(row.index);
             }}
             isDisabled={row.getReadOnly()}
           />
@@ -112,15 +122,15 @@ const getExpandableHypothesisTableHeaders = (
     header: t('home.@status'),
     cell: ({ row, table: { options } }) => {
       const { status, isDefault, trajectory, hypothesis } = row.original;
-      return progress > 0 && fileStatus === 'loading' && rowIndexSelected === row.index ? (
+      return progress > 0 && fileStatus === 'loading' && indexSelected === row.index ? (
         <ProgressBar statusFile={fileStatus} progressValue={progress} />
       ) : (
         <CellWithStatus
           status={status}
-          isDeletable={!isDefault && !(studyStatus === StudyStatus.GENERATED)}
+          isDeletable={(!isDefault || (isDefault && row.depth === 1)) && !(studyStatus === StudyStatus.GENERATED)}
           onClick={() => {
             const parentRow = row.getParentRow();
-            void options?.meta?.removeRow?.(row.depth === 1 && parentRow ? parentRow.index : row.index, hypothesis);
+            void options?.meta?.removeRow?.(hypothesis, row.depth === 1 && parentRow ? parentRow.index : row.index);
           }}
           message={trajectory?.messages?.[0]?.content ?? ''}
         />

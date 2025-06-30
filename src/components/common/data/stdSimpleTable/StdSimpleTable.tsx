@@ -19,11 +19,11 @@ import { RowStatus, SelectOption } from '@/shared/types';
 export type StdSimpleTableProps<TData> = {
   getCoreRowModel?: (table: Table<TData>) => () => RowModel<TData>;
   getExpandedRowModel?: (table: Table<TData>) => () => RowModel<TData>;
-  getSubRows?: (originalRow: TData & { subRows: TData }) => TData[] | undefined;
+  getSubRows?: (originalRow: TData) => TData[] | undefined;
   updateData?: (rowIndex: number, value: unknown, status?: RowStatus, label?: string) => void;
-  removeRow?: (rowIndex: number, value: unknown) => void;
+  removeRow?: (value: string, rowIndex?: number) => void | Promise<void>;
   search?: (value?: string, area?: string) => Promise<SelectOption[] | undefined>;
-  import?: (index: number) => Promise<void>;
+  importData?: (index: number) => Promise<void>;
 } & Omit<TableCoreProps<TData>, 'table'> &
   Omit<TableOptions<TData>, 'getCoreRowModel'>;
 
@@ -45,6 +45,8 @@ const StdSimpleTable = <TData,>({
   enableReadOnly = false,
   updateData,
   removeRow,
+  importData,
+  search,
   ...tableOptions
 }: StdSimpleTableProps<TData>) => {
   const table = useReactTable<TData>({
@@ -57,7 +59,7 @@ const StdSimpleTable = <TData,>({
     enableRowSelection,
     enableMultiRowSelection,
     enableReadOnly,
-    meta: { removeRow, updateData },
+    meta: { removeRow, updateData, importData, search },
     ...tableOptions,
   });
 

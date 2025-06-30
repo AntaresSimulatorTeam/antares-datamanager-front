@@ -14,9 +14,9 @@ import { Fragment } from 'react';
 declare module '@tanstack/react-table' {
   interface TableMeta<TData extends RowData> {
     updateData?: (rowIndex: number, value: unknown, status: RowStatus, label?: string) => void;
-    removeRow?: (rowIndex: number, value: unknown) => void;
+    removeRow?: (value: string, rowIndex?: number) => void | Promise<void>;
     search?: (value?: string, area?: string) => Promise<SelectOption[] | undefined>;
-    import?: (index: number) => Promise<void>;
+    importData?: (index: number) => Promise<void>;
   }
 }
 

@@ -1,16 +1,11 @@
-import {
-  DbTrajectory,
-  HypothesisRowData,
-  HypothesisRowDataWithNestedRow,
-  NestedCheckedType,
-  RowStatus,
-} from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, NestedCheckedType, RowStatus } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { FileInputStatus } from 'rte-design-system-react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
-import { AREA_OTHERS } from '@/shared/const/studyConfig.ts';
+import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { ThermalOptions } from '@/mocks/data/list/names.ts';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 export const getStatus = (status: RowStatus) => {
   switch (status) {
@@ -80,7 +75,7 @@ export const removeDuplicate = (arr: DbTrajectory[]) =>
   }, []);
 
 export const buildRowData = (areaName: string, isDefault: boolean, trajectory?: DbTrajectory): HypothesisRowData => ({
-  hypothesis: areaName === AREA_OTHERS ? 'Other areas' : areaName,
+  hypothesis: areaName === OTHER_AREAS ? OTHER_AREAS_LABEL : areaName,
   trajectory: trajectory?.trajectoryName ? trajectory : null,
   status: trajectory?.trajectoryName ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
   isDefault,
@@ -138,11 +133,7 @@ export const retrieveReadOnlyArea = (rowData: HypothesisRowData[], itemsToReadOn
   return buildReadOnlyRow(readOnlyIndexes);
 };
 
-export const addNestedRow = (
-  data: HypothesisRowDataWithNestedRow[],
-  newRow: HypothesisRowDataWithNestedRow,
-  parentValue?: string,
-) =>
+export const addNestedRow = (data: HypothesisRowData[], newRow: HypothesisRowData, parentValue?: string) =>
   data.map((item) => {
     if (item.hypothesis === parentValue) {
       return {
@@ -171,7 +162,7 @@ export const checkNestedValue = (checkedValues: NestedCheckedType[], value: stri
     }
   });
 
-export const removeThermalRow = (data: HypothesisRowDataWithNestedRow[], value: string, parentValue: string) =>
+export const removeThermalRow = (data: HypothesisRowData[], value: string, parentValue: string) =>
   data.map((item) => {
     if (item.hypothesis === parentValue) {
       const itemsSubRows = item.subRows
@@ -204,3 +195,26 @@ export const unCheckNestedValue = (
       return item;
     }
   });
+
+export const getStudyMenu = (t: (value: string) => string, isTrajectoryAreaLinked: boolean) => [
+  {
+    name: TRAJECTORY_TYPE.AREA,
+    label: t('studyDetails.@areas_links'),
+    icon: StdIconId.LinkedServices,
+    isDisabled: false,
+  },
+  {
+    name: TRAJECTORY_TYPE.LOAD,
+    label: t('studyDetails.@load'),
+    icon: StdIconId.BatteryChargingFull,
+    isDisabled: isTrajectoryAreaLinked,
+  },
+  {
+    name: TRAJECTORY_TYPE.THERMAL_CAPACITY,
+    label: t('studyDetails.@thermal'),
+    icon: StdIconId.LocalFireDepartment,
+    isDisabled: isTrajectoryAreaLinked,
+  },
+  { name: TRAJECTORY_TYPE.ENR, label: t('studyDetails.@enr'), icon: StdIconId.EnergySavingsLeaf, isDisabled: true },
+  { name: TRAJECTORY_TYPE.MISC, label: t('studyDetails.@misc'), icon: StdIconId.Category, isDisabled: true },
+];

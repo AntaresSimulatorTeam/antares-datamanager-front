@@ -1,4 +1,6 @@
 import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
+import { AccessorKeyColumnDefBase, DeepKeys, DeepValue, StringOrTemplateHeader } from '@tanstack/react-table';
+import { HypothesisRowData } from '@/shared/types/Trajectory.type.ts';
 
 export type Entries<T> = {
   [K in keyof T]: [K, T[K]];
@@ -19,3 +21,17 @@ export interface ErrorMessage {
   date: Date;
   type: ERROR_MESSAGE_TYPE;
 }
+
+export type ColumnProps<TData> = (
+  | (AccessorKeyColumnDefBase<HypothesisRowData, string extends DeepKeys<TData> ? DeepValue<TData, string> : never> & {
+      id?: string;
+      header?: StringOrTemplateHeader<
+        HypothesisRowData,
+        string extends DeepKeys<TData> ? DeepValue<TData, string> : never
+      >;
+    })
+  | (AccessorKeyColumnDefBase<HypothesisRowData, string extends DeepKeys<TData> ? DeepValue<TData, string> : never> & {
+      header?: string;
+      id?: string;
+    })
+)[];

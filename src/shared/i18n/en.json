@@ -124,7 +124,11 @@
   },
   "thermal": {
     "@installedPower": "Installed Power",
-    "@parameters": "Parameters"
+    "@parameters": "Parameters",
+    "@parametersTechnical": "Technical Parameters",
+    "@parametersEconomic": "Economic Parameters",
+    "@costs": "Costs",
+    "@economics": "Economics"
   },
   "trajectoryViewModal": {
     "@title_area": "Areas",
