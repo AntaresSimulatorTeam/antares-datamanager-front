@@ -96,10 +96,7 @@ const getEditableHypothesisTableHeaders = (
         <CellWithStatus
           status={status}
           isDeletable={!isDefault && !(studyStatus === StudyStatus.GENERATED)}
-          onClick={() => {
-            console.log('================== removeRow');
-            void options?.meta?.removeRow?.(hypothesis, row.index);
-          }}
+          onClick={() => void options?.meta?.removeRow?.(hypothesis, row.index)}
           message={trajectory?.messages?.[0]?.content ?? ''}
         />
       );
