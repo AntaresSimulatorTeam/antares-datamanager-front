@@ -400,7 +400,6 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
           name,
           data.findIndex((row) => row.hypothesis === name),
         );
-        setCheckedValues((prev) => [...prev.filter((prevName) => prevName !== name)]);
       } catch {
         // Silent handler
       }
