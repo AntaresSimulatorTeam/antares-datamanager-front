@@ -1,5 +1,5 @@
 import StdSimpleTable from '@common/data/stdSimpleTable/StdSimpleTable.tsx';
-import { Dispatch, SetStateAction, useMemo, useState } from 'react';
+import { Dispatch, SetStateAction, useCallback, useMemo, useState } from 'react';
 import { ErrorMessageType, HypothesisRowData, RowStatus, SelectOption } from '@/shared/types';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { useTranslation } from 'react-i18next';
@@ -61,13 +61,16 @@ export const PegaseHypothesisTable = ({
     [errorInfo, fileStatus, indexSelected, progress, studyState, t, columnHeader],
   );
 
-  const onHandleImport = async (index: number) => {
-    try {
-      await handleImport(index);
-    } catch {
-      setErrorInfo({ index, message: t('studyDetails.@select_file_fs_error') });
-    }
-  };
+  const onHandleImport = useCallback(
+    async (index: number) => {
+      try {
+        await handleImport(index);
+      } catch {
+        setErrorInfo({ index, message: t('studyDetails.@select_file_fs_error') });
+      }
+    },
+    [handleImport, t],
+  );
 
   return (
     <div className="flex h-fit w-full">

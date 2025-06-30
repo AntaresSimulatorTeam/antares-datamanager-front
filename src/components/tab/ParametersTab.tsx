@@ -73,7 +73,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
     setDefaultData(areaDefaultData);
 
     setReadOnly(retrieveReadOnlyArea(areaDefaultData, defaultAreaListNotIncludedInList));
-  }, []);
+  }, [areas, defaultAreas]);
 
   const handleSelectionChange = (value: string, isChecked: boolean) => {
     if (isChecked) {
