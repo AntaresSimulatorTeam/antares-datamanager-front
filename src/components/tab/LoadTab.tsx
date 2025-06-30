@@ -6,6 +6,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import {
+  CheckBoxData,
   DbTrajectory,
   HypothesisRowData,
   LocationStudy,
@@ -48,11 +49,6 @@ import { notifyAlert } from '@/shared/notification/notification.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import { useFetchTrajectoriesLinked } from '@/hooks/useFetchTrajectoriesLinked.ts';
-
-export type CheckBoxData = {
-  name: string;
-  isDefault: boolean;
-};
 
 interface LoadTabProps {
   defaultAreas: CheckBoxData[];

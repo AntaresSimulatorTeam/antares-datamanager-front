@@ -1,10 +1,9 @@
 import SearchBar from '@/pages/pegase/home/components/SearchBar.tsx';
 import { FileInputStatus, RdsDivider } from 'rte-design-system-react';
 import { useTranslation } from 'react-i18next';
-import { CheckBoxData } from '@/components/tab/LoadTab.tsx';
 import { useEffect, useState } from 'react';
-import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
-import { HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
+import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
+import { CheckBoxData, HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
 import { buildRowData, retrieveReadOnlyArea } from '@/shared/utils/trajectoryUtils.ts';
 import getEditableHypothesisTableHeaders from '@/components/header/EditableHypothesisTableHeaders.tsx';
@@ -14,7 +13,7 @@ import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { useStudy } from '@/store/contexts/StudyContext.tsx';
 import StdCheckboxGroupWrapper from '@common/forms/stdCheckboxGroup/StdCheckboxGroupWrapper.tsx';
 import StdCheckbox from '@common/forms/stdCheckbox/StdCheckbox.tsx';
-import { sortDefaultFirstPosition } from '@/shared/utils/sortUtils.tsx';
+import { sortWithFixedPosition } from '@/shared/utils/sortUtils.tsx';
 
 interface ParametersTabProps {
   defaultAreas: CheckBoxData[];
@@ -24,7 +23,7 @@ interface ParametersTabProps {
 export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
   const { t } = useTranslation();
   const studyState = useStudy();
-  const [areaDefault, setAreaDefault] = useState<CheckBoxData[]>([...defaultAreas]);
+  const [areaDefault, setAreaDefault] = useState<CheckBoxData[]>([]);
   const [checkedValues, setCheckedValues] = useState<string[]>(areaDefault.map((area) => area.name));
   const [defaultData, setDefaultData] = useState<HypothesisRowData[]>([]);
   const data: HypothesisRowData[] = [
@@ -56,7 +55,8 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
         }
       })
       .filter(Boolean) as CheckBoxData[];
-    setAreaDefault((prev) => (newArea.length > 0 ? [...prev, ...newArea] : prev));
+
+    setAreaDefault([...defaultAreas, ...newArea]);
 
     // Find default area not included in areas trajectory list
     const defaultAreaListNotIncludedInList: string[] = [];
@@ -86,7 +86,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
       isDefault: false,
     };
     setCheckedValues((prev) => [...prev, value]);
-    const newDataSorted = sortDefaultFirstPosition([...defaultData, newRow], OTHER_AREAS_LABEL) ?? [];
+    const newDataSorted = sortWithFixedPosition([...defaultData, newRow]) || [];
     setDefaultData(newDataSorted);
     if (readOnlyAreas.length > 0) {
       const readOnlyRows = retrieveReadOnlyArea(newDataSorted, readOnlyAreas);

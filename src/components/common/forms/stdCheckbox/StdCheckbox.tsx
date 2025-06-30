@@ -28,7 +28,7 @@ const StdCheckbox = ({
   value,
   label,
   disabled = false,
-  defaultChecked,
+  defaultChecked = false,
   checkboxControl,
   onChange,
   onBlur,
