@@ -17,13 +17,13 @@ type CheckboxWithNestedCheckboxProps = {
   isReadOnly?: boolean;
   checked?: boolean;
   defaultChecked?: boolean;
-  onChange?: (value: string, checked: boolean) => void;
+  onChange?: (value: string, checked: boolean, isDefault: boolean) => void;
   onBlur?: (e: React.FocusEvent<{ checked: boolean }>) => void;
   required?: boolean;
   error?: boolean;
   options: string[];
   checkedValues?: { name: string; subOptions: string[] | null }[];
-  onHandleSelection: (value: string, checked: boolean, parentValue?: string) => void;
+  onHandleSelection: (value: string, checked: boolean, isDefault: boolean, parentValue?: string) => void;
 };
 
 export const CheckboxWithNestedCheckbox = ({
@@ -60,7 +60,7 @@ export const CheckboxWithNestedCheckbox = ({
               checked={checkedValues?.some((checkedValue) => checkedValue.name === value)}
               onMouseDown={(e) => e.preventDefault()}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                onHandleSelection?.(event.target.value, event.target.checked)
+                onHandleSelection?.(event.target.value, event.target.checked, disabled)
               }
               value={checkboxControl ? 'checkbox_control' : value}
             />
@@ -92,7 +92,7 @@ export const CheckboxWithNestedCheckbox = ({
             label={''}
             name={''}
             onChange={(valueChecked: string, isChecked?: boolean) =>
-              onHandleSelection?.(valueChecked, isChecked ?? false, value)
+              onHandleSelection?.(valueChecked, isChecked ?? false, disabled, value)
             }
             disabled={isReadOnly}
             checkedValues={checkedValues?.find((checkedValue) => checkedValue.name === value)?.subOptions ?? []}

@@ -127,7 +127,7 @@ const getExpandableHypothesisTableHeaders = (
       ) : (
         <CellWithStatus
           status={status}
-          isDeletable={!isDefault && !(studyStatus === StudyStatus.GENERATED)}
+          isDeletable={(!isDefault || (isDefault && row.depth === 1)) && !(studyStatus === StudyStatus.GENERATED)}
           onClick={() => {
             const parentRow = row.getParentRow();
             void options?.meta?.removeRow?.(hypothesis, row.depth === 1 && parentRow ? parentRow.index : row.index);

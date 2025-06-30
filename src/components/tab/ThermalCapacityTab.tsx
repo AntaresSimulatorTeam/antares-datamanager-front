@@ -102,18 +102,18 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
     void fetchHypothesis();
   }, []);
 
-  const addRow = (value: string, isParentChecked: boolean, parentValue?: string) => {
+  const addRow = (value: string, isParentChecked: boolean, isDefault: boolean, parentValue?: string) => {
     let dataToAdd: HypothesisRowData[] = [];
     const newRow: HypothesisRowData = {
       hypothesis: value,
       trajectory: null,
       status: TRAJECTORY_SELECTION_STATUS.MISSING,
-      isDefault: false,
+      isDefault,
       subRows: null,
     };
     // Add child to the checked parent
     if (parentValue && isParentChecked) {
-      dataToAdd = addNestedRow(data, newRow, parentValue);
+      dataToAdd = addNestedRow(isDefault ? defaultData : data, newRow, parentValue);
       setCheckedValues((prev) => (prev.length > 0 ? checkNestedValue(prev, value, parentValue) : prev));
     } else if (parentValue && !isParentChecked) {
       // Add Row for parent and row for child
@@ -123,7 +123,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
           hypothesis: parentValue,
           subRows: [newRow],
         },
-        ...data,
+        ...(isDefault ? defaultData : data),
       ];
       // Checked technology and area
       setCheckedValues((prev) => [
@@ -134,7 +134,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
         },
       ]);
     } else {
-      dataToAdd = [newRow, ...data];
+      dataToAdd = [newRow, ...(isDefault ? defaultData : data)];
       // Checked only area
       setCheckedValues((prev) => [
         ...prev,
@@ -144,29 +144,33 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
         },
       ]);
     }
-    const newDataSorted = sortKeepLastName(dataToAdd, OTHER_AREAS_LABEL);
-    setData(newDataSorted);
+    if (isDefault) {
+      setDefaultData(dataToAdd);
+    } else {
+      const newDataSorted = sortKeepLastName(dataToAdd, OTHER_AREAS_LABEL);
+      setData(newDataSorted);
+    }
   };
 
-  const removeRow = (value: string, parentValue?: string) => {
+  const removeRow = (value: string, isDefault: boolean, parentValue?: string) => {
     let dataToRemove: HypothesisRowData[] = [];
     if (parentValue) {
-      dataToRemove = removeThermalRow(data, value, parentValue);
+      dataToRemove = removeThermalRow(isDefault ? defaultData : data, value, parentValue);
       setCheckedValues((prev) => (prev.length > 0 ? unCheckNestedValue(prev, value, parentValue) : prev));
     } else {
       dataToRemove = data.filter((item) => item.hypothesis !== value);
       setCheckedValues((prev) => [...prev.filter((checkedValue) => checkedValue.name !== value)]);
     }
-    setData(dataToRemove);
+    isDefault ? setDefaultData(dataToRemove) : setData(dataToRemove);
   };
 
-  const handleSelectionChange = (value: string, isChecked: boolean, parentValue?: string) => {
+  const handleSelectionChange = (value: string, isChecked: boolean, isDefault: boolean, parentValue?: string) => {
     if (isChecked) {
       const isParentChecked =
         parentValue && checkedValues ? checkedValues.some((checkedValue) => checkedValue.name === parentValue) : false;
-      addRow(value, isParentChecked, parentValue);
+      addRow(value, isParentChecked, isDefault, parentValue);
     } else {
-      removeRow(value, parentValue);
+      removeRow(value, isDefault, parentValue);
     }
   };
 
@@ -209,6 +213,11 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
             handleSearch={handleTrajectorySearch}
             handleImport={handleFetchTrajectoriesFS}
             isReadOnlyEnable={true}
+            removeRow={(value: string, rowIndex?: number) => {
+              const parentValue =
+                rowIndex != null && !(data[rowIndex]?.hypothesis === value) ? data[rowIndex].hypothesis : undefined;
+              removeRow(value, true, parentValue);
+            }}
           />
         )}
         <PegaseHypothesisTable
@@ -225,7 +234,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
           removeRow={(value: string, rowIndex?: number) => {
             const parentValue =
               rowIndex != null && !(data[rowIndex]?.hypothesis === value) ? data[rowIndex].hypothesis : undefined;
-            removeRow(value, parentValue);
+            removeRow(value, false, parentValue);
           }}
         />
       </div>
