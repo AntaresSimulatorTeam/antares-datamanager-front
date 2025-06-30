@@ -86,7 +86,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
       isDefault: false,
     };
     setCheckedValues((prev) => [...prev, value]);
-    const newDataSorted = sortDefaultFirstPosition([...defaultData, newRow], OTHER_AREAS_LABEL);
+    const newDataSorted = sortDefaultFirstPosition([...defaultData, newRow], OTHER_AREAS_LABEL) ?? [];
     setDefaultData(newDataSorted);
     if (readOnlyAreas.length > 0) {
       const readOnlyRows = retrieveReadOnlyArea(newDataSorted, readOnlyAreas);
