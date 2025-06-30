@@ -221,4 +221,6 @@ export const ThermalOptions = [
   'Other',
   'Reserves',
   'Storage battery',
+  'Storage VE',
+  'TAC',
 ];
