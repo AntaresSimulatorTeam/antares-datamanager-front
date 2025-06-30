@@ -83,14 +83,6 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
     }
   };
 
-  const handleSelectionChange = (value: string, isChecked: boolean) => {
-    if (isChecked) {
-      setCheckedValues((prev) => [...prev, value]);
-    } else {
-      setCheckedValues((prev) => [...prev.filter((checkedValue) => checkedValue !== value)]);
-    }
-  };
-
   const handleTrajectorySearch = async () => Promise.resolve([]);
   const handleFetchTrajectoriesFS = async (index: number) => {
     console.log('=== index', index);
