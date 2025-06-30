@@ -158,7 +158,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
       dataToRemove = removeThermalRow(isDefault ? defaultData : data, value, parentValue);
       setCheckedValues((prev) => (prev.length > 0 ? unCheckNestedValue(prev, value, parentValue) : prev));
     } else {
-      dataToRemove = data.filter((item) => item.hypothesis !== value);
+      dataToRemove = (isDefault ? defaultData : data).filter((item) => item.hypothesis !== value);
       setCheckedValues((prev) => [...prev.filter((checkedValue) => checkedValue.name !== value)]);
     }
     isDefault ? setDefaultData(dataToRemove) : setData(dataToRemove);
@@ -215,7 +215,9 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
             isReadOnlyEnable={true}
             removeRow={(value: string, rowIndex?: number) => {
               const parentValue =
-                rowIndex != null && !(data[rowIndex]?.hypothesis === value) ? data[rowIndex].hypothesis : undefined;
+                rowIndex != null && !(defaultData[rowIndex]?.hypothesis === value)
+                  ? defaultData[rowIndex].hypothesis
+                  : undefined;
               removeRow(value, true, parentValue);
             }}
           />
