@@ -24,7 +24,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
   const { t } = useTranslation();
   const studyState = useStudy();
   const [areaDefault, setAreaDefault] = useState<CheckBoxData[]>([]);
-  const [checkedValues, setCheckedValues] = useState<string[]>(areaDefault.map((area) => area.name));
+  const [checkedValues, setCheckedValues] = useState<string[]>([]);
   const [defaultData, setDefaultData] = useState<HypothesisRowData[]>([]);
   const data: HypothesisRowData[] = [
     {
@@ -57,6 +57,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
       .filter(Boolean) as CheckBoxData[];
 
     setAreaDefault([...defaultAreas, ...newArea]);
+    setCheckedValues(defaultAreas.map((area) => area.name));
 
     // Find default area not included in areas trajectory list
     const defaultAreaListNotIncludedInList: string[] = [];
