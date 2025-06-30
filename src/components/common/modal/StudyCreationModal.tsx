@@ -76,6 +76,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
       project: projectName,
       horizon,
       trajectoryIds,
+      studyId: study?.id,
     };
 
     try {
@@ -99,6 +100,15 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
     // Clear any previous error messages
     setDuplicateErrorMessage('');
 
+    if (!study?.id) {
+      notifyToast({
+        type: 'error',
+        message: 'Study ID is missing',
+      });
+      return;
+    }
+
+
     if (study && studyName.trim() === study.name.trim()) {
       notifyToast({
         type: 'error',
@@ -114,6 +124,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
       project: projectName,
       horizon,
       trajectoryIds,
+      id:study.id,
     };
 
     try {
