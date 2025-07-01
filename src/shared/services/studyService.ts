@@ -189,3 +189,29 @@ export const getStudyById = async (studyId: number): Promise<StudyDTO> => {
     throw new Error((error as BackendError).antaresErrorMessage);
   }
 };
+
+/**
+ * Duplicate a study
+ * Throws error if duplication fails, displays success toast if successful
+ *
+ * @param {Omit<StudyDTO, 'id' | 'status' | 'creationDate' | 'projectId'>} studyData - Partial study data
+ * @return {Promise<void>}
+ * @throws {Error} If duplication fails
+ */
+export const duplicateStudy = async (
+  studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate' | 'projectId'>,
+): Promise<void> => {
+
+  await AuthService.authFetch(`${STUDY_ENDPOINT}/duplicate`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(studyData),
+  });
+
+  notifyToast({
+    type: 'success',
+    message: 'Study duplicated successfully',
+  });
+};

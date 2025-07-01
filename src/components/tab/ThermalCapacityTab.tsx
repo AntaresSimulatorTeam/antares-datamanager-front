@@ -6,10 +6,9 @@
 
 import SearchBar from '@/pages/pegase/home/components/SearchBar.tsx';
 import { FileInputStatus, RdsDivider } from 'rte-design-system-react';
-import { HypothesisRowData, NestedCheckedType, TrajectoryAreaData } from '@/shared/types';
+import { CheckBoxData, HypothesisRowData, NestedCheckedType, TrajectoryAreaData } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
-import { CheckBoxData } from '@/components/tab/LoadTab.tsx';
 import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
 import { useStudy } from '@/store/contexts/StudyContext.tsx';
 import { CheckboxWithNestedCheckbox } from '@/components/forms/CheckboxWithNestedCheckbox.tsx';
@@ -195,7 +194,9 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
               checkedValues={checkedValues}
               options={ThermalOptions}
             />
-            {index === Math.max(defaultAreas?.length - 1, 0) && <RdsDivider extraClasses="mt-1" />}
+            {defaultAreas?.length > 0 && index === Math.max(defaultAreas?.length - 1, 0) && (
+              <RdsDivider extraClasses="mt-1" />
+            )}
           </div>
         ))}
       </div>

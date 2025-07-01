@@ -6,6 +6,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import {
+  CheckBoxData,
   DbTrajectory,
   HypothesisRowData,
   LocationStudy,
@@ -48,11 +49,6 @@ import { notifyAlert } from '@/shared/notification/notification.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import { useFetchTrajectoriesLinked } from '@/hooks/useFetchTrajectoriesLinked.ts';
-
-export type CheckBoxData = {
-  name: string;
-  isDefault: boolean;
-};
 
 interface LoadTabProps {
   defaultAreas: CheckBoxData[];
@@ -400,7 +396,6 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
           name,
           data.findIndex((row) => row.hypothesis === name),
         );
-        setCheckedValues((prev) => [...prev.filter((prevName) => prevName !== name)]);
       } catch {
         // Silent handler
       }
@@ -410,7 +405,7 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
   return (
     <div className="flex h-full w-full flex-col gap-4">
       <div className="flex h-full w-full gap-6">
-        <div className="flex h-fit w-28 flex-col gap-1 rounded border border-gray-400 p-2">
+        <div className="flex h-fit w-28 flex-col rounded border border-gray-400 p-2">
           <div className="border-b border-gray-400 pb-2">
             <SearchBar onSearch={() => {}} placeholder={t('studyDetails.@search_area')} />
           </div>
@@ -432,7 +427,9 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
                   disabled={area.isDefault}
                   checked={area.isDefault}
                 />
-                {index === Math.max(areasDefaultOptions?.length - 1, 0) && <RdsDivider extraClasses="mt-1" />}
+                {defaultAreas?.length > 0 && index === Math.max(defaultAreas?.length - 1, 0) && (
+                  <RdsDivider extraClasses="mt-1" />
+                )}
               </div>
             ))}
           </RdsCheckboxGroupWrapper>

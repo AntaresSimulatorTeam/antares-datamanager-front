@@ -56,7 +56,7 @@ export const CheckboxWithNestedCheckbox = ({
               className="peer sr-only"
               type="checkbox"
               name={name}
-              disabled={disabled}
+              disabled={isReadOnly}
               checked={checkedValues?.some((checkedValue) => checkedValue.name === value)}
               onMouseDown={(e) => e.preventDefault()}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>

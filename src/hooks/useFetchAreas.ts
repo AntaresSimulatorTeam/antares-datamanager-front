@@ -1,8 +1,7 @@
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useCallback, useEffect, useState } from 'react';
 import { getDefaultLoadHypothesis, getTrajectoryDataByTypeAndId } from '@/shared/services/trajectoryService.ts';
-import { CheckBoxData } from '@/components/tab/LoadTab.tsx';
-import { DbTrajectory, TrajectoryAreaData } from '@/shared/types';
+import { CheckBoxData, DbTrajectory, TrajectoryAreaData } from '@/shared/types';
 
 export const useFetchAreas = (trajectoryArea?: DbTrajectory | null) => {
   const [areaDefault, setAreaDefault] = useState<CheckBoxData[]>([]);

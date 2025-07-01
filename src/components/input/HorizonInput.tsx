@@ -7,9 +7,10 @@ interface YearInputProps {
   onChange: (inputValue: string) => void;
   required: boolean;
   onValidChange?: (isValid: boolean) => void;
+  customErrorMessage?: string;
 }
 
-const HorizonInput: React.FC<YearInputProps> = ({ horizon, onChange, required = true, onValidChange }) => {
+const HorizonInput: React.FC<YearInputProps> = ({ horizon, onChange, required = true, onValidChange, customErrorMessage }) => {
   const { t } = useTranslation();
   const [errorMessage, setErrorMessage] = useState<string>('');
 
@@ -65,7 +66,8 @@ const HorizonInput: React.FC<YearInputProps> = ({ horizon, onChange, required = 
   };
 
   return (
-    <div className="flex w-[320px] flex-col">
+    <div className="flex items-center">
+    <div className="flex w-1/2">
       <RdsInputText
         label="Horizon"
         value={horizon}
@@ -76,8 +78,9 @@ const HorizonInput: React.FC<YearInputProps> = ({ horizon, onChange, required = 
         required={required}
         maxLength={4}
       />
-      <div className={`text-error-500 ${errorMessage ? 'opacity-100' : 'opacity-0'}`}>
-        {errorMessage || t('horizonInput.@errorMessage')}
+  </div>
+      <div className={`text-error-500 ${customErrorMessage || errorMessage ? 'opacity-100' : 'opacity-0'} w-1/2`}>
+        {customErrorMessage || errorMessage || t('horizonInput.@errorMessage')}
       </div>
     </div>
   );

@@ -35,3 +35,8 @@ export type ColumnProps<TData> = (
       id?: string;
     })
 )[];
+
+export type CheckBoxData = {
+  name: string;
+  isDefault: boolean;
+};

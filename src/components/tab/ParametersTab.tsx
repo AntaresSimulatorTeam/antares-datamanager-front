@@ -1,12 +1,9 @@
 import SearchBar from '@/pages/pegase/home/components/SearchBar.tsx';
 import { FileInputStatus, RdsDivider } from 'rte-design-system-react';
-import StdCheckboxGroupWrapper from '@common/forms/stdCheckboxGroup/StdCheckboxGroupWrapper.tsx';
 import { useTranslation } from 'react-i18next';
-import StdCheckbox from '@common/forms/stdCheckbox/StdCheckbox.tsx';
-import { CheckBoxData } from '@/components/tab/LoadTab.tsx';
 import { useEffect, useState } from 'react';
 import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
-import { HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
+import { CheckBoxData, HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
 import { buildRowData, retrieveReadOnlyArea } from '@/shared/utils/trajectoryUtils.ts';
 import getEditableHypothesisTableHeaders from '@/components/header/EditableHypothesisTableHeaders.tsx';
@@ -14,6 +11,9 @@ import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { useStudy } from '@/store/contexts/StudyContext.tsx';
+import StdCheckboxGroupWrapper from '@common/forms/stdCheckboxGroup/StdCheckboxGroupWrapper.tsx';
+import StdCheckbox from '@common/forms/stdCheckbox/StdCheckbox.tsx';
+import { sortWithFixedPosition } from '@/shared/utils/sortUtils.tsx';
 
 interface ParametersTabProps {
   defaultAreas: CheckBoxData[];
@@ -23,8 +23,8 @@ interface ParametersTabProps {
 export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
   const { t } = useTranslation();
   const studyState = useStudy();
-  const [areaDefault, setAreaDefault] = useState<CheckBoxData[]>([...defaultAreas]);
-  const [checkedValues, setCheckedValues] = useState<string[]>(areaDefault.map((area) => area.name));
+  const [areaDefault, setAreaDefault] = useState<CheckBoxData[]>([]);
+  const [checkedValues, setCheckedValues] = useState<string[]>([]);
   const [defaultData, setDefaultData] = useState<HypothesisRowData[]>([]);
   const data: HypothesisRowData[] = [
     {
@@ -44,6 +44,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
   const [fileStatus] = useState<FileInputStatus>('empty');
   const [rowIndexSelected] = useState(0);
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
+  const [readOnlyAreas, setReadOnlyAreas] = useState<string[]>([]);
 
   useEffect(() => {
     let newArea: CheckBoxData[] = [];
@@ -54,7 +55,9 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
         }
       })
       .filter(Boolean) as CheckBoxData[];
-    setAreaDefault((prev) => (newArea.length > 0 ? [...prev, ...newArea] : prev));
+
+    setAreaDefault([...defaultAreas, ...newArea]);
+    setCheckedValues(defaultAreas.map((area) => area.name));
 
     // Find default area not included in areas trajectory list
     const defaultAreaListNotIncludedInList: string[] = [];
@@ -73,13 +76,35 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
     setDefaultData(areaDefaultData);
 
     setReadOnly(retrieveReadOnlyArea(areaDefaultData, defaultAreaListNotIncludedInList));
+    setReadOnlyAreas(defaultAreaListNotIncludedInList);
   }, [areas, defaultAreas]);
+
+  const addRow = (value: string) => {
+    const newRow: HypothesisRowData = {
+      hypothesis: value,
+      trajectory: null,
+      status: TRAJECTORY_SELECTION_STATUS.MISSING,
+      isDefault: false,
+    };
+    setCheckedValues((prev) => [...prev, value]);
+    const newDataSorted = sortWithFixedPosition([...defaultData, newRow]) || [];
+    setDefaultData(newDataSorted);
+    if (readOnlyAreas.length > 0) {
+      const readOnlyRows = retrieveReadOnlyArea(newDataSorted, readOnlyAreas);
+      setReadOnly(readOnlyRows);
+    }
+  };
+
+  const removeRow = (value: string) => {
+    setCheckedValues((prev) => [...prev.filter((checkedValue) => checkedValue !== value)]);
+    setDefaultData((prev) => [...prev.filter((itemData) => itemData.hypothesis !== value)]);
+  };
 
   const handleSelectionChange = (value: string, isChecked: boolean) => {
     if (isChecked) {
-      setCheckedValues((prev) => [...prev, value]);
+      addRow(value);
     } else {
-      setCheckedValues((prev) => [...prev.filter((checkedValue) => checkedValue !== value)]);
+      removeRow(value);
     }
   };
 
@@ -91,7 +116,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
 
   return (
     <div className="flex h-full w-full gap-6">
-      <div className="flex h-fit w-28 flex-col gap-1 rounded border border-gray-400 p-2">
+      <div className="flex h-fit w-28 flex-col rounded border border-gray-400 p-2">
         <div className="border-b border-gray-400 pb-2">
           <SearchBar onSearch={() => {}} placeholder={t('studyDetails.@search_area')} />
         </div>
@@ -100,12 +125,12 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
           name={''}
           checkedValues={checkedValues}
           disabled={false}
-          onChange={(value: string, isChecked?: boolean) => void handleSelectionChange(value, isChecked ?? false)}
+          onChange={(value: string, isChecked?: boolean) => handleSelectionChange(value, isChecked ?? false)}
         >
           {areaDefault?.map((area, index) => (
             <div key={`${index}-${area.name}`} className="my-1">
               <StdCheckbox
-                key={`nested-checkbox-${area.name}`}
+                key={`parameter-checkbox-${area.name}`}
                 label={area.name}
                 value={area.name}
                 name={''}
@@ -113,7 +138,9 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
                 disabled={area.isDefault}
                 checked={area.isDefault}
               />
-              {index === Math.max(defaultAreas?.length - 1, 0) && <RdsDivider extraClasses="mt-1" />}
+              {defaultAreas?.length > 0 && index === Math.max(defaultAreas?.length - 1, 0) && (
+                <RdsDivider extraClasses="mt-1" />
+              )}
             </div>
           ))}
         </StdCheckboxGroupWrapper>
@@ -133,6 +160,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
             handleSearch={handleTrajectorySearch}
             handleImport={handleFetchTrajectoriesFS}
             isReadOnlyEnable={true}
+            removeRow={removeRow}
           />
         )}
         <div className="flex h-fit w-full">
