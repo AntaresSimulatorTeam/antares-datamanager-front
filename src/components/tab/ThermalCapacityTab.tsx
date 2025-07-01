@@ -194,7 +194,9 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
               checkedValues={checkedValues}
               options={ThermalOptions}
             />
-            {index === Math.max(defaultAreas?.length - 1, 0) && <RdsDivider extraClasses="mt-1" />}
+            {defaultAreas?.length > 0 && index === Math.max(defaultAreas?.length - 1, 0) && (
+              <RdsDivider extraClasses="mt-1" />
+            )}
           </div>
         ))}
       </div>

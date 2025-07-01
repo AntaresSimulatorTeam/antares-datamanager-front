@@ -138,7 +138,9 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
                 disabled={area.isDefault}
                 checked={area.isDefault}
               />
-              {index === Math.max(defaultAreas?.length - 1, 0) && <RdsDivider extraClasses="mt-1" />}
+              {defaultAreas?.length > 0 && index === Math.max(defaultAreas?.length - 1, 0) && (
+                <RdsDivider extraClasses="mt-1" />
+              )}
             </div>
           ))}
         </StdCheckboxGroupWrapper>

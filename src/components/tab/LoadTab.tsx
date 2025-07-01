@@ -427,7 +427,9 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
                   disabled={area.isDefault}
                   checked={area.isDefault}
                 />
-                {index === Math.max(areasDefaultOptions?.length - 1, 1) && <RdsDivider extraClasses="mt-1" />}
+                {areasDefaultOptions?.length > 0 && index === Math.max(areasDefaultOptions?.length - 1, 1) && (
+                  <RdsDivider extraClasses="mt-1" />
+                )}
               </div>
             ))}
           </RdsCheckboxGroupWrapper>
