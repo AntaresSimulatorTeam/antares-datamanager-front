@@ -16,16 +16,17 @@ import { useTranslation } from 'react-i18next';
 import { useStudy } from '@/store/contexts/StudyContext.tsx';
 import { HypothesisTab } from '@/shared/types';
 import StdAvatar from '@common/layout/stdAvatar/StdAvatar.tsx';
-import { getMessagesNb } from '@/shared/utils/warningUtils.ts';
 import { ThermalMenu } from '@/components/menu/ThermalMenu.tsx';
 import { getStudyMenu } from '@/shared/utils/trajectoryUtils.ts';
 import { useFetchAreas } from '@/hooks/useFetchAreas.ts';
+import { getNbMessagesFromTrajectoryType } from '@/shared/services/trajectoryService.ts';
 
 type StudyNavigationMenuProps = {
   onRenderActiveComponent?: (content: ReactNode | null) => void;
   setActiveTab: Dispatch<SetStateAction<HypothesisTab>>;
   activeTab: HypothesisTab;
   setErrorMessage: Dispatch<SetStateAction<string>>;
+  studyId: number;
 };
 
 const StudyNavigationMenu = ({
@@ -33,11 +34,13 @@ const StudyNavigationMenu = ({
   setActiveTab,
   activeTab,
   setErrorMessage,
+  studyId,
 }: StudyNavigationMenuProps) => {
   const { t } = useTranslation();
   const studyState = useStudy();
   const [tabs, setTabs] = useState<HypothesisTab[]>(getStudyMenu(t, !!studyState[`${TRAJECTORY_TYPE.AREA}`]?.[0]));
   const { areaDefault, trajectoryAreas } = useFetchAreas(studyState[`${TRAJECTORY_TYPE.AREA}`]?.[0]);
+  const [nbWarning, setNbWarning] = useState<{ [key in keyof typeof TRAJECTORY_TYPE]: number }>();
 
   const renderActiveComponent = (): ReactNode | null => {
     switch (activeTab.name) {
@@ -55,6 +58,18 @@ const StudyNavigationMenu = ({
         return null;
     }
   };
+
+  useEffect(() => {
+    const countNbWarningMessages = async (id: number) => {
+      try {
+        const result = await getNbMessagesFromTrajectoryType(id);
+        setNbWarning(result);
+      } catch {
+        // silent handler
+      }
+    };
+    void countNbWarningMessages(studyId);
+  }, [studyId]);
 
   useEffect(() => {
     setTabs((prev) =>
@@ -76,32 +91,29 @@ const StudyNavigationMenu = ({
 
   return (
     <div className="flex space-x-4 p-4">
-      {tabs.map((tab) => {
-        const warmingMessagesNb = getMessagesNb(studyState, tab.name);
-        return (
-          <div className="flex items-center space-x-2" key={tab.name}>
-            <StdIcon name={tab.icon} />
-            <RdsTabItem
-              key={tab.name}
-              name={tab.name}
-              label={tab.label}
-              active={activeTab.name === tab.name}
-              disabled={tab.isDisabled}
-              onClick={() => setActiveTab(tab)}
+      {tabs.map((tab) => (
+        <div className="flex items-center space-x-2" key={tab.name}>
+          <StdIcon name={tab.icon} />
+          <RdsTabItem
+            key={tab.name}
+            name={tab.name}
+            label={tab.label}
+            active={activeTab.name === tab.name}
+            disabled={tab.isDisabled}
+            onClick={() => setActiveTab(tab)}
+          />
+          {nbWarning && nbWarning[tab.name] != null && nbWarning[tab.name] > 0 && activeTab.name !== tab.name && (
+            <StdAvatar
+              initials={`${nbWarning[tab.name]}`}
+              size="es"
+              backgroundColor="orange"
+              fullname=""
+              textColor="white"
+              hasToolTip={false}
             />
-            {warmingMessagesNb > 0 && activeTab.name !== tab.name && (
-              <StdAvatar
-                initials={`${warmingMessagesNb}`}
-                size="es"
-                backgroundColor="orange"
-                fullname=""
-                textColor="white"
-                hasToolTip={false}
-              />
-            )}
-          </div>
-        );
-      })}
+          )}
+        </div>
+      ))}
     </div>
   );
 };
