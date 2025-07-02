@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "feat/ANT-3484_THERMAL_parameters_add_delete_row",
-  commit: "bcc2495",
-  commitTime: "2025-06-30T15:30:38.661Z"
+  branch: "fix/ANT-3499_LOAD_sort_table_lines_defaut_top_other_bottom",
+  commit: "f5462bd",
+  commitTime: "2025-07-02T15:38:27.155Z"
 };
