@@ -130,18 +130,28 @@ describe('uploadTrajectory', () => {
   });
 
   it('should import trajectory to data base', async () => {
+    // Mock the first call to upload the trajectory
     vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
       ok: true,
       json: async () => Promise.resolve(mockDbTrajectory),
     } as Response);
 
+    // Mock the second call to fetch warnings
+    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => Promise.resolve([]),
+    } as Response);
+
     await uploadTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026', 2, 'FR', onProgress);
 
     await waitFor(() => {
-      expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
+      expect(AuthService.authFetch).toHaveBeenCalledTimes(2);
       expect(AuthService.authFetch).toHaveBeenCalledWith(
         `https://mockapi.com/v1/trajectory?trajectoryType=AREA&trajectoryToUse=area_BP_23_v6&horizon=2025-2026&studyId=2`,
         requestOptions,
+      );
+      expect(AuthService.authFetch).toHaveBeenCalledWith(
+        `https://mockapi.com/v1/warnings?trajectoryId=${mockDbTrajectory.id}&studyId=2`
       );
     });
   });
@@ -176,20 +186,35 @@ describe('linkTrajectoryToStudy', () => {
   });
 
   it('should link a trajectory to a study', async () => {
+    // Mock the first call to link the trajectory
     vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
       ok: true,
       json: async () => Promise.resolve(mockDbTrajectory),
     } as Response);
 
+    // Mock the second call to fetch warnings
+    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => Promise.resolve([]),
+    } as Response);
+
     const result = await linkTrajectoryToStudy(TRAJECTORY_TYPE.AREA, 100, 2);
 
     await waitFor(() => {
-      expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
+      expect(AuthService.authFetch).toHaveBeenCalledTimes(2);
       expect(AuthService.authFetch).toHaveBeenCalledWith(
-        `https://mockapi.com/v1/trajectory/link?type=AREA&trajectoryId=100&studyId=2`,
+        `https://mockapi.com/v1/trajectory/attach?type=AREA&trajectoryId=100&studyId=2`,
         requestOptions,
       );
-      expect(result).toEqual(mockDbTrajectory);
+      expect(AuthService.authFetch).toHaveBeenCalledWith(
+        `https://mockapi.com/v1/warnings?trajectoryId=100&studyId=2`
+      );
+
+      // The result should have the messages property set to an empty array
+      expect(result).toEqual({
+        ...mockDbTrajectory,
+        messages: []
+      });
     });
   });
 
@@ -229,7 +254,7 @@ describe('unlinkTrajectoryFromStudy', () => {
     await waitFor(() => {
       expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
       expect(AuthService.authFetch).toHaveBeenCalledWith(
-        'https://mockapi.com/v1/trajectory/link?trajectoryId=100&studyId=2',
+        'https://mockapi.com/v1/trajectory/detach?trajectoryId=100&studyId=2',
         requestOptions,
       );
     });
