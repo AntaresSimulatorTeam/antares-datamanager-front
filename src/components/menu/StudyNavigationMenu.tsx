@@ -21,6 +21,8 @@ import { getStudyMenu } from '@/shared/utils/trajectoryUtils.ts';
 import { useFetchAreas } from '@/hooks/useFetchAreas.ts';
 import { getNbMessagesFromTrajectoryType } from '@/shared/services/trajectoryService.ts';
 
+type warningTrajectoryType = { [key in keyof typeof TRAJECTORY_TYPE]: number };
+
 type StudyNavigationMenuProps = {
   onRenderActiveComponent?: (content: ReactNode | null) => void;
   setActiveTab: Dispatch<SetStateAction<HypothesisTab>>;
@@ -40,7 +42,7 @@ const StudyNavigationMenu = ({
   const studyState = useStudy();
   const [tabs, setTabs] = useState<HypothesisTab[]>(getStudyMenu(t, !!studyState[`${TRAJECTORY_TYPE.AREA}`]?.[0]));
   const { areaDefault, trajectoryAreas } = useFetchAreas(studyState[`${TRAJECTORY_TYPE.AREA}`]?.[0]);
-  const [nbWarning, setNbWarning] = useState<{ [key in keyof typeof TRAJECTORY_TYPE]: number }>();
+  const [warningTrajectory, setWarningTrajectory] = useState<warningTrajectoryType>();
 
   const renderActiveComponent = (): ReactNode | null => {
     switch (activeTab.name) {
@@ -59,17 +61,13 @@ const StudyNavigationMenu = ({
     }
   };
 
-  useEffect(() => {
-    const countNbWarningMessages = async (id: number) => {
-      try {
-        const result = await getNbMessagesFromTrajectoryType(id);
-        setNbWarning(result);
-      } catch {
-        // silent handler
-      }
-    };
-    void countNbWarningMessages(studyId);
-  }, [studyId]);
+  const countWarning = (warning: warningTrajectoryType, tabName: TRAJECTORY_TYPE) => {
+    if (tabName === TRAJECTORY_TYPE.AREA) {
+      return +warning[TRAJECTORY_TYPE.AREA] + +warning[TRAJECTORY_TYPE.LINK];
+    } else {
+      return warning[tabName];
+    }
+  };
 
   useEffect(() => {
     setTabs((prev) =>
@@ -81,39 +79,52 @@ const StudyNavigationMenu = ({
   }, [studyState]);
 
   useEffect(() => {
+    const countNbWarningMessages = async (id: number) => {
+      try {
+        const result = await getNbMessagesFromTrajectoryType(id);
+        setWarningTrajectory(result);
+      } catch {
+        // silent handler
+      }
+    };
+
     if (onRenderActiveComponent) {
       if (!activeTab.isDisabled) {
         setErrorMessage('');
         onRenderActiveComponent(renderActiveComponent());
       }
     }
+    void countNbWarningMessages(studyId);
   }, [activeTab, onRenderActiveComponent]);
 
   return (
     <div className="flex space-x-4 p-4">
-      {tabs.map((tab) => (
-        <div className="flex items-center space-x-2" key={tab.name}>
-          <StdIcon name={tab.icon} />
-          <RdsTabItem
-            key={tab.name}
-            name={tab.name}
-            label={tab.label}
-            active={activeTab.name === tab.name}
-            disabled={tab.isDisabled}
-            onClick={() => setActiveTab(tab)}
-          />
-          {nbWarning && nbWarning[tab.name] != null && nbWarning[tab.name] > 0 && activeTab.name !== tab.name && (
-            <StdAvatar
-              initials={`${nbWarning[tab.name]}`}
-              size="es"
-              backgroundColor="orange"
-              fullname=""
-              textColor="white"
-              hasToolTip={false}
+      {tabs.map((tab) => {
+        const nbWarning = warningTrajectory ? countWarning(warningTrajectory, tab.name) : 0;
+        return (
+          <div className="flex items-center space-x-2" key={tab.name}>
+            <StdIcon name={tab.icon} />
+            <RdsTabItem
+              key={tab.name}
+              name={tab.name}
+              label={tab.label}
+              active={activeTab.name === tab.name}
+              disabled={tab.isDisabled}
+              onClick={() => setActiveTab(tab)}
             />
-          )}
-        </div>
-      ))}
+            {warningTrajectory && nbWarning != null && nbWarning > 0 && activeTab.name !== tab.name && (
+              <StdAvatar
+                initials={`${nbWarning}`}
+                size="es"
+                backgroundColor="orange"
+                fullname=""
+                textColor="white"
+                hasToolTip={false}
+              />
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 };
