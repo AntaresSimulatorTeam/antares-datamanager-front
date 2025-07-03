@@ -227,7 +227,7 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
           await unlinkTrajectoryFromStudy(trajectoryId, study.id);
         }
         dispatch?.({
-          type: STUDY_ACTION.EMPTY_LOAD_TRAJECTORY,
+          type: STUDY_ACTION.DELETE_LOAD_TRAJECTORY,
           payload: data[rowIndex].hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : data[rowIndex].hypothesis,
         });
         setData((prev) =>
