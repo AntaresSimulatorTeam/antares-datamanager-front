@@ -10,6 +10,7 @@ import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import {
   fetchTrajectoriesFromDB,
   fetchTrajectoriesFromFS,
+  getNbMessagesFromTrajectoryType,
   getTrajectoryDataByTypeAndId,
   linkTrajectoryToStudy,
   unlinkTrajectoryFromStudy,
@@ -283,5 +284,42 @@ describe('getTrajectoryDataByTypeAndId', () => {
     await expect(async () => getTrajectoryDataByTypeAndId(TRAJECTORY_TYPE.LINK, 5)).rejects.toThrowError(
       'Failed to fetch data trajectory',
     );
+  });
+});
+
+describe('getNbMessagesFromTrajectoryType', () => {
+  beforeEach(() => {
+    global.fetch = vi.fn();
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should fetch trajectory data', async () => {
+    const nbMessageByType = { AREA: 1, LINK: 9 };
+    const studyId = 2;
+    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => Promise.resolve(nbMessageByType),
+    } as Response);
+
+    const result = await getNbMessagesFromTrajectoryType(studyId);
+
+    await waitFor(() => {
+      expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
+      expect(AuthService.authFetch).toHaveBeenCalledWith('https://mockapi.com/v1/trajectory/count/warning/2');
+      expect(result).toEqual(nbMessageByType);
+    });
+  });
+
+  it('should throw error when data fetching failed', async () => {
+    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
+      antaresErrorMessage: 'Failed to count warning',
+      date: new Date(),
+      type: ERROR_MESSAGE_TYPE.BUSINESS,
+    });
+
+    await expect(async () => getNbMessagesFromTrajectoryType(5)).rejects.toThrowError('Failed to count warning');
   });
 });

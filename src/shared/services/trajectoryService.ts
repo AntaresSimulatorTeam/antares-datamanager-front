@@ -6,6 +6,7 @@
 
 import {
   HYPOTHESIS_LOAD_DEFAULT,
+  TRAJECTORY_COUNT_WARNING_ENDPOINT,
   TRAJECTORY_DATA_BASE_ENDPOINT,
   TRAJECTORY_DATA_FILE_ENDPOINT,
   TRAJECTORY_ENDPOINT,
@@ -183,6 +184,22 @@ export const getDefaultLoadHypothesis = async (): Promise<{ name: string }[]> =>
   try {
     const response = await AuthService.authFetch(HYPOTHESIS_LOAD_DEFAULT);
     return (await (response as Response).json()) as { name: string }[];
+  } catch (error) {
+    throw new Error((error as BackendError).antaresErrorMessage);
+  }
+};
+
+/**
+ * Count the number of warning messages per trajectory type for a study
+ * @param {number} id - Study id
+ */
+
+export const getNbMessagesFromTrajectoryType = async (
+  id: number,
+): Promise<{ [key in keyof typeof TRAJECTORY_TYPE]: number }> => {
+  try {
+    const response = await AuthService.authFetch(`${TRAJECTORY_COUNT_WARNING_ENDPOINT}/${id}`);
+    return (await (response as Response).json()) as { [key in keyof typeof TRAJECTORY_TYPE]: number };
   } catch (error) {
     throw new Error((error as BackendError).antaresErrorMessage);
   }

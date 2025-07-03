@@ -103,6 +103,7 @@ const StudyDetails = () => {
               setActiveTab={setActiveTab}
               activeTab={activeTab}
               setErrorMessage={setErrorMessage}
+              studyId={study.id}
             />
           </div>
         </div>

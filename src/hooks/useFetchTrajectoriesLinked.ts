@@ -26,7 +26,7 @@ export const useFetchTrajectoriesLinked = (studyId?: number, trajectoryType?: TR
             payload: trajectoryLinkedToStudy,
           });
           setTrajectoryLinked(trajectoryLinkedToStudy);
-          setEmptyAreas(removeDuplicate(trajectoryLinked.concat(emptyAreaSelected)));
+          setEmptyAreas(removeDuplicate(trajectoryLinkedToStudy.concat(emptyAreaSelected)));
         }
       } catch {
         // Silent handler
