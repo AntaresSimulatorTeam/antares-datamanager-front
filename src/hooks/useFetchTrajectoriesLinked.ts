@@ -6,7 +6,7 @@ import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { removeDuplicate } from '@/shared/utils/trajectoryUtils.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 
-export const useFetchTrajectoriesLinked = (studyId?: number, trajectoryType?: TRAJECTORY_TYPE) => {
+export const useFetchTrajectoriesLinked = (studyId?: number, trajectoryType?: TRAJECTORY_TYPE, refreshTrigger?: number) => {
   const [trajectoryLinked, setTrajectoryLinked] = useState<DbTrajectory[]>([]);
   const [emptyAreas, setEmptyAreas] = useState<DbTrajectory[]>([]);
   const studyState = useStudy();
@@ -37,7 +37,7 @@ export const useFetchTrajectoriesLinked = (studyId?: number, trajectoryType?: TR
 
   useEffect(() => {
     void fetchAreas(studyId, trajectoryType);
-  }, [studyId, trajectoryType]);
+  }, [studyId, trajectoryType, refreshTrigger]);
 
   return { trajectoryLinked, emptyAreas };
 };

@@ -80,7 +80,8 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
   const [isStudyGenerated, setIsStudyGenerated] = useState(
     studyState.studyStatus === StudyStatus.GENERATED || study.status === StudyStatus.GENERATED,
   );
-  const { trajectoryLinked, emptyAreas } = useFetchTrajectoriesLinked(study?.id, TRAJECTORY_TYPE.LOAD);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const { trajectoryLinked, emptyAreas } = useFetchTrajectoriesLinked(study?.id, TRAJECTORY_TYPE.LOAD, refreshTrigger);
 
   useEffect(() => {
     const fetchHypothesis = () => {
@@ -273,6 +274,9 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
               : item,
           ),
         );
+
+        // Refresh warnings by triggering a re-fetch of trajectories
+        setRefreshTrigger(prev => prev + 1);
       }
       if (rowIndex != null && status === 'error' && trajectoryId != null && trajectoryLabel && !!errorMessage) {
         handleTrajectoryError(rowIndex, trajectoryId, trajectoryLabel, errorMessage);
