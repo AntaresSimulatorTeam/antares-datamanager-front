@@ -6,6 +6,7 @@ import { WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { ThermalOptions } from '@/mocks/data/list/names.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
+import { Dispatch, SetStateAction } from 'react';
 
 export const getStatus = (status: RowStatus) => {
   switch (status) {
@@ -218,3 +219,12 @@ export const getStudyMenu = (t: (value: string) => string, isTrajectoryAreaLinke
   { name: TRAJECTORY_TYPE.ENR, label: t('studyDetails.@enr'), icon: StdIconId.EnergySavingsLeaf, isDisabled: true },
   { name: TRAJECTORY_TYPE.MISC, label: t('studyDetails.@misc'), icon: StdIconId.Category, isDisabled: true },
 ];
+
+export const setReadOnlyForGeneratedStudy = (
+  rows: HypothesisRowData[],
+  setReadOnly: Dispatch<SetStateAction<ReadOnlyObject>>,
+) => {
+  const areaWithoutTrajectory = rows.map((row) => (row.trajectory == null ? row.hypothesis : null));
+  const readOnlyRows = retrieveReadOnlyArea(rows, areaWithoutTrajectory.filter(Boolean) as string[]);
+  setReadOnly(readOnlyRows);
+};

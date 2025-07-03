@@ -32,12 +32,13 @@ import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import getEditableHypothesisTableHeaders from '@/components/header/EditableHypothesisTableHeaders.tsx';
-import { sortKeepLastName } from '@/shared/utils/sortUtils.tsx';
+import { sortWithFixedPosition } from '@/shared/utils/sortUtils.tsx';
 import {
   buildEmptyTrajectory,
   buildErrorTrajectory,
   buildRowData,
   retrieveReadOnlyArea,
+  setReadOnlyForGeneratedStudy,
 } from '@/shared/utils/trajectoryUtils.ts';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
@@ -80,12 +81,6 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
     studyState.studyStatus === StudyStatus.GENERATED || study.status === StudyStatus.GENERATED,
   );
   const { trajectoryLinked, emptyAreas } = useFetchTrajectoriesLinked(study?.id, TRAJECTORY_TYPE.LOAD);
-
-  const setReadOnlyForGeneratedStudy = (rows: HypothesisRowData[]) => {
-    const areaWithoutTrajectory = rows.map((row) => (row.trajectory == null ? row.hypothesis : null));
-    const readOnlyRows = retrieveReadOnlyArea(rows, areaWithoutTrajectory.filter(Boolean) as string[]);
-    setReadOnly(readOnlyRows);
-  };
 
   useEffect(() => {
     const fetchHypothesis = () => {
@@ -135,13 +130,11 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
             .filter(Boolean) as HypothesisRowData[];
 
           const dataTrajectories =
-            areaData.length > 0
-              ? sortKeepLastName(areaDataDefault.concat(areaData), OTHER_AREAS_LABEL)
-              : areaDataDefault;
+            areaData.length > 0 ? sortWithFixedPosition(areaDataDefault.concat(areaData)) : areaDataDefault;
           setData(dataTrajectories);
 
           if (isStudyGenerated) {
-            setReadOnlyForGeneratedStudy(dataTrajectories);
+            setReadOnlyForGeneratedStudy(dataTrajectories, setReadOnly);
           } else if (defaultAreaListNotIncludedInList.length > 0 && !isStudyGenerated) {
             const readOnlyRows = retrieveReadOnlyArea(dataTrajectories, defaultAreaListNotIncludedInList);
             setReadOnly(readOnlyRows);
@@ -169,7 +162,7 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
   useEffect(() => {
     if (studyState.studyStatus === StudyStatus.GENERATED || study?.status === StudyStatus.GENERATED) {
       setIsStudyGenerated(true);
-      setReadOnlyForGeneratedStudy(data);
+      setReadOnlyForGeneratedStudy(data, setReadOnly);
     }
   }, [studyState.studyStatus, study?.status]);
 
@@ -362,18 +355,15 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
       type: STUDY_ACTION.ADD_TRAJECTORY_LOAD,
       payload: buildEmptyTrajectory(name, TRAJECTORY_TYPE.LOAD),
     });
-    const newDataSorted = sortKeepLastName(
-      [
-        {
-          hypothesis: name,
-          trajectory: null,
-          status: TRAJECTORY_SELECTION_STATUS.MISSING,
-          isDefault: false,
-        },
-        ...data,
-      ],
-      OTHER_AREAS_LABEL,
-    );
+    const newDataSorted = sortWithFixedPosition([
+      {
+        hypothesis: name,
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+        isDefault: false,
+      },
+      ...data,
+    ]);
 
     setData(newDataSorted);
     if (readOnlyAreas.length > 0) {

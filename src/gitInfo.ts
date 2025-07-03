@@ -1,5 +1,7 @@
 export const GIT_INFO = {
-  branch: "fix/ANT-3498_bis",
-  commit: "deaa997",
-  commitTime: "2025-07-03T12:13:32.405Z"
+
+  branch: "fix/ANT-3499_LOAD_sort_table_lines_defaut_top_other_bottom",
+  commit: "f5462bd",
+  commitTime: "2025-07-02T15:38:27.155Z"
+
 };
