@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "feat/ANT-3484_THERMAL_parameters_add_delete_row",
-  commit: "bcc2495",
-  commitTime: "2025-06-30T15:30:38.661Z"
+  branch: "fix/ANT-3498_refresh_should_keep_active_state_for_tab",
+  commit: "18e1167",
+  commitTime: "2025-07-02T15:44:56.923Z"
 };
