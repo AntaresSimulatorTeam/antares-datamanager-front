@@ -63,7 +63,7 @@ export const getMessagesNb = (studyState: Partial<StudyState>, tabName: TRAJECTO
       ((studyState?.[`${TRAJECTORY_TYPE.LINK}`]?.[0] as DbTrajectory)?.messages?.length ?? 0);
   } else if (studyState?.[`${tabName}`]) {
     warmingMessagesNb =
-      (studyState?.[`${tabName}`] as DbTrajectory[])?.reduce((acc, prev) => acc + prev.messages?.length, 0) ?? 0;
+      (studyState?.[`${tabName}`] as DbTrajectory[])?.reduce((acc, prev) => acc + (prev.messages?.length || 0), 0) ?? 0;
   }
   return warmingMessagesNb;
 };
