@@ -28,7 +28,7 @@ import {
 import { convertToFSSelectionOptionType, convertToSelectionOptionType } from '@/shared/utils/formFormatter.ts';
 import SearchBar from '@/pages/pegase/home/components/SearchBar.tsx';
 import { FileInputStatus, RdsCheckbox, RdsCheckboxGroupWrapper, RdsDivider } from 'rte-design-system-react';
-import { getStudyTrajectories } from '@/shared/services/studyService.ts';
+import { getStudyTrajectoriesWithWarnings } from '@/shared/services/studyService.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import getEditableHypothesisTableHeaders from '@/components/header/EditableHypothesisTableHeaders.tsx';
@@ -80,8 +80,7 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
   const [isStudyGenerated, setIsStudyGenerated] = useState(
     studyState.studyStatus === StudyStatus.GENERATED || study.status === StudyStatus.GENERATED,
   );
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const { trajectoryLinked, emptyAreas } = useFetchTrajectoriesLinked(study?.id, TRAJECTORY_TYPE.LOAD, refreshTrigger);
+  const { trajectoryLinked, emptyAreas } = useFetchTrajectoriesLinked(study?.id, TRAJECTORY_TYPE.LOAD);
 
   useEffect(() => {
     const fetchHypothesis = () => {
@@ -244,7 +243,7 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
         );
       } else if (status === 'success') {
         await linkTrajectoryToStudy(TRAJECTORY_TYPE.LOAD, trajectoryId, study.id);
-        const newTrajectories = await getStudyTrajectories(study.id, TRAJECTORY_TYPE.LOAD);
+        const newTrajectories = await getStudyTrajectoriesWithWarnings(study.id, TRAJECTORY_TYPE.LOAD);
         const newTrajectory = newTrajectories?.find((trajectory) => {
           if (data[rowIndex].hypothesis === OTHER_AREAS_LABEL) {
             return trajectory.loadArea === OTHER_AREAS;
@@ -274,9 +273,6 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
               : item,
           ),
         );
-
-        // Refresh warnings by triggering a re-fetch of trajectories
-        setRefreshTrigger(prev => prev + 1);
       }
       if (rowIndex != null && status === 'error' && trajectoryId != null && trajectoryLabel && !!errorMessage) {
         handleTrajectoryError(rowIndex, trajectoryId, trajectoryLabel, errorMessage);

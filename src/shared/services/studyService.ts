@@ -11,6 +11,7 @@ import { notifyToast } from '@/shared/notification/notification.tsx';
 import { AuthService } from '@/shared/services/authService.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { BackendError } from '../utils/errrorHandler';
+import { fetchWarningMessages } from '@/shared/services/warningService.ts';
 
 /**
  * Retrieve a list of studies from a term
@@ -156,21 +157,45 @@ export const createStudy = async (id: number): Promise<void> => {
  * @param {number} studyId - Study id
  * @param {TRAJECTORY_TYPE} trajectoryType - Trajectory type
  *
- * @return {Promise<DbTrajectory[]>} Array of trajectories (data base trajectories)
+ * @return {Promise<Omit<DbTrajectory,'messages'>[]>} Array of trajectories (data base trajectories)
  */
 
 export const getStudyTrajectories = async (
   studyId: number,
   trajectoryType?: TRAJECTORY_TYPE,
-): Promise<DbTrajectory[]> => {
+): Promise<Omit<DbTrajectory, 'messages'>[]> => {
   const urlApi = `${TRAJECTORY_ENDPOINT}?studyId=${studyId}&trajectoryType=${trajectoryType ?? ''}`;
 
   try {
     const response = await AuthService.authFetch(urlApi);
 
-    return (await (response as Response).json()) as DbTrajectory[];
+    return (await (response as Response).json()) as Omit<DbTrajectory, 'messages'>[];
   } catch (error) {
     throw new Error((error as BackendError).antaresErrorMessage);
+  }
+};
+
+/**
+ * Fetch warning messages for each trajectory linked to a study
+ * @param {number} studyId - Study id
+ * @param {TRAJECTORY_TYPE} trajectoryType - Trajectory type
+ *
+ * @return {Promise<DbTrajectory[]>} Array of trajectories (data base trajectories)
+ */
+export const getStudyTrajectoriesWithWarnings = async (
+  studyId: number,
+  trajectoryType?: TRAJECTORY_TYPE,
+): Promise<DbTrajectory[]> => {
+  try {
+    const trajectories = await getStudyTrajectories(studyId, trajectoryType);
+
+    const warningPromises = trajectories.map(async (trajectory) => ({
+      ...trajectory,
+      messages: (await fetchWarningMessages(trajectory.id, studyId)) || [],
+    }));
+    return await Promise.all(warningPromises);
+  } catch (error) {
+    throw new Error((error as Error).message);
   }
 };
 
@@ -201,7 +226,6 @@ export const getStudyById = async (studyId: number): Promise<StudyDTO> => {
 export const duplicateStudy = async (
   studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate' | 'projectId'>,
 ): Promise<void> => {
-
   await AuthService.authFetch(`${STUDY_ENDPOINT}/duplicate`, {
     method: 'POST',
     headers: {

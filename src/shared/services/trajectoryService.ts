@@ -11,9 +11,10 @@ import {
   TRAJECTORY_DATA_FILE_ENDPOINT,
   TRAJECTORY_ENDPOINT,
   TRAJECTORY_FILE_SYSTEM_ENDPOINT,
-  TRAJECTORY_LINK_TO_STUDY_ENDPOINT, TRAJECTORY_UNLINK_TO_STUDY_ENDPOINT, WARNING_MESSAGES,
+  TRAJECTORY_LINK_TO_STUDY_ENDPOINT,
+  TRAJECTORY_UNLINK_TO_STUDY_ENDPOINT,
 } from '@/shared/const/apiEndPoint.ts';
-import { DbTrajectory, FsTrajectory, TRAJECTORY_DATA_TYPE, Types, WarningMessage } from '@/shared/types';
+import { DbTrajectory, FsTrajectory, TRAJECTORY_DATA_TYPE, Types } from '@/shared/types';
 import { AuthService } from '@/shared/services/authService.ts';
 import { fetchWithProgress } from '@/shared/services/progressService.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
@@ -104,20 +105,7 @@ export const uploadTrajectory = async (
       onProgress,
     );
 
-    const trajectoryData = await response.json() as DbTrajectory;
-
-    try {
-      // Fetch warnings separately
-      const warningsUrl = `${WARNING_MESSAGES}?trajectoryId=${trajectoryData.id}&studyId=${studyId}`;
-      const warningsResponse = await AuthService.authFetch(warningsUrl);
-      const warnings = await (warningsResponse as Response).json() as WarningMessage[];
-
-      trajectoryData.messages = warnings;
-    } catch (warningError) {
-      trajectoryData.messages = [];
-    }
-
-    return trajectoryData;
+    return (await response.json()) as DbTrajectory;
   } catch (error) {
     throw new Error((error as Error)?.message ?? '');
   }
@@ -146,24 +134,11 @@ export const linkTrajectoryToStudy = async (
       },
     });
 
-    const trajectoryData = await (response as Response).json() as unknown as DbTrajectory;
-
-    try {
-      const warningsUrl = `${WARNING_MESSAGES}?trajectoryId=${trajectoryId}&studyId=${studyId}`;
-      const warningsResponse = await AuthService.authFetch(warningsUrl);
-      const warnings = await (warningsResponse as Response).json() as unknown as WarningMessage[];
-
-      trajectoryData.messages = warnings;
-    } catch (warningError) {
-      trajectoryData.messages = trajectoryData.messages || [];
-    }
-
-    return trajectoryData;
+    return (await (response as Response).json()) as unknown as DbTrajectory;
   } catch (error) {
     throw new Error((error as BackendError)?.antaresErrorMessage);
   }
 };
-
 
 /**
  * Delete a link between a trajectory and a study

@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { vi } from 'vitest';
+import { expect, Mock, vi } from 'vitest';
 import { waitFor } from '@testing-library/react';
 import {
   createStudy,
@@ -12,14 +12,20 @@ import {
   fetchSearchStudies,
   fetchSuggestedKeywords,
   getStudyTrajectories,
+  getStudyTrajectoriesWithWarnings,
   saveStudy,
 } from '@/shared/services/studyService.ts';
 import { notifyToast } from '@/shared/notification/notification.tsx';
 import { mockStudy, mockStudyResponse } from '@/shared/services/test/mocks/studyMock.tsx';
-import { mockDbTrajectoryArray } from '@/shared/services/test/mocks/trajectoryMock.tsx';
+import {
+  mockDbTrajectoryArray,
+  mockTrajectoryWithWarnings,
+  mockWarningMessagesWithTwo,
+} from '@/shared/services/test/mocks/trajectoryMock.tsx';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
 import { AuthService } from '@/shared/services/authService.ts';
+import * as warningService from '@/shared/services/warningService.ts';
 
 vi.mock('@/shared/notification/notification');
 vi.mock('@/envVariables', () => ({
@@ -27,20 +33,24 @@ vi.mock('@/envVariables', () => ({
 }));
 vi.mock('@/shared/services/authService');
 
-describe('fetchSearchStudies', () => {
-  beforeEach(() => {
-    global.fetch = vi.fn();
-  });
+vi.mock('@/shared/services/warningService', async (importOriginal) => {
+  const actual: Mock = await importOriginal();
+  return {
+    ...actual,
+    fetchWarningMessages: vi.fn(),
+  };
+});
 
+describe('fetchSearchStudies', () => {
   afterEach(() => {
-    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('should fetch study list', async () => {
-    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
       ok: true,
       json: async () => Promise.resolve(mockStudyResponse),
-    } as Response);
+    });
 
     const result = await fetchSearchStudies('test', '124', 3, 10, { column: 'asc' });
 
@@ -54,14 +64,10 @@ describe('fetchSearchStudies', () => {
   });
 
   it('should handle fetch failure gracefully', async () => {
-    global.fetch = vi.fn().mockResolvedValueOnce({
-      ok: false,
-      json: async () =>
-        Promise.resolve({
-          antaresErrorMessage: 'Failed to fetch user studies',
-          date: new Date(),
-          type: ERROR_MESSAGE_TYPE.BUSINESS,
-        }),
+    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
+      antaresErrorMessage: 'Failed to fetch user studies',
+      date: new Date(),
+      type: ERROR_MESSAGE_TYPE.BUSINESS,
     });
 
     await expect(async () => fetchSearchStudies('test', '124', 3, 10, { column: 'asc' })).rejects.toThrowError(
@@ -71,20 +77,16 @@ describe('fetchSearchStudies', () => {
 });
 
 describe('fetchSuggestedKeywords', () => {
-  beforeEach(() => {
-    global.fetch = vi.fn();
-  });
-
   afterEach(() => {
-    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('should return suggested keywords', async () => {
     const mockResponse = ['keyword1', 'keyword2', 'keyword3'];
-    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
       ok: true,
       json: async () => Promise.resolve(mockResponse),
-    } as Response);
+    });
 
     const result = await fetchSuggestedKeywords('test');
 
@@ -94,10 +96,10 @@ describe('fetchSuggestedKeywords', () => {
   });
 
   it('should handle fetch failure gracefully', async () => {
-    // Failed fetch response moc
-    global.fetch = vi.fn().mockResolvedValueOnce({
-      ok: false,
-      json: () => Promise.resolve('Failed to fetch suggested keywords'),
+    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
+      antaresErrorMessage: 'Failed to fetch suggested keywords',
+      date: new Date(),
+      type: ERROR_MESSAGE_TYPE.BUSINESS,
     });
 
     await expect(async () => fetchSuggestedKeywords('test')).rejects.toThrowError('Failed to fetch suggested keywords');
@@ -105,19 +107,15 @@ describe('fetchSuggestedKeywords', () => {
 });
 
 describe('saveStudy', () => {
-  beforeEach(() => {
-    global.fetch = vi.fn();
-  });
-
   afterEach(() => {
-    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('should create a study', async () => {
-    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
       ok: true,
       json: async () => Promise.resolve(),
-    } as Response);
+    });
 
     await saveStudy(mockStudy);
 
@@ -152,20 +150,15 @@ describe('saveStudy', () => {
 });
 
 describe('deleteStudy', () => {
-  beforeEach(() => {
-    global.fetch = vi.fn();
-    vi.clearAllMocks();
-  });
-
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
   it('should delete a study', async () => {
-    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
       ok: true,
       json: async () => Promise.resolve(),
-    } as Response);
+    });
 
     await deleteStudy(5);
 
@@ -195,12 +188,78 @@ describe('deleteStudy', () => {
   });
 });
 
-describe('getStudyTrajectories', () => {
-  beforeEach(() => {
-    global.fetch = vi.fn();
-    vi.clearAllMocks();
+describe('getStudyTrajectoriesWithWarnings', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
+  it('should retrieve trajectories from study id and trajectory type', async () => {
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
+      ok: true,
+      json: async () => Promise.resolve(mockDbTrajectoryArray),
+    });
+    vi.mocked(warningService.fetchWarningMessages).mockResolvedValue(mockWarningMessagesWithTwo);
+
+    const results = await getStudyTrajectoriesWithWarnings(1, TRAJECTORY_TYPE.AREA);
+
+    await waitFor(() => {
+      expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
+      expect(AuthService.authFetch).toHaveBeenCalledWith(
+        `https://mockapi.com/v1/trajectory?studyId=1&trajectoryType=AREA`,
+      );
+      expect(warningService.fetchWarningMessages).toHaveBeenCalledTimes(mockDbTrajectoryArray.length);
+      expect(warningService.fetchWarningMessages).toHaveBeenCalledWith(1, 1);
+      expect(warningService.fetchWarningMessages).toHaveBeenLastCalledWith(2, 1);
+      expect(results).toEqual(mockTrajectoryWithWarnings);
+    });
+  });
+
+  it('should handle fetch failure gracefully', async () => {
+    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
+      antaresErrorMessage: 'Failed to fetch trajectories',
+      date: new Date(),
+      type: ERROR_MESSAGE_TYPE.BUSINESS,
+    });
+
+    await expect(async () => getStudyTrajectoriesWithWarnings(1, TRAJECTORY_TYPE.AREA)).rejects.toThrow(
+      'Failed to fetch trajectories',
+    );
+  });
+});
+
+describe('createStudy', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('should generate a study', async () => {
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
+      ok: true,
+    });
+
+    await createStudy(5);
+
+    expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
+    expect(AuthService.authFetch).toHaveBeenCalledWith('https://mockapi.com/v1/study/generate?id=5', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  });
+
+  it('should throw an error message', async () => {
+    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
+      antaresErrorMessage: 'Failed to generate a study',
+      date: new Date(),
+      type: ERROR_MESSAGE_TYPE.BUSINESS,
+    });
+
+    await expect(async () => createStudy(1)).rejects.toThrowError('Failed to generate a study');
+  });
+});
+
+describe('getStudyTrajectories', () => {
   afterEach(() => {
     vi.restoreAllMocks();
   });
@@ -231,42 +290,5 @@ describe('getStudyTrajectories', () => {
     await expect(async () => getStudyTrajectories(1, TRAJECTORY_TYPE.AREA)).rejects.toThrowError(
       'Failed to fetch trajectories',
     );
-  });
-});
-
-describe('createStudy', () => {
-  beforeEach(() => {
-    global.fetch = vi.fn();
-    vi.clearAllMocks();
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
-  it('should generate a study', async () => {
-    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
-      ok: true,
-    } as Response);
-
-    await createStudy(5);
-
-    expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
-    expect(AuthService.authFetch).toHaveBeenCalledWith('https://mockapi.com/v1/study/generate?id=5', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-  });
-
-  it('should throw an error message', async () => {
-    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
-      antaresErrorMessage: 'Failed to generate a study',
-      date: new Date(),
-      type: ERROR_MESSAGE_TYPE.BUSINESS,
-    });
-
-    await expect(async () => createStudy(1)).rejects.toThrowError('Failed to generate a study');
   });
 });

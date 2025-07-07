@@ -35,10 +35,10 @@ describe('pinProject', () => {
   });
 
   it('should successfully pin a project and call notifyToast with success', async () => {
-    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
       ok: true,
       json: async () => Promise.resolve(mockResponse),
-    } as Response);
+    });
 
     const response = await pinProject(projectId, userId);
 
@@ -78,10 +78,10 @@ describe('fetchPinnedProjects', () => {
   });
 
   it('should fetch pinned project list', async () => {
-    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
       ok: true,
       json: async () => Promise.resolve(mockResponseArray),
-    } as Response);
+    });
 
     const result = await fetchPinnedProjects(userId);
 
@@ -113,9 +113,9 @@ describe('unpinProject', () => {
   });
 
   it('should unpin project from pinned project list', async () => {
-    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
       ok: true,
-    } as Response);
+    });
 
     await unpinProject(projectId, userId);
 

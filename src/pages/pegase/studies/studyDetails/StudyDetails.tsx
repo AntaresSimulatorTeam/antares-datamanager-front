@@ -20,7 +20,7 @@ import { DetailsContent } from '@/components/banner/DetailsContent.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { ContainerWithExpander } from '@/components/banner/ContainerWithExpander.tsx';
-import { discardWarningMessage, fetchWarningMessages } from '@/shared/services/warningService.ts';
+import { discardWarningMessage } from '@/shared/services/warningService.ts';
 
 interface StudyState {
   study: StudyDTO;
@@ -45,89 +45,38 @@ const StudyDetails = () => {
   const [errorMessage, setErrorMessage] = useState<string>('');
 
   useEffect(() => {
-    const fetchWarningsForTrajectories = async () => {
-      try {
-        let messages: WarningMessage[] = [];
-        const trajectories: DbTrajectory[] | null = studyState?.[activeTab?.name as keyof typeof TRAJECTORY_TYPE] ?? null;
-        const studyId = study?.id;
-
-        if (!studyId) {
-          setMessagesWarning([]);
-          return;
-        }
-
-        // Fetch warnings for standard trajectories
-        if (trajectories && Array.isArray(trajectories) && trajectories.length > 0) {
-          const warningPromises = trajectories.map(async (trajectory) => {
-            if (!trajectory) return [];
-
-            // Try to use existing messages if available (for backward compatibility)
-            if (trajectory.messages && Array.isArray(trajectory.messages) && trajectory.messages.length > 0) {
-              return trajectory.messages.map((message) => ({
-                ...message,
-                trajectoryId: trajectory.id,
-                trajectoryType: activeTab?.name ?? '',
-                trajectory: trajectory.trajectoryName ?? '',
-                onClickItem: studyState?.studyStatus !== StudyStatus.GENERATED ? discardWarningMessage : null,
-              }));
-            }
-
-            // Fetch warnings from the new API endpoint
-            const warnings = await fetchWarningMessages(trajectory.id, studyId);
-            return warnings.map((message) => ({
+    let messages: WarningMessage[] = [];
+    const trajectories: DbTrajectory[] | null = studyState[activeTab.name as keyof typeof TRAJECTORY_TYPE] ?? null;
+    if (trajectories && trajectories.length > 0) {
+      messages = trajectories.flatMap((trajectory) =>
+        trajectory.messages
+          ? trajectory.messages?.map((message) => ({
               ...message,
               trajectoryId: trajectory.id,
-              trajectoryType: activeTab?.name ?? '',
-              trajectory: trajectory.trajectoryName ?? '',
-              onClickItem: studyState?.studyStatus !== StudyStatus.GENERATED ? discardWarningMessage : null,
-            }));
-          });
-
-          const warningResults = await Promise.all(warningPromises);
-          messages = warningResults.flat();
-        }
-
-        // Special handling for LINK trajectories in AREA tab
-        if (activeTab?.name === TRAJECTORY_TYPE.AREA &&
-          studyState?.LINK &&
-          Array.isArray(studyState.LINK) &&
-          studyState.LINK[0]) {
-          const linkTrajectory = studyState.LINK[0];
-
-          // Try to use existing messages if available (for backward compatibility)
-          if (linkTrajectory.messages && Array.isArray(linkTrajectory.messages) && linkTrajectory.messages.length > 0) {
-            const linkMessages = linkTrajectory.messages.map((message) => ({
-              ...message,
-              trajectoryId: linkTrajectory.id,
-              trajectoryType: TRAJECTORY_TYPE.LINK,
-              trajectory: linkTrajectory.trajectoryName ?? '',
-              onClickItem: studyState?.studyStatus !== StudyStatus.GENERATED ? discardWarningMessage : null,
-            }));
-
-            messages = messages.concat(linkMessages);
-          } else {
-            // Fetch warnings from the new API endpoint
-            const linkWarnings = await fetchWarningMessages(linkTrajectory.id, studyId);
-            const linkMessages = linkWarnings.map((message) => ({
-              ...message,
-              trajectoryId: linkTrajectory.id,
-              trajectoryType: TRAJECTORY_TYPE.LINK,
-              trajectory: linkTrajectory.trajectoryName ?? '',
-              onClickItem: studyState?.studyStatus !== StudyStatus.GENERATED ? discardWarningMessage : null,
-            }));
-
-            messages = messages.concat(linkMessages);
-          }
-        }
-
-        setMessagesWarning(messages.sort((a, b) => Number(a.isAck) - Number(b.isAck)));
-      } catch (error) {
-        setMessagesWarning([]);
+              trajectoryType: activeTab.name,
+              trajectory: trajectory.trajectoryName,
+              onClickItem: studyState.studyStatus !== StudyStatus.GENERATED ? discardWarningMessage : null,
+            }))
+          : [],
+      );
+    }
+    if (activeTab.name === TRAJECTORY_TYPE.AREA) {
+      const stateLinkedMessages = (studyState?.LINK && studyState.LINK[0].messages) || [];
+      if (stateLinkedMessages.length > 0) {
+        const linkMessage = stateLinkedMessages.map((message) => ({
+          ...message,
+          trajectoryId: studyState?.LINK?.[0].id,
+          trajectoryType: TRAJECTORY_TYPE.LINK,
+          trajectory: (studyState.LINK?.[0] as DbTrajectory)?.trajectoryName ?? '',
+          onClickItem: studyState.studyStatus !== StudyStatus.GENERATED ? discardWarningMessage : null,
+        }));
+        messages = messages.length > 0 && linkMessage?.length > 0 ? messages.concat(linkMessage) : linkMessage;
       }
-    };
-
-    void fetchWarningsForTrajectories();
-  }, [activeTab, studyState, study?.id]);
+    }
+    if (messages) {
+      setMessagesWarning(messages?.sort((a, b) => Number(a.isAck) - Number(b.isAck)));
+    }
+  }, [activeTab, studyState]);
 
   const handleGenerateStudy = async () => {
     try {
