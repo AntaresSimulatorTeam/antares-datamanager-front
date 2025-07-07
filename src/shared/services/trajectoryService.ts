@@ -12,6 +12,7 @@ import {
   TRAJECTORY_ENDPOINT,
   TRAJECTORY_FILE_SYSTEM_ENDPOINT,
   TRAJECTORY_LINK_TO_STUDY_ENDPOINT,
+  TRAJECTORY_UNLINK_TO_STUDY_ENDPOINT,
 } from '@/shared/const/apiEndPoint.ts';
 import { DbTrajectory, FsTrajectory, TRAJECTORY_DATA_TYPE, Types } from '@/shared/types';
 import { AuthService } from '@/shared/services/authService.ts';
@@ -133,7 +134,7 @@ export const linkTrajectoryToStudy = async (
       },
     });
 
-    return (await (response as Response).json()) as DbTrajectory;
+    return (await (response as Response).json()) as unknown as DbTrajectory;
   } catch (error) {
     throw new Error((error as BackendError)?.antaresErrorMessage);
   }
@@ -146,7 +147,7 @@ export const linkTrajectoryToStudy = async (
  * @param {number} studyId - Study id
  */
 export const unlinkTrajectoryFromStudy = async (trajectoryId: number, studyId: number): Promise<void> => {
-  const urlApi = `${TRAJECTORY_LINK_TO_STUDY_ENDPOINT}?trajectoryId=${trajectoryId}&studyId=${studyId}`;
+  const urlApi = `${TRAJECTORY_UNLINK_TO_STUDY_ENDPOINT}?trajectoryId=${trajectoryId}&studyId=${studyId}`;
   try {
     await AuthService.authFetch(urlApi, {
       method: 'DELETE',

@@ -45,9 +45,9 @@ describe('deleteProjectById', () => {
   });
 
   it('should delete a pinned project from pinned project list', async () => {
-    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
       ok: true,
-    } as Response);
+    });
 
     await deleteProjectById(projectId);
 
@@ -71,19 +71,15 @@ describe('deleteProjectById', () => {
 });
 
 describe('fetchProjectDetails', () => {
-  beforeEach(() => {
-    global.fetch = vi.fn();
-  });
-
   afterEach(() => {
     vi.clearAllMocks();
   });
 
   it('should fetch project details', async () => {
-    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
       ok: true,
       json: async () => Promise.resolve(mockProjectInfo),
-    } as Response);
+    });
 
     const result = await fetchProjectDetails(projectId);
 
@@ -120,10 +116,10 @@ describe('fetchProjectsFromPartialName', () => {
   });
 
   it('should search projects by partial name', async () => {
-    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
       ok: true,
       json: async () => Promise.resolve(mockProjectInfoArray),
-    } as Response);
+    });
 
     const result = await fetchProjectsFromPartialName('name');
 
@@ -162,10 +158,10 @@ describe('fetchProjectFromSearchTerm', () => {
   });
 
   it('should search projects by search term', async () => {
-    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
       ok: true,
       json: async () => Promise.resolve(mockProjectInfoArray),
-    } as Response);
+    });
 
     const result = await fetchProjectFromSearchTerm(3, 10, 'searchTerm');
 
@@ -207,10 +203,10 @@ describe('createProject', () => {
   });
 
   it('should create de project', async () => {
-    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
       ok: true,
       json: async () => Promise.resolve(mockProjectCreation),
-    } as Response);
+    });
 
     const result = await createProject(projectData);
 

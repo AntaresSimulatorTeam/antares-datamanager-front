@@ -1,6 +1,6 @@
-import { WARNING_MESSAGE_SKIP } from '@/shared/const/apiEndPoint.ts';
+import { WARNING_MESSAGES } from '@/shared/const/apiEndPoint.ts';
 import { AuthService } from '@/shared/services/authService.ts';
-import { StudyActionType } from '@/shared/types';
+import { StudyActionType, WarningMessage } from '@/shared/types';
 import { Dispatch } from 'react';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
@@ -12,7 +12,7 @@ import { BackendError } from '@/shared/utils/errrorHandler.ts';
  * @return {Promise<void>}
  */
 export const skipMessage = async (id: number): Promise<void> => {
-  const urlApi = `${WARNING_MESSAGE_SKIP}/${id}/ack`;
+  const urlApi = `${WARNING_MESSAGES}/${id}/ack`;
   const response = await AuthService.authFetch(urlApi, {
     method: 'PUT',
     headers: {
@@ -43,5 +43,24 @@ export const discardWarningMessage = async (
     dispatch?.({ type: STUDY_ACTION.SKIP_MESSAGE, payload: { id, trajectoryType, trajectoryId } });
   } catch {
     // Silent handler
+  }
+};
+
+/**
+ * Fetch warning messages for a trajectory
+ * @param {number} trajectoryId - Trajectory id
+ * @param {number} studyId - Study id
+ * @return {Promise<WarningMessage[]>} - Promise object that represents a list of warning messages
+ */
+export const fetchWarningMessages = async (
+  trajectoryId: number,
+  studyId: number,
+): Promise<WarningMessage[]> => {
+  try {
+    const warningsUrl = `${WARNING_MESSAGES}?trajectoryId=${trajectoryId}&studyId=${studyId}`;
+    const warningsResponse = await AuthService.authFetch(warningsUrl);
+    return (await (warningsResponse as Response).json()) as WarningMessage[];
+  } catch (error) {
+    return [];
   }
 };

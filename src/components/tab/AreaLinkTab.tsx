@@ -36,7 +36,7 @@ import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { buildErrorTrajectory, getStatus } from '@/shared/utils/trajectoryUtils.ts';
-import { getStudyById, getStudyTrajectories } from '@/shared/services/studyService.ts';
+import { getStudyById, getStudyTrajectoriesWithWarnings } from '@/shared/services/studyService.ts';
 import { TrajectoryDataVisualisation } from '@common/modal/TrajectoryDataVisualisation.tsx';
 import { generateTrajectoryViewHeader } from '@/components/header/TrajectoryViewHeader.tsx';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -65,18 +65,7 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
   const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
   const [trajectoryData, setTrajectoryData] = useState<TrajectoryViewData | undefined>();
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [data, setData] = useState<HypothesisRowData[]>([
-    {
-      hypothesis: 'Areas',
-      trajectory: null,
-      status: TRAJECTORY_SELECTION_STATUS.MISSING,
-    },
-    {
-      hypothesis: 'Links',
-      trajectory: null,
-      status: TRAJECTORY_SELECTION_STATUS.MISSING,
-    },
-  ]);
+  const [data, setData] = useState<HypothesisRowData[]>([]);
   const [progress, setProgress] = useState(0);
   const [fileStatus, setFileStatus] = useState<FileInputStatus>('empty');
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({ '0': false, '1': false });
@@ -99,8 +88,8 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
         setErrorMessage('');
         [studyData, trajectoryAreaResult, trajectoryLinkResult] = await Promise.all([
           getStudyById(study.id),
-          getStudyTrajectories(study.id, TRAJECTORY_TYPE.AREA),
-          getStudyTrajectories(study.id, TRAJECTORY_TYPE.LINK),
+          getStudyTrajectoriesWithWarnings(study.id, TRAJECTORY_TYPE.AREA),
+          getStudyTrajectoriesWithWarnings(study.id, TRAJECTORY_TYPE.LINK),
         ]);
         if (trajectoryAreaResult?.length > 0 || trajectoryLinkResult?.length > 0) {
           const trajectoryArea: DbTrajectory = trajectoryAreaResult[0] ?? null;
@@ -260,7 +249,7 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
           trajectoryId,
           study.id,
         );
-        const newTrajectories = await getStudyTrajectories(
+        const newTrajectories = await getStudyTrajectoriesWithWarnings(
           study.id,
           rowIndex === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
         );

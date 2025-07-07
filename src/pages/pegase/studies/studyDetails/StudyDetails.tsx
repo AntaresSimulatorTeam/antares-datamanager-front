@@ -9,7 +9,7 @@ import { Location, useLocation } from 'react-router-dom';
 import StudyHeader from './StudyHeader.tsx';
 import { RdsDivider } from 'rte-design-system-react';
 import StudyNavigationMenu from '@/components/menu/StudyNavigationMenu.tsx';
-import { DbTrajectory, HypothesisTab, StudyDTO, WarningMessage } from '@/shared/types';
+import { DataWarningMessage, HypothesisTab, StudyDTO } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { createStudy } from '@/shared/services/studyService.ts';
@@ -20,7 +20,7 @@ import { DetailsContent } from '@/components/banner/DetailsContent.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { ContainerWithExpander } from '@/components/banner/ContainerWithExpander.tsx';
-import { discardWarningMessage } from '@/shared/services/warningService.ts';
+import { buildWarningMessages } from '@/shared/utils/warningUtils.ts';
 
 interface StudyState {
   study: StudyDTO;
@@ -41,37 +41,13 @@ const StudyDetails = () => {
     icon: StdIconId.LinkedServices,
     isDisabled: false,
   });
-  const [messagesWarning, setMessagesWarning] = useState<WarningMessage[]>([]);
+  const [messagesWarning, setMessagesWarning] = useState<DataWarningMessage[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>('');
 
   useEffect(() => {
-    let messages: WarningMessage[] = [];
-    const trajectories: DbTrajectory[] | null = studyState[activeTab.name as keyof typeof TRAJECTORY_TYPE] ?? null;
-    if (trajectories && trajectories.length > 0) {
-      messages = trajectories.flatMap((trajectory) =>
-        trajectory.messages.map((message) => ({
-          ...message,
-          trajectoryId: trajectory.id,
-          trajectoryType: activeTab.name,
-          trajectory: trajectory.trajectoryName,
-          onClickItem: studyState.studyStatus !== StudyStatus.GENERATED ? discardWarningMessage : null,
-        })),
-      );
-    }
-    if (activeTab.name === TRAJECTORY_TYPE.AREA) {
-      if (studyState?.LINK && studyState?.LINK?.[0]?.messages?.length > 0) {
-        const linkMessage = studyState.LINK[0].messages.map((message) => ({
-          ...message,
-          trajectoryId: studyState?.LINK?.[0].id,
-          trajectoryType: TRAJECTORY_TYPE.LINK,
-          trajectory: (studyState.LINK?.[0] as DbTrajectory)?.trajectoryName ?? '',
-          onClickItem: studyState.studyStatus !== StudyStatus.GENERATED ? discardWarningMessage : null,
-        }));
-        messages = messages.length > 0 ? messages.concat(linkMessage) : linkMessage;
-      }
-    }
-    setMessagesWarning(messages.sort((a, b) => Number(a.isAck) - Number(b.isAck)));
-  }, [activeTab, studyState]);
+    const messages: DataWarningMessage[] = buildWarningMessages(studyState, activeTab.name) || [];
+    setMessagesWarning(messages?.sort((a, b) => Number(a.isAck) - Number(b.isAck)));
+  }, [activeTab.name, studyState]);
 
   const handleGenerateStudy = async () => {
     try {

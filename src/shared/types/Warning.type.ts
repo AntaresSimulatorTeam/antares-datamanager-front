@@ -17,6 +17,20 @@ export interface WarningMessage {
   isAck: boolean;
 }
 
+export interface DataWarningMessage extends WarningMessage {
+  trajectoryId?: number;
+  trajectoryType: string;
+  trajectory: string;
+  onClickItem:
+    | ((
+        id: number,
+        trajectoryType: TRAJECTORY_TYPE,
+        trajectoryId: number,
+        dispatch: React.Dispatch<StudyActionType>,
+      ) => Promise<void>)
+    | null;
+}
+
 export interface CardDataType
   extends WithNullableFields<
     Omit<WarningMessage, 'level' | 'trajectory' | 'secondTrajectory'>,

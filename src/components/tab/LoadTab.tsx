@@ -28,7 +28,7 @@ import {
 import { convertToFSSelectionOptionType, convertToSelectionOptionType } from '@/shared/utils/formFormatter.ts';
 import SearchBar from '@/pages/pegase/home/components/SearchBar.tsx';
 import { FileInputStatus, RdsCheckbox, RdsCheckboxGroupWrapper, RdsDivider } from 'rte-design-system-react';
-import { getStudyTrajectories } from '@/shared/services/studyService.ts';
+import { getStudyTrajectoriesWithWarnings } from '@/shared/services/studyService.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import getEditableHypothesisTableHeaders from '@/components/header/EditableHypothesisTableHeaders.tsx';
@@ -227,7 +227,7 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
           await unlinkTrajectoryFromStudy(trajectoryId, study.id);
         }
         dispatch?.({
-          type: STUDY_ACTION.EMPTY_LOAD_TRAJECTORY,
+          type: STUDY_ACTION.DELETE_LOAD_TRAJECTORY,
           payload: data[rowIndex].hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : data[rowIndex].hypothesis,
         });
         setData((prev) =>
@@ -243,7 +243,7 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
         );
       } else if (status === 'success') {
         await linkTrajectoryToStudy(TRAJECTORY_TYPE.LOAD, trajectoryId, study.id);
-        const newTrajectories = await getStudyTrajectories(study.id, TRAJECTORY_TYPE.LOAD);
+        const newTrajectories = await getStudyTrajectoriesWithWarnings(study.id, TRAJECTORY_TYPE.LOAD);
         const newTrajectory = newTrajectories?.find((trajectory) => {
           if (data[rowIndex].hypothesis === OTHER_AREAS_LABEL) {
             return trajectory.loadArea === OTHER_AREAS;

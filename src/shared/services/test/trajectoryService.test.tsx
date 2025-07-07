@@ -30,19 +30,15 @@ vi.mock('@/envVariables', () => ({
 vi.mock('@/shared/services/authService');
 
 describe('fetchTrajectoriesFromDB', () => {
-  beforeEach(() => {
-    global.fetch = vi.fn();
-  });
-
   afterEach(() => {
     vi.clearAllMocks();
   });
 
   it('should fetch trajectories with area type from data base', async () => {
-    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
       ok: true,
       json: async () => Promise.resolve(mockDbTrajectory),
-    } as Response);
+    });
 
     const result = await fetchTrajectoriesFromDB(TRAJECTORY_TYPE.AREA, '2023-2024');
 
@@ -69,19 +65,15 @@ describe('fetchTrajectoriesFromDB', () => {
 });
 
 describe('fetchTrajectoriesFromFS', () => {
-  beforeEach(() => {
-    global.fetch = vi.fn();
-  });
-
   afterEach(() => {
     vi.clearAllMocks();
   });
 
   it('should fetch trajectories with area type from file system', async () => {
-    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
       ok: true,
       json: async () => Promise.resolve(mockFsTrajectoryArray),
-    } as Response);
+    });
 
     const result = await fetchTrajectoriesFromFS(TRAJECTORY_TYPE.AREA);
 
@@ -117,7 +109,6 @@ describe('uploadTrajectory', () => {
   };
 
   beforeEach(() => {
-    global.fetch = vi.fn();
     vi.stubGlobal('JSON', {
       parse: (text: string) => ({ message: text }),
       stringify: (text: string) => text,
@@ -130,10 +121,10 @@ describe('uploadTrajectory', () => {
   });
 
   it('should import trajectory to data base', async () => {
-    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
       ok: true,
       json: async () => Promise.resolve(mockDbTrajectory),
-    } as Response);
+    });
 
     await uploadTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026', 2, 'FR', onProgress);
 
@@ -167,26 +158,23 @@ describe('linkTrajectoryToStudy', () => {
     },
   };
 
-  beforeEach(() => {
-    global.fetch = vi.fn();
-  });
-
   afterEach(() => {
     vi.clearAllMocks();
   });
 
   it('should link a trajectory to a study', async () => {
-    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
+    // Mock the first call to link the trajectory
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
       ok: true,
       json: async () => Promise.resolve(mockDbTrajectory),
-    } as Response);
+    });
 
     const result = await linkTrajectoryToStudy(TRAJECTORY_TYPE.AREA, 100, 2);
 
     await waitFor(() => {
       expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
       expect(AuthService.authFetch).toHaveBeenCalledWith(
-        `https://mockapi.com/v1/trajectory/link?type=AREA&trajectoryId=100&studyId=2`,
+        `https://mockapi.com/v1/trajectory/attach?type=AREA&trajectoryId=100&studyId=2`,
         requestOptions,
       );
       expect(result).toEqual(mockDbTrajectory);
@@ -211,25 +199,21 @@ describe('unlinkTrajectoryFromStudy', () => {
     method: 'DELETE',
   };
 
-  beforeEach(() => {
-    global.fetch = vi.fn();
-  });
-
   afterEach(() => {
     vi.clearAllMocks();
   });
 
   it('should unlink a trajectory from a study', async () => {
-    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
       ok: true,
-    } as Response);
+    });
 
     await unlinkTrajectoryFromStudy(100, 2);
 
     await waitFor(() => {
       expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
       expect(AuthService.authFetch).toHaveBeenCalledWith(
-        'https://mockapi.com/v1/trajectory/link?trajectoryId=100&studyId=2',
+        'https://mockapi.com/v1/trajectory/detach?trajectoryId=100&studyId=2',
         requestOptions,
       );
     });
@@ -249,19 +233,15 @@ describe('unlinkTrajectoryFromStudy', () => {
 });
 
 describe('getTrajectoryDataByTypeAndId', () => {
-  beforeEach(() => {
-    global.fetch = vi.fn();
-  });
-
   afterEach(() => {
     vi.clearAllMocks();
   });
 
   it('should fetch trajectory data', async () => {
-    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
       ok: true,
       json: async () => Promise.resolve(mockTrajectoryAreaData),
-    } as Response);
+    });
 
     const result = await getTrajectoryDataByTypeAndId(TRAJECTORY_TYPE.AREA, 2);
 
@@ -288,10 +268,6 @@ describe('getTrajectoryDataByTypeAndId', () => {
 });
 
 describe('getNbMessagesFromTrajectoryType', () => {
-  beforeEach(() => {
-    global.fetch = vi.fn();
-  });
-
   afterEach(() => {
     vi.clearAllMocks();
   });
@@ -299,10 +275,10 @@ describe('getNbMessagesFromTrajectoryType', () => {
   it('should fetch trajectory data', async () => {
     const nbMessageByType = { AREA: 1, LINK: 9 };
     const studyId = 2;
-    vi.mocked(AuthService.authFetch).mockResolvedValueOnce({
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
       ok: true,
       json: async () => Promise.resolve(nbMessageByType),
-    } as Response);
+    });
 
     const result = await getNbMessagesFromTrajectoryType(studyId);
 

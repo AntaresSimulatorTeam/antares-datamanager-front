@@ -24,7 +24,7 @@ export interface DbTrajectory {
   version: number;
   userName: string;
   creationDate: Date;
-  messages: WarningMessage[];
+  messages?: WarningMessage[];
   loadArea?: string;
   state?: TRAJECTORY_SELECTION_STATUS;
 }

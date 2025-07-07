@@ -1,7 +1,5 @@
 export const GIT_INFO = {
-
-  branch: "fix/ANT-3499_LOAD_sort_table_lines_defaut_top_other_bottom",
-  commit: "f5462bd",
-  commitTime: "2025-07-02T15:38:27.155Z"
-
+  branch: "feat/ANT-3519_WaningAPI",
+  commit: "7aafc53",
+  commitTime: "2025-07-07T13:32:04.445Z"
 };

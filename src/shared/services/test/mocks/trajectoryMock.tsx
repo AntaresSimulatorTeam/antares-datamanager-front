@@ -21,7 +21,6 @@ export const mockDbTrajectoryArray = [
     version: 3,
     userName: 'mouad',
     creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-    messages: [],
     loadArea: 'AT',
   },
   {
@@ -31,8 +30,56 @@ export const mockDbTrajectoryArray = [
     version: 3,
     userName: 'mouad',
     creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
-    messages: [],
     loadArea: 'BE',
+  },
+];
+
+export const mockWarningMessagesWithTwo: WarningMessage[] = [
+  {
+    id: 1,
+    content:
+      'this is a warning message, after all, nothing change, just avoid violence. this is a warning message, after all, nothing change, just avoid violence',
+    level: WARNING_MESSAGE_LEVEL.WARNING_LEVEL,
+    code: 'LINKS_AREA_NOT_PRESENT',
+    generatedBy: 'unknown_user',
+    generatedAt: '2025-04-01T18:31:53.623683' as unknown as Date,
+    trajectory: 'areas_BP23_A_ref',
+    secondTrajectory: 'links_BP23_A_ref',
+    isAck: false,
+  },
+  {
+    id: 2,
+    content: 'this is a warning message',
+    level: WARNING_MESSAGE_LEVEL.WARNING_LEVEL,
+    code: 'LINKS_AREA_NOT_PRESENT',
+    generatedBy: 'unknown_user',
+    generatedAt: '2025-04-01T18:31:53.623683' as unknown as Date,
+    trajectory: 'areas_BP23_A_ref',
+    secondTrajectory: 'links_BP23_A_ref',
+    isAck: false,
+  },
+];
+
+export const mockTrajectoryWithWarnings = [
+  {
+    id: 1,
+    trajectoryName: 'area_PB_2024',
+    type: TRAJECTORY_TYPE.AREA,
+    version: 3,
+    userName: 'mouad',
+    creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+    loadArea: 'AT',
+    messages: mockWarningMessagesWithTwo,
+  },
+  {
+    id: 2,
+    trajectoryName: 'area_PB_2026',
+    type: TRAJECTORY_TYPE.AREA,
+    version: 3,
+    userName: 'mouad',
+    creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+    loadArea: 'BE',
+    messages: mockWarningMessagesWithTwo,
   },
 ];
 
