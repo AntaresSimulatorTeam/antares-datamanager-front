@@ -1,7 +1,9 @@
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
-import { CardDataType, DbTrajectory, StudyState, WarningMessage } from '@/shared/types';
+import { CardDataType, DataWarningMessage, DbTrajectory, StudyState, WarningMessage } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { discardWarningMessage } from '@/shared/services/warningService.ts';
+import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 
 export const sortByLevel = (a: WarningMessage, b: WarningMessage): number => {
   const map: Map<WARNING_MESSAGE_LEVEL, number> = new Map();
@@ -55,15 +57,40 @@ export const convertDataToItem = <T>(data: T, t: (value: string) => string): Car
   };
 };
 
-export const getMessagesNb = (studyState: Partial<StudyState>, tabName: TRAJECTORY_TYPE): number => {
-  let warmingMessagesNb: number = 0;
-  if (tabName === TRAJECTORY_TYPE.AREA) {
-    warmingMessagesNb =
-      ((studyState?.[`${TRAJECTORY_TYPE.AREA}`]?.[0] as DbTrajectory)?.messages?.length ?? 0) +
-      ((studyState?.[`${TRAJECTORY_TYPE.LINK}`]?.[0] as DbTrajectory)?.messages?.length ?? 0);
-  } else if (studyState?.[`${tabName}`]) {
-    warmingMessagesNb =
-      (studyState?.[`${tabName}`] as DbTrajectory[])?.reduce((acc, prev) => acc + (prev.messages?.length || 0), 0) ?? 0;
+export const buildWarningMessageData = (
+  message: WarningMessage,
+  trajectory: DbTrajectory,
+  tabName: TRAJECTORY_TYPE,
+  isNotGenerated: boolean,
+): DataWarningMessage => ({
+  ...message,
+  trajectoryId: trajectory.id,
+  trajectoryType: tabName,
+  trajectory: trajectory.trajectoryName,
+  onClickItem: isNotGenerated ? discardWarningMessage : null,
+});
+
+export const buildMessagesByType = (
+  trajectory: DbTrajectory,
+  tabName: TRAJECTORY_TYPE,
+  isNotGenerated: boolean,
+): DataWarningMessage[] =>
+  (trajectory.messages || []).map((message) => buildWarningMessageData(message, trajectory, tabName, isNotGenerated));
+
+export const buildWarningMessages = (
+  studyState: Partial<StudyState>,
+  tabName: TRAJECTORY_TYPE,
+): DataWarningMessage[] => {
+  let messages: DataWarningMessage[] = [];
+  const trajectories: DbTrajectory[] | null = studyState[tabName] ?? null;
+  const isStudyGenerated = studyState.studyStatus !== StudyStatus.GENERATED;
+  if (trajectories && trajectories.length > 0) {
+    messages = trajectories.flatMap((trajectory) => buildMessagesByType(trajectory, tabName, isStudyGenerated));
   }
-  return warmingMessagesNb;
+  if (tabName === TRAJECTORY_TYPE.AREA && studyState.LINK) {
+    const linkMessage: DataWarningMessage[] = buildMessagesByType(studyState?.LINK?.[0], tabName, isStudyGenerated);
+    return messages.length > 0 && linkMessage?.length > 0 ? messages.concat(linkMessage) : linkMessage;
+  } else {
+    return messages;
+  }
 };
