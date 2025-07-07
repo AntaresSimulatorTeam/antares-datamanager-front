@@ -45,11 +45,9 @@ const StudyDetails = () => {
   const [errorMessage, setErrorMessage] = useState<string>('');
 
   useEffect(() => {
-    const messages: DataWarningMessage[] = buildWarningMessages(studyState, activeTab.name);
-    if (messages.length > 0) {
-      setMessagesWarning(messages?.sort((a, b) => Number(a.isAck) - Number(b.isAck)));
-    }
-  }, [activeTab, studyState]);
+    const messages: DataWarningMessage[] = buildWarningMessages(studyState, activeTab.name) || [];
+    setMessagesWarning(messages?.sort((a, b) => Number(a.isAck) - Number(b.isAck)));
+  }, [activeTab.name, studyState]);
 
   const handleGenerateStudy = async () => {
     try {
