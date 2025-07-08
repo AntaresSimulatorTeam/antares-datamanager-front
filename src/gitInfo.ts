@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "feat/ANT-3519_WaningAPI",
-  commit: "7aafc53",
-  commitTime: "2025-07-07T13:32:04.445Z"
+  branch: "fix/ANT-3505_fetch_warnings_no_warning",
+  commit: "41bdecb",
+  commitTime: "2025-07-08T07:52:41.055Z"
 };
