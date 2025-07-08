@@ -115,6 +115,19 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
             '0': false,
             '1': !trajectoryArea || (!trajectoryLink && studyData?.status === StudyStatus.GENERATED),
           });
+        } else {
+          setData([
+            {
+              hypothesis: 'Areas',
+              trajectory: null,
+              status: TRAJECTORY_SELECTION_STATUS.MISSING,
+            },
+            {
+              hypothesis: 'Links',
+              trajectory: null,
+              status: TRAJECTORY_SELECTION_STATUS.MISSING,
+            },
+          ]);
         }
       } catch {
         //Silent handler
