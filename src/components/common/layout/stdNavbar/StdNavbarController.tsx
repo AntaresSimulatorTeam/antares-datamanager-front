@@ -24,10 +24,10 @@ const StdNavbarController = ({ id, label, action, expanded = true, itemsStyleCon
 
   return (
     <button id={id} className={navbarControllerClasses} onClick={action}>
-      <div>
+      <div className={`flex items-center gap-1 ${expanded ? 'flex-row' : 'flex-col'}`}>
         {expanded ? <StdIcon name={iconId} isExplicit /> : <StdIcon name={iconId} isExplicit={false} alt={label} />}
+        {label}
       </div>
-      {expanded && <>{label}</>}
     </button>
   );
 };

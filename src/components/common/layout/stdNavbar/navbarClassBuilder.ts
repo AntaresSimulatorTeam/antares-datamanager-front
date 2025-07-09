@@ -11,8 +11,8 @@ export const NAVBAR_COLOR_CLASSES = {
   imagrid: 'bg-primary-950 border-gray-200 text-gray-50',
 };
 
-export const NAVBAR_EXPANDED_CLASSES = 'w-28 px-1';
-export const NAVBAR_COLLAPSED_CLASSES = 'w-8 items-center';
+export const NAVBAR_EXPANDED_CLASSES = 'flex-row w-28 px-1';
+export const NAVBAR_COLLAPSED_CLASSES = 'items-center flex-col w-fit';
 
 export const DEFAULT_BACKGROUND_CONFIG: Required<ItemBackgroundStyleConfig> = {
   mainBg: 'bg-gray-100',

@@ -26,10 +26,10 @@ const StdNavbarMenuItem = ({ item, expanded = true, selected = false, itemsStyle
 
   return (
     <Link className={navbarMenuItemClasses} key={key} {...otherProps} to={path}>
-      <div>
+      <div className={`flex items-center gap-1 ${expanded ? 'flex-row' : 'flex-col'}`}>
         <StdIcon name={icon} height={24} width={24} />
+        {label}
       </div>
-      {expanded && label}
     </Link>
   );
 };

@@ -46,6 +46,6 @@ describe('StdNavbarController component', () => {
       />,
     );
     expect(screen.getByTitle(StdIconId.KeyboardDoubleArrowRight)).toBeInTheDocument();
-    expect(screen.queryByText(TEST_LABEL)).not.toBeInTheDocument();
+    expect(screen.queryByText(TEST_LABEL)).toBeInTheDocument();
   });
 });

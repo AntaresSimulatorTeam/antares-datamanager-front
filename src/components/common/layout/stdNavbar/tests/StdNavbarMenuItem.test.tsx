@@ -30,10 +30,10 @@ describe('StdNavbarMenuItem component', () => {
     await renderWithStubRoutes(<StdNavbarMenuItem item={menuTopData[0]} expanded itemsStyleConfig={DEFAULT_CONFIG} />);
     expect(screen.getByText(menuTopData[0].label)).toBeInTheDocument();
   });
-  it('should not render the item label if expanded is not true', async () => {
+  it('should render the item label if expanded is not true', async () => {
     await renderWithStubRoutes(
       <StdNavbarMenuItem item={menuTopData[0]} expanded={false} itemsStyleConfig={DEFAULT_CONFIG} />,
     );
-    expect(screen.queryByText(menuTopData[0].label)).not.toBeInTheDocument();
+    expect(screen.queryByText(menuTopData[0].label)).toBeInTheDocument();
   });
 });
