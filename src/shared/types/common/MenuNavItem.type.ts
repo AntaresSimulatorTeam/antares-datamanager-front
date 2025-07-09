@@ -12,7 +12,7 @@ export type MenuNavItem = {
   label: string;
   path: string;
   icon: StdIconId;
-  id?: string;
+  id: string;
   as: 'a';
   component: ComponentType;
 };

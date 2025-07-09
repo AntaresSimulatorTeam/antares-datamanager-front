@@ -30,7 +30,7 @@ export const menuTopData: MenuNavItem[] = [
   {
     id: 'project-link',
     key: 'project',
-    label: 'page.@projet',
+    label: 'page.@project',
     path: '/projects',
     as: 'a',
     icon: StdIconId.Folder,
@@ -64,7 +64,7 @@ export const menuTopData: MenuNavItem[] = [
     component: AntaresPage,
   },
   {
-    id: 'antares-about',
+    id: 'about-link',
     key: 'about',
     label: 'page.@about',
     path: '/about',
@@ -76,6 +76,7 @@ export const menuTopData: MenuNavItem[] = [
 
 export const menuBottomData: MenuNavItem[] = [
   {
+    id: 'logout-link',
     key: 'logout',
     label: 'page.@logout',
     path: '/logout',

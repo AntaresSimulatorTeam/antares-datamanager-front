@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "feat/ANT-3502_duplication_study_remove_horizon",
-  commit: "3d1fb91",
-  commitTime: "2025-07-16T12:44:53.429Z"
+  branch: "feat/ANT-3545_test_e2e_hub_study_area_links",
+  commit: "1efd265",
+  commitTime: "2025-07-09T11:48:12.238Z"
 };

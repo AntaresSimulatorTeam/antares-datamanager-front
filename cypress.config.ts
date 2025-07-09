@@ -11,5 +11,13 @@ export default defineConfig({
     baseUrl: 'http://localhost:8080',
     video: false,
     screenshotOnRunFailure: false,
+    specPattern: 'cypress/e2e/**/*.{js,jsx,ts,tsx}',
+  },
+
+  component: {
+    devServer: {
+      framework: 'react',
+      bundler: 'vite',
+    },
   },
 });
