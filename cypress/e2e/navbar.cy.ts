@@ -24,20 +24,15 @@ describe('Navbar behavior', () => {
 
   it('navbar should collapse/expand when the controller is clicked', () => {
     const minimizeText = i18next.t('components.navbar.@minimize');
-    //const expendsText = i18next.t('components.navbar.@expand');
+    const expendsText = i18next.t('components.navbar.@expand');
     const navbar = cy.get(`#${PEGASE_NAVBAR_ID}`);
     const navbarController = cy.get(`#${PEGASE_NAVBAR_ID}-controller`);
 
     navbarController.should('contain', minimizeText);
     navbarController.click();
-    navbarController.should('not.contain', minimizeText);
-    //navbarController.trigger('mouseover');
-    // const navbarControllerFloating = cy.get(`#${PEGASE_NAVBAR_ID}-controller-floating`);
-    // navbarControllerFloating.should('contain', expendsText);
+    navbarController.should('contain', expendsText);
     navbar.get(`#${APP_LOGO_ID}`).should('exist');
-
     navbarController.click();
-    // navbarControllerFloating.should('not.contain', expendsText);
     navbarController.should('contain', minimizeText);
     navbar.get(`#${APP_LOGO_ID}`).should('exist');
   });
