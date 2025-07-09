@@ -25,7 +25,7 @@ const StdNavbarMenuItem = ({ item, expanded = true, selected = false, itemsStyle
   );
 
   return (
-    <Link to={path} className={navbarMenuItemClasses} key={key} {...otherProps}>
+    <Link className={navbarMenuItemClasses} key={key} {...otherProps} to={path}>
       <div>
         <StdIcon name={icon} height={24} width={24} />
       </div>

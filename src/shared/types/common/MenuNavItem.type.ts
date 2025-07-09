@@ -4,15 +4,16 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { ComponentType } from 'react';
+import { ComponentType, ElementType } from 'react';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
+import { AnchorDefaultAsType } from '@/shared/types';
 
-export type MenuNavItem = {
+export type MenuNavItem<E extends ElementType = typeof AnchorDefaultAsType> = {
   key: string;
   label: string;
   path: string;
   icon: StdIconId;
   id: string;
-  as: 'a';
+  as?: E;
   component: ComponentType;
 };

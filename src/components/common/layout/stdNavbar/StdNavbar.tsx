@@ -26,7 +26,7 @@ export type LogoConfig = {
 };
 
 type HeaderCommonOwnConfig<E extends ElementType> = {
-  versionTextColor: TailwindColorClass;
+  versionTextColor?: TailwindColorClass;
   appName: string;
   appVersion: string;
   to: string;
