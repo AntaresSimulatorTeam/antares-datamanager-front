@@ -1,9 +1,16 @@
-import { addTrajectories, clearByType, deleteTrajectory, skipTrajectoryMessage } from '@/store/reducers/studyReducer';
+import {
+  addTrajectories,
+  clearByType,
+  deleteTrajectory,
+  skipTrajectoryMessage,
+  updateTrajectory,
+} from '@/store/reducers/studyReducer';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory';
-import { DbTrajectory, WarningMessage } from '@/shared/types';
+import { DbTrajectory, FileInputStatus, StudyState, WarningMessage } from '@/shared/types';
 import { WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { describe, expect, it } from 'vitest';
+import { mockWarningMessagesWithTwo } from '@/mocks/data/tests/warning.mock.ts';
 
 const mockTrajectory = (type: TRAJECTORY_TYPE, id: number, area: string): DbTrajectory => ({
   id,
@@ -241,5 +248,94 @@ describe('clearByType', () => {
     const result = clearByType(prevState, payload);
     expect(result.studyStatus).toEqual(StudyStatus.IN_PROGRESS);
     expect(result[TRAJECTORY_TYPE.AREA]).toBeNull();
+  });
+});
+
+describe('updateTrajectory', () => {
+  const baseTrajectory: DbTrajectory = mockTrajectory(TRAJECTORY_TYPE.LINK, 123, 'ZoneA');
+
+  const prevState: Partial<StudyState> = {
+    studyStatus: StudyStatus.IN_PROGRESS,
+    [TRAJECTORY_TYPE.LINK]: [baseTrajectory],
+  };
+
+  it('should update trajectory when status is success', () => {
+    const updatedTrajectory: DbTrajectory = {
+      ...baseTrajectory,
+      trajectoryName: 'Updated',
+      messages: mockWarningMessagesWithTwo,
+    };
+
+    const payload = {
+      trajectory: updatedTrajectory,
+      status: 'success' as FileInputStatus,
+    };
+
+    const result = updateTrajectory(prevState, payload);
+
+    expect(result[TRAJECTORY_TYPE.LINK]?.[0].trajectoryName).toBe('Updated');
+    expect(result[TRAJECTORY_TYPE.LINK]?.[0].messages).toEqual(mockWarningMessagesWithTwo);
+  });
+
+  it('should clear trajectory fields when status is not success', () => {
+    const updatedTrajectory = {
+      ...baseTrajectory,
+      trajectoryName: 'Updated',
+      messages: mockWarningMessagesWithTwo,
+    };
+
+    const payload = {
+      trajectory: updatedTrajectory,
+      status: 'error' as FileInputStatus,
+    };
+
+    const result = updateTrajectory(prevState, payload);
+
+    expect(result[TRAJECTORY_TYPE.LINK]?.[0].trajectoryName).toBe('');
+    expect(result[TRAJECTORY_TYPE.LINK]?.[0].messages).toEqual([]);
+  });
+
+  it('should return original state if no matching trajectory is found', () => {
+    const payload = {
+      trajectory: {
+        ...baseTrajectory,
+        loadArea: 'NonMatchingZone',
+      },
+      status: 'success' as FileInputStatus,
+    };
+
+    const result = updateTrajectory(prevState, payload);
+
+    expect(result).toEqual(prevState);
+  });
+
+  it('should return original state if trajectory list is null', () => {
+    const nullState: Partial<StudyState> = {
+      [TRAJECTORY_TYPE.LINK]: null,
+    };
+
+    const payload = {
+      trajectory: baseTrajectory,
+      status: 'success' as FileInputStatus,
+    };
+
+    const result = updateTrajectory(nullState, payload);
+
+    expect(result).toEqual(nullState);
+  });
+
+  it('should not mutate original state', () => {
+    const payload = {
+      trajectory: {
+        ...baseTrajectory,
+        trajectoryName: 'Changed',
+        messages: mockWarningMessagesWithTwo,
+      },
+      status: 'success' as FileInputStatus,
+    };
+
+    const result = updateTrajectory(prevState, payload);
+
+    expect(result[TRAJECTORY_TYPE.LINK]).not.toBe(prevState[TRAJECTORY_TYPE.LINK]);
   });
 });

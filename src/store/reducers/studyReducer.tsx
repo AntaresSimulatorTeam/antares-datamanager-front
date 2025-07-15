@@ -29,7 +29,7 @@ export const deleteTrajectory = (prevState: Partial<StudyState>, payload: { area
   return prevState;
 };
 
-const updateTrajectory = (
+export const updateTrajectory = (
   prevState: Partial<StudyState>,
   payload: { trajectory: DbTrajectory; status: FileInputStatus },
 ) => {
