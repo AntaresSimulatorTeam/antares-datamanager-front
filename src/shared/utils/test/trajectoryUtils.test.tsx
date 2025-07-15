@@ -1,11 +1,15 @@
 import {
   addNestedRow,
+  buildEmptyTrajectory,
   buildErrorTrajectory,
   buildReadOnlyRow,
   buildRowData,
+  buildRowWithSubRowsData,
   checkNestedValue,
   getBgColor,
   getStatus,
+  getStudyMenu,
+  isMatchingTrajectoryType,
   removeDuplicate,
   removeRowAndSubRow,
   retrieveReadOnlyArea,
@@ -23,7 +27,9 @@ import {
   mockRowDataTrajectoryC,
 } from '@/mocks/data/tests/trajectory.mock.ts';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
-import { HypothesisRowData, NestedCheckedType } from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, HypothesisTab, NestedCheckedType } from '@/shared/types';
+import { ThermalOptions } from '@/mocks/data/list/names.ts';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 describe('getStatus', () => {
   it("should return an ERROR selection status for 'error' status", () => {
@@ -197,6 +203,63 @@ describe('buildRowData', () => {
       status: TRAJECTORY_SELECTION_STATUS.OK,
       isDefault: false,
     });
+  });
+});
+
+describe('buildEmptyTrajectory', () => {
+  it('generates a trajectory with expected default fields', () => {
+    const area = 'ZoneX';
+    const type: TRAJECTORY_TYPE = TRAJECTORY_TYPE.AREA;
+
+    const result: DbTrajectory = buildEmptyTrajectory(area, type);
+
+    expect(result.loadArea).toBe(area);
+    expect(result.type).toBe(type);
+    expect(result.trajectoryName).toBe('');
+    expect(result.version).toBe(0);
+    expect(result.userName).toBe('user');
+    expect(result.state).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
+    expect(result.messages).toEqual([]);
+    expect(result.creationDate).toBeInstanceOf(Date);
+  });
+
+  it('generates a unique id each time', () => {
+    const t1 = buildEmptyTrajectory('ZoneA', TRAJECTORY_TYPE.AREA);
+    const t2 = buildEmptyTrajectory('ZoneA', TRAJECTORY_TYPE.LINK);
+
+    expect(t1.id).not.toBe(t2.id);
+  });
+});
+
+describe('buildRowWithSubRowsData', () => {
+  it('returns empty array when input is empty', () => {
+    const result = buildRowWithSubRowsData([]);
+    expect(result).toEqual([]);
+  });
+
+  it('creates row data with correct structure', () => {
+    const input = [{ name: 'ZoneA' }, { name: 'ZoneB' }];
+    const result = buildRowWithSubRowsData(input);
+
+    expect(result.length).toBe(2);
+    expect(result[0].hypothesis).toBe('ZoneA');
+    expect(result[1].hypothesis).toBe('ZoneB');
+
+    for (const row of result) {
+      expect(row.trajectory).toBeNull();
+      expect(row.status).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
+      expect(row.isDefault).toBe(true);
+      expect(Array.isArray(row.subRows)).toBe(true);
+      expect(row.subRows.length).toBe(ThermalOptions.length);
+
+      for (const sub of row.subRows) {
+        expect(sub.hypothesis).toBeDefined();
+        expect(sub.trajectory).toBeNull();
+        expect(sub.status).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
+        expect(sub.isDefault).toBe(true);
+        expect(sub.subRows).toBeNull();
+      }
+    }
   });
 });
 
@@ -420,5 +483,57 @@ describe('retrieveReadOnlyArea', () => {
   it('should return an empty object when all default areas are included in the areas option list', () => {
     const readOnlyRows = retrieveReadOnlyArea(rowDataTwo, defaultAreaNotInAreaTrajectoryList);
     expect(readOnlyRows).toStrictEqual({});
+  });
+});
+
+describe('getStudyMenu', () => {
+  const mockTranslate = (value: string) => `translated:${value}`;
+
+  it('should return correct tab structure when area is not linked', () => {
+    const result: HypothesisTab[] = getStudyMenu(mockTranslate, false);
+
+    expect(result.length).toBe(5);
+
+    expect(result[0]).toEqual({
+      name: TRAJECTORY_TYPE.AREA,
+      label: 'translated:studyDetails.@areas_links',
+      icon: StdIconId.LinkedServices,
+      isDisabled: false,
+    });
+
+    expect(result[1].isDisabled).toBe(false);
+    expect(result[2].isDisabled).toBe(false);
+    expect(result[3].isDisabled).toBe(true);
+    expect(result[4].isDisabled).toBe(true);
+  });
+
+  it('should disable LOAD and THERMAL_CAPACITY when area is linked', () => {
+    const result = getStudyMenu(mockTranslate, true);
+
+    expect(result[1].name).toBe(TRAJECTORY_TYPE.LOAD);
+    expect(result[1].isDisabled).toBe(true);
+
+    expect(result[2].name).toBe(TRAJECTORY_TYPE.THERMAL_CAPACITY);
+    expect(result[2].isDisabled).toBe(true);
+  });
+
+  it('should apply translation function to labels', () => {
+    const result = getStudyMenu(mockTranslate, false);
+
+    for (const tab of result) {
+      expect(tab.label.startsWith('translated:')).toBe(true);
+    }
+  });
+});
+
+describe('isMatchingTrajectoryType', () => {
+  it('should return true for matching trajectory types', () => {
+    const matcher = isMatchingTrajectoryType(TRAJECTORY_TYPE.AREA);
+    expect(matcher(TRAJECTORY_TYPE.AREA)).toBe(true);
+  });
+
+  it('should return false for non-matching trajectory types', () => {
+    const matcher = isMatchingTrajectoryType(TRAJECTORY_TYPE.LOAD);
+    expect(matcher(TRAJECTORY_TYPE.THERMAL_CAPACITY)).toBe(false);
   });
 });
