@@ -46,7 +46,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['lcov', 'text'],
-      exclude: ['src/*.test.ts', 'src/shared/**', 'src/components/common/**', 'src/*.mock.ts'],
+      exclude: ['src/*.test.ts', 'src/shared/**', 'src/components/common/**', 'src/mocks/**', 'src/*.mock.ts'],
     },
     server: { deps: { inline: ['rte-design-system'] } },
   },
