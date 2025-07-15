@@ -3,14 +3,16 @@ import {
   clearByType,
   deleteTrajectory,
   skipTrajectoryMessage,
+  studyReducer,
   updateTrajectory,
 } from '@/store/reducers/studyReducer';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory';
-import { DbTrajectory, FileInputStatus, StudyState, WarningMessage } from '@/shared/types';
+import { DbTrajectory, FileInputStatus, StudyActionType, StudyState, WarningMessage } from '@/shared/types';
 import { WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { describe, expect, it } from 'vitest';
 import { mockWarningMessagesWithTwo } from '@/mocks/data/tests/warning.mock.ts';
+import { STUDY_ACTION } from '@/shared/enum/study.ts';
 
 const mockTrajectory = (type: TRAJECTORY_TYPE, id: number, area: string): DbTrajectory => ({
   id,
@@ -20,6 +22,7 @@ const mockTrajectory = (type: TRAJECTORY_TYPE, id: number, area: string): DbTraj
   userName: 'CB',
   creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
   loadArea: area,
+  messages: mockWarningMessagesWithTwo,
 });
 
 describe('addTrajectories', () => {
@@ -149,7 +152,7 @@ describe('skipTrajectoryMessage', () => {
     isAck,
   });
 
-  it('marks a message as acknowledged and moves it to the end with 4 messages', () => {
+  it('should mark a message as acknowledged and moves it to the end with 4 messages', () => {
     const messages: WarningMessage[] = [createMessage(1), createMessage(2), createMessage(3), createMessage(4)];
 
     const trajectory: DbTrajectory = {
@@ -179,7 +182,7 @@ describe('skipTrajectoryMessage', () => {
     expect(newMessages?.slice(0, 3).map((m) => m.id)).toEqual([1, 3, 4]);
   });
 
-  it('returns original state if message ID is not found', () => {
+  it('should return original state if message ID is not found', () => {
     const messages: WarningMessage[] = [createMessage(1)];
 
     const trajectory: DbTrajectory = {
@@ -193,6 +196,39 @@ describe('skipTrajectoryMessage', () => {
 
     const newState = skipTrajectoryMessage(prevState, {
       id: 999, // not found
+      trajectoryType: TRAJECTORY_TYPE.LINK,
+      trajectoryId: 5,
+    });
+
+    expect(newState).toEqual(prevState);
+  });
+
+  it('should set messages to an empty array when no messages', () => {
+    const trajectory = {
+      id: 5,
+      messages: null,
+    } as unknown as DbTrajectory;
+
+    const prevState = {
+      [TRAJECTORY_TYPE.LINK]: [trajectory],
+    };
+
+    const newState = skipTrajectoryMessage(prevState, {
+      id: 5,
+      trajectoryType: TRAJECTORY_TYPE.LINK,
+      trajectoryId: 5,
+    });
+
+    expect(newState).toEqual(prevState);
+  });
+
+  it('should return original state if trajectories list is not an array', () => {
+    const prevState = {
+      [TRAJECTORY_TYPE.LINK]: undefined,
+    };
+
+    const newState = skipTrajectoryMessage(prevState, {
+      id: 999,
       trajectoryType: TRAJECTORY_TYPE.LINK,
       trajectoryId: 5,
     });
@@ -337,5 +373,107 @@ describe('updateTrajectory', () => {
     const result = updateTrajectory(prevState, payload);
 
     expect(result[TRAJECTORY_TYPE.LINK]).not.toBe(prevState[TRAJECTORY_TYPE.LINK]);
+  });
+});
+
+// Mock handlers to isolate reducer logic
+vi.mock('./studyReducer.tsx', () => ({
+  clearByType: vi.fn(() => ({ cleared: true })),
+  addTrajectories: vi.fn(() => ({ added: true })),
+  deleteTrajectory: vi.fn(() => ({ deleted: true })),
+  updateTrajectory: vi.fn(() => ({ updated: true })),
+  skipTrajectoryMessage: vi.fn(() => ({ skipped: true })),
+}));
+
+describe('studyReducer', () => {
+  const prevState = {
+    studyStatus: StudyStatus.IN_PROGRESS,
+    [TRAJECTORY_TYPE.AREA]: [mockTrajectory(TRAJECTORY_TYPE.AREA, 123, 'ZoneA')],
+  };
+
+  it('should handle SET_STUDY_STATUS action', () => {
+    const action: StudyActionType = {
+      type: STUDY_ACTION.SET_STUDY_STATUS,
+      payload: StudyStatus.GENERATED,
+    };
+
+    const result = studyReducer(prevState, action);
+
+    expect(result.studyStatus).toStrictEqual(StudyStatus.GENERATED);
+    expect(result[TRAJECTORY_TYPE.AREA]).toStrictEqual([mockTrajectory(TRAJECTORY_TYPE.AREA, 123, 'ZoneA')]);
+  });
+
+  it('should handle CLEAR_TRAJECTORY_BY_TYPE action', () => {
+    const action: StudyActionType = {
+      type: STUDY_ACTION.CLEAR_TRAJECTORY_BY_TYPE,
+      payload: [TRAJECTORY_TYPE.AREA, TRAJECTORY_TYPE.LINK],
+    };
+
+    const result = studyReducer(prevState, action);
+
+    expect(result[TRAJECTORY_TYPE.AREA]).toBeNull();
+  });
+
+  it('should handle ADD_TRAJECTORIES action', () => {
+    const action: StudyActionType = {
+      type: STUDY_ACTION.ADD_TRAJECTORIES,
+      payload: [mockTrajectory(TRAJECTORY_TYPE.AREA, 123, 'ZoneA')],
+    };
+
+    const result = studyReducer(prevState, action);
+
+    expect(result[TRAJECTORY_TYPE.AREA]).toHaveLength(1);
+  });
+
+  it('should handle DELETE_TRAJECTORY action', () => {
+    const action: StudyActionType = {
+      type: STUDY_ACTION.DELETE_TRAJECTORY,
+      payload: { area: 'ZoneA', type: TRAJECTORY_TYPE.AREA },
+    };
+
+    const result = studyReducer(prevState, action);
+
+    expect(result[TRAJECTORY_TYPE.AREA]).toEqual([]);
+  });
+
+  it('should handles UPDATE_TRAJECTORY action', () => {
+    const newTrajectory = mockTrajectory(TRAJECTORY_TYPE.AREA, 123, 'ZoneA');
+    newTrajectory.trajectoryName = 'Updated';
+    const action: StudyActionType = {
+      type: STUDY_ACTION.UPDATE_TRAJECTORY,
+      payload: {
+        trajectory: newTrajectory,
+        status: 'success' as FileInputStatus,
+      },
+    };
+
+    const result = studyReducer(prevState, action);
+
+    expect(result?.[TRAJECTORY_TYPE.AREA]?.[0]?.trajectoryName).toEqual('Updated');
+  });
+
+  it('should handle SKIP_MESSAGE action', () => {
+    const action: StudyActionType = {
+      type: STUDY_ACTION.SKIP_MESSAGE,
+      payload: { trajectoryType: TRAJECTORY_TYPE.AREA, id: 1, trajectoryId: 123 },
+    };
+
+    const result = studyReducer(prevState, action);
+
+    expect(result?.[TRAJECTORY_TYPE.AREA]?.[0]?.messages?.[1].isAck).toBeTruthy();
+  });
+
+  it('should return previous state when action is undefined', () => {
+    const result = studyReducer(prevState, undefined);
+
+    expect(result).toEqual(prevState);
+  });
+
+  it('should return previous state on unknown action type', () => {
+    const action = { type: 'UNKNOWN_ACTION' } as unknown as StudyActionType;
+
+    const result = studyReducer(prevState, action);
+
+    expect(result).toEqual(prevState);
   });
 });
