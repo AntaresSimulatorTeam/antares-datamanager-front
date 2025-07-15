@@ -1,4 +1,4 @@
-import { DbTrajectory, HypothesisRowData, NestedCheckedType, RowStatus } from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, HypothesisTab, NestedCheckedType, RowStatus } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { FileInputStatus } from 'rte-design-system-react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
@@ -6,9 +6,12 @@ import { WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { ThermalOptions } from '@/mocks/data/list/names.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
-import { Dispatch, SetStateAction } from 'react';
 
-export const getStatus = (status: RowStatus) => {
+/**
+ * Get trajectory status from row status
+ * @param {RowStatus | null} status
+ */
+export const getStatus = (status?: RowStatus) => {
   switch (status) {
     case 'error':
       return TRAJECTORY_SELECTION_STATUS.ERROR;
@@ -22,7 +25,11 @@ export const getStatus = (status: RowStatus) => {
   }
 };
 
-export const getBgColor = (status: FileInputStatus) => {
+/**
+ * Get background color from file status
+ * @param {FileInputStatus | null} status
+ */
+export const getBgColor = (status?: FileInputStatus) => {
   switch (status) {
     case 'loading':
       return 'bg-acc1-600';
@@ -35,6 +42,15 @@ export const getBgColor = (status: FileInputStatus) => {
   }
 };
 
+/**
+ * Create row data for a trajectory with error status
+ * @param {TRAJECTORY_TYPE} type
+ * @param {number} trajectoryId
+ * @param {string} trajectoryLabel
+ * @param {string | null} errorMessage
+ * @param {string | null} userName
+ * @param {string | null} area
+ */
 export const buildErrorTrajectory = (
   type: TRAJECTORY_TYPE,
   trajectoryId: number,
@@ -47,7 +63,7 @@ export const buildErrorTrajectory = (
   trajectoryName: trajectoryLabel,
   type,
   version: 0,
-  userName: 'unknown_user',
+  userName: userName ?? 'unknown_user',
   creationDate: new Date(),
   loadArea: area,
   messages: [
@@ -56,7 +72,7 @@ export const buildErrorTrajectory = (
       content: errorMessage ?? 'Error',
       level: WARNING_MESSAGE_LEVEL.ERROR_LEVEL,
       code: 'ERROR',
-      generatedBy: userName ?? '',
+      generatedBy: userName ?? 'unknown_user',
       generatedAt: new Date(),
       trajectory: trajectoryLabel,
       secondTrajectory: '',
@@ -66,8 +82,13 @@ export const buildErrorTrajectory = (
   state: TRAJECTORY_SELECTION_STATUS.ERROR,
 });
 
-export const removeDuplicate = (arr: DbTrajectory[]) =>
-  arr.reduce((acc: DbTrajectory[], current: DbTrajectory) => {
+/**
+ * Remove duplicate within an array of data base trajectory
+ * @param {DbTrajectory[] | null} array
+ * @return {DbTrajectory[]}
+ */
+export const removeDuplicate = (array?: DbTrajectory[]): DbTrajectory[] =>
+  (array || []).reduce((acc: DbTrajectory[], current: DbTrajectory) => {
     const x = acc.find((item) => item.loadArea === current.loadArea);
     if (!x) {
       acc.push(current);
@@ -75,6 +96,13 @@ export const removeDuplicate = (arr: DbTrajectory[]) =>
     return acc;
   }, []);
 
+/**
+ * Create row data for hypothesis table
+ * @param {string} areaName
+ * @param {boolean} isDefault
+ * @param {DbTrajectory | null} trajectory
+ * @return {HypothesisRowData}
+ */
 export const buildRowData = (areaName: string, isDefault: boolean, trajectory?: DbTrajectory): HypothesisRowData => ({
   hypothesis: areaName === OTHER_AREAS ? OTHER_AREAS_LABEL : areaName,
   trajectory: trajectory?.trajectoryName ? trajectory : null,
@@ -82,6 +110,12 @@ export const buildRowData = (areaName: string, isDefault: boolean, trajectory?: 
   isDefault,
 });
 
+/**
+ * Create empty data base trajectory
+ * @param {string} areaName
+ * @param type
+ * @return {DbTrajectory}
+ */
 export const buildEmptyTrajectory = (areaName: string, type: TRAJECTORY_TYPE): DbTrajectory => ({
   id: Math.random(),
   trajectoryName: '',
@@ -109,9 +143,14 @@ export const buildRowWithSubRowsData = (array: { name: string }[]) =>
     })),
   }));
 
-export const buildReadOnlyRow = (indexes: (number | null)[]): ReadOnlyObject => {
+/**
+ * Create read only mapping from the read only item indexes array
+ * @param {(number | null)[]} indexes
+ * @return {ReadOnlyObject}
+ */
+export const buildReadOnlyRow = (indexes?: (number | null)[]): ReadOnlyObject => {
   const readOnlyRows = {};
-  indexes.forEach((readOnlyIndex) => {
+  (indexes || []).forEach((readOnlyIndex) => {
     if (readOnlyIndex != null) {
       Object.assign(readOnlyRows, { [`${readOnlyIndex}`]: true });
     }
@@ -134,7 +173,18 @@ export const retrieveReadOnlyArea = (rowData: HypothesisRowData[], itemsToReadOn
   return buildReadOnlyRow(readOnlyIndexes);
 };
 
-export const addNestedRow = (data: HypothesisRowData[], newRow: HypothesisRowData, parentValue?: string) =>
+/**
+ * Add data to nested row
+ * @param data
+ * @param newRow
+ * @param parentValue
+ * @return {HypothesisRowData[]}
+ */
+export const addNestedRow = (
+  data: HypothesisRowData[],
+  newRow: HypothesisRowData,
+  parentValue?: string,
+): HypothesisRowData[] =>
   data.map((item) => {
     if (item.hypothesis === parentValue) {
       return {
@@ -148,7 +198,18 @@ export const addNestedRow = (data: HypothesisRowData[], newRow: HypothesisRowDat
     }
   });
 
-export const checkNestedValue = (checkedValues: NestedCheckedType[], value: string, parentValue?: string) =>
+/**
+ * Add checked nested value to nested value list
+ * @param {NestedCheckedType[]} checkedValues
+ * @param {string} value
+ * @param {string | null} parentValue
+ * @return {NestedCheckedType[]}
+ */
+export const checkNestedValue = (
+  checkedValues: NestedCheckedType[],
+  value: string,
+  parentValue?: string,
+): NestedCheckedType[] =>
   checkedValues.map((item) => {
     if (item.name === parentValue) {
       return {
@@ -163,7 +224,18 @@ export const checkNestedValue = (checkedValues: NestedCheckedType[], value: stri
     }
   });
 
-export const removeThermalRow = (data: HypothesisRowData[], value: string, parentValue: string) =>
+/**
+ * Remove and sub row if parent is checked
+ * @param {HypothesisRowData[]} data
+ * @param {string} value
+ * @param {string} parentValue
+ * @return {HypothesisRowData[]}
+ */
+export const removeRowAndSubRow = (
+  data: HypothesisRowData[],
+  value: string,
+  parentValue: string,
+): HypothesisRowData[] =>
   data.map((item) => {
     if (item.hypothesis === parentValue) {
       const itemsSubRows = item.subRows
@@ -180,6 +252,13 @@ export const removeThermalRow = (data: HypothesisRowData[], value: string, paren
     }
   });
 
+/**
+ * Unchecked value from checked value list
+ * @param {NestedCheckedType[]} checkedValues
+ * @param {string} value
+ * @param {string | null} parentValue
+ * @return {NestedCheckedType[]}
+ */
 export const unCheckNestedValue = (
   checkedValues: NestedCheckedType[],
   value: string,
@@ -197,7 +276,7 @@ export const unCheckNestedValue = (
     }
   });
 
-export const getStudyMenu = (t: (value: string) => string, isTrajectoryAreaLinked: boolean) => [
+export const getStudyMenu = (t: (value: string) => string, isTrajectoryAreaLinked: boolean): HypothesisTab[] => [
   {
     name: TRAJECTORY_TYPE.AREA,
     label: t('studyDetails.@areas_links'),
@@ -220,11 +299,5 @@ export const getStudyMenu = (t: (value: string) => string, isTrajectoryAreaLinke
   { name: TRAJECTORY_TYPE.MISC, label: t('studyDetails.@misc'), icon: StdIconId.Category, isDisabled: true },
 ];
 
-export const setReadOnlyForGeneratedStudy = (
-  rows: HypothesisRowData[],
-  setReadOnly: Dispatch<SetStateAction<ReadOnlyObject>>,
-) => {
-  const areaWithoutTrajectory = rows.map((row) => (row.trajectory == null ? row.hypothesis : null));
-  const readOnlyRows = retrieveReadOnlyArea(rows, areaWithoutTrajectory.filter(Boolean) as string[]);
-  setReadOnly(readOnlyRows);
-};
+export const isMatchingTrajectoryType = (trajectoryKey: TRAJECTORY_TYPE) => (trajectoryType: TRAJECTORY_TYPE) =>
+  trajectoryType === trajectoryKey;

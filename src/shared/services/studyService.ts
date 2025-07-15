@@ -4,13 +4,12 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { DbTrajectory, PaginatedResponse, StudyDTO } from '@/shared/types';
+import { BackendError, DbTrajectory, PaginatedResponse, StudyDTO } from '@/shared/types';
 import { STUDY_GENERATE_ENDPOINT, STUDY_SEARCH_ENDPOINT, TRAJECTORY_ENDPOINT } from '@/shared/const/apiEndPoint';
 import { STUDY_ENDPOINT, STUDY_KEYWORDS_SEARCH_ENDPOINT } from '@/shared/const/apiEndPoint.ts';
 import { notifyToast } from '@/shared/notification/notification.tsx';
 import { AuthService } from '@/shared/services/authService.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { BackendError } from '../utils/errrorHandler';
 import { fetchWarningMessages } from '@/shared/services/warningService.ts';
 
 /**

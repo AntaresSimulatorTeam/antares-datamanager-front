@@ -9,7 +9,7 @@ import { Queries, renderHook, RenderHookOptions, waitFor } from '@testing-librar
 import { useStudyNavigation } from '@/hooks/useStudyNavigation.ts';
 import { Router, useNavigate } from 'react-router-dom';
 import { ReactNode } from 'react';
-import { mockStudy } from '@/shared/services/test/mocks/studyMock.tsx';
+import { mockStudy } from '@/mocks/data/tests/study.mock.ts';
 import { notifyToast } from '@/shared/notification/notification.tsx';
 
 const mockNavigator = {

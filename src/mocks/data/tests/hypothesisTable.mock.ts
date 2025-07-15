@@ -1,5 +1,6 @@
 import { HypothesisRowData } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 
 export const defaultAreaNotInAreaTrajectoryList = ['FR', 'DEkf'];
 
@@ -18,6 +19,7 @@ export const rowData: HypothesisRowData[] = [
     },
     status: TRAJECTORY_SELECTION_STATUS.OK,
     isDefault: true,
+    subRows: null,
   },
   {
     hypothesis: 'CH',
@@ -33,6 +35,7 @@ export const rowData: HypothesisRowData[] = [
     },
     status: TRAJECTORY_SELECTION_STATUS.MISSING,
     isDefault: true,
+    subRows: null,
   },
   {
     hypothesis: 'DEkf',
@@ -48,6 +51,7 @@ export const rowData: HypothesisRowData[] = [
     },
     status: TRAJECTORY_SELECTION_STATUS.OK,
     isDefault: true,
+    subRows: null,
   },
   {
     hypothesis: 'AT',
@@ -63,12 +67,13 @@ export const rowData: HypothesisRowData[] = [
     },
     status: TRAJECTORY_SELECTION_STATUS.OK,
     isDefault: true,
+    subRows: null,
   },
 ];
 
 export const rowDataTwo: HypothesisRowData[] = [
   {
-    hypothesis: 'DKke',
+    hypothesis: 'SL',
     trajectory: {
       id: 1,
       trajectoryName: 'LOAD_area_BP_23',
@@ -77,10 +82,27 @@ export const rowDataTwo: HypothesisRowData[] = [
       userName: 'unknown',
       creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
       messages: [],
-      loadArea: 'FR',
+      loadArea: 'SL',
     },
     status: TRAJECTORY_SELECTION_STATUS.OK,
     isDefault: true,
+    subRows: null,
+  },
+  {
+    hypothesis: OTHER_AREAS_LABEL,
+    trajectory: {
+      id: 1,
+      trajectoryName: 'LOAD_area_BP_23',
+      type: TRAJECTORY_TYPE.LOAD,
+      version: 0,
+      userName: 'unknown',
+      creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+      messages: [],
+      loadArea: 'AT',
+    },
+    status: TRAJECTORY_SELECTION_STATUS.OK,
+    isDefault: true,
+    subRows: null,
   },
   {
     hypothesis: 'CH',
@@ -96,6 +118,7 @@ export const rowDataTwo: HypothesisRowData[] = [
     },
     status: TRAJECTORY_SELECTION_STATUS.MISSING,
     isDefault: true,
+    subRows: null,
   },
   {
     hypothesis: 'AT',
@@ -110,6 +133,23 @@ export const rowDataTwo: HypothesisRowData[] = [
       loadArea: 'AT',
     },
     status: TRAJECTORY_SELECTION_STATUS.OK,
-    isDefault: true,
+    isDefault: false,
+    subRows: null,
+  },
+  {
+    hypothesis: 'BE',
+    trajectory: {
+      id: 1,
+      trajectoryName: 'LOAD_area_BP_23',
+      type: TRAJECTORY_TYPE.LOAD,
+      version: 0,
+      userName: 'unknown',
+      creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+      messages: [],
+      loadArea: 'BE',
+    },
+    status: TRAJECTORY_SELECTION_STATUS.OK,
+    isDefault: false,
+    subRows: null,
   },
 ];

@@ -14,11 +14,10 @@ import {
   TRAJECTORY_LINK_TO_STUDY_ENDPOINT,
   TRAJECTORY_UNLINK_TO_STUDY_ENDPOINT,
 } from '@/shared/const/apiEndPoint.ts';
-import { DbTrajectory, FsTrajectory, TRAJECTORY_DATA_TYPE, Types } from '@/shared/types';
+import { BackendError, DbTrajectory, FsTrajectory, TRAJECTORY_DATA_TYPE, Types } from '@/shared/types';
 import { AuthService } from '@/shared/services/authService.ts';
 import { fetchWithProgress } from '@/shared/services/progressService.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { BackendError } from '@/shared/utils/errrorHandler.ts';
 
 /**
  * Retrieve a list of trajectories by type and horizon from database

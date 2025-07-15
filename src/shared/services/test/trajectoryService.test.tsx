@@ -18,9 +18,9 @@ import {
 } from '@/shared/services/trajectoryService.ts';
 import {
   mockDbTrajectory,
-  mockFsTrajectoryArray,
+  mockFsTrajectoryAreaArray,
   mockTrajectoryAreaData,
-} from '@/shared/services/test/mocks/trajectoryMock.tsx';
+} from '@/mocks/data/tests/trajectory.mock.ts';
 import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
 import { AuthService } from '@/shared/services/authService.ts';
 
@@ -72,7 +72,7 @@ describe('fetchTrajectoriesFromFS', () => {
   it('should fetch trajectories with area type from file system', async () => {
     vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
       ok: true,
-      json: async () => Promise.resolve(mockFsTrajectoryArray),
+      json: async () => Promise.resolve(mockFsTrajectoryAreaArray),
     });
 
     const result = await fetchTrajectoriesFromFS(TRAJECTORY_TYPE.AREA);
@@ -82,7 +82,7 @@ describe('fetchTrajectoriesFromFS', () => {
       expect(AuthService.authFetch).toHaveBeenCalledWith(
         `https://mockapi.com/v1/trajectory/fs?trajectoryType=AREA&thermalCapacityArea=&fileNameContains=`,
       );
-      expect(result).toEqual(mockFsTrajectoryArray);
+      expect(result).toEqual(mockFsTrajectoryAreaArray);
     });
   });
 

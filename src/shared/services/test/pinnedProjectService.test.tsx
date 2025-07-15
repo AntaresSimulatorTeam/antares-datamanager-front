@@ -7,7 +7,7 @@
 import { fetchPinnedProjects, pinProject, unpinProject } from '../pinnedProjectService';
 import { vi } from 'vitest';
 import { waitFor } from '@testing-library/react';
-import { mockResponse, mockResponseArray } from '@/shared/services/test/mocks/pinnedProjectMock.tsx';
+import { mockPinProjectResponseArray, mockResponse } from '@/mocks/data/tests/pinnedProject.mock.ts';
 import { AuthService } from '@/shared/services/authService.ts';
 import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
 
@@ -80,7 +80,7 @@ describe('fetchPinnedProjects', () => {
   it('should fetch pinned project list', async () => {
     vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
       ok: true,
-      json: async () => Promise.resolve(mockResponseArray),
+      json: async () => Promise.resolve(mockPinProjectResponseArray),
     });
 
     const result = await fetchPinnedProjects(userId);
@@ -88,7 +88,7 @@ describe('fetchPinnedProjects', () => {
     await waitFor(() => {
       expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
       expect(AuthService.authFetch).toHaveBeenCalledWith(`https://mockapi.com/v1/project/pinned?userId=${userId}`);
-      expect(result).toEqual(mockResponseArray);
+      expect(result).toEqual(mockPinProjectResponseArray);
     });
   });
 

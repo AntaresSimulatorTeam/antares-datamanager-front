@@ -10,13 +10,12 @@ import { useTranslation } from 'react-i18next';
 import KeywordsInput from '@/components/input/KeywordsInput.tsx';
 import HorizonInput from '@/components/input/HorizonInput';
 import ProjectInput from '@/components/input/ProjectInput.tsx';
-import { saveStudy, duplicateStudy } from '@/shared/services/studyService';
-import { StudyDTO } from '@/shared/types';
+import { duplicateStudy, saveStudy } from '@/shared/services/studyService';
+import { BackendError, StudyDTO } from '@/shared/types';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { notifyToast } from '@/shared/notification/notification';
 import { validateMaxLength } from '@/shared/utils/validateMaxTextLength';
 import { MAX_STUDY_NAME_LENGTH } from '@/shared/const/studyConfig';
-import { BackendError } from '@/shared/utils/errrorHandler';
 
 interface StudyCreationModalProps {
   isOpen?: boolean;
@@ -58,7 +57,6 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
       }
     }
   };
-
 
   const saveStudyHandler = async () => {
     if (study && studyName.trim() === study.name.trim()) {
@@ -109,7 +107,6 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
       return;
     }
 
-
     if (study && studyName.trim() === study.name.trim()) {
       notifyToast({
         type: 'error',
@@ -125,7 +122,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
       project: projectName,
       horizon,
       trajectoryIds,
-      id:study.id,
+      id: study.id,
     };
 
     try {
@@ -137,7 +134,6 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
       setKeywords([]);
       onClose();
     } catch (error) {
-
       let errorMsg = (error as BackendError).antaresErrorMessage || 'Error duplicating study';
 
       errorMsg = errorMsg.replace(/:\s+/g, ': ');

@@ -10,7 +10,7 @@ import { isAuthenticationActive } from '@/shared/utils/authUtils.ts';
 import { getEnvVariables } from '@/envVariables.ts';
 import { notifyToast } from '@/shared/notification/notification';
 import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
-import { BackendError } from '@/shared/utils/errrorHandler.ts';
+import { BackendError } from '@/shared/types';
 
 const userManager = new UserManager(config);
 

@@ -6,8 +6,7 @@
 
 import { PROJECT_AUTOCOMPLETE_ENDPOINT, PROJECT_ENDPOINT, PROJECT_SEARCH_ENDPOINT } from '@/shared/const/apiEndPoint';
 import { AuthService } from '@/shared/services/authService.ts';
-import { PaginatedResponse, ProjectInfo, ProjectResponse } from '@/shared/types';
-import { BackendError } from '@/shared/utils/errrorHandler.ts';
+import { BackendError, PaginatedResponse, ProjectInfo, ProjectResponse } from '@/shared/types';
 
 /**
  * Delete project

@@ -8,6 +8,7 @@ import { useCallback, useEffect, useState } from 'react';
 import {
   CheckBoxData,
   DbTrajectory,
+  FileInputStatus,
   HypothesisRowData,
   LocationStudy,
   RowStatus,
@@ -27,7 +28,7 @@ import {
 } from '@/shared/services/trajectoryService.ts';
 import { convertToFSSelectionOptionType, convertToSelectionOptionType } from '@/shared/utils/formFormatter.ts';
 import SearchBar from '@/pages/pegase/home/components/SearchBar.tsx';
-import { FileInputStatus, RdsCheckbox, RdsCheckboxGroupWrapper, RdsDivider } from 'rte-design-system-react';
+import { RdsCheckbox, RdsCheckboxGroupWrapper, RdsDivider } from 'rte-design-system-react';
 import { getStudyTrajectoriesWithWarnings } from '@/shared/services/studyService.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
@@ -38,7 +39,6 @@ import {
   buildErrorTrajectory,
   buildRowData,
   retrieveReadOnlyArea,
-  setReadOnlyForGeneratedStudy,
 } from '@/shared/utils/trajectoryUtils.ts';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
@@ -50,6 +50,7 @@ import { notifyAlert } from '@/shared/notification/notification.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import { useFetchTrajectoriesLinked } from '@/hooks/useFetchTrajectoriesLinked.ts';
+import { setReadOnlyForGeneratedStudy } from '@/shared/helpers/hypothesisTableHelper.ts';
 
 interface LoadTabProps {
   defaultAreas: CheckBoxData[];
@@ -68,7 +69,6 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
   const [readOnlyAreas, setReadOnlyAreas] = useState<string[]>([]);
   const [data, setData] = useState<HypothesisRowData[]>([]);
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
-  const [areasDefaultOptions, setAreasDefaultOptions] = useState<CheckBoxData[]>([]);
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const [isDeletionModalOpen, setIsDeletionModalOpen] = useState(false);
@@ -95,7 +95,6 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
               }
             })
             .filter(Boolean) as CheckBoxData[];
-          setAreasDefaultOptions(defaultAreas);
           setAreasOptions(defaultAreas?.concat(newArea));
 
           // Find default area not included in areas trajectory list
@@ -123,8 +122,11 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
           });
           const areaData = emptyAreas
             .map((trajectory: DbTrajectory) => {
-              if (!areaDefaultOther.some((item: CheckBoxData) => item.name === trajectory.loadArea)) {
-                return buildRowData(trajectory.loadArea as string, false, trajectory);
+              if (
+                trajectory.loadArea &&
+                !areaDefaultOther.some((item: CheckBoxData) => item.name === trajectory.loadArea)
+              ) {
+                return buildRowData(trajectory.loadArea, false, trajectory);
               }
             })
             .filter(Boolean) as HypothesisRowData[];
@@ -222,13 +224,13 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
     errorMessage?: string,
   ) => {
     try {
-      if (status === 'empty' || status === 'emptyError') {
+      if ((status === 'empty' && data[rowIndex].trajectory) || (status === 'emptyError' && data[rowIndex].trajectory)) {
         if (status === 'empty') {
           await unlinkTrajectoryFromStudy(trajectoryId, study.id);
         }
         dispatch?.({
-          type: STUDY_ACTION.DELETE_LOAD_TRAJECTORY,
-          payload: data[rowIndex].hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : data[rowIndex].hypothesis,
+          type: STUDY_ACTION.UPDATE_TRAJECTORY,
+          payload: { trajectory: data[rowIndex].trajectory, status },
         });
         setData((prev) =>
           prev.map((item, index) =>
@@ -251,16 +253,8 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
             return trajectory.loadArea === data[rowIndex].hypothesis;
           }
         });
-        if (newTrajectory && newTrajectory.loadArea) {
-          const isDefaultAreaNotInState =
-            areasDefaultOptions?.some((area) => area.name === newTrajectory.loadArea) &&
-            !studyState?.[`${TRAJECTORY_TYPE.LOAD}`]?.some(
-              (trajectory) => trajectory.loadArea === newTrajectory.loadArea,
-            );
-          dispatch?.({
-            type: isDefaultAreaNotInState ? STUDY_ACTION.ADD_TRAJECTORY_LOAD : STUDY_ACTION.UPDATE_LOAD_TRAJECTORY,
-            payload: newTrajectory,
-          });
+        if (newTrajectory?.loadArea) {
+          dispatch?.({ type: STUDY_ACTION.ADD_TRAJECTORIES, payload: [newTrajectory] });
         }
         setData((prev) =>
           prev.map((item, index) =>
@@ -323,8 +317,8 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
   const handleRemoveRow = async (value?: string, indexRow?: number) => {
     if (indexRow && data?.[indexRow]) {
       dispatch?.({
-        type: STUDY_ACTION.DELETE_LOAD_TRAJECTORY,
-        payload: data[indexRow].hypothesis,
+        type: STUDY_ACTION.DELETE_TRAJECTORY,
+        payload: { area: data[indexRow].hypothesis, type: TRAJECTORY_TYPE.LOAD },
       });
       if (data[indexRow]?.trajectory && data[indexRow]?.status === TRAJECTORY_SELECTION_STATUS.OK) {
         await unlinkTrajectoryFromStudy(data[indexRow].trajectory.id, study.id);
@@ -352,8 +346,8 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
 
   const addRow = (name: string) => {
     dispatch?.({
-      type: STUDY_ACTION.ADD_TRAJECTORY_LOAD,
-      payload: buildEmptyTrajectory(name, TRAJECTORY_TYPE.LOAD),
+      type: STUDY_ACTION.ADD_TRAJECTORIES,
+      payload: [buildEmptyTrajectory(name, TRAJECTORY_TYPE.LOAD)],
     });
     const newDataSorted = sortWithFixedPosition([
       {

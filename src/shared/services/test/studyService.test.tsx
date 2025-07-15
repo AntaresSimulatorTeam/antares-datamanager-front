@@ -16,16 +16,13 @@ import {
   saveStudy,
 } from '@/shared/services/studyService.ts';
 import { notifyToast } from '@/shared/notification/notification.tsx';
-import { mockStudy, mockStudyResponse } from '@/shared/services/test/mocks/studyMock.tsx';
-import {
-  mockDbTrajectoryArray,
-  mockTrajectoryWithWarnings,
-  mockWarningMessagesWithTwo,
-} from '@/shared/services/test/mocks/trajectoryMock.tsx';
+import { mockStudy, mockStudyResponse } from '@/mocks/data/tests/study.mock.ts';
+import { mockDbTrajectoryArray } from '@/mocks/data/tests/trajectory.mock.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
 import { AuthService } from '@/shared/services/authService.ts';
 import * as warningService from '@/shared/services/warningService.ts';
+import { mockTrajectoryWithWarnings, mockWarningMessagesWithTwo } from '@/mocks/data/tests/warning.mock.ts';
 
 vi.mock('@/shared/notification/notification');
 vi.mock('@/envVariables', () => ({

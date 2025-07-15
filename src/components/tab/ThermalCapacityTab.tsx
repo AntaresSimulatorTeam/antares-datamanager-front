@@ -18,7 +18,7 @@ import {
   addNestedRow,
   buildRowWithSubRowsData,
   checkNestedValue,
-  removeThermalRow,
+  removeRowAndSubRow,
   retrieveReadOnlyArea,
   unCheckNestedValue,
 } from '@/shared/utils/trajectoryUtils.ts';
@@ -154,7 +154,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
   const removeRow = (value: string, isDefault: boolean, parentValue?: string) => {
     let dataToRemove: HypothesisRowData[] = [];
     if (parentValue) {
-      dataToRemove = removeThermalRow(isDefault ? defaultData : data, value, parentValue);
+      dataToRemove = removeRowAndSubRow(isDefault ? defaultData : data, value, parentValue);
       setCheckedValues((prev) => (prev.length > 0 ? unCheckNestedValue(prev, value, parentValue) : prev));
     } else {
       dataToRemove = (isDefault ? defaultData : data).filter((item) => item.hypothesis !== value);

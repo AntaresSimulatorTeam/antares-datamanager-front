@@ -91,50 +91,35 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
           getStudyTrajectoriesWithWarnings(study.id, TRAJECTORY_TYPE.AREA),
           getStudyTrajectoriesWithWarnings(study.id, TRAJECTORY_TYPE.LINK),
         ]);
-        if (trajectoryAreaResult?.length > 0 || trajectoryLinkResult?.length > 0) {
-          const trajectoryArea: DbTrajectory = trajectoryAreaResult[0] ?? null;
-          const trajectoryLink: DbTrajectory = trajectoryLinkResult[0] ?? null;
-          dispatch?.({
-            type: STUDY_ACTION.ADD_AREA_TRAJECTORIES,
-            payload: [trajectoryArea && { ...trajectoryArea }, trajectoryLink && { ...trajectoryLink }].filter(Boolean),
-          });
+        const trajectoryArea: DbTrajectory | null = trajectoryAreaResult[0] ?? null;
+        const trajectoryLink: DbTrajectory | null = trajectoryLinkResult[0] ?? null;
+        dispatch?.({
+          type: STUDY_ACTION.ADD_TRAJECTORIES,
+          payload: [trajectoryArea && { ...trajectoryArea }, trajectoryLink && { ...trajectoryLink }].filter(Boolean),
+        });
 
-          setData([
-            {
-              hypothesis: 'Areas',
-              trajectory: trajectoryArea,
-              status: trajectoryArea ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
-            },
-            {
-              hypothesis: 'Links',
-              trajectory: trajectoryLink,
-              status: trajectoryLink ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
-            },
-          ]);
-          setReadOnly({
-            '0': false,
-            '1': !trajectoryArea || (!trajectoryLink && studyData?.status === StudyStatus.GENERATED),
-          });
-        } else {
-          setData([
-            {
-              hypothesis: 'Areas',
-              trajectory: null,
-              status: TRAJECTORY_SELECTION_STATUS.MISSING,
-            },
-            {
-              hypothesis: 'Links',
-              trajectory: null,
-              status: TRAJECTORY_SELECTION_STATUS.MISSING,
-            },
-          ]);
-        }
+        setData([
+          {
+            hypothesis: 'Areas',
+            trajectory: trajectoryArea,
+            status: trajectoryArea ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+          },
+          {
+            hypothesis: 'Links',
+            trajectory: trajectoryLink,
+            status: trajectoryLink ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+          },
+        ]);
+        setReadOnly({
+          '0': false,
+          '1': !trajectoryArea || (!trajectoryLink && studyData?.status === StudyStatus.GENERATED),
+        });
       } catch {
         //Silent handler
       }
     };
     void getTrajectories();
-  }, []);
+  }, [dispatch, setErrorMessage, study.id]);
 
   const handleFetchTrajectoriesFS = async (index: number) => {
     try {
@@ -167,7 +152,8 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
       if (rowIndex === 0 && data[1]?.trajectory && data[1]?.status != TRAJECTORY_SELECTION_STATUS.ERROR) {
         await unlinkTrajectoryFromStudy(data[1].trajectory.id, study.id);
         dispatch?.({
-          type: STUDY_ACTION.CLEAR_LINK_TRAJECTORY,
+          type: STUDY_ACTION.CLEAR_TRAJECTORY_BY_TYPE,
+          payload: [TRAJECTORY_TYPE.LINK],
         } as StudyActionType);
         setData((prev) => {
           prev[0].trajectory = newDbTrajectory;
@@ -217,7 +203,8 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
       }
       setErrorMessage(t('studyDetails.@add_trajectories_message'));
       dispatch?.({
-        type: STUDY_ACTION.CLEAR_AREA_AND_LINK_TRAJECTORY,
+        type: STUDY_ACTION.CLEAR_TRAJECTORY_BY_TYPE,
+        payload: [TRAJECTORY_TYPE.AREA, TRAJECTORY_TYPE.LINK],
       } as StudyActionType);
       setData((prev) =>
         prev.map((item) => ({ ...item, trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING })),
@@ -230,7 +217,8 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
 
       rowIndex === 0 ? setErrorMessage(t('studyDetails.@add_trajectories_message')) : setErrorMessage('');
       dispatch?.({
-        type: rowIndex === 0 ? STUDY_ACTION.CLEAR_AREA_TRAJECTORY : STUDY_ACTION.CLEAR_LINK_TRAJECTORY,
+        type: STUDY_ACTION.CLEAR_TRAJECTORY_BY_TYPE,
+        payload: [rowIndex === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK],
       } as StudyActionType);
       setData((prev) =>
         prev.map((item, index) =>
@@ -269,8 +257,8 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
         const newTrajectory = newTrajectories?.[0];
         if (newTrajectory) {
           dispatch?.({
-            type: rowIndex === 0 ? STUDY_ACTION.ADD_TRAJECTORY_AREA : STUDY_ACTION.ADD_TRAJECTORY_LINK,
-            payload: newTrajectory,
+            type: STUDY_ACTION.ADD_TRAJECTORIES,
+            payload: [newTrajectory],
           });
         }
         setData((prev) =>

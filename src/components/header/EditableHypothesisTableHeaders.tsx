@@ -5,7 +5,7 @@
  */
 
 import { createColumnHelper } from '@tanstack/react-table';
-import { HypothesisRowData, SelectOption } from '@/shared/types';
+import { FileInputStatus, HypothesisRowData, SelectOption } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
 import { Dispatch, SetStateAction } from 'react';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
@@ -16,7 +16,6 @@ import { SelectInputWithButton } from '@common/data/SelectInputWithButton.tsx';
 import { ErrorMessageType } from '@/shared/types/Generic.type.ts';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { ProgressBar } from '@/components/forms/ProgressBar.tsx';
-import { FileInputStatus } from 'rte-design-system-react';
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
 

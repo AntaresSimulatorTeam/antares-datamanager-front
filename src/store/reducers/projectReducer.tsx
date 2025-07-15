@@ -8,11 +8,11 @@ import { ProjectActionType, ProjectInfo, ProjectState } from '@/shared/types/Pro
 import { PROJECT_ACTION } from '@/shared/enum/project';
 
 // PROJECTS
-const addProject = (currentState: ProjectState, payload: ProjectInfo) => {
+export const addProject = (currentState: ProjectState, payload: ProjectInfo) => {
   const { pinnedProjects, projects } = currentState;
   return { projects: [payload, ...projects], pinnedProjects };
 };
-const removeProject = (currentState: ProjectState, payload: string) => {
+export const removeProject = (currentState: ProjectState, payload: string) => {
   const { pinnedProjects, projects } = currentState;
   return {
     projects: [...projects.filter((p) => p.id !== payload)],
@@ -20,12 +20,12 @@ const removeProject = (currentState: ProjectState, payload: string) => {
   };
 };
 // PINNED PROJECTS
-const addPinnedProject = (currentState: ProjectState, payload: ProjectInfo) => {
+export const addPinnedProject = (currentState: ProjectState, payload: ProjectInfo) => {
   const { pinnedProjects, projects } = currentState;
   payload.pinned = true;
   return { projects, pinnedProjects: [...pinnedProjects, payload] };
 };
-const unpinPinnedProject = (currentState: ProjectState, payload: string) => {
+export const unpinPinnedProject = (currentState: ProjectState, payload: string) => {
   const { pinnedProjects, projects } = currentState;
   return { projects, pinnedProjects: [...pinnedProjects.filter((p) => p.id !== payload)] };
 };

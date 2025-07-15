@@ -9,6 +9,8 @@ export const mockProjectInfo: ProjectInfo = {
   tags: ['tag1', 'tag2'],
   path: '',
   studies: [],
+  archived: false,
+  pinned: false
 };
 
 export const mockProjectInfoArray: ProjectInfo[] = [
@@ -21,9 +23,11 @@ export const mockProjectInfoArray: ProjectInfo[] = [
     tags: ['tag1', 'tag2'],
     path: '',
     studies: [],
+    archived: false,
+    pinned: false
   },
   {
-    id: '123',
+    id: '125',
     name: 'Bilan prévisionnel 2019',
     description: 'Project Description',
     createdBy: 'User B',
@@ -31,6 +35,8 @@ export const mockProjectInfoArray: ProjectInfo[] = [
     tags: ['tag3', 'tag4'],
     path: '',
     studies: [],
+    archived: false,
+    pinned: false
   },
 ];
 

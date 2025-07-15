@@ -13,7 +13,7 @@ import { WarningMessage } from '@/shared/types/Warning.type.ts';
 
 export interface FsTrajectory {
   trajectoryName: string;
-  type: string;
+  type: TRAJECTORY_TYPE;
   lastModifiedDate: Date;
 }
 

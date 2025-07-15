@@ -19,14 +19,17 @@ export const useFetchTrajectoriesLinked = (studyId?: number, trajectoryType?: TR
   const fetchAreas = useCallback(
     async (id?: number, type?: TRAJECTORY_TYPE) => {
       try {
-        if (id && type) {
+        if (id != null && type) {
           const trajectoryLinkedToStudy = await getStudyTrajectoriesWithWarnings(id, type);
-          dispatch?.({
-            type: type === TRAJECTORY_TYPE.LOAD ? STUDY_ACTION.ADD_TRAJECTORIES_LOAD : STUDY_ACTION.ADD_TRAJECTORIES,
-            payload: trajectoryLinkedToStudy,
-          });
+          const arrayWithoutDuplicate = removeDuplicate(trajectoryLinkedToStudy.concat(emptyAreaSelected));
+          if (arrayWithoutDuplicate.length > 0) {
+            dispatch?.({
+              type: STUDY_ACTION.ADD_TRAJECTORIES,
+              payload: arrayWithoutDuplicate,
+            });
+            setEmptyAreas(arrayWithoutDuplicate);
+          }
           setTrajectoryLinked(trajectoryLinkedToStudy);
-          setEmptyAreas(removeDuplicate(trajectoryLinkedToStudy.concat(emptyAreaSelected)));
         }
       } catch {
         // Silent handler
