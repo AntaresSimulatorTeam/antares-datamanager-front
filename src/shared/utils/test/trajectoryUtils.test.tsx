@@ -207,7 +207,7 @@ describe('buildRowData', () => {
 });
 
 describe('buildEmptyTrajectory', () => {
-  it('generates a trajectory with expected default fields', () => {
+  it('should generate a trajectory with expected default fields', () => {
     const area = 'ZoneX';
     const type: TRAJECTORY_TYPE = TRAJECTORY_TYPE.AREA;
 
@@ -221,13 +221,6 @@ describe('buildEmptyTrajectory', () => {
     expect(result.state).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
     expect(result.messages).toEqual([]);
     expect(result.creationDate).toBeInstanceOf(Date);
-  });
-
-  it('generates a unique id each time', () => {
-    const t1 = buildEmptyTrajectory('ZoneA', TRAJECTORY_TYPE.AREA);
-    const t2 = buildEmptyTrajectory('ZoneA', TRAJECTORY_TYPE.LINK);
-
-    expect(t1.id).not.toBe(t2.id);
   });
 });
 

@@ -117,7 +117,7 @@ export const buildRowData = (areaName: string, isDefault: boolean, trajectory?: 
  * @return {DbTrajectory}
  */
 export const buildEmptyTrajectory = (areaName: string, type: TRAJECTORY_TYPE): DbTrajectory => ({
-  id: Math.random(),
+  id: Math.floor(Math.random() * 10),
   trajectoryName: '',
   type,
   version: 0,
