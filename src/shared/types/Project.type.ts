@@ -17,7 +17,6 @@ export interface ProjectResponse {
 }
 
 export interface ProjectInfo extends ProjectResponse {
-  description: string;
   archived?: boolean;
   pinned?: boolean;
   path: string;

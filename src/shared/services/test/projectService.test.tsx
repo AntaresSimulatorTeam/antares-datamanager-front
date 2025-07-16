@@ -18,7 +18,7 @@ import {
   mockProjectInfo,
   mockProjectInfoArray,
   projectData,
-} from '@/shared/services/test/mocks/projectMock.tsx';
+} from '@/mocks/data/tests/project.mock.ts';
 import { AuthService } from '@/shared/services/authService.ts';
 import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
 

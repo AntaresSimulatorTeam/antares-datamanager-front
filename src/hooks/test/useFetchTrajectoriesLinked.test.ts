@@ -3,14 +3,11 @@ import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { StudyState } from '@/shared/types';
 import { renderHook, waitFor } from '@testing-library/react';
 import * as studyService from '@/shared/services/studyService.ts';
-import {
-  mockDbTrajectory,
-  mockDbTrajectoryArray,
-  mockTrajectoryWithWarnings,
-} from '@/shared/services/test/mocks/trajectoryMock.tsx';
+import { mockDbTrajectory, mockDbTrajectoryArray } from '@/mocks/data/tests/trajectory.mock.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { useFetchTrajectoriesLinked } from '@/hooks/useFetchTrajectoriesLinked.ts';
+import { mockTrajectoryWithWarnings } from '@/mocks/data/tests/warning.mock.ts';
 
 vi.mock('@/shared/services/trajectoryService');
 vi.mock('@/shared/services/studyService');
@@ -57,7 +54,7 @@ describe('useFetchTrajectoriesLinked', () => {
       expect(studyService.getStudyTrajectoriesWithWarnings).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.LOAD);
       expect(mockDispatch).toHaveBeenCalledTimes(1);
       expect(mockDispatch).toHaveBeenCalledWith({
-        type: STUDY_ACTION.ADD_TRAJECTORIES_LOAD,
+        type: STUDY_ACTION.ADD_TRAJECTORIES,
         payload: mockTrajectoryWithWarnings,
       });
       expect(result.current.trajectoryLinked).toEqual(mockTrajectoryWithWarnings);

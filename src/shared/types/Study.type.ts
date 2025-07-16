@@ -8,7 +8,7 @@ import { DbTrajectory } from '@/shared/types/Trajectory.type.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
-import { WarningMessage } from '@/shared/types/Warning.type.ts';
+import { FileInputStatus } from '@/shared/types';
 
 export interface StudyDTO {
   id: number;
@@ -35,29 +35,11 @@ export type StudyState = {
 };
 
 export type StudyActionType =
+  | { type: STUDY_ACTION.CLEAR_TRAJECTORY_BY_TYPE; payload: TRAJECTORY_TYPE[] }
   | { type: STUDY_ACTION.ADD_TRAJECTORIES; payload: DbTrajectory[] }
-  | { type: STUDY_ACTION.ADD_AREA_TRAJECTORIES; payload: DbTrajectory[] }
-  | {
-      type: STUDY_ACTION.ADD_TRAJECTORY_AREA;
-      payload: DbTrajectory;
-    }
-  | {
-      type: STUDY_ACTION.ADD_TRAJECTORY_LINK;
-      payload: DbTrajectory;
-    }
-  | {
-      type: STUDY_ACTION.ADD_TRAJECTORY_LOAD;
-      payload: DbTrajectory;
-    }
-  | { type: STUDY_ACTION.CLEAR_AREA_TRAJECTORY }
-  | { type: STUDY_ACTION.CLEAR_LINK_TRAJECTORY }
-  | { type: STUDY_ACTION.DELETE_LOAD_TRAJECTORY; payload: string }
-  | { type: STUDY_ACTION.EMPTY_LOAD_TRAJECTORY; payload: string }
-  | { type: STUDY_ACTION.UPDATE_LOAD_TRAJECTORY; payload: DbTrajectory }
-  | { type: STUDY_ACTION.ADD_TRAJECTORIES_LOAD; payload: DbTrajectory[] }
-  | { type: STUDY_ACTION.CLEAR_AREA_AND_LINK_TRAJECTORY }
+  | { type: STUDY_ACTION.DELETE_TRAJECTORY; payload: { area: string; type: TRAJECTORY_TYPE } }
+  | { type: STUDY_ACTION.UPDATE_TRAJECTORY; payload: { trajectory: DbTrajectory; status: FileInputStatus } }
   | { type: STUDY_ACTION.SET_STUDY_STATUS; payload: StudyStatus }
-  | { type: STUDY_ACTION.ADD_WARNING_MESSAGE; payload: { message: WarningMessage; type: TRAJECTORY_TYPE } }
   | { type: STUDY_ACTION.SKIP_MESSAGE; payload: { id: number; trajectoryType: TRAJECTORY_TYPE; trajectoryId: number } };
 
 export interface LocationStudy {

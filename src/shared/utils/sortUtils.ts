@@ -27,7 +27,7 @@ export const sortWithFixedPosition = (arr: HypothesisRowData[]): HypothesisRowDa
     }
   });
 
-  // Sort the non-fixed items
+  fixedFirstItems.sort((a, b) => a.hypothesis.localeCompare(b.hypothesis));
   toSort.sort((a, b) => a.hypothesis.localeCompare(b.hypothesis)); // Customize the sort logic as needed
 
   return [...fixedFirstItems, ...toSort, ...fixedLastItems];

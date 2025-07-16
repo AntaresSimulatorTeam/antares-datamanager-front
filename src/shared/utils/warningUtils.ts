@@ -1,10 +1,16 @@
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
-import { CardDataType, DataWarningMessage, DbTrajectory, StudyState, WarningMessage } from '@/shared/types';
+import { CardDataType, DataWarningMessage, DbTrajectory, WarningMessage } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { discardWarningMessage } from '@/shared/services/warningService.ts';
-import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 
+/**
+ * Sort messages list according to the warning level (typeof WARNING_MESSAGE_LEVEL)
+ *
+ * @param {WarningMessage} a - Warning message
+ * @param {WarningMessage} b - Warning message
+ * @return {number}
+ */
 export const sortByLevel = (a: WarningMessage, b: WarningMessage): number => {
   const map: Map<WARNING_MESSAGE_LEVEL, number> = new Map();
   map.set(WARNING_MESSAGE_LEVEL.ERROR_LEVEL, 0);
@@ -57,40 +63,23 @@ export const convertDataToItem = <T>(data: T, t: (value: string) => string): Car
   };
 };
 
-export const buildWarningMessageData = (
-  message: WarningMessage,
-  trajectory: DbTrajectory,
-  tabName: TRAJECTORY_TYPE,
-  isNotGenerated: boolean,
-): DataWarningMessage => ({
-  ...message,
-  trajectoryId: trajectory.id,
-  trajectoryType: tabName,
-  trajectory: trajectory.trajectoryName,
-  onClickItem: isNotGenerated ? discardWarningMessage : null,
-});
-
-export const buildMessagesByType = (
+/**
+ * Convert message warning DTO into DataWarningMessage object according to trajectory type
+ * @param {DbTrajectory} trajectory
+ * @param {TRAJECTORY_TYPE} tabName - Tab name is defined as typeof TRAJECTORY_TYPE
+ * @param {boolean} isNotGenerated
+ * @return {DataWarningMessage[]} - Data that can be used into card component
+ */
+export const buildDataWarningMessage = (
   trajectory: DbTrajectory,
   tabName: TRAJECTORY_TYPE,
   isNotGenerated: boolean,
 ): DataWarningMessage[] =>
-  (trajectory.messages || []).map((message) => buildWarningMessageData(message, trajectory, tabName, isNotGenerated));
+  (trajectory.messages || []).map((message: WarningMessage) => ({
+    ...message,
+    trajectoryId: trajectory.id,
+    trajectoryType: tabName,
+    trajectory: trajectory.trajectoryName,
+    onClickItem: isNotGenerated ? discardWarningMessage : null,
+  }));
 
-export const buildWarningMessages = (
-  studyState: Partial<StudyState>,
-  tabName: TRAJECTORY_TYPE,
-): DataWarningMessage[] => {
-  let messages: DataWarningMessage[] = [];
-  const trajectories: DbTrajectory[] | null = studyState[tabName] ?? null;
-  const isStudyGenerated = studyState.studyStatus !== StudyStatus.GENERATED;
-  if (trajectories && trajectories.length > 0) {
-    messages = trajectories.flatMap((trajectory) => buildMessagesByType(trajectory, tabName, isStudyGenerated));
-  }
-  if (tabName === TRAJECTORY_TYPE.AREA && studyState.LINK) {
-    const linkMessage: DataWarningMessage[] = buildMessagesByType(studyState?.LINK?.[0], tabName, isStudyGenerated);
-    return messages.length > 0 && linkMessage?.length > 0 ? messages.concat(linkMessage) : linkMessage;
-  } else {
-    return messages;
-  }
-};

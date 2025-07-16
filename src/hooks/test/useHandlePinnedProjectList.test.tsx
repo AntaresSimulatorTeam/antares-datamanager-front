@@ -15,7 +15,7 @@ import { notifyToast } from '@/shared/notification/notification.tsx';
 import { PROJECT_ACTION } from '@/shared/enum/project.ts';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { UserState } from '@/shared/types';
-import { mockPinProjectResponse, mockProjectsApiResponse } from '@/shared/services/test/mocks/pinnedProjectMock';
+import { mockPinProjectResponse, mockProjectsApiResponse } from '@/mocks/data/tests/pinnedProject.mock';
 
 vi.mock('@/envVariables', () => ({
   getEnvVariables: vi.fn(() => 'https://mockapi.com'),

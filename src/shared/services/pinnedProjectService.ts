@@ -7,7 +7,7 @@
 import { PROJECT_PIN_ENDPOINT, PROJECT_PINNED_ENDPOINT, PROJECT_UNPIN_ENDPOINT } from '@/shared/const/apiEndPoint';
 import { ProjectInfo } from '@/shared/types/Project.type.ts';
 import { AuthService } from '@/shared/services/authService.ts';
-import { BackendError } from '@/shared/utils/errrorHandler.ts';
+import { BackendError } from '@/shared/types';
 
 /**
  * Retrieve pinned projects list by user id
@@ -22,11 +22,10 @@ export const fetchPinnedProjects = async (userId: string | undefined): Promise<P
     const json = (await (response as Response).json()) as Partial<ProjectInfo>[];
     return json.map((project: Partial<ProjectInfo>) => ({
       ...project,
-      projectId: project.id?.toString(),
       pinned: project.pinned ?? true,
     })) as ProjectInfo[];
   } catch (error) {
-    throw new Error((error as BackendError).antaresErrorMessage);
+    throw new Error(`${(error as BackendError)?.antaresErrorMessage}`);
   }
 };
 

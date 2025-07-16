@@ -9,7 +9,7 @@ import {
   mockDbTrajectoryArray,
   mockDefaultArea,
   mockTrajectoryAreaData,
-} from '@/shared/services/test/mocks/trajectoryMock.tsx';
+} from '@/mocks/data/tests/trajectory.mock.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 
 vi.mock('@/shared/services/trajectoryService');

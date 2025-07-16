@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "fix/ANT-3505_fetch_warnings_no_warning",
-  commit: "41bdecb",
-  commitTime: "2025-07-08T07:52:41.055Z"
+  branch: "feat/ANT-3459_unit_tests_method_utils_and_reducers",
+  commit: "7d7360a",
+  commitTime: "2025-07-16T08:41:29.980Z"
 };

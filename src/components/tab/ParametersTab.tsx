@@ -13,7 +13,7 @@ import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { useStudy } from '@/store/contexts/StudyContext.tsx';
 import StdCheckboxGroupWrapper from '@common/forms/stdCheckboxGroup/StdCheckboxGroupWrapper.tsx';
 import StdCheckbox from '@common/forms/stdCheckbox/StdCheckbox.tsx';
-import { sortWithFixedPosition } from '@/shared/utils/sortUtils.tsx';
+import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
 
 interface ParametersTabProps {
   defaultAreas: CheckBoxData[];

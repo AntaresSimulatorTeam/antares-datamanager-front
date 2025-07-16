@@ -19,7 +19,7 @@ export interface WarningMessage {
 
 export interface DataWarningMessage extends WarningMessage {
   trajectoryId?: number;
-  trajectoryType: string;
+  trajectoryType: TRAJECTORY_TYPE;
   trajectory: string;
   onClickItem:
     | ((

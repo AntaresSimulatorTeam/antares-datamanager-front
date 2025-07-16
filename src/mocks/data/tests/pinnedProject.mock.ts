@@ -1,4 +1,4 @@
-import { ProjectInfo } from '@/shared/types/index.js';
+import { ProjectInfo } from '@/shared/types';
 
 export const mockProjectsApiResponse: ProjectInfo[] = [
   {
@@ -48,14 +48,13 @@ export const mockPinProjectResponse: ProjectInfo = {
   path: '',
 };
 
-export const mockResponseArray = [
+export const mockPinProjectResponseArray = [
   {
     id: '123',
-    projectId: '123',
     name: 'Project Name',
     description: 'Project Description',
     createdBy: 'User A',
-    creationDate: '2024-01-01',
+    creationDate: '2024-07-25T10:09:41' as unknown as Date,
     tags: ['tag1', 'tag2'],
     archived: true,
     pinned: true,
@@ -64,11 +63,10 @@ export const mockResponseArray = [
   },
   {
     id: '124',
-    projectId: '124',
     name: 'Project Name 3',
     description: 'Project Description',
     createdBy: 'User A',
-    creationDate: '2024-01-01',
+    creationDate: '2024-07-25T10:09:41' as unknown as Date,
     tags: ['tag1', 'tag2'],
     archived: true,
     pinned: true,

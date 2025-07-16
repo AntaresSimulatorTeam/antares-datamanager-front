@@ -1,10 +1,9 @@
 import { WARNING_MESSAGES } from '@/shared/const/apiEndPoint.ts';
 import { AuthService } from '@/shared/services/authService.ts';
-import { StudyActionType, WarningMessage } from '@/shared/types';
+import { BackendError, StudyActionType, WarningMessage } from '@/shared/types';
 import { Dispatch } from 'react';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { BackendError } from '@/shared/utils/errrorHandler.ts';
 
 /**
  * Discard warning message
@@ -12,16 +11,17 @@ import { BackendError } from '@/shared/utils/errrorHandler.ts';
  * @return {Promise<void>}
  */
 export const skipMessage = async (id: number): Promise<void> => {
-  const urlApi = `${WARNING_MESSAGES}/${id}/ack`;
-  const response = await AuthService.authFetch(urlApi, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-  if (!(response as Response).ok) {
-    throw new Error(`${(response as BackendError).antaresErrorMessage}`);
-  }
+  try {
+    const urlApi = `${WARNING_MESSAGES}/${id}/ack`;
+    await AuthService.authFetch(urlApi, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    } catch(error) {
+      throw new Error(`${(error as BackendError).antaresErrorMessage}`);
+    }
 };
 
 /**

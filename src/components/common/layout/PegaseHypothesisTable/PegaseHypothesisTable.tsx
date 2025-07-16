@@ -1,10 +1,9 @@
 import StdSimpleTable from '@common/data/stdSimpleTable/StdSimpleTable.tsx';
 import { Dispatch, SetStateAction, useCallback, useMemo, useState } from 'react';
-import { ErrorMessageType, HypothesisRowData, RowStatus, SelectOption } from '@/shared/types';
+import { ErrorMessageType, FileInputStatus, HypothesisRowData, RowStatus, SelectOption } from '@/shared/types';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { useTranslation } from 'react-i18next';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
-import { FileInputStatus } from 'rte-design-system-react';
 import { TableOptions } from '@tanstack/react-table';
 
 interface PegaseHypothesisTableProps {

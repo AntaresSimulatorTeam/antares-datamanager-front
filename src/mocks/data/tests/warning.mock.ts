@@ -1,38 +1,19 @@
-import { DbTrajectory, TrajectoryAreaData, WarningMessage } from '@/shared/types';
-import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { DataWarningMessage, WarningMessage } from '@/shared/types';
 import { WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
+import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 
-export const mockDbTrajectory: DbTrajectory = {
+export const mockSingleWarningMessages: WarningMessage = {
   id: 1,
-  trajectoryName: 'area_BP_23_v6',
-  type: TRAJECTORY_TYPE.AREA,
-  version: 6,
-  userName: 'mouad',
-  creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-  messages: [],
-  loadArea: 'AT',
+  content:
+    'this is a warning message, after all, nothing change, just avoid violence. this is a warning message, after all, nothing change, just avoid violence',
+  level: WARNING_MESSAGE_LEVEL.WARNING_LEVEL,
+  code: 'LINKS_AREA_NOT_PRESENT',
+  generatedBy: 'unknown_user',
+  generatedAt: '2025-04-01T18:31:53.623683' as unknown as Date,
+  trajectory: 'areas_BP23_A_ref',
+  secondTrajectory: 'links_BP23_A_ref',
+  isAck: false,
 };
-
-export const mockDbTrajectoryArray = [
-  {
-    id: 1,
-    trajectoryName: 'area_PB_2024',
-    type: TRAJECTORY_TYPE.AREA,
-    version: 3,
-    userName: 'mouad',
-    creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-    loadArea: 'AT',
-  },
-  {
-    id: 2,
-    trajectoryName: 'area_PB_2026',
-    type: TRAJECTORY_TYPE.AREA,
-    version: 3,
-    userName: 'mouad',
-    creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
-    loadArea: 'BE',
-  },
-];
 
 export const mockWarningMessagesWithTwo: WarningMessage[] = [
   {
@@ -80,24 +61,6 @@ export const mockTrajectoryWithWarnings = [
     creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
     loadArea: 'BE',
     messages: mockWarningMessagesWithTwo,
-  },
-];
-
-export const mockFsTrajectoryArray = [
-  {
-    trajectoryName: 'area_BP_2028',
-    type: TRAJECTORY_TYPE.AREA,
-    lastModifiedDate: '2026-08-22 15:13:56.860045' as unknown as Date,
-  },
-  {
-    trajectoryName: 'area_BP_2027',
-    type: TRAJECTORY_TYPE.AREA,
-    lastModifiedDate: '2026-08-22 15:13:56.860045' as unknown as Date,
-  },
-  {
-    trajectoryName: 'area_BP_2030_2050',
-    type: TRAJECTORY_TYPE.AREA,
-    lastModifiedDate: '2026-08-22 15:13:56.860045' as unknown as Date,
   },
 ];
 
@@ -194,32 +157,9 @@ export const mockWarningMessages: WarningMessage[] = [
   },
 ];
 
-export const mockTrajectoryAreaData: TrajectoryAreaData[] = [
-  {
-    areaName: 'CH',
-    powerToGas: 'false',
-    shortTermStorage: 'false',
-  },
-  {
-    areaName: 'BR',
-    powerToGas: 'false',
-    shortTermStorage: 'false',
-  },
-  {
-    areaName: 'ES',
-    powerToGas: 'true',
-    shortTermStorage: 'false',
-  },
-  {
-    areaName: 'IE',
-    powerToGas: 'false',
-    shortTermStorage: 'true',
-  },
-  {
-    areaName: 'ITcs',
-    powerToGas: 'false',
-    shortTermStorage: 'false',
-  },
-];
-
-export const mockDefaultArea = [{ name: 'FR' }];
+export const mockDataMessage: DataWarningMessage = {
+  ...mockSingleWarningMessages,
+  trajectory: 'load_BP_23_REF',
+  trajectoryType: TRAJECTORY_TYPE.LOAD,
+  onClickItem: null,
+};

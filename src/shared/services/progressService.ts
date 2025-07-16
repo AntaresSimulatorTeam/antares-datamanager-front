@@ -1,5 +1,5 @@
 import { AuthService } from '@/shared/services/authService.ts';
-import { BackendError } from '@/shared/utils/errrorHandler.ts';
+import { BackendError } from '@/shared/types';
 
 const simulateProgress = async (duration: number, onProgress: (value: number) => void) =>
   new Promise((resolve) => {

@@ -1,6 +1,9 @@
-import { mockWarningMessages } from '@/shared/services/test/mocks/trajectoryMock.tsx';
-import { sortByLevel } from '@/shared/utils/warningUtils.ts';
+import { buildDataWarningMessage, sortByLevel } from '@/shared/utils/warningUtils.ts';
 import { WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
+import { mockWarningMessages, mockWarningMessagesWithTwo } from '@/mocks/data/tests/warning.mock.ts';
+import { discardWarningMessage } from '@/shared/services/warningService.ts';
+import { DbTrajectory } from '@/shared/types';
+import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 
 describe('sortByLevel', () => {
   it('should sort messages according to the level priority', () => {
@@ -97,5 +100,53 @@ describe('sortByLevel', () => {
         isAck: false,
       },
     ]);
+  });
+});
+
+describe('buildDataWarningMessage', () => {
+  const mockTrajectory: DbTrajectory =
+    {
+      id: 123,
+      trajectoryName: 'T-Alpha',
+      type: TRAJECTORY_TYPE.AREA,
+      version: 1,
+      userName: 'CB',
+      creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+      messages: mockWarningMessagesWithTwo
+    }
+
+  it('should return enriched messages when isNotGenerated is true', () => {
+    const result = buildDataWarningMessage(mockTrajectory, TRAJECTORY_TYPE.AREA, true);
+
+    expect(result).toHaveLength(2);
+    expect(result[0]).toEqual({
+      ...mockWarningMessagesWithTwo[0],
+      trajectoryId: 123,
+      trajectoryType: TRAJECTORY_TYPE.AREA,
+      trajectory: 'T-Alpha',
+      onClickItem: discardWarningMessage,
+    });
+    expect(result[1].onClickItem).toBe(discardWarningMessage);
+  });
+
+  it('should return messages with onClickItem set to null when isNotGenerated is false', () => {
+    const result = buildDataWarningMessage(mockTrajectory, TRAJECTORY_TYPE.LOAD, false);
+
+    expect(result.every((msg) => msg.onClickItem === null)).toBe(true);
+  });
+
+  it('should return empty array when trajectory.messages is undefined', () => {
+    const emptyTrajectory = {
+      id: 123,
+      trajectoryName: 'T-Alpha',
+      type: TRAJECTORY_TYPE.AREA,
+      version: 1,
+      userName: 'CB',
+      creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+      messages: [],
+    };
+
+    const result = buildDataWarningMessage(emptyTrajectory, TRAJECTORY_TYPE.AREA, true);
+    expect(result).toEqual([]);
   });
 });

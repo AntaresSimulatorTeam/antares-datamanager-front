@@ -15,7 +15,7 @@ export interface ErrorMessageType {
   message: string;
 }
 
-export interface ErrorMessage {
+export interface BackendError {
   antaresErrorMessage: string;
   errorMessageArguments: string[];
   date: Date;
@@ -40,3 +40,5 @@ export type CheckBoxData = {
   name: string;
   isDefault: boolean;
 };
+
+export type FileInputStatus = 'success' | 'error' | 'loading' | 'empty' | 'emptyError';
