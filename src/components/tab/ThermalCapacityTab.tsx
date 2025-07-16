@@ -5,8 +5,14 @@
  */
 
 import SearchBar from '@/pages/pegase/home/components/SearchBar.tsx';
-import { FileInputStatus, RdsDivider } from 'rte-design-system-react';
-import { CheckBoxData, HypothesisRowData, NestedCheckedType, TrajectoryAreaData } from '@/shared/types';
+import { RdsDivider } from 'rte-design-system-react';
+import {
+  CheckBoxData,
+  FileInputStatus,
+  HypothesisRowData,
+  NestedCheckedType,
+  TrajectoryAreaData,
+} from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
@@ -23,7 +29,7 @@ import {
   unCheckNestedValue,
 } from '@/shared/utils/trajectoryUtils.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
-import { sortKeepLastName } from '@/shared/utils/sortUtils.tsx';
+import { sortKeepLastName } from '@/shared/utils/sortUtils.ts';
 import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';

@@ -33,7 +33,7 @@ import { getStudyTrajectoriesWithWarnings } from '@/shared/services/studyService
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import getEditableHypothesisTableHeaders from '@/components/header/EditableHypothesisTableHeaders.tsx';
-import { sortWithFixedPosition } from '@/shared/utils/sortUtils.tsx';
+import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
 import {
   buildEmptyTrajectory,
   buildErrorTrajectory,
