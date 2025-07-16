@@ -1,4 +1,4 @@
-import { sortKeepLastName, sortWithFixedPosition } from '@/shared/utils/sortUtils.tsx';
+import { sortKeepLastName, sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
 import { rowData, rowDataTwo } from '@/mocks/data/tests/hypothesisTable.mock.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
