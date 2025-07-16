@@ -6,6 +6,7 @@ import { WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { ThermalOptions } from '@/mocks/data/list/names.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
+import { generateId } from '@/shared/utils/defaultUtils.ts';
 
 /**
  * Get trajectory status from row status
@@ -117,7 +118,7 @@ export const buildRowData = (areaName: string, isDefault: boolean, trajectory?: 
  * @return {DbTrajectory}
  */
 export const buildEmptyTrajectory = (areaName: string, type: TRAJECTORY_TYPE): DbTrajectory => ({
-  id: Math.floor(Math.random() * 10),
+  id: Math.floor(generateId()),
   trajectoryName: '',
   type,
   version: 0,

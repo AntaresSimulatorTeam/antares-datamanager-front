@@ -2,15 +2,28 @@ import { sortKeepLastName, sortWithFixedPosition } from '@/shared/utils/sortUtil
 import { rowData, rowDataTwo } from '@/mocks/data/tests/hypothesisTable.mock.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
+import { Mock } from 'vitest';
+
+vi.mock('@/shared/utils/defaultUtils.ts', async (importOriginal) => {
+  const actual: Mock = await importOriginal();
+  return {
+    ...actual,
+    generateId: vi.fn(() => 1),
+  };
+});
 
 describe('sortKeepLastName', () => {
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('should return an array sorted alphabetically expect for name passed as argument', () => {
     expect(sortKeepLastName(rowData, 'DEkf')).toEqual([
       {
         hypothesis: 'AT',
         trajectory: {
           id: 1,
-          trajectoryName: 'LOAD_area_BP_23',
+          trajectoryName: 'BP_AREF_AT',
           type: TRAJECTORY_TYPE.LOAD,
           version: 0,
           userName: 'unknown',
@@ -30,7 +43,7 @@ describe('sortKeepLastName', () => {
           type: TRAJECTORY_TYPE.LOAD,
           version: 0,
           userName: 'unknown',
-          creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+          creationDate: '2026-00-15 14:17:40' as unknown as Date,
           messages: [],
           loadArea: 'CH',
         },
@@ -42,9 +55,9 @@ describe('sortKeepLastName', () => {
         hypothesis: 'FR',
         trajectory: {
           id: 1,
-          trajectoryName: 'LOAD_area_BP_23',
+          trajectoryName: 'BP_AREF_FR',
           type: TRAJECTORY_TYPE.LOAD,
-          version: 0,
+          version: 1,
           userName: 'unknown',
           creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
           messages: [],
@@ -58,11 +71,11 @@ describe('sortKeepLastName', () => {
         hypothesis: 'DEkf',
         trajectory: {
           id: 1,
-          trajectoryName: 'LOAD_area_BP_23',
+          trajectoryName: 'BP_AREF_DEkf',
           type: TRAJECTORY_TYPE.LOAD,
           version: 0,
           userName: 'unknown',
-          creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+          creationDate: '2027-04-06 08:56:34' as unknown as Date,
           messages: [],
           loadArea: 'DEkf',
         },
@@ -78,6 +91,10 @@ describe('sortKeepLastName', () => {
 });
 
 describe('sortKeepLastName', () => {
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('should return an array sorted alphabetically expect for name passed as argument', () => {
     expect(sortWithFixedPosition(rowDataTwo)).toEqual([
       {
@@ -100,7 +117,7 @@ describe('sortKeepLastName', () => {
         hypothesis: 'SL',
         trajectory: {
           id: 1,
-          trajectoryName: 'LOAD_BP_23',
+          trajectoryName: 'BP_23_REF_SL',
           type: TRAJECTORY_TYPE.LOAD,
           version: 0,
           userName: 'unknown',
@@ -155,7 +172,7 @@ describe('sortKeepLastName', () => {
           userName: 'robert',
           creationDate: '2025-08-34 10:40:30' as unknown as Date,
           messages: [],
-          loadArea: 'AT',
+          loadArea: 'OTHERS',
         },
         status: TRAJECTORY_SELECTION_STATUS.OK,
         isDefault: true,
