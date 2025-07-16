@@ -22,6 +22,7 @@ import { fetchWarningMessages } from '@/shared/services/warningService.ts';
  * @param {{ [key: string]: 'asc' | 'desc' })} sortBy - Object that describes the sorting type (ascending or descending) of a column
  *
  * @return {Promise<PaginatedResponse<StudyDTO>>} - Promise object that represents a list of studies
+ * @throws {Error}
  */
 export const fetchSearchStudies = async (
   searchTerm: string = '',
@@ -64,6 +65,7 @@ export const fetchSearchStudies = async (
  *
  * @param {string} partialName - Partial name of a study
  * @return {Promise<string[]>} - Promise object that represents a list of keywords
+ * @throws {Error}
  */
 export const fetchSuggestedKeywords = async (partialName: string): Promise<string[]> => {
   const queryString = new URLSearchParams({
@@ -136,6 +138,7 @@ export const deleteStudy = async (id: number): Promise<void> => {
  * Generate a study
  *
  * @param {number} id - Study id
+ * @throws {Error}
  */
 export const createStudy = async (id: number): Promise<void> => {
   const urlApi = `${STUDY_GENERATE_ENDPOINT}?id=${id}`;
@@ -157,6 +160,7 @@ export const createStudy = async (id: number): Promise<void> => {
  * @param {TRAJECTORY_TYPE} trajectoryType - Trajectory type
  *
  * @return {Promise<Omit<DbTrajectory,'messages'>[]>} Array of trajectories (data base trajectories)
+ * @throws {Error}
  */
 
 export const getStudyTrajectories = async (
@@ -180,6 +184,7 @@ export const getStudyTrajectories = async (
  * @param {TRAJECTORY_TYPE} trajectoryType - Trajectory type
  *
  * @return {Promise<DbTrajectory[]>} Array of trajectories (data base trajectories)
+ * @throws {Error}
  */
 export const getStudyTrajectoriesWithWarnings = async (
   studyId: number,
@@ -203,6 +208,7 @@ export const getStudyTrajectoriesWithWarnings = async (
  *
  * @param {number} studyId - Study id
  * @return {Promise<StudyDTO>} Study object
+ * @throws {Error}
  */
 export const getStudyById = async (studyId: number): Promise<StudyDTO> => {
   const urlApi = `${STUDY_ENDPOINT}/${studyId}`;
