@@ -49,11 +49,11 @@ export const navbarClassBuilder = (
     expanded ? NAVBAR_EXPANDED_CLASSES : NAVBAR_COLLAPSED_CLASSES,
   );
 
-export const NAVBAR_ITEM_BASE_CLASSES = 'mx-1 flex items-center gap-1 truncate rounded p-1 text-button-s font-semibold';
+export const NAVBAR_ITEM_BASE_CLASSES = 'mx-1 flex items-center truncate rounded px-1 pt-1 pb-1 text-button-s';
 export const NAVBAR_ITEM_FOCUS_CLASSES = 'focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-0';
 
 export const NAVBAR_ITEM_COMMON_CLASSES = clsx(NAVBAR_ITEM_BASE_CLASSES, NAVBAR_ITEM_FOCUS_CLASSES);
-export const NAVBAR_ITEM_COLLAPSED_CLASSES = 'w-fit';
+export const NAVBAR_ITEM_COLLAPSED_CLASSES = 'w-fit px-1 pt-1 pb-0';
 
 export const navbarItemClassBuilder = (
   selected: boolean,
