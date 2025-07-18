@@ -32,7 +32,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
   projectInfoName,
 }) => {
   const { t } = useTranslation();
-  const [studyName, setStudyName] = useState<string>(study?.name || '');
+  const [studyName, setStudyName] = useState<string>(study?.name.substring(0, study?.name.lastIndexOf('_')) || '');
   const [projectName, setProjectName] = useState<string>(study?.project || projectInfoName || '');
   const [keywords, setKeywords] = useState<string[]>(study?.keywords || []);
   const [trajectoryIds] = useState<number[]>(study?.trajectoryIds || []);

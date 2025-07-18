@@ -9,6 +9,7 @@ import { waitFor } from '@testing-library/react';
 import {
   createStudy,
   deleteStudy,
+  duplicateStudy,
   fetchSearchStudies,
   fetchSuggestedKeywords,
   getStudyTrajectories,
@@ -287,5 +288,49 @@ describe('getStudyTrajectories', () => {
     await expect(async () => getStudyTrajectories(1, TRAJECTORY_TYPE.AREA)).rejects.toThrowError(
       'Failed to fetch trajectories',
     );
+  });
+});
+
+describe('duplicateStudy', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('should generate a study', async () => {
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
+      ok: true,
+    });
+    const mockStudyData = {
+      name: 'BP_study',
+      createdBy: 'unknown',
+      keywords: ['tag1'],
+      project: 'BP_REF_23',
+      horizon: '2021-2022',
+      trajectoryIds: [102, 123],
+    };
+    await duplicateStudy(mockStudyData);
+
+    expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
+    expect(AuthService.authFetch).toHaveBeenCalledWith('https://mockapi.com/v1/study/duplicate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(mockStudyData),
+    });
+    expect(notifyToast).toHaveBeenCalledWith({
+      type: 'success',
+      message: 'Study duplicated successfully',
+    });
+  });
+
+  it('should throw an error message', async () => {
+    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
+      antaresErrorMessage: 'Failed to duplicate study',
+      date: new Date(),
+      type: ERROR_MESSAGE_TYPE.BUSINESS,
+    });
+
+    await expect(async () => createStudy(1)).rejects.toThrowError('Failed to duplicate study');
   });
 });
