@@ -37,7 +37,7 @@ const PegaseCardTitle = ({ title, dropdownOptions, icons, tag, lineClamp, onClic
       <div className="flex min-w-0 items-center gap-1">
         {icons && <span className="flex shrink items-center">{icons}</span>}
         {onClick ? (
-          <button className={titleClasses} onClick={onClick} aria-label={`title-${id}`}>
+          <button className={titleClasses} onClick={() => onClick()} aria-label={`title-${id}`}>
             <StdTextWithTooltip className={textClasses} text={title} id={`title-${id}`} />
           </button>
         ) : (

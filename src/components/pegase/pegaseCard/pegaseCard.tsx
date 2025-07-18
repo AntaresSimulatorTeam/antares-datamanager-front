@@ -43,7 +43,7 @@ const PegaseCard = ({
         <PegaseCardTitle
           id={`${id}-title`}
           title={title}
-          onClick={buttons ? onClick : undefined}
+          onClick={() => (onClick ? onClick() : undefined)}
           icons={icons}
           lineClamp={lineClamp}
           dropdownOptions={dropdownOptions}
