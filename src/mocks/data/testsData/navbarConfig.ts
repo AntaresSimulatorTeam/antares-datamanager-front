@@ -5,14 +5,14 @@ export const TEST_TEXT_HEADER_CONFIG: HeaderStyleTextConfig = {
   appTwoLetters: 'IG',
   appVersion: 'v3.0',
   appName: 'Imagrid',
-  versionTextColor: 'text-gray-600',
+  versionTextColor: 'gray-600',
 };
 
 export const TEST_LOGO_HEADER_CONFIG: HeaderStyleLogoConfig = {
   variant: 'logo',
   appName: 'Imagrid',
   appVersion: 'v3.0',
-  versionTextColor: 'text-gray-600',
+  versionTextColor: 'gray-600',
   logoConfig: {
     logoCollapsedHref: '/logo-collapsed.svg',
     logoExpandedHref: '/logo-expanded.svg',

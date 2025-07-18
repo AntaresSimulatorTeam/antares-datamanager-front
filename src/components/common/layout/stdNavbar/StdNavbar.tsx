@@ -29,7 +29,7 @@ type HeaderCommonOwnConfig<E extends ElementType> = {
   versionTextColor?: TailwindColorClass;
   appName: string;
   appVersion: string;
-  to: string;
+  to?: string;
   as?: E;
 };
 
