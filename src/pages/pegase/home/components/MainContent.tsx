@@ -19,6 +19,7 @@ import { StudyProvider } from '@/store/contexts/StudyProvider';
 import StdNavbar from '@common/layout/stdNavbar/StdNavbar.tsx';
 import { translateMenuItemLabel } from '@/shared/utils/textUtils.ts';
 import { useTranslation } from 'react-i18next';
+import { PEGASE_NAVBAR_ID } from '@/shared/constants.ts';
 
 const MainContent = () => {
   const { t } = useTranslation();
@@ -29,6 +30,7 @@ const MainContent = () => {
         <PegaseToastContainer />
         <PegaseAlertContainer />
         <StdNavbar
+          id={PEGASE_NAVBAR_ID}
           topItems={translateMenuItemLabel(menuTopData, t)}
           bottomItems={translateMenuItemLabel(menuBottomData, t)}
           config={navBarConfig}

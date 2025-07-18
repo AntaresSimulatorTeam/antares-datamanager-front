@@ -13,7 +13,7 @@ type StdNavbarMenuProps = {
 };
 
 const StdNavbarMenu = ({ menuItems, expanded = true, itemsStyleConfig = {}, currentItemKey }: StdNavbarMenuProps) => (
-  <section>
+  <section className={`${expanded ? 'flex flex-col' : 'flex flex-col items-center'}`}>
     {menuItems.map((item: MenuNavItem) => (
       <StdNavbarMenuItem
         item={item}

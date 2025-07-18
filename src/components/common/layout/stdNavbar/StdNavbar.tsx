@@ -26,10 +26,10 @@ export type LogoConfig = {
 };
 
 type HeaderCommonOwnConfig<E extends ElementType> = {
-  versionTextColor: TailwindColorClass;
+  versionTextColor?: TailwindColorClass;
   appName: string;
   appVersion: string;
-  to: string;
+  to?: string;
   as?: E;
 };
 
@@ -70,12 +70,14 @@ export type ItemBackgroundStyleConfig = {
 };
 
 export type StdNavbarProps<E extends ElementType = AnchorDefaultAsType> = PropsWithChildren<{
+  id: string;
   topItems: MenuNavItem[];
   bottomItems: MenuNavItem[];
   config: NavbarConfig<E>;
 }>;
 
 const StdNavbar = <E extends ElementType = AnchorDefaultAsType>({
+  id,
   topItems,
   bottomItems,
   config,
@@ -95,7 +97,7 @@ const StdNavbar = <E extends ElementType = AnchorDefaultAsType>({
   const controllerLabel = expanded ? t('components.navbar.@minimize') : t('components.navbar.@expand');
 
   return (
-    <nav className={`${navbarClasses} ${zIndex}`} aria-label={config.header.appName}>
+    <nav id={id} className={`${navbarClasses} ${zIndex}`} aria-label={config.header.appName}>
       {config.header.variant === 'text' ? (
         <StdNavbarTextHeader expanded={expanded} headerConfig={config.header} />
       ) : (
@@ -111,6 +113,7 @@ const StdNavbar = <E extends ElementType = AnchorDefaultAsType>({
       <StdNavbarMenu menuItems={bottomItems} expanded={expanded} itemsStyleConfig={{ itemBackground, itemContent }} />
       <StdDivider />
       <StdNavbarController
+        id={`${id}-controller`}
         action={toggleExpanded}
         label={controllerLabel}
         expanded={expanded}

@@ -26,7 +26,7 @@
   },
   "page": {
     "@logs": "Logs",
-    "@projet": "Project",
+    "@project": "Project",
     "@logout": "Log out",
     "@parameters": "Parameters",
     "@antares": "Antares",

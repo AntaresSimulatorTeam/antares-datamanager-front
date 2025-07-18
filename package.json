@@ -12,6 +12,7 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "cy:open": "cypress open",
+    "cy:open e2e": "cypress open --e2e",
     "prepare": "husky && husky install",
     "coverage": "vitest run --coverage"
   },
@@ -45,7 +46,7 @@
     "@typescript-eslint/parser": "^7.13.1",
     "@vitejs/plugin-react": "^4.3.1",
     "@vitest/coverage-v8": "^2.1.6",
-    "cypress": "^13.13.1",
+    "cypress": "^14.5.1",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-i18n-json": "^4.0.0",
