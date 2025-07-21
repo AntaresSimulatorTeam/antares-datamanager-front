@@ -41,7 +41,7 @@ export const PegaseAlertContainer = () => (
     style={{ width: '600px' }}
     hideProgressBar
     newestOnTop={true}
-    closeOnClick={true}
+    closeOnClick={false}
     icon={() => <StdIcon name={StdIconId.Close} />}
   />
 );

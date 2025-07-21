@@ -144,7 +144,6 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
         rowIndex === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
         trajectoryId,
         trajectoryLabel,
-        errorMessage,
         user?.profile?.sub,
       );
 
@@ -177,10 +176,10 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
         );
       }
       setReadOnly({ '0': false, '1': false });
-      const alertMessage = `Error: ${trajectoryLabel} cannot be saved for ${rowIndex === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK}`;
       notifyAlert({
         icon: StdIconId.Close,
-        message: alertMessage,
+        message: `Error: ${trajectoryLabel} cannot be saved for ${rowIndex === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK}`,
+        content: errorMessage,
         type: 'error',
         filledIcon: true,
         action: {

@@ -188,7 +188,6 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
       TRAJECTORY_TYPE.LOAD,
       trajectoryId,
       trajectoryLabel,
-      errorMessage,
       user?.profile?.sub,
       data[rowIndex]?.hypothesis,
     );
@@ -207,6 +206,7 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
     notifyAlert({
       icon: StdIconId.Close,
       message: `Error: ${trajectoryLabel} cannot be saved for ${data[rowIndex]?.hypothesis}`,
+      content: errorMessage,
       type: 'error',
       filledIcon: true,
       action: {
