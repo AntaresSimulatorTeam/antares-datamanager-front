@@ -41,4 +41,6 @@ export type CheckBoxData = {
   isDefault: boolean;
 };
 
+export const AnchorDefaultAsType = 'a';
+
 export type FileInputStatus = 'success' | 'error' | 'loading' | 'empty' | 'emptyError';

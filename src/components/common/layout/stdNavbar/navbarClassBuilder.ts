@@ -11,8 +11,8 @@ export const NAVBAR_COLOR_CLASSES = {
   imagrid: 'bg-primary-950 border-gray-200 text-gray-50',
 };
 
-export const NAVBAR_EXPANDED_CLASSES = 'w-28 px-1';
-export const NAVBAR_COLLAPSED_CLASSES = 'w-8 items-center';
+export const NAVBAR_EXPANDED_CLASSES = 'flex-row w-28 px-1';
+export const NAVBAR_COLLAPSED_CLASSES = 'items-center flex-col w-fit';
 
 export const DEFAULT_BACKGROUND_CONFIG: Required<ItemBackgroundStyleConfig> = {
   mainBg: 'bg-gray-100',
@@ -49,11 +49,11 @@ export const navbarClassBuilder = (
     expanded ? NAVBAR_EXPANDED_CLASSES : NAVBAR_COLLAPSED_CLASSES,
   );
 
-export const NAVBAR_ITEM_BASE_CLASSES = 'mx-1 flex items-center gap-1 truncate rounded p-1 text-button-s font-semibold';
+export const NAVBAR_ITEM_BASE_CLASSES = 'mx-1 flex items-center truncate rounded px-1 pt-1 pb-1 text-button-s';
 export const NAVBAR_ITEM_FOCUS_CLASSES = 'focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-0';
 
 export const NAVBAR_ITEM_COMMON_CLASSES = clsx(NAVBAR_ITEM_BASE_CLASSES, NAVBAR_ITEM_FOCUS_CLASSES);
-export const NAVBAR_ITEM_COLLAPSED_CLASSES = 'w-fit';
+export const NAVBAR_ITEM_COLLAPSED_CLASSES = 'w-fit px-1 pt-1 pb-0';
 
 export const navbarItemClassBuilder = (
   selected: boolean,

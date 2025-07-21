@@ -3,6 +3,7 @@ import { HeaderStyleLogoConfig } from './StdNavbar';
 import { navbarHeaderClassBuilder } from './navbarClassBuilder.ts';
 import { AnchorDefaultAsType } from '@common/base/element.type.ts';
 import { ElementType } from 'react';
+import { APP_LOGO_ID } from '@/shared/constants.ts';
 
 type StdNavbarHeaderProps<E extends ElementType> = {
   headerConfig: HeaderStyleLogoConfig<E>;
@@ -35,13 +36,23 @@ const StdNavbarLogoHeader = <E extends ElementType = AnchorDefaultAsType>({
       {expanded ? (
         <>
           <div className="h-4">
-            <img src={logoConfig.logoExpandedHref} alt={appName} className="h-4 min-w-max object-contain" />
+            <img
+              id={APP_LOGO_ID}
+              src={logoConfig.logoExpandedHref}
+              alt={appName}
+              className="h-4 min-w-max object-contain"
+            />
           </div>
           <div className={versionClasses}>{appVersion}</div>
         </>
       ) : (
         <div className="flex h-4 items-center justify-center py-0.25">
-          <img src={logoConfig.logoCollapsedHref} alt={appName} className="h-4 min-w-max object-contain" />
+          <img
+            id={APP_LOGO_ID}
+            src={logoConfig.logoCollapsedHref}
+            alt={appName}
+            className="h-4 min-w-max object-contain"
+          />
         </div>
       )}
     </Link>

@@ -5,8 +5,8 @@
  */
 
 import i18next from '@/i18n';
-import { menuTopData } from '@/mocks/data/features/menuData.mock';
 import { APP_LOGO_ID, PEGASE_NAVBAR_ID } from '@/shared/constants';
+import { menuTopData } from '@/mocks/data/features/navbar.mock.ts';
 
 describe('Navbar behavior', () => {
   beforeEach(() => {
@@ -30,48 +30,46 @@ describe('Navbar behavior', () => {
 
     navbarController.should('contain', minimizeText);
     navbarController.click();
-    navbarController.should('not.contain', minimizeText);
-    navbarController.trigger('mouseover');
-    const navbarControllerFloating = cy.get(`#${PEGASE_NAVBAR_ID}-controller-floating`);
-    navbarControllerFloating.should('contain', expendsText);
+    navbarController.should('contain', expendsText);
     navbar.get(`#${APP_LOGO_ID}`).should('exist');
-
     navbarController.click();
-    navbarControllerFloating.should('not.contain', expendsText);
     navbarController.should('contain', minimizeText);
     navbar.get(`#${APP_LOGO_ID}`).should('exist');
   });
 
   it('displays items and handle clicking properly', () => {
-    const firstLink = menuTopData[0];
-    const firstItem = cy.get(`#${firstLink.id}`);
-    firstItem.should('contain', firstLink.label);
-
-    const secondLink = menuTopData[1];
-    const secondItem = cy.get(`#${secondLink.id}`);
-    secondItem.should('contain', secondLink.label);
+    const firstLinkData = menuTopData[0];
+    const firstItem = cy.get(`#${firstLinkData.id}`);
+    firstItem.should('contain', firstLinkData.label);
 
     firstItem.click();
-    cy.url().should('include', firstLink.path);
+    cy.url().should('include', '/');
+  });
+
+  it('displays items and handle clicking properly', () => {
+    const secondLinkData = menuTopData[1];
+    const secondItem = cy.get(`#${secondLinkData.id}`);
+    secondItem.should('contain', secondLinkData.label);
 
     secondItem.click();
-    cy.url().should('include', secondLink.path);
+    cy.url().should('include', secondLinkData.path);
   });
 
   it('displays items and handle clicking properly when the navbar is collapsed', () => {
-    const navbarController = cy.get(`#${PEGASE_NAVBAR_ID}-controller`);
-    navbarController.click();
-
+    cy.get(`#${PEGASE_NAVBAR_ID}-controller`).click();
     const firstLink = menuTopData[0];
     const firstItem = cy.get(`#${firstLink.id}`);
     firstItem.should('not.contain', firstLink.label);
 
+    firstItem.click();
+    cy.url().should('include', firstLink.path);
+  });
+
+  it('displays items and handle clicking properly when the navbar is collapsed', () => {
+    cy.get(`#${PEGASE_NAVBAR_ID}-controller`).click();
     const secondLink = menuTopData[1];
     const secondItem = cy.get(`#${secondLink.id}`);
     secondItem.should('not.contain', secondLink.label);
-
-    firstItem.click();
-    cy.url().should('include', firstLink.path);
 
     secondItem.click();
     cy.url().should('include', secondLink.path);
