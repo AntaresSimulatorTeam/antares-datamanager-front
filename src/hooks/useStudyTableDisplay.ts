@@ -5,7 +5,7 @@
  */
 
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { PaginatedResponse, StudyDTO } from '@/shared/types';
+import { StudyDTO } from '@/shared/types';
 import { fetchSearchStudies } from '@/shared/services/studyService.ts';
 
 const ITEMS_PER_PAGE = 9;
@@ -46,13 +46,13 @@ export const useStudyTableDisplay = ({
   useEffect(() => {
     const fetchStudyList = async () => {
       try {
-        const { content, totalElements } = (await fetchSearchStudies(
+        const { content, totalElements } = await fetchSearchStudies(
           searchTerm,
           projectId,
           currentPage,
           intervalSize,
           sortBy,
-        )) as PaginatedResponse<StudyDTO>;
+        );
         setRows(content);
         setCount(totalElements);
       } catch (error: unknown) {

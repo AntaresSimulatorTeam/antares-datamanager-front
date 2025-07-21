@@ -12,7 +12,7 @@ import './containers.css';
 import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
-type NotificationContainerProps = ToastContainerProps;
+export type NotificationContainerProps = ToastContainerProps;
 
 export const NotificationContainer = (props: NotificationContainerProps) => (
   <ToastContainer {...props} closeButton={false} icon={false} />
