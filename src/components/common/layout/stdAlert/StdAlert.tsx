@@ -46,13 +46,26 @@ const StdAlert = ({
   const [open, setOpen] = useState(false);
 
   return (
-    <div id={id} className={`${containerClasses} ${open ? 'items-start' : 'items-center'}`} role="alert">
-      <div className={iconClasses}>
-        <StdIcon name={icon ?? DEFAULT_ICON[status]} width={ICON_SIZE} height={ICON_SIZE} />
-      </div>
-      <div className={`flex cursor-pointer flex-col items-start gap-1 text-left`} onClick={() => setOpen(!open)}>
-        <span className={textClasses}>{message}</span>
-        {open && <div className="grow text-body-s font-normal text-gray-900">{content}</div>}
+    <div
+      id={id}
+      className={`${containerClasses} ${open ? 'items-start' : 'items-center'} justify-between`}
+      role="alert"
+    >
+      <div className={`flex ${open ? 'items-start' : 'items-center'} justify-start gap-2`}>
+        <div className={iconClasses}>
+          <StdIcon name={icon ?? DEFAULT_ICON[status]} width={ICON_SIZE} height={ICON_SIZE} />
+        </div>
+        <button
+          className="flex cursor-pointer flex-col items-start gap-1 text-left"
+          onClick={() => {
+            if (content && content?.length > 0) setOpen(!open);
+          }}
+        >
+          <span className={textClasses}>{message}</span>
+          {open && content && content?.length > 0 && (
+            <div className="grow text-body-s font-normal text-gray-900">{content}</div>
+          )}
+        </button>
       </div>
       <div className="flex min-w-fit items-center gap-1">
         {action && (
