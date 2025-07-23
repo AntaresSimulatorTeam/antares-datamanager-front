@@ -182,10 +182,6 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
         content: errorMessage,
         type: 'error',
         filledIcon: true,
-        action: {
-          label: t('studyDetails.@viewLog'),
-          onClick: () => void navigate('/logs'),
-        },
       });
     } catch {
       //Silent handler

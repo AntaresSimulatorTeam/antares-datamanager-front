@@ -209,10 +209,6 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
       content: errorMessage,
       type: 'error',
       filledIcon: true,
-      action: {
-        label: t('studyDetails.@viewLog'),
-        onClick: () => void navigate('/logs'),
-      },
     });
   };
 

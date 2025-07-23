@@ -55,17 +55,21 @@ const StdAlert = ({
         <div className={iconClasses}>
           <StdIcon name={icon ?? DEFAULT_ICON[status]} width={ICON_SIZE} height={ICON_SIZE} />
         </div>
-        <button
-          className="flex cursor-pointer flex-col items-start gap-1 text-left"
-          onClick={() => {
-            if (content && content?.length > 0) setOpen(!open);
-          }}
-        >
+        <div className="flex flex-col items-start gap-1 text-left">
           <span className={textClasses}>{message}</span>
           {open && content && content?.length > 0 && (
             <div className="grow text-body-s font-normal text-gray-900">{content}</div>
           )}
-        </button>
+        </div>
+        <StdButton
+          variant="transparent"
+          color="secondary"
+          onClick={() => {
+            if (content && content?.length > 0) setOpen(!open);
+          }}
+          icon={open ? StdIconId.KeyboardArrowUp : StdIconId.KeyboardArrowDown}
+          size="small"
+        />
       </div>
       <div className="flex min-w-fit items-center gap-1">
         {action && (
