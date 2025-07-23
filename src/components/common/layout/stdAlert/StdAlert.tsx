@@ -41,37 +41,37 @@ const StdAlert = ({
   filledIcon,
   content,
 }: StdAlertProps) => {
-  const { containerClasses, iconClasses, textClasses } = alertClassBuilder(status, filledIcon);
   const id = useRdsId('alert', propsId);
-  const [open, setOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const { containerClasses, iconClasses, textClasses } = alertClassBuilder(status, filledIcon);
 
   return (
     <div
       id={id}
-      className={`${containerClasses} ${open ? 'items-start' : 'items-center'} justify-between`}
+      className={`${containerClasses} ${expanded ? 'items-start' : 'items-center'} justify-between`}
       role="alert"
     >
-      <div className={`flex ${open ? 'items-start' : 'items-center'} justify-start gap-2`}>
+      <div className={`flex ${expanded ? 'items-start' : 'items-center'} justify-start gap-2`}>
         <div className={iconClasses}>
           <StdIcon name={icon ?? DEFAULT_ICON[status]} width={ICON_SIZE} height={ICON_SIZE} />
         </div>
         <div className="flex flex-col items-start gap-1 text-left">
-          <span className={textClasses}>{message}</span>
-          {open && content && content?.length > 0 && (
-            <div className="grow text-body-s font-normal text-gray-900">{content}</div>
+          <span className={`${textClasses} ${expanded ? 'line-clamp-none' : 'line-clamp-1'}`}>{message}</span>
+          {expanded && content && content?.length > 0 && (
+            <div className="grow text-body-xs font-normal text-gray-700">{content}</div>
           )}
         </div>
+      </div>
+      <div className="flex min-w-fit items-center gap-1">
         <StdButton
           variant="transparent"
           color="secondary"
           onClick={() => {
-            if (content && content?.length > 0) setOpen(!open);
+            if (content && content?.length > 0) setExpanded((prev) => !prev);
           }}
-          icon={open ? StdIconId.KeyboardArrowUp : StdIconId.KeyboardArrowDown}
+          icon={expanded ? StdIconId.KeyboardArrowUp : StdIconId.KeyboardArrowDown}
           size="small"
         />
-      </div>
-      <div className="flex min-w-fit items-center gap-1">
         {action && (
           <StdButton
             variant="outlined"

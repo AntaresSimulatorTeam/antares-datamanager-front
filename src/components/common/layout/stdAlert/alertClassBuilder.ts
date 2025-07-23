@@ -3,7 +3,7 @@ import { clsx } from 'clsx';
 
 export const COMMON_CONTAINER_CLASSES = 'flex gap-2 rounded border-b-2 px-2 py-1 shadow-4 text-left';
 
-export const COMMON_TEXT_CLASSES = 'line-clamp-1 grow text-body-s font-normal text-gray-900';
+export const COMMON_TEXT_CLASSES = 'grow text-body-s font-normal text-gray-900';
 
 export const STATUS_CONTAINER_CLASSES = {
   success: 'border-success-600',

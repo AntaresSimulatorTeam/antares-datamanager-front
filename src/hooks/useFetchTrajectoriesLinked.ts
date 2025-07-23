@@ -35,7 +35,7 @@ export const useFetchTrajectoriesLinked = (studyId?: number, trajectoryType?: TR
         // Silent handler
       }
     },
-    [dispatch, emptyAreaSelected, trajectoryLinked],
+    [dispatch, emptyAreaSelected],
   );
 
   useEffect(() => {
