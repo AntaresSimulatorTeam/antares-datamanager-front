@@ -4,7 +4,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import StdTextWithTooltip from '@/components/common/layout/stdTextWithTooltip/StdTextWithTooltip';
 import { ReactElement } from 'react';
 import cardTitleClassBuilder from './cardTitleClassBuilder';
 import {
@@ -31,17 +30,19 @@ export type PegaseCardTitleProps = {
 const { Trigger, Element } = RdsFloatingWrapper;
 
 const PegaseCardTitle = ({ title, dropdownOptions, icons, tag, lineClamp, onClick, id }: PegaseCardTitleProps) => {
-  const { titleClasses, textClasses } = cardTitleClassBuilder(lineClamp, !!onClick);
+  const { titleClasses } = cardTitleClassBuilder(lineClamp, !!onClick);
   return (
     <header className="flex items-start justify-between gap-1">
       <div className="flex min-w-0 items-center gap-1">
         {icons && <span className="flex shrink items-center">{icons}</span>}
         {onClick ? (
           <button className={titleClasses} onClick={onClick} aria-label={`title-${id}`}>
-            <StdTextWithTooltip className={textClasses} text={title} id={`title-${id}`} />
+            {title}
           </button>
         ) : (
-          <StdTextWithTooltip className={titleClasses} text={title} id={`title-${id}`} />
+          <span className={titleClasses} id={`title-${id}`}>
+            {title}
+          </span>
         )}
         {tag && (
           <span role="list" className="flex items-center">

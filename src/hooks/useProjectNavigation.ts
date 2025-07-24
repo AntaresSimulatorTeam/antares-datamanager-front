@@ -31,7 +31,7 @@ export const useProjectNavigation = () => {
         });
       }
     },
-    [navigate],
+    [navigate, pathname, state],
   );
 
   return { navigateToProject };
