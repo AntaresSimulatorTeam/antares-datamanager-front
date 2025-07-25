@@ -4,13 +4,13 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { ToastProps } from 'node_modules/react-toastify/dist/types';
-import { ReactNode } from 'react';
 import { Flip, ToastContainer, ToastContainerProps, useToast, useToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './containers.css';
 import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
+import { ToastProps } from 'node_modules/react-toastify/dist/types';
+import { ReactNode } from 'react';
 
 export type NotificationContainerProps = ToastContainerProps;
 
@@ -47,7 +47,7 @@ export const PegaseAlertContainer = () => (
 );
 
 export const BannerContainerId = 'banner';
-const BannerToast = (props: ToastProps) => {
+export const BannerToast = (props: ToastProps) => {
   const { preventExitTransition, toastRef, playToast } = useToast(props);
   const { transition: Transition, position, deleteToast, isIn, children } = props;
   return (

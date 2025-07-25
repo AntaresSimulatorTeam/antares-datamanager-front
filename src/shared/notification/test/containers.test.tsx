@@ -1,11 +1,36 @@
 import { afterEach, describe, expect, it, Mock, vi } from 'vitest';
 import { render } from '@testing-library/react';
-import { NotificationContainer, PegaseToastContainer } from '@/shared/notification/containers.tsx';
+import {
+  NotificationContainer,
+  PegaseAlertContainer,
+  PegaseToastContainer,
+} from '@/shared/notification/containers.tsx';
 import { ToastContainerProps } from 'react-toastify';
 
 vi.mock('react-toastify', () => ({
   ToastContainer: (props: any) => <div data-testid="toast-container" {...props} />,
 }));
+
+vi.mock('@/shared/notification/containers', async (importOriginal) => {
+  const actual: Mock = await importOriginal();
+  // eslint-disable-next-line react/display-name
+  const createMockContainer = (testId: string) => (props: ToastContainerProps) => {
+    const safeProps = {
+      ['data-testid']: testId,
+      role: 'alert',
+      className: 'top-center',
+      position: 'top-center',
+      ...props,
+    };
+    // @ts-ignore
+    return <div {...safeProps} />;
+  };
+
+  return {
+    ...actual,
+    NotificationContainer: createMockContainer('toast-container'),
+  };
+});
 
 describe('NotificationContainer', () => {
   it('should render ToastContainer with the proper props', () => {
@@ -18,47 +43,37 @@ describe('NotificationContainer', () => {
   });
 });
 
-vi.mock('@/shared/notification/containers', async (importOriginal) => {
-  const actual: Mock = await importOriginal();
-  const createMockContainer = (testId: string) =>
-    vi.fn().mockImplementation((props: ToastContainerProps) => {
-      const safeProps = {
-        ...props,
-        'data-testid': testId,
-        role: 'alert',
-        className: '' as string,
-        position: 'top-center',
-      };
-      // @ts-ignore
-      return <div {...safeProps} />;
-    });
-
-  return {
-    ...actual,
-    NotificationContainer: createMockContainer('toast-container'),
-    PegaseAlertContainer: createMockContainer('alert-container'),
-    PegaseBannerContainer: createMockContainer('banner-container'),
-    ToastContainerId: 'toast',
-    AlertContainerId: 'alert',
-    BannerContainerId: 'banner',
-  };
-});
-
 describe('PegaseToastContainer', () => {
   afterEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
   });
-  it('should render NotificationContainer with the proper props', () => {
-    render(<PegaseToastContainer />);
-    const notificationContainerMock = vi.mocked(NotificationContainer);
-    const mockNotificationCalls = notificationContainerMock.mock.calls;
-    expect(mockNotificationCalls.length).toBeGreaterThan(0);
-    expect(mockNotificationCalls[0]).toBeDefined();
+  it('should render PegaseToastContainer with the proper props', () => {
+    const { getByTestId } = render(<PegaseToastContainer />);
+    const container = getByTestId('toast-container');
+    expect(container).toBeInTheDocument();
+    expect(container.getAttribute('position')).toBe('top-center');
+    expect(container.getAttribute('limit')).toBe('1');
+    expect(container.getAttribute('autoClose')).toBe('5000');
+    expect(container.getAttribute('containerId')).toBe('toast');
+    expect(container.getAttribute('pauseOnFocusLoss')).toBeFalsy();
+  });
+});
 
-    const props = mockNotificationCalls[0][0];
-    expect(props).toMatchObject({
-      autoClose: 5000,
-      theme: 'dark',
-    });
+describe('PegaseAlertContainer', () => {
+  afterEach(() => {
+    vi.resetAllMocks();
+  });
+
+  it('should render PegaseAlertContainer with the proper props', () => {
+    const { getByTestId } = render(<PegaseAlertContainer />);
+    const container = getByTestId('toast-container');
+    expect(container).toBeInTheDocument();
+    expect(container).toHaveClass('!bottom-8');
+    expect(container).toHaveStyle({ width: '600px' });
+    expect(container.getAttribute('position')).toBe('bottom-right');
+    expect(container.getAttribute('limit')).toBe('50');
+    expect(container.getAttribute('autoClose')).toBeFalsy();
+    expect(container.getAttribute('containerId')).toBe('alert');
+    expect(container.getAttribute('closeOnClick')).toBeFalsy();
   });
 });
