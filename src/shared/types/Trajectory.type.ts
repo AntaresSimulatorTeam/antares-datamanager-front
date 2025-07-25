@@ -9,7 +9,6 @@ import { FileInputStatus } from 'rte-design-system-react';
 // @ts-ignore
 import { AccessorKeyColumnDef } from '@tanstack/table-core/src/types.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
-import { WarningMessage } from '@/shared/types/Warning.type.ts';
 
 export interface FsTrajectory {
   trajectoryName: string;
@@ -24,7 +23,6 @@ export interface DbTrajectory {
   version: number;
   userName: string;
   creationDate: Date;
-  messages?: WarningMessage[];
   loadArea?: string;
   state?: TRAJECTORY_SELECTION_STATUS;
 }

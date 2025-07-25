@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "feat/ANT-3398_error_alert_improve_message_display",
-  commit: "41a0b06",
-  commitTime: "2025-07-29T12:59:06.222Z"
+  branch: "fix/ANT-3656_warning_modify_how_warning_are_retrieved",
+  commit: "39d1af3",
+  commitTime: "2025-07-25T14:39:41.270Z"
 };

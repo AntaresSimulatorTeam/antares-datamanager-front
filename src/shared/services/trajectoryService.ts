@@ -191,7 +191,8 @@ export const getDefaultLoadHypothesis = async (): Promise<{ name: string }[]> =>
 
 /**
  * Count the number of warning messages per trajectory type for a study
- * @param {number} id - Study id
+ * @param {number} id - Study i
+ * @returns {Promise<{ [key in keyof typeof TRAJECTORY_TYPE]: number }>} - Number of warning messages per trajectory type
  */
 
 export const getNbMessagesFromTrajectoryType = async (
