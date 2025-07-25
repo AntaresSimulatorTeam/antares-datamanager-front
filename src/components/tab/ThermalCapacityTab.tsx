@@ -10,12 +10,14 @@ import {
   CheckBoxData,
   FileInputStatus,
   HypothesisRowData,
+  LocationStudy,
   NestedCheckedType,
+  RowStatus,
   TrajectoryAreaData,
 } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
-import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
+import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useStudy } from '@/store/contexts/StudyContext.tsx';
 import { CheckboxWithNestedCheckbox } from '@/components/forms/CheckboxWithNestedCheckbox.tsx';
 import { ThermalOptions } from '@/mocks/data/list/names';
@@ -33,6 +35,9 @@ import { sortKeepLastName } from '@/shared/utils/sortUtils.ts';
 import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
+import { linkTrajectoryToStudy } from '@/shared/services/trajectoryService.ts';
+import { useLocation } from 'react-router-dom';
+import { convertToSelectionOptionType } from '@/shared/utils/formFormatter.ts';
 
 interface ThermalTabProps {
   defaultAreas: CheckBoxData[];
@@ -42,6 +47,8 @@ interface ThermalTabProps {
 const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
   const { t } = useTranslation();
   const studyState = useStudy();
+  const location = useLocation();
+  const study = (location.state as LocationStudy)?.study;
   const [checkedValues, setCheckedValues] = useState<NestedCheckedType[]>([]);
   const [defaultData, setDefaultData] = useState<HypothesisRowData[]>([]);
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
@@ -60,9 +67,33 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
 
   const handleFetchTrajectoriesFS = async () => Promise.resolve();
-  const handleTrajectorySearch = (value?: string, area?: string) => {
-    console.log('================= area', area, value);
-    return Promise.resolve([]);
+  const handleTrajectorySearch = async (value?: string, area?: string) => {
+    try {
+      //const results = await fetchTrajectoriesFromDB(TRAJECTORY_TYPE.THERMAL_CAPACITY, study.horizon, value, area);
+      const results = [
+        {
+          id: 128,
+          trajectoryName: 'BP23_AREF_EU_CBN',
+          type: TRAJECTORY_TYPE.THERMAL_CAPACITY,
+          version: 2,
+          userName: 'unknown_user',
+          loadArea: 'FR',
+          creationDate: '2025-06-30T18:15:39.775167' as unknown as Date,
+        },
+        {
+          id: 127,
+          trajectoryName: 'BP23_AREF_EU_coherence_scenario7',
+          type: TRAJECTORY_TYPE.THERMAL_CAPACITY,
+          version: 1,
+          userName: 'unknown_user',
+          loadArea: 'OTHERS',
+          creationDate: '2025-06-30T18:15:25.040294' as unknown as Date,
+        },
+      ];
+      return Promise.resolve(convertToSelectionOptionType(results));
+    } catch {
+      // silent handler
+    }
   };
 
   useEffect(() => {
@@ -179,6 +210,20 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
     }
   };
 
+  const handleTrajectoryUpdate = async (
+    rowIndex: number,
+    trajectoryId: number,
+    status?: RowStatus,
+    trajectoryLabel?: string,
+    errorMessage?: string,
+  ) => {
+    console.log('=============== rowIndex', rowIndex);
+    console.log('=============== status', status);
+    console.log('=============== trajectoryLabel', trajectoryLabel);
+    console.log('=============== errorMessage', errorMessage);
+    await linkTrajectoryToStudy(TRAJECTORY_TYPE.THERMAL_CAPACITY, trajectoryId, study.id);
+  };
+
   return (
     <div className="flex h-full w-full gap-6">
       <div className="flex h-fit w-28 flex-col gap-1 rounded border border-gray-400 p-2">
@@ -220,6 +265,9 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
             handleSearch={handleTrajectorySearch}
             handleImport={handleFetchTrajectoriesFS}
             isReadOnlyEnable={true}
+            updateData={(rowIndex: number, value: unknown, status?: RowStatus, label?: string) =>
+              void handleTrajectoryUpdate(rowIndex, value as number, status, label)
+            }
             removeRow={(value: string, rowIndex?: number) => {
               const parentValue =
                 rowIndex != null && !(defaultData[rowIndex]?.hypothesis === value)

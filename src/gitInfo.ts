@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "feature/ANT-3652_area_traj_deletion",
-  commit: "59a7660",
-  commitTime: "2025-08-04T12:20:55.885Z"
+  branch: "feat/ANT-3467_thermal_navigation_between_installed_power_and_parameters",
+  commit: "39d1af3",
+  commitTime: "2025-07-25T11:09:20.170Z"
 };
