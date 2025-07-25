@@ -2,7 +2,7 @@ import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { DbTrajectory } from '@/shared/types';
-import { getStudyTrajectoriesWithWarnings } from '@/shared/services/studyService.ts';
+import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { removeDuplicate } from '@/shared/utils/trajectoryUtils.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 
@@ -20,7 +20,7 @@ export const useFetchTrajectoriesLinked = (studyId?: number, trajectoryType?: TR
     async (id?: number, type?: TRAJECTORY_TYPE) => {
       try {
         if (id != null && type) {
-          const trajectoryLinkedToStudy = await getStudyTrajectoriesWithWarnings(id, type);
+          const trajectoryLinkedToStudy = await getStudyTrajectories(id, type);
           const arrayWithoutDuplicate = removeDuplicate(trajectoryLinkedToStudy.concat(emptyAreaSelected));
           if (arrayWithoutDuplicate.length > 0) {
             dispatch?.({

@@ -12,15 +12,14 @@ export interface WarningMessage {
   code: string;
   generatedBy: string;
   generatedAt: Date;
+  trajectoryId: number | null;
   trajectory: string;
   secondTrajectory: string;
   isAck: boolean;
 }
 
 export interface DataWarningMessage extends WarningMessage {
-  trajectoryId?: number;
   trajectoryType: TRAJECTORY_TYPE;
-  trajectory: string;
   onClickItem:
     | ((
         id: number,
@@ -54,3 +53,5 @@ export interface CardDataType
   buttonLabel: string;
   buttonTooltipText: string;
 }
+
+export type WarningTrajectoryType = { [key in keyof typeof TRAJECTORY_TYPE]: number };

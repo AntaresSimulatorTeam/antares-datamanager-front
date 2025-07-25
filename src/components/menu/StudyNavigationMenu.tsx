@@ -14,14 +14,13 @@ import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useTranslation } from 'react-i18next';
 import { useStudy } from '@/store/contexts/StudyContext.tsx';
-import { HypothesisTab } from '@/shared/types';
+import { HypothesisTab, WarningTrajectoryType } from '@/shared/types';
 import StdAvatar from '@common/layout/stdAvatar/StdAvatar.tsx';
 import { ThermalMenu } from '@/components/menu/ThermalMenu.tsx';
 import { getStudyMenu } from '@/shared/utils/trajectoryUtils.ts';
 import { useFetchAreas } from '@/hooks/useFetchAreas.ts';
 import { getNbMessagesFromTrajectoryType } from '@/shared/services/trajectoryService.ts';
-
-type warningTrajectoryType = { [key in keyof typeof TRAJECTORY_TYPE]: number };
+import { countWarning } from '@/shared/utils/warningUtils';
 
 type StudyNavigationMenuProps = {
   onRenderActiveComponent?: (content: ReactNode | null) => void;
@@ -42,7 +41,7 @@ const StudyNavigationMenu = ({
   const studyState = useStudy();
   const [tabs, setTabs] = useState<HypothesisTab[]>(getStudyMenu(t, !!studyState[`${TRAJECTORY_TYPE.AREA}`]?.[0]));
   const { areaDefault, trajectoryAreas } = useFetchAreas(studyState[`${TRAJECTORY_TYPE.AREA}`]?.[0]);
-  const [warningTrajectory, setWarningTrajectory] = useState<warningTrajectoryType>();
+  const [warningTrajectory, setWarningTrajectory] = useState<WarningTrajectoryType>();
 
   const renderActiveComponent = (): ReactNode | null => {
     switch (activeTab.name) {
@@ -58,14 +57,6 @@ const StudyNavigationMenu = ({
         return <MiscTab />;
       default:
         return null;
-    }
-  };
-
-  const countWarning = (warning: warningTrajectoryType, tabName: TRAJECTORY_TYPE) => {
-    if (tabName === TRAJECTORY_TYPE.AREA) {
-      return +warning[TRAJECTORY_TYPE.AREA] + +warning[TRAJECTORY_TYPE.LINK];
-    } else {
-      return warning[tabName];
     }
   };
 

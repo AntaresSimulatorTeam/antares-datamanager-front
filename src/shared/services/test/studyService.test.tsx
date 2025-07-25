@@ -13,7 +13,6 @@ import {
   fetchSearchStudies,
   fetchSuggestedKeywords,
   getStudyTrajectories,
-  getStudyTrajectoriesWithWarnings,
   saveStudy,
 } from '@/shared/services/studyService.ts';
 import { notifyToast } from '@/shared/notification/notification.tsx';
@@ -22,8 +21,6 @@ import { mockDbTrajectoryArray } from '@/mocks/data/tests/trajectory.mock.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
 import { AuthService } from '@/shared/services/authService.ts';
-import * as warningService from '@/shared/services/warningService.ts';
-import { mockTrajectoryWithWarnings, mockWarningMessagesWithTwo } from '@/mocks/data/tests/warning.mock.ts';
 
 vi.mock('@/shared/notification/notification');
 vi.mock('@/envVariables', () => ({
@@ -183,45 +180,6 @@ describe('deleteStudy', () => {
       type: 'error',
       message: 'Failed to delete study',
     });
-  });
-});
-
-describe('getStudyTrajectoriesWithWarnings', () => {
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
-  it('should retrieve trajectories from study id and trajectory type', async () => {
-    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
-      ok: true,
-      json: async () => Promise.resolve(mockDbTrajectoryArray),
-    });
-    vi.mocked(warningService.fetchWarningMessages).mockResolvedValue(mockWarningMessagesWithTwo);
-
-    const results = await getStudyTrajectoriesWithWarnings(1, TRAJECTORY_TYPE.AREA);
-
-    await waitFor(() => {
-      expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
-      expect(AuthService.authFetch).toHaveBeenCalledWith(
-        `https://mockapi.com/v1/trajectory?studyId=1&trajectoryType=AREA`,
-      );
-      expect(warningService.fetchWarningMessages).toHaveBeenCalledTimes(mockDbTrajectoryArray.length);
-      expect(warningService.fetchWarningMessages).toHaveBeenCalledWith(1, 1);
-      expect(warningService.fetchWarningMessages).toHaveBeenLastCalledWith(2, 1);
-      expect(results).toEqual(mockTrajectoryWithWarnings);
-    });
-  });
-
-  it('should handle fetch failure gracefully', async () => {
-    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
-      antaresErrorMessage: 'Failed to fetch trajectories',
-      date: new Date(),
-      type: ERROR_MESSAGE_TYPE.BUSINESS,
-    });
-
-    await expect(async () => getStudyTrajectoriesWithWarnings(1, TRAJECTORY_TYPE.AREA)).rejects.toThrow(
-      'Failed to fetch trajectories',
-    );
   });
 });
 

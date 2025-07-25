@@ -1,6 +1,6 @@
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
-import { CardDataType, DataWarningMessage, DbTrajectory, WarningMessage } from '@/shared/types';
+import { CardDataType, DataWarningMessage, WarningMessage, WarningTrajectoryType } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { discardWarningMessage } from '@/shared/services/warningService.ts';
 
@@ -65,21 +65,26 @@ export const convertDataToItem = <T>(data: T, t: (value: string) => string): Car
 
 /**
  * Convert message warning DTO into DataWarningMessage object according to trajectory type
- * @param {DbTrajectory} trajectory
+ * @param {WarningMessage} messages
  * @param {TRAJECTORY_TYPE} tabName - Tab name is defined as typeof TRAJECTORY_TYPE
  * @param {boolean} isNotGenerated
  * @return {DataWarningMessage[]} - Data that can be used into card component
  */
 export const buildDataWarningMessage = (
-  trajectory: DbTrajectory,
+  messages: WarningMessage[],
   tabName: TRAJECTORY_TYPE,
   isNotGenerated: boolean,
 ): DataWarningMessage[] =>
-  (trajectory.messages || []).map((message: WarningMessage) => ({
+  (messages || []).map((message: WarningMessage) => ({
     ...message,
-    trajectoryId: trajectory.id,
     trajectoryType: tabName,
-    trajectory: trajectory.trajectoryName,
     onClickItem: isNotGenerated ? discardWarningMessage : null,
   }));
 
+export const countWarning = (warning: WarningTrajectoryType, tabName: TRAJECTORY_TYPE) => {
+  if (tabName === TRAJECTORY_TYPE.AREA) {
+    return +warning[TRAJECTORY_TYPE.AREA] + +warning[TRAJECTORY_TYPE.LINK];
+  } else {
+    return warning[tabName];
+  }
+};

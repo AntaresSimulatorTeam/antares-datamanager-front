@@ -20,7 +20,8 @@ import { DetailsContent } from '@/components/banner/DetailsContent.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { ContainerWithExpander } from '@/components/banner/ContainerWithExpander.tsx';
-import { buildWarningMessages } from '@/shared/helpers/warningHelper.ts';
+import { buildDataWarningMessage } from '@/shared/utils/warningUtils.ts';
+import { fetchWarningMessagesFromType } from '@/shared/services/warningService.ts';
 
 interface StudyState {
   study: StudyDTO;
@@ -45,9 +46,27 @@ const StudyDetails = () => {
   const [errorMessage, setErrorMessage] = useState<string>('');
 
   useEffect(() => {
-    const messages: DataWarningMessage[] = buildWarningMessages(studyState, activeTab.name) || [];
-    setMessagesWarning(messages?.sort((a, b) => Number(a.isAck) - Number(b.isAck)));
-  }, [activeTab.name, studyState]);
+    const fetchWarningMessages = async (tabName: TRAJECTORY_TYPE, studyId: number) => {
+      let messagesDTO = [];
+      try {
+        if (activeTab.name === TRAJECTORY_TYPE.AREA) {
+          const [messagesArea = [], messagesLink = []] = await Promise.all([
+            await fetchWarningMessagesFromType(tabName, study.id),
+            await fetchWarningMessagesFromType(TRAJECTORY_TYPE.LINK, studyId),
+          ]);
+          messagesDTO = messagesArea.concat(messagesLink);
+        } else {
+          messagesDTO = await fetchWarningMessagesFromType(tabName, studyId);
+        }
+        const messages: DataWarningMessage[] =
+          buildDataWarningMessage(messagesDTO, tabName, studyState.studyStatus !== StudyStatus.GENERATED) || [];
+        setMessagesWarning(messages?.sort((a, b) => Number(a.isAck) - Number(b.isAck)));
+      } catch {
+        // silent handler
+      }
+    };
+    void fetchWarningMessages(activeTab.name, study.id);
+  }, [activeTab.name, study.id, studyState]);
 
   const handleGenerateStudy = async () => {
     try {
@@ -55,7 +74,7 @@ const StudyDetails = () => {
       await createStudy(study.id);
       setIsGenerating(false);
       dispatch?.({ type: STUDY_ACTION.SET_STUDY_STATUS, payload: StudyStatus.GENERATED });
-    } catch (error) {
+    } catch {
       setIsGenerating(false);
     }
   };

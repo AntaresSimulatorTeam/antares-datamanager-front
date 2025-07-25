@@ -7,7 +7,7 @@ import { mockDbTrajectory, mockDbTrajectoryArray } from '@/mocks/data/tests/traj
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { useFetchTrajectoriesLinked } from '@/hooks/useFetchTrajectoriesLinked.ts';
-import { mockTrajectoryWithWarnings } from '@/mocks/data/tests/warning.mock.ts';
+import { mockTrajectoryTwo } from '@/mocks/data/tests/warning.mock.ts';
 
 vi.mock('@/shared/services/trajectoryService');
 vi.mock('@/shared/services/studyService');
@@ -30,7 +30,7 @@ vi.mock('@/shared/services/warningService', async (importOriginal) => {
 });
 
 describe('useFetchTrajectoriesLinked', () => {
-  vi.mocked(studyService.getStudyTrajectoriesWithWarnings).mockResolvedValue(mockTrajectoryWithWarnings);
+  vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockTrajectoryTwo);
   const mockUseStudyDispatch = useStudyDispatch as Mock<typeof useStudyDispatch>;
   const mockUseStudy = useStudy as Mock<typeof useStudy>;
   const mockDispatch = vi.fn().mockImplementation(vi.fn());
@@ -50,15 +50,15 @@ describe('useFetchTrajectoriesLinked', () => {
     const { result } = renderHook(() => useFetchTrajectoriesLinked(5, TRAJECTORY_TYPE.LOAD));
 
     await waitFor(() => {
-      expect(studyService.getStudyTrajectoriesWithWarnings).toHaveBeenCalledTimes(1);
-      expect(studyService.getStudyTrajectoriesWithWarnings).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.LOAD);
+      expect(studyService.getStudyTrajectories).toHaveBeenCalledTimes(1);
+      expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.LOAD);
       expect(mockDispatch).toHaveBeenCalledTimes(1);
       expect(mockDispatch).toHaveBeenCalledWith({
         type: STUDY_ACTION.ADD_TRAJECTORIES,
-        payload: mockTrajectoryWithWarnings,
+        payload: mockTrajectoryTwo,
       });
-      expect(result.current.trajectoryLinked).toEqual(mockTrajectoryWithWarnings);
-      expect(result.current.emptyAreas).toEqual(mockTrajectoryWithWarnings);
+      expect(result.current.trajectoryLinked).toEqual(mockTrajectoryTwo);
+      expect(result.current.emptyAreas).toEqual(mockTrajectoryTwo);
     });
   });
 
@@ -66,7 +66,7 @@ describe('useFetchTrajectoriesLinked', () => {
     const { result } = renderHook(() => useFetchTrajectoriesLinked(5));
 
     await waitFor(() => {
-      expect(studyService.getStudyTrajectoriesWithWarnings).toHaveBeenCalledTimes(0);
+      expect(studyService.getStudyTrajectories).toHaveBeenCalledTimes(0);
       expect(result.current.trajectoryLinked).toEqual([]);
       expect(result.current.emptyAreas).toEqual([]);
     });
@@ -76,7 +76,7 @@ describe('useFetchTrajectoriesLinked', () => {
     const { result } = renderHook(() => useFetchTrajectoriesLinked());
 
     await waitFor(() => {
-      expect(studyService.getStudyTrajectoriesWithWarnings).toHaveBeenCalledTimes(0);
+      expect(studyService.getStudyTrajectories).toHaveBeenCalledTimes(0);
       expect(result.current.trajectoryLinked).toEqual([]);
       expect(result.current.emptyAreas).toEqual([]);
     });
