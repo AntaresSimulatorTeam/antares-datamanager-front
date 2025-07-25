@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "fix/ANT-3656_warning_modify_how_warning_are_retrieved",
-  commit: "62d947d",
-  commitTime: "2025-07-31T13:02:22.942Z"
+  branch: "feat/ANT-3467_thermal_navigation_between_installed_power_and_parameters",
+  commit: "39d1af3",
+  commitTime: "2025-07-25T11:09:20.170Z"
 };
