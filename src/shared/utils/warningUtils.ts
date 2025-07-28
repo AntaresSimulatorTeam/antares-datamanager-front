@@ -5,7 +5,7 @@ import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { discardWarningMessage } from '@/shared/services/warningService.ts';
 
 /**
- * Sort messages list according to the warning level (typeof WARNING_MESSAGE_LEVEL)
+ * Sort the messages list according to the warning level (typeof WARNING_MESSAGE_LEVEL)
  *
  * @param {WarningMessage} a - Warning message
  * @param {WarningMessage} b - Warning message

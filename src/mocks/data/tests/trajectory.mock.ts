@@ -8,9 +8,29 @@ export const mockDbTrajectory: DbTrajectory = {
   version: 6,
   userName: 'mouad',
   creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-  messages: [],
   loadArea: 'AT',
 };
+
+export const mockTrajectoryTwo = [
+  {
+    id: 1,
+    trajectoryName: 'area_PB_2024',
+    type: TRAJECTORY_TYPE.AREA,
+    version: 3,
+    userName: 'mouad',
+    creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+    loadArea: 'AT',
+  },
+  {
+    id: 2,
+    trajectoryName: 'area_PB_2026',
+    type: TRAJECTORY_TYPE.AREA,
+    version: 3,
+    userName: 'mouad',
+    creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+    loadArea: 'BE',
+  },
+];
 
 export const mockDbTrajectoryAREA: DbTrajectory = {
   id: 1,
@@ -19,7 +39,6 @@ export const mockDbTrajectoryAREA: DbTrajectory = {
   version: 6,
   userName: 'mouad',
   creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-  messages: [],
   loadArea: 'AT',
 };
 
@@ -30,7 +49,6 @@ export const mockDbTrajectoryLINK: DbTrajectory = {
   version: 6,
   userName: 'mouad',
   creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-  messages: [],
   loadArea: 'AT',
 };
 

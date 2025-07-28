@@ -3,11 +3,10 @@ import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { StudyState } from '@/shared/types';
 import { renderHook, waitFor } from '@testing-library/react';
 import * as studyService from '@/shared/services/studyService.ts';
-import { mockDbTrajectory, mockDbTrajectoryArray } from '@/mocks/data/tests/trajectory.mock.ts';
+import { mockDbTrajectory, mockDbTrajectoryArray, mockTrajectoryTwo } from '@/mocks/data/tests/trajectory.mock.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { useFetchTrajectoriesLinked } from '@/hooks/useFetchTrajectoriesLinked.ts';
-import { mockTrajectoryTwo } from '@/mocks/data/tests/warning.mock.ts';
 
 vi.mock('@/shared/services/trajectoryService');
 vi.mock('@/shared/services/studyService');
