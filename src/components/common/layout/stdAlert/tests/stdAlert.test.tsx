@@ -30,7 +30,7 @@ describe('StdAlert', () => {
     const alert = screen.getByRole('alert');
     expect(alert).toBeInTheDocument();
     expect(alert.textContent).toContain(TEST_MESSAGE);
-    const closeButton = screen.getByRole('button');
+    const [_, closeButton] = screen.getAllByRole('button');
     expect(closeButton).toBeInTheDocument();
     const closeIcon = screen.getByTitle(TEST_CLOSE_ICON);
     expect(closeIcon).toBeInTheDocument();
@@ -42,7 +42,7 @@ describe('StdAlert', () => {
     const alert = screen.getByRole('alert');
     expect(alert).toBeInTheDocument();
     expect(alert.textContent).toContain(TEST_MESSAGE);
-    const actionButton = screen.getByRole('button');
+    const [_, actionButton] = screen.getAllByRole('button');
     expect(actionButton).toBeInTheDocument();
     expect(actionButton.textContent).toBe(TEST_ACTION.label);
   });
@@ -53,7 +53,7 @@ describe('StdAlert', () => {
     expect(alert).toBeInTheDocument();
     expect(alert.textContent).toContain(TEST_MESSAGE);
 
-    const [actionButton, closeButton] = screen.getAllByRole('button');
+    const [_, actionButton, closeButton] = screen.getAllByRole('button');
     expect(closeButton).toBeInTheDocument();
     const closeIcon = screen.getByTitle(TEST_CLOSE_ICON);
     expect(closeIcon).toBeInTheDocument();

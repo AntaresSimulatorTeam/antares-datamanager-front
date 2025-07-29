@@ -8,19 +8,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { useFetchProjectList } from '@/hooks/useFetchProjectList.ts';
 import * as projectService from '@/shared/services/projectService.ts';
 import { vi } from 'vitest';
-import { ProjectResponse } from '@/shared/types';
-
-const mockContentResponseFetchProjectApi: ProjectResponse[] = [
-  {
-    id: '1',
-    name: 'Project 1',
-    tags: ['Tag1', 'Tag2'],
-    creationDate: '2023-10-01' as unknown as Date,
-    createdBy: 'User A',
-    studies: [4, 6, 7],
-    description: '',
-  },
-];
+import { mockProjectCreation } from '@/mocks/data/tests/project.mock.ts';
 
 vi.mock('@/shared/notification/notification');
 vi.mock('@/envVariables', () => ({
@@ -34,7 +22,7 @@ describe('useFetchProjectList', () => {
       ok: true,
       json: async () =>
         Promise.resolve({
-          content: mockContentResponseFetchProjectApi,
+          content: mockProjectCreation,
           totalElements: 1,
         }),
     });
@@ -46,7 +34,7 @@ describe('useFetchProjectList', () => {
 
   it('fetches projects on mount', async () => {
     vi.mocked(projectService.fetchProjectFromSearchTerm).mockResolvedValueOnce({
-      content: mockContentResponseFetchProjectApi,
+      content: [mockProjectCreation],
       totalElements: 1,
     });
     const { result } = renderHook(() => useFetchProjectList(0, 9, 'mouad'));
@@ -54,7 +42,7 @@ describe('useFetchProjectList', () => {
     await waitFor(() => {
       expect(projectService.fetchProjectFromSearchTerm).toHaveBeenCalledTimes(1);
       expect(projectService.fetchProjectFromSearchTerm).toHaveBeenCalledWith(0, 9, 'mouad');
-      expect(result.current.projects).toEqual(mockContentResponseFetchProjectApi);
+      expect(result.current.projects).toEqual([mockProjectCreation]);
       expect(result.current.count).toBe(1);
     });
   });

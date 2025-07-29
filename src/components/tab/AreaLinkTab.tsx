@@ -39,7 +39,7 @@ import { buildErrorTrajectory, getStatus } from '@/shared/utils/trajectoryUtils.
 import { getStudyById, getStudyTrajectoriesWithWarnings } from '@/shared/services/studyService.ts';
 import { TrajectoryDataVisualisation } from '@common/modal/TrajectoryDataVisualisation.tsx';
 import { generateTrajectoryViewHeader } from '@/components/header/TrajectoryViewHeader.tsx';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { ErrorMessageType } from '@/shared/types/Generic.type.ts';
 import { computeReadOnlyState } from '@/shared/utils/computeReadOnlyState';
@@ -59,7 +59,6 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
   const dispatch = useStudyDispatch();
   const { t } = useTranslation();
   const { user } = useUser();
-  const navigate = useNavigate();
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
   const [rowIndexSelected, setRowIndexSelected] = useState<number>(0);
   const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
@@ -144,7 +143,6 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
         rowIndex === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
         trajectoryId,
         trajectoryLabel,
-        errorMessage,
         user?.profile?.sub,
       );
 
@@ -177,16 +175,16 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
         );
       }
       setReadOnly({ '0': false, '1': false });
-      const alertMessage = `Error: ${trajectoryLabel} cannot be saved for ${rowIndex === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK}`;
       notifyAlert({
         icon: StdIconId.Close,
-        message: alertMessage,
+        message: t('studyDetails.@notificationAlert', {
+          studyName: study?.name ?? '',
+          trajectoryName: trajectoryLabel,
+          trajectoryType: rowIndex === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
+        }),
+        content: errorMessage,
         type: 'error',
         filledIcon: true,
-        action: {
-          label: t('studyDetails.@viewLog'),
-          onClick: () => void navigate('/logs'),
-        },
       });
     } catch {
       //Silent handler

@@ -112,11 +112,11 @@ const getHypothesisTableHeaders = (
   columnHelper.accessor('status', {
     header: t('home.@status'),
     cell: ({ row }) => {
-      const { status, trajectory } = row.original;
+      const { status } = row.original;
       return progress > 0 && fileStatus === 'loading' && rowIndexSelected === row.index ? (
         <ProgressBar statusFile={fileStatus} progressValue={progress} />
       ) : (
-        <CellWithStatus status={status} isDeletable={false} message={trajectory?.messages?.[0]?.content} />
+        <CellWithStatus status={status} isDeletable={false} />
       );
     },
   }),
