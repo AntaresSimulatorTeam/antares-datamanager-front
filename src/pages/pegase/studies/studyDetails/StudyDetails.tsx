@@ -20,7 +20,7 @@ import { DetailsContent } from '@/components/banner/DetailsContent.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { ContainerWithExpander } from '@/components/banner/ContainerWithExpander.tsx';
-import { getWarningMessages } from '@/shared/utils/warningUtils.ts';
+import { getWarningMessages } from '@/shared/helpers/warningMessagesHelper.ts';
 
 interface StudyState {
   study: StudyDTO;
