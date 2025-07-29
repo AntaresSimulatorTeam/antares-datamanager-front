@@ -4,15 +4,15 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { ToastProps } from 'node_modules/react-toastify/dist/types';
-import { ReactNode } from 'react';
 import { Flip, ToastContainer, ToastContainerProps, useToast, useToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './containers.css';
 import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
+import { ToastProps } from 'node_modules/react-toastify/dist/types';
+import { ReactNode } from 'react';
 
-type NotificationContainerProps = ToastContainerProps;
+export type NotificationContainerProps = ToastContainerProps;
 
 export const NotificationContainer = (props: NotificationContainerProps) => (
   <ToastContainer {...props} closeButton={false} icon={false} />
@@ -37,17 +37,17 @@ export const PegaseAlertContainer = () => (
     position="bottom-right"
     limit={50}
     autoClose={false}
-    className="!bottom-8"
+    className="!bottom-8 font-body"
     style={{ width: '600px' }}
     hideProgressBar
     newestOnTop={true}
-    closeOnClick={true}
+    closeOnClick={false}
     icon={() => <StdIcon name={StdIconId.Close} />}
   />
 );
 
 export const BannerContainerId = 'banner';
-const BannerToast = (props: ToastProps) => {
+export const BannerToast = (props: ToastProps) => {
   const { preventExitTransition, toastRef, playToast } = useToast(props);
   const { transition: Transition, position, deleteToast, isIn, children } = props;
   return (

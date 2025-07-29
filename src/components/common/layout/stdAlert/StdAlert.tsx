@@ -4,6 +4,7 @@ import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import StdIcon from '@common/base/stdIcon/StdIcon';
 import StdButton from '../../base/stdButton/StdButton';
 import { alertClassBuilder } from './alertClassBuilder';
+import { useState } from 'react';
 
 const DEFAULT_ICON = {
   success: StdIconId.Done,
@@ -19,6 +20,7 @@ export interface AlertAction {
 
 export interface StdAlertProps {
   message: string;
+  content?: string;
   id?: string;
   status?: DisplayStatus;
   icon?: StdIconId;
@@ -29,16 +31,47 @@ export interface StdAlertProps {
 
 const ICON_SIZE = 20;
 
-const StdAlert = ({ message, id: propsId, status = 'info', icon, onClose, action, filledIcon }: StdAlertProps) => {
-  const { containerClasses, iconClasses, textClasses } = alertClassBuilder(status, filledIcon);
+const StdAlert = ({
+  message,
+  id: propsId,
+  status = 'info',
+  icon,
+  onClose,
+  action,
+  filledIcon,
+  content,
+}: StdAlertProps) => {
   const id = useRdsId('alert', propsId);
+  const [expanded, setExpanded] = useState(false);
+  const { containerClasses, iconClasses, textClasses } = alertClassBuilder(status, filledIcon);
+
   return (
-    <div id={id} className={containerClasses} role="alert">
-      <div className={iconClasses}>
-        <StdIcon name={icon ?? DEFAULT_ICON[status]} width={ICON_SIZE} height={ICON_SIZE} />
+    <div
+      id={id}
+      className={`${containerClasses} ${expanded ? 'items-start' : 'items-center'} justify-between`}
+      role="alert"
+    >
+      <div className={`flex ${expanded ? 'items-start' : 'items-center'} justify-start gap-2`}>
+        <div className={iconClasses}>
+          <StdIcon name={icon ?? DEFAULT_ICON[status]} width={ICON_SIZE} height={ICON_SIZE} />
+        </div>
+        <div className="flex flex-col items-start gap-1 text-left">
+          <span className={`${textClasses} ${expanded ? 'line-clamp-none' : 'line-clamp-1'}`}>{message}</span>
+          {expanded && content && content?.length > 0 && (
+            <div className="grow text-body-xs text-gray-700">{content}</div>
+          )}
+        </div>
       </div>
-      <span className={textClasses}>{message}</span>
       <div className="flex min-w-fit items-center gap-1">
+        <StdButton
+          variant="transparent"
+          color="secondary"
+          onClick={() => {
+            if (content && content?.length > 0) setExpanded((prev) => !prev);
+          }}
+          icon={expanded ? StdIconId.KeyboardArrowUp : StdIconId.KeyboardArrowDown}
+          size="small"
+        />
         {action && (
           <StdButton
             variant="outlined"

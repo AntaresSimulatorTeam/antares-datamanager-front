@@ -8,6 +8,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import { useStudyTableDisplay } from '@/hooks/useStudyTableDisplay';
 import { vi } from 'vitest';
 import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
+import { mockStudyResponse, mockStudyResponse2 } from '@/mocks/data/tests/study.mock.ts';
 
 vi.mock('@/envVariables', () => ({
   getEnvVariables: vi.fn(() => 'https://mockapi.com'),
@@ -23,33 +24,9 @@ describe('useStudyTableDisplay', () => {
   });
 
   it('fetches data and updates state correctly', async () => {
-    const mockResponse = {
-      content: [
-        {
-          name: 'study1',
-          createdBy: 'Luis Perez',
-          project: 'Project FE2050',
-          status: 'Closed',
-          horizon: '2050',
-          keywords: 'keyword1',
-          creationDate: '2023-01-01',
-        },
-        {
-          name: 'study2',
-          createdBy: 'Maria Rojas',
-          project: 'Project PDH27',
-          status: 'Inactive',
-          horizon: '2027',
-          keywords: 'keyword2',
-          creationDate: '2023-01-01',
-        },
-      ],
-      totalElements: 2,
-    };
-
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => Promise.resolve(mockResponse),
+      json: async () => Promise.resolve(mockStudyResponse2),
     });
 
     const { result } = renderHook(() =>
@@ -57,7 +34,7 @@ describe('useStudyTableDisplay', () => {
     );
     await waitFor(() => {
       expect(result.current.rows).toHaveLength(2);
-      expect(result.current.rows).toEqual(mockResponse.content);
+      expect(result.current.rows).toEqual(mockStudyResponse2.content);
       expect(result.current.count).toEqual(2);
       //expect(global.fetch).toHaveBeenCalledTimes(1); TODO: ANT-2719
       expect(global.fetch).toHaveBeenCalledWith(
@@ -100,24 +77,9 @@ describe('useStudyTableDisplay', () => {
   });
 
   it('updates the page correctly when setPage is called', async () => {
-    const mockResponse = {
-      content: [
-        {
-          name: 'study1',
-          createdBy: 'Luis Perez',
-          project: 'Project FE2050',
-          status: 'Closed',
-          horizon: '2050',
-          keywords: 'keyword1',
-          creationDate: '2023-01-01',
-        },
-      ],
-      totalElements: 1,
-    };
-
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => Promise.resolve(mockResponse),
+      json: async () => Promise.resolve(mockStudyResponse),
     });
 
     const { result } = renderHook(() =>

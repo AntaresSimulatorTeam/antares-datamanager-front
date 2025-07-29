@@ -47,9 +47,9 @@ const KeywordsInput = ({
     setKeywordInput(value);
 
     try {
-      const tags = (await fetchSuggestedKeywords(value)) as string[];
+      const tags = await fetchSuggestedKeywords(value);
       setSuggestedKeywords(tags);
-    } catch (error) {
+    } catch {
       setErrorMessage('Failed to fetch suggested keywords');
     }
   };

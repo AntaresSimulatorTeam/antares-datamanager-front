@@ -18,7 +18,7 @@ import {
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useTranslation } from 'react-i18next';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import {
   fetchTrajectoriesFromDB,
   fetchTrajectoriesFromFS,
@@ -64,7 +64,6 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
   const location = useLocation();
   const study = (location.state as LocationStudy)?.study;
   const dispatch = useStudyDispatch();
-  const navigate = useNavigate();
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
   const [readOnlyAreas, setReadOnlyAreas] = useState<string[]>([]);
   const [data, setData] = useState<HypothesisRowData[]>([]);
@@ -188,7 +187,6 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
       TRAJECTORY_TYPE.LOAD,
       trajectoryId,
       trajectoryLabel,
-      errorMessage,
       user?.profile?.sub,
       data[rowIndex]?.hypothesis,
     );
@@ -206,13 +204,14 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
 
     notifyAlert({
       icon: StdIconId.Close,
-      message: `Error: ${trajectoryLabel} cannot be saved for ${data[rowIndex]?.hypothesis}`,
+      message: t('studyDetails.@notificationAlert', {
+        studyName: study?.name ?? '',
+        trajectoryName: trajectoryLabel,
+        trajectoryType: data[rowIndex]?.hypothesis,
+      }),
+      content: errorMessage,
       type: 'error',
       filledIcon: true,
-      action: {
-        label: t('studyDetails.@viewLog'),
-        onClick: () => void navigate('/logs'),
-      },
     });
   };
 

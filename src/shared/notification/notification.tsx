@@ -23,6 +23,7 @@ export type NotifyProps = {
 
 export type NotifyWithActionProps = NotifyProps & {
   action?: ToastAction;
+  content?: string;
 };
 
 /**
@@ -49,11 +50,12 @@ export const dismissToast = (id?: Id) => toast.dismiss({ containerId: ToastConta
  * Show an alert with a message, a type and an action
  * @returns The id of the alert
  */
-export const notifyAlert = ({ message, type, action, id, icon, filledIcon }: NotifyWithActionProps) => {
+export const notifyAlert = ({ message, content, type, action, id, icon, filledIcon }: NotifyWithActionProps) => {
   const toastId = id ?? uuidv4();
   return toast(
     <StdAlert
       message={message}
+      content={content}
       status={type}
       action={action}
       onClose={() => toast.dismiss(toastId)}

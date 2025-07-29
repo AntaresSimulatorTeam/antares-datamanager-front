@@ -120,7 +120,8 @@
     "@error_link_trajectory_message": "Please select another LINK trajectory or delete it",
     "@search_area": "Search area",
     "@or": "or",
-    "@viewLog": "View Log"
+    "@viewLog": "View Log",
+    "@notificationAlert": "Error: {{studyName}} - {{trajectoryName}} no parameter cannot be saved for {{trajectoryType}}"
   },
   "thermal": {
     "@installedPower": "Installed Power",
