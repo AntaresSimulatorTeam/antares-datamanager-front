@@ -4,12 +4,12 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { Location, useLocation } from 'react-router-dom';
 import StudyHeader from './StudyHeader.tsx';
 import { RdsDivider } from 'rte-design-system-react';
 import StudyNavigationMenu from '@/components/menu/StudyNavigationMenu.tsx';
-import { DataWarningMessage, HypothesisTab, StudyDTO } from '@/shared/types';
+import { DbTrajectory, HypothesisTab, StudyDTO, StudyTrajectoriesData, WarningMessage } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { createStudy } from '@/shared/services/studyService.ts';
@@ -20,8 +20,6 @@ import { DetailsContent } from '@/components/banner/DetailsContent.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { ContainerWithExpander } from '@/components/banner/ContainerWithExpander.tsx';
-import { buildDataWarningMessage } from '@/shared/utils/warningUtils.ts';
-import { fetchWarningMessagesFromType } from '@/shared/services/warningService.ts';
 
 interface StudyState {
   study: StudyDTO;
@@ -42,31 +40,7 @@ const StudyDetails = () => {
     icon: StdIconId.LinkedServices,
     isDisabled: false,
   });
-  const [messagesWarning, setMessagesWarning] = useState<DataWarningMessage[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>('');
-
-  useEffect(() => {
-    const fetchWarningMessages = async (tabName: TRAJECTORY_TYPE, studyId: number) => {
-      let messagesDTO = [];
-      try {
-        if (activeTab.name === TRAJECTORY_TYPE.AREA) {
-          const [messagesArea = [], messagesLink = []] = await Promise.all([
-            await fetchWarningMessagesFromType(tabName, study.id),
-            await fetchWarningMessagesFromType(TRAJECTORY_TYPE.LINK, studyId),
-          ]);
-          messagesDTO = messagesArea.concat(messagesLink);
-        } else {
-          messagesDTO = await fetchWarningMessagesFromType(tabName, studyId);
-        }
-        const messages: DataWarningMessage[] =
-          buildDataWarningMessage(messagesDTO, tabName, studyState.studyStatus !== StudyStatus.GENERATED) || [];
-        setMessagesWarning(messages?.sort((a, b) => Number(a.isAck) - Number(b.isAck)));
-      } catch {
-        // silent handler
-      }
-    };
-    void fetchWarningMessages(activeTab.name, study.id);
-  }, [activeTab.name, study.id, studyState]);
 
   const handleGenerateStudy = async () => {
     try {
@@ -76,6 +50,21 @@ const StudyDetails = () => {
       dispatch?.({ type: STUDY_ACTION.SET_STUDY_STATUS, payload: StudyStatus.GENERATED });
     } catch {
       setIsGenerating(false);
+    }
+  };
+
+  const getWarningMessages = (
+    state: Partial<StudyTrajectoriesData & { studyStatus?: StudyStatus }>,
+  ): WarningMessage[] => {
+    const activeTabWarning: WarningMessage[] = state?.[activeTab.name]
+      ? (state[`${activeTab.name}`] as { trajectories: DbTrajectory[]; warningMessages: WarningMessage[] })
+          ?.warningMessages
+      : [];
+    if (activeTab.name === TRAJECTORY_TYPE.AREA) {
+      const warningLink: WarningMessage[] = state[`${TRAJECTORY_TYPE.LINK}`]?.warningMessages ?? [];
+      return activeTabWarning.concat(warningLink);
+    } else {
+      return activeTabWarning;
     }
   };
 
@@ -98,13 +87,15 @@ const StudyDetails = () => {
               setActiveTab={setActiveTab}
               activeTab={activeTab}
               setErrorMessage={setErrorMessage}
-              studyId={study.id}
             />
           </div>
         </div>
         <div className="relative flex flex-1 flex-col overflow-y-auto px-4">
           <div className="flex h-full w-full flex-col gap-4">
-            <ContainerWithExpander content={messagesWarning} placeholder={t('studyDetails.@noWarnings')} />
+            <ContainerWithExpander
+              content={getWarningMessages(studyState)}
+              placeholder={t('studyDetails.@noWarnings')}
+            />
             <div className="flex w-full">{activeContent}</div>
           </div>
           <div className="fixed bottom-0 right-0 w-full border-t bg-gray-w px-1 py-1.5">

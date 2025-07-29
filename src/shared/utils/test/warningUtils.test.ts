@@ -112,25 +112,26 @@ describe('sortByLevel', () => {
 
 describe('buildDataWarningMessage', () => {
   it('should return enriched messages when isNotGenerated is true', () => {
-    const result = buildDataWarningMessage(mockWarningMessagesWithTwo, TRAJECTORY_TYPE.AREA, true);
+    const result = buildDataWarningMessage(mockWarningMessagesWithTwo, TRAJECTORY_TYPE.AREA, true, 123);
 
     expect(result).toHaveLength(2);
     expect(result[0]).toEqual({
       ...mockWarningMessagesWithTwo[0],
       trajectoryType: TRAJECTORY_TYPE.AREA,
       onClickItem: discardWarningMessage,
+      studyId: 123,
     });
     expect(result[1].onClickItem).toBe(discardWarningMessage);
   });
 
   it('should return messages with onClickItem set to null when isNotGenerated is false', () => {
-    const result = buildDataWarningMessage(mockWarningMessagesWithTwo, TRAJECTORY_TYPE.LOAD, false);
+    const result = buildDataWarningMessage(mockWarningMessagesWithTwo, TRAJECTORY_TYPE.LOAD, false, 123);
 
     expect(result.every((msg) => msg.onClickItem === null)).toBe(true);
   });
 
   it('should return empty array when messages is an empty array', () => {
-    const result = buildDataWarningMessage([], TRAJECTORY_TYPE.AREA, true);
+    const result = buildDataWarningMessage([], TRAJECTORY_TYPE.AREA, true, 123);
     expect(result).toEqual([]);
   });
 });

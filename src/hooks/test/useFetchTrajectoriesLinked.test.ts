@@ -29,7 +29,10 @@ vi.mock('@/shared/services/warningService', async (importOriginal) => {
 });
 
 describe('useFetchTrajectoriesLinked', () => {
-  vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockTrajectoryTwo);
+  vi.mocked(studyService.getStudyTrajectoriesWithWarnings).mockResolvedValue({
+    trajectories: mockDbTrajectoryArray,
+    warningMessages: [],
+  });
   const mockUseStudyDispatch = useStudyDispatch as Mock<typeof useStudyDispatch>;
   const mockUseStudy = useStudy as Mock<typeof useStudy>;
   const mockDispatch = vi.fn().mockImplementation(vi.fn());
@@ -38,7 +41,11 @@ describe('useFetchTrajectoriesLinked', () => {
   beforeEach(() => {
     global.fetch = vi.fn();
     mockUseStudy.mockImplementation(
-      () => ({ ['AREA']: [mockDbTrajectory], ['LOAD']: mockDbTrajectoryArray }) as Partial<StudyState>,
+      () =>
+        ({
+          ['AREA']: { trajectories: [mockDbTrajectory], warningMessages: [] },
+          ['LOAD']: { trajectories: mockDbTrajectoryArray, warningMessages: [] },
+        }) as Partial<StudyState>,
     );
   });
   afterEach(() => {
@@ -49,12 +56,12 @@ describe('useFetchTrajectoriesLinked', () => {
     const { result } = renderHook(() => useFetchTrajectoriesLinked(5, TRAJECTORY_TYPE.LOAD));
 
     await waitFor(() => {
-      expect(studyService.getStudyTrajectories).toHaveBeenCalledTimes(1);
-      expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.LOAD);
+      expect(studyService.getStudyTrajectoriesWithWarnings).toHaveBeenCalledTimes(1);
+      expect(studyService.getStudyTrajectoriesWithWarnings).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.LOAD);
       expect(mockDispatch).toHaveBeenCalledTimes(1);
       expect(mockDispatch).toHaveBeenCalledWith({
         type: STUDY_ACTION.ADD_TRAJECTORIES,
-        payload: mockTrajectoryTwo,
+        payload: { [TRAJECTORY_TYPE.LOAD]: { trajectories: mockTrajectoryTwo, warningMessages: [] } },
       });
       expect(result.current.trajectoryLinked).toEqual(mockTrajectoryTwo);
       expect(result.current.emptyAreas).toEqual(mockTrajectoryTwo);

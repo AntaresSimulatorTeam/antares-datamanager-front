@@ -88,7 +88,7 @@ const getEditableHypothesisTableHeaders = (
   columnHelper.accessor('status', {
     header: t('home.@status'),
     cell: ({ row, table: { options } }) => {
-      const { status, hypothesis, isDefault, trajectory } = row.original;
+      const { status, hypothesis, isDefault } = row.original;
       return progress > 0 && fileStatus === 'loading' && rowIndexSelected === row.index ? (
         <ProgressBar statusFile={fileStatus} progressValue={progress} />
       ) : (
@@ -96,7 +96,6 @@ const getEditableHypothesisTableHeaders = (
           status={status}
           isDeletable={!isDefault && !(studyStatus === StudyStatus.GENERATED)}
           onClick={() => void options?.meta?.removeRow?.(hypothesis, row.index)}
-          message={trajectory?.messages?.[0]?.content ?? ''}
         />
       );
     },

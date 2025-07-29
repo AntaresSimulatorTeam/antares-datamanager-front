@@ -1,4 +1,4 @@
-import { RdsIcon, RdsIconButton, RdsIconId, RdsTextTooltip } from 'rte-design-system-react';
+import { RdsIcon, RdsIconButton, RdsIconId } from 'rte-design-system-react';
 import { useTranslation } from 'react-i18next';
 import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
@@ -8,10 +8,9 @@ interface CellWithStatusProps {
   status: TRAJECTORY_SELECTION_STATUS;
   isDeletable: boolean;
   onClick?: () => void;
-  message?: string;
 }
 
-export const CellWithStatus = ({ status, isDeletable, onClick, message }: CellWithStatusProps) => {
+export const CellWithStatus = ({ status, isDeletable, onClick }: CellWithStatusProps) => {
   const { t } = useTranslation();
 
   const getIcon = (rowStatus: TRAJECTORY_SELECTION_STATUS) => {
@@ -27,14 +26,7 @@ export const CellWithStatus = ({ status, isDeletable, onClick, message }: CellWi
         return (
           <>
             <RdsIcon name={RdsIconId.Info} color="error-700" />
-            <div className="flex items-center gap-2 text-error-700">
-              {t('studyDetails.@import_status_error')}
-              {message && (
-                <RdsTextTooltip text={message} offset={5} placement="left">
-                  <div className="line-clamp-2">{message}</div>
-                </RdsTextTooltip>
-              )}
-            </div>
+            <div className="flex items-center gap-2 text-error-700">{t('studyDetails.@import_status_error')}</div>
           </>
         );
       case TRAJECTORY_SELECTION_STATUS.MISSING:

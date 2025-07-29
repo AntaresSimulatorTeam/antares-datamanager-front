@@ -17,7 +17,6 @@ import {
 } from '../trajectoryUtils';
 import { defaultAreaNotInAreaTrajectoryList, rowData, rowDataTwo } from '@/mocks/data/tests/hypothesisTable.mock.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
 import { afterEach, beforeEach, vi } from 'vitest';
 import {
   mockDbTrajectory,
@@ -90,36 +89,7 @@ describe('buildErrorTrajectory', () => {
   it('should return an error trajectory', () => {
     const date = new Date(2000, 1, 1, 13);
     vi.setSystemTime(date);
-    const errorTrajectory = buildErrorTrajectory(TRAJECTORY_TYPE.AREA, 3, 'trajectory', 'error message', 'CE', 'FR');
-    expect(errorTrajectory).toStrictEqual({
-      id: 3,
-      trajectoryName: 'trajectory',
-      type: TRAJECTORY_TYPE.AREA,
-      version: 0,
-      userName: 'CE',
-      creationDate: date,
-      loadArea: 'FR',
-      messages: [
-        {
-          id: 10,
-          content: 'error message',
-          level: WARNING_MESSAGE_LEVEL.ERROR_LEVEL,
-          code: 'ERROR',
-          generatedBy: 'CE',
-          generatedAt: date,
-          trajectory: 'trajectory',
-          secondTrajectory: '',
-          isAck: false,
-        },
-      ],
-      state: TRAJECTORY_SELECTION_STATUS.ERROR,
-    });
-  });
-
-  it('should return an error trajectory', () => {
-    const date = new Date(2000, 1, 1, 13);
-    vi.setSystemTime(date);
-    const errorTrajectory = buildErrorTrajectory(TRAJECTORY_TYPE.AREA, 3, 'trajectory', undefined, undefined, 'FR');
+    const errorTrajectory = buildErrorTrajectory(TRAJECTORY_TYPE.AREA, 3, 'trajectory', undefined, 'FR');
     expect(errorTrajectory).toStrictEqual({
       id: 3,
       trajectoryName: 'trajectory',
@@ -128,19 +98,6 @@ describe('buildErrorTrajectory', () => {
       userName: 'unknown_user',
       creationDate: date,
       loadArea: 'FR',
-      messages: [
-        {
-          id: 10,
-          content: 'Error',
-          level: WARNING_MESSAGE_LEVEL.ERROR_LEVEL,
-          code: 'ERROR',
-          generatedBy: 'unknown_user',
-          generatedAt: date,
-          trajectory: 'trajectory',
-          secondTrajectory: '',
-          isAck: false,
-        },
-      ],
       state: TRAJECTORY_SELECTION_STATUS.ERROR,
     });
   });
@@ -219,7 +176,6 @@ describe('buildEmptyTrajectory', () => {
     expect(result.version).toBe(0);
     expect(result.userName).toBe('user');
     expect(result.state).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
-    expect(result.messages).toEqual([]);
     expect(result.creationDate).toBeInstanceOf(Date);
   });
 });

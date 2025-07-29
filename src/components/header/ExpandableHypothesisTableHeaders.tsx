@@ -120,7 +120,7 @@ const getExpandableHypothesisTableHeaders = (
   columnHelper.accessor('status', {
     header: t('home.@status'),
     cell: ({ row, table: { options } }) => {
-      const { status, isDefault, trajectory, hypothesis } = row.original;
+      const { status, isDefault, hypothesis } = row.original;
       return progress > 0 && fileStatus === 'loading' && indexSelected === row.index ? (
         <ProgressBar statusFile={fileStatus} progressValue={progress} />
       ) : (
@@ -131,7 +131,6 @@ const getExpandableHypothesisTableHeaders = (
             const parentRow = row.getParentRow();
             void options?.meta?.removeRow?.(hypothesis, row.depth === 1 && parentRow ? parentRow.index : row.index);
           }}
-          message={trajectory?.messages?.[0]?.content ?? ''}
         />
       );
     },

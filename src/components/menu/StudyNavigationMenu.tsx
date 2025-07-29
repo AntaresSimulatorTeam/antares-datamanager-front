@@ -14,20 +14,18 @@ import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useTranslation } from 'react-i18next';
 import { useStudy } from '@/store/contexts/StudyContext.tsx';
-import { HypothesisTab, WarningTrajectoryType } from '@/shared/types';
+import { HypothesisTab } from '@/shared/types';
 import StdAvatar from '@common/layout/stdAvatar/StdAvatar.tsx';
 import { ThermalMenu } from '@/components/menu/ThermalMenu.tsx';
 import { getStudyMenu } from '@/shared/utils/trajectoryUtils.ts';
 import { useFetchAreas } from '@/hooks/useFetchAreas.ts';
-import { getNbMessagesFromTrajectoryType } from '@/shared/services/trajectoryService.ts';
-import { countWarning } from '@/shared/utils/warningUtils';
+import { countWarning } from '@/shared/utils/warningUtils.ts';
 
 type StudyNavigationMenuProps = {
   onRenderActiveComponent?: (content: ReactNode | null) => void;
   setActiveTab: Dispatch<SetStateAction<HypothesisTab>>;
   activeTab: HypothesisTab;
   setErrorMessage: Dispatch<SetStateAction<string>>;
-  studyId: number;
 };
 
 const StudyNavigationMenu = ({
@@ -35,13 +33,13 @@ const StudyNavigationMenu = ({
   setActiveTab,
   activeTab,
   setErrorMessage,
-  studyId,
 }: StudyNavigationMenuProps) => {
   const { t } = useTranslation();
   const studyState = useStudy();
-  const [tabs, setTabs] = useState<HypothesisTab[]>(getStudyMenu(t, !!studyState[`${TRAJECTORY_TYPE.AREA}`]?.[0]));
-  const { areaDefault, trajectoryAreas } = useFetchAreas(studyState[`${TRAJECTORY_TYPE.AREA}`]?.[0]);
-  const [warningTrajectory, setWarningTrajectory] = useState<WarningTrajectoryType>();
+  const [tabs, setTabs] = useState<HypothesisTab[]>(
+    getStudyMenu(t, !!studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0]),
+  );
+  const { areaDefault, trajectoryAreas } = useFetchAreas(studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0]);
 
   const renderActiveComponent = (): ReactNode | null => {
     switch (activeTab.name) {
@@ -64,34 +62,24 @@ const StudyNavigationMenu = ({
     setTabs((prev) =>
       prev.map((tab) => ({
         ...tab,
-        isDisabled: tab.name !== TRAJECTORY_TYPE.AREA && !studyState[`${TRAJECTORY_TYPE.AREA}`]?.[0],
+        isDisabled: tab.name !== TRAJECTORY_TYPE.AREA && !studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0],
       })),
     );
   }, [studyState]);
 
   useEffect(() => {
-    const countNbWarningMessages = async (id: number) => {
-      try {
-        const result = await getNbMessagesFromTrajectoryType(id);
-        setWarningTrajectory(result);
-      } catch {
-        // silent handler
-      }
-    };
-
     if (onRenderActiveComponent) {
       if (!activeTab.isDisabled) {
         setErrorMessage('');
         onRenderActiveComponent(renderActiveComponent());
       }
     }
-    void countNbWarningMessages(studyId);
   }, [activeTab, onRenderActiveComponent]);
 
   return (
     <div className="flex space-x-4 p-4">
       {tabs.map((tab) => {
-        const nbWarning = warningTrajectory ? countWarning(warningTrajectory, tab.name) : 0;
+        const nbWarning = countWarning(studyState, tab.name);
         return (
           <div className="flex items-center space-x-2" key={tab.name}>
             <StdIcon name={tab.icon} />
@@ -103,7 +91,7 @@ const StudyNavigationMenu = ({
               disabled={tab.isDisabled}
               onClick={() => setActiveTab(tab)}
             />
-            {warningTrajectory && nbWarning != null && nbWarning > 0 && activeTab.name !== tab.name && (
+            {nbWarning > 0 && activeTab.name !== tab.name && (
               <StdAvatar
                 initials={`${nbWarning}`}
                 size="es"
