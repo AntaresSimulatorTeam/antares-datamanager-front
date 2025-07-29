@@ -22,6 +22,7 @@ import { useLocation } from 'react-router-dom';
 import {
   fetchTrajectoriesFromDB,
   fetchTrajectoriesFromFS,
+  getStudyTrajectoriesWithWarnings,
   linkTrajectoryToStudy,
   unlinkTrajectoryFromStudy,
   uploadTrajectory,
@@ -29,7 +30,6 @@ import {
 import { convertToFSSelectionOptionType, convertToSelectionOptionType } from '@/shared/utils/formFormatter.ts';
 import SearchBar from '@/pages/pegase/home/components/SearchBar.tsx';
 import { RdsCheckbox, RdsCheckboxGroupWrapper, RdsDivider } from 'rte-design-system-react';
-import { getStudyTrajectoriesWithWarnings } from '@/shared/services/studyService.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import getEditableHypothesisTableHeaders from '@/components/header/EditableHypothesisTableHeaders.tsx';

@@ -2,7 +2,7 @@ import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { DbTrajectory } from '@/shared/types';
-import { getStudyTrajectoriesWithWarnings } from '@/shared/services/studyService.ts';
+import { getStudyTrajectoriesWithWarnings } from '@/shared/services/trajectoryService';
 import { removeDuplicate } from '@/shared/utils/trajectoryUtils.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 

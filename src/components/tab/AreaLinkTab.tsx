@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import {
   fetchTrajectoriesFromDB,
   fetchTrajectoriesFromFS,
+  getStudyTrajectoriesWithWarnings,
   getTrajectoryDataByTypeAndId,
   linkTrajectoryToStudy,
   unlinkTrajectoryFromStudy,
@@ -36,7 +37,7 @@ import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { buildErrorTrajectory, getStatus } from '@/shared/utils/trajectoryUtils.ts';
-import { getStudyById, getStudyTrajectoriesWithWarnings } from '@/shared/services/studyService.ts';
+import { getStudyById } from '@/shared/services/studyService.ts';
 import { TrajectoryDataVisualisation } from '@common/modal/TrajectoryDataVisualisation.tsx';
 import { generateTrajectoryViewHeader } from '@/components/header/TrajectoryViewHeader.tsx';
 import { useLocation } from 'react-router-dom';
