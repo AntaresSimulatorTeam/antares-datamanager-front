@@ -1,9 +1,9 @@
 import { buildDataWarningMessage, convertDataToItem, countWarning, sortByLevel } from '@/shared/utils/warningUtils.ts';
 import { WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
 import { mockDataMessage, mockWarningMessages, mockWarningMessagesWithTwo } from '@/mocks/data/tests/warning.mock.ts';
-import { discardWarningMessage } from '@/shared/services/warningService.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
+import { discardWarningMessage } from '@/shared/services/messagesWarningService.ts';
 
 describe('sortByLevel', () => {
   it('should sort messages according to the level priority', () => {

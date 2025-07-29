@@ -2,7 +2,7 @@ import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
 import { CardDataType, DataWarningMessage, StudyState, WarningMessage } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { discardWarningMessage } from '@/shared/services/warningService.ts';
+import { discardWarningMessage } from '@/shared/services/messagesWarningService.ts';
 
 /**
  * Sort the messages list according to the warning level (typeof WARNING_MESSAGE_LEVEL)
