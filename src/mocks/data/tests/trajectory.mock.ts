@@ -1,6 +1,7 @@
 import { DbTrajectory, HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
+import { mockWarningMessagesWithTwo } from '@/mocks/data/tests/warning.mock.ts';
 
 export const mockDataBaseTrajectory = (type: TRAJECTORY_TYPE, id: number, area: string): DbTrajectory => ({
   id,
@@ -68,6 +69,14 @@ export const mockPrevStateArea = () => ({
   [TRAJECTORY_TYPE.AREA]: {
     trajectories: [mockDataBaseTrajectory(TRAJECTORY_TYPE.AREA, 123, 'ZoneA')],
     warningMessages: [],
+  },
+});
+
+export const mockPrevStateAreaWithWarnings = () => ({
+  studyStatus: StudyStatus.IN_PROGRESS,
+  [TRAJECTORY_TYPE.AREA]: {
+    trajectories: [mockDataBaseTrajectory(TRAJECTORY_TYPE.AREA, 123, 'ZoneA')],
+    warningMessages: mockWarningMessagesWithTwo,
   },
 });
 

@@ -9,7 +9,7 @@ import { Location, useLocation } from 'react-router-dom';
 import StudyHeader from './StudyHeader.tsx';
 import { RdsDivider } from 'rte-design-system-react';
 import StudyNavigationMenu from '@/components/menu/StudyNavigationMenu.tsx';
-import { DbTrajectory, HypothesisTab, StudyDTO, StudyTrajectoriesData, WarningMessage } from '@/shared/types';
+import { HypothesisTab, StudyDTO } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { createStudy } from '@/shared/services/studyService.ts';
@@ -20,6 +20,7 @@ import { DetailsContent } from '@/components/banner/DetailsContent.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { ContainerWithExpander } from '@/components/banner/ContainerWithExpander.tsx';
+import { getWarningMessages } from '@/shared/utils/warningUtils.ts';
 
 interface StudyState {
   study: StudyDTO;
@@ -53,21 +54,6 @@ const StudyDetails = () => {
     }
   };
 
-  const getWarningMessages = (
-    state: Partial<StudyTrajectoriesData & { studyStatus?: StudyStatus }>,
-  ): WarningMessage[] => {
-    const activeTabWarning: WarningMessage[] = state?.[activeTab.name]
-      ? (state[`${activeTab.name}`] as { trajectories: DbTrajectory[]; warningMessages: WarningMessage[] })
-          ?.warningMessages
-      : [];
-    if (activeTab.name === TRAJECTORY_TYPE.AREA) {
-      const warningLink: WarningMessage[] = state[`${TRAJECTORY_TYPE.LINK}`]?.warningMessages ?? [];
-      return activeTabWarning.concat(warningLink);
-    } else {
-      return activeTabWarning;
-    }
-  };
-
   return !study.id ? (
     <div className="flex h-screen items-center justify-center">
       <p>{t('studyDetails.@loading')}</p>
@@ -93,7 +79,7 @@ const StudyDetails = () => {
         <div className="relative flex flex-1 flex-col overflow-y-auto px-4">
           <div className="flex h-full w-full flex-col gap-4">
             <ContainerWithExpander
-              content={getWarningMessages(studyState)}
+              content={getWarningMessages(studyState, activeTab.name, study.id)}
               placeholder={t('studyDetails.@noWarnings')}
             />
             <div className="flex w-full">{activeContent}</div>

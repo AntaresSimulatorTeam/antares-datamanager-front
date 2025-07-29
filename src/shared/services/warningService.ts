@@ -1,9 +1,7 @@
 import { WARNING_MESSAGES } from '@/shared/const/apiEndPoint.ts';
 import { AuthService } from '@/shared/services/authService.ts';
-import { BackendError, StudyActionType, WarningMessage } from '@/shared/types';
-import { Dispatch } from 'react';
+import { BackendError, WarningMessage } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { STUDY_ACTION } from '@/shared/enum/study.ts';
 
 /**
  * Discard warning message
@@ -40,28 +38,5 @@ export const fetchWarningMessagesFromType = async (
     return (await (warningsResponse as Response).json()) as unknown as WarningMessage[];
   } catch {
     return [];
-  }
-};
-
-/**
- * @param {number} id - Warning message id
- * @param {TRAJECTORY_TYPE} trajectoryType - Trajectory type
- * @param {number} studyId - Study id
- * @param {Dispatch<StudyActionType>} dispatch
- *
- * @return {Promise<void>}
- */
-export const discardWarningMessage = async (
-  id: number,
-  trajectoryType: TRAJECTORY_TYPE,
-  studyId: number,
-  dispatch: Dispatch<StudyActionType>,
-): Promise<void> => {
-  try {
-    await skipMessage(id);
-    const warningMessages: WarningMessage[] = await fetchWarningMessagesFromType(trajectoryType, studyId);
-    dispatch?.({ type: STUDY_ACTION.SKIP_MESSAGE, payload: { trajectoryType, warningMessages } });
-  } catch {
-    // Silent handler
   }
 };

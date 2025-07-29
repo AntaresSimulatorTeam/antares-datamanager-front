@@ -84,7 +84,7 @@ export const skipWarningMessage = (
 ): Partial<StudyState> => {
   const { trajectoryType, warningMessages } = payload;
 
-  if (!Array.isArray(warningMessages)) return prevState;
+  if (!Array.isArray(prevState[`${trajectoryType}`]?.warningMessages)) return prevState;
 
   return {
     ...prevState,

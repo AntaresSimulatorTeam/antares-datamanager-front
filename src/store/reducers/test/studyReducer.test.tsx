@@ -2,16 +2,26 @@ import {
   addTrajectories,
   clearByType,
   deleteTrajectory,
+  skipWarningMessage,
   studyReducer,
   updateTrajectory,
 } from '@/store/reducers/studyReducer';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory';
-import { DbTrajectory, FileInputStatus, StudyActionType, StudyState } from '@/shared/types';
+import { DbTrajectory, FileInputStatus, StudyActionType, StudyState, WarningMessage } from '@/shared/types';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { describe, expect, it } from 'vitest';
-import { mockWarningMessagesWithTwo } from '@/mocks/data/tests/warning.mock.ts';
+import {
+  mockSingleWarningMessages,
+  mockWarningMessages,
+  mockWarningMessagesWithTwo,
+} from '@/mocks/data/tests/warning.mock.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
-import { mockDataBaseTrajectory, mockPrevStateArea, mockPrevStateLoad } from '@/mocks/data/tests/trajectory.mock.ts';
+import {
+  mockDataBaseTrajectory,
+  mockPrevStateArea,
+  mockPrevStateAreaWithWarnings,
+  mockPrevStateLoad,
+} from '@/mocks/data/tests/trajectory.mock.ts';
 
 describe('addTrajectories', () => {
   it('should add new trajectories to empty state', () => {
@@ -107,7 +117,7 @@ describe('deleteTrajectory', () => {
 
   it('should returns the same state if no matching trajectory is found', () => {
     const prevState = {
-      studyState: StudyStatus.IN_PROGRESS,
+      studyStatus: StudyStatus.IN_PROGRESS,
       [TRAJECTORY_TYPE.AREA]: {
         trajectories: [mockDataBaseTrajectory(TRAJECTORY_TYPE.AREA, 456, 'ZoneB')],
         warningMessages: [],
@@ -121,11 +131,23 @@ describe('deleteTrajectory', () => {
 
   it('should returns the same state if the trajectory list is null', () => {
     const prevState = {
-      studyState: StudyStatus.IN_PROGRESS,
+      studyStatus: StudyStatus.IN_PROGRESS,
       [TRAJECTORY_TYPE.AREA]: {
         trajectories: [],
         warningMessages: [],
       },
+    };
+
+    const payload = { area: 'ZoneA', type: TRAJECTORY_TYPE.AREA };
+
+    const result = deleteTrajectory(prevState, payload);
+
+    expect(result).toEqual(prevState);
+  });
+
+  it('should returns the same state if no trajectory of the trajectory type', () => {
+    const prevState = {
+      studyStatus: StudyStatus.IN_PROGRESS,
     };
 
     const payload = { area: 'ZoneA', type: TRAJECTORY_TYPE.AREA };
@@ -155,6 +177,71 @@ describe('deleteTrajectory', () => {
     const result = deleteTrajectory(prevState, payload);
 
     expect(result[TRAJECTORY_TYPE.AREA]?.trajectories).not.toBe(prevState[TRAJECTORY_TYPE.AREA]);
+  });
+});
+
+describe('skipWarningMessage', () => {
+  const trajectorySample = mockDataBaseTrajectory(TRAJECTORY_TYPE.AREA, 123, 'zoneA');
+
+  it('should removes the mutate warningMessages from the correct type array', () => {
+    const prevState = {
+      [TRAJECTORY_TYPE.LOAD]: {
+        trajectories: [trajectorySample],
+        warningMessages: mockWarningMessagesWithTwo,
+      },
+    };
+    const payload = { trajectoryType: TRAJECTORY_TYPE.LOAD, warningMessages: mockWarningMessages };
+    const result = skipWarningMessage(prevState, payload);
+
+    expect(result[TRAJECTORY_TYPE.LOAD]?.warningMessages).toEqual(mockWarningMessages);
+  });
+
+  it('should returns the same state if the warningMessages list is not an array', () => {
+    const prevState = {
+      studyStatus: StudyStatus.IN_PROGRESS,
+      [TRAJECTORY_TYPE.AREA]: {
+        trajectories: [trajectorySample],
+        warningMessages: mockSingleWarningMessages as unknown as Array<WarningMessage>,
+      },
+    };
+
+    const payload = { trajectoryType: TRAJECTORY_TYPE.LOAD, warningMessages: mockWarningMessages };
+
+    const result = skipWarningMessage(prevState, payload);
+
+    expect(result).toEqual(prevState);
+  });
+
+  it('should returns the same state if the warningMessages list is an empty array', () => {
+    const prevState = {
+      studyStatus: StudyStatus.IN_PROGRESS,
+      [TRAJECTORY_TYPE.AREA]: {
+        trajectories: [],
+        warningMessages: [],
+      },
+    };
+
+    const payload = { trajectoryType: TRAJECTORY_TYPE.LOAD, warningMessages: mockWarningMessages };
+
+    const result = skipWarningMessage(prevState, payload);
+
+    expect(result).toEqual(prevState);
+  });
+
+  it('should returns the same state if the warningMessages list is null', () => {
+    const prevState = {
+      studyStatus: StudyStatus.IN_PROGRESS,
+      [TRAJECTORY_TYPE.AREA]: {
+        trajectories: [],
+        warningMessages: null,
+      },
+    } as unknown as Partial<StudyState>;
+
+    const payload = { trajectoryType: TRAJECTORY_TYPE.LOAD, warningMessages: mockWarningMessages };
+
+    const result = skipWarningMessage(prevState, payload);
+
+    expect(result).toEqual(prevState);
   });
 });
 
@@ -300,6 +387,24 @@ describe('updateTrajectory', () => {
 
     expect(result[TRAJECTORY_TYPE.LINK]).not.toBe(prevState[TRAJECTORY_TYPE.LINK]);
   });
+
+  it('should returns the same state if no trajectory of the trajectory type', () => {
+    const prevStateWithNoType = {
+      studyStatus: StudyStatus.IN_PROGRESS,
+    };
+
+    const payload = {
+      trajectory: {
+        ...baseTrajectory,
+        trajectoryName: 'Changed',
+      },
+      status: 'success' as FileInputStatus,
+    };
+
+    const result = updateTrajectory(prevStateWithNoType, payload);
+
+    expect(result).toEqual(prevStateWithNoType);
+  });
 });
 
 // Mock handlers to isolate reducer logic
@@ -361,6 +466,20 @@ describe('studyReducer', () => {
     const result = studyReducer(mockPrevStateLoad(), action);
 
     expect(result[TRAJECTORY_TYPE.LOAD]?.trajectories).toEqual([]);
+  });
+
+  it('should handle SKIP_MESSAGE action', () => {
+    const action: StudyActionType = {
+      type: STUDY_ACTION.SKIP_MESSAGE,
+      payload: {
+        trajectoryType: TRAJECTORY_TYPE.AREA,
+        warningMessages: [mockWarningMessages[2], mockWarningMessages[3]],
+      },
+    };
+
+    const result = studyReducer(mockPrevStateAreaWithWarnings(), action);
+
+    expect(result[TRAJECTORY_TYPE.AREA]?.warningMessages).toEqual([mockWarningMessages[2], mockWarningMessages[3]]);
   });
 
   it('should handles UPDATE_TRAJECTORY action', () => {
