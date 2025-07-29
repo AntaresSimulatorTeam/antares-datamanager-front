@@ -58,7 +58,7 @@ const StdAlert = ({
         <div className="flex flex-col items-start gap-1 text-left">
           <span className={`${textClasses} ${expanded ? 'line-clamp-none' : 'line-clamp-1'}`}>{message}</span>
           {expanded && content && content?.length > 0 && (
-            <div className="grow text-body-xs font-normal text-gray-700">{content}</div>
+            <div className="grow text-body-xs text-gray-700">{content}</div>
           )}
         </div>
       </div>

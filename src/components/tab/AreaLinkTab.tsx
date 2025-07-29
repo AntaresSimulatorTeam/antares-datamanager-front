@@ -177,7 +177,11 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
       setReadOnly({ '0': false, '1': false });
       notifyAlert({
         icon: StdIconId.Close,
-        message: `Error: ${trajectoryLabel} cannot be saved for ${rowIndex === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK}`,
+        message: t('studyDetails.@notificationAlert', {
+          studyName: study?.name ?? '',
+          trajectoryName: trajectoryLabel,
+          trajectoryType: rowIndex === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
+        }),
         content: errorMessage,
         type: 'error',
         filledIcon: true,

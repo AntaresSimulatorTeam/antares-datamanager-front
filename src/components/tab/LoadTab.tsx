@@ -204,7 +204,11 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
 
     notifyAlert({
       icon: StdIconId.Close,
-      message: `Error: ${trajectoryLabel} cannot be saved for ${data[rowIndex]?.hypothesis}`,
+      message: t('studyDetails.@notificationAlert', {
+        studyName: study?.name ?? '',
+        trajectoryName: trajectoryLabel,
+        trajectoryType: data[rowIndex]?.hypothesis,
+      }),
       content: errorMessage,
       type: 'error',
       filledIcon: true,

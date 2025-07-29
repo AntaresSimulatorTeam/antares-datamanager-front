@@ -83,7 +83,8 @@
     "@import_status_done": "OK",
     "@import_status_missing": "Missing",
     "@import_status_error": "Error",
-    "@generate": "Générer"
+    "@generate": "Générer",
+    "@notificationAlert": "Erreur: {{studyName}} - {{trajectoryName}} aucun paramètre n'a pas être enregistré pour {{trajectoryType}}"
   },
   "thermal": {
     "@installedPower": "Capacités installées",
