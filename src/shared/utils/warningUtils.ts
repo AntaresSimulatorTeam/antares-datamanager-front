@@ -1,6 +1,6 @@
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
-import { CardDataType, DataWarningMessage, WarningMessage, WarningTrajectoryType } from '@/shared/types';
+import { CardDataType, DataWarningMessage, StudyState, WarningMessage } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { discardWarningMessage } from '@/shared/services/warningService.ts';
 
@@ -41,6 +41,7 @@ export const convertDataToItem = <T>(data: T, t: (value: string) => string): Car
     onClickItem = null,
     trajectoryType = null,
     trajectoryId = null,
+    studyId = null,
   } = data || {};
 
   return {
@@ -60,6 +61,7 @@ export const convertDataToItem = <T>(data: T, t: (value: string) => string): Car
     generatedAt,
     isAck,
     onClickItem,
+    studyId,
   };
 };
 
@@ -68,23 +70,30 @@ export const convertDataToItem = <T>(data: T, t: (value: string) => string): Car
  * @param {WarningMessage} messages
  * @param {TRAJECTORY_TYPE} tabName - Tab name is defined as typeof TRAJECTORY_TYPE
  * @param {boolean} isNotGenerated
+ * @param {number} studyId
  * @return {DataWarningMessage[]} - Data that can be used into card component
  */
 export const buildDataWarningMessage = (
   messages: WarningMessage[],
   tabName: TRAJECTORY_TYPE,
   isNotGenerated: boolean,
+  studyId: number,
 ): DataWarningMessage[] =>
   (messages || []).map((message: WarningMessage) => ({
     ...message,
     trajectoryType: tabName,
     onClickItem: isNotGenerated ? discardWarningMessage : null,
+    studyId,
   }));
 
-export const countWarning = (warning: WarningTrajectoryType, tabName: TRAJECTORY_TYPE) => {
+export const countWarning = (studyState: Partial<StudyState>, tabName: TRAJECTORY_TYPE) => {
+  const warningMessages = studyState[tabName]?.warningMessages;
+
   if (tabName === TRAJECTORY_TYPE.AREA) {
-    return +warning[TRAJECTORY_TYPE.AREA] + +warning[TRAJECTORY_TYPE.LINK];
-  } else {
-    return warning[tabName];
+    const areaWarnings = studyState[TRAJECTORY_TYPE.AREA]?.warningMessages?.length ?? 0;
+    const linkWarnings = studyState[TRAJECTORY_TYPE.LINK]?.warningMessages?.length ?? 0;
+    return areaWarnings + linkWarnings;
   }
+
+  return warningMessages?.length ?? 0;
 };

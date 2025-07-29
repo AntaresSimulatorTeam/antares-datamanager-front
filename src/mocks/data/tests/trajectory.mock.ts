@@ -1,5 +1,16 @@
 import { DbTrajectory, HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
+
+export const mockDataBaseTrajectory = (type: TRAJECTORY_TYPE, id: number, area: string): DbTrajectory => ({
+  id,
+  type,
+  trajectoryName: `${type}-name`,
+  version: 1,
+  userName: 'CB',
+  creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+  loadArea: area,
+});
 
 export const mockDbTrajectory: DbTrajectory = {
   id: 1,
@@ -51,6 +62,22 @@ export const mockDbTrajectoryLINK: DbTrajectory = {
   creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
   loadArea: 'AT',
 };
+
+export const mockPrevStateArea = () => ({
+  studyStatus: StudyStatus.IN_PROGRESS,
+  [TRAJECTORY_TYPE.AREA]: {
+    trajectories: [mockDataBaseTrajectory(TRAJECTORY_TYPE.AREA, 123, 'ZoneA')],
+    warningMessages: [],
+  },
+});
+
+export const mockPrevStateLoad = () => ({
+  studyStatus: StudyStatus.IN_PROGRESS,
+  [TRAJECTORY_TYPE.LOAD]: {
+    trajectories: [mockDataBaseTrajectory(TRAJECTORY_TYPE.AREA, 123, 'ZoneA')],
+    warningMessages: [],
+  },
+});
 
 export const mockRowDataTrajectoryA: HypothesisRowData = {
   hypothesis: 'A',

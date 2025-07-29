@@ -32,7 +32,11 @@ describe('useFetchAreas', () => {
   beforeEach(() => {
     global.fetch = vi.fn();
     mockUseStudy.mockImplementation(
-      () => ({ ['AREA']: [mockDbTrajectory], ['LOAD']: mockDbTrajectoryArray }) as Partial<StudyState>,
+      () =>
+        ({
+          ['AREA']: { trajectories: [mockDbTrajectory], warningMessages: [] },
+          ['LOAD']: { trajectories: mockDbTrajectoryArray, warningMessages: [] },
+        }) as Partial<StudyState>,
     );
   });
   afterEach(() => {

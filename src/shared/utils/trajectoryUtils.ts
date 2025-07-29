@@ -110,7 +110,6 @@ export const buildEmptyTrajectory = (areaName: string, type: TRAJECTORY_TYPE): D
   creationDate: new Date(),
   loadArea: areaName,
   state: TRAJECTORY_SELECTION_STATUS.MISSING,
-  messages: [],
 });
 
 export const buildRowWithSubRowsData = (array: { name: string }[]) =>

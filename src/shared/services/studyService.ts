@@ -4,12 +4,13 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { BackendError, DbTrajectory, PaginatedResponse, StudyDTO } from '@/shared/types';
+import { BackendError, DbTrajectory, PaginatedResponse, StudyDTO, WarningMessage } from '@/shared/types';
 import { STUDY_GENERATE_ENDPOINT, STUDY_SEARCH_ENDPOINT, TRAJECTORY_ENDPOINT } from '@/shared/const/apiEndPoint';
 import { STUDY_ENDPOINT, STUDY_KEYWORDS_SEARCH_ENDPOINT } from '@/shared/const/apiEndPoint.ts';
 import { notifyToast } from '@/shared/notification/notification.tsx';
 import { AuthService } from '@/shared/services/authService.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { fetchWarningMessagesFromType } from '@/shared/services/warningService.ts';
 
 /**
  * Retrieve a list of studies from a term
@@ -158,7 +159,7 @@ export const createStudy = async (id: number): Promise<void> => {
  * @param {number} studyId - Study id
  * @param {TRAJECTORY_TYPE} trajectoryType - Trajectory type
  *
- * @return {Promise<Omit<DbTrajectory,'messages'>[]>} Array of trajectories (data base trajectories)
+ * @return {Promise<DbTrajectory[]>} Array of trajectories (data base trajectories)
  * @throws {Error}
  */
 
@@ -171,9 +172,33 @@ export const getStudyTrajectories = async (
   try {
     const response = await AuthService.authFetch(urlApi);
 
-    return (await (response as Response).json()) as Omit<DbTrajectory, 'messages'>[];
+    return (await (response as Response).json()) as DbTrajectory[];
   } catch (error) {
     throw new Error((error as BackendError).antaresErrorMessage);
+  }
+};
+
+/**
+ * Fetch warning messages for each trajectory linked to a study
+ * @param {number} studyId - Study id
+ * @param {TRAJECTORY_TYPE} trajectoryType - Trajectory type
+ *
+ * @return {Promise<{trajectories: DbTrajectory[], warningMessages: WarningMessage[]}>} Array of trajectories (data base trajectories)
+ * @throws {Error}
+ */
+export const getStudyTrajectoriesWithWarnings = async (
+  studyId: number,
+  trajectoryType?: TRAJECTORY_TYPE,
+): Promise<{ trajectories: DbTrajectory[]; warningMessages: WarningMessage[] }> => {
+  try {
+    const trajectories: DbTrajectory[] = await getStudyTrajectories(studyId, trajectoryType);
+    let warningMessages: WarningMessage[] = [];
+    if (trajectories?.length > 0 && trajectoryType) {
+      warningMessages = await fetchWarningMessagesFromType(trajectoryType, studyId);
+    }
+    return { trajectories, warningMessages };
+  } catch (error) {
+    throw new Error((error as Error).message);
   }
 };
 

@@ -89,7 +89,7 @@ describe('buildErrorTrajectory', () => {
   it('should return an error trajectory', () => {
     const date = new Date(2000, 1, 1, 13);
     vi.setSystemTime(date);
-    const errorTrajectory = buildErrorTrajectory(TRAJECTORY_TYPE.AREA, 3, 'trajectory', 'CE', 'FR');
+    const errorTrajectory = buildErrorTrajectory(TRAJECTORY_TYPE.AREA, 3, 'trajectory', undefined, 'FR');
     expect(errorTrajectory).toStrictEqual({
       id: 3,
       trajectoryName: 'trajectory',
@@ -192,7 +192,6 @@ describe('buildEmptyTrajectory', () => {
     expect(result.version).toBe(0);
     expect(result.userName).toBe('user');
     expect(result.state).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
-    expect(result.messages).toEqual([]);
     expect(result.creationDate).toBeInstanceOf(Date);
   });
 });

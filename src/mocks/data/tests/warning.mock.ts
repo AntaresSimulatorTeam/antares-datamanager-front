@@ -1,6 +1,5 @@
-import { DataWarningMessage, WarningMessage } from '@/shared/types';
+import { WarningMessage } from '@/shared/types';
 import { WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
-import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 
 export const mockSingleWarningMessages: WarningMessage = {
   id: 1,
@@ -144,9 +143,3 @@ export const mockWarningMessages: WarningMessage[] = [
     isAck: false,
   },
 ];
-
-export const mockDataMessage: DataWarningMessage = {
-  ...mockSingleWarningMessages,
-  trajectoryType: TRAJECTORY_TYPE.LOAD,
-  onClickItem: null,
-};

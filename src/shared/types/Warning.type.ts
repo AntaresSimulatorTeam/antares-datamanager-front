@@ -19,6 +19,7 @@ export interface WarningMessage {
 }
 
 export interface DataWarningMessage extends WarningMessage {
+  studyId: number;
   trajectoryType: TRAJECTORY_TYPE;
   onClickItem:
     | ((
@@ -52,6 +53,7 @@ export interface CardDataType
     | null;
   buttonLabel: string;
   buttonTooltipText: string;
+  studyId: number | null;
 }
 
 export type WarningTrajectoryType = { [key in keyof typeof TRAJECTORY_TYPE]: number };

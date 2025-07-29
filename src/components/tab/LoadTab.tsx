@@ -29,7 +29,7 @@ import {
 import { convertToFSSelectionOptionType, convertToSelectionOptionType } from '@/shared/utils/formFormatter.ts';
 import SearchBar from '@/pages/pegase/home/components/SearchBar.tsx';
 import { RdsCheckbox, RdsCheckboxGroupWrapper, RdsDivider } from 'rte-design-system-react';
-import { getStudyTrajectories } from '@/shared/services/studyService.ts';
+import { getStudyTrajectoriesWithWarnings } from '@/shared/services/studyService.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import getEditableHypothesisTableHeaders from '@/components/header/EditableHypothesisTableHeaders.tsx';
@@ -201,7 +201,7 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
           : item,
       ),
     );
-
+    console.log('================== errorMessage', errorMessage);
     notifyAlert({
       icon: StdIconId.Close,
       message: t('studyDetails.@notificationAlert', {
@@ -244,8 +244,8 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
         );
       } else if (status === 'success') {
         await linkTrajectoryToStudy(TRAJECTORY_TYPE.LOAD, trajectoryId, study.id);
-        const newTrajectories = await getStudyTrajectories(study.id, TRAJECTORY_TYPE.LOAD);
-        const newTrajectory = newTrajectories?.find((trajectory) => {
+        const result = await getStudyTrajectoriesWithWarnings(study.id, TRAJECTORY_TYPE.LOAD);
+        const newTrajectory = result?.trajectories?.find((trajectory) => {
           if (data[rowIndex].hypothesis === OTHER_AREAS_LABEL) {
             return trajectory.loadArea === OTHER_AREAS;
           } else {
@@ -253,7 +253,7 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
           }
         });
         if (newTrajectory?.loadArea) {
-          dispatch?.({ type: STUDY_ACTION.ADD_TRAJECTORIES, payload: [newTrajectory] });
+          dispatch?.({ type: STUDY_ACTION.ADD_TRAJECTORIES, payload: { [TRAJECTORY_TYPE.LOAD]: result } });
         }
         setData((prev) =>
           prev.map((item, index) =>
@@ -346,7 +346,12 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
   const addRow = (name: string) => {
     dispatch?.({
       type: STUDY_ACTION.ADD_TRAJECTORIES,
-      payload: [buildEmptyTrajectory(name, TRAJECTORY_TYPE.LOAD)],
+      payload: {
+        [TRAJECTORY_TYPE.LOAD]: {
+          trajectories: [buildEmptyTrajectory(name, TRAJECTORY_TYPE.LOAD)],
+          warningMessages: [],
+        },
+      },
     });
     const newDataSorted = sortWithFixedPosition([
       {
