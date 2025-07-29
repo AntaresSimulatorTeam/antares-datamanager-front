@@ -16,6 +16,7 @@ import {
   getStudyTrajectoriesWithWarnings,
   getTrajectoryDataByTypeAndId,
   linkTrajectoryToStudy,
+  unlinkAllTrajectoriesFromStudy,
   unlinkTrajectoryFromStudy,
   uploadTrajectory,
 } from '@/shared/services/trajectoryService.ts';
@@ -47,6 +48,8 @@ import { computeReadOnlyState } from '@/shared/utils/computeReadOnlyState';
 import { FileInputStatus } from 'rte-design-system-react';
 import { notifyAlert } from '@/shared/notification/notification.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
+import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
+
 
 interface AreaLinkTabProps {
   setErrorMessage: Dispatch<SetStateAction<string>>;
@@ -69,6 +72,7 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
   const [progress, setProgress] = useState(0);
   const [fileStatus, setFileStatus] = useState<FileInputStatus>('empty');
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({ '0': false, '1': false });
+  const [isAreaDeletionConfirmOpen, setIsAreaDeletionConfirmOpen] = useState(false);
 
   const areaTrajectory = data[0]?.trajectory;
   const areaStatus = data[0]?.status;
@@ -197,7 +201,16 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
   const handleTrajectoryDeletion = async (rowIndex: number, status: RowStatus, trajectoryId: number) => {
     if (rowIndex === 0 && data[1].trajectory) {
       if (status === 'empty') {
-        await unlinkTrajectoryFromStudy(trajectoryId, study.id);
+        try {
+          await unlinkTrajectoryFromStudy(trajectoryId, study.id);
+        } catch (error) {
+          if ((error as Error).message.includes('Confirmation required')) {
+            setRowIndexSelected(rowIndex);
+            setIsAreaDeletionConfirmOpen(true);
+            return;
+          }
+          throw error;
+        }
         if (data[1]?.status != TRAJECTORY_SELECTION_STATUS.ERROR) {
           await unlinkTrajectoryFromStudy(data[1].trajectory.id, study.id);
         }
@@ -234,6 +247,24 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
       );
       setReadOnly({ '0': false, '1': rowIndex === 0 });
     }
+  };
+
+  const handleConfirmedAreaDeletion = async () => {
+    await unlinkAllTrajectoriesFromStudy(study.id);
+
+    dispatch?.({
+      type: STUDY_ACTION.CLEAR_TRAJECTORY_BY_TYPE,
+      payload: [TRAJECTORY_TYPE.AREA, TRAJECTORY_TYPE.LINK],
+    });
+
+    setData([
+      { hypothesis: 'Areas', trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING },
+      { hypothesis: 'Links', trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING },
+    ]);
+
+    setReadOnly({ '0': false, '1': true });
+    setIsAreaDeletionConfirmOpen(false);
+    setErrorMessage(t('studyDetails.@add_trajectories_message'));
   };
 
   const handleTrajectoryUpdate = async (
@@ -396,6 +427,11 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
       {isViewModalOpen && trajectoryData && (
         <TrajectoryDataVisualisation trajectoryData={trajectoryData} onClose={() => setIsViewModalOpen(false)} />
       )}
+      <AreaDeletionConfirmationModal
+        isOpen={isAreaDeletionConfirmOpen}
+        onClose={() => setIsAreaDeletionConfirmOpen(false)}
+        onConfirm={handleConfirmedAreaDeletion}
+      />
     </div>
   );
 };

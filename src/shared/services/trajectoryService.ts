@@ -13,6 +13,7 @@ import {
   TRAJECTORY_FILE_SYSTEM_ENDPOINT,
   TRAJECTORY_LINK_TO_STUDY_ENDPOINT,
   TRAJECTORY_UNLINK_TO_STUDY_ENDPOINT,
+  TRAJECTORY_UNLINK_ALL_TO_STUDY_ENDPOINT,
 } from '@/shared/const/apiEndPoint.ts';
 import {
   BackendError,
@@ -157,6 +158,22 @@ export const linkTrajectoryToStudy = async (
  */
 export const unlinkTrajectoryFromStudy = async (trajectoryId: number, studyId: number): Promise<void> => {
   const urlApi = `${TRAJECTORY_UNLINK_TO_STUDY_ENDPOINT}?trajectoryId=${trajectoryId}&studyId=${studyId}`;
+  try {
+    await AuthService.authFetch(urlApi, {
+      method: 'DELETE',
+    });
+  } catch (error) {
+    throw new Error(`${(error as BackendError)?.antaresErrorMessage}`);
+  }
+};
+
+/**
+ * Delete all trajectories linked to a study
+ *
+ * @param {number} studyId - Study id
+ */
+export const unlinkAllTrajectoriesFromStudy = async (studyId: number): Promise<void> => {
+  const urlApi = `${TRAJECTORY_UNLINK_ALL_TO_STUDY_ENDPOINT}?studyId=${studyId}`;
   try {
     await AuthService.authFetch(urlApi, {
       method: 'DELETE',
