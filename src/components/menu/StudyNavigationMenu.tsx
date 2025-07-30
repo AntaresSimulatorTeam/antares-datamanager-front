@@ -91,7 +91,7 @@ const StudyNavigationMenu = ({
               disabled={tab.isDisabled}
               onClick={() => !tab.isDisabled && setActiveTab(tab)}
             />
-            {nbWarning > 0 && activeTab.name !== tab.name && (
+            {nbWarning > 0 && (
               <StdAvatar
                 initials={`${nbWarning}`}
                 size="es"
