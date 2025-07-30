@@ -1,4 +1,11 @@
-import { DbTrajectory, HypothesisRowData, HypothesisTab, NestedCheckedType, RowStatus } from '@/shared/types';
+import {
+  DbTrajectory,
+  HypothesisRowData,
+  HypothesisTab,
+  NestedCheckedType,
+  RowStatus,
+  WarningMessage,
+} from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { FileInputStatus } from 'rte-design-system-react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
@@ -82,6 +89,21 @@ export const removeDuplicate = (array?: DbTrajectory[]): DbTrajectory[] =>
   }, []);
 
 /**
+ * Removes duplicate objects from an array of WarningMessage objects based on their 'id' property.
+ *
+ * @param {WarningMessage[]} [array] - Optional array of WarningMessage objects to process.
+ * @returns {WarningMessage[]} A new array containing only unique WarningMessage objects by 'id'.
+ */
+export const removeDuplicateById = (array?: WarningMessage[]): WarningMessage[] =>
+  (array || []).reduce((acc: WarningMessage[], current: WarningMessage) => {
+    const x = acc.find((item) => item.id === current.id);
+    if (!x) {
+      acc.push(current);
+    }
+    return acc;
+  }, []);
+
+/**
  * Create row data for hypothesis table
  * @param {string} areaName
  * @param {boolean} isDefault
@@ -102,7 +124,7 @@ export const buildRowData = (areaName: string, isDefault: boolean, trajectory?: 
  * @return {DbTrajectory}
  */
 export const buildEmptyTrajectory = (areaName: string, type: TRAJECTORY_TYPE): DbTrajectory => ({
-  id: Math.floor(generateId()),
+  id: generateId(),
   trajectoryName: '',
   type,
   version: 0,

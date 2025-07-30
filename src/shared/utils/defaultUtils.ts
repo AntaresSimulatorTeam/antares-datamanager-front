@@ -1,3 +1,3 @@
 export const noop = () => {};
 
-export const generateId = () => Math.floor(Date.now() * 1e15);
+export const generateId = () => Math.floor(Math.random() * 90) + 10;

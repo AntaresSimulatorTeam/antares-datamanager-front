@@ -9,12 +9,27 @@ import {
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
-import { isMatchingTrajectoryType } from '@/shared/utils/trajectoryUtils.ts';
+import { isMatchingTrajectoryType, removeDuplicate, removeDuplicateById } from '@/shared/utils/trajectoryUtils.ts';
 
 export const addTrajectories = (prevState: Partial<StudyState>, data: StudyTrajectoriesData): Partial<StudyState> => {
   const studyState: Partial<StudyState> = { ...prevState };
   (Object.keys(data) as TRAJECTORY_TYPE[]).forEach((keyType: TRAJECTORY_TYPE) => {
-    Object.assign(studyState, { [keyType]: data[keyType] });
+    if (keyType === TRAJECTORY_TYPE.AREA || keyType === TRAJECTORY_TYPE.LINK) {
+      Object.assign(studyState, { [keyType]: data[keyType] });
+    } else {
+      const newTrajectories = prevState[keyType]?.trajectories
+        ? [...(prevState[keyType]?.trajectories ?? []), ...(data[keyType]?.trajectories ?? [])]
+        : (data[keyType]?.trajectories ?? []);
+      const newWarningMessages = prevState[keyType]?.warningMessages
+        ? [...(prevState[keyType]?.warningMessages ?? []), ...(data[keyType]?.warningMessages ?? [])]
+        : (data[keyType]?.warningMessages ?? []);
+      Object.assign(studyState, {
+        [keyType]: {
+          trajectories: removeDuplicate(newTrajectories),
+          warningMessages: removeDuplicateById(newWarningMessages),
+        },
+      });
+    }
   });
 
   return studyState;
@@ -25,17 +40,21 @@ export const deleteTrajectory = (prevState: Partial<StudyState>, payload: { area
   const trajectories = Array.isArray(prevState[`${type}`]?.trajectories)
     ? (prevState[`${payload.type}`]?.trajectories as DbTrajectory[])
     : null;
-  if (trajectories?.length) {
-    if (type !== TRAJECTORY_TYPE.AREA && type !== TRAJECTORY_TYPE.LINK) {
-      const newTrajectories = trajectories.filter((trajectory) => trajectory.loadArea !== area);
-      const newStudyState = {
-        ...prevState[`${type}`],
-        trajectories: newTrajectories,
-      };
-      Object.assign(prevState, { [type]: newStudyState });
-    } else {
-      Object.assign(prevState, { [type]: { trajectories: [], warningMessages: [] } });
-    }
+  const warningMessages = Array.isArray(prevState[`${type}`]?.warningMessages)
+    ? (prevState[`${payload.type}`]?.warningMessages as WarningMessage[])
+    : null;
+  if (type === TRAJECTORY_TYPE.AREA || type === TRAJECTORY_TYPE.LINK) {
+    Object.assign(prevState, { [type]: { trajectories: [], warningMessages: [] } });
+  } else {
+    const trajectoryId = (trajectories ?? []).find((trajectory) => trajectory.loadArea === area)?.id;
+    const newTrajectories = (trajectories ?? []).filter((trajectory) => trajectory.id !== trajectoryId);
+    const newWarningMessages = (warningMessages ?? []).filter((message) => message.trajectoryId !== trajectoryId);
+    const newStudyState = {
+      ...prevState[`${type}`],
+      trajectories: newTrajectories,
+      warningMessages: newWarningMessages,
+    };
+    Object.assign(prevState, { [type]: newStudyState });
   }
   return prevState;
 };
@@ -60,10 +79,14 @@ export const updateTrajectory = (
         return trajectoryDb;
       }
     });
+    const warningMessages = Array.isArray(prevState[`${trajectory.type}`]?.warningMessages)
+      ? (prevState[`${trajectory.type}`]?.warningMessages as WarningMessage[])
+      : null;
 
     const newStudyState = {
       ...prevState[`${trajectoryType}`],
       trajectories: newTrajectories,
+      warningMessages: (warningMessages ?? []).filter((message) => message.trajectoryId !== trajectory.id),
     };
 
     return {

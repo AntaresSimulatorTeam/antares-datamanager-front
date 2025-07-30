@@ -314,7 +314,7 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
   );
 
   const handleRemoveRow = async (value?: string, indexRow?: number) => {
-    if (indexRow && data?.[indexRow]) {
+    if (indexRow && data[indexRow].hypothesis) {
       dispatch?.({
         type: STUDY_ACTION.DELETE_TRAJECTORY,
         payload: { area: data[indexRow].hypothesis, type: TRAJECTORY_TYPE.LOAD },

@@ -32,27 +32,52 @@ describe('addTrajectories', () => {
     expect(result[TRAJECTORY_TYPE.AREA]?.trajectories).toEqual([trajectory]);
   });
 
-  it('should merge with existing trajectories and deduplicate', () => {
-    const existingTrajectory = mockDataBaseTrajectory(TRAJECTORY_TYPE.AREA, 56, 'AT');
-    const newTrajectory = mockDataBaseTrajectory(TRAJECTORY_TYPE.AREA, 90, 'FR');
+  it('should merge with existing trajectories and preserve warningMessages if no messages is added', () => {
+    const existingTrajectory = mockDataBaseTrajectory(TRAJECTORY_TYPE.LOAD, 56, 'AT');
+    const newTrajectory = mockDataBaseTrajectory(TRAJECTORY_TYPE.LOAD, 90, 'FR');
 
     const prevState = {
-      [TRAJECTORY_TYPE.AREA]: {
+      [TRAJECTORY_TYPE.LOAD]: {
         trajectories: [existingTrajectory],
         warningMessages: [],
       },
     };
 
     const result = addTrajectories(prevState, {
-      [TRAJECTORY_TYPE.AREA]: {
-        trajectories: [existingTrajectory, newTrajectory],
+      [TRAJECTORY_TYPE.LOAD]: {
+        trajectories: [newTrajectory],
         warningMessages: [],
       },
     });
 
-    expect(result[TRAJECTORY_TYPE.AREA]?.trajectories).toContainEqual(existingTrajectory);
-    expect(result[TRAJECTORY_TYPE.AREA]?.trajectories).toContainEqual(newTrajectory);
-    expect(result[TRAJECTORY_TYPE.AREA]?.trajectories).toHaveLength(2);
+    expect(result[TRAJECTORY_TYPE.LOAD]?.trajectories).toContainEqual(existingTrajectory);
+    expect(result[TRAJECTORY_TYPE.LOAD]?.trajectories).toContainEqual(newTrajectory);
+    expect(result[TRAJECTORY_TYPE.LOAD]?.trajectories).toHaveLength(2);
+    expect(result[TRAJECTORY_TYPE.LOAD]?.warningMessages).toHaveLength(0);
+  });
+
+  it('should merge with existing trajectories and warningMessages', () => {
+    const existingTrajectory = mockDataBaseTrajectory(TRAJECTORY_TYPE.LOAD, 56, 'AT');
+    const newTrajectory = mockDataBaseTrajectory(TRAJECTORY_TYPE.LOAD, 90, 'FR');
+
+    const prevState = {
+      [TRAJECTORY_TYPE.LOAD]: {
+        trajectories: [existingTrajectory],
+        warningMessages: mockWarningMessagesWithTwo,
+      },
+    };
+
+    const result = addTrajectories(prevState, {
+      [TRAJECTORY_TYPE.LOAD]: {
+        trajectories: [newTrajectory],
+        warningMessages: [],
+      },
+    });
+
+    expect(result[TRAJECTORY_TYPE.LOAD]?.trajectories).toContainEqual(existingTrajectory);
+    expect(result[TRAJECTORY_TYPE.LOAD]?.trajectories).toContainEqual(newTrajectory);
+    expect(result[TRAJECTORY_TYPE.LOAD]?.warningMessages).toEqual(mockWarningMessagesWithTwo);
+    expect(result[TRAJECTORY_TYPE.LOAD]?.trajectories).toHaveLength(2);
   });
 
   it('should preserve unrelated trajectory types', () => {
