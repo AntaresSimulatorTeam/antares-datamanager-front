@@ -201,7 +201,7 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
           : item,
       ),
     );
-    console.log('================== errorMessage', errorMessage);
+
     notifyAlert({
       icon: StdIconId.Close,
       message: t('studyDetails.@notificationAlert', {
