@@ -253,7 +253,7 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
           }
         });
         if (newTrajectory?.loadArea) {
-          dispatch?.({ type: STUDY_ACTION.ADD_TRAJECTORIES, payload: { [TRAJECTORY_TYPE.LOAD]: result } });
+          dispatch?.({ type: STUDY_ACTION.UPDATE_TRAJECTORY, payload: { trajectory: newTrajectory, status } });
         }
         setData((prev) =>
           prev.map((item, index) =>
