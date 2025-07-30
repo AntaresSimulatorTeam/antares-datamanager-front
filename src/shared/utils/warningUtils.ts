@@ -1,6 +1,6 @@
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
-import { CardDataType, DataWarningMessage, StudyState, WarningMessage } from '@/shared/types';
+import { CardDataType, DataWarningMessage, WarningMessage, WarningTrajectoryType } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { discardWarningMessage } from '@/shared/services/messagesWarningService.ts';
 
@@ -95,24 +95,16 @@ export const convertDataToItem = <T>(data: T, t: (value: string) => string): Car
 };
 
 /**
- * Calculates the total number of warning messages for a specified tab in the study state.
+ * Computes the count of warnings based on the warning trajectory type and the tab name.
  *
- * This function assesses the count of warning messages within a given `tabName` in the study state.
- * If the `tabName` corresponds to the `TRAJECTORY_TYPE.AREA`, it aggregates the warning messages
- * from both the `AREA` and `LINK` trajectory types.
- *
- * @param {Partial<StudyState>} studyState - The current state of the study, which includes warning messages for various trajectory types.
- * @param {TRAJECTORY_TYPE} tabName - The trajectory type or tab name for which the warnings are being evaluated.
- * @returns {number} The total count of warning messages for the given tab or, in the case of an `AREA` tab, for the combined `AREA` and `LINK` trajectory types.
+ * @param {WarningTrajectoryType} warning - The object containing warning counts for different trajectory types.
+ * @param {TRAJECTORY_TYPE} tabName - The trajectory type for which the warning count needs to be calculated.
+ * @returns {number} - The total warning count for the specified trajectory type.
  */
-export const countWarning = (studyState: Partial<StudyState>, tabName: TRAJECTORY_TYPE): number => {
-  const warningMessages = studyState[tabName]?.warningMessages;
-
+export const countWarning = (warning: WarningTrajectoryType, tabName: TRAJECTORY_TYPE) => {
   if (tabName === TRAJECTORY_TYPE.AREA) {
-    const areaWarnings = studyState[TRAJECTORY_TYPE.AREA]?.warningMessages?.length ?? 0;
-    const linkWarnings = studyState[TRAJECTORY_TYPE.LINK]?.warningMessages?.length ?? 0;
-    return areaWarnings + linkWarnings;
+    return +warning[TRAJECTORY_TYPE.AREA] + +warning[TRAJECTORY_TYPE.LINK];
+  } else {
+    return warning[tabName] ?? 0;
   }
-
-  return warningMessages?.length ?? 0;
 };

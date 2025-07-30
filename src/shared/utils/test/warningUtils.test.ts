@@ -4,6 +4,7 @@ import { mockDataMessage, mockWarningMessages, mockWarningMessagesWithTwo } from
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { discardWarningMessage } from '@/shared/services/messagesWarningService.ts';
+import { WarningTrajectoryType } from '@/shared/types';
 
 describe('sortByLevel', () => {
   it('should sort messages according to the level priority', () => {
@@ -168,29 +169,19 @@ describe('buildDataWarningMessage', () => {
 });
 
 describe('countWarning', () => {
-  it('returns 0 when studyState is empty', () => {
-    expect(countWarning({}, TRAJECTORY_TYPE.AREA)).toBe(0);
-  });
-
+  const warningNbByType = {
+    AREA: 2,
+    LINK: 1,
+  } as unknown as WarningTrajectoryType;
   it('returns correct count for AREA (sums AREA and LINK warnings)', () => {
-    const studyState = {
-      AREA: { trajectories: [], warningMessages: mockWarningMessagesWithTwo },
-      LINK: { trajectories: [], warningMessages: [mockWarningMessagesWithTwo[0]] },
-    };
-    expect(countWarning(studyState, TRAJECTORY_TYPE.AREA)).toBe(3);
+    expect(countWarning(warningNbByType, TRAJECTORY_TYPE.AREA)).toBe(3);
   });
 
   it('returns correct count for LINK only', () => {
-    const studyState = {
-      LINK: { trajectories: [], warningMessages: mockWarningMessagesWithTwo },
-    };
-    expect(countWarning(studyState, TRAJECTORY_TYPE.LINK)).toBe(2);
+    expect(countWarning(warningNbByType, TRAJECTORY_TYPE.LINK)).toBe(1);
   });
 
   it('returns 0 when warningMessages is undefined', () => {
-    const studyState = {
-      LOAD: { trajectories: [], warningMessages: [] },
-    };
-    expect(countWarning(studyState, TRAJECTORY_TYPE.LOAD)).toBe(0);
+    expect(countWarning(warningNbByType, TRAJECTORY_TYPE.LOAD)).toBe(0);
   });
 });
