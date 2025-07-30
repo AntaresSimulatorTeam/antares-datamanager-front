@@ -65,7 +65,7 @@ const StudyNavigationMenu = ({
         isDisabled: tab.name !== TRAJECTORY_TYPE.AREA && !studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0],
       })),
     );
-  }, [studyState]);
+  }, [studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories]);
 
   useEffect(() => {
     if (onRenderActiveComponent) {
@@ -89,7 +89,7 @@ const StudyNavigationMenu = ({
               label={tab.label}
               active={activeTab.name === tab.name}
               disabled={tab.isDisabled}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => !tab.isDisabled && setActiveTab(tab)}
             />
             {nbWarning > 0 && activeTab.name !== tab.name && (
               <StdAvatar

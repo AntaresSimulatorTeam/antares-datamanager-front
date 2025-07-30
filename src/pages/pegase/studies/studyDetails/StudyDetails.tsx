@@ -86,14 +86,14 @@ const StudyDetails = () => {
           </div>
           <div className="fixed bottom-0 right-0 w-full border-t bg-gray-w px-1 py-1.5">
             <div className="flex h-fit w-full items-center justify-end">
-              {!studyState.AREA && !errorMessage && (
+              {!studyState.AREA?.trajectories?.length && !errorMessage && (
                 <div className="mr-1 text-error-600">{t('studyDetails.@add_trajectories_message')}</div>
               )}
               {errorMessage && <div className="mr-1 text-error-600">{errorMessage}</div>}
               <ButtonWithStdIcon
                 label={t('studyDetails.@generate')}
                 onClick={() => void handleGenerateStudy()}
-                disabled={!studyState.AREA || studyState.studyStatus === StudyStatus.GENERATED}
+                disabled={!studyState.AREA?.trajectories?.length || studyState.studyStatus === StudyStatus.GENERATED}
                 icon={StdIconId.CheckCircle}
                 position="right"
                 isLoading={isGenerating}

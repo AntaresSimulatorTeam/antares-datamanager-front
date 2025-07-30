@@ -205,7 +205,7 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
       setErrorMessage(t('studyDetails.@add_trajectories_message'));
       dispatch?.({
         type: STUDY_ACTION.CLEAR_TRAJECTORY_BY_TYPE,
-        payload: [TRAJECTORY_TYPE.AREA, TRAJECTORY_TYPE.LINK],
+        payload: [TRAJECTORY_TYPE.AREA, TRAJECTORY_TYPE.LINK, TRAJECTORY_TYPE.LOAD],
       } as StudyActionType);
       setData((prev) =>
         prev.map((item) => ({ ...item, trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING })),
@@ -219,7 +219,7 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
       rowIndex === 0 ? setErrorMessage(t('studyDetails.@add_trajectories_message')) : setErrorMessage('');
       dispatch?.({
         type: STUDY_ACTION.CLEAR_TRAJECTORY_BY_TYPE,
-        payload: [rowIndex === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK],
+        payload: rowIndex === 0 ? [TRAJECTORY_TYPE.AREA, TRAJECTORY_TYPE.LOAD] : [TRAJECTORY_TYPE.LINK],
       } as StudyActionType);
       setData((prev) =>
         prev.map((item, index) =>
