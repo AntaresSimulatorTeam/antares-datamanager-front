@@ -59,7 +59,8 @@ export type StudyActionType =
   | {
       type: STUDY_ACTION.SKIP_MESSAGE;
       payload: { trajectoryType: TRAJECTORY_TYPE; warningMessages: WarningMessage[] };
-    };
+    }
+  | { type: STUDY_ACTION.RESET_STUDY_STATE };
 
 export interface LocationStudy {
   study: StudyDTO;

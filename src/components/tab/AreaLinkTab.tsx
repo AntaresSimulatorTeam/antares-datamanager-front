@@ -252,11 +252,7 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
   const handleConfirmedAreaDeletion = async () => {
     await unlinkAllTrajectoriesFromStudy(study.id);
 
-    dispatch?.({
-      type: STUDY_ACTION.CLEAR_TRAJECTORY_BY_TYPE,
-      payload: [TRAJECTORY_TYPE.AREA, TRAJECTORY_TYPE.LINK],
-    });
-
+    dispatch?.({ type: STUDY_ACTION.RESET_STUDY_STATE });
     setData([
       { hypothesis: 'Areas', trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING },
       { hypothesis: 'Links', trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING },

@@ -13,7 +13,7 @@ import {
   getNbMessagesFromTrajectoryType,
   getStudyTrajectoriesWithWarnings,
   getTrajectoryDataByTypeAndId,
-  linkTrajectoryToStudy,
+  linkTrajectoryToStudy, unlinkAllTrajectoriesFromStudy,
   unlinkTrajectoryFromStudy,
   uploadTrajectory,
 } from '@/shared/services/trajectoryService.ts';
@@ -233,6 +233,41 @@ describe('unlinkTrajectoryFromStudy', () => {
 
     await expect(async () => unlinkTrajectoryFromStudy(100, 2)).rejects.toThrowError(
       'Failed to unlink trajectory to study',
+    );
+  });
+});
+
+describe('unlinkAllTrajectoriesFromStudy', () => {
+  const requestOptions = { method: 'DELETE' };
+  const studyId = 42;
+
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should unlink all trajectories from a study', async () => {
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({ ok: true });
+
+    await unlinkAllTrajectoriesFromStudy(studyId);
+
+    await waitFor(() => {
+      expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
+      expect(AuthService.authFetch).toHaveBeenCalledWith(
+        `https://mockapi.com/v1/trajectory/detach/all?studyId=${studyId}`,
+        requestOptions,
+      );
+    });
+  });
+
+  it('should handle exception during unlink all', async () => {
+    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
+      antaresErrorMessage: 'Failed to unlink all trajectories',
+      date: new Date(),
+      type: ERROR_MESSAGE_TYPE.BUSINESS,
+    });
+
+    await expect(() => unlinkAllTrajectoriesFromStudy(studyId)).rejects.toThrowError(
+      'Failed to unlink all trajectories'
     );
   });
 });
