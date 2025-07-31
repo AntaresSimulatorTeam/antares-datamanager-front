@@ -51,6 +51,7 @@ import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import { useFetchTrajectoriesLinked } from '@/hooks/useFetchTrajectoriesLinked.ts';
 import { setReadOnlyForGeneratedStudy } from '@/shared/helpers/hypothesisTableHelper.ts';
+import { fetchWarningMessagesFromType } from '@/shared/services/warningService.ts';
 
 interface LoadTabProps {
   defaultAreas: CheckBoxData[];
@@ -227,9 +228,10 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
         if (status === 'empty') {
           await unlinkTrajectoryFromStudy(trajectoryId, study.id);
         }
+        const warningMessages = await fetchWarningMessagesFromType(TRAJECTORY_TYPE.LOAD, study.id);
         dispatch?.({
           type: STUDY_ACTION.UPDATE_TRAJECTORY,
-          payload: { trajectory: data[rowIndex].trajectory, status },
+          payload: { trajectory: data[rowIndex].trajectory, warningMessages, status },
         });
         setData((prev) =>
           prev.map((item, index) =>
@@ -252,8 +254,9 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
             return trajectory.loadArea === data[rowIndex].hypothesis;
           }
         });
-        if (newTrajectory?.loadArea) {
-          dispatch?.({ type: STUDY_ACTION.UPDATE_TRAJECTORY, payload: { trajectory: newTrajectory, status } });
+        if (newTrajectory) {
+          const payloadResult = { trajectory: newTrajectory, warningMessages: result.warningMessages, status };
+          dispatch?.({ type: STUDY_ACTION.UPDATE_TRAJECTORY, payload: payloadResult });
         }
         setData((prev) =>
           prev.map((item, index) =>

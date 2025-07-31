@@ -51,7 +51,10 @@ export type StudyActionType =
       payload: { trajectoryType: TRAJECTORY_TYPE; messages: WarningMessage[] };
     }
   | { type: STUDY_ACTION.DELETE_TRAJECTORY; payload: { area: string; type: TRAJECTORY_TYPE } }
-  | { type: STUDY_ACTION.UPDATE_TRAJECTORY; payload: { trajectory: DbTrajectory; status: FileInputStatus } }
+  | {
+      type: STUDY_ACTION.UPDATE_TRAJECTORY;
+      payload: { trajectory: DbTrajectory; warningMessages: WarningMessage[]; status: FileInputStatus };
+    }
   | { type: STUDY_ACTION.SET_STUDY_STATUS; payload: StudyStatus }
   | {
       type: STUDY_ACTION.SKIP_MESSAGE;

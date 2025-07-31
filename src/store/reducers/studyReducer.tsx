@@ -61,9 +61,9 @@ export const deleteTrajectory = (prevState: Partial<StudyState>, payload: { area
 
 export const updateTrajectory = (
   prevState: Partial<StudyState>,
-  payload: { trajectory: DbTrajectory; status: FileInputStatus },
+  payload: { trajectory: DbTrajectory; warningMessages: WarningMessage[]; status: FileInputStatus },
 ) => {
-  const { trajectory, status } = payload;
+  const { trajectory, warningMessages, status } = payload;
   const trajectoryType = trajectory.type;
   const trajectories = Array.isArray(prevState[`${trajectoryType}`]?.trajectories)
     ? (prevState[`${trajectoryType}`]?.trajectories as DbTrajectory[])
@@ -79,14 +79,11 @@ export const updateTrajectory = (
         return trajectoryDb;
       }
     });
-    const warningMessages = Array.isArray(prevState[`${trajectory.type}`]?.warningMessages)
-      ? (prevState[`${trajectory.type}`]?.warningMessages as WarningMessage[])
-      : null;
 
     const newStudyState = {
       ...prevState[`${trajectoryType}`],
       trajectories: newTrajectories,
-      warningMessages: (warningMessages ?? []).filter((message) => message.trajectoryId !== trajectory.id),
+      warningMessages,
     };
 
     return {
