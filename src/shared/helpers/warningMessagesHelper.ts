@@ -30,7 +30,9 @@ export const getWarningMessages = (
 
   if (activeTabName === TRAJECTORY_TYPE.AREA) {
     const warningLink: WarningMessage[] = state[`${TRAJECTORY_TYPE.LINK}`]?.warningMessages ?? [];
-    return buildDataWarningMessage(activeTabWarning.concat(warningLink), activeTabName, isNotGenerated, studyId);
+    const dataWarningMessageArea = buildDataWarningMessage(activeTabWarning, activeTabName, isNotGenerated, studyId);
+    const dataWarningMessageLink = buildDataWarningMessage(warningLink, TRAJECTORY_TYPE.LINK, isNotGenerated, studyId);
+    return dataWarningMessageArea.concat(dataWarningMessageLink);
   } else {
     return buildDataWarningMessage(activeTabWarning, activeTabName, isNotGenerated, studyId);
   }

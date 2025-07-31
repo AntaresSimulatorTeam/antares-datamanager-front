@@ -22,13 +22,15 @@ describe('getWarningMessages', () => {
     };
     vi.mocked(buildDataWarningMessage).mockReturnValue([mockDataMessage, mockDataMessage, mockDataMessage]);
     const result = getWarningMessages(state, TRAJECTORY_TYPE.AREA, 123);
+    expect(buildDataWarningMessage).toBeCalledTimes(2);
     expect(buildDataWarningMessage).toHaveBeenCalledWith(
-      [mockWarningMessagesWithTwo[0]].concat(mockWarningMessagesWithTwo),
+      [mockWarningMessagesWithTwo[0]],
       TRAJECTORY_TYPE.AREA,
       true,
       123,
     );
-    expect(result.length).toBe(3);
+    expect(buildDataWarningMessage).toHaveBeenCalledWith(mockWarningMessagesWithTwo, TRAJECTORY_TYPE.LINK, true, 123);
+    expect(result.length).toBe(6);
   });
 
   it('handles non-AREA tab without merging LINK', () => {
