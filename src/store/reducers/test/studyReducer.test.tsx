@@ -345,6 +345,7 @@ describe('updateTrajectory', () => {
 
     const payload = {
       trajectory: updatedTrajectory,
+      warningMessages: [],
       status: 'success' as FileInputStatus,
     };
 
@@ -362,6 +363,7 @@ describe('updateTrajectory', () => {
 
     const payload = {
       trajectory: updatedTrajectory,
+      warningMessages: [],
       status: 'error' as FileInputStatus,
     };
 
@@ -392,6 +394,7 @@ describe('updateTrajectory', () => {
 
     const payload = {
       trajectory: baseTrajectory,
+      warningMessages: [],
       status: 'success' as FileInputStatus,
     };
 
@@ -406,6 +409,7 @@ describe('updateTrajectory', () => {
         ...baseTrajectory,
         trajectoryName: 'Changed',
       },
+      warningMessages: [],
       status: 'success' as FileInputStatus,
     };
 
@@ -424,6 +428,7 @@ describe('updateTrajectory', () => {
         ...baseTrajectory,
         trajectoryName: 'Changed',
       },
+      warningMessages: [],
       status: 'success' as FileInputStatus,
     };
 
@@ -515,6 +520,7 @@ describe('studyReducer', () => {
       type: STUDY_ACTION.UPDATE_TRAJECTORY,
       payload: {
         trajectory: newTrajectory,
+        warningMessages: [],
         status: 'success' as FileInputStatus,
       },
     };
