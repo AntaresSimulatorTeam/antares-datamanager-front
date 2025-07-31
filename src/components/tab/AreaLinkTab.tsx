@@ -198,19 +198,26 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
     }
   };
 
+  const unlinkWithConfirmationCheck = async (trajectoryId: number, rowIndex: number): Promise<boolean> => {
+    try {
+      await unlinkTrajectoryFromStudy(trajectoryId, study.id);
+      return true;
+    } catch (error) {
+      if ((error as Error).message.includes('Confirmation required')) {
+        setRowIndexSelected(rowIndex);
+        setIsAreaDeletionConfirmOpen(true);
+        return false;
+      }
+      throw error;
+    }
+  };
+
   const handleTrajectoryDeletion = async (rowIndex: number, status: RowStatus, trajectoryId: number) => {
     if (rowIndex === 0 && data[1].trajectory) {
       if (status === 'empty') {
-        try {
-          await unlinkTrajectoryFromStudy(trajectoryId, study.id);
-        } catch (error) {
-          if ((error as Error).message.includes('Confirmation required')) {
-            setRowIndexSelected(rowIndex);
-            setIsAreaDeletionConfirmOpen(true);
-            return;
-          }
-          throw error;
-        }
+        const areaUnlinked = await unlinkWithConfirmationCheck(trajectoryId, rowIndex);
+        if (!areaUnlinked) return;
+
         if (data[1]?.status != TRAJECTORY_SELECTION_STATUS.ERROR) {
           await unlinkTrajectoryFromStudy(data[1].trajectory.id, study.id);
         }
@@ -225,17 +232,8 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
       );
       setReadOnly({ '0': false, '1': true });
     } else {
-      if (status === 'empty') {
-        try {
-          await unlinkTrajectoryFromStudy(trajectoryId, study.id);
-        } catch (error) {
-          if ((error as Error).message.includes('Confirmation required')) {
-            setRowIndexSelected(rowIndex);
-            setIsAreaDeletionConfirmOpen(true);
-            return;
-          }
-        }
-      }
+      const areaUnlinked = await unlinkWithConfirmationCheck(trajectoryId, rowIndex);
+      if (!areaUnlinked) return;
 
       rowIndex === 0 ? setErrorMessage(t('studyDetails.@add_trajectories_message')) : setErrorMessage('');
       dispatch?.({

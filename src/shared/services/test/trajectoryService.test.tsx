@@ -266,7 +266,7 @@ describe('unlinkAllTrajectoriesFromStudy', () => {
       type: ERROR_MESSAGE_TYPE.BUSINESS,
     });
 
-    await expect(() => unlinkAllTrajectoriesFromStudy(studyId)).rejects.toThrowError(
+    await expect(async () => unlinkAllTrajectoriesFromStudy(studyId)).rejects.toThrowError(
       'Failed to unlink all trajectories'
     );
   });
