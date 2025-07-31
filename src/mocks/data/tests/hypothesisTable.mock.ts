@@ -1,4 +1,4 @@
-import { HypothesisRowData, WarningMessage } from '@/shared/types';
+import { HypothesisRowData } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { generateId } from '@/shared/utils/defaultUtils.ts';
@@ -15,7 +15,6 @@ const buildRowDataMock = (
   version: number,
   userName: string,
   creationDate: Date,
-  messages: WarningMessage[] = [],
 ): HypothesisRowData => ({
   hypothesis,
   status,
@@ -28,7 +27,6 @@ const buildRowDataMock = (
     version,
     userName,
     creationDate,
-    messages,
     loadArea: hypothesis === OTHER_AREAS_LABEL ? 'OTHERS' : hypothesis,
   },
 });

@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import {
   fetchTrajectoriesFromDB,
   fetchTrajectoriesFromFS,
+  getStudyTrajectoriesWithWarnings,
   getTrajectoryDataByTypeAndId,
   linkTrajectoryToStudy,
   unlinkTrajectoryFromStudy,
@@ -36,7 +37,7 @@ import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { buildErrorTrajectory, getStatus } from '@/shared/utils/trajectoryUtils.ts';
-import { getStudyById, getStudyTrajectoriesWithWarnings } from '@/shared/services/studyService.ts';
+import { getStudyById } from '@/shared/services/studyService.ts';
 import { TrajectoryDataVisualisation } from '@common/modal/TrajectoryDataVisualisation.tsx';
 import { generateTrajectoryViewHeader } from '@/components/header/TrajectoryViewHeader.tsx';
 import { useLocation } from 'react-router-dom';
@@ -90,13 +91,15 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
           getStudyTrajectoriesWithWarnings(study.id, TRAJECTORY_TYPE.AREA),
           getStudyTrajectoriesWithWarnings(study.id, TRAJECTORY_TYPE.LINK),
         ]);
-        const trajectoryArea: DbTrajectory | null = trajectoryAreaResult[0] ?? null;
-        const trajectoryLink: DbTrajectory | null = trajectoryLinkResult[0] ?? null;
+        const trajectoryArea: DbTrajectory | null = trajectoryAreaResult?.trajectories[0] ?? null;
+        const trajectoryLink: DbTrajectory | null = trajectoryLinkResult?.trajectories[0] ?? null;
         dispatch?.({
           type: STUDY_ACTION.ADD_TRAJECTORIES,
-          payload: [trajectoryArea && { ...trajectoryArea }, trajectoryLink && { ...trajectoryLink }].filter(Boolean),
+          payload: {
+            ...(trajectoryArea && { [TRAJECTORY_TYPE.AREA]: trajectoryAreaResult }),
+            ...(trajectoryLink && { [TRAJECTORY_TYPE.LINK]: trajectoryLinkResult }),
+          },
         });
-
         setData([
           {
             hypothesis: 'Areas',
@@ -202,7 +205,7 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
       setErrorMessage(t('studyDetails.@add_trajectories_message'));
       dispatch?.({
         type: STUDY_ACTION.CLEAR_TRAJECTORY_BY_TYPE,
-        payload: [TRAJECTORY_TYPE.AREA, TRAJECTORY_TYPE.LINK],
+        payload: [TRAJECTORY_TYPE.AREA, TRAJECTORY_TYPE.LINK, TRAJECTORY_TYPE.LOAD],
       } as StudyActionType);
       setData((prev) =>
         prev.map((item) => ({ ...item, trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING })),
@@ -216,7 +219,7 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
       rowIndex === 0 ? setErrorMessage(t('studyDetails.@add_trajectories_message')) : setErrorMessage('');
       dispatch?.({
         type: STUDY_ACTION.CLEAR_TRAJECTORY_BY_TYPE,
-        payload: [rowIndex === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK],
+        payload: rowIndex === 0 ? [TRAJECTORY_TYPE.AREA, TRAJECTORY_TYPE.LOAD] : [TRAJECTORY_TYPE.LINK],
       } as StudyActionType);
       setData((prev) =>
         prev.map((item, index) =>
@@ -243,20 +246,14 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
     try {
       if (trajectoryId != null && status === 'success') {
         setErrorMessage('');
-        await linkTrajectoryToStudy(
-          rowIndex === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
-          trajectoryId,
-          study.id,
-        );
-        const newTrajectories = await getStudyTrajectoriesWithWarnings(
-          study.id,
-          rowIndex === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
-        );
-        const newTrajectory = newTrajectories?.[0];
+        const trajectoryType = rowIndex === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK;
+        await linkTrajectoryToStudy(trajectoryType, trajectoryId, study.id);
+        const result = await getStudyTrajectoriesWithWarnings(study.id, trajectoryType);
+        const newTrajectory = result?.trajectories?.[0];
         if (newTrajectory) {
           dispatch?.({
             type: STUDY_ACTION.ADD_TRAJECTORIES,
-            payload: [newTrajectory],
+            payload: { [trajectoryType]: result },
           });
         }
         setData((prev) =>

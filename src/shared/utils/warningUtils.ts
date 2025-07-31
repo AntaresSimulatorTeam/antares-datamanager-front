@@ -1,11 +1,11 @@
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
-import { CardDataType, DataWarningMessage, DbTrajectory, WarningMessage } from '@/shared/types';
+import { CardDataType, DataWarningMessage, WarningMessage, WarningTrajectoryType } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { discardWarningMessage } from '@/shared/services/warningService.ts';
+import { discardWarningMessage } from '@/shared/services/messagesWarningService.ts';
 
 /**
- * Sort messages list according to the warning level (typeof WARNING_MESSAGE_LEVEL)
+ * Sort the messages list according to the warning level (typeof WARNING_MESSAGE_LEVEL)
  *
  * @param {WarningMessage} a - Warning message
  * @param {WarningMessage} b - Warning message
@@ -29,10 +29,39 @@ export const sortByLevel = (a: WarningMessage, b: WarningMessage): number => {
   return 0;
 };
 
+/**
+ * Convert message warning DTO into DataWarningMessage object according to trajectory type
+ * @param {WarningMessage} messages
+ * @param {TRAJECTORY_TYPE} tabName - Tab name is defined as typeof TRAJECTORY_TYPE
+ * @param {boolean} isNotGenerated
+ * @param {number} studyId
+ * @return {DataWarningMessage[]} - Data that can be used into card component
+ */
+export const buildDataWarningMessage = (
+  messages: WarningMessage[],
+  tabName: TRAJECTORY_TYPE,
+  isNotGenerated: boolean,
+  studyId: number,
+): DataWarningMessage[] =>
+  (messages || []).map((message: WarningMessage) => ({
+    ...message,
+    trajectoryType: tabName,
+    onClickItem: isNotGenerated ? discardWarningMessage : null,
+    studyId,
+  }));
+
+/**
+ * Transforms the input data object into a structured `CardDataType` object.
+ *
+ * @template T
+ * @param {T} data - The input data object containing information to be transformed.
+ * @param {(value: string) => string} t - A translation function to localize specific text values.
+ * @returns {CardDataType} A `CardDataType` object containing structured and formatted properties based on the input data.
+ */
 export const convertDataToItem = <T>(data: T, t: (value: string) => string): CardDataType => {
   const {
     id = null,
-    trajectory = null,
+    trajectoryName = null,
     secondTrajectory = null,
     content = null,
     generatedBy = null,
@@ -41,6 +70,7 @@ export const convertDataToItem = <T>(data: T, t: (value: string) => string): Car
     onClickItem = null,
     trajectoryType = null,
     trajectoryId = null,
+    studyId = null,
   } = data || {};
 
   return {
@@ -49,7 +79,7 @@ export const convertDataToItem = <T>(data: T, t: (value: string) => string): Car
     color: 'text-warning-500',
     colorBorder: 'hover:border-b-acc6-500',
     icon: StdIconId.Warning,
-    title: `${trajectory ?? ''} ${secondTrajectory ? ' - ' : ''} ${secondTrajectory || ''}`,
+    title: `${trajectoryName ?? ''} ${secondTrajectory ? '-' : ''} ${secondTrajectory ?? ''}`,
     buttonLabel: isAck ? t('studyDetails.@skipped') : t('studyDetails.@skip'),
     buttonTooltipText: t('studyDetails.@warningButtonTooltip'),
     trajectoryId,
@@ -60,26 +90,21 @@ export const convertDataToItem = <T>(data: T, t: (value: string) => string): Car
     generatedAt,
     isAck,
     onClickItem,
+    studyId,
   };
 };
 
 /**
- * Convert message warning DTO into DataWarningMessage object according to trajectory type
- * @param {DbTrajectory} trajectory
- * @param {TRAJECTORY_TYPE} tabName - Tab name is defined as typeof TRAJECTORY_TYPE
- * @param {boolean} isNotGenerated
- * @return {DataWarningMessage[]} - Data that can be used into card component
+ * Computes the count of warnings based on the warning trajectory type and the tab name.
+ *
+ * @param {WarningTrajectoryType} warning - The object containing warning counts for different trajectory types.
+ * @param {TRAJECTORY_TYPE} tabName - The trajectory type for which the warning count needs to be calculated.
+ * @returns {number} - The total warning count for the specified trajectory type.
  */
-export const buildDataWarningMessage = (
-  trajectory: DbTrajectory,
-  tabName: TRAJECTORY_TYPE,
-  isNotGenerated: boolean,
-): DataWarningMessage[] =>
-  (trajectory.messages || []).map((message: WarningMessage) => ({
-    ...message,
-    trajectoryId: trajectory.id,
-    trajectoryType: tabName,
-    trajectory: trajectory.trajectoryName,
-    onClickItem: isNotGenerated ? discardWarningMessage : null,
-  }));
-
+export const countWarning = (warning: WarningTrajectoryType, tabName: TRAJECTORY_TYPE) => {
+  if (tabName === TRAJECTORY_TYPE.AREA) {
+    return +warning[TRAJECTORY_TYPE.AREA] + +warning[TRAJECTORY_TYPE.LINK];
+  } else {
+    return warning[tabName] ?? 0;
+  }
+};

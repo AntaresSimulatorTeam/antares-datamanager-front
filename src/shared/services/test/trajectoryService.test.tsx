@@ -4,13 +4,14 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { vi } from 'vitest';
+import { expect, Mock, vi } from 'vitest';
 import { waitFor } from '@testing-library/react';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import {
   fetchTrajectoriesFromDB,
   fetchTrajectoriesFromFS,
   getNbMessagesFromTrajectoryType,
+  getStudyTrajectoriesWithWarnings,
   getTrajectoryDataByTypeAndId,
   linkTrajectoryToStudy,
   unlinkTrajectoryFromStudy,
@@ -20,9 +21,13 @@ import {
   mockDbTrajectory,
   mockFsTrajectoryAreaArray,
   mockTrajectoryAreaData,
+  mockTrajectoryTwo,
 } from '@/mocks/data/tests/trajectory.mock.ts';
 import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
 import { AuthService } from '@/shared/services/authService.ts';
+import { mockWarningMessagesWithTwo } from '@/mocks/data/tests/warning.mock.ts';
+import { getStudyTrajectories } from '@/shared/services/studyService.ts';
+import { fetchWarningMessagesFromType } from '@/shared/services/warningService.ts';
 
 vi.mock('@/envVariables', () => ({
   getEnvVariables: vi.fn(() => 'https://mockapi.com'),
@@ -297,5 +302,54 @@ describe('getNbMessagesFromTrajectoryType', () => {
     });
 
     await expect(async () => getNbMessagesFromTrajectoryType(5)).rejects.toThrowError('Failed to count warning');
+  });
+});
+
+vi.mock('@/shared/services/studyService', async (importOriginal) => {
+  const actual: Mock = await importOriginal();
+  return {
+    ...actual,
+    getStudyTrajectories: vi.fn().mockImplementation(() => Promise.resolve(mockTrajectoryTwo)),
+  };
+});
+
+vi.mock('@/shared/services/warningService', async (importOriginal) => {
+  const actual: Mock = await importOriginal();
+  return {
+    ...actual,
+    fetchWarningMessagesFromType: vi.fn().mockImplementation(() => Promise.resolve(mockWarningMessagesWithTwo)),
+  };
+});
+
+describe('getStudyTrajectoriesWithWarnings', () => {
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should fetch trajectories study and warning message from trajectory type', async () => {
+    const trajectoryType = TRAJECTORY_TYPE.AREA;
+    const studyId = 2;
+
+    const result = await getStudyTrajectoriesWithWarnings(studyId, trajectoryType);
+
+    await waitFor(() => {
+      expect(getStudyTrajectories).toHaveBeenCalledWith(2, 'AREA');
+      expect(fetchWarningMessagesFromType).toHaveBeenCalledWith('AREA', 2);
+      expect(result).toEqual({ trajectories: mockTrajectoryTwo, warningMessages: mockWarningMessagesWithTwo });
+    });
+  });
+
+  it('should throw error when data fetching failed', async () => {
+    vi.mocked(getStudyTrajectories).mockRejectedValueOnce({
+      antaresErrorMessage: 'Failed to fetch warning message',
+      date: new Date(),
+      type: ERROR_MESSAGE_TYPE.BUSINESS,
+    });
+
+    //vi.mocked(getStudyTrajectories).mockRejectedValueOnce(new Error('Failed to fetch warning message'));
+
+    await expect(async () => getStudyTrajectoriesWithWarnings(5)).rejects.toThrowError(
+      'Failed to fetch warning message',
+    );
   });
 });
