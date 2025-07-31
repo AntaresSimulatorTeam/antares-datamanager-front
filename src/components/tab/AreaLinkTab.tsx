@@ -203,7 +203,7 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
       setErrorMessage(t('studyDetails.@add_trajectories_message'));
       dispatch?.({
         type: STUDY_ACTION.CLEAR_TRAJECTORY_BY_TYPE,
-        payload: rowIndex === 0 ? [TRAJECTORY_TYPE.AREA] : [TRAJECTORY_TYPE.LINK],
+        payload: [TRAJECTORY_TYPE.AREA, TRAJECTORY_TYPE.LINK, TRAJECTORY_TYPE.LOAD],
       } as StudyActionType);
       const hasLinks = rowIndex === 0 && data[1].trajectory
       setData((prev) =>
