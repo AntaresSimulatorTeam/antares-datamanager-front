@@ -376,6 +376,7 @@ describe('updateTrajectory', () => {
         ...baseTrajectory,
         loadArea: 'NonMatchingZone',
       },
+      warningMessages: [],
       status: 'success' as FileInputStatus,
     };
 
