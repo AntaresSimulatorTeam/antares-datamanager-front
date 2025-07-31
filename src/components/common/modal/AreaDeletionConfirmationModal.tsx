@@ -22,13 +22,17 @@ export const AreaDeletionConfirmationModal: React.FC<AreaDeletionConfirmationMod
         <p>{t('trajectoryDeletionModal.@confirmDeleteMessage')}</p>
       </RdsModal.Content>
       <RdsModal.Footer>
-        <RdsButton label={t('trajectoryDeletionModal.@cancel')} onClick={onClose} />
+        <RdsButton
+          label={t('trajectoryDeletionModal.@cancel')}
+          variant="text"
+          color="secondary"
+          onClick={onClose}
+        />
         <RdsButton
           label={t('trajectoryDeletionModal.@confirm')}
-          color="primary"
-          onClick={() => {
-            void onConfirm();
-          }}
+          variant="contained"
+          color="danger"
+          onClick={ () => void onConfirm() }
         />
       </RdsModal.Footer>
     </RdsModal>
