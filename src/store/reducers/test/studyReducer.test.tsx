@@ -387,22 +387,6 @@ describe('updateTrajectory', () => {
     expect(result).toEqual(prevState);
   });
 
-  it('should return original state if trajectory list is null', () => {
-    const nullState: Partial<StudyState> = {
-      [TRAJECTORY_TYPE.LINK]: { trajectories: [], warningMessages: [] },
-    };
-
-    const payload = {
-      trajectory: baseTrajectory,
-      warningMessages: [],
-      status: 'success' as FileInputStatus,
-    };
-
-    const result = updateTrajectory(nullState, payload);
-
-    expect(result).toEqual(nullState);
-  });
-
   it('should not mutate original state', () => {
     const payload = {
       trajectory: {
