@@ -1,5 +1,17 @@
 import { DbTrajectory, HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
+import { mockWarningMessagesWithTwo } from '@/mocks/data/tests/warning.mock.ts';
+
+export const mockDataBaseTrajectory = (type: TRAJECTORY_TYPE, id: number, area: string): DbTrajectory => ({
+  id,
+  type,
+  trajectoryName: `${type}-name`,
+  version: 1,
+  userName: 'CB',
+  creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+  loadArea: area,
+});
 
 export const mockDbTrajectory: DbTrajectory = {
   id: 1,
@@ -8,9 +20,29 @@ export const mockDbTrajectory: DbTrajectory = {
   version: 6,
   userName: 'mouad',
   creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-  messages: [],
   loadArea: 'AT',
 };
+
+export const mockTrajectoryTwo = [
+  {
+    id: 1,
+    trajectoryName: 'area_PB_2024',
+    type: TRAJECTORY_TYPE.AREA,
+    version: 3,
+    userName: 'mouad',
+    creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+    loadArea: 'AT',
+  },
+  {
+    id: 2,
+    trajectoryName: 'area_PB_2026',
+    type: TRAJECTORY_TYPE.AREA,
+    version: 3,
+    userName: 'mouad',
+    creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+    loadArea: 'BE',
+  },
+];
 
 export const mockDbTrajectoryAREA: DbTrajectory = {
   id: 1,
@@ -19,7 +51,6 @@ export const mockDbTrajectoryAREA: DbTrajectory = {
   version: 6,
   userName: 'mouad',
   creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-  messages: [],
   loadArea: 'AT',
 };
 
@@ -30,9 +61,32 @@ export const mockDbTrajectoryLINK: DbTrajectory = {
   version: 6,
   userName: 'mouad',
   creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-  messages: [],
   loadArea: 'AT',
 };
+
+export const mockPrevStateArea = () => ({
+  studyStatus: StudyStatus.IN_PROGRESS,
+  [TRAJECTORY_TYPE.AREA]: {
+    trajectories: [mockDataBaseTrajectory(TRAJECTORY_TYPE.AREA, 123, 'ZoneA')],
+    warningMessages: [],
+  },
+});
+
+export const mockPrevStateAreaWithWarnings = () => ({
+  studyStatus: StudyStatus.IN_PROGRESS,
+  [TRAJECTORY_TYPE.AREA]: {
+    trajectories: [mockDataBaseTrajectory(TRAJECTORY_TYPE.AREA, 123, 'ZoneA')],
+    warningMessages: mockWarningMessagesWithTwo,
+  },
+});
+
+export const mockPrevStateLoad = () => ({
+  studyStatus: StudyStatus.IN_PROGRESS,
+  [TRAJECTORY_TYPE.LOAD]: {
+    trajectories: [mockDataBaseTrajectory(TRAJECTORY_TYPE.AREA, 123, 'ZoneA')],
+    warningMessages: [],
+  },
+});
 
 export const mockRowDataTrajectoryA: HypothesisRowData = {
   hypothesis: 'A',

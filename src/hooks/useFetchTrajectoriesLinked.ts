@@ -2,7 +2,7 @@ import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { DbTrajectory } from '@/shared/types';
-import { getStudyTrajectoriesWithWarnings } from '@/shared/services/studyService.ts';
+import { getStudyTrajectoriesWithWarnings } from '@/shared/services/trajectoryService';
 import { removeDuplicate } from '@/shared/utils/trajectoryUtils.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 
@@ -12,7 +12,7 @@ export const useFetchTrajectoriesLinked = (studyId?: number, trajectoryType?: TR
   const studyState = useStudy();
   const dispatch = useStudyDispatch();
   const emptyAreaSelected = useMemo(
-    () => (trajectoryType ? (studyState?.[trajectoryType] ?? []) : []),
+    () => (trajectoryType ? (studyState?.[trajectoryType]?.trajectories ?? []) : []),
     [trajectoryType],
   );
 
@@ -20,16 +20,16 @@ export const useFetchTrajectoriesLinked = (studyId?: number, trajectoryType?: TR
     async (id?: number, type?: TRAJECTORY_TYPE) => {
       try {
         if (id != null && type) {
-          const trajectoryLinkedToStudy = await getStudyTrajectoriesWithWarnings(id, type);
-          const arrayWithoutDuplicate = removeDuplicate(trajectoryLinkedToStudy.concat(emptyAreaSelected));
-          if (arrayWithoutDuplicate.length > 0) {
+          const result = await getStudyTrajectoriesWithWarnings(id, type);
+          if (result?.trajectories?.length > 0) {
+            const arrayWithoutDuplicate = removeDuplicate(result?.trajectories?.concat(emptyAreaSelected));
             dispatch?.({
               type: STUDY_ACTION.ADD_TRAJECTORIES,
-              payload: arrayWithoutDuplicate,
+              payload: { [type]: { trajectories: arrayWithoutDuplicate, warningMessages: result?.warningMessages } },
             });
             setEmptyAreas(arrayWithoutDuplicate);
           }
-          setTrajectoryLinked(trajectoryLinkedToStudy);
+          setTrajectoryLinked(result?.trajectories);
         }
       } catch {
         // Silent handler

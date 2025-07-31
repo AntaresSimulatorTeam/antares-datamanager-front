@@ -12,15 +12,15 @@ export interface WarningMessage {
   code: string;
   generatedBy: string;
   generatedAt: Date;
-  trajectory: string;
+  trajectoryId: number;
+  trajectoryName: string;
   secondTrajectory: string;
   isAck: boolean;
 }
 
 export interface DataWarningMessage extends WarningMessage {
-  trajectoryId?: number;
+  studyId: number;
   trajectoryType: TRAJECTORY_TYPE;
-  trajectory: string;
   onClickItem:
     | ((
         id: number,
@@ -33,7 +33,7 @@ export interface DataWarningMessage extends WarningMessage {
 
 export interface CardDataType
   extends WithNullableFields<
-    Omit<WarningMessage, 'level' | 'trajectory' | 'secondTrajectory'>,
+    Omit<WarningMessage, 'level' | 'trajectoryId' | 'trajectoryName' | 'secondTrajectory'>,
     'id' | 'content' | 'generatedBy' | 'generatedAt'
   > {
   trajectoryId: number | null;
@@ -53,4 +53,7 @@ export interface CardDataType
     | null;
   buttonLabel: string;
   buttonTooltipText: string;
+  studyId: number | null;
 }
+
+export type WarningTrajectoryType = { [key in keyof typeof TRAJECTORY_TYPE]: number };

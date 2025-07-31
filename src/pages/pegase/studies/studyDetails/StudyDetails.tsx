@@ -4,12 +4,12 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { Location, useLocation } from 'react-router-dom';
 import StudyHeader from './StudyHeader.tsx';
 import { RdsDivider } from 'rte-design-system-react';
 import StudyNavigationMenu from '@/components/menu/StudyNavigationMenu.tsx';
-import { DataWarningMessage, HypothesisTab, StudyDTO } from '@/shared/types';
+import { HypothesisTab, StudyDTO } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { createStudy } from '@/shared/services/studyService.ts';
@@ -20,7 +20,7 @@ import { DetailsContent } from '@/components/banner/DetailsContent.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { ContainerWithExpander } from '@/components/banner/ContainerWithExpander.tsx';
-import { buildWarningMessages } from '@/shared/helpers/warningHelper.ts';
+import { getWarningMessages } from '@/shared/helpers/warningMessagesHelper.ts';
 
 interface StudyState {
   study: StudyDTO;
@@ -41,13 +41,7 @@ const StudyDetails = () => {
     icon: StdIconId.LinkedServices,
     isDisabled: false,
   });
-  const [messagesWarning, setMessagesWarning] = useState<DataWarningMessage[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>('');
-
-  useEffect(() => {
-    const messages: DataWarningMessage[] = buildWarningMessages(studyState, activeTab.name) || [];
-    setMessagesWarning(messages?.sort((a, b) => Number(a.isAck) - Number(b.isAck)));
-  }, [activeTab.name, studyState]);
 
   const handleGenerateStudy = async () => {
     try {
@@ -55,7 +49,7 @@ const StudyDetails = () => {
       await createStudy(study.id);
       setIsGenerating(false);
       dispatch?.({ type: STUDY_ACTION.SET_STUDY_STATUS, payload: StudyStatus.GENERATED });
-    } catch (error) {
+    } catch {
       setIsGenerating(false);
     }
   };
@@ -85,19 +79,22 @@ const StudyDetails = () => {
         </div>
         <div className="relative flex flex-1 flex-col overflow-y-auto px-4">
           <div className="flex h-full w-full flex-col gap-4">
-            <ContainerWithExpander content={messagesWarning} placeholder={t('studyDetails.@noWarnings')} />
+            <ContainerWithExpander
+              content={getWarningMessages(studyState, activeTab.name, study.id)}
+              placeholder={t('studyDetails.@noWarnings')}
+            />
             <div className="flex w-full">{activeContent}</div>
           </div>
           <div className="fixed bottom-0 right-0 w-full border-t bg-gray-w px-1 py-1.5">
             <div className="flex h-fit w-full items-center justify-end">
-              {!studyState.AREA && !errorMessage && (
+              {!studyState.AREA?.trajectories?.length && !errorMessage && (
                 <div className="mr-1 text-error-600">{t('studyDetails.@add_trajectories_message')}</div>
               )}
               {errorMessage && <div className="mr-1 text-error-600">{errorMessage}</div>}
               <ButtonWithStdIcon
                 label={t('studyDetails.@generate')}
                 onClick={() => void handleGenerateStudy()}
-                disabled={!studyState.AREA || studyState.studyStatus === StudyStatus.GENERATED}
+                disabled={!studyState.AREA?.trajectories?.length || studyState.studyStatus === StudyStatus.GENERATED}
                 icon={StdIconId.CheckCircle}
                 position="right"
                 isLoading={isGenerating}

@@ -14,10 +14,20 @@ import {
   TRAJECTORY_LINK_TO_STUDY_ENDPOINT,
   TRAJECTORY_UNLINK_TO_STUDY_ENDPOINT,
 } from '@/shared/const/apiEndPoint.ts';
-import { BackendError, DbTrajectory, FsTrajectory, TRAJECTORY_DATA_TYPE, Types } from '@/shared/types';
+import {
+  BackendError,
+  DbTrajectory,
+  FsTrajectory,
+  TRAJECTORY_DATA_TYPE,
+  TrajectoryState,
+  Types,
+  WarningMessage,
+} from '@/shared/types';
 import { AuthService } from '@/shared/services/authService.ts';
 import { fetchWithProgress } from '@/shared/services/progressService.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { getStudyTrajectories } from '@/shared/services/studyService.ts';
+import { fetchWarningMessagesFromType } from './warningService';
 
 /**
  * Retrieve a list of trajectories by type and horizon from database
@@ -191,7 +201,8 @@ export const getDefaultLoadHypothesis = async (): Promise<{ name: string }[]> =>
 
 /**
  * Count the number of warning messages per trajectory type for a study
- * @param {number} id - Study id
+ * @param {number} id - Study i
+ * @returns {Promise<{ [key in keyof typeof TRAJECTORY_TYPE]: number }>} - Number of warning messages per trajectory type
  */
 
 export const getNbMessagesFromTrajectoryType = async (
@@ -200,6 +211,30 @@ export const getNbMessagesFromTrajectoryType = async (
   try {
     const response = await AuthService.authFetch(`${TRAJECTORY_COUNT_WARNING_ENDPOINT}/${id}`);
     return (await (response as Response).json()) as { [key in keyof typeof TRAJECTORY_TYPE]: number };
+  } catch (error) {
+    throw new Error((error as BackendError).antaresErrorMessage);
+  }
+};
+
+/**
+ * Fetch warning messages for each trajectory linked to a study
+ * @param {number} studyId - Study id
+ * @param {TRAJECTORY_TYPE} trajectoryType - Trajectory type
+ *
+ * @return {Promise<{trajectories: DbTrajectory[], warningMessages: WarningMessage[]}>} Array of trajectories (data base trajectories)
+ * @throws {Error}
+ */
+export const getStudyTrajectoriesWithWarnings = async (
+  studyId: number,
+  trajectoryType?: TRAJECTORY_TYPE,
+): Promise<TrajectoryState> => {
+  try {
+    const trajectories: DbTrajectory[] = await getStudyTrajectories(studyId, trajectoryType);
+    let warningMessages: WarningMessage[] = [];
+    if (trajectories?.length > 0 && trajectoryType) {
+      warningMessages = await fetchWarningMessagesFromType(trajectoryType, studyId);
+    }
+    return { trajectories, warningMessages };
   } catch (error) {
     throw new Error((error as BackendError).antaresErrorMessage);
   }

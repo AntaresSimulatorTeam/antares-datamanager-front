@@ -12,8 +12,8 @@ import {
   duplicateStudy,
   fetchSearchStudies,
   fetchSuggestedKeywords,
+  getStudyById,
   getStudyTrajectories,
-  getStudyTrajectoriesWithWarnings,
   saveStudy,
 } from '@/shared/services/studyService.ts';
 import { notifyToast } from '@/shared/notification/notification.tsx';
@@ -22,8 +22,6 @@ import { mockDbTrajectoryArray } from '@/mocks/data/tests/trajectory.mock.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
 import { AuthService } from '@/shared/services/authService.ts';
-import * as warningService from '@/shared/services/warningService.ts';
-import { mockTrajectoryWithWarnings, mockWarningMessagesWithTwo } from '@/mocks/data/tests/warning.mock.ts';
 
 vi.mock('@/shared/notification/notification');
 vi.mock('@/envVariables', () => ({
@@ -186,45 +184,6 @@ describe('deleteStudy', () => {
   });
 });
 
-describe('getStudyTrajectoriesWithWarnings', () => {
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
-  it('should retrieve trajectories from study id and trajectory type', async () => {
-    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
-      ok: true,
-      json: async () => Promise.resolve(mockDbTrajectoryArray),
-    });
-    vi.mocked(warningService.fetchWarningMessages).mockResolvedValue(mockWarningMessagesWithTwo);
-
-    const results = await getStudyTrajectoriesWithWarnings(1, TRAJECTORY_TYPE.AREA);
-
-    await waitFor(() => {
-      expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
-      expect(AuthService.authFetch).toHaveBeenCalledWith(
-        `https://mockapi.com/v1/trajectory?studyId=1&trajectoryType=AREA`,
-      );
-      expect(warningService.fetchWarningMessages).toHaveBeenCalledTimes(mockDbTrajectoryArray.length);
-      expect(warningService.fetchWarningMessages).toHaveBeenCalledWith(1, 1);
-      expect(warningService.fetchWarningMessages).toHaveBeenLastCalledWith(2, 1);
-      expect(results).toEqual(mockTrajectoryWithWarnings);
-    });
-  });
-
-  it('should handle fetch failure gracefully', async () => {
-    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
-      antaresErrorMessage: 'Failed to fetch trajectories',
-      date: new Date(),
-      type: ERROR_MESSAGE_TYPE.BUSINESS,
-    });
-
-    await expect(async () => getStudyTrajectoriesWithWarnings(1, TRAJECTORY_TYPE.AREA)).rejects.toThrow(
-      'Failed to fetch trajectories',
-    );
-  });
-});
-
 describe('createStudy', () => {
   afterEach(() => {
     vi.restoreAllMocks();
@@ -332,5 +291,36 @@ describe('duplicateStudy', () => {
     });
 
     await expect(async () => createStudy(1)).rejects.toThrowError('Failed to duplicate study');
+  });
+});
+
+describe('getStudyById', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('should fetch study list', async () => {
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
+      ok: true,
+      json: async () => Promise.resolve(mockStudyResponse),
+    });
+
+    const result = await getStudyById(123);
+
+    await waitFor(() => {
+      expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
+      expect(AuthService.authFetch).toHaveBeenCalledWith(`https://mockapi.com/v1/study/123`);
+      expect(result).toEqual(mockStudyResponse);
+    });
+  });
+
+  it('should handle fetch failure gracefully', async () => {
+    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
+      antaresErrorMessage: 'Failed to study details',
+      date: new Date(),
+      type: ERROR_MESSAGE_TYPE.BUSINESS,
+    });
+
+    await expect(async () => getStudyById(123)).rejects.toThrowError('Failed to study details');
   });
 });

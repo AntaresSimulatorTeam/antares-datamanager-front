@@ -13,6 +13,7 @@ interface CardWithIconTitleProps {
 
 export const CardWithIconTitle = ({ data, size, transform }: CardWithIconTitleProps) => {
   const dispatch = useStudyDispatch();
+
   const getButtonWithIcon = () => (
     <ButtonWithStdIcon
       label={data.buttonLabel}
@@ -24,7 +25,7 @@ export const CardWithIconTitle = ({ data, size, transform }: CardWithIconTitlePr
       disabled={data.isAck}
       onClick={() => {
         if (data.id != null && data.onClickItem && dispatch) {
-          void data.onClickItem?.(data.id, data.trajectoryType, data.trajectoryId, dispatch);
+          void data.onClickItem?.(data.id, data.trajectoryType, data.studyId, dispatch);
         }
       }}
     />

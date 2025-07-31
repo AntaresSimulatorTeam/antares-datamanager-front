@@ -22,6 +22,7 @@ import { useLocation } from 'react-router-dom';
 import {
   fetchTrajectoriesFromDB,
   fetchTrajectoriesFromFS,
+  getStudyTrajectoriesWithWarnings,
   linkTrajectoryToStudy,
   unlinkTrajectoryFromStudy,
   uploadTrajectory,
@@ -29,7 +30,6 @@ import {
 import { convertToFSSelectionOptionType, convertToSelectionOptionType } from '@/shared/utils/formFormatter.ts';
 import SearchBar from '@/pages/pegase/home/components/SearchBar.tsx';
 import { RdsCheckbox, RdsCheckboxGroupWrapper, RdsDivider } from 'rte-design-system-react';
-import { getStudyTrajectoriesWithWarnings } from '@/shared/services/studyService.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import getEditableHypothesisTableHeaders from '@/components/header/EditableHypothesisTableHeaders.tsx';
@@ -51,6 +51,7 @@ import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import { useFetchTrajectoriesLinked } from '@/hooks/useFetchTrajectoriesLinked.ts';
 import { setReadOnlyForGeneratedStudy } from '@/shared/helpers/hypothesisTableHelper.ts';
+import { fetchWarningMessagesFromType } from '@/shared/services/warningService.ts';
 
 interface LoadTabProps {
   defaultAreas: CheckBoxData[];
@@ -227,9 +228,10 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
         if (status === 'empty') {
           await unlinkTrajectoryFromStudy(trajectoryId, study.id);
         }
+        const warningMessages = await fetchWarningMessagesFromType(TRAJECTORY_TYPE.LOAD, study.id);
         dispatch?.({
           type: STUDY_ACTION.UPDATE_TRAJECTORY,
-          payload: { trajectory: data[rowIndex].trajectory, status },
+          payload: { trajectory: data[rowIndex].trajectory, warningMessages, status },
         });
         setData((prev) =>
           prev.map((item, index) =>
@@ -244,16 +246,17 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
         );
       } else if (status === 'success') {
         await linkTrajectoryToStudy(TRAJECTORY_TYPE.LOAD, trajectoryId, study.id);
-        const newTrajectories = await getStudyTrajectoriesWithWarnings(study.id, TRAJECTORY_TYPE.LOAD);
-        const newTrajectory = newTrajectories?.find((trajectory) => {
+        const result = await getStudyTrajectoriesWithWarnings(study.id, TRAJECTORY_TYPE.LOAD);
+        const newTrajectory = result?.trajectories?.find((trajectory) => {
           if (data[rowIndex].hypothesis === OTHER_AREAS_LABEL) {
             return trajectory.loadArea === OTHER_AREAS;
           } else {
             return trajectory.loadArea === data[rowIndex].hypothesis;
           }
         });
-        if (newTrajectory?.loadArea) {
-          dispatch?.({ type: STUDY_ACTION.ADD_TRAJECTORIES, payload: [newTrajectory] });
+        if (newTrajectory) {
+          const payloadResult = { trajectory: newTrajectory, warningMessages: result.warningMessages, status };
+          dispatch?.({ type: STUDY_ACTION.UPDATE_TRAJECTORY, payload: payloadResult });
         }
         setData((prev) =>
           prev.map((item, index) =>
@@ -314,7 +317,7 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
   );
 
   const handleRemoveRow = async (value?: string, indexRow?: number) => {
-    if (indexRow && data?.[indexRow]) {
+    if (indexRow && data[indexRow].hypothesis) {
       dispatch?.({
         type: STUDY_ACTION.DELETE_TRAJECTORY,
         payload: { area: data[indexRow].hypothesis, type: TRAJECTORY_TYPE.LOAD },
@@ -346,7 +349,12 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
   const addRow = (name: string) => {
     dispatch?.({
       type: STUDY_ACTION.ADD_TRAJECTORIES,
-      payload: [buildEmptyTrajectory(name, TRAJECTORY_TYPE.LOAD)],
+      payload: {
+        [TRAJECTORY_TYPE.LOAD]: {
+          trajectories: [buildEmptyTrajectory(name, TRAJECTORY_TYPE.LOAD)],
+          warningMessages: [],
+        },
+      },
     });
     const newDataSorted = sortWithFixedPosition([
       {
