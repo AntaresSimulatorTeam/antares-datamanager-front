@@ -417,25 +417,6 @@ describe('updateTrajectory', () => {
 
     expect(result[TRAJECTORY_TYPE.LINK]).not.toBe(prevState[TRAJECTORY_TYPE.LINK]);
   });
-
-  it('should returns the same state if no trajectory of the trajectory type', () => {
-    const prevStateWithNoType = {
-      studyStatus: StudyStatus.IN_PROGRESS,
-    };
-
-    const payload = {
-      trajectory: {
-        ...baseTrajectory,
-        trajectoryName: 'Changed',
-      },
-      warningMessages: [],
-      status: 'success' as FileInputStatus,
-    };
-
-    const result = updateTrajectory(prevStateWithNoType, payload);
-
-    expect(result).toEqual(prevStateWithNoType);
-  });
 });
 
 // Mock handlers to isolate reducer logic
