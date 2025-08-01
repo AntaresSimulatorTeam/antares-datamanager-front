@@ -232,8 +232,9 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
       );
       setReadOnly({ '0': false, '1': true });
     } else {
-      const areaUnlinked = await unlinkWithConfirmationCheck(trajectoryId, rowIndex);
-      if (!areaUnlinked) return;
+      if (status === 'empty') {
+        await unlinkTrajectoryFromStudy(trajectoryId, study.id);
+      }
 
       rowIndex === 0 ? setErrorMessage(t('studyDetails.@add_trajectories_message')) : setErrorMessage('');
       dispatch?.({
