@@ -147,6 +147,8 @@ export const studyReducer = (prevState: Partial<StudyState>, action?: StudyActio
         return { ...skipWarningMessage(prevState, action.payload) };
       case STUDY_ACTION.CLEAR_TRAJECTORY_BY_TYPE:
         return { ...clearByType(prevState, action.payload) };
+      case STUDY_ACTION.RESET_STUDY_STATE:
+        return { studyStatus: StudyStatus.IN_PROGRESS };
       default:
         return prevState;
     }
