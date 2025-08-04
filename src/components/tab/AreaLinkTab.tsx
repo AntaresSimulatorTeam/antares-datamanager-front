@@ -50,7 +50,6 @@ import { notifyAlert } from '@/shared/notification/notification.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
 
-
 interface AreaLinkTabProps {
   setErrorMessage: Dispatch<SetStateAction<string>>;
 }
@@ -198,49 +197,13 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
     }
   };
 
-  const unlinkWithConfirmationCheck = async (trajectoryId: number, rowIndex: number): Promise<boolean> => {
+  const unlinkWithConfirmationCheck = async (trajectoryId: number, rowIndex: number): Promise<void> => {
     try {
       await unlinkTrajectoryFromStudy(trajectoryId, study.id);
-      return true;
-    } catch (error) {
-      if ((error as Error).message.includes('Confirmation required')) {
-        setRowIndexSelected(rowIndex);
-        setIsAreaDeletionConfirmOpen(true);
-        return false;
-      }
-      throw error;
-    }
-  };
-
-  const handleTrajectoryDeletion = async (rowIndex: number, status: RowStatus, trajectoryId: number) => {
-    if (rowIndex === 0 && data[1].trajectory) {
-      if (status === 'empty') {
-        const areaUnlinked = await unlinkWithConfirmationCheck(trajectoryId, rowIndex);
-        if (!areaUnlinked) return;
-
-        if (data[1]?.status != TRAJECTORY_SELECTION_STATUS.ERROR) {
-          await unlinkTrajectoryFromStudy(data[1].trajectory.id, study.id);
-        }
-      }
       setErrorMessage(t('studyDetails.@add_trajectories_message'));
       dispatch?.({
         type: STUDY_ACTION.CLEAR_TRAJECTORY_BY_TYPE,
-        payload: [TRAJECTORY_TYPE.AREA, TRAJECTORY_TYPE.LINK, TRAJECTORY_TYPE.LOAD],
-      } as StudyActionType);
-      setData((prev) =>
-        prev.map((item) => ({ ...item, trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING })),
-      );
-      setReadOnly({ '0': false, '1': true });
-    } else {
-      if (status === 'empty') {
-        const areaUnlinked = await unlinkWithConfirmationCheck(trajectoryId, rowIndex);
-        if (!areaUnlinked) return;
-      }
-
-      rowIndex === 0 ? setErrorMessage(t('studyDetails.@add_trajectories_message')) : setErrorMessage('');
-      dispatch?.({
-        type: STUDY_ACTION.CLEAR_TRAJECTORY_BY_TYPE,
-        payload: rowIndex === 0 ? [TRAJECTORY_TYPE.AREA, TRAJECTORY_TYPE.LOAD] : [TRAJECTORY_TYPE.LINK],
+        payload: rowIndex === 0 ? [TRAJECTORY_TYPE.AREA] : [TRAJECTORY_TYPE.LINK],
       } as StudyActionType);
       setData((prev) =>
         prev.map((item, index) =>
@@ -254,6 +217,30 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
         ),
       );
       setReadOnly({ '0': false, '1': rowIndex === 0 });
+    } catch (error) {
+      if ((error as Error).message.includes('Confirmation required')) {
+        setRowIndexSelected(rowIndex);
+        setIsAreaDeletionConfirmOpen(true);
+      }
+      throw error;
+    }
+  };
+
+  const handleTrajectoryDeletion = async (rowIndex: number, status: RowStatus, trajectoryId: number) => {
+    if (status === 'empty') {
+      await unlinkWithConfirmationCheck(trajectoryId, rowIndex);
+    } else if (status === 'emptyError') {
+      setData((prev) =>
+        prev.map((item, index) =>
+          index === rowIndex
+            ? {
+                ...item,
+                trajectory: null,
+                status: TRAJECTORY_SELECTION_STATUS.MISSING,
+              }
+            : item,
+        ),
+      );
     }
   };
 
