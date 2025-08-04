@@ -222,7 +222,6 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
         setRowIndexSelected(rowIndex);
         setIsAreaDeletionConfirmOpen(true);
       }
-      throw error;
     }
   };
 
