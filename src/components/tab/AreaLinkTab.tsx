@@ -205,9 +205,10 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
         type: STUDY_ACTION.CLEAR_TRAJECTORY_BY_TYPE,
         payload: rowIndex === 0 ? [TRAJECTORY_TYPE.AREA] : [TRAJECTORY_TYPE.LINK],
       } as StudyActionType);
+      const hasLinks = rowIndex === 0 && data[1].trajectory
       setData((prev) =>
         prev.map((item, index) =>
-          index === rowIndex
+          index === rowIndex || hasLinks
             ? {
                 ...item,
                 trajectory: null,
