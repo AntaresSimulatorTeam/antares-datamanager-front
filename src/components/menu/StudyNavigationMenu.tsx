@@ -87,7 +87,7 @@ const StudyNavigationMenu = ({
       }
     }
     void countNbWarningMessages(studyId);
-  }, [activeTab, onRenderActiveComponent, studyId]);
+  }, [activeTab, onRenderActiveComponent, studyId, studyState]);
 
   return (
     <div className="flex space-x-4 p-4">
