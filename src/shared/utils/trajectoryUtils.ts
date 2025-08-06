@@ -1,16 +1,8 @@
-import {
-  DbTrajectory,
-  HypothesisRowData,
-  HypothesisTab,
-  NestedCheckedType,
-  RowStatus,
-  WarningMessage,
-} from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, HypothesisTab, RowStatus, WarningMessage } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { FileInputStatus } from 'rte-design-system-react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
-import { ThermalOptions } from '@/mocks/data/list/names.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { generateId } from '@/shared/utils/defaultUtils.ts';
 
@@ -134,20 +126,41 @@ export const buildEmptyTrajectory = (areaName: string, type: TRAJECTORY_TYPE): D
   state: TRAJECTORY_SELECTION_STATUS.MISSING,
 });
 
-export const buildRowWithSubRowsData = (array: { name: string }[]) =>
-  array.map((area) => ({
-    hypothesis: area.name,
-    trajectory: null,
-    status: TRAJECTORY_SELECTION_STATUS.MISSING,
-    isDefault: true,
-    subRows: ThermalOptions.map((option) => ({
-      hypothesis: option,
-      trajectory: null,
-      status: TRAJECTORY_SELECTION_STATUS.MISSING,
-      isDefault: true,
-      subRows: null,
-    })),
-  }));
+/**
+ * Generates row data with optional sub-rows based on a trajectory and associated options.
+ *
+ * @param {DbTrajectory} trajectory - The trajectory object containing load area and other properties.
+ * @param {string[]} subRowOptions - An array of sub-row options to be considered for sub-rows.
+ * @param {{name: string}[]} [defaultAreas] - An optional array of default areas used to check if a trajectory is default.
+ * @param {string[]} [areasNotInTrajectoryArea] - An optional array of area names not included in the trajectory's area.
+ *
+ * @returns {HypothesisRowData} An object representing the row data, which includes the trajectory hypothesis, status, default status, and optional sub-rows data.
+ */
+export const buildRowWithSubRowsData = (
+  trajectory: DbTrajectory,
+  subRowOptions: string[],
+  defaultAreas?: {
+    name: string;
+  }[],
+  areasNotInTrajectoryArea?: string[],
+): HypothesisRowData => ({
+  hypothesis: trajectory.loadArea === OTHER_AREAS ? OTHER_AREAS_LABEL : (trajectory.loadArea as string),
+  trajectory: trajectory ?? null,
+  status: trajectory.trajectoryName ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+  isDefault:
+    defaultAreas?.some((item: { name: string }) => item.name === trajectory.loadArea) ||
+    OTHER_AREAS === trajectory.loadArea,
+  subRows:
+    trajectory.loadArea !== OTHER_AREAS && !areasNotInTrajectoryArea?.some((item) => item === trajectory.loadArea)
+      ? subRowOptions.map((option) => ({
+          hypothesis: option,
+          trajectory: null,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          isDefault: true,
+          subRows: null,
+        }))
+      : null,
+});
 
 /**
  * Create read only mapping from the read only item indexes array
@@ -205,32 +218,6 @@ export const addNestedRow = (
   });
 
 /**
- * Add checked nested value to nested value list
- * @param {NestedCheckedType[]} checkedValues
- * @param {string} value
- * @param {string | null} parentValue
- * @return {NestedCheckedType[]}
- */
-export const checkNestedValue = (
-  checkedValues: NestedCheckedType[],
-  value: string,
-  parentValue?: string,
-): NestedCheckedType[] =>
-  checkedValues.map((item) => {
-    if (item.name === parentValue) {
-      return {
-        ...item,
-        subOptions:
-          item.subOptions && !item.subOptions.includes(value)
-            ? [...item.subOptions, value].sort((a, b) => a.localeCompare(b))
-            : [value],
-      };
-    } else {
-      return item;
-    }
-  });
-
-/**
  * Remove and sub row if parent is checked
  * @param {HypothesisRowData[]} data
  * @param {string} value
@@ -252,30 +239,6 @@ export const removeRowAndSubRow = (
       return {
         ...item,
         subRows: itemsSubRows?.length ? itemsSubRows : null,
-      };
-    } else {
-      return item;
-    }
-  });
-
-/**
- * Unchecked value from checked value list
- * @param {NestedCheckedType[]} checkedValues
- * @param {string} value
- * @param {string | null} parentValue
- * @return {NestedCheckedType[]}
- */
-export const unCheckNestedValue = (
-  checkedValues: NestedCheckedType[],
-  value: string,
-  parentValue?: string,
-): NestedCheckedType[] =>
-  checkedValues.map((item) => {
-    if (item.name === parentValue) {
-      const subOptions = item?.subOptions?.filter((subOption) => subOption !== value);
-      return {
-        ...item,
-        subOptions: subOptions?.length ? subOptions : null,
       };
     } else {
       return item;
@@ -307,3 +270,63 @@ export const getStudyMenu = (t: (value: string) => string, isTrajectoryAreaLinke
 
 export const isMatchingTrajectoryType = (trajectoryKey: TRAJECTORY_TYPE) => (trajectoryType: TRAJECTORY_TYPE) =>
   trajectoryType === trajectoryKey;
+
+export const getRowDataSelected = (data: HypothesisRowData[], indexArray: number[]): HypothesisRowData | undefined =>
+  indexArray.length === 2 ? data[indexArray[0]].subRows?.[indexArray[1]] : data[indexArray[0]];
+
+/**
+ * Retrieves the hypothesis and technology values based on selected row data.
+ *
+ * This function processes a list of data and current row selection to determine
+ * the hypothesis and technology information from the respective data structure.
+ *
+ * @param {HypothesisRowData[]} data - The array of hypothesis row data.
+ * @param {string} rowId - The selected row information, containing the index and optionally the parent index.
+ * @returns {{ hypothesis: string, technology: string | undefined }} An object containing the hypothesis string and optionally the technology string if available.
+ */
+export const getHypothesis = (
+  data: HypothesisRowData[],
+  rowId: string,
+): { hypothesis: string | undefined; technology: string | undefined } => {
+  const dataRowSelected = getRowDataSelected(
+    data,
+    rowId.split('.').map((item) => parseInt(item)),
+  );
+  const indexArray = rowId.split('.').map((item) => parseInt(item));
+  if (indexArray.length === 2) {
+    return { hypothesis: data[indexArray[0]]?.hypothesis, technology: dataRowSelected?.hypothesis };
+  } else {
+    return {
+      hypothesis: dataRowSelected?.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : dataRowSelected?.hypothesis,
+      technology: undefined,
+    };
+  }
+};
+
+export const setNestedData = (
+  state: HypothesisRowData[],
+  rowSelected: number[],
+  newEmptyTrajectory: Pick<HypothesisRowData, 'trajectory' | 'status'>,
+) =>
+  state.map((item, index) => {
+    if (rowSelected.length === 2 && index === rowSelected[1]) {
+      return {
+        ...item,
+        subRows: item.subRows?.map((subItem, subIndex) =>
+          subIndex === rowSelected[1]
+            ? {
+                ...subItem,
+                ...newEmptyTrajectory,
+              }
+            : subItem,
+        ),
+      };
+    } else if (rowSelected.length === 1 && index === rowSelected[0]) {
+      return {
+        ...item,
+        ...newEmptyTrajectory,
+      };
+    } else {
+      return item;
+    }
+  });

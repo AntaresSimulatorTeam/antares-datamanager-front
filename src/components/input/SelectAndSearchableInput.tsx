@@ -67,6 +67,7 @@ const SelectAndSearchableInput = ({
 
   const handleClickOnKeyboard = async (event: MouseEvent<HTMLButtonElement>) => {
     try {
+      if (options?.length) return;
       const results = await setSearchTerm?.();
       if (results && results.length > 0) {
         setOptionsSelection(results);

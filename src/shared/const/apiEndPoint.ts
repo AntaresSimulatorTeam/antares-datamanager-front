@@ -33,6 +33,7 @@ export const TRAJECTORY_UNLINK_TO_STUDY_ENDPOINT = `${BASE_URL}/v1/trajectory/de
 export const TRAJECTORY_DATA_FILE_ENDPOINT = `${BASE_URL}/v1/trajectory/trajectoryData`;
 export const TRAJECTORY_COUNT_WARNING_ENDPOINT = `${BASE_URL}/v1/trajectory/count/warning`;
 export const TRAJECTORY_UNLINK_ALL_TO_STUDY_ENDPOINT = `${BASE_URL}/v1/trajectory/detach/all`;
+export const TRAJECTORY_THERMAL_INSTALLED_POWER_IMPORT = `${BASE_URL}/v1/trajectory/thermal-capacity`;
 
 //ABOUT
 export const ACTUATOR_ENDPOINT = `${BASE_URL}/actuator/info`;

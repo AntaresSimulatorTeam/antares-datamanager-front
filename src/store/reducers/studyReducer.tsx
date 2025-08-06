@@ -68,27 +68,31 @@ export const updateTrajectory = (
   const trajectories = Array.isArray(prevState[`${trajectoryType}`]?.trajectories)
     ? (prevState[`${trajectoryType}`]?.trajectories as DbTrajectory[])
     : null;
-  const newTrajectories = (trajectories || []).map((trajectoryDb) => {
-    if (trajectoryDb.loadArea === trajectory.loadArea) {
-      return {
-        ...trajectoryDb,
-        trajectoryName: status === 'success' ? trajectory.trajectoryName : '',
-      };
-    } else {
-      return trajectoryDb;
-    }
-  });
+  if (trajectories?.length) {
+    const newTrajectories = trajectories.map((trajectoryDb) => {
+      if (trajectoryDb.loadArea === trajectory.loadArea) {
+        return {
+          ...trajectoryDb,
+          trajectoryName: status === 'success' ? trajectory.trajectoryName : '',
+        };
+      } else {
+        return trajectoryDb;
+      }
+    });
 
-  const newStudyState = {
-    ...prevState[`${trajectoryType}`],
-    trajectories: newTrajectories.length > 0 ? newTrajectories : [trajectory],
-    warningMessages,
-  };
+    const newStudyState = {
+      ...prevState[`${trajectoryType}`],
+      trajectories: newTrajectories,
+      warningMessages,
+    };
 
-  return {
-    ...prevState,
-    [trajectoryType]: newStudyState,
-  };
+    return {
+      ...prevState,
+      [trajectoryType]: newStudyState,
+    };
+  }
+
+  return prevState;
 };
 
 export const skipWarningMessage = (

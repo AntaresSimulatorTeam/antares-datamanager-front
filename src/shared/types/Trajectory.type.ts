@@ -107,8 +107,3 @@ export interface Tab {
   name: TRAJECTORY_TYPE;
   label: string;
 }
-
-export interface NestedCheckedType {
-  name: string;
-  subOptions: string[] | null;
-}

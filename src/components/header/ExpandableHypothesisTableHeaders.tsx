@@ -38,7 +38,7 @@ const getExpandableHypothesisTableHeaders = (
   studyStatus: StudyStatus | undefined,
   progress: number,
   fileStatus: FileInputStatus,
-  indexSelected: number,
+  idSelected: string,
 ): TableOptions<HypothesisRowData>['columns'] => [
   columnHelper.accessor('hypothesis', {
     header: t('studyDetails.@area'),
@@ -49,6 +49,13 @@ const getExpandableHypothesisTableHeaders = (
         if (row.depth === 0) return !row.getCanExpand() ? 'pl-1' : 'pl-0';
         return 'pl-4';
       };
+      const nbOfChildren: number =
+        row.depth === 0
+          ? (row.originalSubRows || []).reduce(
+              (acc: number, current: HypothesisRowData) => (current.trajectory ? acc + 1 : acc),
+              0,
+            )
+          : 0;
       return (
         <div className="flex gap-1">
           {row.getCanExpand() && (
@@ -67,6 +74,7 @@ const getExpandableHypothesisTableHeaders = (
             hasPreview={false}
             alignment={getAlignment()}
           />
+          {nbOfChildren > 0 && <div>{'|'}</div>}
         </div>
       );
     },
@@ -85,7 +93,7 @@ const getExpandableHypothesisTableHeaders = (
             onClick={() => {
               setErrorInfo({ index: row.index, message: '' });
               void options?.meta?.updateData?.(
-                row.index,
+                row.id,
                 trajectory.id,
                 status === TRAJECTORY_SELECTION_STATUS.ERROR ? 'emptyError' : 'empty',
               );
@@ -97,7 +105,7 @@ const getExpandableHypothesisTableHeaders = (
           <SelectInputWithButton
             onSelect={(value: SelectOption) => {
               setErrorInfo({ index: row.index, message: '' });
-              void options?.meta?.updateData?.(row.index, value.id, 'success', value.label);
+              void options?.meta?.updateData?.(row.id, value.id, 'success', value.label);
             }}
             onSearch={async (value?: string) =>
               options?.meta?.search?.(
@@ -107,7 +115,7 @@ const getExpandableHypothesisTableHeaders = (
             }
             onClickButton={() => {
               setErrorInfo({ index: row.index, message: '' });
-              void options?.meta?.importData?.(row.index);
+              void options?.meta?.importData?.(row.id);
             }}
             isDisabled={row.getReadOnly()}
           />
@@ -121,15 +129,14 @@ const getExpandableHypothesisTableHeaders = (
     header: t('home.@status'),
     cell: ({ row, table: { options } }) => {
       const { status, isDefault, hypothesis } = row.original;
-      return progress > 0 && fileStatus === 'loading' && indexSelected === row.index ? (
+      return progress > 0 && fileStatus === 'loading' && idSelected === row.id ? (
         <ProgressBar statusFile={fileStatus} progressValue={progress} />
       ) : (
         <CellWithStatus
           status={status}
-          isDeletable={(!isDefault || (isDefault && row.depth === 1)) && !(studyStatus === StudyStatus.GENERATED)}
+          isDeletable={!isDefault && !(studyStatus === StudyStatus.GENERATED)}
           onClick={() => {
-            const parentRow = row.getParentRow();
-            void options?.meta?.removeRow?.(hypothesis, row.depth === 1 && parentRow ? parentRow.index : row.index);
+            void options?.meta?.removeRow?.(hypothesis, row.id);
           }}
         />
       );

@@ -49,12 +49,12 @@ import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { notifyAlert } from '@/shared/notification/notification.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
-import { useFetchTrajectoriesLinked } from '@/hooks/useFetchTrajectoriesLinked.ts';
+import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
 import { setReadOnlyForGeneratedStudy } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { fetchWarningMessagesFromType } from '@/shared/services/warningService.ts';
 
 interface LoadTabProps {
-  defaultAreas: CheckBoxData[];
+  defaultAreas: { name: string }[];
   areas: TrajectoryAreaData[];
 }
 
@@ -66,13 +66,12 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
   const study = (location.state as LocationStudy)?.study;
   const dispatch = useStudyDispatch();
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
-  const [readOnlyAreas, setReadOnlyAreas] = useState<string[]>([]);
   const [data, setData] = useState<HypothesisRowData[]>([]);
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const [isDeletionModalOpen, setIsDeletionModalOpen] = useState(false);
-  const [rowIndexSelected, setRowIndexSelected] = useState<number>(0);
+  const [rowIdSelected, setRowIdSelected] = useState<number>(0);
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
   const [rowToDelete, setRowToDelete] = useState<{ index: number; value?: string } | null>(null);
   const [progress, setProgress] = useState(0);
@@ -80,78 +79,60 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
   const [isStudyGenerated, setIsStudyGenerated] = useState(
     studyState.studyStatus === StudyStatus.GENERATED || study.status === StudyStatus.GENERATED,
   );
-  const { trajectoryLinked, emptyAreas } = useFetchTrajectoriesLinked(study?.id, TRAJECTORY_TYPE.LOAD);
+  const { hypothesisTrajectories } = useFetchHypothesisTrajectories(study?.id, TRAJECTORY_TYPE.LOAD, defaultAreas);
 
   useEffect(() => {
     const fetchHypothesis = () => {
       try {
-        const defaultAreaListNotIncludedInList: string[] = [];
         // Build dropdown list options
-        if (areas.length > 0) {
-          const newArea = areas
-            .map((trajectoryArea) => {
-              if (!defaultAreas?.some((item) => item.name === trajectoryArea.areaName)) {
-                return { name: trajectoryArea.areaName, isDefault: false };
-              }
-            })
-            .filter(Boolean) as CheckBoxData[];
-          setAreasOptions(defaultAreas?.concat(newArea));
-
-          // Find default area not included in areas trajectory list
-          defaultAreas.forEach((defaultArea) => {
-            if (!areas.some((trajectoryArea) => trajectoryArea.areaName === defaultArea.name)) {
-              defaultAreaListNotIncludedInList.push(defaultArea.name);
+        const newArea = (areas || [])
+          .map((trajectoryArea) => {
+            if (!defaultAreas?.some((item) => item.name === trajectoryArea.areaName)) {
+              return { name: trajectoryArea.areaName, isDefault: false };
             }
-          });
-        } else {
-          setAreasOptions(defaultAreas);
-        }
-
-        const areaDefaultOther = [
-          ...defaultAreas,
-          {
-            name: OTHER_AREAS,
-            isDefault: true,
-          },
-        ];
-        if (areaDefaultOther.length > 0) {
-          // Build hypothesis table
-          const areaDataDefault: HypothesisRowData[] = areaDefaultOther?.map((area) => {
-            const trajectoryArea = trajectoryLinked?.find((trajectory) => trajectory.loadArea === area.name);
-            return buildRowData(area.name, true, trajectoryArea);
-          });
-          const areaData = emptyAreas
-            .map((trajectory: DbTrajectory) => {
-              if (
-                trajectory.loadArea &&
-                !areaDefaultOther.some((item: CheckBoxData) => item.name === trajectory.loadArea)
-              ) {
-                return buildRowData(trajectory.loadArea, false, trajectory);
-              }
-            })
-            .filter(Boolean) as HypothesisRowData[];
-
-          const dataTrajectories =
-            areaData.length > 0 ? sortWithFixedPosition(areaDataDefault.concat(areaData)) : areaDataDefault;
-          setData(dataTrajectories);
-
-          if (isStudyGenerated) {
-            setReadOnlyForGeneratedStudy(dataTrajectories, setReadOnly);
-          } else if (defaultAreaListNotIncludedInList.length > 0 && !isStudyGenerated) {
-            const readOnlyRows = retrieveReadOnlyArea(dataTrajectories, defaultAreaListNotIncludedInList);
-            setReadOnly(readOnlyRows);
-            setReadOnlyAreas(defaultAreaListNotIncludedInList);
-          }
-        }
+          })
+          .filter(Boolean) as CheckBoxData[];
+        setAreasOptions(defaultAreas?.map((area) => ({ name: area.name, isDefault: true }))?.concat(newArea));
 
         if (defaultAreas.length > 0) {
-          const defaultCheckList: string[] = defaultAreas.map((item) => item.name);
-          const checkList = emptyAreas
+          const checkList = hypothesisTrajectories
             .map((trajectory) => {
               if (trajectory.loadArea) return trajectory.loadArea;
             })
             .filter(Boolean) as string[];
-          setCheckedValues(defaultCheckList.concat(checkList));
+          setCheckedValues(defaultAreas.map((item) => item.name).concat(checkList));
+        }
+
+        // Build hypothesis table
+        if (hypothesisTrajectories.length > 0) {
+          const areaData = hypothesisTrajectories
+            .map((trajectory: DbTrajectory) => {
+              if (trajectory.loadArea) {
+                return buildRowData(
+                  trajectory.loadArea,
+                  defaultAreas.some((item: { name: string }) => item.name === trajectory.loadArea) ||
+                    trajectory.loadArea === OTHER_AREAS,
+                  trajectory,
+                );
+              }
+            })
+            .filter(Boolean) as HypothesisRowData[];
+          const dataTrajectories = sortWithFixedPosition(areaData);
+          setData(dataTrajectories);
+
+          // Find default area not included in areas trajectory list
+          const defaultAreaListNotIncludedInList = defaultAreas
+            .map((defaultArea) => {
+              if (!areas.some((trajectoryArea) => trajectoryArea.areaName === defaultArea.name)) {
+                return defaultArea.name;
+              }
+            })
+            .filter(Boolean) as string[];
+          if (isStudyGenerated) {
+            setReadOnlyForGeneratedStudy(dataTrajectories, setReadOnly);
+          } else if (defaultAreaListNotIncludedInList.length > 0 && !isStudyGenerated) {
+            setReadOnly(retrieveReadOnlyArea(dataTrajectories, defaultAreaListNotIncludedInList));
+          }
         }
       } catch {
         //silent handler
@@ -159,7 +140,7 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
     };
 
     void fetchHypothesis();
-  }, [trajectoryLinked, emptyAreas]);
+  }, [hypothesisTrajectories, areas, defaultAreas, isStudyGenerated]);
 
   useEffect(() => {
     if (studyState.studyStatus === StudyStatus.GENERATED || study?.status === StudyStatus.GENERATED) {
@@ -168,13 +149,13 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
     }
   }, [studyState.studyStatus, study?.status]);
 
-  const handleFetchTrajectoriesFS = async (index: number): Promise<void> => {
+  const handleFetchTrajectoriesFS = async (rowId: string): Promise<void> => {
     try {
       const results = await fetchTrajectoriesFromFS(TRAJECTORY_TYPE.LOAD);
       setOptionsFS(convertToFSSelectionOptionType(results));
       toggleModal();
     } finally {
-      setRowIndexSelected(index);
+      setRowIdSelected(Number(rowId));
     }
   };
 
@@ -289,18 +270,18 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
         value.label,
         study.horizon,
         study.id,
-        data[rowIndexSelected]?.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : data[rowIndexSelected]?.hypothesis,
+        data[rowIdSelected]?.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : data[rowIdSelected]?.hypothesis,
         (progressValue: number) => {
           setProgress(+progressValue?.toFixed(0));
         },
       );
       setFileStatus('success');
       if (newTrajectory.id != null) {
-        await handleTrajectoryUpdate(rowIndexSelected, newTrajectory.id, 'success', newTrajectory.trajectoryName);
+        await handleTrajectoryUpdate(rowIdSelected, newTrajectory.id, 'success', newTrajectory.trajectoryName);
       }
     } catch (error) {
       setFileStatus('error');
-      await handleTrajectoryUpdate(rowIndexSelected, value.id, 'error', value.label, (error as Error)?.message);
+      await handleTrajectoryUpdate(rowIdSelected, value.id, 'error', value.label, (error as Error)?.message);
     }
   };
 
@@ -327,38 +308,34 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
       }
     }
     const newDataSorted = data.filter((_row: HypothesisRowData, index: number) => index !== indexRow);
-    setData(newDataSorted);
-    if (readOnlyAreas.length > 0) {
-      const readOnlyRows = retrieveReadOnlyArea(newDataSorted, readOnlyAreas);
-      setReadOnly(readOnlyRows);
-    }
+    setData(sortWithFixedPosition(newDataSorted));
     if (value) {
       setCheckedValues((prev) => [...prev.filter((name) => name !== value)]);
     }
   };
 
-  const removeRow = async (valueToDelete?: string, indexRow?: number) => {
+  const removeRow = async (value?: string, indexRow?: number) => {
     if (indexRow && data[indexRow].trajectory && data[indexRow].status === TRAJECTORY_SELECTION_STATUS.OK) {
-      setRowToDelete({ index: indexRow, value: valueToDelete });
+      setRowToDelete({ index: indexRow, value });
       setIsDeletionModalOpen(true);
     } else {
-      await handleRemoveRow(valueToDelete, indexRow);
+      await handleRemoveRow(value, indexRow);
     }
   };
 
-  const addRow = (name: string) => {
+  const addRow = (value: string) => {
     dispatch?.({
       type: STUDY_ACTION.ADD_TRAJECTORIES,
       payload: {
         [TRAJECTORY_TYPE.LOAD]: {
-          trajectories: [buildEmptyTrajectory(name, TRAJECTORY_TYPE.LOAD)],
+          trajectories: [buildEmptyTrajectory(value, TRAJECTORY_TYPE.LOAD)],
           warningMessages: [],
         },
       },
     });
     const newDataSorted = sortWithFixedPosition([
       {
-        hypothesis: name,
+        hypothesis: value,
         trajectory: null,
         status: TRAJECTORY_SELECTION_STATUS.MISSING,
         isDefault: false,
@@ -366,11 +343,7 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
       ...data,
     ]);
 
-    setData(newDataSorted);
-    if (readOnlyAreas.length > 0) {
-      const readOnlyRows = retrieveReadOnlyArea(newDataSorted, readOnlyAreas);
-      setReadOnly(readOnlyRows);
-    }
+    setData(sortWithFixedPosition(newDataSorted));
   };
 
   const handleSelectionChange = async (name: string, isChecked?: boolean) => {
@@ -434,12 +407,12 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
             studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
             readOnly={readOnly}
             progress={progress}
-            indexSelected={rowIndexSelected}
+            idSelected={String(rowIdSelected)}
             handleSearch={handleTrajectorySearch}
-            handleImport={async (index: number) => await handleFetchTrajectoriesFS(index)}
-            removeRow={(value: string, rowIndex?: number) => void removeRow(value, rowIndex)}
-            updateData={(rowIndex: number, value: unknown, status?: RowStatus, label?: string) =>
-              void handleTrajectoryUpdate(rowIndex, value as number, status, label)
+            handleImport={async (rowId: string) => await handleFetchTrajectoriesFS(rowId)}
+            removeRow={(value: string, rowId?: string) => void removeRow(value, Number(rowId))}
+            updateData={(rowId: string, value: unknown, status?: RowStatus, label?: string) =>
+              void handleTrajectoryUpdate(Number(rowId), value as number, status, label)
             }
             isReadOnlyEnable={true}
           />
@@ -454,7 +427,7 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
               }
             }}
             trajectoryType={TRAJECTORY_TYPE.LOAD}
-            area={data[rowIndexSelected]?.hypothesis}
+            area={data[rowIdSelected]?.hypothesis}
           />
         )}
         {isDeletionModalOpen && (

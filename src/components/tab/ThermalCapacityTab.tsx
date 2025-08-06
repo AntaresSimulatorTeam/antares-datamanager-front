@@ -8,220 +8,336 @@ import SearchBar from '@/pages/pegase/home/components/SearchBar.tsx';
 import { RdsDivider } from 'rte-design-system-react';
 import {
   CheckBoxData,
+  DbTrajectory,
   FileInputStatus,
   HypothesisRowData,
   LocationStudy,
-  NestedCheckedType,
   RowStatus,
+  SelectOption,
   TrajectoryAreaData,
 } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { useStudy } from '@/store/contexts/StudyContext.tsx';
-import { CheckboxWithNestedCheckbox } from '@/components/forms/CheckboxWithNestedCheckbox.tsx';
-import { ThermalOptions } from '@/mocks/data/list/names';
+import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import {
-  addNestedRow,
+  buildEmptyTrajectory,
+  buildErrorTrajectory,
   buildRowWithSubRowsData,
-  checkNestedValue,
-  removeRowAndSubRow,
+  getHypothesis,
+  getRowDataSelected,
   retrieveReadOnlyArea,
-  unCheckNestedValue,
+  setNestedData,
 } from '@/shared/utils/trajectoryUtils.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
-import { sortKeepLastName } from '@/shared/utils/sortUtils.ts';
-import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
+import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
+import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
-import { linkTrajectoryToStudy } from '@/shared/services/trajectoryService.ts';
+import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
+import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
+import {
+  fetchTrajectoriesFromDB,
+  fetchTrajectoriesFromFS,
+  getStudyTrajectoriesWithWarnings,
+  linkTrajectoryToStudy,
+  unlinkTrajectoryFromStudy,
+  uploadTrajectoryWithTechnology,
+} from '@/shared/services/trajectoryService.ts';
+import { convertToFSSelectionOptionType, convertToSelectionOptionType } from '@/shared/utils/formFormatter.ts';
 import { useLocation } from 'react-router-dom';
-import { convertToSelectionOptionType } from '@/shared/utils/formFormatter.ts';
+import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
+import StdCheckbox from '@common/forms/stdCheckbox/StdCheckbox.tsx';
+import StdCheckboxGroupWrapper from '@common/forms/stdCheckboxGroup/StdCheckboxGroupWrapper.tsx';
+import { ThermalOptions } from '@/mocks/data/list/names.ts';
+import { STUDY_ACTION } from '@/shared/enum/study.ts';
+import { notifyAlert } from '@/shared/notification/notification.tsx';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
+import { useUser } from '@/store/contexts/UserContext.tsx';
+import { fetchWarningMessagesFromType } from '@/shared/services/warningService.ts';
+import { DeletionModal } from '@common/modal/DeletionModal.tsx';
 
 interface ThermalTabProps {
-  defaultAreas: CheckBoxData[];
+  defaultAreas: { name: string }[];
   areas: TrajectoryAreaData[];
 }
 
 const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
   const { t } = useTranslation();
+  const { user } = useUser();
   const studyState = useStudy();
   const location = useLocation();
   const study = (location.state as LocationStudy)?.study;
-  const [checkedValues, setCheckedValues] = useState<NestedCheckedType[]>([]);
-  const [defaultData, setDefaultData] = useState<HypothesisRowData[]>([]);
+  const dispatch = useStudyDispatch();
+  const [checkedValues, setCheckedValues] = useState<string[]>([]);
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
-  const [data, setData] = useState<HypothesisRowData[]>([
-    {
-      hypothesis: OTHER_AREAS_LABEL,
-      trajectory: null,
-      status: TRAJECTORY_SELECTION_STATUS.MISSING,
-      isDefault: true,
-      subRows: null,
-    },
-  ]);
-  const [progress] = useState(0);
-  const [fileStatus] = useState<FileInputStatus>('empty');
-  const [rowIndexSelected] = useState(0);
+  const [data, setData] = useState<HypothesisRowData[]>([]);
+  const [progress, setProgress] = useState(0);
+  const [fileStatus, setFileStatus] = useState<FileInputStatus>('empty');
+  const [rowIdSelected, setRowIdSelected] = useState<string>('0');
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
-
-  const handleFetchTrajectoriesFS = async () => Promise.resolve();
-  const handleTrajectorySearch = async (value?: string, area?: string) => {
-    try {
-      //const results = await fetchTrajectoriesFromDB(TRAJECTORY_TYPE.THERMAL_CAPACITY, study.horizon, value, area);
-      const results = [
-        {
-          id: 128,
-          trajectoryName: 'BP23_AREF_EU_CBN',
-          type: TRAJECTORY_TYPE.THERMAL_CAPACITY,
-          version: 2,
-          userName: 'unknown_user',
-          loadArea: 'FR',
-          creationDate: '2025-06-30T18:15:39.775167' as unknown as Date,
-        },
-        {
-          id: 127,
-          trajectoryName: 'BP23_AREF_EU_coherence_scenario7',
-          type: TRAJECTORY_TYPE.THERMAL_CAPACITY,
-          version: 1,
-          userName: 'unknown_user',
-          loadArea: 'OTHERS',
-          creationDate: '2025-06-30T18:15:25.040294' as unknown as Date,
-        },
-      ];
-      return Promise.resolve(convertToSelectionOptionType(results));
-    } catch {
-      // silent handler
-    }
-  };
+  const { isModalOpen, toggleModal } = useNewStudyModal();
+  const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
+  const [rowToDelete, setRowToDelete] = useState<{ index: number; value?: string } | null>(null);
+  const [isDeletionModalOpen, setIsDeletionModalOpen] = useState(false);
+  const { hypothesisTrajectories } = useFetchHypothesisTrajectories(
+    study?.id,
+    TRAJECTORY_TYPE.THERMAL_CAPACITY,
+    defaultAreas,
+  );
 
   useEffect(() => {
     const fetchHypothesis = () => {
       try {
-        // Handle default areas (checkbox list and hypothesis table)
-        // Checkbox list
-        setCheckedValues(
-          defaultAreas.map((item) => ({
-            name: item.name,
-            subOptions: ThermalOptions,
-          })),
-        );
-        // Hypothesis table => set data
-        const areaDefaultData = buildRowWithSubRowsData(defaultAreas);
-        setDefaultData(areaDefaultData);
         // Hypothesis table => set read only
         // Find default area not included in areas trajectory list
-        const defaultAreaListNotIncludedInList: string[] = [];
-        defaultAreas.forEach((defaultArea) => {
-          if (!areas.some((trajectoryArea) => trajectoryArea.areaName === defaultArea.name)) {
-            defaultAreaListNotIncludedInList.push(defaultArea.name);
-          }
-        });
-        setReadOnly(retrieveReadOnlyArea(areaDefaultData, defaultAreaListNotIncludedInList));
+        const defaultAreaListNotIncludedInList: string[] = defaultAreas
+          .map((defaultArea) => {
+            if (!areas.some((trajectoryArea) => trajectoryArea.areaName === defaultArea.name)) {
+              return defaultArea.name;
+            }
+          })
+          .filter(Boolean) as string[];
 
-        // Handle areas from trajectory AREA
+        const areaData = hypothesisTrajectories
+          .map((trajectory) => {
+            if (trajectory.loadArea) {
+              return buildRowWithSubRowsData(
+                trajectory,
+                ThermalOptions,
+                defaultAreas,
+                defaultAreaListNotIncludedInList,
+              );
+            }
+          })
+          .filter(Boolean) as HypothesisRowData[];
+        const dataTrajectories = sortWithFixedPosition(areaData);
+        setData(dataTrajectories);
+        setReadOnly(retrieveReadOnlyArea(dataTrajectories, defaultAreaListNotIncludedInList));
+
         // Build checkbox list options
-        let newArea: CheckBoxData[] = [];
-        newArea = areas
+        const newArea = areas
           .map((trajectoryArea) => {
             if (!defaultAreas?.some((item) => item.name === trajectoryArea.areaName)) {
               return { name: trajectoryArea.areaName, isDefault: false };
             }
           })
           .filter(Boolean) as CheckBoxData[];
-        setAreasOptions(newArea.length > 0 ? defaultAreas?.concat(newArea) : defaultAreas);
+        const checkBoxDefaultData = defaultAreas?.map((area) => ({ name: area.name, isDefault: true }));
+        setAreasOptions(newArea.length > 0 ? checkBoxDefaultData.concat(newArea) : checkBoxDefaultData);
+        setCheckedValues(defaultAreas.map((item) => item.name));
       } catch {
         // Silent handler
       }
     };
     void fetchHypothesis();
-  }, []);
+  }, [areas, defaultAreas, hypothesisTrajectories]);
 
-  const addRow = (value: string, isParentChecked: boolean, isDefault: boolean, parentValue?: string) => {
-    let dataToAdd: HypothesisRowData[] = [];
+  const addRow = (value: string) => {
+    dispatch?.({
+      type: STUDY_ACTION.ADD_TRAJECTORIES,
+      payload: {
+        [TRAJECTORY_TYPE.THERMAL_CAPACITY]: {
+          trajectories: [buildEmptyTrajectory(value, TRAJECTORY_TYPE.THERMAL_CAPACITY)],
+          warningMessages: [],
+        },
+      },
+    });
     const newRow: HypothesisRowData = {
       hypothesis: value,
       trajectory: null,
       status: TRAJECTORY_SELECTION_STATUS.MISSING,
-      isDefault,
-      subRows: null,
+      isDefault: false,
+      subRows: ThermalOptions.map((option) => ({
+        hypothesis: option,
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+        isDefault: true,
+        subRows: null,
+      })),
     };
-    // Add child to the checked parent
-    if (parentValue && isParentChecked) {
-      dataToAdd = addNestedRow(isDefault ? defaultData : data, newRow, parentValue);
-      setCheckedValues((prev) => (prev.length > 0 ? checkNestedValue(prev, value, parentValue) : prev));
-    } else if (parentValue && !isParentChecked) {
-      // Add Row for parent and row for child
-      dataToAdd = [
-        {
-          ...newRow,
-          hypothesis: parentValue,
-          subRows: [newRow],
-        },
-        ...(isDefault ? defaultData : data),
-      ];
-      // Checked technology and area
-      setCheckedValues((prev) => [
-        ...prev,
-        {
-          name: parentValue,
-          subOptions: [value].sort((a, b) => a.localeCompare(b)),
-        },
-      ]);
-    } else {
-      dataToAdd = [newRow, ...(isDefault ? defaultData : data)];
-      // Checked only area
-      setCheckedValues((prev) => [
-        ...prev,
-        {
-          name: value,
-          subOptions: null,
-        },
-      ]);
+
+    // Checked only area
+    setCheckedValues((prev) => [...prev, value]);
+    setData(sortWithFixedPosition([newRow, ...data]));
+  };
+
+  const handleRemoveRow = async (value?: string, indexRow?: number) => {
+    if (indexRow && data[indexRow].hypothesis) {
+      dispatch?.({
+        type: STUDY_ACTION.DELETE_TRAJECTORY,
+        payload: { area: data[indexRow].hypothesis, type: TRAJECTORY_TYPE.LOAD },
+      });
+      if (data[indexRow]?.trajectory && data[indexRow]?.status === TRAJECTORY_SELECTION_STATUS.OK) {
+        await unlinkTrajectoryFromStudy(data[indexRow].trajectory.id, study.id);
+      }
     }
-    if (isDefault) {
-      setDefaultData(dataToAdd);
-    } else {
-      const newDataSorted = sortKeepLastName(dataToAdd, OTHER_AREAS_LABEL);
-      setData(newDataSorted);
+    setData(sortWithFixedPosition(data.filter((item) => item.hypothesis !== value)));
+    if (value) {
+      setCheckedValues((prev) => [...prev.filter((name) => name !== value)]);
     }
   };
 
-  const removeRow = (value: string, isDefault: boolean, parentValue?: string) => {
-    let dataToRemove: HypothesisRowData[] = [];
-    if (parentValue) {
-      dataToRemove = removeRowAndSubRow(isDefault ? defaultData : data, value, parentValue);
-      setCheckedValues((prev) => (prev.length > 0 ? unCheckNestedValue(prev, value, parentValue) : prev));
+  const removeRow = async (value: string, rowId?: number) => {
+    // Deletion modal
+    if (rowId != null && data[rowId].trajectory && data[rowId].status === TRAJECTORY_SELECTION_STATUS.OK) {
+      setRowToDelete({ index: rowId, value });
+      setIsDeletionModalOpen(true);
     } else {
-      dataToRemove = (isDefault ? defaultData : data).filter((item) => item.hypothesis !== value);
-      setCheckedValues((prev) => [...prev.filter((checkedValue) => checkedValue.name !== value)]);
+      // remove
+      await handleRemoveRow(value, rowId);
     }
-    isDefault ? setDefaultData(dataToRemove) : setData(dataToRemove);
   };
 
-  const handleSelectionChange = (value: string, isChecked: boolean, isDefault: boolean, parentValue?: string) => {
+  const handleSelectionChange = async (value: string, isChecked: boolean) => {
     if (isChecked) {
-      const isParentChecked =
-        parentValue && checkedValues ? checkedValues.some((checkedValue) => checkedValue.name === parentValue) : false;
-      addRow(value, isParentChecked, isDefault, parentValue);
+      addRow(value);
     } else {
-      removeRow(value, isDefault, parentValue);
+      void removeRow(value);
     }
+  };
+
+  const handleFetchTrajectoriesFS = async (rowId: string): Promise<void> => {
+    try {
+      const indexArray = rowId.split('.').map((item) => parseInt(item));
+      const results = await fetchTrajectoriesFromFS(
+        TRAJECTORY_TYPE.THERMAL_CAPACITY,
+        '',
+        data[indexArray[0]]?.hypothesis === 'FR' ? 'FR' : '',
+      );
+      setOptionsFS(convertToFSSelectionOptionType(results));
+      setRowIdSelected(rowId);
+      toggleModal();
+    } catch {
+      // Silent handler
+    }
+  };
+
+  const handleTrajectorySearch = useCallback(
+    async (value?: string, area?: string): Promise<SelectOption[] | undefined> => {
+      try {
+        const results = await fetchTrajectoriesFromDB(TRAJECTORY_TYPE.THERMAL_CAPACITY, study.horizon, value, area);
+        return convertToSelectionOptionType(results);
+      } catch {
+        // silent handler
+      }
+    },
+    [study.horizon],
+  );
+
+  const handleTrajectoryError = (
+    indexArray: number[],
+    trajectoryId: number,
+    trajectoryLabel: string,
+    errorMessage: string,
+  ) => {
+    const hypothesis = getRowDataSelected(data, indexArray)?.hypothesis;
+    const newDbTrajectory = buildErrorTrajectory(
+      TRAJECTORY_TYPE.THERMAL_CAPACITY,
+      trajectoryId,
+      trajectoryLabel,
+      user?.profile?.sub,
+      hypothesis,
+    );
+    setData((prev) =>
+      setNestedData(prev, indexArray, { trajectory: newDbTrajectory, status: TRAJECTORY_SELECTION_STATUS.ERROR }),
+    );
+
+    notifyAlert({
+      icon: StdIconId.Close,
+      message: t('studyDetails.@notificationAlert', {
+        studyName: study?.name ?? '',
+        trajectoryName: trajectoryLabel,
+        trajectoryType: hypothesis,
+      }),
+      content: errorMessage,
+      type: 'error',
+      filledIcon: true,
+    });
   };
 
   const handleTrajectoryUpdate = async (
-    rowIndex: number,
+    rowId: string,
     trajectoryId: number,
     status?: RowStatus,
     trajectoryLabel?: string,
     errorMessage?: string,
   ) => {
-    console.log('=============== rowIndex', rowIndex);
-    console.log('=============== status', status);
-    console.log('=============== trajectoryLabel', trajectoryLabel);
-    console.log('=============== errorMessage', errorMessage);
-    await linkTrajectoryToStudy(TRAJECTORY_TYPE.THERMAL_CAPACITY, trajectoryId, study.id);
+    const indexArray = rowId.split('.').map((item) => parseInt(item));
+    try {
+      const trajectorySelected: DbTrajectory | null | undefined = getRowDataSelected(data, indexArray)?.trajectory;
+
+      if ((status === 'empty' && trajectorySelected) || (status === 'emptyError' && trajectorySelected)) {
+        if (status === 'empty') {
+          await unlinkTrajectoryFromStudy(trajectoryId, study.id);
+        }
+        const warningMessages = await fetchWarningMessagesFromType(TRAJECTORY_TYPE.THERMAL_CAPACITY, study.id);
+        dispatch?.({
+          type: STUDY_ACTION.UPDATE_TRAJECTORY,
+          payload: { trajectory: trajectorySelected, warningMessages, status },
+        });
+        const newEmptyTrajectory: Pick<HypothesisRowData, 'trajectory' | 'status'> = {
+          trajectory: null,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+        };
+        setData((prev) => setNestedData(prev, indexArray, newEmptyTrajectory));
+      }
+      if (status === 'success') {
+        await linkTrajectoryToStudy(TRAJECTORY_TYPE.THERMAL_CAPACITY, trajectoryId, study.id);
+        const result = await getStudyTrajectoriesWithWarnings(study.id, TRAJECTORY_TYPE.THERMAL_CAPACITY);
+        const newTrajectory = result?.trajectories?.find((trajectory) => {
+          if (data[indexArray[0]].hypothesis === OTHER_AREAS_LABEL) {
+            return trajectory.loadArea === OTHER_AREAS;
+          } else {
+            return trajectory.loadArea === data[indexArray[0]].hypothesis;
+          }
+        });
+        if (newTrajectory) {
+          const payloadResult = { trajectory: newTrajectory, warningMessages: result.warningMessages, status };
+          dispatch?.({ type: STUDY_ACTION.UPDATE_TRAJECTORY, payload: payloadResult });
+        }
+        const newEmptyTrajectory = {
+          trajectory: newTrajectory ?? null,
+          status: newTrajectory ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+        };
+        setData((prev) => setNestedData(prev, indexArray, newEmptyTrajectory));
+      }
+      if (status === 'error' && trajectoryId != null && trajectoryLabel && !!errorMessage) {
+        handleTrajectoryError(indexArray, trajectoryId, trajectoryLabel, errorMessage);
+      }
+    } catch (error) {
+      if (indexArray.length) {
+        handleTrajectoryError(indexArray, trajectoryId, trajectoryLabel ?? '', (error as Error).message);
+      }
+    }
+  };
+
+  const handleImportTrajectory = async (value: SelectOption) => {
+    setFileStatus('loading');
+    let newTrajectory: DbTrajectory;
+    const rowSelectedData = getHypothesis(data, rowIdSelected);
+
+    try {
+      newTrajectory = await uploadTrajectoryWithTechnology(
+        rowSelectedData.hypothesis,
+        value.label,
+        study.horizon,
+        study.id,
+        true,
+        (progressValue: number) => {
+          setProgress(+progressValue?.toFixed(0));
+        },
+        rowSelectedData?.technology,
+      );
+      setFileStatus('success');
+      if (newTrajectory.id != null) {
+        await handleTrajectoryUpdate(rowIdSelected, newTrajectory.id, 'success', newTrajectory.trajectoryName);
+      }
+    } catch (error) {
+      setFileStatus('error');
+      await handleTrajectoryUpdate(rowIdSelected, value.id, 'error', value.label, (error as Error)?.message);
+    }
   };
 
   return (
@@ -230,71 +346,83 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
         <div className="border-b border-gray-400 pb-2">
           <SearchBar onSearch={() => {}} placeholder={t('studyDetails.@search_area')} />
         </div>
-        {areasOptions?.map((area, index) => (
-          <div key={`${index}-${area.name}`}>
-            <CheckboxWithNestedCheckbox
-              key={`nested-checkbox-${area.name}`}
-              label={area.name}
-              value={area.name}
-              name={''}
-              defaultChecked={area.isDefault}
-              disabled={area.isDefault}
-              isReadOnly={readOnly[index]}
-              onChange={handleSelectionChange}
-              onHandleSelection={handleSelectionChange}
-              checkedValues={checkedValues}
-              options={ThermalOptions}
-            />
-            {defaultAreas?.length > 0 && index === Math.max(defaultAreas?.length - 1, 0) && (
-              <RdsDivider extraClasses="mt-1" />
-            )}
-          </div>
-        ))}
+        <StdCheckboxGroupWrapper
+          label={''}
+          name={''}
+          onChange={(valueChecked: string, isChecked?: boolean) =>
+            void handleSelectionChange?.(valueChecked, isChecked ?? false)
+          }
+          checkedValues={checkedValues}
+        >
+          {areasOptions?.map((area, index) => (
+            <div key={`${area.name}`} className="my-1">
+              <StdCheckbox
+                key={`nested-${area.name}`}
+                label={area.name}
+                value={area.name}
+                name={''}
+                disabled={area.isDefault}
+                checked={area.isDefault}
+              />
+              {defaultAreas?.length > 0 && index === Math.max(defaultAreas?.length - 1, 0) && (
+                <RdsDivider extraClasses="mt-1" />
+              )}
+            </div>
+          ))}
+        </StdCheckboxGroupWrapper>
       </div>
       <div className="flex w-full flex-col gap-6">
         {defaultAreas.length > 0 && (
           <PegaseHypothesisTable
-            id="default-thermal-table"
-            data={defaultData}
+            id="thermal-table"
+            data={data}
             getTableHeaders={getExpandableHypothesisTableHeaders}
             fileStatus={fileStatus}
             studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
             readOnly={readOnly}
             progress={progress}
-            indexSelected={rowIndexSelected}
+            idSelected={rowIdSelected}
             handleSearch={handleTrajectorySearch}
-            handleImport={handleFetchTrajectoriesFS}
+            handleImport={async (rowId: string) => await handleFetchTrajectoriesFS(rowId)}
             isReadOnlyEnable={true}
-            updateData={(rowIndex: number, value: unknown, status?: RowStatus, label?: string) =>
-              void handleTrajectoryUpdate(rowIndex, value as number, status, label)
+            updateData={(rowId: string, value: unknown, status?: RowStatus, label?: string) =>
+              void handleTrajectoryUpdate(rowId, value as number, status, label)
             }
-            removeRow={(value: string, rowIndex?: number) => {
-              const parentValue =
-                rowIndex != null && !(defaultData[rowIndex]?.hypothesis === value)
-                  ? defaultData[rowIndex].hypothesis
-                  : undefined;
-              removeRow(value, true, parentValue);
+            removeRow={(value: string, rowId?: string) => {
+              void removeRow(value, Number(rowId));
             }}
           />
         )}
-        <PegaseHypothesisTable
-          id="main-thermal-table"
-          data={data}
-          getTableHeaders={getExpandableHypothesisTableHeaders}
-          fileStatus={fileStatus}
-          studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
-          readOnly={readOnly}
-          progress={progress}
-          indexSelected={rowIndexSelected}
-          handleSearch={handleTrajectorySearch}
-          handleImport={handleFetchTrajectoriesFS}
-          removeRow={(value: string, rowIndex?: number) => {
-            const parentValue =
-              rowIndex != null && !(data[rowIndex]?.hypothesis === value) ? data[rowIndex].hypothesis : undefined;
-            removeRow(value, false, parentValue);
+      </div>
+      {isModalOpen && (
+        <ImportTrajectoryModal
+          options={optionsFS}
+          onClose={async (value?: SelectOption) => {
+            toggleModal();
+            if (value != null) {
+              await handleImportTrajectory(value);
+            }
+          }}
+          trajectoryType={TRAJECTORY_TYPE.THERMAL_CAPACITY}
+          area={
+            getRowDataSelected(
+              data,
+              rowIdSelected.split('.').map((item) => parseInt(item)),
+            )?.hypothesis
+          }
+        />
+      )}
+      {isDeletionModalOpen && (
+        <DeletionModal
+          onClose={() => setIsDeletionModalOpen(false)}
+          handleDeletionRow={async () => {
+            if (rowToDelete) {
+              await handleRemoveRow(rowToDelete?.value, rowToDelete.index);
+              setIsDeletionModalOpen(false);
+            }
           }}
         />
-      </div>
+      )}
     </div>
   );
 };

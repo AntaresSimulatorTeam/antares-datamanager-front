@@ -26,7 +26,7 @@ const getEditableHypothesisTableHeaders = (
   studyStatus: StudyStatus | undefined,
   progress: number,
   fileStatus: FileInputStatus,
-  rowIndexSelected: number,
+  idSelected: string,
   columnHeader?: string,
 ) => [
   columnHelper.accessor('hypothesis', {
@@ -53,7 +53,7 @@ const getEditableHypothesisTableHeaders = (
             onClick={() => {
               setErrorInfo({ index: row.index, message: '' });
               void options?.meta?.updateData?.(
-                row.index,
+                row.id,
                 trajectory.id,
                 status === TRAJECTORY_SELECTION_STATUS.ERROR ? 'emptyError' : 'empty',
               );
@@ -65,7 +65,7 @@ const getEditableHypothesisTableHeaders = (
           <SelectInputWithButton
             onSelect={(value: SelectOption) => {
               setErrorInfo({ index: row.index, message: '' });
-              void options?.meta?.updateData?.(row.index, value.id, 'success', value.label);
+              void options?.meta?.updateData?.(row.id, value.id, 'success', value.label);
             }}
             onSearch={async (value?: string) =>
               await options?.meta?.search?.(
@@ -75,7 +75,7 @@ const getEditableHypothesisTableHeaders = (
             }
             onClickButton={async () => {
               setErrorInfo({ index: row.index, message: '' });
-              await options?.meta?.importData?.(row.index);
+              await options?.meta?.importData?.(row.id);
             }}
             isDisabled={row.getReadOnly()}
           />
@@ -89,13 +89,13 @@ const getEditableHypothesisTableHeaders = (
     header: t('home.@status'),
     cell: ({ row, table: { options } }) => {
       const { status, hypothesis, isDefault } = row.original;
-      return progress > 0 && fileStatus === 'loading' && rowIndexSelected === row.index ? (
+      return progress > 0 && fileStatus === 'loading' && idSelected === row.id ? (
         <ProgressBar statusFile={fileStatus} progressValue={progress} />
       ) : (
         <CellWithStatus
           status={status}
           isDeletable={!isDefault && !(studyStatus === StudyStatus.GENERATED)}
-          onClick={() => void options?.meta?.removeRow?.(hypothesis, row.index)}
+          onClick={() => void options?.meta?.removeRow?.(hypothesis, row.id)}
         />
       );
     },
