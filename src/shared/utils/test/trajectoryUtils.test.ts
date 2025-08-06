@@ -5,7 +5,6 @@ import {
   buildReadOnlyRow,
   buildRowData,
   buildRowWithSubRowsData,
-  checkNestedValue,
   getBgColor,
   getStatus,
   getStudyMenu,
@@ -13,7 +12,6 @@ import {
   removeDuplicate,
   removeRowAndSubRow,
   retrieveReadOnlyArea,
-  unCheckNestedValue,
 } from '../trajectoryUtils';
 import { defaultAreaNotInAreaTrajectoryList, rowData, rowDataTwo } from '@/mocks/data/tests/hypothesisTable.mock.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
@@ -26,8 +24,7 @@ import {
   mockRowDataTrajectoryC,
 } from '@/mocks/data/tests/trajectory.mock.ts';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
-import { DbTrajectory, HypothesisRowData, HypothesisTab, NestedCheckedType } from '@/shared/types';
-import { ThermalOptions } from '@/mocks/data/list/names.ts';
+import { DbTrajectory, HypothesisRowData, HypothesisTab } from '@/shared/types';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 describe('getStatus', () => {
@@ -181,34 +178,68 @@ describe('buildEmptyTrajectory', () => {
 });
 
 describe('buildRowWithSubRowsData', () => {
-  it('returns empty array when input is empty', () => {
-    const result = buildRowWithSubRowsData([]);
-    expect(result).toEqual([]);
+  const subRowOptions = ['Option A', 'Option B'];
+
+  it('returns correct data when loadArea is OTHER_AREAS', () => {
+    const trajectory = { loadArea: OTHER_AREAS } as DbTrajectory;
+
+    const result = buildRowWithSubRowsData(trajectory, subRowOptions);
+
+    expect(result).toEqual({
+      hypothesis: OTHER_AREAS_LABEL,
+      trajectory,
+      status: TRAJECTORY_SELECTION_STATUS.MISSING,
+      isDefault: true,
+      subRows: null,
+    });
   });
 
-  it('creates row data with correct structure', () => {
-    const input = [{ name: 'ZoneA' }, { name: 'ZoneB' }];
-    const result = buildRowWithSubRowsData(input);
+  it('returns correct data when trajectory has name and is in defaultAreas', () => {
+    const trajectory = { loadArea: 'Zone 1', trajectoryName: 'T1' } as DbTrajectory;
+    const defaultAreas = [{ name: 'Zone 1' }];
 
-    expect(result.length).toBe(2);
-    expect(result[0].hypothesis).toBe('ZoneA');
-    expect(result[1].hypothesis).toBe('ZoneB');
+    const result = buildRowWithSubRowsData(trajectory, subRowOptions, defaultAreas);
 
-    for (const row of result) {
-      expect(row.trajectory).toBeNull();
-      expect(row.status).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
-      expect(row.isDefault).toBe(true);
-      expect(Array.isArray(row.subRows)).toBe(true);
-      expect(row.subRows.length).toBe(ThermalOptions.length);
+    expect(result).toEqual({
+      hypothesis: 'Zone 1',
+      trajectory,
+      status: TRAJECTORY_SELECTION_STATUS.OK,
+      isDefault: true,
+      subRows: [
+        {
+          hypothesis: 'Option A',
+          trajectory: null,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          isDefault: true,
+          subRows: null,
+        },
+        {
+          hypothesis: 'Option B',
+          trajectory: null,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          isDefault: true,
+          subRows: null,
+        },
+      ],
+    });
+  });
 
-      for (const sub of row.subRows) {
-        expect(sub.hypothesis).toBeDefined();
-        expect(sub.trajectory).toBeNull();
-        expect(sub.status).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
-        expect(sub.isDefault).toBe(true);
-        expect(sub.subRows).toBeNull();
-      }
-    }
+  it('excludes subRows if area is in areasNotInTrajectoryArea', () => {
+    const trajectory = { loadArea: 'Zone 2' } as DbTrajectory;
+    const areasNotInTrajectoryArea = ['Zone 2'];
+
+    const result = buildRowWithSubRowsData(trajectory, subRowOptions, undefined, areasNotInTrajectoryArea);
+
+    expect(result.subRows).toBeNull();
+  });
+
+  it('marks isDefault as false if not in defaultAreas and not OTHER_AREAS', () => {
+    const trajectory = { loadArea: 'Zone 3' } as DbTrajectory;
+    const defaultAreas = [{ name: 'Zone 1' }];
+
+    const result = buildRowWithSubRowsData(trajectory, subRowOptions, defaultAreas);
+
+    expect(result.isDefault).toBe(false);
   });
 });
 
@@ -259,45 +290,6 @@ describe('addNestedRow', () => {
   it('should handle undefined parentValue gracefully', () => {
     const data = [baseRow];
     const result = addNestedRow(data, newRow);
-
-    expect(result).toEqual(data);
-  });
-});
-
-describe('checkNestedValue', () => {
-  const baseItem: NestedCheckedType = { name: 'parent1', subOptions: null };
-
-  it('should add a new subOption to an item with no subOptions', () => {
-    const data = [baseItem];
-    const result = checkNestedValue(data, 'option1', 'parent1');
-
-    expect(result[0].subOptions).toEqual(['option1']);
-  });
-
-  it('should append and sort subOptions alphabetically', () => {
-    const data: NestedCheckedType[] = [{ name: 'parent1', subOptions: ['optionB'] }];
-    const result = checkNestedValue(data, 'optionA', 'parent1');
-
-    expect(result[0].subOptions).toEqual(['optionA', 'optionB']);
-  });
-
-  it('should not duplicate subOptions if value already exists', () => {
-    const data: NestedCheckedType[] = [{ name: 'parent1', subOptions: ['option1'] }];
-    const result = checkNestedValue(data, 'option1', 'parent1');
-
-    expect(result[0].subOptions).toEqual(['option1']);
-  });
-
-  it('should not modify items if parentValue does not match', () => {
-    const data = [baseItem];
-    const result = checkNestedValue(data, 'option1', 'nonexistent');
-
-    expect(result).toEqual(data);
-  });
-
-  it('should handle undefined parentValue gracefully', () => {
-    const data = [baseItem];
-    const result = checkNestedValue(data, 'option1');
 
     expect(result).toEqual(data);
   });
@@ -377,44 +369,6 @@ describe('removeRowAndSubRow', () => {
   it('should not fail if subRows is undefined', () => {
     const result = removeRowAndSubRow(dataWithChild1, 'Child1', 'Parent1');
     expect(result[0].subRows).toBeNull();
-  });
-});
-
-describe('unCheckNestedValue', () => {
-  it('should remove a value from subOptions of the correct parent', () => {
-    const data: NestedCheckedType[] = [{ name: 'Parent1', subOptions: ['A', 'B', 'C'] }];
-    const result = unCheckNestedValue(data, 'B', 'Parent1');
-    expect(result[0].subOptions).toEqual(['A', 'C']);
-  });
-
-  it('should set subOptions to null if the last value is removed', () => {
-    const data: NestedCheckedType[] = [{ name: 'Parent1', subOptions: ['OnlyOne'] }];
-    const result = unCheckNestedValue(data, 'OnlyOne', 'Parent1');
-    expect(result[0].subOptions).toBeNull();
-  });
-
-  it('should not modify the item if value is not found in subOptions', () => {
-    const data: NestedCheckedType[] = [{ name: 'Parent1', subOptions: ['X', 'Y'] }];
-    const result = unCheckNestedValue(data, 'Z', 'Parent1');
-    expect(result[0].subOptions).toEqual(['X', 'Y']);
-  });
-
-  it('should not modify the item if parentValue does not match', () => {
-    const data: NestedCheckedType[] = [{ name: 'Parent1', subOptions: ['A'] }];
-    const result = unCheckNestedValue(data, 'A', 'NonExistentParent');
-    expect(result).toEqual(data);
-  });
-
-  it('should handle null subOptions gracefully', () => {
-    const data: NestedCheckedType[] = [{ name: 'Parent1', subOptions: null }];
-    const result = unCheckNestedValue(data, 'A', 'Parent1');
-    expect(result[0].subOptions).toBeNull();
-  });
-
-  it('should handle undefined parentValue gracefully', () => {
-    const data: NestedCheckedType[] = [{ name: 'Parent1', subOptions: ['A'] }];
-    const result = unCheckNestedValue(data, 'A');
-    expect(result).toEqual(data);
   });
 });
 

@@ -1,18 +1,15 @@
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useCallback, useEffect, useState } from 'react';
 import { getDefaultLoadHypothesis, getTrajectoryDataByTypeAndId } from '@/shared/services/trajectoryService.ts';
-import { CheckBoxData, DbTrajectory, TrajectoryAreaData } from '@/shared/types';
+import { DbTrajectory, TrajectoryAreaData } from '@/shared/types';
 
 export const useFetchAreas = (trajectoryArea?: DbTrajectory | null) => {
-  const [areaDefault, setAreaDefault] = useState<CheckBoxData[]>([]);
+  const [areaDefault, setAreaDefault] = useState<{ name: string }[]>([]);
   const [trajectoryAreas, setTrajectoryAreas] = useState<TrajectoryAreaData[]>([]);
 
   const fetchAreas = useCallback(async () => {
     try {
-      const defaultAreas: CheckBoxData[] = (await getDefaultLoadHypothesis())?.map((area) => ({
-        name: area.name,
-        isDefault: true,
-      }));
+      const defaultAreas: { name: string }[] = await getDefaultLoadHypothesis();
       setAreaDefault(defaultAreas);
       if (trajectoryArea?.id != null) {
         const areas = (await getTrajectoryDataByTypeAndId(

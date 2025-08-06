@@ -12,6 +12,7 @@ import {
   TRAJECTORY_ENDPOINT,
   TRAJECTORY_FILE_SYSTEM_ENDPOINT,
   TRAJECTORY_LINK_TO_STUDY_ENDPOINT,
+  TRAJECTORY_THERMAL_INSTALLED_POWER_IMPORT,
   TRAJECTORY_UNLINK_TO_STUDY_ENDPOINT,
 } from '@/shared/const/apiEndPoint.ts';
 import {
@@ -57,18 +58,18 @@ export const fetchTrajectoriesFromDB = async (
  * Retrieve a list of trajectories by type and thermal capacity area from file system
  *
  * @param {TRAJECTORY_TYPE} trajectoryType - Partial name of a study
- * @param {string | undefined} thermalCapacityArea - To use just in thermal capacity case
+ * @param {string | undefined} zone - To use just in thermal capacity case
  * @param {string | undefined} searchTerm - Autocompletion - filter trajectories by file name
  * @returns {Promise<FsTrajectory[]>} - Promise object that represents a list of trajectories
  */
 export const fetchTrajectoriesFromFS = async (
-  trajectoryType: string,
+  trajectoryType: TRAJECTORY_TYPE,
   searchTerm?: string | undefined,
-  thermalCapacityArea?: string | undefined,
+  zone?: string | undefined,
 ): Promise<FsTrajectory[]> => {
   const queryString = new URLSearchParams({
     trajectoryType: trajectoryType ?? '',
-    thermalCapacityArea: thermalCapacityArea ?? '',
+    zone: zone ?? '',
     fileNameContains: searchTerm ?? '',
   }).toString();
 
@@ -105,6 +106,48 @@ export const uploadTrajectory = async (
   try {
     const response = await fetchWithProgress(
       trajectoryType === TRAJECTORY_TYPE.LOAD ? urlLoadApi : urlApi,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+      onProgress,
+    );
+
+    return (await response.json()) as DbTrajectory;
+  } catch (error) {
+    throw new Error((error as Error)?.message ?? '');
+  }
+};
+
+/**
+ * Asynchronously uploads a trajectory with the given parameters and tracks the progress of the operation.
+ *
+ * @param {string | undefined} area - The geographical area associated with the trajectory, may be undefined.
+ * @param {string} trajectoryName - The name of the trajectory to be uploaded.
+ * @param {string} horizon - The time horizon associated with the trajectory.
+ * @param {number} studyId - The unique identifier for the associated study.
+ * @param {boolean} isCivilYear - Indicates whether the horizon is based on the civil or a different calendar year.
+ * @param {(progress: number) => void} onProgress - A callback function invoked to report progress updates. Receives a numeric progress value.
+ * @param {string} technology - The technology associated with the trajectory.
+ * @returns {Promise<DbTrajectory>} A promise that resolves to the uploaded trajectory object.
+ * @throws {Error} If the upload process fails or an invalid response is encountered.
+ */
+export const uploadTrajectoryWithTechnology = async (
+  area: string | undefined,
+  trajectoryName: string,
+  horizon: string,
+  studyId: number,
+  isCivilYear: boolean,
+  onProgress: (progress: number) => void,
+  technology?: string,
+): Promise<DbTrajectory> => {
+  const urlApi = `${TRAJECTORY_THERMAL_INSTALLED_POWER_IMPORT}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}&technology=${technology ?? ''}`;
+
+  try {
+    const response = await fetchWithProgress(
+      urlApi,
       {
         method: 'POST',
         headers: {

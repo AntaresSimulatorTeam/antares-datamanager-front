@@ -85,7 +85,7 @@ describe('fetchTrajectoriesFromFS', () => {
     await waitFor(() => {
       expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
       expect(AuthService.authFetch).toHaveBeenCalledWith(
-        `https://mockapi.com/v1/trajectory/fs?trajectoryType=AREA&thermalCapacityArea=&fileNameContains=`,
+        `https://mockapi.com/v1/trajectory/fs?trajectoryType=AREA&zone=&fileNameContains=`,
       );
       expect(result).toEqual(mockFsTrajectoryAreaArray);
     });

@@ -127,6 +127,48 @@ export const mockDbTrajectoryArray = [
   },
 ];
 
+export const mockDbTrajectoryArrayLoad = [
+  {
+    id: 1,
+    trajectoryName: 'area_PB_2024',
+    type: TRAJECTORY_TYPE.LOAD,
+    version: 3,
+    userName: 'mouad',
+    creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+    loadArea: 'AT',
+  },
+  {
+    id: 2,
+    trajectoryName: 'area_PB_2026',
+    type: TRAJECTORY_TYPE.LOAD,
+    version: 3,
+    userName: 'mouad',
+    creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+    loadArea: 'BE',
+  },
+];
+
+export const mockEmptyDbTrajectoryArrayLoad = [
+  {
+    id: 1,
+    trajectoryName: '',
+    type: TRAJECTORY_TYPE.LOAD,
+    version: 0,
+    userName: 'mouad',
+    creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+    loadArea: 'ES',
+  },
+  {
+    id: 2,
+    trajectoryName: '',
+    type: TRAJECTORY_TYPE.LOAD,
+    version: 0,
+    userName: 'mouad',
+    creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+    loadArea: 'DEkf',
+  },
+];
+
 export const mockDbTrajectoryArrayWithDuplicate = [
   {
     id: 1,
@@ -207,6 +249,29 @@ export const mockFsTrajectoryLoadArray = [
   },
 ];
 
+export const mockFsTrajectoryThermalCapacityArray = [
+  {
+    trajectoryName: 'FR_BP23_A-ref_FR',
+    type: TRAJECTORY_TYPE.THERMAL_CAPACITY,
+    lastModifiedDate: '2025-07-02T11:57:48.493018687' as unknown as Date,
+  },
+  {
+    trajectoryName: 'FR_BP23_A-ref_FR_nuc',
+    type: TRAJECTORY_TYPE.THERMAL_CAPACITY,
+    lastModifiedDate: '2025-07-02T11:57:48.493018687' as unknown as Date,
+  },
+  {
+    trajectoryName: 'FR_DSR',
+    type: TRAJECTORY_TYPE.THERMAL_CAPACITY,
+    lastModifiedDate: '2025-06-27T10:40:47.410233' as unknown as Date,
+  },
+  {
+    trajectoryName: 'BE_PEMMDB23_26avril',
+    type: TRAJECTORY_TYPE.THERMAL_CAPACITY,
+    lastModifiedDate: '2025-06-27T10:40:07.150247' as unknown as Date,
+  },
+];
+
 export const mockTrajectoryAreaData: TrajectoryAreaData[] = [
   {
     areaName: 'CH',
@@ -236,3 +301,23 @@ export const mockTrajectoryAreaData: TrajectoryAreaData[] = [
 ];
 
 export const mockDefaultArea = [{ name: 'FR' }];
+
+export const mockEmptyDbTrajectoryLoadOthers = {
+  id: 1,
+  trajectoryName: '',
+  type: TRAJECTORY_TYPE.LOAD,
+  version: 0,
+  userName: 'mouad',
+  creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+  loadArea: 'OTHERS',
+};
+
+export const mockEmptyDbTrajectoryLoadFR = {
+  id: 1,
+  trajectoryName: '',
+  type: TRAJECTORY_TYPE.LOAD,
+  version: 0,
+  userName: 'mouad',
+  creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+  loadArea: 'FR',
+};

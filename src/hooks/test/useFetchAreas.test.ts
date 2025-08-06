@@ -53,7 +53,6 @@ describe('useFetchAreas', () => {
       expect(result.current.areaDefault).toEqual([
         {
           name: 'FR',
-          isDefault: true,
         },
       ]);
       expect(result.current.trajectoryAreas).toEqual(mockTrajectoryAreaData);

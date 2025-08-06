@@ -20,10 +20,10 @@ export type StdSimpleTableProps<TData> = {
   getCoreRowModel?: (table: Table<TData>) => () => RowModel<TData>;
   getExpandedRowModel?: (table: Table<TData>) => () => RowModel<TData>;
   getSubRows?: (originalRow: TData) => TData[] | undefined;
-  updateData?: (rowIndex: number, value: unknown, status?: RowStatus, label?: string) => void;
-  removeRow?: (value: string, rowIndex?: number) => void | Promise<void>;
+  updateData?: (rowId: string, value: unknown, status?: RowStatus, label?: string) => void;
+  removeRow?: (value: string, rowId?: string) => void | Promise<void>;
   search?: (value?: string, area?: string) => Promise<SelectOption[] | undefined>;
-  importData?: (index: number) => Promise<void>;
+  importData?: (rowId: string, index?: number) => Promise<void>;
 } & Omit<TableCoreProps<TData>, 'table'> &
   Omit<TableOptions<TData>, 'getCoreRowModel'>;
 

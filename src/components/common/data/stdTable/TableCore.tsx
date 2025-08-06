@@ -13,10 +13,10 @@ import { Fragment } from 'react';
 
 declare module '@tanstack/react-table' {
   interface TableMeta<TData extends RowData> {
-    updateData?: (rowIndex: number, value: unknown, status: RowStatus, label?: string) => void;
-    removeRow?: (value: string, rowIndex?: number) => void | Promise<void>;
+    updateData?: (rowId: string, value: unknown, status: RowStatus, label?: string) => void;
+    removeRow?: (value: string, rowId?: string) => void | Promise<void>;
     search?: (value?: string, area?: string) => Promise<SelectOption[] | undefined>;
-    importData?: (index: number) => Promise<void>;
+    importData?: (rowId: string, index?: number) => Promise<void>;
   }
 }
 
