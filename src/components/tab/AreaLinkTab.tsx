@@ -54,7 +54,7 @@ interface AreaLinkTabProps {
   setErrorMessage: Dispatch<SetStateAction<string>>;
 }
 
-const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
+export const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
   const studyState = useStudy();
   const location = useLocation();
   const study = (location.state as LocationStudy)?.study;
@@ -203,9 +203,9 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
       setErrorMessage(t('studyDetails.@add_trajectories_message'));
       dispatch?.({
         type: STUDY_ACTION.CLEAR_TRAJECTORY_BY_TYPE,
-        payload: [TRAJECTORY_TYPE.AREA, TRAJECTORY_TYPE.LINK, TRAJECTORY_TYPE.LOAD],
+        payload: rowIndex === 0 ? [TRAJECTORY_TYPE.AREA] : [TRAJECTORY_TYPE.LINK],
       } as StudyActionType);
-      const hasLinks = rowIndex === 0 && data[1].trajectory
+      const hasLinks = rowIndex === 0 && data[1].trajectory;
       setData((prev) =>
         prev.map((item, index) =>
           index === rowIndex || hasLinks
@@ -426,5 +426,3 @@ const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
     </div>
   );
 };
-
-export default AreaLinkTab;
