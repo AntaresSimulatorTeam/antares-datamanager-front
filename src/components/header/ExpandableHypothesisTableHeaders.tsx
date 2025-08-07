@@ -18,6 +18,7 @@ import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { ProgressBar } from '@/components/forms/ProgressBar.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
+import { RdsTextTooltip } from 'rte-design-system-react';
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
 
@@ -49,13 +50,21 @@ const getExpandableHypothesisTableHeaders = (
         if (row.depth === 0) return !row.getCanExpand() ? 'pl-1' : 'pl-0';
         return 'pl-4';
       };
-      const nbOfChildren: number =
+      const nbOfChildren: { list: string[]; nb: number } =
         row.depth === 0
           ? (row.originalSubRows || []).reduce(
-              (acc: number, current: HypothesisRowData) => (current.trajectory ? acc + 1 : acc),
-              0,
+              (acc: { list: string[]; nb: number }, current: HypothesisRowData) => {
+                if (!!current?.trajectory?.technology?.length && current?.trajectory?.technology?.length > 0) {
+                  acc.nb = acc.nb + 1;
+                  acc.list.push(current.trajectory.technology);
+                  return acc;
+                } else {
+                  return acc;
+                }
+              },
+              { list: [], nb: 0 },
             )
-          : 0;
+          : { list: [], nb: 0 };
       return (
         <div className="flex gap-1">
           {row.getCanExpand() && (
@@ -74,7 +83,11 @@ const getExpandableHypothesisTableHeaders = (
             hasPreview={false}
             alignment={getAlignment()}
           />
-          {nbOfChildren > 0 && <div>{'|'}</div>}
+          {row.getCanExpand() && nbOfChildren.nb > 0 && (
+            <RdsTextTooltip text={nbOfChildren.list.toString()} offset={5} placement="left">
+              <div className={'text-gray-600'}>{` | +${nbOfChildren.nb}`}</div>
+            </RdsTextTooltip>
+          )}
         </div>
       );
     },
@@ -94,7 +107,7 @@ const getExpandableHypothesisTableHeaders = (
               setErrorInfo({ index: row.index, message: '' });
               void options?.meta?.updateData?.(
                 row.id,
-                trajectory.id,
+                trajectory?.trajectoryName,
                 status === TRAJECTORY_SELECTION_STATUS.ERROR ? 'emptyError' : 'empty',
               );
             }}
@@ -105,7 +118,7 @@ const getExpandableHypothesisTableHeaders = (
           <SelectInputWithButton
             onSelect={(value: SelectOption) => {
               setErrorInfo({ index: row.index, message: '' });
-              void options?.meta?.updateData?.(row.id, value.id, 'success', value.label);
+              void options?.meta?.updateData?.(row.id, value.label, 'success');
             }}
             onSearch={async (value?: string) =>
               options?.meta?.search?.(

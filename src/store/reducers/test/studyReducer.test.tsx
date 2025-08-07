@@ -91,7 +91,7 @@ describe('addTrajectories', () => {
             version: 1,
             userName: 'CF',
             creationDate: '2025' as unknown as Date,
-            loadArea: 'CZ',
+            area: 'CZ',
           },
         ],
         warningMessages: [],
@@ -121,6 +121,21 @@ describe('addTrajectories', () => {
 
     expect(result[TRAJECTORY_TYPE.AREA]?.trajectories).toEqual([areaTraj]);
     expect(result[TRAJECTORY_TYPE.LINK]?.trajectories).toEqual([linkTraj]);
+  });
+
+  it('should return change state if data is full', () => {
+    const prevState: Partial<StudyState> = {
+      AREA: {
+        trajectories: [],
+        warningMessages: [],
+      },
+    };
+    const areaTraj = mockDataBaseTrajectory(TRAJECTORY_TYPE.AREA, 56, 'CZ');
+    const result = addTrajectories(prevState, {
+      AREA: { trajectories: [areaTraj], warningMessages: [mockSingleWarningMessages] },
+    });
+    expect(result?.AREA?.trajectories).toEqual([areaTraj]);
+    expect(result?.AREA?.warningMessages).toEqual([mockSingleWarningMessages]);
   });
 });
 
@@ -376,7 +391,7 @@ describe('updateTrajectory', () => {
     const payload = {
       trajectory: {
         ...baseTrajectory,
-        loadArea: 'NonMatchingZone',
+        area: 'NonMatchingZone',
       },
       warningMessages: [],
       status: 'success' as FileInputStatus,
@@ -493,6 +508,16 @@ describe('studyReducer', () => {
     const result = studyReducer(mockPrevStateArea(), action);
 
     expect(result?.[TRAJECTORY_TYPE.AREA]?.trajectories?.[0]?.trajectoryName).toEqual('Updated');
+  });
+
+  it('should handles RESET_STUDY_STATE action', () => {
+    const action: StudyActionType = {
+      type: STUDY_ACTION.RESET_STUDY_STATE,
+    };
+
+    const result = studyReducer(mockPrevStateArea(), action);
+
+    expect(result?.[TRAJECTORY_TYPE.AREA]).toBeUndefined();
   });
 
   it('should return previous state when action is undefined', () => {

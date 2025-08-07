@@ -6,18 +6,21 @@ import {
   buildRowData,
   buildRowWithSubRowsData,
   getBgColor,
+  getHypothesis,
+  getRowDataSelected,
   getStatus,
   getStudyMenu,
   isMatchingTrajectoryType,
   removeDuplicate,
-  removeRowAndSubRow,
   retrieveReadOnlyArea,
+  setNestedData,
 } from '../trajectoryUtils';
 import { defaultAreaNotInAreaTrajectoryList, rowData, rowDataTwo } from '@/mocks/data/tests/hypothesisTable.mock.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { afterEach, beforeEach, vi } from 'vitest';
 import {
   mockDbTrajectory,
+  mockDbTrajectoryAREA,
   mockDbTrajectoryArrayWithDuplicate,
   mockRowDataTrajectoryA,
   mockRowDataTrajectoryB,
@@ -86,15 +89,16 @@ describe('buildErrorTrajectory', () => {
   it('should return an error trajectory', () => {
     const date = new Date(2000, 1, 1, 13);
     vi.setSystemTime(date);
-    const errorTrajectory = buildErrorTrajectory(TRAJECTORY_TYPE.AREA, 3, 'trajectory', undefined, 'FR');
+    const errorTrajectory = buildErrorTrajectory(TRAJECTORY_TYPE.AREA, 3, 'trajectory', null, 'FR');
     expect(errorTrajectory).toStrictEqual({
       id: 3,
       trajectoryName: 'trajectory',
+      technology: '',
       type: TRAJECTORY_TYPE.AREA,
       version: 0,
       userName: 'unknown_user',
       creationDate: date,
-      loadArea: 'FR',
+      area: 'FR',
       state: TRAJECTORY_SELECTION_STATUS.ERROR,
     });
   });
@@ -111,7 +115,7 @@ describe('removeDuplicate', () => {
         version: 3,
         userName: 'mouad',
         creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-        loadArea: 'AT',
+        area: 'AT',
       },
       {
         id: 2,
@@ -120,7 +124,7 @@ describe('removeDuplicate', () => {
         version: 3,
         userName: 'mouad',
         creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
-        loadArea: 'BE',
+        area: 'BE',
       },
     ]);
   });
@@ -167,7 +171,7 @@ describe('buildEmptyTrajectory', () => {
 
     const result: DbTrajectory = buildEmptyTrajectory(area, type);
 
-    expect(result.loadArea).toBe(area);
+    expect(result.area).toBe(area);
     expect(result.type).toBe(type);
     expect(result.trajectoryName).toBe('');
     expect(result.version).toBe(0);
@@ -181,21 +185,21 @@ describe('buildRowWithSubRowsData', () => {
   const subRowOptions = ['Option A', 'Option B'];
 
   it('returns correct data when loadArea is OTHER_AREAS', () => {
-    const trajectory = { loadArea: OTHER_AREAS } as DbTrajectory;
+    const trajectory = { area: OTHER_AREAS, technology: '', trajectoryName: 'name' } as DbTrajectory;
 
     const result = buildRowWithSubRowsData(trajectory, subRowOptions);
 
     expect(result).toEqual({
       hypothesis: OTHER_AREAS_LABEL,
       trajectory,
-      status: TRAJECTORY_SELECTION_STATUS.MISSING,
+      status: TRAJECTORY_SELECTION_STATUS.OK,
       isDefault: true,
       subRows: null,
     });
   });
 
   it('returns correct data when trajectory has name and is in defaultAreas', () => {
-    const trajectory = { loadArea: 'Zone 1', trajectoryName: 'T1' } as DbTrajectory;
+    const trajectory = { area: 'Zone 1', trajectoryName: 'T1', technology: '' } as DbTrajectory;
     const defaultAreas = [{ name: 'Zone 1' }];
 
     const result = buildRowWithSubRowsData(trajectory, subRowOptions, defaultAreas);
@@ -225,7 +229,7 @@ describe('buildRowWithSubRowsData', () => {
   });
 
   it('excludes subRows if area is in areasNotInTrajectoryArea', () => {
-    const trajectory = { loadArea: 'Zone 2' } as DbTrajectory;
+    const trajectory = { area: 'Zone 2' } as DbTrajectory;
     const areasNotInTrajectoryArea = ['Zone 2'];
 
     const result = buildRowWithSubRowsData(trajectory, subRowOptions, undefined, areasNotInTrajectoryArea);
@@ -234,7 +238,7 @@ describe('buildRowWithSubRowsData', () => {
   });
 
   it('marks isDefault as false if not in defaultAreas and not OTHER_AREAS', () => {
-    const trajectory = { loadArea: 'Zone 3' } as DbTrajectory;
+    const trajectory = { area: 'Zone 3' } as DbTrajectory;
     const defaultAreas = [{ name: 'Zone 1' }];
 
     const result = buildRowWithSubRowsData(trajectory, subRowOptions, defaultAreas);
@@ -292,83 +296,6 @@ describe('addNestedRow', () => {
     const result = addNestedRow(data, newRow);
 
     expect(result).toEqual(data);
-  });
-});
-
-describe('removeRowAndSubRow', () => {
-  const subRowChild1 = {
-    hypothesis: 'Child1',
-    trajectory: mockDbTrajectory,
-    status: TRAJECTORY_SELECTION_STATUS.MISSING,
-  };
-  const subRowChild2 = {
-    hypothesis: 'Child2',
-    trajectory: mockDbTrajectory,
-    status: TRAJECTORY_SELECTION_STATUS.MISSING,
-  };
-  const data: HypothesisRowData[] = [
-    {
-      hypothesis: 'Parent1',
-      trajectory: mockDbTrajectory,
-      status: TRAJECTORY_SELECTION_STATUS.MISSING,
-      subRows: [subRowChild1, subRowChild2],
-    },
-  ];
-  const dataWithChild1: HypothesisRowData[] = [
-    {
-      hypothesis: 'Parent1',
-      trajectory: mockDbTrajectory,
-      status: TRAJECTORY_SELECTION_STATUS.MISSING,
-      subRows: [{ hypothesis: 'Child1', trajectory: mockDbTrajectory, status: TRAJECTORY_SELECTION_STATUS.MISSING }],
-    },
-  ];
-  const dataWithTreeChildren: HypothesisRowData[] = [
-    {
-      hypothesis: 'Parent1',
-      trajectory: mockDbTrajectory,
-      status: TRAJECTORY_SELECTION_STATUS.MISSING,
-      subRows: [
-        { hypothesis: 'Zebra', trajectory: mockDbTrajectory, status: TRAJECTORY_SELECTION_STATUS.MISSING },
-        { hypothesis: 'Apple', trajectory: mockDbTrajectory, status: TRAJECTORY_SELECTION_STATUS.MISSING },
-        { hypothesis: 'Banana', trajectory: mockDbTrajectory, status: TRAJECTORY_SELECTION_STATUS.MISSING },
-      ],
-    },
-  ];
-  const dataOnlyChild: HypothesisRowData[] = [
-    {
-      hypothesis: 'Parent1',
-      trajectory: mockDbTrajectory,
-      status: TRAJECTORY_SELECTION_STATUS.MISSING,
-      subRows: [{ hypothesis: 'OnlyChild', trajectory: mockDbTrajectory, status: TRAJECTORY_SELECTION_STATUS.MISSING }],
-    },
-  ];
-
-  it('should remove a matching subRow from the correct parent', () => {
-    const result = removeRowAndSubRow(data, 'Child1', 'Parent1');
-    expect(result[0].subRows).toEqual([subRowChild2]);
-  });
-
-  it('should sort remaining subRows alphabetically after removal', () => {
-    const result = removeRowAndSubRow(dataWithTreeChildren, 'Zebra', 'Parent1');
-    expect(result[0].subRows).toEqual([
-      { hypothesis: 'Apple', trajectory: mockDbTrajectory, status: TRAJECTORY_SELECTION_STATUS.MISSING },
-      { hypothesis: 'Banana', trajectory: mockDbTrajectory, status: TRAJECTORY_SELECTION_STATUS.MISSING },
-    ]);
-  });
-
-  it('should set subRows to null if the last subRow is removed', () => {
-    const result = removeRowAndSubRow(dataOnlyChild, 'OnlyChild', 'Parent1');
-    expect(result[0].subRows).toBeNull();
-  });
-
-  it('should not modify data if parentValue does not match', () => {
-    const result = removeRowAndSubRow(data, 'Child1', 'NonExistentParent');
-    expect(result).toEqual(data);
-  });
-
-  it('should not fail if subRows is undefined', () => {
-    const result = removeRowAndSubRow(dataWithChild1, 'Child1', 'Parent1');
-    expect(result[0].subRows).toBeNull();
   });
 });
 
@@ -438,5 +365,142 @@ describe('isMatchingTrajectoryType', () => {
   it('should return false for non-matching trajectory types', () => {
     const matcher = isMatchingTrajectoryType(TRAJECTORY_TYPE.LOAD);
     expect(matcher(TRAJECTORY_TYPE.THERMAL_CAPACITY)).toBe(false);
+  });
+});
+
+describe('getRowDataSelected', () => {
+  const mockData: HypothesisRowData[] = [
+    {
+      hypothesis: 'row0',
+      trajectory: mockDbTrajectory,
+      status: TRAJECTORY_SELECTION_STATUS.OK,
+      subRows: [
+        { hypothesis: 'row0-sub0', trajectory: mockDbTrajectory, status: TRAJECTORY_SELECTION_STATUS.OK },
+        { hypothesis: 'row0-sub1', trajectory: mockDbTrajectory, status: TRAJECTORY_SELECTION_STATUS.OK },
+      ],
+    },
+    {
+      hypothesis: 'row1',
+      trajectory: mockDbTrajectory,
+      status: TRAJECTORY_SELECTION_STATUS.OK,
+    },
+  ];
+
+  it('should return subRow when indexArray has length 2', () => {
+    const result = getRowDataSelected(mockData, [0, 1]);
+    expect(result?.hypothesis).toBe('row0-sub1');
+  });
+
+  it('should return top-level row when indexArray has length 1', () => {
+    const result = getRowDataSelected(mockData, [1]);
+    expect(result?.hypothesis).toBe('row1');
+  });
+
+  it('should return null if subRows is undefined', () => {
+    const result = getRowDataSelected(mockData, [1, 0]);
+    expect(result).toBeNull();
+  });
+
+  it('should return null if indexArray is empty', () => {
+    const result = getRowDataSelected(mockData, []);
+    expect(result).toBeNull();
+  });
+
+  it('should return null if indexArray points to out-of-bound index', () => {
+    const result = getRowDataSelected(mockData, [5]);
+    expect(result).toBeNull();
+  });
+});
+
+describe('getHypothesis', () => {
+  const mockData: HypothesisRowData[] = [
+    {
+      hypothesis: 'AI',
+      trajectory: mockDbTrajectory,
+      status: TRAJECTORY_SELECTION_STATUS.OK,
+      subRows: [
+        { hypothesis: 'Machine Learning', trajectory: mockDbTrajectory, status: TRAJECTORY_SELECTION_STATUS.OK },
+        { hypothesis: 'Deep Learning', trajectory: mockDbTrajectory, status: TRAJECTORY_SELECTION_STATUS.OK },
+      ],
+    },
+    {
+      hypothesis: OTHER_AREAS_LABEL,
+      trajectory: mockDbTrajectory,
+      status: TRAJECTORY_SELECTION_STATUS.OK,
+    },
+  ];
+
+  it('should return parent and sub hypothesis for rowId with two levels', () => {
+    const result = getHypothesis(mockData, '0.1');
+    expect(result).toEqual({
+      hypothesis: 'AI',
+      technology: 'Deep Learning',
+    });
+  });
+
+  it('should return hypothesis and undefined technology for rowId with one level', () => {
+    const result = getHypothesis(mockData, '0');
+    expect(result).toEqual({
+      hypothesis: 'AI',
+      technology: undefined,
+    });
+  });
+
+  it('should return OTHER_AREAS when hypothesis is OTHER_AREAS_LABEL', () => {
+    const result = getHypothesis(mockData, '1');
+    expect(result).toEqual({
+      hypothesis: OTHER_AREAS,
+      technology: undefined,
+    });
+  });
+
+  it('should return undefined values for invalid rowId', () => {
+    const result = getHypothesis(mockData, '5');
+    expect(result).toEqual({
+      hypothesis: undefined,
+      technology: undefined,
+    });
+  });
+});
+
+describe('setNestedData', () => {
+  const initialState: HypothesisRowData[] = [
+    {
+      hypothesis: 'ES',
+      trajectory: mockDbTrajectory,
+      status: TRAJECTORY_SELECTION_STATUS.OK,
+      subRows: [
+        { hypothesis: 'CCGT', trajectory: mockDbTrajectory, status: TRAJECTORY_SELECTION_STATUS.OK },
+        { hypothesis: 'DSR', trajectory: mockDbTrajectory, status: TRAJECTORY_SELECTION_STATUS.OK },
+      ],
+    },
+    {
+      hypothesis: 'CZ',
+      trajectory: mockDbTrajectory,
+      status: TRAJECTORY_SELECTION_STATUS.OK,
+    },
+  ];
+
+  const newData = { trajectory: mockDbTrajectoryAREA, status: TRAJECTORY_SELECTION_STATUS.OK } as Pick<
+    HypothesisRowData,
+    'trajectory' | 'status'
+  >;
+
+  it('should update top-level row', () => {
+    const result = setNestedData(initialState, [1], newData);
+    expect(result[1].trajectory).toStrictEqual(mockDbTrajectoryAREA);
+    expect(result[1].status).toBe(TRAJECTORY_SELECTION_STATUS.OK);
+  });
+
+  it('should update nested subRow', () => {
+    const result = setNestedData(initialState, [0, 1], newData);
+    expect(result[0].subRows?.[1].trajectory).toStrictEqual(mockDbTrajectoryAREA);
+    expect(result[0].subRows?.[1].status).toBe(TRAJECTORY_SELECTION_STATUS.OK);
+  });
+
+  it('should not modify other rows', () => {
+    const result = setNestedData(initialState, [0, 1], newData);
+    expect(result[1]).toEqual(initialState[1]);
+    expect(result[0].subRows?.[0]).toEqual(initialState[0].subRows?.[0]);
   });
 });

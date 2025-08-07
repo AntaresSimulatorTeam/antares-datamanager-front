@@ -1,4 +1,4 @@
-import { DbTrajectory, HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
+import { DbTrajectory, FsTrajectory, HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { mockWarningMessagesWithTwo } from '@/mocks/data/tests/warning.mock.ts';
@@ -10,7 +10,7 @@ export const mockDataBaseTrajectory = (type: TRAJECTORY_TYPE, id: number, area: 
   version: 1,
   userName: 'CB',
   creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-  loadArea: area,
+  area,
 });
 
 export const mockDbTrajectory: DbTrajectory = {
@@ -20,10 +20,10 @@ export const mockDbTrajectory: DbTrajectory = {
   version: 6,
   userName: 'mouad',
   creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-  loadArea: 'AT',
+  area: 'AT',
 };
 
-export const mockTrajectoryTwo = [
+export const mockTrajectoryTwo: DbTrajectory[] = [
   {
     id: 1,
     trajectoryName: 'area_PB_2024',
@@ -31,7 +31,7 @@ export const mockTrajectoryTwo = [
     version: 3,
     userName: 'mouad',
     creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-    loadArea: 'AT',
+    area: 'AT',
   },
   {
     id: 2,
@@ -40,7 +40,7 @@ export const mockTrajectoryTwo = [
     version: 3,
     userName: 'mouad',
     creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
-    loadArea: 'BE',
+    area: 'BE',
   },
 ];
 
@@ -51,7 +51,7 @@ export const mockDbTrajectoryAREA: DbTrajectory = {
   version: 6,
   userName: 'mouad',
   creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-  loadArea: 'AT',
+  area: 'AT',
 };
 
 export const mockDbTrajectoryLINK: DbTrajectory = {
@@ -61,7 +61,7 @@ export const mockDbTrajectoryLINK: DbTrajectory = {
   version: 6,
   userName: 'mouad',
   creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-  loadArea: 'AT',
+  area: 'AT',
 };
 
 export const mockPrevStateArea = () => ({
@@ -106,7 +106,7 @@ export const mockRowDataTrajectoryC: HypothesisRowData = {
   status: TRAJECTORY_SELECTION_STATUS.MISSING,
 };
 
-export const mockDbTrajectoryArray = [
+export const mockDbTrajectoryArray: DbTrajectory[] = [
   {
     id: 1,
     trajectoryName: 'area_PB_2024',
@@ -114,7 +114,7 @@ export const mockDbTrajectoryArray = [
     version: 3,
     userName: 'mouad',
     creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-    loadArea: 'AT',
+    area: 'AT',
   },
   {
     id: 2,
@@ -123,11 +123,11 @@ export const mockDbTrajectoryArray = [
     version: 3,
     userName: 'mouad',
     creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
-    loadArea: 'BE',
+    area: 'BE',
   },
 ];
 
-export const mockDbTrajectoryArrayLoad = [
+export const mockDbTrajectoryArrayLoad: DbTrajectory[] = [
   {
     id: 1,
     trajectoryName: 'area_PB_2024',
@@ -135,7 +135,7 @@ export const mockDbTrajectoryArrayLoad = [
     version: 3,
     userName: 'mouad',
     creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-    loadArea: 'AT',
+    area: 'AT',
   },
   {
     id: 2,
@@ -144,11 +144,11 @@ export const mockDbTrajectoryArrayLoad = [
     version: 3,
     userName: 'mouad',
     creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
-    loadArea: 'BE',
+    area: 'BE',
   },
 ];
 
-export const mockEmptyDbTrajectoryArrayLoad = [
+export const mockEmptyDbTrajectoryArrayLoad: DbTrajectory[] = [
   {
     id: 1,
     trajectoryName: '',
@@ -156,7 +156,7 @@ export const mockEmptyDbTrajectoryArrayLoad = [
     version: 0,
     userName: 'mouad',
     creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-    loadArea: 'ES',
+    area: 'ES',
   },
   {
     id: 2,
@@ -165,11 +165,11 @@ export const mockEmptyDbTrajectoryArrayLoad = [
     version: 0,
     userName: 'mouad',
     creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
-    loadArea: 'DEkf',
+    area: 'DEkf',
   },
 ];
 
-export const mockDbTrajectoryArrayWithDuplicate = [
+export const mockDbTrajectoryArrayWithDuplicate: DbTrajectory[] = [
   {
     id: 1,
     trajectoryName: 'area_PB_2024',
@@ -177,7 +177,7 @@ export const mockDbTrajectoryArrayWithDuplicate = [
     version: 3,
     userName: 'mouad',
     creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-    loadArea: 'AT',
+    area: 'AT',
   },
   {
     id: 2,
@@ -186,7 +186,7 @@ export const mockDbTrajectoryArrayWithDuplicate = [
     version: 3,
     userName: 'mouad',
     creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
-    loadArea: 'BE',
+    area: 'BE',
   },
   {
     id: 1,
@@ -195,7 +195,7 @@ export const mockDbTrajectoryArrayWithDuplicate = [
     version: 3,
     userName: 'mouad',
     creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-    loadArea: 'AT',
+    area: 'AT',
   },
   {
     id: 1,
@@ -204,11 +204,11 @@ export const mockDbTrajectoryArrayWithDuplicate = [
     version: 3,
     userName: 'mouad',
     creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-    loadArea: 'AT',
+    area: 'AT',
   },
 ];
 
-export const mockFsTrajectoryAreaArray = [
+export const mockFsTrajectoryAreaArray: FsTrajectory[] = [
   {
     trajectoryName: 'area_BP_2028.xlsx',
     type: TRAJECTORY_TYPE.AREA,
@@ -226,7 +226,7 @@ export const mockFsTrajectoryAreaArray = [
   },
 ];
 
-export const mockFsTrajectoryLoadArray = [
+export const mockFsTrajectoryLoadArray: FsTrajectory[] = [
   {
     trajectoryName: 'BP23_TEST_LOAD',
     type: TRAJECTORY_TYPE.LOAD,
@@ -249,7 +249,7 @@ export const mockFsTrajectoryLoadArray = [
   },
 ];
 
-export const mockFsTrajectoryThermalCapacityArray = [
+export const mockFsTrajectoryThermalCapacityArray: FsTrajectory[] = [
   {
     trajectoryName: 'FR_BP23_A-ref_FR',
     type: TRAJECTORY_TYPE.THERMAL_CAPACITY,
@@ -302,22 +302,22 @@ export const mockTrajectoryAreaData: TrajectoryAreaData[] = [
 
 export const mockDefaultArea = [{ name: 'FR' }];
 
-export const mockEmptyDbTrajectoryLoadOthers = {
+export const mockEmptyDbTrajectoryLoadOthers: DbTrajectory = {
   id: 1,
   trajectoryName: '',
   type: TRAJECTORY_TYPE.LOAD,
   version: 0,
   userName: 'mouad',
   creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-  loadArea: 'OTHERS',
+  area: 'OTHERS',
 };
 
-export const mockEmptyDbTrajectoryLoadFR = {
+export const mockEmptyDbTrajectoryLoadFR: DbTrajectory = {
   id: 1,
   trajectoryName: '',
   type: TRAJECTORY_TYPE.LOAD,
   version: 0,
   userName: 'mouad',
   creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-  loadArea: 'FR',
+  area: 'FR',
 };

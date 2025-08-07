@@ -54,7 +54,7 @@ const getEditableHypothesisTableHeaders = (
               setErrorInfo({ index: row.index, message: '' });
               void options?.meta?.updateData?.(
                 row.id,
-                trajectory.id,
+                trajectory?.trajectoryName,
                 status === TRAJECTORY_SELECTION_STATUS.ERROR ? 'emptyError' : 'empty',
               );
             }}
@@ -65,7 +65,7 @@ const getEditableHypothesisTableHeaders = (
           <SelectInputWithButton
             onSelect={(value: SelectOption) => {
               setErrorInfo({ index: row.index, message: '' });
-              void options?.meta?.updateData?.(row.id, value.id, 'success', value.label);
+              void options?.meta?.updateData?.(row.id, value.label, 'success');
             }}
             onSearch={async (value?: string) =>
               await options?.meta?.search?.(

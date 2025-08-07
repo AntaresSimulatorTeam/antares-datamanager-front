@@ -10,10 +10,12 @@ import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import {
   fetchTrajectoriesFromDB,
   fetchTrajectoriesFromFS,
+  getDefaultLoadHypothesis,
   getNbMessagesFromTrajectoryType,
   getStudyTrajectoriesWithWarnings,
   getTrajectoryDataByTypeAndId,
-  linkTrajectoryToStudy, unlinkAllTrajectoriesFromStudy,
+  linkTrajectoryToStudy,
+  unlinkAllTrajectoriesFromStudy,
   unlinkTrajectoryFromStudy,
   uploadTrajectory,
 } from '@/shared/services/trajectoryService.ts';
@@ -101,57 +103,6 @@ describe('fetchTrajectoriesFromFS', () => {
     await expect(async () => fetchTrajectoriesFromFS(TRAJECTORY_TYPE.AREA)).rejects.toThrowError(
       'Failed to fetch trajectories from file system',
     );
-  });
-});
-
-describe('uploadTrajectory', () => {
-  const onProgress = vi.fn();
-  const requestOptions = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  };
-
-  beforeEach(() => {
-    vi.stubGlobal('JSON', {
-      parse: (text: string) => ({ message: text }),
-      stringify: (text: string) => text,
-    });
-  });
-
-  afterEach(() => {
-    vi.unstubAllGlobals();
-    vi.clearAllMocks();
-  });
-
-  it('should import trajectory to data base', async () => {
-    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
-      ok: true,
-      json: async () => Promise.resolve(mockDbTrajectory),
-    });
-
-    await uploadTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026', 2, 'FR', onProgress);
-
-    await waitFor(() => {
-      expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
-      expect(AuthService.authFetch).toHaveBeenCalledWith(
-        `https://mockapi.com/v1/trajectory?trajectoryType=AREA&trajectoryToUse=area_BP_23_v6&horizon=2025-2026&studyId=2`,
-        requestOptions,
-      );
-    });
-  });
-
-  it('should handle fetch failure gracefully', async () => {
-    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
-      antaresErrorMessage: 'Failed to import trajectory to data base',
-      date: new Date(),
-      type: ERROR_MESSAGE_TYPE.BUSINESS,
-    });
-
-    await expect(async () =>
-      uploadTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026', 2, 'FR', onProgress),
-    ).rejects.toThrowError('Failed to import trajectory to data base');
   });
 });
 
@@ -267,7 +218,7 @@ describe('unlinkAllTrajectoriesFromStudy', () => {
     });
 
     await expect(async () => unlinkAllTrajectoriesFromStudy(studyId)).rejects.toThrowError(
-      'Failed to unlink all trajectories'
+      'Failed to unlink all trajectories',
     );
   });
 });
@@ -381,10 +332,150 @@ describe('getStudyTrajectoriesWithWarnings', () => {
       type: ERROR_MESSAGE_TYPE.BUSINESS,
     });
 
-    //vi.mocked(getStudyTrajectories).mockRejectedValueOnce(new Error('Failed to fetch warning message'));
-
     await expect(async () => getStudyTrajectoriesWithWarnings(5)).rejects.toThrowError(
       'Failed to fetch warning message',
     );
+  });
+});
+
+describe('getDefaultLoadHypothesis', () => {
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should fetch default hypothesis', async () => {
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
+      ok: true,
+      json: async () => Promise.resolve({ name: 'FR' }),
+    });
+
+    const result = await getDefaultLoadHypothesis();
+
+    await waitFor(() => {
+      expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
+      expect(AuthService.authFetch).toHaveBeenCalledWith('https://mockapi.com/v1/default_config/load');
+      expect(result).toEqual({ name: 'FR' });
+    });
+  });
+
+  it('should throw error when data fetching failed', async () => {
+    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
+      antaresErrorMessage: 'Failed to fetch default hypothesis',
+      date: new Date(),
+      type: ERROR_MESSAGE_TYPE.BUSINESS,
+    });
+
+    await expect(async () => getDefaultLoadHypothesis()).rejects.toThrowError('Failed to fetch default hypothesis');
+  });
+});
+
+describe('uploadTrajectory', () => {
+  const onProgress = vi.fn();
+  const requestOptions = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+
+  beforeEach(() => {
+    vi.stubGlobal('JSON', {
+      parse: (text: string) => ({ message: text }),
+      stringify: (text: string) => text,
+    });
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.clearAllMocks();
+  });
+
+  it('should import trajectory to data base', async () => {
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
+      ok: true,
+      json: async () => Promise.resolve(mockDbTrajectory),
+    });
+
+    await uploadTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026', 2, 'FR', onProgress);
+
+    await waitFor(() => {
+      expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
+      expect(AuthService.authFetch).toHaveBeenCalledWith(
+        `https://mockapi.com/v1/trajectory?trajectoryType=AREA&trajectoryToUse=area_BP_23_v6&horizon=2025-2026&studyId=2`,
+        requestOptions,
+      );
+    });
+  });
+
+  it('should import trajectory to data base', async () => {
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
+      ok: true,
+      json: async () => Promise.resolve(mockDbTrajectory),
+    });
+
+    await uploadTrajectory(TRAJECTORY_TYPE.LOAD, 'area_BP_23_v6', '2025-2026', 2, 'FR', onProgress);
+
+    await waitFor(() => {
+      expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
+      expect(AuthService.authFetch).toHaveBeenCalledWith(
+        `https://mockapi.com/v1/trajectory/load?area=FR&trajectoryToUse=area_BP_23_v6&horizon=2025-2026&studyId=2`,
+        requestOptions,
+      );
+    });
+  });
+
+  it.skip('should import trajectory without technology into data base', async () => {
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
+      ok: true,
+      json: async () => Promise.resolve(mockDbTrajectory),
+    });
+
+    await uploadTrajectory(TRAJECTORY_TYPE.THERMAL_CAPACITY, 'area_BP_23_v6', '2025-2026', 2, 'FR', onProgress, true);
+
+    await waitFor(() => {
+      expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
+      expect(AuthService.authFetch).toHaveBeenCalledWith(
+        `https://mockapi.com/v1/trajectory?area=FR&trajectoryToUse=area_BP_23_v6&horizon=2025-2026&studyId=2&isCivilYear=true&technology=`,
+        requestOptions,
+      );
+    });
+  });
+
+  it.skip('should import trajectory with technology into data base', async () => {
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
+      ok: true,
+      json: async () => Promise.resolve(mockDbTrajectory),
+    });
+
+    await uploadTrajectory(
+      TRAJECTORY_TYPE.THERMAL_CAPACITY,
+      'area_BP_23_v6',
+      '2025-2026',
+      2,
+      'FR',
+      onProgress,
+      true,
+      'Nuclear',
+    );
+
+    await waitFor(() => {
+      expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
+      expect(AuthService.authFetch).toHaveBeenCalledWith(
+        `https://mockapi.com/v1/trajectory?area=CZ&trajectoryToUse=area_BP_23_v6&horizon=2025-2026&studyId=2&isCivilYear=true&technology=Nuclear`,
+        requestOptions,
+      );
+    });
+  });
+
+  it('should handle fetch failure gracefully', async () => {
+    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
+      antaresErrorMessage: 'Failed to import trajectory to data base',
+      date: new Date(),
+      type: ERROR_MESSAGE_TYPE.BUSINESS,
+    });
+
+    await expect(async () =>
+      uploadTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026', 2, 'FR', onProgress),
+    ).rejects.toThrowError('Failed to import trajectory to data base');
   });
 });

@@ -53,16 +53,17 @@ export const buildErrorTrajectory = (
   type: TRAJECTORY_TYPE,
   trajectoryId: number,
   trajectoryLabel: string,
-  userName?: string,
-  area?: string,
+  userName: string | null,
+  area: string | null,
 ): DbTrajectory => ({
   id: trajectoryId,
   trajectoryName: trajectoryLabel,
+  technology: '',
   type,
   version: 0,
   userName: userName ?? 'unknown_user',
   creationDate: new Date(),
-  loadArea: area,
+  area,
   state: TRAJECTORY_SELECTION_STATUS.ERROR,
 });
 
@@ -73,7 +74,7 @@ export const buildErrorTrajectory = (
  */
 export const removeDuplicate = (array?: DbTrajectory[]): DbTrajectory[] =>
   (array || []).reduce((acc: DbTrajectory[], current: DbTrajectory) => {
-    const x = acc.find((item) => item.loadArea === current.loadArea);
+    const x = acc.find((item) => item.area === current.area);
     if (!x) {
       acc.push(current);
     }
@@ -111,18 +112,19 @@ export const buildRowData = (areaName: string, isDefault: boolean, trajectory?: 
 
 /**
  * Create empty data base trajectory
- * @param {string} areaName
+ * @param {string} area
  * @param type
  * @return {DbTrajectory}
  */
-export const buildEmptyTrajectory = (areaName: string, type: TRAJECTORY_TYPE): DbTrajectory => ({
+export const buildEmptyTrajectory = (area: string, type: TRAJECTORY_TYPE): DbTrajectory => ({
   id: generateId(),
   trajectoryName: '',
   type,
   version: 0,
   userName: 'user',
   creationDate: new Date(),
-  loadArea: areaName,
+  area,
+  technology: '',
   state: TRAJECTORY_SELECTION_STATUS.MISSING,
 });
 
@@ -144,21 +146,26 @@ export const buildRowWithSubRowsData = (
   }[],
   areasNotInTrajectoryArea?: string[],
 ): HypothesisRowData => ({
-  hypothesis: trajectory.loadArea === OTHER_AREAS ? OTHER_AREAS_LABEL : (trajectory.loadArea as string),
-  trajectory: trajectory ?? null,
-  status: trajectory.trajectoryName ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+  hypothesis: trajectory.area === OTHER_AREAS ? OTHER_AREAS_LABEL : (trajectory.area as string),
+  trajectory: trajectory.trajectoryName && trajectory.technology?.length === 0 ? trajectory : null,
+  status:
+    trajectory.trajectoryName && trajectory.technology.length === 0
+      ? TRAJECTORY_SELECTION_STATUS.OK
+      : TRAJECTORY_SELECTION_STATUS.MISSING,
   isDefault:
-    defaultAreas?.some((item: { name: string }) => item.name === trajectory.loadArea) ||
-    OTHER_AREAS === trajectory.loadArea,
+    defaultAreas?.some((item: { name: string }) => item.name === trajectory.area) || OTHER_AREAS === trajectory.area,
   subRows:
-    trajectory.loadArea !== OTHER_AREAS && !areasNotInTrajectoryArea?.some((item) => item === trajectory.loadArea)
-      ? subRowOptions.map((option) => ({
-          hypothesis: option,
-          trajectory: null,
-          status: TRAJECTORY_SELECTION_STATUS.MISSING,
-          isDefault: true,
-          subRows: null,
-        }))
+    trajectory.area !== OTHER_AREAS && !areasNotInTrajectoryArea?.some((item) => item === trajectory.area)
+      ? subRowOptions.map((option) => {
+          const hasTechnology = trajectory?.trajectoryName && option === trajectory?.technology;
+          return {
+            hypothesis: option,
+            trajectory: hasTechnology ? trajectory : null,
+            status: hasTechnology ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+            isDefault: true,
+            subRows: null,
+          };
+        })
       : null,
 });
 
@@ -217,34 +224,6 @@ export const addNestedRow = (
     }
   });
 
-/**
- * Remove and sub row if parent is checked
- * @param {HypothesisRowData[]} data
- * @param {string} value
- * @param {string} parentValue
- * @return {HypothesisRowData[]}
- */
-export const removeRowAndSubRow = (
-  data: HypothesisRowData[],
-  value: string,
-  parentValue: string,
-): HypothesisRowData[] =>
-  data.map((item) => {
-    if (item.hypothesis === parentValue) {
-      const itemsSubRows = item.subRows
-        ? [...item.subRows.filter((subRow) => subRow.hypothesis !== value)].sort((a, b) =>
-            a.hypothesis.localeCompare(b.hypothesis),
-          )
-        : item.subRows;
-      return {
-        ...item,
-        subRows: itemsSubRows?.length ? itemsSubRows : null,
-      };
-    } else {
-      return item;
-    }
-  });
-
 export const getStudyMenu = (t: (value: string) => string, isTrajectoryAreaLinked: boolean): HypothesisTab[] => [
   {
     name: TRAJECTORY_TYPE.AREA,
@@ -271,8 +250,8 @@ export const getStudyMenu = (t: (value: string) => string, isTrajectoryAreaLinke
 export const isMatchingTrajectoryType = (trajectoryKey: TRAJECTORY_TYPE) => (trajectoryType: TRAJECTORY_TYPE) =>
   trajectoryType === trajectoryKey;
 
-export const getRowDataSelected = (data: HypothesisRowData[], indexArray: number[]): HypothesisRowData | undefined =>
-  indexArray.length === 2 ? data[indexArray[0]].subRows?.[indexArray[1]] : data[indexArray[0]];
+export const getRowDataSelected = (data: HypothesisRowData[], indexArray: number[]): HypothesisRowData | null =>
+  indexArray.length === 2 ? (data[indexArray[0]].subRows?.[indexArray[1]] ?? null) : (data[indexArray[0]] ?? null);
 
 /**
  * Retrieves the hypothesis and technology values based on selected row data.
@@ -288,11 +267,8 @@ export const getHypothesis = (
   data: HypothesisRowData[],
   rowId: string,
 ): { hypothesis: string | undefined; technology: string | undefined } => {
-  const dataRowSelected = getRowDataSelected(
-    data,
-    rowId.split('.').map((item) => parseInt(item)),
-  );
   const indexArray = rowId.split('.').map((item) => parseInt(item));
+  const dataRowSelected = getRowDataSelected(data, indexArray);
   if (indexArray.length === 2) {
     return { hypothesis: data[indexArray[0]]?.hypothesis, technology: dataRowSelected?.hypothesis };
   } else {
@@ -309,7 +285,7 @@ export const setNestedData = (
   newEmptyTrajectory: Pick<HypothesisRowData, 'trajectory' | 'status'>,
 ) =>
   state.map((item, index) => {
-    if (rowSelected.length === 2 && index === rowSelected[1]) {
+    if (rowSelected.length === 2 && index === rowSelected[0]) {
       return {
         ...item,
         subRows: item.subRows?.map((subItem, subIndex) =>

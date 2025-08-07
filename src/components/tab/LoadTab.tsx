@@ -73,6 +73,7 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
   const [isDeletionModalOpen, setIsDeletionModalOpen] = useState(false);
   const [rowIdSelected, setRowIdSelected] = useState<number>(0);
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
+  const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const [rowToDelete, setRowToDelete] = useState<{ index: number; value?: string } | null>(null);
   const [progress, setProgress] = useState(0);
   const [fileStatus, setFileStatus] = useState<FileInputStatus>('empty');
@@ -97,7 +98,7 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
         if (defaultAreas.length > 0) {
           const checkList = hypothesisTrajectories
             .map((trajectory) => {
-              if (trajectory.loadArea) return trajectory.loadArea;
+              if (trajectory.area) return trajectory.area;
             })
             .filter(Boolean) as string[];
           setCheckedValues(defaultAreas.map((item) => item.name).concat(checkList));
@@ -107,11 +108,11 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
         if (hypothesisTrajectories.length > 0) {
           const areaData = hypothesisTrajectories
             .map((trajectory: DbTrajectory) => {
-              if (trajectory.loadArea) {
+              if (trajectory.area) {
                 return buildRowData(
-                  trajectory.loadArea,
-                  defaultAreas.some((item: { name: string }) => item.name === trajectory.loadArea) ||
-                    trajectory.loadArea === OTHER_AREAS,
+                  trajectory.area,
+                  defaultAreas.some((item: { name: string }) => item.name === trajectory.area) ||
+                    trajectory.area === OTHER_AREAS,
                   trajectory,
                 );
               }
@@ -169,7 +170,7 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
       TRAJECTORY_TYPE.LOAD,
       trajectoryId,
       trajectoryLabel,
-      user?.profile?.sub,
+      user?.profile?.sub ?? null,
       data[rowIndex]?.hypothesis,
     );
     setData((prev) =>
@@ -197,66 +198,60 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
     });
   };
 
-  const handleTrajectoryUpdate = async (
-    rowIndex: number,
-    trajectoryId: number,
-    status?: RowStatus,
-    trajectoryLabel?: string,
-    errorMessage?: string,
-  ) => {
+  const handleTrajectoryUpdate = async (rowIndex: number, status: RowStatus, trajectory: DbTrajectory) => {
     try {
-      if ((status === 'empty' && data[rowIndex].trajectory) || (status === 'emptyError' && data[rowIndex].trajectory)) {
-        if (status === 'empty') {
-          await unlinkTrajectoryFromStudy(trajectoryId, study.id);
-        }
-        const warningMessages = await fetchWarningMessagesFromType(TRAJECTORY_TYPE.LOAD, study.id);
-        dispatch?.({
-          type: STUDY_ACTION.UPDATE_TRAJECTORY,
-          payload: { trajectory: data[rowIndex].trajectory, warningMessages, status },
-        });
-        setData((prev) =>
-          prev.map((item, index) =>
-            index === rowIndex
-              ? {
-                  ...item,
-                  trajectory: null,
-                  status: TRAJECTORY_SELECTION_STATUS.MISSING,
-                }
-              : item,
-          ),
-        );
-      } else if (status === 'success') {
-        await linkTrajectoryToStudy(TRAJECTORY_TYPE.LOAD, trajectoryId, study.id);
-        const result = await getStudyTrajectoriesWithWarnings(study.id, TRAJECTORY_TYPE.LOAD);
-        const newTrajectory = result?.trajectories?.find((trajectory) => {
-          if (data[rowIndex].hypothesis === OTHER_AREAS_LABEL) {
-            return trajectory.loadArea === OTHER_AREAS;
-          } else {
-            return trajectory.loadArea === data[rowIndex].hypothesis;
-          }
-        });
-        if (newTrajectory) {
-          const payloadResult = { trajectory: newTrajectory, warningMessages: result.warningMessages, status };
-          dispatch?.({ type: STUDY_ACTION.UPDATE_TRAJECTORY, payload: payloadResult });
-        }
-        setData((prev) =>
-          prev.map((item, index) =>
-            index === rowIndex
-              ? {
-                  ...item,
-                  trajectory: newTrajectory ?? null,
-                  status: newTrajectory ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
-                }
-              : item,
-          ),
-        );
+      await linkTrajectoryToStudy(TRAJECTORY_TYPE.LOAD, trajectory.id, study.id);
+      const result = await getStudyTrajectoriesWithWarnings(study.id, TRAJECTORY_TYPE.LOAD);
+      const newTrajectory = result?.trajectories?.find((resultTrajectory) => resultTrajectory.id === trajectory.id);
+      if (newTrajectory) {
+        const payloadResult = { trajectory: newTrajectory, warningMessages: result.warningMessages, status };
+        dispatch?.({ type: STUDY_ACTION.UPDATE_TRAJECTORY, payload: payloadResult });
       }
-      if (rowIndex != null && status === 'error' && trajectoryId != null && trajectoryLabel && !!errorMessage) {
-        handleTrajectoryError(rowIndex, trajectoryId, trajectoryLabel, errorMessage);
-      }
+      const newEmptyTrajectory = {
+        trajectory: newTrajectory ?? null,
+        status: newTrajectory ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+      };
+      setData((prev) =>
+        prev.map((item, index) =>
+          index === rowIndex
+            ? {
+                ...item,
+                ...newEmptyTrajectory,
+              }
+            : item,
+        ),
+      );
     } catch (error) {
       if (rowIndex != null) {
-        handleTrajectoryError(rowIndex, trajectoryId, trajectoryLabel ?? '', (error as Error).message);
+        handleTrajectoryError(rowIndex, trajectory.id, trajectory.trajectoryName, (error as Error).message);
+      }
+    }
+  };
+
+  const handleTrajectoryDeletion = async (rowIndex: number, status: RowStatus, trajectory: DbTrajectory) => {
+    try {
+      if (status === 'empty') {
+        await unlinkTrajectoryFromStudy(trajectory.id, study.id);
+      }
+      const warningMessages = await fetchWarningMessagesFromType(TRAJECTORY_TYPE.LOAD, study.id);
+      dispatch?.({
+        type: STUDY_ACTION.UPDATE_TRAJECTORY,
+        payload: { trajectory, warningMessages, status },
+      });
+      setData((prev) =>
+        prev.map((item, index) =>
+          index === rowIndex
+            ? {
+                ...item,
+                trajectory: null,
+                status: TRAJECTORY_SELECTION_STATUS.MISSING,
+              }
+            : item,
+        ),
+      );
+    } catch (error) {
+      if (rowIndex != null) {
+        handleTrajectoryError(rowIndex, trajectory.id, trajectory.trajectoryName, (error as Error).message);
       }
     }
   };
@@ -277,11 +272,11 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
       );
       setFileStatus('success');
       if (newTrajectory.id != null) {
-        await handleTrajectoryUpdate(rowIdSelected, newTrajectory.id, 'success', newTrajectory.trajectoryName);
+        await handleTrajectoryUpdate(rowIdSelected, 'success', newTrajectory);
       }
     } catch (error) {
       setFileStatus('error');
-      await handleTrajectoryUpdate(rowIdSelected, value.id, 'error', value.label, (error as Error)?.message);
+      handleTrajectoryError(rowIdSelected, value.id, value.label, (error as Error)?.message);
     }
   };
 
@@ -289,6 +284,7 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
     async (value?: string, area?: string): Promise<SelectOption[] | undefined> => {
       try {
         const results = await fetchTrajectoriesFromDB(TRAJECTORY_TYPE.LOAD, study.horizon, value, area);
+        setDbTrajectories(results);
         return convertToSelectionOptionType(results);
       } catch {
         // silent handler
@@ -411,9 +407,15 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
             handleSearch={handleTrajectorySearch}
             handleImport={async (rowId: string) => await handleFetchTrajectoriesFS(rowId)}
             removeRow={(value: string, rowId?: string) => void removeRow(value, Number(rowId))}
-            updateData={(rowId: string, value: unknown, status?: RowStatus, label?: string) =>
-              void handleTrajectoryUpdate(Number(rowId), value as number, status, label)
-            }
+            updateData={(rowId: string, value: unknown, status: RowStatus) => {
+              const trajectory = data[Number(rowId)]?.trajectory;
+              if ((status === 'empty' && trajectory) || (status === 'emptyError' && trajectory)) {
+                void handleTrajectoryDeletion(Number(rowId), status, trajectory);
+              } else if (status === 'success') {
+                const dbTrajectory = dbTrajectories.find((item) => item.trajectoryName === value) ?? trajectory;
+                if (dbTrajectory) void handleTrajectoryUpdate(Number(rowId), status, dbTrajectory);
+              }
+            }}
             isReadOnlyEnable={true}
           />
         </div>

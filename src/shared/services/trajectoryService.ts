@@ -13,8 +13,8 @@ import {
   TRAJECTORY_FILE_SYSTEM_ENDPOINT,
   TRAJECTORY_LINK_TO_STUDY_ENDPOINT,
   TRAJECTORY_THERMAL_INSTALLED_POWER_IMPORT,
-  TRAJECTORY_UNLINK_TO_STUDY_ENDPOINT,
   TRAJECTORY_UNLINK_ALL_TO_STUDY_ENDPOINT,
+  TRAJECTORY_UNLINK_TO_STUDY_ENDPOINT,
 } from '@/shared/const/apiEndPoint.ts';
 import {
   BackendError,
@@ -84,47 +84,9 @@ export const fetchTrajectoriesFromFS = async (
 };
 
 /**
- * Import a trajectory file into database
+ * Asynchronously uploads a trajectory into the data base and tracks the progress of the operation.
  *
- * @param {TRAJECTORY_TYPE} trajectoryType - Trajectory type
- * @param {string} trajectoryName - Name of trajectory to add to data base
- * @param {string} horizon - Study horizon
- * @param {number} studyId - Study id
- * @param {(progress: number) => void} onProgress - Set progress value
- * @param {string | undefined} area - Area to use in thermal capacity case
- * @returns {Promise<DbTrajectory>} - Promise object that represents a trajectory inserted into database
- */
-export const uploadTrajectory = async (
-  trajectoryType: TRAJECTORY_TYPE,
-  trajectoryName: string,
-  horizon: string,
-  studyId: number,
-  area: string | undefined,
-  onProgress: (progress: number) => void,
-): Promise<DbTrajectory> => {
-  const urlApi = `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
-  const urlLoadApi = `${TRAJECTORY_ENDPOINT}/load?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
-  try {
-    const response = await fetchWithProgress(
-      trajectoryType === TRAJECTORY_TYPE.LOAD ? urlLoadApi : urlApi,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      },
-      onProgress,
-    );
-
-    return (await response.json()) as DbTrajectory;
-  } catch (error) {
-    throw new Error((error as Error)?.message ?? '');
-  }
-};
-
-/**
- * Asynchronously uploads a trajectory with the given parameters and tracks the progress of the operation.
- *
+ * @param {TRAJECTORY_TYPE} trajectoryType - Type of the trajectory (AREA, LINK, LOAD...)
  * @param {string | undefined} area - The geographical area associated with the trajectory, may be undefined.
  * @param {string} trajectoryName - The name of the trajectory to be uploaded.
  * @param {string} horizon - The time horizon associated with the trajectory.
@@ -135,16 +97,24 @@ export const uploadTrajectory = async (
  * @returns {Promise<DbTrajectory>} A promise that resolves to the uploaded trajectory object.
  * @throws {Error} If the upload process fails or an invalid response is encountered.
  */
-export const uploadTrajectoryWithTechnology = async (
-  area: string | undefined,
+export const uploadTrajectory = async (
+  trajectoryType: TRAJECTORY_TYPE,
   trajectoryName: string,
   horizon: string,
   studyId: number,
-  isCivilYear: boolean,
+  area: string | undefined,
   onProgress: (progress: number) => void,
+  isCivilYear?: boolean,
   technology?: string,
 ): Promise<DbTrajectory> => {
-  const urlApi = `${TRAJECTORY_THERMAL_INSTALLED_POWER_IMPORT}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}&technology=${technology ?? ''}`;
+  let urlApi;
+  if (trajectoryType === TRAJECTORY_TYPE.LOAD) {
+    urlApi = `${TRAJECTORY_ENDPOINT}/load?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
+  } else if (trajectoryType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
+    urlApi = `${TRAJECTORY_THERMAL_INSTALLED_POWER_IMPORT}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}&technology=${technology ?? ''}`;
+  } else {
+    urlApi = `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
+  }
 
   try {
     const response = await fetchWithProgress(

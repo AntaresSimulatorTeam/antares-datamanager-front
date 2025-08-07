@@ -28,7 +28,7 @@ interface PegaseHypothesisTableProps {
   handleImport: (rowId: string) => Promise<void>;
   isReadOnlyEnable?: boolean;
   removeRow?: (value: string, rowId?: string) => void | Promise<void>;
-  updateData?: (rowId: string, value: unknown, status?: RowStatus, label?: string) => void;
+  updateData?: (rowId: string, value: unknown, status: RowStatus) => void;
   columnHeader?: string;
 }
 type ExpandedState = true | Record<string, boolean>;
@@ -87,9 +87,7 @@ export const PegaseHypothesisTable = ({
         removeRow={(value: string, rowId?: string) => {
           void removeRow?.(value, rowId);
         }}
-        updateData={(rowId: string, value: unknown, status?: RowStatus, label?: string) =>
-          void updateData?.(rowId, value, status, label)
-        }
+        updateData={(rowId: string, value: unknown, status: RowStatus) => void updateData?.(rowId, value, status)}
       />
     </div>
   );

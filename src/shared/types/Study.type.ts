@@ -4,11 +4,11 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { DbTrajectory } from '@/shared/types/Trajectory.type.ts';
+import { DbTrajectory, RowStatus } from '@/shared/types/Trajectory.type.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
-import { FileInputStatus, WarningMessage } from '@/shared/types';
+import { WarningMessage } from '@/shared/types';
 
 export interface StudyDTO {
   id: number;
@@ -53,7 +53,7 @@ export type StudyActionType =
   | { type: STUDY_ACTION.DELETE_TRAJECTORY; payload: { area: string; type: TRAJECTORY_TYPE } }
   | {
       type: STUDY_ACTION.UPDATE_TRAJECTORY;
-      payload: { trajectory: DbTrajectory; warningMessages: WarningMessage[]; status: FileInputStatus };
+      payload: { trajectory: DbTrajectory; warningMessages: WarningMessage[]; status: RowStatus };
     }
   | { type: STUDY_ACTION.SET_STUDY_STATUS; payload: StudyStatus }
   | {

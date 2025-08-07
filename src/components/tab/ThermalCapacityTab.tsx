@@ -14,6 +14,7 @@ import {
   LocationStudy,
   RowStatus,
   SelectOption,
+  StudyTrajectoriesData,
   TrajectoryAreaData,
 } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
@@ -32,7 +33,6 @@ import {
 } from '@/shared/utils/trajectoryUtils.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
-import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
@@ -43,7 +43,7 @@ import {
   getStudyTrajectoriesWithWarnings,
   linkTrajectoryToStudy,
   unlinkTrajectoryFromStudy,
-  uploadTrajectoryWithTechnology,
+  uploadTrajectory,
 } from '@/shared/services/trajectoryService.ts';
 import { convertToFSSelectionOptionType, convertToSelectionOptionType } from '@/shared/utils/formFormatter.ts';
 import { useLocation } from 'react-router-dom';
@@ -79,6 +79,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
+  const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const [rowToDelete, setRowToDelete] = useState<{ index: number; value?: string } | null>(null);
   const [isDeletionModalOpen, setIsDeletionModalOpen] = useState(false);
   const { hypothesisTrajectories } = useFetchHypothesisTrajectories(
@@ -102,7 +103,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
 
         const areaData = hypothesisTrajectories
           .map((trajectory) => {
-            if (trajectory.loadArea) {
+            if (trajectory.area) {
               return buildRowWithSubRowsData(
                 trajectory,
                 ThermalOptions,
@@ -194,7 +195,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
     if (isChecked) {
       addRow(value);
     } else {
-      void removeRow(value);
+      await removeRow(value);
     }
   };
 
@@ -218,6 +219,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
     async (value?: string, area?: string): Promise<SelectOption[] | undefined> => {
       try {
         const results = await fetchTrajectoriesFromDB(TRAJECTORY_TYPE.THERMAL_CAPACITY, study.horizon, value, area);
+        setDbTrajectories(results);
         return convertToSelectionOptionType(results);
       } catch {
         // silent handler
@@ -237,8 +239,8 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
       TRAJECTORY_TYPE.THERMAL_CAPACITY,
       trajectoryId,
       trajectoryLabel,
-      user?.profile?.sub,
-      hypothesis,
+      user?.profile?.sub ?? null,
+      hypothesis ?? null,
     );
     setData((prev) =>
       setNestedData(prev, indexArray, { trajectory: newDbTrajectory, status: TRAJECTORY_SELECTION_STATUS.ERROR }),
@@ -257,20 +259,48 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
     });
   };
 
-  const handleTrajectoryUpdate = async (
-    rowId: string,
-    trajectoryId: number,
-    status?: RowStatus,
-    trajectoryLabel?: string,
-    errorMessage?: string,
-  ) => {
-    const indexArray = rowId.split('.').map((item) => parseInt(item));
+  const handleTrajectoryUpdate = async (indexArray: number[], status: RowStatus, trajectory: DbTrajectory) => {
     try {
-      const trajectorySelected: DbTrajectory | null | undefined = getRowDataSelected(data, indexArray)?.trajectory;
+      await linkTrajectoryToStudy(TRAJECTORY_TYPE.THERMAL_CAPACITY, trajectory.id, study.id);
+      const result = await getStudyTrajectoriesWithWarnings(study.id, TRAJECTORY_TYPE.THERMAL_CAPACITY);
+      const newDbTrajectory = result?.trajectories?.find((resultTrajectory) => resultTrajectory.id === trajectory.id);
 
-      if ((status === 'empty' && trajectorySelected) || (status === 'emptyError' && trajectorySelected)) {
+      if (newDbTrajectory) {
+        if (studyState[newDbTrajectory.type]?.trajectories.find((item) => item.area === newDbTrajectory.area)) {
+          const payloadResult = { trajectory: newDbTrajectory, warningMessages: result.warningMessages, status };
+          dispatch?.({ type: STUDY_ACTION.UPDATE_TRAJECTORY, payload: payloadResult });
+        } else {
+          const payloadResult: StudyTrajectoriesData = {
+            [TRAJECTORY_TYPE.THERMAL_CAPACITY]: {
+              trajectories: [newDbTrajectory],
+              warningMessages: result.warningMessages,
+            },
+          };
+          dispatch?.({ type: STUDY_ACTION.ADD_TRAJECTORIES, payload: payloadResult });
+        }
+      }
+      const newTrajectory = {
+        trajectory: newDbTrajectory ?? null,
+        status: newDbTrajectory ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+      };
+
+      setData((prev) => setNestedData(prev, indexArray, newTrajectory));
+    } catch (error) {
+      if (indexArray.length) {
+        handleTrajectoryError(indexArray, trajectory.id, trajectory.trajectoryName, (error as Error).message);
+      }
+    }
+  };
+
+  const handleTrajectoryDeletion = async (
+    indexArray: number[],
+    status: RowStatus,
+    trajectorySelected: DbTrajectory,
+  ) => {
+    try {
+      if (trajectorySelected && status) {
         if (status === 'empty') {
-          await unlinkTrajectoryFromStudy(trajectoryId, study.id);
+          await unlinkTrajectoryFromStudy(trajectorySelected.id, study.id);
         }
         const warningMessages = await fetchWarningMessagesFromType(TRAJECTORY_TYPE.THERMAL_CAPACITY, study.id);
         dispatch?.({
@@ -283,32 +313,14 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
         };
         setData((prev) => setNestedData(prev, indexArray, newEmptyTrajectory));
       }
-      if (status === 'success') {
-        await linkTrajectoryToStudy(TRAJECTORY_TYPE.THERMAL_CAPACITY, trajectoryId, study.id);
-        const result = await getStudyTrajectoriesWithWarnings(study.id, TRAJECTORY_TYPE.THERMAL_CAPACITY);
-        const newTrajectory = result?.trajectories?.find((trajectory) => {
-          if (data[indexArray[0]].hypothesis === OTHER_AREAS_LABEL) {
-            return trajectory.loadArea === OTHER_AREAS;
-          } else {
-            return trajectory.loadArea === data[indexArray[0]].hypothesis;
-          }
-        });
-        if (newTrajectory) {
-          const payloadResult = { trajectory: newTrajectory, warningMessages: result.warningMessages, status };
-          dispatch?.({ type: STUDY_ACTION.UPDATE_TRAJECTORY, payload: payloadResult });
-        }
-        const newEmptyTrajectory = {
-          trajectory: newTrajectory ?? null,
-          status: newTrajectory ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
-        };
-        setData((prev) => setNestedData(prev, indexArray, newEmptyTrajectory));
-      }
-      if (status === 'error' && trajectoryId != null && trajectoryLabel && !!errorMessage) {
-        handleTrajectoryError(indexArray, trajectoryId, trajectoryLabel, errorMessage);
-      }
     } catch (error) {
-      if (indexArray.length) {
-        handleTrajectoryError(indexArray, trajectoryId, trajectoryLabel ?? '', (error as Error).message);
+      if (indexArray.length && trajectorySelected) {
+        handleTrajectoryError(
+          indexArray,
+          trajectorySelected.id,
+          trajectorySelected.trajectoryName,
+          (error as Error).message,
+        );
       }
     }
   };
@@ -317,26 +329,29 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
     setFileStatus('loading');
     let newTrajectory: DbTrajectory;
     const rowSelectedData = getHypothesis(data, rowIdSelected);
-
+    const indexArray = rowIdSelected.split('.').map((item) => parseInt(item));
     try {
-      newTrajectory = await uploadTrajectoryWithTechnology(
-        rowSelectedData.hypothesis,
+      newTrajectory = await uploadTrajectory(
+        TRAJECTORY_TYPE.THERMAL_CAPACITY,
         value.label,
         study.horizon,
         study.id,
-        true,
+        rowSelectedData.hypothesis,
         (progressValue: number) => {
           setProgress(+progressValue?.toFixed(0));
         },
+        true,
         rowSelectedData?.technology,
       );
       setFileStatus('success');
-      if (newTrajectory.id != null) {
-        await handleTrajectoryUpdate(rowIdSelected, newTrajectory.id, 'success', newTrajectory.trajectoryName);
+      if (newTrajectory) {
+        await handleTrajectoryUpdate(indexArray, 'success', newTrajectory);
       }
     } catch (error) {
       setFileStatus('error');
-      await handleTrajectoryUpdate(rowIdSelected, value.id, 'error', value.label, (error as Error)?.message);
+      if (value.id != null && value.label && !!(error as Error)?.message) {
+        handleTrajectoryError(indexArray, value.id, value.label, (error as Error)?.message);
+      }
     }
   };
 
@@ -385,9 +400,20 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
             handleSearch={handleTrajectorySearch}
             handleImport={async (rowId: string) => await handleFetchTrajectoriesFS(rowId)}
             isReadOnlyEnable={true}
-            updateData={(rowId: string, value: unknown, status?: RowStatus, label?: string) =>
-              void handleTrajectoryUpdate(rowId, value as number, status, label)
-            }
+            updateData={(rowId: string, value: unknown, status: RowStatus) => {
+              const indexArray = rowId.split('.').map((item) => parseInt(item));
+              if (status === 'empty' || status === 'emptyError') {
+                const trajectorySelected: DbTrajectory | null =
+                  getRowDataSelected(data, indexArray)?.trajectory ?? null;
+                if (trajectorySelected) void handleTrajectoryDeletion(indexArray, status, trajectorySelected);
+              } else if (status === 'success') {
+                const dbTrajectory =
+                  dbTrajectories.length > 0
+                    ? dbTrajectories.find((item) => item.trajectoryName === value)
+                    : getRowDataSelected(data, indexArray)?.trajectory;
+                if (dbTrajectory) void handleTrajectoryUpdate(indexArray, status, dbTrajectory);
+              }
+            }}
             removeRow={(value: string, rowId?: string) => {
               void removeRow(value, Number(rowId));
             }}

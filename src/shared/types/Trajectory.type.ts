@@ -23,7 +23,8 @@ export interface DbTrajectory {
   version: number;
   userName: string;
   creationDate: Date;
-  loadArea?: string;
+  area: string | null;
+  technology: string;
   state?: TRAJECTORY_SELECTION_STATUS;
 }
 

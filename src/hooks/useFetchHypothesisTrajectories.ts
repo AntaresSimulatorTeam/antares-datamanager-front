@@ -34,9 +34,7 @@ export const useFetchHypothesisTrajectories = (
           // check if default areas are not already linked to a trajectory
           const defaultAreasNotLinkedToStudy =
             result?.trajectories.length > 0
-              ? areaDefault?.filter((area) =>
-                  result?.trajectories.find((trajectory) => area.name !== trajectory.loadArea),
-                )
+              ? areaDefault?.filter((area) => result?.trajectories.find((trajectory) => area.name !== trajectory.area))
               : areaDefault;
           const defaultEmptyAreas = (defaultAreasNotLinkedToStudy || []).map((defaultArea) =>
             buildEmptyTrajectory(defaultArea.name, type),

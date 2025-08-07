@@ -1,6 +1,6 @@
 import {
   DbTrajectory,
-  FileInputStatus,
+  RowStatus,
   StudyActionType,
   StudyState,
   StudyTrajectoriesData,
@@ -46,7 +46,7 @@ export const deleteTrajectory = (prevState: Partial<StudyState>, payload: { area
   if (type === TRAJECTORY_TYPE.AREA || type === TRAJECTORY_TYPE.LINK) {
     Object.assign(prevState, { [type]: { trajectories: [], warningMessages: [] } });
   } else {
-    const trajectoryId = (trajectories ?? []).find((trajectory) => trajectory.loadArea === area)?.id;
+    const trajectoryId = (trajectories ?? []).find((trajectory) => trajectory.area === area)?.id;
     const newTrajectories = (trajectories ?? []).filter((trajectory) => trajectory.id !== trajectoryId);
     const newWarningMessages = (warningMessages ?? []).filter((message) => message.trajectoryId !== trajectoryId);
     const newStudyState = {
@@ -61,7 +61,7 @@ export const deleteTrajectory = (prevState: Partial<StudyState>, payload: { area
 
 export const updateTrajectory = (
   prevState: Partial<StudyState>,
-  payload: { trajectory: DbTrajectory; warningMessages: WarningMessage[]; status: FileInputStatus },
+  payload: { trajectory: DbTrajectory; warningMessages: WarningMessage[]; status: RowStatus },
 ) => {
   const { trajectory, warningMessages, status } = payload;
   const trajectoryType = trajectory.type;
@@ -70,7 +70,7 @@ export const updateTrajectory = (
     : null;
   if (trajectories?.length) {
     const newTrajectories = trajectories.map((trajectoryDb) => {
-      if (trajectoryDb.loadArea === trajectory.loadArea) {
+      if (trajectoryDb.area === trajectory.area && trajectoryDb.technology === trajectory.technology) {
         return {
           ...trajectoryDb,
           trajectoryName: status === 'success' ? trajectory.trajectoryName : '',

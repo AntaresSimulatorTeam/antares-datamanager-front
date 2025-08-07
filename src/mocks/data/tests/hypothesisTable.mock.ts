@@ -27,7 +27,7 @@ const buildRowDataMock = (
     version,
     userName,
     creationDate,
-    loadArea: hypothesis === OTHER_AREAS_LABEL ? 'OTHERS' : hypothesis,
+    area: hypothesis === OTHER_AREAS_LABEL ? 'OTHERS' : hypothesis,
   },
 });
 
