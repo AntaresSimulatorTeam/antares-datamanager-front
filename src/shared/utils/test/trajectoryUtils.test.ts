@@ -6,6 +6,7 @@ import {
   buildRowData,
   buildRowWithSubRowsData,
   getBgColor,
+  getChildrenList,
   getHypothesis,
   getRowDataSelected,
   getStatus,
@@ -29,6 +30,7 @@ import {
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { DbTrajectory, HypothesisRowData, HypothesisTab } from '@/shared/types';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
+import { Row } from '@tanstack/react-table';
 
 describe('getStatus', () => {
   it("should return an ERROR selection status for 'error' status", () => {
@@ -502,5 +504,46 @@ describe('setNestedData', () => {
     const result = setNestedData(initialState, [0, 1], newData);
     expect(result[1]).toEqual(initialState[1]);
     expect(result[0].subRows?.[0]).toEqual(initialState[0].subRows?.[0]);
+  });
+});
+
+describe('getChildrenList', () => {
+  it('should return technologies when depth is 0 and subRows have technologies', () => {
+    const row = {
+      depth: 0,
+      originalSubRows: [{ trajectory: { technology: 'AI' } }, { trajectory: { technology: 'Blockchain' } }],
+    } as Row<HypothesisRowData>;
+
+    const result = getChildrenList(row);
+    expect(result).toEqual(['AI', 'Blockchain']);
+  });
+
+  it('should return empty array when depth is not 0', () => {
+    const row = {
+      depth: 1,
+      originalSubRows: [{ trajectory: { technology: 'AI' } }],
+    } as Row<HypothesisRowData>;
+
+    const result = getChildrenList(row);
+    expect(result).toEqual([]);
+  });
+
+  it('should skip subRows without technology', () => {
+    const row = {
+      depth: 0,
+      originalSubRows: [{ trajectory: { technology: '' } }, { trajectory: {} }, {}],
+    } as Row<HypothesisRowData>;
+
+    const result = getChildrenList(row);
+    expect(result).toEqual([]);
+  });
+
+  it('should handle undefined originalSubRows', () => {
+    const row = {
+      depth: 0,
+    } as Row<HypothesisRowData>;
+
+    const result = getChildrenList(row);
+    expect(result).toEqual([]);
   });
 });

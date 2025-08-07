@@ -19,6 +19,7 @@ import { ProgressBar } from '@/components/forms/ProgressBar.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 import { RdsTextTooltip } from 'rte-design-system-react';
+import { getChildrenList } from '@/shared/utils/trajectoryUtils.ts';
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
 
@@ -50,21 +51,7 @@ const getExpandableHypothesisTableHeaders = (
         if (row.depth === 0) return !row.getCanExpand() ? 'pl-1' : 'pl-0';
         return 'pl-4';
       };
-      const nbOfChildren: { list: string[]; nb: number } =
-        row.depth === 0
-          ? (row.originalSubRows || []).reduce(
-              (acc: { list: string[]; nb: number }, current: HypothesisRowData) => {
-                if (!!current?.trajectory?.technology?.length && current?.trajectory?.technology?.length > 0) {
-                  acc.nb = acc.nb + 1;
-                  acc.list.push(current.trajectory.technology);
-                  return acc;
-                } else {
-                  return acc;
-                }
-              },
-              { list: [], nb: 0 },
-            )
-          : { list: [], nb: 0 };
+      const childrenArray: string[] = getChildrenList(row);
       return (
         <div className="flex gap-1">
           {row.getCanExpand() && (
@@ -83,9 +70,9 @@ const getExpandableHypothesisTableHeaders = (
             hasPreview={false}
             alignment={getAlignment()}
           />
-          {row.getCanExpand() && nbOfChildren.nb > 0 && (
-            <RdsTextTooltip text={nbOfChildren.list.toString()} offset={5} placement="left">
-              <div className={'text-gray-600'}>{` | +${nbOfChildren.nb}`}</div>
+          {row.getCanExpand() && childrenArray.length > 0 && (
+            <RdsTextTooltip text={childrenArray.toString()} offset={5} placement="left">
+              <div className={'text-gray-600'}>{` | +${childrenArray.length}`}</div>
             </RdsTextTooltip>
           )}
         </div>
@@ -147,7 +134,7 @@ const getExpandableHypothesisTableHeaders = (
       ) : (
         <CellWithStatus
           status={status}
-          isDeletable={!isDefault && !(studyStatus === StudyStatus.GENERATED)}
+          isDeletable={!isDefault && studyStatus !== StudyStatus.GENERATED}
           onClick={() => {
             void options?.meta?.removeRow?.(hypothesis, row.id);
           }}

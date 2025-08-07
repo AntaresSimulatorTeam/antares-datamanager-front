@@ -5,6 +5,7 @@ import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { generateId } from '@/shared/utils/defaultUtils.ts';
+import { Row } from '@tanstack/react-table';
 
 /**
  * Get trajectory status from row status
@@ -279,11 +280,21 @@ export const getHypothesis = (
   }
 };
 
+/**
+ * Updates the nested data structure within a state array based on the provided row selection and new trajectory details.
+ *
+ * @param {HypothesisRowData[]} state - The current state containing rows of data.
+ * @param {number[]} rowSelected - An array specifying the index of the row to update.
+ *                                   If it contains one element, the parent row will be updated.
+ *                                   If it contains two elements, a sub-row of the specified parent will be updated.
+ * @param {Pick<HypothesisRowData, 'trajectory' | 'status'>} newEmptyTrajectory - An object containing the updated trajectory and status values.
+ * @returns {HypothesisRowData[]} A new state array with the specified updates applied.
+ */
 export const setNestedData = (
   state: HypothesisRowData[],
   rowSelected: number[],
   newEmptyTrajectory: Pick<HypothesisRowData, 'trajectory' | 'status'>,
-) =>
+): HypothesisRowData[] =>
   state.map((item, index) => {
     if (rowSelected.length === 2 && index === rowSelected[0]) {
       return {
@@ -306,3 +317,25 @@ export const setNestedData = (
       return item;
     }
   });
+
+/**
+ * Retrieves a list of child row technologies associated with the given row.
+ *
+ * This function processes rows at a depth of 0 and extracts technologies from their subrows,
+ * returning them as an array of strings. If no technologies are found or the row is not at
+ * depth 0, an empty array is returned.
+ *
+ * @param {Row<HypothesisRowData>} row - The input row containing child data and associated information.
+ * @returns {string[]} An array of technology strings from the child rows, or an empty array if none are found.
+ */
+export const getChildrenList = (row: Row<HypothesisRowData>): string[] =>
+  row.depth === 0
+    ? (row.originalSubRows || []).reduce((acc: string[], current: HypothesisRowData) => {
+        if (!!current?.trajectory?.technology?.length && current?.trajectory?.technology?.length > 0) {
+          acc.push(current.trajectory.technology);
+          return acc;
+        } else {
+          return acc;
+        }
+      }, [])
+    : [];

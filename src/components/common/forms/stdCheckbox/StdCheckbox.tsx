@@ -13,7 +13,6 @@ export type StdCheckboxProps = {
   name?: string;
   id?: string;
   disabled?: boolean;
-  defaultChecked?: boolean;
   onChange?: StdChangeHandler<boolean | undefined>;
   onBlur?: (e: React.FocusEvent<{ checked: boolean }>) => void;
   required?: boolean;

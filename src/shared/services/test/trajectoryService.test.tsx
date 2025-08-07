@@ -30,11 +30,27 @@ import { AuthService } from '@/shared/services/authService.ts';
 import { mockWarningMessagesWithTwo } from '@/mocks/data/tests/warning.mock.ts';
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { fetchWarningMessagesFromType } from '@/shared/services/warningService.ts';
+import * as progressService from '@/shared/services/progressService.ts';
 
 vi.mock('@/envVariables', () => ({
   getEnvVariables: vi.fn(() => 'https://mockapi.com'),
 }));
 vi.mock('@/shared/services/authService');
+vi.mock('@/shared/services/progressService');
+vi.mock('@/shared/services/studyService', async (importOriginal) => {
+  const actual: Mock = await importOriginal();
+  return {
+    ...actual,
+    getStudyTrajectories: vi.fn().mockImplementation(() => Promise.resolve(mockTrajectoryTwo)),
+  };
+});
+vi.mock('@/shared/services/warningService', async (importOriginal) => {
+  const actual: Mock = await importOriginal();
+  return {
+    ...actual,
+    fetchWarningMessagesFromType: vi.fn().mockImplementation(() => Promise.resolve(mockWarningMessagesWithTwo)),
+  };
+});
 
 describe('fetchTrajectoriesFromDB', () => {
   afterEach(() => {
@@ -291,22 +307,6 @@ describe('getNbMessagesFromTrajectoryType', () => {
   });
 });
 
-vi.mock('@/shared/services/studyService', async (importOriginal) => {
-  const actual: Mock = await importOriginal();
-  return {
-    ...actual,
-    getStudyTrajectories: vi.fn().mockImplementation(() => Promise.resolve(mockTrajectoryTwo)),
-  };
-});
-
-vi.mock('@/shared/services/warningService', async (importOriginal) => {
-  const actual: Mock = await importOriginal();
-  return {
-    ...actual,
-    fetchWarningMessagesFromType: vi.fn().mockImplementation(() => Promise.resolve(mockWarningMessagesWithTwo)),
-  };
-});
-
 describe('getStudyTrajectoriesWithWarnings', () => {
   afterEach(() => {
     vi.clearAllMocks();
@@ -377,76 +377,55 @@ describe('uploadTrajectory', () => {
       'Content-Type': 'application/json',
     },
   };
-
-  beforeEach(() => {
-    vi.stubGlobal('JSON', {
-      parse: (text: string) => ({ message: text }),
-      stringify: (text: string) => text,
-    });
+  vi.mocked(progressService.fetchWithProgress, { partial: true }).mockResolvedValue({
+    ok: true,
+    json: async () => Promise.resolve(mockDbTrajectory),
   });
 
   afterEach(() => {
-    vi.unstubAllGlobals();
     vi.clearAllMocks();
   });
 
   it('should import trajectory to data base', async () => {
-    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
-      ok: true,
-      json: async () => Promise.resolve(mockDbTrajectory),
-    });
-
     await uploadTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026', 2, 'FR', onProgress);
 
     await waitFor(() => {
-      expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
-      expect(AuthService.authFetch).toHaveBeenCalledWith(
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
         `https://mockapi.com/v1/trajectory?trajectoryType=AREA&trajectoryToUse=area_BP_23_v6&horizon=2025-2026&studyId=2`,
         requestOptions,
+        onProgress,
       );
     });
   });
 
   it('should import trajectory to data base', async () => {
-    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
-      ok: true,
-      json: async () => Promise.resolve(mockDbTrajectory),
-    });
-
     await uploadTrajectory(TRAJECTORY_TYPE.LOAD, 'area_BP_23_v6', '2025-2026', 2, 'FR', onProgress);
 
     await waitFor(() => {
-      expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
-      expect(AuthService.authFetch).toHaveBeenCalledWith(
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
         `https://mockapi.com/v1/trajectory/load?area=FR&trajectoryToUse=area_BP_23_v6&horizon=2025-2026&studyId=2`,
         requestOptions,
+        onProgress,
       );
     });
   });
 
-  it.skip('should import trajectory without technology into data base', async () => {
-    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
-      ok: true,
-      json: async () => Promise.resolve(mockDbTrajectory),
-    });
-
+  it('should import trajectory without technology into data base', async () => {
     await uploadTrajectory(TRAJECTORY_TYPE.THERMAL_CAPACITY, 'area_BP_23_v6', '2025-2026', 2, 'FR', onProgress, true);
 
     await waitFor(() => {
-      expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
-      expect(AuthService.authFetch).toHaveBeenCalledWith(
-        `https://mockapi.com/v1/trajectory?area=FR&trajectoryToUse=area_BP_23_v6&horizon=2025-2026&studyId=2&isCivilYear=true&technology=`,
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        `https://mockapi.com/v1/trajectory/thermal-capacity?area=FR&trajectoryToUse=area_BP_23_v6&horizon=2025-2026&studyId=2&isCivilYear=true&technology=`,
         requestOptions,
+        onProgress,
       );
     });
   });
 
-  it.skip('should import trajectory with technology into data base', async () => {
-    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
-      ok: true,
-      json: async () => Promise.resolve(mockDbTrajectory),
-    });
-
+  it('should import trajectory with technology into data base', async () => {
     await uploadTrajectory(
       TRAJECTORY_TYPE.THERMAL_CAPACITY,
       'area_BP_23_v6',
@@ -459,19 +438,18 @@ describe('uploadTrajectory', () => {
     );
 
     await waitFor(() => {
-      expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
-      expect(AuthService.authFetch).toHaveBeenCalledWith(
-        `https://mockapi.com/v1/trajectory?area=CZ&trajectoryToUse=area_BP_23_v6&horizon=2025-2026&studyId=2&isCivilYear=true&technology=Nuclear`,
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        `https://mockapi.com/v1/trajectory/thermal-capacity?area=FR&trajectoryToUse=area_BP_23_v6&horizon=2025-2026&studyId=2&isCivilYear=true&technology=Nuclear`,
         requestOptions,
+        onProgress,
       );
     });
   });
 
   it('should handle fetch failure gracefully', async () => {
-    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
-      antaresErrorMessage: 'Failed to import trajectory to data base',
-      date: new Date(),
-      type: ERROR_MESSAGE_TYPE.BUSINESS,
+    vi.mocked(progressService.fetchWithProgress).mockRejectedValueOnce({
+      message: 'Failed to import trajectory to data base',
     });
 
     await expect(async () =>
