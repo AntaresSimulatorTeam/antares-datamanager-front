@@ -230,6 +230,35 @@ describe('buildRowWithSubRowsData', () => {
     });
   });
 
+  it('returns correct data when trajectory has name and technology', () => {
+    const trajectory = { area: 'Zone 1', trajectoryName: 'T1', technology: 'Option A' } as DbTrajectory;
+
+    const result = buildRowWithSubRowsData(trajectory, subRowOptions);
+
+    expect(result).toEqual({
+      hypothesis: 'Zone 1',
+      trajectory: null,
+      status: TRAJECTORY_SELECTION_STATUS.MISSING,
+      isDefault: false,
+      subRows: [
+        {
+          hypothesis: 'Option A',
+          trajectory,
+          status: TRAJECTORY_SELECTION_STATUS.OK,
+          isDefault: true,
+          subRows: null,
+        },
+        {
+          hypothesis: 'Option B',
+          trajectory: null,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          isDefault: true,
+          subRows: null,
+        },
+      ],
+    });
+  });
+
   it('excludes subRows if area is in areasNotInTrajectoryArea', () => {
     const trajectory = { area: 'Zone 2' } as DbTrajectory;
     const areasNotInTrajectoryArea = ['Zone 2'];

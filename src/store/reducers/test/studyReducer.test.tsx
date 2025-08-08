@@ -7,11 +7,19 @@ import {
   updateTrajectory,
 } from '@/store/reducers/studyReducer';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory';
-import { DbTrajectory, FileInputStatus, StudyActionType, StudyState, WarningMessage } from '@/shared/types';
+import {
+  DbTrajectory,
+  FileInputStatus,
+  StudyActionType,
+  StudyState,
+  StudyTrajectoriesData,
+  WarningMessage,
+} from '@/shared/types';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { describe, expect, it } from 'vitest';
 import {
   mockSingleWarningMessages,
+  mockSingleWarningMessagesSkipped,
   mockWarningMessages,
   mockWarningMessagesWithTwo,
 } from '@/mocks/data/tests/warning.mock.ts';
@@ -80,6 +88,36 @@ describe('addTrajectories', () => {
     expect(result[TRAJECTORY_TYPE.LOAD]?.trajectories).toHaveLength(2);
   });
 
+  it('deduplicates trajectories and warningMessages', () => {
+    const prevState = {
+      LOAD: {
+        trajectories: [
+          { id: 1, area: 'FR' },
+          { id: 2, area: 'CZ' },
+        ] as DbTrajectory[],
+        warningMessages: [{ id: 'Warning A' }] as unknown as WarningMessage[],
+      },
+    };
+    const data = {
+      LOAD: {
+        trajectories: [
+          { id: 2, area: 'CZ' },
+          { id: 3, area: 'BE' },
+        ] as DbTrajectory[],
+        warningMessages: [{ id: 'Warning A' }, { id: 'Warning B' }] as unknown as WarningMessage[],
+      },
+    };
+    const result = addTrajectories(prevState, data);
+    expect(result.LOAD?.trajectories).toEqual(
+      expect.arrayContaining([
+        { id: 1, area: 'FR' },
+        { id: 2, area: 'CZ' },
+        { id: 3, area: 'BE' },
+      ]),
+    );
+    expect(result.LOAD?.warningMessages).toEqual(expect.arrayContaining([{ id: 'Warning A' }, { id: 'Warning B' }]));
+  });
+
   it('should preserve unrelated trajectory types', () => {
     const prevState = {
       LINK: {
@@ -92,6 +130,7 @@ describe('addTrajectories', () => {
             userName: 'CF',
             creationDate: '2025' as unknown as Date,
             area: 'CZ',
+            technology: '',
           },
         ],
         warningMessages: [],
@@ -137,6 +176,31 @@ describe('addTrajectories', () => {
     expect(result?.AREA?.trajectories).toEqual([areaTraj]);
     expect(result?.AREA?.warningMessages).toEqual([mockSingleWarningMessages]);
   });
+
+  it('returns prevState when data is empty', () => {
+    const prevState = { AREA: { trajectories: [], warningMessages: [] } };
+    const result = addTrajectories(prevState, {});
+    expect(result).toEqual(prevState);
+  });
+
+  it('handles missing trajectories and warningMessages gracefully', () => {
+    const prevState = { AREA: { trajectories: [], warningMessages: [] } };
+    const data = { AREA: {} } as StudyTrajectoriesData;
+    const result = addTrajectories(prevState, data);
+    expect(result).toEqual({ AREA: {} });
+  });
+
+  it('handles non-array trajectories and warningMessages', () => {
+    const prevState = { LOAD: { trajectories: [], warningMessages: [] } };
+    const data = {
+      LOAD: {
+        trajectories: 'not an array',
+        warningMessages: null,
+      },
+    } as unknown as StudyTrajectoriesData;
+    const result = addTrajectories(prevState, data);
+    expect(result).toEqual(prevState);
+  });
 });
 
 describe('deleteTrajectory', () => {
@@ -146,13 +210,14 @@ describe('deleteTrajectory', () => {
     const prevState = {
       [TRAJECTORY_TYPE.LOAD]: {
         trajectories: [trajectorySample],
-        warningMessages: [],
+        warningMessages: [mockSingleWarningMessagesSkipped],
       },
     };
     const payload = { area: 'zoneA', type: TRAJECTORY_TYPE.LOAD };
     const result = deleteTrajectory(prevState, payload);
 
     expect(result[TRAJECTORY_TYPE.LOAD]?.trajectories).toEqual([]);
+    expect(result[TRAJECTORY_TYPE.LOAD]?.warningMessages).toEqual([]);
   });
 
   it('should returns the same state if no matching trajectory is found', () => {
@@ -415,6 +480,25 @@ describe('updateTrajectory', () => {
     const result = updateTrajectory(prevState, payload);
 
     expect(result[TRAJECTORY_TYPE.LINK]).not.toBe(prevState[TRAJECTORY_TYPE.LINK]);
+  });
+
+  it('should not change original state when type has no trajectories', () => {
+    const prevStateLINK: Partial<StudyState> = {
+      studyStatus: StudyStatus.IN_PROGRESS,
+      [TRAJECTORY_TYPE.LINK]: { trajectories: [], warningMessages: [] },
+    };
+    const payload = {
+      trajectory: {
+        ...baseTrajectory,
+        trajectoryName: 'Changed',
+      },
+      warningMessages: [],
+      status: 'success' as FileInputStatus,
+    };
+
+    const result = updateTrajectory(prevStateLINK, payload);
+
+    expect(result[TRAJECTORY_TYPE.LINK]).toBe(prevStateLINK[TRAJECTORY_TYPE.LINK]);
   });
 });
 

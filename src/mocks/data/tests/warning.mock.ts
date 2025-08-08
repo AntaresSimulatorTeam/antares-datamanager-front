@@ -24,7 +24,7 @@ export const mockSingleWarningMessagesSkipped: WarningMessage = {
   code: 'LINKS_AREA_NOT_PRESENT',
   generatedBy: 'unknown_user',
   generatedAt: '2025-04-01T18:31:53.623683' as unknown as Date,
-  trajectoryId: 105,
+  trajectoryId: 123,
   trajectoryName: 'areas_BP23_A_ref',
   secondTrajectory: 'links_BP23_A_ref',
   isAck: true,

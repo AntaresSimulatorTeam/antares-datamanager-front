@@ -251,6 +251,11 @@ export const getStudyMenu = (t: (value: string) => string, isTrajectoryAreaLinke
 export const isMatchingTrajectoryType = (trajectoryKey: TRAJECTORY_TYPE) => (trajectoryType: TRAJECTORY_TYPE) =>
   trajectoryType === trajectoryKey;
 
+/**
+ * Select data row according to index array provided
+ * @param data
+ * @param indexArray
+ */
 export const getRowDataSelected = (data: HypothesisRowData[], indexArray: number[]): HypothesisRowData | null =>
   indexArray.length === 2 ? (data[indexArray[0]].subRows?.[indexArray[1]] ?? null) : (data[indexArray[0]] ?? null);
 

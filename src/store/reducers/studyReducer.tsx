@@ -16,13 +16,12 @@ export const addTrajectories = (prevState: Partial<StudyState>, data: StudyTraje
   (Object.keys(data) as TRAJECTORY_TYPE[]).forEach((keyType: TRAJECTORY_TYPE) => {
     if (keyType === TRAJECTORY_TYPE.AREA || keyType === TRAJECTORY_TYPE.LINK) {
       Object.assign(studyState, { [keyType]: data[keyType] });
-    } else {
-      const newTrajectories = prevState[keyType]?.trajectories
-        ? [...(prevState[keyType]?.trajectories ?? []), ...(data[keyType]?.trajectories ?? [])]
-        : (data[keyType]?.trajectories ?? []);
-      const newWarningMessages = prevState[keyType]?.warningMessages
-        ? [...(prevState[keyType]?.warningMessages ?? []), ...(data[keyType]?.warningMessages ?? [])]
-        : (data[keyType]?.warningMessages ?? []);
+    } else if (Array.isArray(data[keyType]?.trajectories) && Array.isArray(data[keyType]?.warningMessages)) {
+      const newTrajectories = [...(prevState[keyType]?.trajectories ?? []), ...(data[keyType]?.trajectories ?? [])];
+      const newWarningMessages = [
+        ...(prevState[keyType]?.warningMessages ?? []),
+        ...(data[keyType]?.warningMessages ?? []),
+      ];
       Object.assign(studyState, {
         [keyType]: {
           trajectories: removeDuplicate(newTrajectories),
