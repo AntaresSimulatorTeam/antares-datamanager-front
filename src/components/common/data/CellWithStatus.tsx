@@ -26,7 +26,7 @@ export const CellWithStatus = ({ status, isDeletable, onClick }: CellWithStatusP
         return (
           <>
             <StdIcon name={StdIconId.Info} color="text-error-700" />
-            <div className="flex items-center gap-2">{t('studyDetails.@import_status_error')}</div>
+            <div className="flex items-center gap-2 text-error-700">{t('studyDetails.@import_status_error')}</div>
           </>
         );
       case TRAJECTORY_SELECTION_STATUS.MISSING:
