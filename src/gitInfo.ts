@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "fix/area_links_bad_api_call_db_trajectory",
-  commit: "5a6c4e0",
-  commitTime: "2025-09-09T16:02:09.518Z"
+  branch: "feat/ANT-3515-Design_improve_table_display",
+  commit: "e88418b",
+  commitTime: "2025-08-13T09:00:49.093Z"
 };
