@@ -14,6 +14,7 @@ import {
   TRAJECTORY_LINK_TO_STUDY_ENDPOINT,
   TRAJECTORY_THERMAL_INSTALLED_POWER_IMPORT,
   TRAJECTORY_UNLINK_ALL_TO_STUDY_ENDPOINT,
+  TRAJECTORY_UNLINK_MULTIPLE_TO_STUDY_ENDPOINT,
   TRAJECTORY_UNLINK_TO_STUDY_ENDPOINT,
 } from '@/shared/const/apiEndPoint.ts';
 import {
@@ -190,6 +191,26 @@ export const unlinkAllTrajectoriesFromStudy = async (studyId: number): Promise<v
   try {
     await AuthService.authFetch(urlApi, {
       method: 'DELETE',
+    });
+  } catch (error) {
+    throw new Error(`${(error as BackendError)?.antaresErrorMessage}`);
+  }
+};
+
+/**
+ * Delete all trajectories linked to a study
+ * @param {number[]} trajectoryIds - Trajectory id list to delete
+ * @param {number} studyId - Study id
+ */
+export const unlinkMultipleTrajectoriesFromStudy = async (trajectoryIds: number[], studyId: number): Promise<void> => {
+  const urlApi = `${TRAJECTORY_UNLINK_MULTIPLE_TO_STUDY_ENDPOINT}?studyId=${studyId}`;
+  try {
+    await AuthService.authFetch(urlApi, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(trajectoryIds),
     });
   } catch (error) {
     throw new Error(`${(error as BackendError)?.antaresErrorMessage}`);

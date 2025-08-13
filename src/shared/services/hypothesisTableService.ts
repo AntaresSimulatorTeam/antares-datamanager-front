@@ -22,6 +22,7 @@ import {
   fetchTrajectoriesFromFS,
   getStudyTrajectoriesWithWarnings,
   linkTrajectoryToStudy,
+  unlinkMultipleTrajectoriesFromStudy,
   unlinkTrajectoryFromStudy,
   uploadTrajectory,
 } from '@/shared/services/trajectoryService.ts';
@@ -302,20 +303,34 @@ export const removeRow = async (
   data: HypothesisRowData[],
   studyId?: number,
 ) => {
-  if (indexRow && data[indexRow].hypothesis) {
-    dispatch?.({
-      type: STUDY_ACTION.DELETE_TRAJECTORY,
-      payload: { area: data[indexRow].hypothesis, type },
-    });
-    if (studyId != null && data[indexRow]?.trajectory && data[indexRow]?.status === TRAJECTORY_SELECTION_STATUS.OK) {
-      // TODO ANT-3698 for THERMAL CAPACITY
-      await unlinkTrajectoryFromStudy(data[indexRow].trajectory.id, studyId);
+  try {
+    if (indexRow && data[indexRow].hypothesis) {
+      dispatch?.({
+        type: STUDY_ACTION.DELETE_TRAJECTORY,
+        payload: { area: data[indexRow].hypothesis, type },
+      });
+      if (studyId != null && data[indexRow]?.trajectory && data[indexRow]?.status === TRAJECTORY_SELECTION_STATUS.OK) {
+        if (type === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
+          const trajectoryIds = data[indexRow]?.subRows
+            ?.map((row) => {
+              if (row.trajectory) {
+                return row.trajectory.id;
+              }
+            })
+            .filter(Boolean) as number[];
+          await unlinkMultipleTrajectoriesFromStudy(trajectoryIds, studyId);
+        } else {
+          await unlinkTrajectoryFromStudy(data[indexRow].trajectory.id, studyId);
+        }
+      }
     }
-  }
-  const newDataSorted = data.filter((item: HypothesisRowData) => item.hypothesis !== value);
-  setData(sortWithFixedPosition(newDataSorted));
-  if (value) {
-    setCheckedValues((prev) => [...prev.filter((name) => name !== value)]);
+    const newDataSorted = data.filter((item: HypothesisRowData) => item.hypothesis !== value);
+    setData(sortWithFixedPosition(newDataSorted));
+    if (value) {
+      setCheckedValues((prev) => [...prev.filter((name) => name !== value)]);
+    }
+  } catch (error) {
+    console.log('======================== error', error);
   }
 };
 
