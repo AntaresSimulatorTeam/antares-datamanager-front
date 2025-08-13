@@ -1,7 +1,7 @@
 import { clsx } from 'clsx';
 import type { ButtonColor, ButtonSize, ButtonVariant } from './StdButton';
 
-export const COMMON_CLASSES = 'rounded-sm font-semibold text-center inline-flex flex-row items-center cursor-pointer';
+export const COMMON_CLASSES = 'rounded-s font-semibold text-center inline-flex flex-row items-center cursor-pointer';
 
 export const SIZE_CLASSES = {
   extraSmall: 'px-0.25 text-button-xs',

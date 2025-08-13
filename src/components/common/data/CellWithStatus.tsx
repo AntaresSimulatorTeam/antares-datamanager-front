@@ -1,4 +1,4 @@
-import { RdsIcon, RdsIconButton, RdsIconId } from 'rte-design-system-react';
+import { RdsIconButton, RdsIconId } from 'rte-design-system-react';
 import { useTranslation } from 'react-i18next';
 import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
@@ -18,14 +18,14 @@ export const CellWithStatus = ({ status, isDeletable, onClick }: CellWithStatusP
       case TRAJECTORY_SELECTION_STATUS.OK:
         return (
           <>
-            <RdsIcon name={RdsIconId.Done} color="primary-600" />
+            <StdIcon name={StdIconId.Done} color="text-acc1-600" />
             {t('studyDetails.@import_status_done')}
           </>
         );
       case TRAJECTORY_SELECTION_STATUS.ERROR:
         return (
           <>
-            <RdsIcon name={RdsIconId.Info} color="error-700" />
+            <StdIcon name={StdIconId.Info} color="error-700" />
             <div className="flex items-center gap-2 text-error-700">{t('studyDetails.@import_status_error')}</div>
           </>
         );
