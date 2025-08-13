@@ -318,7 +318,8 @@ export const removeRow = async (
               }
             })
             .filter(Boolean) as number[];
-          await unlinkMultipleTrajectoriesFromStudy(trajectoryIds, studyId);
+          const response = await unlinkMultipleTrajectoriesFromStudy(trajectoryIds, studyId);
+          console.log('===================== response', response);
         } else {
           await unlinkTrajectoryFromStudy(data[indexRow].trajectory.id, studyId);
         }
@@ -330,7 +331,7 @@ export const removeRow = async (
       setCheckedValues((prev) => [...prev.filter((name) => name !== value)]);
     }
   } catch (error) {
-    console.log('======================== error', error);
+    // silent handler
   }
 };
 

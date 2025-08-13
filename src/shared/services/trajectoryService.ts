@@ -201,17 +201,22 @@ export const unlinkAllTrajectoriesFromStudy = async (studyId: number): Promise<v
  * Delete all trajectories linked to a study
  * @param {number[]} trajectoryIds - Trajectory id list to delete
  * @param {number} studyId - Study id
+ * @return {Promise<{ failed: number[]; success: number[] }>}
  */
-export const unlinkMultipleTrajectoriesFromStudy = async (trajectoryIds: number[], studyId: number): Promise<void> => {
+export const unlinkMultipleTrajectoriesFromStudy = async (
+  trajectoryIds: number[],
+  studyId: number,
+): Promise<{ failed: number[]; success: number[] }> => {
   const urlApi = `${TRAJECTORY_UNLINK_MULTIPLE_TO_STUDY_ENDPOINT}?studyId=${studyId}`;
   try {
-    await AuthService.authFetch(urlApi, {
+    const response = await AuthService.authFetch(urlApi, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(trajectoryIds),
     });
+    return (await (response as Response).json()) as unknown as { failed: number[]; success: number[] };
   } catch (error) {
     throw new Error(`${(error as BackendError)?.antaresErrorMessage}`);
   }
