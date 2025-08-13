@@ -141,23 +141,23 @@ export const buildEmptyTrajectory = (area: string, type: TRAJECTORY_TYPE): DbTra
  */
 export const buildRowWithSubRowsData = (
   trajectory: DbTrajectory,
-  subRowOptions: string[],
   defaultAreas?: {
     name: string;
   }[],
   areasNotInTrajectoryArea?: string[],
+  subRowOptions?: string[] | null,
 ): HypothesisRowData => ({
   hypothesis: trajectory.area === OTHER_AREAS ? OTHER_AREAS_LABEL : (trajectory.area as string),
-  trajectory: trajectory.trajectoryName && trajectory.technology?.length === 0 ? trajectory : null,
+  trajectory: trajectory.trajectoryName && !trajectory?.technology ? trajectory : null,
   status:
-    trajectory.trajectoryName && trajectory.technology.length === 0
+    trajectory.trajectoryName && !trajectory?.technology
       ? TRAJECTORY_SELECTION_STATUS.OK
       : TRAJECTORY_SELECTION_STATUS.MISSING,
   isDefault:
     defaultAreas?.some((item: { name: string }) => item.name === trajectory.area) || OTHER_AREAS === trajectory.area,
   subRows:
     trajectory.area !== OTHER_AREAS && !areasNotInTrajectoryArea?.some((item) => item === trajectory.area)
-      ? subRowOptions.map((option) => {
+      ? subRowOptions?.map((option) => {
           const hasTechnology = trajectory?.trajectoryName && option === trajectory?.technology;
           return {
             hypothesis: option,

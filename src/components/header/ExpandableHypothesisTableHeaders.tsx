@@ -71,7 +71,7 @@ const getExpandableHypothesisTableHeaders = (
             alignment={getAlignment()}
           />
           {row.getCanExpand() && childrenArray.length > 0 && (
-            <RdsTextTooltip text={childrenArray.toString()} offset={5} placement="left">
+            <RdsTextTooltip text={childrenArray.toString()} offset={5} placement="right">
               <div className={'text-gray-600'}>{` | +${childrenArray.length}`}</div>
             </RdsTextTooltip>
           )}
@@ -89,7 +89,7 @@ const getExpandableHypothesisTableHeaders = (
         <div className="flex w-full items-center gap-2">
           <LabelWithDeleteButton
             label={trajectory.trajectoryName}
-            isDeletable={!(studyStatus === StudyStatus.GENERATED)}
+            isDeletable={studyStatus !== StudyStatus.GENERATED}
             onClick={() => {
               setErrorInfo({ index: row.index, message: '' });
               void options?.meta?.updateData?.(
@@ -109,7 +109,7 @@ const getExpandableHypothesisTableHeaders = (
             }}
             onSearch={async (value?: string) =>
               options?.meta?.search?.(
-                value,
+                value ?? '',
                 row.original.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : row.original.hypothesis,
               )
             }

@@ -69,7 +69,7 @@ const getEditableHypothesisTableHeaders = (
             }}
             onSearch={async (value?: string) =>
               await options?.meta?.search?.(
-                value,
+                value ?? '',
                 row.original.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : row.original.hypothesis,
               )
             }

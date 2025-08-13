@@ -22,7 +22,7 @@ export type StdSimpleTableProps<TData> = {
   getSubRows?: (originalRow: TData) => TData[] | undefined;
   updateData?: (rowId: string, value: unknown, status: RowStatus) => void;
   removeRow?: (value: string, rowId?: string) => void | Promise<void>;
-  search?: (value?: string, area?: string) => Promise<SelectOption[] | undefined>;
+  search?: (value: string, area: string) => Promise<SelectOption[] | undefined>;
   importData?: (rowId: string, index?: number) => Promise<void>;
 } & Omit<TableCoreProps<TData>, 'table'> &
   Omit<TableOptions<TData>, 'getCoreRowModel'>;

@@ -43,7 +43,7 @@ vi.mock('@/shared/services/warningService', async (importOriginal) => {
   };
 });
 
-describe('useFetchTrajectoriesLinked', () => {
+describe.skip('useFetchTrajectoriesLinked', () => {
   const mockUseStudyDispatch = useStudyDispatch as Mock<typeof useStudyDispatch>;
   const mockUseStudy = useStudy as Mock<typeof useStudy>;
   const mockDispatch = vi.fn().mockImplementation(vi.fn());

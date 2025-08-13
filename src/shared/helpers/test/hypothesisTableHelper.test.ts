@@ -3,7 +3,7 @@ import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { HypothesisRowData } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
 import { mockDbTrajectory } from '@/mocks/data/tests/trajectory.mock.ts';
-import { setReadOnlyForGeneratedStudy } from '@/shared/helpers/hypothesisTableHelper.ts';
+import { getReadOnlyForGeneratedStudy } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { retrieveReadOnlyArea } from '@/shared/utils/trajectoryUtils.ts';
 
 // mock trajectory utils
@@ -21,7 +21,6 @@ describe('setReadOnlyForGeneratedStudy', () => {
   it('should call setReadOnly with the result of retrieveReadOnlyArea for rows without trajectory', () => {
     const mockRetrieveReadOnlyArea = retrieveReadOnlyArea as Mock<typeof retrieveReadOnlyArea>;
     mockRetrieveReadOnlyArea.mockReturnValue(mockReadOnlyResult);
-    const setReadOnlyMock = vi.fn();
     const mockRows: HypothesisRowData[] = [
       { hypothesis: 'H1', trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING },
       { hypothesis: 'H2', trajectory: mockDbTrajectory, status: TRAJECTORY_SELECTION_STATUS.OK },
@@ -31,9 +30,8 @@ describe('setReadOnlyForGeneratedStudy', () => {
 
     const expectedHypotheses = ['H1', 'H3'];
 
-    setReadOnlyForGeneratedStudy(mockRows, setReadOnlyMock);
+    getReadOnlyForGeneratedStudy(mockRows);
 
     expect(retrieveReadOnlyArea).toHaveBeenCalledWith(mockRows, expectedHypotheses);
-    expect(setReadOnlyMock).toHaveBeenCalledWith(mockReadOnlyResult);
   });
 });

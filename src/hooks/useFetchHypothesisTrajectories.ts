@@ -1,19 +1,32 @@
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { DbTrajectory, TrajectoryState } from '@/shared/types';
+import { CheckBoxData, DbTrajectory, HypothesisRowData, TrajectoryAreaData, TrajectoryState } from '@/shared/types';
 import { getStudyTrajectoriesWithWarnings } from '@/shared/services/trajectoryService';
-import { buildEmptyTrajectory, removeDuplicate } from '@/shared/utils/trajectoryUtils.ts';
+import {
+  buildEmptyTrajectory,
+  buildRowWithSubRowsData,
+  removeDuplicate,
+  retrieveReadOnlyArea,
+} from '@/shared/utils/trajectoryUtils.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
+import { sortWithFixedPosition } from '@/shared/utils/sortUtils';
+import { ThermalOptions } from '@/mocks/data/list/names.ts';
+import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
+import { getReadOnlyForGeneratedStudy } from '@/shared/helpers/hypothesisTableHelper.ts';
 
 export const useFetchHypothesisTrajectories = (
   studyId?: number,
   trajectoryType?: TRAJECTORY_TYPE,
   defaultAreas?: { name: string }[],
+  areas?: TrajectoryAreaData[],
+  isStudyGenerated?: boolean,
 ) => {
-  //const [trajectoryLinked, setTrajectoryLinked] = useState<DbTrajectory[]>([]);
-  const [hypothesisTrajectories, setHypothesisTrajectories] = useState<DbTrajectory[]>([]);
+  const [hypothesisTrajectories, setHypothesisTrajectories] = useState<HypothesisRowData[]>([]);
+  const [areasTrajectoryOptions, setAreasTrajectoryOptions] = useState<CheckBoxData[] | undefined>([]);
+  const [dropDownListOptions, setDropDownListOptions] = useState<string[] | undefined>([]);
+  const [readOnlyRow, setReadOnlyRow] = useState<ReadOnlyObject>({});
   const studyState = useStudy();
   const dispatch = useStudyDispatch();
   const emptyAreaSelected = useMemo(
@@ -53,18 +66,68 @@ export const useFetchHypothesisTrajectories = (
               },
             },
           });
-          setHypothesisTrajectories(arrayWithoutDuplicate);
+
+          // Build checklist for dropdown list
+          const newArea = (areas || [])
+            .map((trajectoryArea) => {
+              if (!defaultAreas?.some((item) => item.name === trajectoryArea.areaName)) {
+                return { name: trajectoryArea.areaName, isDefault: false };
+              }
+            })
+            .filter(Boolean) as CheckBoxData[];
+          setAreasTrajectoryOptions(
+            defaultAreas?.map((area) => ({ name: area.name, isDefault: true }))?.concat(newArea),
+          );
+
+          const checkList = arrayWithoutDuplicate
+            ?.map((trajectory) => {
+              if (trajectory.area) {
+                return trajectory.area;
+              }
+            })
+            .filter(Boolean) as string[];
+          setDropDownListOptions(defaultAreas?.map((item) => item.name).concat(checkList));
+
+          // Build row data for hypothesis table
+          // Find default area not included in areas trajectory list
+          const defaultAreaListNotIncludedInList: string[] = defaultAreas
+            ?.map((defaultArea) => {
+              if (!areas?.some((trajectoryArea) => trajectoryArea.areaName === defaultArea.name)) {
+                return defaultArea.name;
+              }
+            })
+            .filter(Boolean) as string[];
+
+          // Hypothesis table
+          const areaData = arrayWithoutDuplicate
+            .map((trajectory) =>
+              buildRowWithSubRowsData(
+                trajectory,
+                defaultAreas,
+                defaultAreaListNotIncludedInList,
+                type === TRAJECTORY_TYPE.THERMAL_CAPACITY ? ThermalOptions : null,
+              ),
+            )
+            .filter(Boolean);
+          const dataTrajectories = sortWithFixedPosition(areaData);
+          setHypothesisTrajectories(dataTrajectories);
+          if (isStudyGenerated) {
+            const rows = getReadOnlyForGeneratedStudy(dataTrajectories);
+            setReadOnlyRow(rows);
+          } else if (defaultAreaListNotIncludedInList.length > 0 && !isStudyGenerated) {
+            setReadOnlyRow(retrieveReadOnlyArea(dataTrajectories, defaultAreaListNotIncludedInList));
+          }
         }
       } catch {
         // Silent handler
       }
     },
-    [defaultAreas, emptyAreaSelected, dispatch],
+    [defaultAreas, emptyAreaSelected, dispatch, areas],
   );
 
   useEffect(() => {
     void fetchAreas(studyId, trajectoryType);
   }, [studyId, trajectoryType]);
 
-  return { hypothesisTrajectories };
+  return { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow };
 };

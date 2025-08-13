@@ -15,7 +15,7 @@ declare module '@tanstack/react-table' {
   interface TableMeta<TData extends RowData> {
     updateData?: (rowId: string, value: unknown, status: RowStatus) => void;
     removeRow?: (value: string, rowId?: string) => void | Promise<void>;
-    search?: (value?: string, area?: string) => Promise<SelectOption[] | undefined>;
+    search?: (value: string, area: string) => Promise<SelectOption[] | undefined>;
     importData?: (rowId: string, index?: number) => Promise<void>;
   }
 }
