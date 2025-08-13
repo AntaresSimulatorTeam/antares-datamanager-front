@@ -5,11 +5,11 @@
  */
 
 import StdAvatar from '@/components/common/layout/stdAvatar/StdAvatar';
-import { StudyStatus } from '@/shared/types/common/StudyStatus.type';
 import { StudyDTO } from '@/shared/types/Study.type.ts';
 import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter';
 import { createColumnHelper } from '@tanstack/react-table';
-import { RdsRadioButton, RdsTagList } from 'rte-design-system-react';
+import { RdsTagList } from 'rte-design-system-react';
+import StdRadioButton from '@/components/forms/stdRadioButton/StdRadioButton.tsx';
 
 const columnHelper = createColumnHelper<StudyDTO>();
 
@@ -20,7 +20,7 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
     size: 50,
     cell: ({ row }) => (
       <div className={`${row.getIsSelected() ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
-        <RdsRadioButton
+        <StdRadioButton
           value={row.original.id.toString()}
           label=""
           disabled={!row.getCanSelect()}
@@ -33,15 +33,28 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
 
   columnHelper.accessor('name', {
     header: t('home.@study_name'),
-    cell: ({ getValue, row }) => {
-      const status = row.original.status;
-      const textClass = status === StudyStatus.GENERATED ? 'text-primary-900' : 'group-hover:text-green-500';
-      return <span className={`transition-colors ${textClass}`}>{getValue()}</span>;
-    },
+    size: 250,
+    cell: ({ getValue }) => <span className="text-primary-600 transition-colors">{getValue()}</span>,
+  }),
+
+  columnHelper.accessor('project', {
+    header: t('home.@project'),
+    size: 200,
+  }),
+
+  columnHelper.accessor('horizon', {
+    header: t('home.@horizon'),
+    size: 100,
+  }),
+
+  columnHelper.accessor('creationDate', {
+    header: t('home.@creation_date'),
+    cell: ({ getValue }) => formatDateToDDMMYYYY(getValue(), true),
   }),
 
   columnHelper.accessor('createdBy', {
     header: t('home.@user_name'),
+    size: 50,
     cell: ({ getValue }) => (
       <StdAvatar
         size="es"
@@ -52,32 +65,19 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
     ),
   }),
 
-  columnHelper.accessor('project', {
-    header: t('home.@project'),
-    size: 250,
-  }),
-
-  columnHelper.accessor('status', {
-    header: t('home.@status'),
-  }),
-
-  columnHelper.accessor('horizon', {
-    header: t('home.@horizon'),
-  }),
-
   columnHelper.accessor('keywords', {
     header: t('home.@keywords'),
-    size: 400,
+    size: 300,
     cell: ({ getValue, row }) => (
-      <div className="flex h-3 w-32">
+      <div className="flex h-3">
         <RdsTagList id={`pegase-tags-${row.id}`} tags={getValue()} />
       </div>
     ),
   }),
 
-  columnHelper.accessor('creationDate', {
-    header: t('home.@creation_date'),
-    cell: ({ getValue }) => formatDateToDDMMYYYY(getValue(), true),
+  columnHelper.accessor('status', {
+    header: t('home.@status'),
+    size: 200,
   }),
 ];
 

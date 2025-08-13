@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { RdsHeading } from 'rte-design-system-react';
+import StdHeading from '@common/layout/stdHeading/StdHeading.tsx';
 
 type ProjectDetailsHeaderProps = {
   projectName: string;
@@ -12,8 +12,7 @@ type ProjectDetailsHeaderProps = {
 
 const ProjectDetailsHeader = ({ projectName }: ProjectDetailsHeaderProps) => (
   <div className="flex items-center justify-between px-3 py-2">
-    <RdsHeading title={projectName} />
-    <div className="ml-auto flex items-center gap-4"></div>
+    <StdHeading title={projectName} />
   </div>
 );
 

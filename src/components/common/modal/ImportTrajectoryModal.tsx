@@ -1,4 +1,4 @@
-import { RdsButton, RdsIconId, RdsModal } from 'rte-design-system-react';
+import { RdsModal } from 'rte-design-system-react';
 import SelectAndSearchableInput from '@/components/input/SelectAndSearchableInput.tsx';
 import { useTranslation } from 'react-i18next';
 import { useCallback, useState } from 'react';
@@ -6,6 +6,8 @@ import { SelectOption } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { fetchTrajectoriesFromFS } from '@/shared/services/trajectoryService.ts';
 import { convertToFSSelectionOptionType } from '@/shared/utils/formFormatter.ts';
+import StdButton from '@common/base/stdButton/StdButton.tsx';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
 
 interface ImportTrajectoryModalProps {
@@ -65,11 +67,15 @@ export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, area }
             </div>
           </div>
           <div className="relative flex w-full justify-end gap-1 pb-2 pt-8">
-            <RdsButton label="Cancel" onClick={() => void onClose()} color="secondary" />
-            <RdsButton
-              icon={RdsIconId.Add}
+            <StdButton label="Cancel" onClick={() => void onClose()} color="secondary" />
+            <StdButton
+              icon={StdIconId.Add}
               label={t('studyDetails.@import')}
-              onClick={() => trajectorySelected && void onClose(trajectorySelected)}
+              onClick={() => {
+                if (trajectorySelected) {
+                  void onClose(trajectorySelected);
+                }
+              }}
               variant="contained"
               color="primary"
               disabled={!trajectorySelected}

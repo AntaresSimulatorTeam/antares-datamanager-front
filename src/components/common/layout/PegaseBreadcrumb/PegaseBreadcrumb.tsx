@@ -6,15 +6,15 @@
 
 import {
   RdsBreadcrumbSeparator,
-  RdsButton,
   RdsDropdown,
   RdsDropdownOption,
   RdsFloatingWrapper,
-  RdsIconId,
   useRdsId,
 } from 'rte-design-system-react';
 import { PegaseBreadcrumbItemType } from '@/shared/types';
 import { PegaseLinearBreadcrumb } from '@common/layout/PegaseBreadcrumb/PegaseLinearBreadcrumb.tsx';
+import StdButton from '@/components/button/stdButton/StdButton.tsx';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 type RdsBreadcrumbProps = {
   items: PegaseBreadcrumbItemType[];
@@ -47,7 +47,7 @@ export const PegaseBreadcrumb = ({ items, id: propsId }: RdsBreadcrumbProps) => 
       <RdsFloatingWrapper placement="bottom-start" autoClose offset={3}>
         <Trigger>
           <div className="rds-flex rds-items-center">
-            <RdsButton variant="transparent" size="small" color="secondary" icon={RdsIconId.MoreHoriz} />
+            <StdButton variant="transparent" size="small" color="secondary" icon={StdIconId.MoreHoriz} />
           </div>
         </Trigger>
         <Element>

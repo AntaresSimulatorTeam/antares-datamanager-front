@@ -5,8 +5,10 @@
  */
 
 import { MouseEvent, useRef, useState } from 'react';
-import { RdsButton, RdsIconId, RdsInputText } from 'rte-design-system-react';
 import { SelectOption } from '@/shared/types';
+import StdInputText from '@/components/forms/stdInputText/StdInputText.tsx';
+import StdButton from '@common/base/stdButton/StdButton.tsx';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 interface ProjectManagerProps {
   defaultPlaceHolder: string;
@@ -86,10 +88,10 @@ const SelectAndSearchableInput = ({
 
   return (
     <div className="relative">
-      <div className="absolute right-0 top-3">
+      <div className="absolute right-0 top-1">
         {isSelectEnable && (
-          <RdsButton
-            icon={!isDropdownOpen ? RdsIconId.KeyboardArrowRight : RdsIconId.KeyboardArrowDown}
+          <StdButton
+            icon={!isDropdownOpen ? StdIconId.KeyboardArrowRight : StdIconId.KeyboardArrowDown}
             size="extraSmall"
             variant="text"
             onClick={(e) => void handleClickOnKeyboard(e)}
@@ -98,7 +100,7 @@ const SelectAndSearchableInput = ({
           />
         )}
       </div>
-      <RdsInputText
+      <StdInputText
         onChange={(e) => {
           if (isSearchable) {
             void handleInputChange(e);
@@ -115,7 +117,7 @@ const SelectAndSearchableInput = ({
       />
       {isDropdownOpen && !!optionsSelection?.length && (
         <div
-          className="absolute left-0 top-7 z-50 max-h-32 w-full overflow-y-auto rounded border border-gray-300 bg-gray-w shadow-2 outline-none"
+          className="absolute left-0 top-4 z-50 max-h-32 w-full overflow-y-auto rounded border border-gray-300 bg-gray-w shadow-2 outline-none"
           onMouseDown={(e) => e.preventDefault()}
           ref={dropdownList}
           tabIndex={0}

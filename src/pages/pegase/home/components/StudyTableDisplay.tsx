@@ -13,12 +13,12 @@ import StudiesPagination from './StudiesPagination';
 import { RowSelectionState } from '@tanstack/react-table';
 import { deleteStudy } from '@/shared/services/studyService';
 import StdSimpleTable from '@/components/common/data/stdSimpleTable/StdSimpleTable';
-import { RdsButton } from 'rte-design-system-react';
 import { useStudyTableDisplay } from '@/hooks/useStudyTableDisplay';
 import { useStudyNavigation } from '@/hooks/useStudyNavigation';
 import { useTranslation } from 'react-i18next';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal';
 import StudyCreationModal from '@common/modal/StudyCreationModal';
+import StdButton from '@common/base/stdButton/StdButton.tsx';
 
 interface StudyTableDisplayProps {
   searchStudy: string | undefined;
@@ -110,18 +110,18 @@ const StudyTableDisplay = ({ searchStudy, projectId, projectInfoName }: StudyTab
         <div className="flex gap-2">
           {selectedRowId !== undefined ? (
             <>
-              <RdsButton
+              <StdButton
                 label={t('study.@open')}
                 onClick={() => void navigateToStudy(rows[Number.parseInt(selectedRowId || '-1')])}
                 variant="outlined"
               />
-              <RdsButton
+              <StdButton
                 label={t('study.@duplicate')}
                 onClick={handleDuplicate}
                 variant="outlined"
                 disabled={!isDuplicateActive}
               />
-              <RdsButton
+              <StdButton
                 label={t('study.@delete')}
                 onClick={handleDeleteClick}
                 variant="outlined"
@@ -129,7 +129,7 @@ const StudyTableDisplay = ({ searchStudy, projectId, projectInfoName }: StudyTab
               />
             </>
           ) : (
-            projectId !== '' && <RdsButton label={t('studyModal.@new_study')} onClick={toggleModal} />
+            projectId !== '' && <StdButton label={t('studyModal.@new_study')} onClick={toggleModal} />
           )}
         </div>
         <StudiesPagination count={count} intervalSize={intervalSize} current={currentPage} onChange={setPage} />

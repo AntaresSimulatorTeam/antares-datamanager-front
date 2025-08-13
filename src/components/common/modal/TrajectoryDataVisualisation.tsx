@@ -1,11 +1,12 @@
 /* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */
-import { RdsButton, RdsModal } from 'rte-design-system-react';
+import { RdsModal } from 'rte-design-system-react';
 import { useTranslation } from 'react-i18next';
 import StdSimpleTable from '@common/data/stdSimpleTable/StdSimpleTable.tsx';
 import { TrajectoryViewData } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
+import StdButton from '@common/base/stdButton/StdButton.tsx';
 
 interface TrajectoryDataVisualisationProps {
   trajectoryData: TrajectoryViewData;
@@ -31,7 +32,7 @@ export const TrajectoryDataVisualisation = ({ trajectoryData, onClose }: Traject
         </div>
       </RdsModal.Content>
       <RdsModal.Footer>
-        <RdsButton label={t('project.@close')} onClick={onClose} color="primary" />
+        <StdButton label={t('project.@close')} onClick={onClose} color="primary" />
       </RdsModal.Footer>
     </RdsModal>
   );

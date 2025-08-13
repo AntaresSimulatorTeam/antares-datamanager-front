@@ -8,8 +8,9 @@ import { useState } from 'react';
 import SearchBar from './SearchBar';
 import StudyTableDisplay from './StudyTableDisplay';
 import { useTranslation } from 'react-i18next';
-import { RdsChip, RdsHeading } from 'rte-design-system-react';
+import { RdsChip } from 'rte-design-system-react';
 import { useUser } from '@/store/contexts/UserContext.tsx';
+import StdHeading from '@common/layout/stdHeading/StdHeading.tsx';
 
 const HomePageContent = () => {
   const { t } = useTranslation();
@@ -33,7 +34,7 @@ const HomePageContent = () => {
 
   return (
     <div className="flex w-full flex-1 flex-col gap-3">
-      <RdsHeading title={t('home.@study_table_title')} />
+      <StdHeading title={t('home.@study_table_title')} />
       <div className="flex gap-4 py-2">
         <SearchBar onSearch={searchStudy} />
         <RdsChip

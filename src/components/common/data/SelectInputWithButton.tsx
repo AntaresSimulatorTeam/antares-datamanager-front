@@ -1,7 +1,7 @@
 import SelectAndSearchableInput from '@/components/input/SelectAndSearchableInput.tsx';
-import { RdsButton } from 'rte-design-system-react';
 import { useTranslation } from 'react-i18next';
 import { SelectOption } from '@/shared/types';
+import StdButton from '@/components/button/stdButton/StdButton.tsx';
 
 interface SelectInputWithButtonProps {
   onSelect: (value: SelectOption) => void;
@@ -21,7 +21,7 @@ export const SelectInputWithButton = ({
   const { t } = useTranslation();
 
   return (
-    <div className="flex w-fit items-center justify-start gap-2">
+    <div className="flex w-fit items-center justify-start gap-2 py-0.25">
       <SelectAndSearchableInput
         onSelect={(value: SelectOption) => void onSelect(value)}
         setSearchTerm={async (value?: string) => await onSearch(value)}
@@ -30,7 +30,7 @@ export const SelectInputWithButton = ({
         isInputDisabled={isDisabled}
       />
       <span>{t('studyDetails.@or')}</span>
-      <RdsButton label={t('studyDetails.@import_file')} onClick={() => void onClickButton?.()} disabled={isDisabled} />
+      <StdButton label={t('studyDetails.@import_file')} onClick={() => void onClickButton?.()} disabled={isDisabled} />
     </div>
   );
 };

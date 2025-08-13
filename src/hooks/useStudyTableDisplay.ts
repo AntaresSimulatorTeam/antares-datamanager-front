@@ -8,7 +8,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { StudyDTO } from '@/shared/types';
 import { fetchSearchStudies } from '@/shared/services/studyService.ts';
 
-const ITEMS_PER_PAGE = 9;
+const ITEMS_PER_PAGE = 12;
 const PAGINATION_CURRENT = 0;
 const intervalSize = ITEMS_PER_PAGE;
 
