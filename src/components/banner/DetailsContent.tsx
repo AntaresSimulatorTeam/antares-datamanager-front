@@ -6,10 +6,10 @@
 
 import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter';
 import { ProjectInfo, StudyDTO } from '@/shared/types';
-import { RdsTagList } from 'rte-design-system-react';
 import StdIcon from '@common/base/stdIcon/StdIcon';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import { useTranslation } from 'react-i18next';
+import StdTagList from '@common/base/StdTagList/StdTagList.tsx';
 
 type DetailsContentProps = {
   content: StudyDTO | ProjectInfo;
@@ -54,7 +54,7 @@ export const DetailsContent = ({ content }: DetailsContentProps) => {
                 <>
                   <div>|</div>
                   <div className="flex h-3 w-32">
-                    <RdsTagList id={`${content.id}-tag-list`} tags={(content as StudyDTO).keywords} />
+                    <StdTagList id={`${content.id}-tag-list`} tags={(content as StudyDTO).keywords} />
                   </div>
                 </>
               )}
@@ -62,7 +62,7 @@ export const DetailsContent = ({ content }: DetailsContentProps) => {
                 <>
                   <div>|</div>
                   <div className="flex h-3 w-32">
-                    <RdsTagList id={`${content.id}-tag-list`} tags={(content as ProjectInfo).tags} />
+                    <StdTagList id={`${content.id}-tag-list`} tags={(content as ProjectInfo).tags} />
                   </div>
                 </>
               )}
