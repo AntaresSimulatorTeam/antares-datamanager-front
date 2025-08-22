@@ -123,6 +123,7 @@ const StdFloatingWrapperComponent = ({
               style={{ ...floatingStyles, ...styles }}
               id={`${ELEMENT_PREFIX_ID}-${id}`}
               onClick={() => autoClose && setShowFloating(false)}
+              onKeyDown={() => autoClose && setShowFloating(false)}
               className={zIndex}
               {...getFloatingProps()}
             >

@@ -81,7 +81,12 @@ const StdTagList = ({
           </span>
         ))}
         {plusTagsVisible && (
-          <span className="flex h-2.25 items-center" ref={plusTagRef} onClick={stopPropagationAndPreventDefault}>
+          <span
+            onKeyDown={stopPropagationAndPreventDefault}
+            className="flex h-2.25 items-center"
+            ref={plusTagRef}
+            onClick={stopPropagationAndPreventDefault}
+          >
             <StdPopover
               offset={POPOVER_OFFSET}
               show={showPopover}

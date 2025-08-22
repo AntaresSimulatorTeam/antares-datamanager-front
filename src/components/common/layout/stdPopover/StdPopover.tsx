@@ -67,6 +67,7 @@ const StdPopoverComponent = ({
         <div
           className="flex flex-col gap-2 rounded bg-gray-w p-2 shadow-4"
           onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => e.stopPropagation()}
           role="popover"
         >
           {ContentComponent}
