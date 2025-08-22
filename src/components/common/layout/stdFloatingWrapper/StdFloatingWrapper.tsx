@@ -1,16 +1,16 @@
 import { useStdId } from '@/hooks/useStdId';
-import { ZIndex } from '@/shared/types/Tailwind.type';
+import { ZIndex } from '@/shared/types';
 import { findSlotOfType } from '@/shared/utils/slotsUtils';
 import {
-  FloatingArrow,
-  FloatingFocusManager,
-  FloatingPortal,
-  OffsetOptions,
-  Placement,
   arrow as arrowMw,
   autoUpdate,
   flip as flipMw,
+  FloatingArrow,
+  FloatingFocusManager,
+  FloatingPortal,
   offset as offsetMw,
+  OffsetOptions,
+  Placement,
   size as sizeMw,
   useClick,
   useDismiss,

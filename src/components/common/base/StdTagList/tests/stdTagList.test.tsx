@@ -1,4 +1,4 @@
-import { StdIconId } from '@/shared/utils/mappings/common/iconMaps';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { t } from 'i18next';
