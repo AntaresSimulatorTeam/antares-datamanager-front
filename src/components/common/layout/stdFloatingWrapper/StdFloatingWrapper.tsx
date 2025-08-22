@@ -1,5 +1,4 @@
 import { useStdId } from '@/hooks/useStdId';
-import { ZIndex } from '@/shared/types';
 import { findSlotOfType } from '@/shared/utils/slotsUtils';
 import {
   arrow as arrowMw,
@@ -11,6 +10,10 @@ import {
   offset as offsetMw,
   OffsetOptions,
   Placement,
+  arrow as arrowMw,
+  autoUpdate,
+  flip as flipMw,
+  offset as offsetMw,
   size as sizeMw,
   useClick,
   useDismiss,

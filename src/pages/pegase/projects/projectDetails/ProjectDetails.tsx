@@ -78,8 +78,8 @@ const ProjectDetails = () => {
       <div className="flex flex-col">
         <DetailsContent content={projectInfo} />
       </div>
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center gap-4 px-3 py-2">
+      <div className="flex flex-col gap-4 p-3">
+        <div className="flex items-center gap-4">
           <SearchBar onSearch={searchStudy} />
           <RdsChip
             label={t('home.@my_studies')}
