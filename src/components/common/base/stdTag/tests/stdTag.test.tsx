@@ -1,5 +1,5 @@
 import { noop } from '@/shared/utils/defaultUtils';
-import { StdIconId } from '@/shared/utils/mappings/common/iconMaps';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import { render, screen } from '@testing-library/react';
 import StdTag from '../StdTag';
 
