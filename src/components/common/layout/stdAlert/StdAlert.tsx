@@ -2,7 +2,7 @@ import { useRdsId } from 'rte-design-system-react';
 import { DisplayStatus } from '@/shared/types';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import StdIcon from '@common/base/stdIcon/StdIcon';
-import StdButton from '../../base/stdButton/StdButton';
+import StdButton from '@common/base/stdButton/StdButton';
 import { alertClassBuilder } from './alertClassBuilder';
 import { useState } from 'react';
 

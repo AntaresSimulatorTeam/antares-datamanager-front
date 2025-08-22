@@ -18,7 +18,7 @@ import { useStudyNavigation } from '@/hooks/useStudyNavigation';
 import { useTranslation } from 'react-i18next';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal';
 import StudyCreationModal from '@common/modal/StudyCreationModal';
-import StdButton from '@common/base/stdButton/StdButton.tsx';
+import StdButton from '@common/base/stdButton/StdButton';
 
 interface StudyTableDisplayProps {
   searchStudy: string | undefined;

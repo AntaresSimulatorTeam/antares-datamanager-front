@@ -1,7 +1,7 @@
 import { useStdId } from '@/hooks/common/useStdId';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { UIEventHandler, useEffect, useRef, useState } from 'react';
-import StdButton from '../../base/stdButton/StdButton';
+import StdButton from '@common/base/stdButton/StdButton';
 import { TabItemType } from './StdTabItem';
 import { tabListClassBuilder } from './tabClassBuilder';
 

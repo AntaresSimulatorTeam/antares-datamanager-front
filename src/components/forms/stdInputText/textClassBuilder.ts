@@ -14,7 +14,8 @@ export const VARIANT_CLASSES = {
   outlined: 'bg-gray-w hover:bg-gray-50 focus-within:border-primary-600 rounded border-gray-400',
   text: 'bg-gray-w hover:bg-gray-50 focus-within:border-b-primary-600 border-gray-w border-b-gray-400',
 };
-export const VARIANT_DISABLED_CLASSES = '[&]:bg-gray-100 hover:bg-gray-100 [&]:text-gray-500 [&]:cursor-not-allowed';
+export const VARIANT_DISABLED_CLASSES =
+  'border-l-gray-400 [&]:bg-gray-300 hover:bg-gray-100 [&]:text-gray-500 [&]:cursor-not-allowed';
 
 export const BUTTON_CLASSES = 'flex w-2.5 [&>button]:p-0';
 export const HIDE_BUTTON_CLASSES = 'invisible';

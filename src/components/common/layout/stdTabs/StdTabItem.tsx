@@ -3,7 +3,7 @@ import { useStdId } from '@/hooks/common/useStdId';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import StdIcon from '@common/base/stdIcon/StdIcon';
 import { MouseEventHandler } from 'react';
-import StdButton from '../../base/stdButton/StdButton';
+import StdButton from '@common/base/stdButton/StdButton';
 import { tabItemClassBuilder } from './tabClassBuilder';
 
 export type TabItemType = 'primary' | 'secondary';

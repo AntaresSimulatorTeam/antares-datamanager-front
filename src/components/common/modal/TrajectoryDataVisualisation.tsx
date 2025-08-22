@@ -6,7 +6,7 @@ import { TrajectoryViewData } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
-import StdButton from '@common/base/stdButton/StdButton.tsx';
+import StdButton from '@common/base/stdButton/StdButton';
 
 interface TrajectoryDataVisualisationProps {
   trajectoryData: TrajectoryViewData;

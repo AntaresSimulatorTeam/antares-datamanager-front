@@ -64,7 +64,7 @@
   },
   "projectDetails": {
     "@buttonEdit": "Edit",
-    "@bannerProjectName": "Project: {{name}}",
+    "@bannerProjectName": "Project",
     "@loading": "Loading project details..."
   },
   "projectModal": {
@@ -89,9 +89,9 @@
     "@loading": "Loading study details...",
     "@warnings": "Warnings",
     "@noWarnings": "No warning message at this time",
-    "@bannerStudyName": "Study: {{name}}",
+    "@bannerStudyName": "Study",
     "@bannerHorizon": "Horizon: {{horizon}}",
-    "@bannerCreatedBy": "By: {{createdBy}}",
+    "@bannerCreatedBy": "by {{createdBy}}",
     "@hypothesis": "Hypothesis",
     "@area": "Areas",
     "@link": "Link",

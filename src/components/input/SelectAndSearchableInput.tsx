@@ -7,7 +7,7 @@
 import { MouseEvent, useRef, useState } from 'react';
 import { SelectOption } from '@/shared/types';
 import StdInputText from '@/components/forms/stdInputText/StdInputText.tsx';
-import StdButton from '@common/base/stdButton/StdButton.tsx';
+import StdButton from '@common/base/stdButton/StdButton';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 interface ProjectManagerProps {

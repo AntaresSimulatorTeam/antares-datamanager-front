@@ -1,6 +1,6 @@
 import { RdsModal } from 'rte-design-system-react';
 import { useTranslation } from 'react-i18next';
-import StdButton from '@/components/button/stdButton/StdButton.tsx';
+import StdButton from '@common/base/stdButton/StdButton';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 interface DeletionModalProps {

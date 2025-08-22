@@ -7,7 +7,7 @@
 import { useTranslation } from 'react-i18next';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { ProjectCreationModal } from '@common/modal/ProjectCreationModal';
-import StdButton from '@/components/button/stdButton/StdButton.tsx';
+import StdButton from '@common/base/stdButton/StdButton';
 
 export const ProjectCreator = () => {
   const { t } = useTranslation();

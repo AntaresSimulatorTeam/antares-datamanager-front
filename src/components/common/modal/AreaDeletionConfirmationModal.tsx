@@ -1,7 +1,7 @@
 import React from 'react';
 import { RdsModal } from 'rte-design-system-react';
 import { useTranslation } from 'react-i18next';
-import StdButton from '@common/base/stdButton/StdButton.tsx';
+import StdButton from '@common/base/stdButton/StdButton';
 
 interface AreaDeletionConfirmationModalProps {
   isOpen?: boolean;

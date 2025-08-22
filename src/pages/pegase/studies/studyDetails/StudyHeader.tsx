@@ -32,7 +32,7 @@ const StudyHeader = ({ study }: StudyDetailsHeaderProps) => {
 
   return (
     <div className="flex items-center justify-between px-3 py-2">
-      <div className="font-nunito text-base flex items-center gap-2 py-1 font-semibold leading-none">
+      <div className="text-base flex items-center gap-2 py-1 font-semibold leading-none">
         <RdsIcon name={RdsIconId.MoreHoriz} color="secondary" />
         <RdsIcon name={RdsIconId.KeyboardArrowRight} color="secondary" />
         <PegaseBreadcrumb items={itemsStudyHeader}></PegaseBreadcrumb>

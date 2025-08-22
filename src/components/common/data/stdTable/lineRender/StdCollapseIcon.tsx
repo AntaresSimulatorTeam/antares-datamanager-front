@@ -5,7 +5,7 @@
  */
 
 import { RdsButtonProps } from 'rte-design-system-react';
-import StdButton from '@/components/button/stdButton/StdButton.tsx';
+import StdButton from '@common/base/stdButton/StdButton';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 type RdsCollapseIconProps = {

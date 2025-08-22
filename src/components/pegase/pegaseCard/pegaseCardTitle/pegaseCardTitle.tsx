@@ -14,7 +14,7 @@ import {
   RdsTag,
   RdsTagProps,
 } from 'rte-design-system-react';
-import StdButton from '@common/base/stdButton/StdButton.tsx';
+import StdButton from '@common/base/stdButton/StdButton';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 export type PegaseCardTitleProps = {

@@ -13,7 +13,7 @@ import {
 } from 'rte-design-system-react';
 import { PegaseBreadcrumbItemType } from '@/shared/types';
 import { PegaseLinearBreadcrumb } from '@common/layout/PegaseBreadcrumb/PegaseLinearBreadcrumb.tsx';
-import StdButton from '@/components/button/stdButton/StdButton.tsx';
+import StdButton from '@common/base/stdButton/StdButton';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 type RdsBreadcrumbProps = {
