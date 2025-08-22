@@ -4,7 +4,7 @@ import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import StdIcon from '@common/base/stdIcon/StdIcon';
 import { MouseEventHandler } from 'react';
 import { tabItemClassBuilder } from './tabClassBuilder';
-import StdButton from '@common/base/stdButton/StdButton.tsx';
+import StdButton from '@common/base/stdButton/StdButton';
 
 export type TabItemType = 'primary' | 'secondary';
 
