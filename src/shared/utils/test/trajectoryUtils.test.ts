@@ -118,6 +118,7 @@ describe('removeDuplicate', () => {
         userName: 'mouad',
         creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
         area: 'AT',
+        technology: '',
       },
       {
         id: 2,
@@ -127,6 +128,7 @@ describe('removeDuplicate', () => {
         userName: 'mouad',
         creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
         area: 'BE',
+        technology: '',
       },
     ]);
   });

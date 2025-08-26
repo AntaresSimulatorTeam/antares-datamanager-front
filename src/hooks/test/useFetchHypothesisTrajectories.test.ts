@@ -11,10 +11,11 @@ import {
   mockEmptyDbTrajectoryLoadFR,
   mockEmptyDbTrajectoryLoadOthers,
 } from '@/mocks/data/tests/trajectory.mock.ts';
-import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
 import * as trajectoryUtils from '@/shared/utils/trajectoryUtils.ts';
+import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 
 vi.mock('@/shared/services/trajectoryService');
 vi.mock('@/shared/services/studyService');
@@ -43,7 +44,7 @@ vi.mock('@/shared/services/warningService', async (importOriginal) => {
   };
 });
 
-describe.skip('useFetchTrajectoriesLinked', () => {
+describe('useFetchTrajectoriesLinked', () => {
   const mockUseStudyDispatch = useStudyDispatch as Mock<typeof useStudyDispatch>;
   const mockUseStudy = useStudy as Mock<typeof useStudy>;
   const mockDispatch = vi.fn().mockImplementation(vi.fn());
@@ -88,9 +89,59 @@ describe.skip('useFetchTrajectoriesLinked', () => {
         },
       });
       expect(result.current.hypothesisTrajectories).toEqual([
-        ...mockDbTrajectoryArrayLoad,
-        ...mockEmptyDbTrajectoryArrayLoad,
-        mockEmptyDbTrajectoryLoadOthers,
+        {
+          hypothesis: 'AT',
+          isDefault: false,
+          status: TRAJECTORY_SELECTION_STATUS.OK,
+          subRows: undefined,
+          trajectory: {
+            id: 1,
+            trajectoryName: 'area_PB_2024',
+            type: TRAJECTORY_TYPE.LOAD,
+            version: 3,
+            userName: 'mouad',
+            creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+            area: 'AT',
+            technology: '',
+          },
+        },
+        {
+          hypothesis: 'BE',
+          isDefault: false,
+          status: TRAJECTORY_SELECTION_STATUS.OK,
+          subRows: undefined,
+          trajectory: {
+            id: 2,
+            trajectoryName: 'area_PB_2026',
+            type: TRAJECTORY_TYPE.LOAD,
+            version: 3,
+            userName: 'mouad',
+            creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+            area: 'BE',
+            technology: '',
+          },
+        },
+        {
+          hypothesis: 'DEkf',
+          isDefault: false,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          subRows: undefined,
+          trajectory: null,
+        },
+        {
+          hypothesis: 'ES',
+          isDefault: false,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          subRows: undefined,
+          trajectory: null,
+        },
+        {
+          hypothesis: OTHER_AREAS_LABEL,
+          isDefault: true,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          subRows: null,
+          trajectory: null,
+        },
       ]);
     });
   });
@@ -129,10 +180,66 @@ describe.skip('useFetchTrajectoriesLinked', () => {
         },
       });
       expect(result.current.hypothesisTrajectories).toEqual([
-        ...mockDbTrajectoryArrayLoad,
-        ...mockEmptyDbTrajectoryArrayLoad,
-        mockEmptyDbTrajectoryLoadOthers,
-        mockEmptyDbTrajectoryLoadFR,
+        {
+          hypothesis: 'FR',
+          isDefault: true,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          subRows: null,
+          trajectory: null,
+        },
+        {
+          hypothesis: 'AT',
+          isDefault: false,
+          status: TRAJECTORY_SELECTION_STATUS.OK,
+          subRows: undefined,
+          trajectory: {
+            id: 1,
+            trajectoryName: 'area_PB_2024',
+            type: TRAJECTORY_TYPE.LOAD,
+            version: 3,
+            userName: 'mouad',
+            creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+            area: 'AT',
+            technology: '',
+          },
+        },
+        {
+          hypothesis: 'BE',
+          isDefault: false,
+          status: TRAJECTORY_SELECTION_STATUS.OK,
+          subRows: undefined,
+          trajectory: {
+            id: 2,
+            trajectoryName: 'area_PB_2026',
+            type: TRAJECTORY_TYPE.LOAD,
+            version: 3,
+            userName: 'mouad',
+            creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+            area: 'BE',
+            technology: '',
+          },
+        },
+        {
+          hypothesis: 'DEkf',
+          isDefault: false,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          subRows: undefined,
+          trajectory: null,
+        },
+        {
+          hypothesis: 'ES',
+          isDefault: false,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          subRows: undefined,
+          trajectory: null,
+        },
+        {
+          hypothesis: OTHER_AREAS_LABEL,
+          isDefault: true,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          subRows: null,
+          trajectory: null,
+        },
       ]);
     });
   });
@@ -166,9 +273,52 @@ describe.skip('useFetchTrajectoriesLinked', () => {
         },
       });
       expect(result.current.hypothesisTrajectories).toEqual([
-        ...mockDbTrajectoryArrayLoad,
-        mockEmptyDbTrajectoryLoadOthers,
-        mockEmptyDbTrajectoryLoadFR,
+        {
+          hypothesis: 'FR',
+          isDefault: true,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          subRows: null,
+          trajectory: null,
+        },
+        {
+          hypothesis: 'AT',
+          isDefault: false,
+          status: TRAJECTORY_SELECTION_STATUS.OK,
+          subRows: undefined,
+          trajectory: {
+            id: 1,
+            trajectoryName: 'area_PB_2024',
+            type: TRAJECTORY_TYPE.LOAD,
+            version: 3,
+            userName: 'mouad',
+            creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+            area: 'AT',
+            technology: '',
+          },
+        },
+        {
+          hypothesis: 'BE',
+          isDefault: false,
+          status: TRAJECTORY_SELECTION_STATUS.OK,
+          subRows: undefined,
+          trajectory: {
+            id: 2,
+            trajectoryName: 'area_PB_2026',
+            type: TRAJECTORY_TYPE.LOAD,
+            version: 3,
+            userName: 'mouad',
+            creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+            area: 'BE',
+            technology: '',
+          },
+        },
+        {
+          hypothesis: OTHER_AREAS_LABEL,
+          isDefault: true,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          subRows: null,
+          trajectory: null,
+        },
       ]);
     });
   });
@@ -197,9 +347,52 @@ describe.skip('useFetchTrajectoriesLinked', () => {
         },
       });
       expect(result.current.hypothesisTrajectories).toEqual([
-        ...mockDbTrajectoryArrayLoad,
-        mockEmptyDbTrajectoryLoadOthers,
-        mockEmptyDbTrajectoryLoadFR,
+        {
+          hypothesis: 'BE',
+          isDefault: true,
+          status: TRAJECTORY_SELECTION_STATUS.OK,
+          subRows: null,
+          trajectory: {
+            id: 2,
+            trajectoryName: 'area_PB_2026',
+            type: TRAJECTORY_TYPE.LOAD,
+            version: 3,
+            userName: 'mouad',
+            creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+            area: 'BE',
+            technology: '',
+          },
+        },
+        {
+          hypothesis: 'FR',
+          isDefault: true,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          subRows: null,
+          trajectory: null,
+        },
+        {
+          hypothesis: 'AT',
+          isDefault: false,
+          status: TRAJECTORY_SELECTION_STATUS.OK,
+          subRows: undefined,
+          trajectory: {
+            id: 1,
+            trajectoryName: 'area_PB_2024',
+            type: TRAJECTORY_TYPE.LOAD,
+            version: 3,
+            userName: 'mouad',
+            creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+            area: 'AT',
+            technology: '',
+          },
+        },
+        {
+          hypothesis: OTHER_AREAS_LABEL,
+          isDefault: true,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          subRows: null,
+          trajectory: null,
+        },
       ]);
     });
   });
