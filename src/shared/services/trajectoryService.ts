@@ -183,8 +183,8 @@ export const unlinkTrajectoryFromStudy = async (trajectoryId: number, studyId: n
 
 /**
  * Delete all trajectories linked to a study
- *
  * @param {number} studyId - Study id
+ * @return {Promise<void>}
  */
 export const unlinkAllTrajectoriesFromStudy = async (studyId: number): Promise<void> => {
   const urlApi = `${TRAJECTORY_UNLINK_ALL_TO_STUDY_ENDPOINT}?studyId=${studyId}`;
@@ -199,24 +199,20 @@ export const unlinkAllTrajectoriesFromStudy = async (studyId: number): Promise<v
 
 /**
  * Delete all trajectories linked to a study
- * @param {number[]} trajectoryIds - Trajectory id list to delete
  * @param {number} studyId - Study id
- * @return {Promise<{ failed: number[]; success: number[] }>}
+ * @param {number[]} trajectoryIds - Trajectory id list to delete
+ * @return {Promise<void>}
  */
-export const unlinkMultipleTrajectoriesFromStudy = async (
-  trajectoryIds: number[],
-  studyId: number,
-): Promise<{ failed: number[]; success: number[] }> => {
+export const unlinkMultipleTrajectoriesFromStudy = async (studyId: number, trajectoryIds: number[]): Promise<void> => {
   const urlApi = `${TRAJECTORY_UNLINK_MULTIPLE_TO_STUDY_ENDPOINT}?studyId=${studyId}`;
   try {
-    const response = await AuthService.authFetch(urlApi, {
+    await AuthService.authFetch(urlApi, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(trajectoryIds),
     });
-    return (await (response as Response).json()) as unknown as { failed: number[]; success: number[] };
   } catch (error) {
     throw new Error(`${(error as BackendError)?.antaresErrorMessage}`);
   }

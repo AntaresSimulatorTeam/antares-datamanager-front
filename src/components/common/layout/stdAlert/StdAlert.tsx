@@ -66,9 +66,7 @@ const StdAlert = ({
         <StdButton
           variant="transparent"
           color="secondary"
-          onClick={() => {
-            if (content && content?.length > 0) setExpanded((prev) => !prev);
-          }}
+          onClick={() => setExpanded((prev) => !prev)}
           icon={expanded ? StdIconId.KeyboardArrowUp : StdIconId.KeyboardArrowDown}
           size="small"
         />

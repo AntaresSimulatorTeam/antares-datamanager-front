@@ -9,7 +9,6 @@ import { RdsDivider } from 'rte-design-system-react';
 import {
   CheckBoxData,
   DbTrajectory,
-  FileInputStatus,
   HypothesisRowData,
   LocationStudy,
   RowStatus,
@@ -21,7 +20,7 @@ import { useEffect, useState } from 'react';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
-import { getRowDataSelected } from '@/shared/utils/trajectoryUtils.ts';
+import { getAreaTrajectoryName, getRowDataSelected } from '@/shared/utils/trajectoryUtils.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
@@ -31,17 +30,13 @@ import { useLocation } from 'react-router-dom';
 import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
 import StdCheckbox from '@common/forms/stdCheckbox/StdCheckbox.tsx';
 import StdCheckboxGroupWrapper from '@common/forms/stdCheckboxGroup/StdCheckboxGroupWrapper.tsx';
-import { useUser } from '@/store/contexts/UserContext.tsx';
 import { DeletionModal } from '@common/modal/DeletionModal.tsx';
-import {
-  handleFetchTrajectoriesFS,
-  handleImportTrajectory,
-  handleSelectionChange,
-  handleTrajectoryAttach,
-  handleTrajectorySearch,
-  handleTrajectoryUnlink,
-  removeRow,
-} from '@/shared/services/hypothesisTableService.ts';
+import { addRow, handleFetchTrajectoriesFS, handleTrajectorySearch } from '@/shared/services/hypothesisTableService.ts';
+import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
+import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
+import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow.ts';
+import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
+import { shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
 
 interface ThermalTabProps {
   defaultAreas: { name: string }[];
@@ -50,7 +45,6 @@ interface ThermalTabProps {
 
 const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
   const { t } = useTranslation();
-  const { user } = useUser();
   const studyState = useStudy();
   const location = useLocation();
   const study = (location.state as LocationStudy)?.study;
@@ -58,8 +52,6 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
   const [data, setData] = useState<HypothesisRowData[]>([]);
-  const [progress, setProgress] = useState(0);
-  const [fileStatus, setFileStatus] = useState<FileInputStatus>('empty');
   const [rowIdSelected, setRowIdSelected] = useState<string>('0');
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
   const { isModalOpen, toggleModal } = useNewStudyModal();
@@ -72,6 +64,10 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
   );
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
     useFetchHypothesisTrajectories(study?.id, TRAJECTORY_TYPE.THERMAL_CAPACITY, defaultAreas, areas, isStudyGenerated);
+  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(study, studyState, dispatch, setData);
+  const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch, setData);
+  const { removeRow } = useHypothesisTableRemoveRow(study, dispatch, setData, setCheckedValues);
+  const { detachTrajectory } = useTrajectoryDetach(study, dispatch, setData);
 
   useEffect(() => {
     const setHypothesis = () => {
@@ -94,19 +90,14 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
           name={''}
           onChange={(value: string, isChecked?: boolean) => {
             const indexRow = data.findIndex((row) => row.hypothesis === value);
-            void handleSelectionChange(
-              TRAJECTORY_TYPE.THERMAL_CAPACITY,
-              value,
-              indexRow,
-              dispatch,
-              setCheckedValues,
-              setData,
-              setRowToDelete,
-              setIsDeletionModalOpen,
-              data,
-              study?.id,
-              isChecked,
-            );
+            if (isChecked) {
+              addRow(TRAJECTORY_TYPE.THERMAL_CAPACITY, value, dispatch, setCheckedValues, setData);
+            } else if (shouldOpenDeletionModal(TRAJECTORY_TYPE.THERMAL_CAPACITY, indexRow, data)) {
+              setRowToDelete({ index: indexRow, value });
+              setIsDeletionModalOpen(true);
+            } else {
+              void removeRow(TRAJECTORY_TYPE.THERMAL_CAPACITY, value, indexRow, data);
+            }
           }}
           checkedValues={checkedValues}
         >
@@ -142,68 +133,42 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
               await handleTrajectorySearch(TRAJECTORY_TYPE.THERMAL_CAPACITY, value, area, setDbTrajectories, study)
             }
             handleImport={async (rowId: string) => {
-              const indexArray = rowId.split('.').map((item) => parseInt(item));
-              const hypothesis = data[indexArray[0]]?.hypothesis === 'FR' ? 'FR' : '';
+              const indexArray = rowId.split('.').map(Number);
               await handleFetchTrajectoriesFS(
                 TRAJECTORY_TYPE.THERMAL_CAPACITY,
                 rowId,
                 setOptionsFS,
                 setRowIdSelected,
                 toggleModal,
-                hypothesis,
+                data[indexArray[0]]?.hypothesis === 'FR' ? 'FR' : '',
               );
             }}
             isReadOnlyEnable={true}
             updateData={(rowId: string, value: unknown, status: RowStatus) => {
-              const indexArray = rowId.split('.').map((item) => parseInt(item));
+              const indexArray = rowId.split('.').map(Number);
               if (status === 'empty' || status === 'emptyError') {
                 const trajectorySelected: DbTrajectory | null =
                   getRowDataSelected(data, indexArray)?.trajectory ?? null;
-                if (trajectorySelected)
-                  void handleTrajectoryUnlink(
-                    TRAJECTORY_TYPE.THERMAL_CAPACITY,
-                    indexArray,
-                    status,
-                    trajectorySelected,
-                    study,
-                    dispatch,
-                    setData,
-                    user?.profile?.sub ?? '',
-                    t,
-                  );
+                if (trajectorySelected) {
+                  void detachTrajectory(TRAJECTORY_TYPE.THERMAL_CAPACITY, indexArray, status, trajectorySelected);
+                }
               } else if (status === 'success') {
                 const dbTrajectory =
                   dbTrajectories.length > 0
                     ? dbTrajectories.find((item) => item.trajectoryName === value)
                     : getRowDataSelected(data, indexArray)?.trajectory;
-                if (dbTrajectory)
-                  void handleTrajectoryAttach(
-                    TRAJECTORY_TYPE.THERMAL_CAPACITY,
-                    indexArray,
-                    status,
-                    dbTrajectory,
-                    study,
-                    studyState,
-                    dispatch,
-                    setData,
-                    t,
-                    user?.profile?.sub ?? '',
-                  );
+                if (dbTrajectory) {
+                  void attachTrajectory(TRAJECTORY_TYPE.THERMAL_CAPACITY, indexArray, status, dbTrajectory);
+                }
               }
             }}
             removeRow={(value: string, rowId?: string) => {
-              void handleSelectionChange(
-                TRAJECTORY_TYPE.THERMAL_CAPACITY,
-                value,
-                Number(rowId),
-                dispatch,
-                setCheckedValues,
-                setData,
-                setRowToDelete,
-                setIsDeletionModalOpen,
-                data,
-                study?.id,
-              );
+              if (shouldOpenDeletionModal(TRAJECTORY_TYPE.THERMAL_CAPACITY, Number(rowId), data)) {
+                setRowToDelete({ index: Number(rowId), value });
+                setIsDeletionModalOpen(true);
+              } else {
+                void removeRow(TRAJECTORY_TYPE.THERMAL_CAPACITY, value, Number(rowId), data);
+              }
             }}
           />
         )}
@@ -213,31 +178,13 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
           options={optionsFS}
           onClose={async (value?: SelectOption) => {
             toggleModal();
-            const indexArray = rowIdSelected.split('.').map((item) => parseInt(item));
             if (value != null) {
-              await handleImportTrajectory(
-                TRAJECTORY_TYPE.THERMAL_CAPACITY,
-                value,
-                indexArray,
-                data[indexArray[0]]?.hypothesis,
-                setFileStatus,
-                setProgress,
-                study,
-                studyState,
-                dispatch,
-                t,
-                user?.profile?.sub ?? '',
-                setData,
-              );
+              const indexArray = rowIdSelected.split('.').map(Number);
+              await importTrajectory(TRAJECTORY_TYPE.THERMAL_CAPACITY, value, indexArray, data);
             }
           }}
           trajectoryType={TRAJECTORY_TYPE.THERMAL_CAPACITY}
-          area={
-            getRowDataSelected(
-              data,
-              rowIdSelected.split('.').map((item) => parseInt(item)),
-            )?.hypothesis
-          }
+          area={getAreaTrajectoryName(rowIdSelected, data)}
         />
       )}
       {isDeletionModalOpen && (
@@ -245,16 +192,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
           onClose={() => setIsDeletionModalOpen(false)}
           handleDeletionRow={async () => {
             if (rowToDelete?.value) {
-              await removeRow(
-                TRAJECTORY_TYPE.THERMAL_CAPACITY,
-                rowToDelete?.value,
-                rowToDelete.index,
-                dispatch,
-                setCheckedValues,
-                setData,
-                data,
-                study.id,
-              );
+              await removeRow(TRAJECTORY_TYPE.THERMAL_CAPACITY, rowToDelete?.value, rowToDelete.index, data);
               setIsDeletionModalOpen(false);
             }
           }}

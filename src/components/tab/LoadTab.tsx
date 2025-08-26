@@ -8,7 +8,6 @@ import { useEffect, useState } from 'react';
 import {
   CheckBoxData,
   DbTrajectory,
-  FileInputStatus,
   HypothesisRowData,
   LocationStudy,
   RowStatus,
@@ -20,26 +19,23 @@ import { useTranslation } from 'react-i18next';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { useLocation } from 'react-router-dom';
 import SearchBar from '@/pages/pegase/home/components/SearchBar.tsx';
-import { RdsCheckbox, RdsCheckboxGroupWrapper, RdsDivider } from 'rte-design-system-react';
+import { RdsDivider } from 'rte-design-system-react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import getEditableHypothesisTableHeaders from '@/components/header/EditableHypothesisTableHeaders.tsx';
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { DeletionModal } from '@common/modal/DeletionModal.tsx';
-import { useUser } from '@/store/contexts/UserContext.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
-import {
-  handleFetchTrajectoriesFS,
-  handleImportTrajectory,
-  handleSelectionChange,
-  handleTrajectoryAttach,
-  handleTrajectorySearch,
-  handleTrajectoryUnlink,
-  removeRow,
-} from '@/shared/services/hypothesisTableService.ts';
-import { getReadOnlyForGeneratedStudy } from '@/shared/helpers/hypothesisTableHelper.ts';
+import { addRow, handleFetchTrajectoriesFS, handleTrajectorySearch } from '@/shared/services/hypothesisTableService.ts';
+import { getReadOnlyForGeneratedStudy, shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
+import StdCheckboxGroupWrapper from '@common/forms/stdCheckboxGroup/StdCheckboxGroupWrapper.tsx';
+import StdCheckbox from '@common/forms/stdCheckbox/StdCheckbox.tsx';
+import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
+import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
+import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
+import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow.ts';
 
 interface LoadTabProps {
   defaultAreas: { name: string }[];
@@ -49,7 +45,6 @@ interface LoadTabProps {
 const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
   const { t } = useTranslation();
   const studyState = useStudy();
-  const { user } = useUser();
   const location = useLocation();
   const study = (location.state as LocationStudy)?.study;
   const dispatch = useStudyDispatch();
@@ -63,13 +58,15 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const [rowToDelete, setRowToDelete] = useState<{ index: number; value?: string } | null>(null);
-  const [progress, setProgress] = useState(0);
-  const [fileStatus, setFileStatus] = useState<FileInputStatus>('empty');
   const [isStudyGenerated, setIsStudyGenerated] = useState(
     studyState.studyStatus === StudyStatus.GENERATED || study.status === StudyStatus.GENERATED,
   );
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
     useFetchHypothesisTrajectories(study?.id, TRAJECTORY_TYPE.LOAD, defaultAreas, areas, isStudyGenerated);
+  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(study, studyState, dispatch, setData);
+  const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch, setData);
+  const { removeRow } = useHypothesisTableRemoveRow(study, dispatch, setData, setCheckedValues);
+  const { detachTrajectory } = useTrajectoryDetach(study, dispatch, setData);
 
   useEffect(() => {
     const setHypothesis = () => {
@@ -95,7 +92,7 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
       const rows = getReadOnlyForGeneratedStudy(data);
       setReadOnly(rows);
     }
-  }, [studyState.studyStatus, study?.status]);
+  }, [studyState.studyStatus, study?.status, data]);
 
   return (
     <div className="flex h-full w-full flex-col gap-4">
@@ -104,36 +101,30 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
           <div className="border-b border-gray-400 pb-2">
             <SearchBar onSearch={() => {}} placeholder={t('studyDetails.@search_area')} />
           </div>
-          <RdsCheckboxGroupWrapper
+          <StdCheckboxGroupWrapper
             label={''}
             name={''}
             onChange={(value: string, isChecked?: boolean) => {
               const indexRow = data.findIndex((row) => row.hypothesis === value);
-              void handleSelectionChange(
-                TRAJECTORY_TYPE.LOAD,
-                value,
-                indexRow,
-                dispatch,
-                setCheckedValues,
-                setData,
-                setRowToDelete,
-                setIsDeletionModalOpen,
-                data,
-                study?.id,
-                isChecked,
-              );
+              if (isChecked) {
+                addRow(TRAJECTORY_TYPE.LOAD, value, dispatch, setCheckedValues, setData);
+              } else if (shouldOpenDeletionModal(TRAJECTORY_TYPE.LOAD, indexRow, data)) {
+                setRowToDelete({ index: indexRow, value });
+                setIsDeletionModalOpen(true);
+              } else {
+                void removeRow(TRAJECTORY_TYPE.LOAD, value, indexRow, data);
+              }
             }}
             checkedValues={checkedValues}
             disabled={isStudyGenerated}
           >
             {areasOptions?.map((area, index) => (
               <div key={`${index}-${area.name}`} className="my-1">
-                <RdsCheckbox
+                <StdCheckbox
                   key={`load-checkbox-${area.name}`}
                   label={area.name}
                   value={area.name}
                   name={''}
-                  defaultChecked={area.isDefault}
                   disabled={area.isDefault}
                   checked={area.isDefault}
                 />
@@ -142,7 +133,7 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
                 )}
               </div>
             ))}
-          </RdsCheckboxGroupWrapper>
+          </StdCheckboxGroupWrapper>
         </div>
         <div className="flex h-fit w-full">
           <PegaseHypothesisTable
@@ -160,50 +151,22 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
             handleImport={async (rowId: string) =>
               await handleFetchTrajectoriesFS(TRAJECTORY_TYPE.LOAD, rowId, setOptionsFS, setRowIdSelected, toggleModal)
             }
-            removeRow={(value: string, rowId?: string) =>
-              void handleSelectionChange(
-                TRAJECTORY_TYPE.LOAD,
-                value,
-                Number(rowId),
-                dispatch,
-                setCheckedValues,
-                setData,
-                setRowToDelete,
-                setIsDeletionModalOpen,
-                data,
-                study?.id,
-              )
-            }
+            removeRow={(value: string, rowId?: string) => {
+              if (shouldOpenDeletionModal(TRAJECTORY_TYPE.LOAD, Number(rowId), data)) {
+                setRowToDelete({ index: Number(rowId), value });
+                setIsDeletionModalOpen(true);
+              } else {
+                void removeRow(TRAJECTORY_TYPE.LOAD, value, Number(rowId), data);
+              }
+            }}
             updateData={(rowId: string, value: unknown, status: RowStatus) => {
               const index = Number(rowId);
               const trajectory = data[index]?.trajectory;
               if ((status === 'empty' && trajectory) || (status === 'emptyError' && trajectory)) {
-                void handleTrajectoryUnlink(
-                  TRAJECTORY_TYPE.LOAD,
-                  [index],
-                  status,
-                  trajectory,
-                  study,
-                  dispatch,
-                  setData,
-                  user?.profile?.sub ?? '',
-                  t,
-                );
+                void detachTrajectory(TRAJECTORY_TYPE.LOAD, [index], status, trajectory);
               } else if (status === 'success') {
                 const dbTrajectory = dbTrajectories.find((item) => item.trajectoryName === value) ?? trajectory;
-                if (dbTrajectory)
-                  void handleTrajectoryAttach(
-                    TRAJECTORY_TYPE.LOAD,
-                    [Number(rowId)],
-                    status,
-                    dbTrajectory,
-                    study,
-                    studyState,
-                    dispatch,
-                    setData,
-                    t,
-                    user?.profile?.sub ?? '',
-                  );
+                if (dbTrajectory) void attachTrajectory(TRAJECTORY_TYPE.LOAD, [Number(rowId)], status, dbTrajectory);
               }
             }}
             isReadOnlyEnable={true}
@@ -214,22 +177,8 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
             options={optionsFS}
             onClose={async (value?: SelectOption) => {
               toggleModal();
-              const indexArray = rowIdSelected.split('.').map((item) => parseInt(item));
               if (value != null) {
-                await handleImportTrajectory(
-                  TRAJECTORY_TYPE.LOAD,
-                  value,
-                  indexArray,
-                  data[indexArray[0]]?.hypothesis,
-                  setFileStatus,
-                  setProgress,
-                  study,
-                  studyState,
-                  dispatch,
-                  t,
-                  user?.profile?.sub ?? '',
-                  setData,
-                );
+                await importTrajectory(TRAJECTORY_TYPE.LOAD, value, [Number(rowIdSelected)], data);
               }
             }}
             trajectoryType={TRAJECTORY_TYPE.LOAD}
@@ -241,16 +190,7 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
             onClose={() => setIsDeletionModalOpen(false)}
             handleDeletionRow={async () => {
               if (rowToDelete?.value) {
-                await removeRow(
-                  TRAJECTORY_TYPE.LOAD,
-                  rowToDelete?.value,
-                  rowToDelete.index,
-                  dispatch,
-                  setCheckedValues,
-                  setData,
-                  data,
-                  study?.id,
-                );
+                await removeRow(TRAJECTORY_TYPE.LOAD, rowToDelete?.value, rowToDelete.index, data);
                 setIsDeletionModalOpen(false);
               }
             }}

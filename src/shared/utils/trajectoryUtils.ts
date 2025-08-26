@@ -253,11 +253,30 @@ export const isMatchingTrajectoryType = (trajectoryKey: TRAJECTORY_TYPE) => (tra
 
 /**
  * Select data row according to index array provided
- * @param data
- * @param indexArray
+ * @param {HypothesisRowData[]} data
+ * @param {number[]} indexArray
+ * @return {HypothesisRowData | null} - Hypothesis row data
  */
 export const getRowDataSelected = (data: HypothesisRowData[], indexArray: number[]): HypothesisRowData | null =>
   indexArray.length === 2 ? (data[indexArray[0]].subRows?.[indexArray[1]] ?? null) : (data[indexArray[0]] ?? null);
+
+/**
+ * Get a name composed of an area name and a technology name
+ * @param {string} rowIdSelected
+ * @param {HypothesisRowData[]} data
+ * @return {string}
+ */
+export const getAreaTrajectoryName = (rowIdSelected: string, data: HypothesisRowData[]): string => {
+  const [mainIndex, subIndex] = rowIdSelected.split('.').map(Number);
+
+  const mainRow = data[mainIndex];
+  if (!mainRow) return '';
+
+  const subRow = mainRow.subRows?.[subIndex];
+  const technologyName = subRow?.hypothesis ? ` - ${subRow.hypothesis}` : '';
+
+  return `${mainRow.hypothesis ?? ''}${technologyName}`;
+};
 
 /**
  * Retrieves the hypothesis and technology values based on selected row data.

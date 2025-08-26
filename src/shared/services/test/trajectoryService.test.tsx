@@ -16,6 +16,7 @@ import {
   getTrajectoryDataByTypeAndId,
   linkTrajectoryToStudy,
   unlinkAllTrajectoriesFromStudy,
+  unlinkMultipleTrajectoriesFromStudy,
   unlinkTrajectoryFromStudy,
   uploadTrajectory,
 } from '@/shared/services/trajectoryService.ts';
@@ -235,6 +236,41 @@ describe('unlinkAllTrajectoriesFromStudy', () => {
 
     await expect(async () => unlinkAllTrajectoriesFromStudy(studyId)).rejects.toThrowError(
       'Failed to unlink all trajectories',
+    );
+  });
+});
+
+describe('unlinkMultipleTrajectoriesFromStudy', () => {
+  const requestOptions = { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '[1,8,45]' };
+  const studyId = 42;
+
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should unlink all trajectories from a study', async () => {
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({ ok: true });
+
+    await unlinkMultipleTrajectoriesFromStudy(studyId, [1, 8, 45]);
+
+    await waitFor(() => {
+      expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
+      expect(AuthService.authFetch).toHaveBeenCalledWith(
+        `https://mockapi.com/v1/trajectory/detach/batch?studyId=${studyId}`,
+        requestOptions,
+      );
+    });
+  });
+
+  it('should handle exception during unlink all', async () => {
+    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
+      antaresErrorMessage: 'Batch detach of trajectories [0] failed',
+      date: new Date(),
+      type: ERROR_MESSAGE_TYPE.BUSINESS,
+    });
+
+    await expect(async () => unlinkAllTrajectoriesFromStudy(studyId)).rejects.toThrowError(
+      'Batch detach of trajectories [0] failed',
     );
   });
 });

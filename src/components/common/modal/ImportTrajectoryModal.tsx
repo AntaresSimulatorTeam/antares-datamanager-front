@@ -46,7 +46,6 @@ export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, area }
     <RdsModal size="small">
       <RdsModal.Title onClose={() => void onClose()} icon="Upload">
         {t('studyDetails.@import_from_file_system', {
-          trajectoryType,
           area,
         })}
       </RdsModal.Title>
