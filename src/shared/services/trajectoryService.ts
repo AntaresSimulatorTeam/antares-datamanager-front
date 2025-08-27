@@ -39,6 +39,7 @@ import { fetchWarningMessagesFromType } from './warningService';
  * @param {string} horizon - Horizon value (ex: 2020-2021)
  * @param {string | undefined} fileName - Autocompletion - filter trajectories by file name
  * @param {string | undefined} area - To use just in thermal capacity case
+ * @param {string | undefined} technology - Technology
  * @returns {Promise<DbTrajectory[]>} - Promise object that represents a list of trajectories
  * @throws {Error}
  */
@@ -47,8 +48,9 @@ export const fetchTrajectoriesFromDB = async (
   horizon: string,
   fileName?: string,
   area?: string,
+  technology?: string,
 ): Promise<DbTrajectory[]> => {
-  const urlApi = `${TRAJECTORY_DATA_BASE_ENDPOINT}?trajectoryType=${trajectoryType}&horizon=${horizon}&fileNameContains=${fileName ?? ''}&loadArea=${area ?? ''}`;
+  const urlApi = `${TRAJECTORY_DATA_BASE_ENDPOINT}?trajectoryType=${trajectoryType}&horizon=${horizon}&fileNameContains=${fileName ?? ''}&area=${area ?? ''}&technology=${technology ?? ''}`;
   try {
     const response = await AuthService.authFetch(urlApi);
     return (await (response as Response).json()) as DbTrajectory[];

@@ -14,7 +14,6 @@ import { LabelWithButtonPreview } from '@common/data/LabelWithButtonPreview.tsx'
 import { LabelWithDeleteButton } from '@common/data/LabelWithDeleteButton.tsx';
 import { SelectInputWithButton } from '@common/data/SelectInputWithButton.tsx';
 import { ErrorMessageType } from '@/shared/types/Generic.type.ts';
-import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { ProgressBar } from '@/components/forms/ProgressBar.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
@@ -107,12 +106,7 @@ const getExpandableHypothesisTableHeaders = (
               setErrorInfo({ index: row.index, message: '' });
               void options?.meta?.updateData?.(row.id, value.label, 'success');
             }}
-            onSearch={async (value?: string) =>
-              options?.meta?.search?.(
-                value ?? '',
-                row.original.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : row.original.hypothesis,
-              )
-            }
+            onSearch={async (value?: string) => options?.meta?.search?.(value ?? '', row.id)}
             onClickButton={() => {
               setErrorInfo({ index: row.index, message: '' });
               void options?.meta?.importData?.(row.id);

@@ -59,9 +59,10 @@ export const handleTrajectorySearch = async (
   area: string,
   setDbTrajectories: Dispatch<SetStateAction<DbTrajectory[]>>,
   study: StudyDTO,
+  technology?: string,
 ): Promise<SelectOption[] | undefined> => {
   try {
-    const results = await fetchTrajectoriesFromDB(type, study.horizon, value, area);
+    const results = await fetchTrajectoriesFromDB(type, study.horizon, value, area, technology);
     setDbTrajectories(results);
     return convertToSelectionOptionType(results);
   } catch {

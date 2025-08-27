@@ -170,7 +170,7 @@ describe('handleTrajectorySearch', () => {
 
     const result = await handleTrajectorySearch(type, value, area, setDbTrajectories, study);
 
-    expect(trajectoryService.fetchTrajectoriesFromDB).toHaveBeenCalledWith(type, study.horizon, value, area);
+    expect(trajectoryService.fetchTrajectoriesFromDB).toHaveBeenCalledWith(type, study.horizon, value, area, undefined);
     expect(setDbTrajectories).toHaveBeenCalledWith(mockResults);
     expect(formFormatter.convertToSelectionOptionType).toHaveBeenCalledWith(mockResults);
     expect(result).toEqual(mockConvertedOptions);

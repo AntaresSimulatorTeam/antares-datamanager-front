@@ -69,7 +69,7 @@ describe('fetchTrajectoriesFromDB', () => {
     await waitFor(() => {
       expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
       expect(AuthService.authFetch).toHaveBeenCalledWith(
-        `https://mockapi.com/v1/trajectory/db?trajectoryType=AREA&horizon=2023-2024&fileNameContains=&loadArea=`,
+        `https://mockapi.com/v1/trajectory/db?trajectoryType=AREA&horizon=2023-2024&fileNameContains=&area=&technology=`,
       );
       expect(result).toEqual(mockDbTrajectory);
     });

@@ -80,7 +80,7 @@ export const PegaseHypothesisTable = ({
         state={isReadOnlyEnable ? { readOnly, expanded } : { expanded }}
         onExpandedChange={setExpanded}
         getSubRows={(originalRow) => originalRow.subRows ?? undefined}
-        search={(value: string, area: string) => handleSearch(value, area)}
+        search={(value: string, rowId: string) => handleSearch(value, rowId)}
         importData={async (rowId: string) => await onHandleImport(rowId)}
         removeRow={(value: string, rowId?: string) => {
           void removeRow?.(value, rowId);

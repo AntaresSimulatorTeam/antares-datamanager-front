@@ -37,6 +37,8 @@ import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
 import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow.ts';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
 import { shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
+import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig';
+import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
 
 interface ThermalTabProps {
   defaultAreas: { name: string }[];
@@ -129,9 +131,21 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
             readOnly={readOnly}
             progress={progress}
             idSelected={rowIdSelected}
-            handleSearch={async (value: string, area: string) =>
-              await handleTrajectorySearch(TRAJECTORY_TYPE.THERMAL_CAPACITY, value, area, setDbTrajectories, study)
-            }
+            handleSearch={async (value: string, rowId: string) => {
+              const indexArray = rowId.split('.').map(Number);
+              const area =
+                data[indexArray[0]]?.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : data[indexArray[0]]?.hypothesis;
+              const technology =
+                indexArray?.length > 1 ? data[indexArray[0]]?.subRows?.[indexArray[1]]?.hypothesis : undefined;
+              return await handleTrajectorySearch(
+                TRAJECTORY_TYPE.THERMAL_CAPACITY,
+                value,
+                area,
+                setDbTrajectories,
+                study,
+                technology,
+              );
+            }}
             handleImport={async (rowId: string) => {
               const indexArray = rowId.split('.').map(Number);
               await handleFetchTrajectoriesFS(

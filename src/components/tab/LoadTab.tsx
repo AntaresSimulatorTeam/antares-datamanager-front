@@ -36,6 +36,7 @@ import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
 import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow.ts';
+import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 
 interface LoadTabProps {
   defaultAreas: { name: string }[];
@@ -145,9 +146,11 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
             readOnly={readOnly}
             progress={progress}
             idSelected={String(rowIdSelected)}
-            handleSearch={async (value, area) =>
-              await handleTrajectorySearch(TRAJECTORY_TYPE.LOAD, value, area, setDbTrajectories, study)
-            }
+            handleSearch={async (value: string, rowId: string) => {
+              const area =
+                data[Number(rowId)]?.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : data[Number(rowId)]?.hypothesis;
+              return await handleTrajectorySearch(TRAJECTORY_TYPE.LOAD, value, area, setDbTrajectories, study);
+            }}
             handleImport={async (rowId: string) =>
               await handleFetchTrajectoriesFS(TRAJECTORY_TYPE.LOAD, rowId, setOptionsFS, setRowIdSelected, toggleModal)
             }
