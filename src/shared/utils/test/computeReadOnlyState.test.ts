@@ -11,6 +11,7 @@ describe('computeReadOnlyState', () => {
     version: 0,
     userName: '',
     creationDate: new Date(),
+    technology: '',
   };
 
   it('should disable Links (index 1) if no area trajectory', () => {

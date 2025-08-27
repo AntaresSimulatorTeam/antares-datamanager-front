@@ -7,6 +7,7 @@ import StdRequiredIndicator from '../stdRequiredIndicator/StdRequiredIndicator';
 import { checkboxClassBuilder } from './checkboxClassBuilder';
 
 export type StdCheckboxProps = {
+  defaultChecked?: boolean;
   label?: string;
   checkboxControl?: boolean;
   value?: Exclude<string, 'checkbox_control'>;

@@ -28,6 +28,7 @@ const buildRowDataMock = (
     userName,
     creationDate,
     area: hypothesis === OTHER_AREAS_LABEL ? 'OTHERS' : hypothesis,
+    technology: '',
   },
 });
 
