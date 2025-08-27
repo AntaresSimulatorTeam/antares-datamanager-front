@@ -1,12 +1,13 @@
 import { describe, expect, it, Mock, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import { DbTrajectory, StudyDTO, StudyState } from '@/shared/types';
+import { DbTrajectory, StudyDTO, StudyState, UserState } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import * as trajectoryService from '@/shared/services/trajectoryService.ts';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
 import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { mockSingleWarningMessages } from '@/mocks/data/tests/warning.mock.ts';
+import { useUser } from '@/store/contexts/UserContext.tsx';
 
 vi.mock('@/shared/services/trajectoryService', async (importOriginal) => {
   const actual: Mock = await importOriginal();
@@ -27,11 +28,15 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
-vi.mock('@/store/contexts/UserContext', () => ({
-  useUser: () => ({
-    user: { profile: { sub: 'user-123' } },
-  }),
-}));
+vi.mock('@/store/contexts/UserContext', async (importOriginal) => {
+  const actual: Mock = await importOriginal();
+  return {
+    ...actual,
+    useUser: vi.fn(() => ({
+      user: { profile: { sub: 'user-123' } },
+    })),
+  };
+});
 
 describe('useTrajectoryAttach', () => {
   const mockDispatch = vi.fn();
@@ -121,6 +126,38 @@ describe('useTrajectoryAttach', () => {
       { id: 42, label: 'Traj A' },
       'Zone A',
       'user-123',
+      mockSetData,
+      expect.objectContaining({
+        message: 'studyDetails.@notificationAlert',
+        content: 'link failed',
+      }),
+    );
+  });
+
+  it('should handle error and call handleTrajectoryError with no user name', async () => {
+    vi.mocked(trajectoryService.linkTrajectoryToStudy).mockRejectedValue(new Error('link failed'));
+    const mockUseUser = useUser as Mock<typeof useUser>;
+    mockUseUser.mockImplementation(() => ({ user: { profile: {} } }) as UserState);
+    const { result } = renderHook(() => useTrajectoryAttach(study, studyState, mockDispatch, mockSetData));
+
+    const trajectoryArea: DbTrajectory = {
+      id: 100,
+      trajectoryName: 'BP23_A_ref_v2',
+      type: TRAJECTORY_TYPE.AREA,
+      version: 1,
+      userName: '',
+      technology: '',
+      creationDate: '2025-08-07T14:17:09.895028' as unknown as Date,
+    };
+
+    await result.current.attachTrajectory(TRAJECTORY_TYPE.AREA, [0], 'success', trajectoryArea);
+
+    expect(handleTrajectoryError).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.AREA,
+      [0],
+      { id: 100, label: 'BP23_A_ref_v2' },
+      '',
+      '',
       mockSetData,
       expect.objectContaining({
         message: 'studyDetails.@notificationAlert',

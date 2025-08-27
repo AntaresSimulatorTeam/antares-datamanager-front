@@ -5,6 +5,7 @@ import {
   buildReadOnlyRow,
   buildRowData,
   buildRowWithSubRowsData,
+  getAreaTrajectoryName,
   getBgColor,
   getChildrenList,
   getHypothesis,
@@ -576,5 +577,42 @@ describe('getChildrenList', () => {
 
     const result = getChildrenList(row);
     expect(result).toEqual([]);
+  });
+});
+
+describe('getAreaTrajectoryName', () => {
+  const mockData = [
+    {
+      hypothesis: 'Energy',
+      subRows: [{ hypothesis: 'Solar' } as HypothesisRowData, { hypothesis: 'Wind' } as HypothesisRowData],
+    },
+    {
+      hypothesis: 'Transport',
+      subRows: [{ hypothesis: 'Electric' } as HypothesisRowData],
+    },
+  ] as HypothesisRowData[];
+
+  it('should return combined hypothesis for valid rowIdSelected', () => {
+    expect(getAreaTrajectoryName('0.1', mockData)).toBe('Energy - Wind');
+    expect(getAreaTrajectoryName('1.0', mockData)).toBe('Transport - Electric');
+  });
+
+  it('should return only main hypothesis if subRow hypothesis is missing', () => {
+    const dataWithMissingSubHypothesis = [
+      {
+        hypothesis: 'Agriculture',
+        subRows: [{}],
+      },
+    ] as HypothesisRowData[];
+    expect(getAreaTrajectoryName('0.0', dataWithMissingSubHypothesis)).toBe('Agriculture');
+  });
+
+  it('should return empty string if mainRow is missing', () => {
+    expect(getAreaTrajectoryName('5.0', mockData)).toBe('');
+  });
+
+  it('should return empty string if both hypotheses are missing', () => {
+    const emptyData: HypothesisRowData[] = [{}, {}] as HypothesisRowData[];
+    expect(getAreaTrajectoryName('0.0', emptyData)).toBe('');
   });
 });

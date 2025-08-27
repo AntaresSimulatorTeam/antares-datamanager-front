@@ -3,9 +3,10 @@ import { act, renderHook } from '@testing-library/react';
 import { uploadTrajectory } from '@/shared/services/trajectoryService.ts';
 import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory';
-import { HypothesisRowData, StudyDTO } from '@/shared/types';
+import { HypothesisRowData, StudyDTO, UserState } from '@/shared/types';
 import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.ts';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
+import { useUser } from '@/store/contexts/UserContext.tsx';
 
 vi.mock('@/shared/services/trajectoryService', () => ({
   uploadTrajectory: vi.fn(),
@@ -22,9 +23,9 @@ vi.mock('react-i18next', () => ({
 }));
 
 vi.mock('@/store/contexts/UserContext', () => ({
-  useUser: () => ({
+  useUser: vi.fn(() => ({
     user: { profile: { sub: 'user-123' } },
-  }),
+  })),
 }));
 
 vi.mock('@/hooks/useTrajectoryAttach', () => ({
@@ -99,6 +100,31 @@ describe('useTrajectoryImport', () => {
       { id: 12, label: 'Trajectory A' },
       'Solar',
       'user-123',
+      mockSetData,
+      expect.objectContaining({
+        message: 'studyDetails.@notificationAlert',
+        content: 'upload failed',
+      }),
+    );
+  });
+  it('should handle error and call handleTrajectoryError with no user name', async () => {
+    (uploadTrajectory as Mock).mockRejectedValue(new Error('upload failed'));
+    const mockUseUser = useUser as Mock<typeof useUser>;
+    mockUseUser.mockImplementation(() => ({ user: { profile: {} } }) as UserState);
+
+    const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch, mockSetData));
+
+    await act(async () => {
+      await result.current.importTrajectory(TRAJECTORY_TYPE.LOAD, value, [0], data);
+    });
+
+    expect(result.current.fileStatus).toBe('error');
+    expect(handleTrajectoryError).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.LOAD,
+      [0],
+      { id: 12, label: 'Trajectory A' },
+      'Solar',
+      '',
       mockSetData,
       expect.objectContaining({
         message: 'studyDetails.@notificationAlert',

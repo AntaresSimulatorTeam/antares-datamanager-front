@@ -1,12 +1,13 @@
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import { DbTrajectory, RowStatus, StudyDTO } from '@/shared/types';
+import { DbTrajectory, RowStatus, StudyDTO, UserState } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory';
 import { fetchWarningMessagesFromType } from '@/shared/services/warningService.ts';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
 import { unlinkTrajectoryFromStudy } from '@/shared/services/trajectoryService.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.ts';
+import { useUser } from '@/store/contexts/UserContext.tsx';
 
 vi.mock('@/shared/services/trajectoryService', () => ({
   unlinkTrajectoryFromStudy: vi.fn(),
@@ -27,9 +28,9 @@ vi.mock('react-i18next', () => ({
 }));
 
 vi.mock('@/store/contexts/UserContext', () => ({
-  useUser: () => ({
+  useUser: vi.fn(() => ({
     user: { profile: { sub: 'user-456' } },
-  }),
+  })),
 }));
 
 describe('useTrajectoryDetach', () => {
@@ -101,6 +102,29 @@ describe('useTrajectoryDetach', () => {
       { id: 99, label: 'Traj X' },
       'Zone X',
       'user-456',
+      mockSetData,
+      expect.objectContaining({
+        message: 'studyDetails.@notificationAlert',
+        content: 'unlink failed',
+      }),
+    );
+  });
+
+  it('should handle error and call handleTrajectoryError with no user name', async () => {
+    (unlinkTrajectoryFromStudy as Mock).mockRejectedValue(new Error('unlink failed'));
+    const mockUseUser = useUser as Mock<typeof useUser>;
+    mockUseUser.mockImplementation(() => ({ user: { profile: {} } }) as UserState);
+
+    const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch, mockSetData));
+
+    await result.current.detachTrajectory(TRAJECTORY_TYPE.LOAD, [0], 'empty', trajectory);
+
+    expect(handleTrajectoryError).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.LOAD,
+      [0],
+      { id: 99, label: 'Traj X' },
+      'Zone X',
+      '',
       mockSetData,
       expect.objectContaining({
         message: 'studyDetails.@notificationAlert',

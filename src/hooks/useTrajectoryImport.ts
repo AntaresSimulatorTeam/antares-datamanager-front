@@ -55,7 +55,7 @@ export const useTrajectoryImport = (
       } catch (error) {
         setFileStatus('error');
         const message = t('studyDetails.@notificationAlert', {
-          studyName: study?.name ?? '',
+          studyName: study.name,
           trajectoryName: value.label,
           trajectoryType: technology ?? hypothesis,
         });

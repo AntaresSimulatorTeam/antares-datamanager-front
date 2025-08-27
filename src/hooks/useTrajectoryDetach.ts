@@ -47,7 +47,7 @@ export const useTrajectoryDetach = (
       } catch (error) {
         if (indexArray.length && trajectorySelected?.area) {
           const message = t('studyDetails.@notificationAlert', {
-            studyName: study?.name ?? '',
+            studyName: study.name,
             trajectoryName: trajectorySelected.trajectoryName,
             trajectoryType: trajectorySelected.area,
           });

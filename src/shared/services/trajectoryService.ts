@@ -40,6 +40,7 @@ import { fetchWarningMessagesFromType } from './warningService';
  * @param {string | undefined} fileName - Autocompletion - filter trajectories by file name
  * @param {string | undefined} area - To use just in thermal capacity case
  * @returns {Promise<DbTrajectory[]>} - Promise object that represents a list of trajectories
+ * @throws {Error}
  */
 export const fetchTrajectoriesFromDB = async (
   trajectoryType: string,
@@ -63,6 +64,7 @@ export const fetchTrajectoriesFromDB = async (
  * @param {string | undefined} zone - To use just in thermal capacity case
  * @param {string | undefined} searchTerm - Autocompletion - filter trajectories by file name
  * @returns {Promise<FsTrajectory[]>} - Promise object that represents a list of trajectories
+ * @throws {Error}
  */
 export const fetchTrajectoriesFromFS = async (
   trajectoryType: TRAJECTORY_TYPE,
@@ -70,7 +72,7 @@ export const fetchTrajectoriesFromFS = async (
   zone?: string | undefined,
 ): Promise<FsTrajectory[]> => {
   const queryString = new URLSearchParams({
-    trajectoryType: trajectoryType ?? '',
+    trajectoryType,
     zone: zone ?? '',
     fileNameContains: searchTerm ?? '',
   }).toString();
@@ -131,7 +133,7 @@ export const uploadTrajectory = async (
 
     return (await response.json()) as DbTrajectory;
   } catch (error) {
-    throw new Error((error as Error)?.message ?? '');
+    throw new Error((error as Error)?.message);
   }
 };
 
@@ -142,6 +144,7 @@ export const uploadTrajectory = async (
  * @param {number} studyId - Study id
  *
  * @return {Promise<DbTrajectory>} - Trajectory linked to a study
+ * @throws {Error}
  */
 
 export const linkTrajectoryToStudy = async (
@@ -169,6 +172,7 @@ export const linkTrajectoryToStudy = async (
  *
  * @param {number} trajectoryId - Trajectory id
  * @param {number} studyId - Study id
+ * @throws {Error}
  */
 export const unlinkTrajectoryFromStudy = async (trajectoryId: number, studyId: number): Promise<void> => {
   const urlApi = `${TRAJECTORY_UNLINK_TO_STUDY_ENDPOINT}?trajectoryId=${trajectoryId}&studyId=${studyId}`;
@@ -177,7 +181,7 @@ export const unlinkTrajectoryFromStudy = async (trajectoryId: number, studyId: n
       method: 'DELETE',
     });
   } catch (error) {
-    throw new Error(`${(error as BackendError)?.antaresErrorMessage}`);
+    throw new Error((error as BackendError)?.antaresErrorMessage);
   }
 };
 
@@ -185,6 +189,7 @@ export const unlinkTrajectoryFromStudy = async (trajectoryId: number, studyId: n
  * Delete all trajectories linked to a study
  * @param {number} studyId - Study id
  * @return {Promise<void>}
+ * @throws {Error}
  */
 export const unlinkAllTrajectoriesFromStudy = async (studyId: number): Promise<void> => {
   const urlApi = `${TRAJECTORY_UNLINK_ALL_TO_STUDY_ENDPOINT}?studyId=${studyId}`;
@@ -193,7 +198,7 @@ export const unlinkAllTrajectoriesFromStudy = async (studyId: number): Promise<v
       method: 'DELETE',
     });
   } catch (error) {
-    throw new Error(`${(error as BackendError)?.antaresErrorMessage}`);
+    throw new Error((error as BackendError)?.antaresErrorMessage);
   }
 };
 
@@ -202,6 +207,7 @@ export const unlinkAllTrajectoriesFromStudy = async (studyId: number): Promise<v
  * @param {number} studyId - Study id
  * @param {number[]} trajectoryIds - Trajectory id list to delete
  * @return {Promise<void>}
+ * @throws {Error}
  */
 export const unlinkMultipleTrajectoriesFromStudy = async (studyId: number, trajectoryIds: number[]): Promise<void> => {
   const urlApi = `${TRAJECTORY_UNLINK_MULTIPLE_TO_STUDY_ENDPOINT}?studyId=${studyId}`;
@@ -214,7 +220,7 @@ export const unlinkMultipleTrajectoriesFromStudy = async (studyId: number, traje
       body: JSON.stringify(trajectoryIds),
     });
   } catch (error) {
-    throw new Error(`${(error as BackendError)?.antaresErrorMessage}`);
+    throw new Error((error as BackendError)?.antaresErrorMessage);
   }
 };
 
@@ -224,6 +230,7 @@ export const unlinkMultipleTrajectoriesFromStudy = async (studyId: number, traje
  * @param {TRAJECTORY_TYPE} trajectoryType - Trajectory type
  * @param {number} trajectoryId - Trajectory id
  * @return {Promise<Types<TRAJECTORY_DATA_TYPE>[]>}
+ * @throws {Error}
  */
 export const getTrajectoryDataByTypeAndId = async (
   trajectoryType: TRAJECTORY_TYPE,
@@ -241,6 +248,7 @@ export const getTrajectoryDataByTypeAndId = async (
 /**
  * Fetch load default hypothesis (LOAD_OTHERS, LOAD_FR...)
  * @return {Promise<{ name: string }[]>}
+ * @throws {Error}
  */
 export const getDefaultLoadHypothesis = async (): Promise<{ name: string }[]> => {
   try {
@@ -255,6 +263,7 @@ export const getDefaultLoadHypothesis = async (): Promise<{ name: string }[]> =>
  * Count the number of warning messages per trajectory type for a study
  * @param {number} id - Study i
  * @returns {Promise<{ [key in keyof typeof TRAJECTORY_TYPE]: number }>} - Number of warning messages per trajectory type
+ * @throws {Error}
  */
 
 export const getNbMessagesFromTrajectoryType = async (

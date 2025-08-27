@@ -49,18 +49,17 @@ export const useTrajectoryAttach = (
               },
             });
           }
+          const newTrajectory = {
+            trajectory: newDbTrajectory,
+            status: TRAJECTORY_SELECTION_STATUS.OK,
+          };
+
+          setData((prev) => setNestedData(prev, indexArray, newTrajectory));
         }
-
-        const newTrajectory = {
-          trajectory: newDbTrajectory ?? null,
-          status: newDbTrajectory ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
-        };
-
-        setData((prev) => setNestedData(prev, indexArray, newTrajectory));
       } catch (error) {
         if (indexArray.length) {
           const message = t('studyDetails.@notificationAlert', {
-            studyName: study?.name ?? '',
+            studyName: study.name,
             trajectoryName: trajectory.trajectoryName,
             trajectoryType: trajectory.area,
           });

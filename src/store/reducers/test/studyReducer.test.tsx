@@ -177,6 +177,20 @@ describe('addTrajectories', () => {
     expect(result?.AREA?.warningMessages).toEqual([mockSingleWarningMessages]);
   });
 
+  it('should return empty array for trajectories and warningMessages if data is empty', () => {
+    const prevState: Partial<StudyState> = {
+      AREA: {
+        trajectories: [],
+        warningMessages: [],
+      },
+    };
+    const result = addTrajectories(prevState, {
+      AREA: { trajectories: [], warningMessages: [] },
+    });
+    expect(result?.AREA?.trajectories).toEqual([]);
+    expect(result?.AREA?.warningMessages).toEqual([]);
+  });
+
   it('returns prevState when data is empty', () => {
     const prevState = { AREA: { trajectories: [], warningMessages: [] } };
     const result = addTrajectories(prevState, {});

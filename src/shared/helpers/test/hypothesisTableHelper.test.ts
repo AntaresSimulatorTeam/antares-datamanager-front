@@ -6,7 +6,6 @@ import { mockDbTrajectory } from '@/mocks/data/tests/trajectory.mock.ts';
 import { getReadOnlyForGeneratedStudy, shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { retrieveReadOnlyArea } from '@/shared/utils/trajectoryUtils.ts';
 
-// mock trajectory utils
 vi.mock('@/shared/utils/trajectoryUtils.ts', async (importOriginal) => {
   const actual: Mock = await importOriginal();
   return {
@@ -90,6 +89,24 @@ describe('shouldOpenDeletionModal', () => {
       },
     ];
     const result = shouldOpenDeletionModal(TRAJECTORY_TYPE.LOAD, 0, data);
+    expect(result).toBe(false);
+  });
+
+  it('returns false when indexRow is out of bounds', () => {
+    const data = [baseRow];
+    const result = shouldOpenDeletionModal(TRAJECTORY_TYPE.LOAD, 5, data);
+    expect(result).toBe(false);
+  });
+
+  it('returns false when data is empty', () => {
+    const result = shouldOpenDeletionModal(TRAJECTORY_TYPE.LOAD, 0, []);
+    expect(result).toBe(false);
+  });
+
+  it('returns false when data[indexRow] is undefined', () => {
+    const data: HypothesisRowData[] = [];
+    data[3] = baseRow;
+    const result = shouldOpenDeletionModal(TRAJECTORY_TYPE.LOAD, 1, data);
     expect(result).toBe(false);
   });
 });

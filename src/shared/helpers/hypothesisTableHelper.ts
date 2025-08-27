@@ -9,6 +9,7 @@ import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
  * @return {ReadOnlyObject}
  */
 export const getReadOnlyForGeneratedStudy = (rows: HypothesisRowData[]): ReadOnlyObject => {
+  console.log('================ rows', rows);
   const areaWithoutTrajectory = rows
     .map((row) => (row.trajectory == null ? row.hypothesis : null))
     .filter(Boolean) as string[];

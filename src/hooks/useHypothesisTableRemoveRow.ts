@@ -47,7 +47,7 @@ export const useHypothesisTableRemoveRow = (
         }
       } catch (error) {
         const errorMessage = t('studyDetails.@notificationAlert', {
-          studyName: study?.name ?? '',
+          studyName: study.name,
           trajectoryName: value,
           trajectoryType: data[indexRow]?.hypothesis,
         });
