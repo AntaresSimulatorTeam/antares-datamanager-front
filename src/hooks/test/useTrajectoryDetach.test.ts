@@ -8,6 +8,7 @@ import { unlinkTrajectoryFromStudy } from '@/shared/services/trajectoryService.t
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.ts';
 import { useUser } from '@/store/contexts/UserContext.tsx';
+import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
 
 vi.mock('@/shared/services/trajectoryService', () => ({
   unlinkTrajectoryFromStudy: vi.fn(),
@@ -89,8 +90,13 @@ describe('useTrajectoryDetach', () => {
     expect(mockSetData).toHaveBeenCalled();
   });
 
-  it('should handle error and call handleTrajectoryError', async () => {
-    (unlinkTrajectoryFromStudy as Mock).mockRejectedValue(new Error('unlink failed'));
+  it('should handle error and call handleTrajectoryError when error is a business one', async () => {
+    (unlinkTrajectoryFromStudy as Mock).mockRejectedValue({
+      antaresErrorMessage: 'unlink failed',
+      errorMessageArguments: ['args'],
+      date: '2028-08-07T14:17:09.895028' as unknown as Date,
+      type: ERROR_MESSAGE_TYPE.BUSINESS,
+    });
 
     const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch, mockSetData));
 
@@ -110,8 +116,38 @@ describe('useTrajectoryDetach', () => {
     );
   });
 
-  it('should handle error and call handleTrajectoryError with no user name', async () => {
+  it('should not handle error and not call handleTrajectoryError when error is a technical one', async () => {
+    (unlinkTrajectoryFromStudy as Mock).mockRejectedValue({
+      antaresErrorMessage: 'unlink failed',
+      errorMessageArguments: ['args'],
+      date: '2028-08-07T14:17:09.895028' as unknown as Date,
+      type: ERROR_MESSAGE_TYPE.TECHNICAL,
+    });
+
+    const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch, mockSetData));
+
+    await result.current.detachTrajectory(TRAJECTORY_TYPE.LOAD, [0], 'empty', trajectory);
+
+    expect(handleTrajectoryError).not.toHaveBeenCalled();
+  });
+
+  it('should not handle error and not call handleTrajectoryError when error is not a business one', async () => {
     (unlinkTrajectoryFromStudy as Mock).mockRejectedValue(new Error('unlink failed'));
+
+    const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch, mockSetData));
+
+    await result.current.detachTrajectory(TRAJECTORY_TYPE.LOAD, [0], 'empty', trajectory);
+
+    expect(handleTrajectoryError).not.toHaveBeenCalled();
+  });
+
+  it('should handle error and call handleTrajectoryError with no user name', async () => {
+    (unlinkTrajectoryFromStudy as Mock).mockRejectedValue({
+      antaresErrorMessage: 'unlink failed',
+      errorMessageArguments: ['args'],
+      date: '2028-08-07T14:17:09.895028' as unknown as Date,
+      type: ERROR_MESSAGE_TYPE.BUSINESS,
+    });
     const mockUseUser = useUser as Mock<typeof useUser>;
     mockUseUser.mockImplementation(() => ({ user: { profile: {} } }) as UserState);
 

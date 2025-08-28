@@ -22,6 +22,7 @@ import {
   DbTrajectory,
   FsTrajectory,
   TRAJECTORY_DATA_TYPE,
+  TrajectoryBackendError,
   TrajectoryState,
   Types,
   WarningMessage,
@@ -31,6 +32,7 @@ import { fetchWithProgress } from '@/shared/services/progressService.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { fetchWarningMessagesFromType } from './warningService';
+import { isBusinessError } from '@/shared/utils/errorUtils.ts';
 
 /**
  * Retrieve a list of trajectories by type and horizon from database
@@ -174,16 +176,25 @@ export const linkTrajectoryToStudy = async (
  *
  * @param {number} trajectoryId - Trajectory id
  * @param {number} studyId - Study id
- * @throws {Error}
+ * @throws {BackendError}
  */
 export const unlinkTrajectoryFromStudy = async (trajectoryId: number, studyId: number): Promise<void> => {
-  const urlApi = `${TRAJECTORY_UNLINK_TO_STUDY_ENDPOINT}?trajectoryId=${trajectoryId}&studyId=${studyId}`;
+  const params = new URLSearchParams({
+    trajectoryId: trajectoryId.toString(),
+    studyId: studyId.toString(),
+  });
+  const urlApi = `${TRAJECTORY_UNLINK_TO_STUDY_ENDPOINT}?${params.toString()}`;
+
   try {
     await AuthService.authFetch(urlApi, {
       method: 'DELETE',
     });
-  } catch (error) {
-    throw new Error((error as BackendError)?.antaresErrorMessage);
+  } catch (error: unknown) {
+    if (isBusinessError(error)) {
+      throw new TrajectoryBackendError(`${error.antaresErrorMessage}`, error);
+    } else {
+      throw new TrajectoryBackendError(`Failed to unlink trajectory ${trajectoryId} from study ${studyId}`, error);
+    }
   }
 };
 

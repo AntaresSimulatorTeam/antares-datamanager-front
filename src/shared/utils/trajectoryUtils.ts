@@ -55,7 +55,7 @@ export const buildErrorTrajectory = (
   trajectoryId: number,
   trajectoryLabel: string,
   userName: string | null,
-  area: string | null,
+  area?: string | null,
 ): DbTrajectory => ({
   id: trajectoryId,
   trajectoryName: trajectoryLabel,

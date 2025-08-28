@@ -8,6 +8,7 @@ import { setNestedData } from '@/shared/utils/trajectoryUtils.ts';
 import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.ts';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { useTranslation } from 'react-i18next';
+import { isBusinessError } from '@/shared/utils/errorUtils.ts';
 
 export const useTrajectoryDetach = (
   study: StudyDTO,
@@ -45,7 +46,7 @@ export const useTrajectoryDetach = (
 
         setData((prev) => setNestedData(prev, indexArray, newEmptyTrajectory));
       } catch (error) {
-        if (indexArray.length && trajectorySelected?.area) {
+        if (indexArray.length && trajectorySelected?.area && isBusinessError(error)) {
           const message = t('studyDetails.@notificationAlert', {
             studyName: study.name,
             trajectoryName: trajectorySelected.trajectoryName,
@@ -59,7 +60,7 @@ export const useTrajectoryDetach = (
             trajectorySelected.area,
             user?.profile?.sub ?? '',
             setData,
-            { message, content: (error as Error).message },
+            { message, content: error.antaresErrorMessage },
           );
         }
       }
