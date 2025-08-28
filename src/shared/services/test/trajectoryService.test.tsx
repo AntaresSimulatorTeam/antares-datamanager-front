@@ -104,7 +104,7 @@ describe('fetchTrajectoriesFromFS', () => {
     await waitFor(() => {
       expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
       expect(AuthService.authFetch).toHaveBeenCalledWith(
-        `https://mockapi.com/v1/trajectory/fs?trajectoryType=AREA&zone=&fileNameContains=`,
+        `https://mockapi.com/v1/trajectory/fs?trajectoryType=AREA&area=&fileNameContains=`,
       );
       expect(result).toEqual(mockFsTrajectoryAreaArray);
     });

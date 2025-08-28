@@ -154,7 +154,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
                 setOptionsFS,
                 setRowIdSelected,
                 toggleModal,
-                data[indexArray[0]]?.hypothesis === 'FR' ? 'FR' : '',
+                data[indexArray[0]]?.hypothesis === 'FR' ? 'FR' : OTHER_AREAS,
               );
             }}
             isReadOnlyEnable={true}
