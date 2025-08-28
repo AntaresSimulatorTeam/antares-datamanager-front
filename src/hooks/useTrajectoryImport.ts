@@ -14,6 +14,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
+import { isBusinessError } from '@/shared/utils/errorUtils.ts';
 
 export const useTrajectoryImport = (
   study: StudyDTO,
@@ -54,20 +55,22 @@ export const useTrajectoryImport = (
         }
       } catch (error) {
         setFileStatus('error');
-        const message = t('studyDetails.@notificationAlert', {
-          studyName: study.name,
-          trajectoryName: value.label,
-          trajectoryType: technology ?? hypothesis,
-        });
-        handleTrajectoryError(
-          type,
-          indexArray,
-          { id: value.id, label: value.label },
-          technology ?? hypothesis,
-          user?.profile?.sub ?? '',
-          setData,
-          { message, content: (error as Error).message },
-        );
+        if (isBusinessError(error)) {
+          const message = t('studyDetails.@notificationAlert', {
+            studyName: study.name,
+            trajectoryName: value.label,
+            trajectoryType: technology ?? hypothesis,
+          });
+          handleTrajectoryError(
+            type,
+            indexArray,
+            { id: value.id, label: value.label },
+            technology ?? hypothesis,
+            user?.profile?.sub ?? '',
+            setData,
+            { message, content: error.antaresErrorMessage },
+          );
+        }
       }
     },
     [study.horizon, study.id, study?.name, attachTrajectory, t, user?.profile?.sub, setData],

@@ -7,6 +7,7 @@ import { HypothesisRowData, StudyDTO, UserState } from '@/shared/types';
 import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.ts';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { useUser } from '@/store/contexts/UserContext.tsx';
+import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
 
 vi.mock('@/shared/services/trajectoryService', () => ({
   uploadTrajectory: vi.fn(),
@@ -85,7 +86,12 @@ describe('useTrajectoryImport', () => {
   });
 
   it('should handle error and call handleTrajectoryError', async () => {
-    (uploadTrajectory as Mock).mockRejectedValue(new Error('upload failed'));
+    (uploadTrajectory as Mock).mockRejectedValue({
+      antaresErrorMessage: 'upload failed',
+      errorMessageArguments: ['args'],
+      date: '2028-08-07T14:17:09.895028' as unknown as Date,
+      type: ERROR_MESSAGE_TYPE.BUSINESS,
+    });
 
     const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch, mockSetData));
 
@@ -108,7 +114,12 @@ describe('useTrajectoryImport', () => {
     );
   });
   it('should handle error and call handleTrajectoryError with no user name', async () => {
-    (uploadTrajectory as Mock).mockRejectedValue(new Error('upload failed'));
+    (uploadTrajectory as Mock).mockRejectedValue({
+      antaresErrorMessage: 'upload failed',
+      errorMessageArguments: ['args'],
+      date: '2028-08-07T14:17:09.895028' as unknown as Date,
+      type: ERROR_MESSAGE_TYPE.BUSINESS,
+    });
     const mockUseUser = useUser as Mock<typeof useUser>;
     mockUseUser.mockImplementation(() => ({ user: { profile: {} } }) as UserState);
 
@@ -131,6 +142,23 @@ describe('useTrajectoryImport', () => {
         content: 'upload failed',
       }),
     );
+  });
+
+  it('should not handle error and not call handleTrajectoryError when error is a technical one', async () => {
+    (uploadTrajectory as Mock).mockRejectedValue({
+      antaresErrorMessage: 'import failed',
+      errorMessageArguments: ['args'],
+      date: '2028-08-07T14:17:09.895028' as unknown as Date,
+      type: ERROR_MESSAGE_TYPE.TECHNICAL,
+    });
+
+    const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch, mockSetData));
+
+    await act(async () => {
+      await result.current.importTrajectory(TRAJECTORY_TYPE.LOAD, value, [0], data);
+    });
+
+    expect(handleTrajectoryError).not.toHaveBeenCalled();
   });
 
   it('should use OTHER_AREAS when hypothesis is OTHER_AREAS_LABEL', async () => {
