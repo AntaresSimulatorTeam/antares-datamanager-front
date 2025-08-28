@@ -16,19 +16,19 @@ interface PegaseHypothesisTableProps {
     studyState: StudyStatus,
     progress: number,
     fileStatus: FileInputStatus,
-    indexSelected: number,
+    idSelected: string,
     columnHeader?: string,
   ) => TableOptions<HypothesisRowData>['columns'];
   studyState: StudyStatus;
   readOnly?: ReadOnlyObject;
   progress: number;
   fileStatus: FileInputStatus;
-  indexSelected: number;
-  handleSearch: (value?: string, area?: string) => Promise<SelectOption[] | undefined>;
-  handleImport: (index: number) => Promise<void>;
+  idSelected: string;
+  handleSearch: (value: string, area: string) => Promise<SelectOption[] | undefined>;
+  handleImport: (rowId: string) => Promise<void>;
   isReadOnlyEnable?: boolean;
-  removeRow?: (value: string, rowIndex?: number) => void | Promise<void>;
-  updateData?: (rowIndex: number, value: unknown, status?: RowStatus, label?: string) => void;
+  removeRow?: (value: string, rowId?: string) => void | Promise<void>;
+  updateData?: (rowId: string, value: unknown, status: RowStatus) => void;
   columnHeader?: string;
 }
 type ExpandedState = true | Record<string, boolean>;
@@ -41,7 +41,7 @@ export const PegaseHypothesisTable = ({
   progress,
   studyState,
   fileStatus,
-  indexSelected,
+  idSelected,
   handleSearch,
   handleImport,
   isReadOnlyEnable = false,
@@ -51,21 +51,19 @@ export const PegaseHypothesisTable = ({
 }: PegaseHypothesisTableProps) => {
   const { t } = useTranslation();
   const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
-  const [expanded, setExpanded] = useState<ExpandedState>(
-    data.every((item) => item.isDefault && item?.subRows) ? {} : true,
-  );
+  const [expanded, setExpanded] = useState<ExpandedState>({});
 
   const columns: TableOptions<HypothesisRowData>['columns'] = useMemo(
-    () => getTableHeaders(t, errorInfo, setErrorInfo, studyState, progress, fileStatus, indexSelected, columnHeader),
-    [errorInfo, fileStatus, indexSelected, progress, studyState, t, columnHeader],
+    () => getTableHeaders(t, errorInfo, setErrorInfo, studyState, progress, fileStatus, idSelected, columnHeader),
+    [getTableHeaders, t, errorInfo, studyState, progress, fileStatus, idSelected, columnHeader],
   );
 
   const onHandleImport = useCallback(
-    async (index: number) => {
+    async (rowId: string) => {
       try {
-        await handleImport(index);
+        await handleImport(rowId);
       } catch {
-        setErrorInfo({ index, message: t('studyDetails.@select_file_fs_error') });
+        setErrorInfo({ index: Number(rowId), message: t('studyDetails.@select_file_fs_error') });
       }
     },
     [handleImport, t],
@@ -82,14 +80,12 @@ export const PegaseHypothesisTable = ({
         state={isReadOnlyEnable ? { readOnly, expanded } : { expanded }}
         onExpandedChange={setExpanded}
         getSubRows={(originalRow) => originalRow.subRows ?? undefined}
-        search={(value?: string, area?: string) => handleSearch(value, area)}
-        importData={async (index: number) => await onHandleImport(index)}
-        removeRow={(value: string, rowIndex?: number) => {
-          void removeRow?.(value, rowIndex);
+        search={(value: string, rowId: string) => handleSearch(value, rowId)}
+        importData={async (rowId: string) => await onHandleImport(rowId)}
+        removeRow={(value: string, rowId?: string) => {
+          void removeRow?.(value, rowId);
         }}
-        updateData={(rowIndex: number, value: unknown, status?: RowStatus, label?: string) =>
-          void updateData?.(rowIndex, value, status, label)
-        }
+        updateData={(rowId: string, value: unknown, status: RowStatus) => void updateData?.(rowId, value, status)}
       />
     </div>
   );

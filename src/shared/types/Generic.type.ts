@@ -22,6 +22,16 @@ export interface BackendError {
   type: ERROR_MESSAGE_TYPE;
 }
 
+export class TrajectoryBackendError extends Error {
+  constructor(message: string, originalError: unknown) {
+    super(message);
+    this.name = 'TrajectoryBackendError';
+    if (originalError instanceof Error) {
+      this.stack += '\nCaused by: ' + originalError.stack;
+    }
+  }
+}
+
 export type ColumnProps<TData> = (
   | (AccessorKeyColumnDefBase<HypothesisRowData, string extends DeepKeys<TData> ? DeepValue<TData, string> : never> & {
       id?: string;

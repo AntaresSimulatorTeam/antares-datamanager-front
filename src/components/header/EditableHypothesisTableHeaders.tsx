@@ -14,7 +14,6 @@ import { LabelWithButtonPreview } from '@common/data/LabelWithButtonPreview.tsx'
 import { LabelWithDeleteButton } from '@common/data/LabelWithDeleteButton.tsx';
 import { SelectInputWithButton } from '@common/data/SelectInputWithButton.tsx';
 import { ErrorMessageType } from '@/shared/types/Generic.type.ts';
-import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { ProgressBar } from '@/components/forms/ProgressBar.tsx';
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
@@ -26,7 +25,7 @@ const getEditableHypothesisTableHeaders = (
   studyStatus: StudyStatus | undefined,
   progress: number,
   fileStatus: FileInputStatus,
-  rowIndexSelected: number,
+  idSelected: string,
   columnHeader?: string,
 ) => [
   columnHelper.accessor('hypothesis', {
@@ -53,8 +52,8 @@ const getEditableHypothesisTableHeaders = (
             onClick={() => {
               setErrorInfo({ index: row.index, message: '' });
               void options?.meta?.updateData?.(
-                row.index,
-                trajectory.id,
+                row.id,
+                trajectory?.trajectoryName,
                 status === TRAJECTORY_SELECTION_STATUS.ERROR ? 'emptyError' : 'empty',
               );
             }}
@@ -65,17 +64,12 @@ const getEditableHypothesisTableHeaders = (
           <SelectInputWithButton
             onSelect={(value: SelectOption) => {
               setErrorInfo({ index: row.index, message: '' });
-              void options?.meta?.updateData?.(row.index, value.id, 'success', value.label);
+              void options?.meta?.updateData?.(row.id, value.label, 'success');
             }}
-            onSearch={async (value?: string) =>
-              await options?.meta?.search?.(
-                value,
-                row.original.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : row.original.hypothesis,
-              )
-            }
+            onSearch={async (value?: string) => await options?.meta?.search?.(value ?? '', row.id)}
             onClickButton={async () => {
               setErrorInfo({ index: row.index, message: '' });
-              await options?.meta?.importData?.(row.index);
+              await options?.meta?.importData?.(row.id);
             }}
             isDisabled={row.getReadOnly()}
           />
@@ -89,13 +83,13 @@ const getEditableHypothesisTableHeaders = (
     header: t('home.@status'),
     cell: ({ row, table: { options } }) => {
       const { status, hypothesis, isDefault } = row.original;
-      return progress > 0 && fileStatus === 'loading' && rowIndexSelected === row.index ? (
+      return progress > 0 && fileStatus === 'loading' && idSelected === row.id ? (
         <ProgressBar statusFile={fileStatus} progressValue={progress} />
       ) : (
         <CellWithStatus
           status={status}
           isDeletable={!isDefault && !(studyStatus === StudyStatus.GENERATED)}
-          onClick={() => void options?.meta?.removeRow?.(hypothesis, row.index)}
+          onClick={() => void options?.meta?.removeRow?.(hypothesis, row.id)}
         />
       );
     },

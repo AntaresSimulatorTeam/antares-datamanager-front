@@ -14,10 +14,11 @@ import { LabelWithButtonPreview } from '@common/data/LabelWithButtonPreview.tsx'
 import { LabelWithDeleteButton } from '@common/data/LabelWithDeleteButton.tsx';
 import { SelectInputWithButton } from '@common/data/SelectInputWithButton.tsx';
 import { ErrorMessageType } from '@/shared/types/Generic.type.ts';
-import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { ProgressBar } from '@/components/forms/ProgressBar.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
+import { RdsTextTooltip } from 'rte-design-system-react';
+import { getChildrenList } from '@/shared/utils/trajectoryUtils.ts';
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
 
@@ -38,7 +39,7 @@ const getExpandableHypothesisTableHeaders = (
   studyStatus: StudyStatus | undefined,
   progress: number,
   fileStatus: FileInputStatus,
-  indexSelected: number,
+  idSelected: string,
 ): TableOptions<HypothesisRowData>['columns'] => [
   columnHelper.accessor('hypothesis', {
     header: t('studyDetails.@area'),
@@ -49,6 +50,7 @@ const getExpandableHypothesisTableHeaders = (
         if (row.depth === 0) return !row.getCanExpand() ? 'pl-1' : 'pl-0';
         return 'pl-4';
       };
+      const childrenArray: string[] = getChildrenList(row);
       return (
         <div className="flex gap-1">
           {row.getCanExpand() && (
@@ -67,6 +69,11 @@ const getExpandableHypothesisTableHeaders = (
             hasPreview={false}
             alignment={getAlignment()}
           />
+          {row.getCanExpand() && childrenArray.length > 0 && (
+            <RdsTextTooltip text={childrenArray.toString()} offset={5} placement="right">
+              <div className={'text-gray-600'}>{` | +${childrenArray.length}`}</div>
+            </RdsTextTooltip>
+          )}
         </div>
       );
     },
@@ -81,12 +88,12 @@ const getExpandableHypothesisTableHeaders = (
         <div className="flex w-full items-center gap-2">
           <LabelWithDeleteButton
             label={trajectory.trajectoryName}
-            isDeletable={!(studyStatus === StudyStatus.GENERATED)}
+            isDeletable={studyStatus !== StudyStatus.GENERATED}
             onClick={() => {
               setErrorInfo({ index: row.index, message: '' });
               void options?.meta?.updateData?.(
-                row.index,
-                trajectory.id,
+                row.id,
+                trajectory?.trajectoryName,
                 status === TRAJECTORY_SELECTION_STATUS.ERROR ? 'emptyError' : 'empty',
               );
             }}
@@ -97,17 +104,12 @@ const getExpandableHypothesisTableHeaders = (
           <SelectInputWithButton
             onSelect={(value: SelectOption) => {
               setErrorInfo({ index: row.index, message: '' });
-              void options?.meta?.updateData?.(row.index, value.id, 'success', value.label);
+              void options?.meta?.updateData?.(row.id, value.label, 'success');
             }}
-            onSearch={async (value?: string) =>
-              options?.meta?.search?.(
-                value,
-                row.original.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : row.original.hypothesis,
-              )
-            }
+            onSearch={async (value?: string) => options?.meta?.search?.(value ?? '', row.id)}
             onClickButton={() => {
               setErrorInfo({ index: row.index, message: '' });
-              void options?.meta?.importData?.(row.index);
+              void options?.meta?.importData?.(row.id);
             }}
             isDisabled={row.getReadOnly()}
           />
@@ -121,15 +123,14 @@ const getExpandableHypothesisTableHeaders = (
     header: t('home.@status'),
     cell: ({ row, table: { options } }) => {
       const { status, isDefault, hypothesis } = row.original;
-      return progress > 0 && fileStatus === 'loading' && indexSelected === row.index ? (
+      return progress > 0 && fileStatus === 'loading' && idSelected === row.id ? (
         <ProgressBar statusFile={fileStatus} progressValue={progress} />
       ) : (
         <CellWithStatus
           status={status}
-          isDeletable={(!isDefault || (isDefault && row.depth === 1)) && !(studyStatus === StudyStatus.GENERATED)}
+          isDeletable={!isDefault && studyStatus !== StudyStatus.GENERATED}
           onClick={() => {
-            const parentRow = row.getParentRow();
-            void options?.meta?.removeRow?.(hypothesis, row.depth === 1 && parentRow ? parentRow.index : row.index);
+            void options?.meta?.removeRow?.(hypothesis, row.id);
           }}
         />
       );

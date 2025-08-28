@@ -16,7 +16,7 @@ import StdCheckbox from '@common/forms/stdCheckbox/StdCheckbox.tsx';
 import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
 
 interface ParametersTabProps {
-  defaultAreas: CheckBoxData[];
+  defaultAreas: { name: string }[];
   areas: TrajectoryAreaData[];
 }
 
@@ -42,7 +42,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
   ];
   const [progress] = useState(0);
   const [fileStatus] = useState<FileInputStatus>('empty');
-  const [rowIndexSelected] = useState(0);
+  const [rowIndexSelected] = useState('0');
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
   const [readOnlyAreas, setReadOnlyAreas] = useState<string[]>([]);
 
@@ -55,8 +55,8 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
         }
       })
       .filter(Boolean) as CheckBoxData[];
-
-    setAreaDefault([...defaultAreas, ...newArea]);
+    const defaultCheckBoxArea = defaultAreas.map((area) => ({ name: area.name, isDefault: true }));
+    setAreaDefault([...defaultCheckBoxArea, ...newArea]);
     setCheckedValues(defaultAreas.map((area) => area.name));
 
     // Find default area not included in areas trajectory list
@@ -67,7 +67,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
       }
     });
     const areaDefaultData = [
-      ...defaultAreas,
+      ...defaultCheckBoxArea,
       {
         name: OTHER_AREAS,
         isDefault: true,
@@ -109,8 +109,8 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
   };
 
   const handleTrajectorySearch = async () => Promise.resolve([]);
-  const handleFetchTrajectoriesFS = async (index: number) => {
-    console.log('=== index', index);
+  const handleFetchTrajectoriesFS = async (rowId: string) => {
+    console.log('=== rowId', rowId);
     return Promise.resolve();
   };
 
@@ -134,7 +134,6 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
                 label={area.name}
                 value={area.name}
                 name={''}
-                defaultChecked={area.isDefault}
                 disabled={area.isDefault}
                 checked={area.isDefault}
               />
@@ -156,7 +155,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
             studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
             readOnly={readOnly}
             progress={progress}
-            indexSelected={rowIndexSelected}
+            idSelected={rowIndexSelected}
             handleSearch={handleTrajectorySearch}
             handleImport={handleFetchTrajectoriesFS}
             isReadOnlyEnable={true}
@@ -172,7 +171,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
             fileStatus={fileStatus}
             studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
             progress={progress}
-            indexSelected={rowIndexSelected}
+            idSelected={rowIndexSelected}
             handleSearch={handleTrajectorySearch}
             handleImport={handleFetchTrajectoriesFS}
           />

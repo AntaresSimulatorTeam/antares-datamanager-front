@@ -1,4 +1,4 @@
-import { DbTrajectory, HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
+import { DbTrajectory, FsTrajectory, HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { mockWarningMessagesWithTwo } from '@/mocks/data/tests/warning.mock.ts';
@@ -10,7 +10,8 @@ export const mockDataBaseTrajectory = (type: TRAJECTORY_TYPE, id: number, area: 
   version: 1,
   userName: 'CB',
   creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-  loadArea: area,
+  area,
+  technology: '',
 });
 
 export const mockDbTrajectory: DbTrajectory = {
@@ -20,10 +21,11 @@ export const mockDbTrajectory: DbTrajectory = {
   version: 6,
   userName: 'mouad',
   creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-  loadArea: 'AT',
+  area: 'AT',
+  technology: '',
 };
 
-export const mockTrajectoryTwo = [
+export const mockTrajectoryTwo: DbTrajectory[] = [
   {
     id: 1,
     trajectoryName: 'area_PB_2024',
@@ -31,7 +33,8 @@ export const mockTrajectoryTwo = [
     version: 3,
     userName: 'mouad',
     creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-    loadArea: 'AT',
+    area: 'AT',
+    technology: '',
   },
   {
     id: 2,
@@ -40,7 +43,8 @@ export const mockTrajectoryTwo = [
     version: 3,
     userName: 'mouad',
     creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
-    loadArea: 'BE',
+    area: 'BE',
+    technology: '',
   },
 ];
 
@@ -51,18 +55,19 @@ export const mockDbTrajectoryAREA: DbTrajectory = {
   version: 6,
   userName: 'mouad',
   creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-  loadArea: 'AT',
+  area: 'AT',
+  technology: '',
 };
 
-export const mockDbTrajectoryLINK: DbTrajectory = {
-  id: 1,
-  trajectoryName: 'link_BP_23_v6',
-  type: TRAJECTORY_TYPE.LINK,
-  version: 6,
-  userName: 'mouad',
-  creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-  loadArea: 'AT',
-};
+// export const mockDbTrajectoryLINK: DbTrajectory = {
+//   id: 1,
+//   trajectoryName: 'link_BP_23_v6',
+//   type: TRAJECTORY_TYPE.LINK,
+//   version: 6,
+//   userName: 'mouad',
+//   creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+//   area: 'AT',
+// };
 
 export const mockPrevStateArea = () => ({
   studyStatus: StudyStatus.IN_PROGRESS,
@@ -106,7 +111,7 @@ export const mockRowDataTrajectoryC: HypothesisRowData = {
   status: TRAJECTORY_SELECTION_STATUS.MISSING,
 };
 
-export const mockDbTrajectoryArray = [
+export const mockDbTrajectoryArray: DbTrajectory[] = [
   {
     id: 1,
     trajectoryName: 'area_PB_2024',
@@ -114,7 +119,8 @@ export const mockDbTrajectoryArray = [
     version: 3,
     userName: 'mouad',
     creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-    loadArea: 'AT',
+    area: 'AT',
+    technology: '',
   },
   {
     id: 2,
@@ -123,11 +129,81 @@ export const mockDbTrajectoryArray = [
     version: 3,
     userName: 'mouad',
     creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
-    loadArea: 'BE',
+    area: 'BE',
+    technology: '',
   },
 ];
 
-export const mockDbTrajectoryArrayWithDuplicate = [
+export const mockDbTrajectoryArrayLoad: DbTrajectory[] = [
+  {
+    id: 1,
+    trajectoryName: 'area_PB_2024',
+    type: TRAJECTORY_TYPE.LOAD,
+    version: 3,
+    userName: 'mouad',
+    creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+    area: 'AT',
+    technology: '',
+  },
+  {
+    id: 2,
+    trajectoryName: 'area_PB_2026',
+    type: TRAJECTORY_TYPE.LOAD,
+    version: 3,
+    userName: 'mouad',
+    creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+    area: 'BE',
+    technology: '',
+  },
+];
+
+export const mockDbTrajectoryArrayThermal: DbTrajectory[] = [
+  {
+    id: 1,
+    trajectoryName: 'area_PB_2024',
+    type: TRAJECTORY_TYPE.THERMAL_CAPACITY,
+    version: 3,
+    userName: 'mouad',
+    creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+    area: 'AT',
+    technology: '',
+  },
+  {
+    id: 2,
+    trajectoryName: 'area_PB_2026',
+    type: TRAJECTORY_TYPE.THERMAL_CAPACITY,
+    version: 3,
+    userName: 'mouad',
+    creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+    area: 'BE',
+    technology: '',
+  },
+];
+
+export const mockEmptyDbTrajectoryArrayLoad: DbTrajectory[] = [
+  {
+    id: 1,
+    trajectoryName: '',
+    type: TRAJECTORY_TYPE.LOAD,
+    version: 0,
+    userName: 'mouad',
+    creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+    area: 'ES',
+    technology: '',
+  },
+  {
+    id: 2,
+    trajectoryName: '',
+    type: TRAJECTORY_TYPE.LOAD,
+    version: 0,
+    userName: 'mouad',
+    creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+    area: 'DEkf',
+    technology: '',
+  },
+];
+
+export const mockDbTrajectoryArrayWithDuplicate: DbTrajectory[] = [
   {
     id: 1,
     trajectoryName: 'area_PB_2024',
@@ -135,7 +211,8 @@ export const mockDbTrajectoryArrayWithDuplicate = [
     version: 3,
     userName: 'mouad',
     creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-    loadArea: 'AT',
+    area: 'AT',
+    technology: '',
   },
   {
     id: 2,
@@ -144,7 +221,8 @@ export const mockDbTrajectoryArrayWithDuplicate = [
     version: 3,
     userName: 'mouad',
     creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
-    loadArea: 'BE',
+    area: 'BE',
+    technology: '',
   },
   {
     id: 1,
@@ -153,7 +231,8 @@ export const mockDbTrajectoryArrayWithDuplicate = [
     version: 3,
     userName: 'mouad',
     creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-    loadArea: 'AT',
+    area: 'AT',
+    technology: '',
   },
   {
     id: 1,
@@ -162,11 +241,12 @@ export const mockDbTrajectoryArrayWithDuplicate = [
     version: 3,
     userName: 'mouad',
     creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-    loadArea: 'AT',
+    area: 'AT',
+    technology: '',
   },
 ];
 
-export const mockFsTrajectoryAreaArray = [
+export const mockFsTrajectoryAreaArray: FsTrajectory[] = [
   {
     trajectoryName: 'area_BP_2028.xlsx',
     type: TRAJECTORY_TYPE.AREA,
@@ -184,7 +264,7 @@ export const mockFsTrajectoryAreaArray = [
   },
 ];
 
-export const mockFsTrajectoryLoadArray = [
+export const mockFsTrajectoryLoadArray: FsTrajectory[] = [
   {
     trajectoryName: 'BP23_TEST_LOAD',
     type: TRAJECTORY_TYPE.LOAD,
@@ -203,6 +283,29 @@ export const mockFsTrajectoryLoadArray = [
   {
     trajectoryName: 'BP23_AREF_EU_CBN_VIDE',
     type: TRAJECTORY_TYPE.LOAD,
+    lastModifiedDate: '2025-06-27T10:40:07.150247' as unknown as Date,
+  },
+];
+
+export const mockFsTrajectoryThermalCapacityArray: FsTrajectory[] = [
+  {
+    trajectoryName: 'FR_BP23_A-ref_FR',
+    type: TRAJECTORY_TYPE.THERMAL_CAPACITY,
+    lastModifiedDate: '2025-07-02T11:57:48.493018687' as unknown as Date,
+  },
+  {
+    trajectoryName: 'FR_BP23_A-ref_FR_nuc',
+    type: TRAJECTORY_TYPE.THERMAL_CAPACITY,
+    lastModifiedDate: '2025-07-02T11:57:48.493018687' as unknown as Date,
+  },
+  {
+    trajectoryName: 'FR_DSR',
+    type: TRAJECTORY_TYPE.THERMAL_CAPACITY,
+    lastModifiedDate: '2025-06-27T10:40:47.410233' as unknown as Date,
+  },
+  {
+    trajectoryName: 'BE_PEMMDB23_26avril',
+    type: TRAJECTORY_TYPE.THERMAL_CAPACITY,
     lastModifiedDate: '2025-06-27T10:40:07.150247' as unknown as Date,
   },
 ];
@@ -236,3 +339,25 @@ export const mockTrajectoryAreaData: TrajectoryAreaData[] = [
 ];
 
 export const mockDefaultArea = [{ name: 'FR' }];
+
+export const mockEmptyDbTrajectoryLoadOthers: DbTrajectory = {
+  id: 1,
+  trajectoryName: '',
+  type: TRAJECTORY_TYPE.LOAD,
+  version: 0,
+  userName: 'mouad',
+  creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+  area: 'OTHERS',
+  technology: '',
+};
+
+export const mockEmptyDbTrajectoryLoadFR: DbTrajectory = {
+  id: 1,
+  trajectoryName: '',
+  type: TRAJECTORY_TYPE.LOAD,
+  version: 0,
+  userName: 'mouad',
+  creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+  area: 'FR',
+  technology: '',
+};

@@ -1,13 +1,45 @@
 import { HypothesisRowData } from '@/shared/types';
-import { Dispatch, SetStateAction } from 'react';
-import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { retrieveReadOnlyArea } from '@/shared/utils/trajectoryUtils.ts';
+import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 
-export const setReadOnlyForGeneratedStudy = (
-  rows: HypothesisRowData[],
-  setReadOnly: Dispatch<SetStateAction<ReadOnlyObject>>,
-) => {
-  const areaWithoutTrajectory = rows.map((row) => (row.trajectory == null ? row.hypothesis : null));
-  const readOnlyRows = retrieveReadOnlyArea(rows, areaWithoutTrajectory.filter(Boolean) as string[]);
-  setReadOnly(readOnlyRows);
+/**
+ * Retrieve read only row of a study generated
+ * @param {HypothesisRowData[]} rows
+ * @return {ReadOnlyObject}
+ */
+export const getReadOnlyForGeneratedStudy = (rows: HypothesisRowData[]): ReadOnlyObject => {
+  const areaWithoutTrajectory = rows
+    .map((row) => (row.trajectory == null ? row.hypothesis : null))
+    .filter(Boolean) as string[];
+  return retrieveReadOnlyArea(rows, areaWithoutTrajectory);
+};
+
+/**
+ * Return boolean to indicate if the deletion modal should open
+ * @param {TRAJECTORY_TYPE} type
+ * @param {number} indexRow
+ * @param {HypothesisRowData[]} data
+ * @return {boolean} True if a trajectory is linked to an area for all trajectory type (expect THERMAL_CAPACITY) or at least two trajectories linked to one area and to one technology
+ */
+export const shouldOpenDeletionModal = (
+  type: TRAJECTORY_TYPE,
+  indexRow: number,
+  data: HypothesisRowData[],
+): boolean => {
+  const hasTrajectoryLinkedToTechnology =
+    indexRow != null
+      ? (data[indexRow]?.subRows || [])?.some(
+          (item: HypothesisRowData) => item.trajectory && item.status === TRAJECTORY_SELECTION_STATUS.OK,
+        )
+      : false;
+  const hasTrajectoryLinkedToArea =
+    indexRow != null
+      ? !!(data[indexRow]?.trajectory && data[indexRow]?.status === TRAJECTORY_SELECTION_STATUS.OK)
+      : false;
+
+  return (
+    (hasTrajectoryLinkedToArea && type !== TRAJECTORY_TYPE.THERMAL_CAPACITY) ||
+    (hasTrajectoryLinkedToArea && hasTrajectoryLinkedToTechnology)
+  );
 };

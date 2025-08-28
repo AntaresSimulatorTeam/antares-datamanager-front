@@ -7,13 +7,13 @@ import StdRequiredIndicator from '../stdRequiredIndicator/StdRequiredIndicator';
 import { checkboxClassBuilder } from './checkboxClassBuilder';
 
 export type StdCheckboxProps = {
+  defaultChecked?: boolean;
   label?: string;
   checkboxControl?: boolean;
   value?: Exclude<string, 'checkbox_control'>;
   name?: string;
   id?: string;
   disabled?: boolean;
-  defaultChecked?: boolean;
   onChange?: StdChangeHandler<boolean | undefined>;
   onBlur?: (e: React.FocusEvent<{ checked: boolean }>) => void;
   required?: boolean;
@@ -28,7 +28,6 @@ const StdCheckbox = ({
   value,
   label,
   disabled = false,
-  defaultChecked = false,
   checkboxControl,
   onChange,
   onBlur,
@@ -63,7 +62,6 @@ const StdCheckbox = ({
         type="checkbox"
         name={name}
         disabled={disabled}
-        defaultChecked={defaultChecked}
         checked={checked}
         onChange={handleOnChange}
         onMouseDown={(e) => e.preventDefault()}

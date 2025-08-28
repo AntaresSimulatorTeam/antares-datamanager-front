@@ -5,10 +5,10 @@ import { useTranslation } from 'react-i18next';
 import { ReactNode, useState } from 'react';
 import ThermalCapacityTab from '@/components/tab/ThermalCapacityTab.tsx';
 import { ParametersTab } from '@/components/tab/ParametersTab.tsx';
-import { CheckBoxData, TrajectoryAreaData } from '@/shared/types';
+import { TrajectoryAreaData } from '@/shared/types';
 
 interface ThermalMenuProps {
-  defaultAreas: CheckBoxData[];
+  defaultAreas: { name: string }[];
   areas: TrajectoryAreaData[];
 }
 

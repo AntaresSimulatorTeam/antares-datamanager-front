@@ -1,12 +1,11 @@
 import { Mock, vi } from 'vitest';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
-import { HypothesisRowData } from '@/shared/types';
-import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
+import { DbTrajectory, HypothesisRowData } from '@/shared/types';
+import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { mockDbTrajectory } from '@/mocks/data/tests/trajectory.mock.ts';
-import { setReadOnlyForGeneratedStudy } from '@/shared/helpers/hypothesisTableHelper.ts';
+import { getReadOnlyForGeneratedStudy, shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { retrieveReadOnlyArea } from '@/shared/utils/trajectoryUtils.ts';
 
-// mock trajectory utils
 vi.mock('@/shared/utils/trajectoryUtils.ts', async (importOriginal) => {
   const actual: Mock = await importOriginal();
   return {
@@ -21,7 +20,6 @@ describe('setReadOnlyForGeneratedStudy', () => {
   it('should call setReadOnly with the result of retrieveReadOnlyArea for rows without trajectory', () => {
     const mockRetrieveReadOnlyArea = retrieveReadOnlyArea as Mock<typeof retrieveReadOnlyArea>;
     mockRetrieveReadOnlyArea.mockReturnValue(mockReadOnlyResult);
-    const setReadOnlyMock = vi.fn();
     const mockRows: HypothesisRowData[] = [
       { hypothesis: 'H1', trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING },
       { hypothesis: 'H2', trajectory: mockDbTrajectory, status: TRAJECTORY_SELECTION_STATUS.OK },
@@ -31,9 +29,84 @@ describe('setReadOnlyForGeneratedStudy', () => {
 
     const expectedHypotheses = ['H1', 'H3'];
 
-    setReadOnlyForGeneratedStudy(mockRows, setReadOnlyMock);
+    getReadOnlyForGeneratedStudy(mockRows);
 
     expect(retrieveReadOnlyArea).toHaveBeenCalledWith(mockRows, expectedHypotheses);
-    expect(setReadOnlyMock).toHaveBeenCalledWith(mockReadOnlyResult);
+  });
+});
+
+describe('shouldOpenDeletionModal', () => {
+  const baseRow: HypothesisRowData = {
+    hypothesis: 'Zone A',
+    trajectory: { id: 1, trajectoryName: 'Traj A', area: 'Zone A' } as DbTrajectory,
+    status: TRAJECTORY_SELECTION_STATUS.OK,
+    subRows: [],
+  };
+
+  it('returns true when trajectory is linked to area and type is not THERMAL_CAPACITY', () => {
+    const data = [baseRow];
+    const result = shouldOpenDeletionModal(TRAJECTORY_TYPE.LOAD, 0, data);
+    expect(result).toBe(true);
+  });
+
+  it('returns false when trajectory is linked to area but type is THERMAL_CAPACITY and no subRows', () => {
+    const data = [baseRow];
+    const result = shouldOpenDeletionModal(TRAJECTORY_TYPE.THERMAL_CAPACITY, 0, data);
+    expect(result).toBe(false);
+  });
+
+  it('returns true when trajectory is linked to area and subRows contain valid trajectory', () => {
+    const data: HypothesisRowData[] = [
+      {
+        ...baseRow,
+        subRows: [
+          {
+            hypothesis: 'Tech A',
+            trajectory: { id: 2, trajectoryName: 'Traj B', area: 'Tech A' } as DbTrajectory,
+            status: TRAJECTORY_SELECTION_STATUS.OK,
+            subRows: [],
+          },
+        ],
+      },
+    ];
+    const result = shouldOpenDeletionModal(TRAJECTORY_TYPE.THERMAL_CAPACITY, 0, data);
+    expect(result).toBe(true);
+  });
+
+  it('returns false when indexRow is invalid', () => {
+    const data = [baseRow];
+    const result = shouldOpenDeletionModal(TRAJECTORY_TYPE.LOAD, -1, data);
+    expect(result).toBe(false);
+  });
+
+  it('returns false when no trajectory is linked', () => {
+    const data: HypothesisRowData[] = [
+      {
+        hypothesis: 'Zone A',
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+        subRows: [],
+      },
+    ];
+    const result = shouldOpenDeletionModal(TRAJECTORY_TYPE.LOAD, 0, data);
+    expect(result).toBe(false);
+  });
+
+  it('returns false when indexRow is out of bounds', () => {
+    const data = [baseRow];
+    const result = shouldOpenDeletionModal(TRAJECTORY_TYPE.LOAD, 5, data);
+    expect(result).toBe(false);
+  });
+
+  it('returns false when data is empty', () => {
+    const result = shouldOpenDeletionModal(TRAJECTORY_TYPE.LOAD, 0, []);
+    expect(result).toBe(false);
+  });
+
+  it('returns false when data[indexRow] is undefined', () => {
+    const data: HypothesisRowData[] = [];
+    data[3] = baseRow;
+    const result = shouldOpenDeletionModal(TRAJECTORY_TYPE.LOAD, 1, data);
+    expect(result).toBe(false);
   });
 });

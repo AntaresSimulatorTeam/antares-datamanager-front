@@ -9,7 +9,7 @@ import { RdsTabItem } from 'rte-design-system-react';
 import LoadTab from '@/components/tab/LoadTab.tsx';
 import EnrTab from '@/components/tab/EnrTab.tsx';
 import MiscTab from '@/components/tab/MiscLinkTab.tsx';
-import AreaLinkTab from '@/components/tab/AreaLinkTab.tsx';
+import { AreaLinkTab } from '@/components/tab/AreaLinkTab.tsx';
 import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useTranslation } from 'react-i18next';

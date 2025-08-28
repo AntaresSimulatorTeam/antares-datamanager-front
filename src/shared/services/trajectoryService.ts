@@ -12,14 +12,17 @@ import {
   TRAJECTORY_ENDPOINT,
   TRAJECTORY_FILE_SYSTEM_ENDPOINT,
   TRAJECTORY_LINK_TO_STUDY_ENDPOINT,
-  TRAJECTORY_UNLINK_TO_STUDY_ENDPOINT,
+  TRAJECTORY_THERMAL_INSTALLED_POWER_IMPORT,
   TRAJECTORY_UNLINK_ALL_TO_STUDY_ENDPOINT,
+  TRAJECTORY_UNLINK_MULTIPLE_TO_STUDY_ENDPOINT,
+  TRAJECTORY_UNLINK_TO_STUDY_ENDPOINT,
 } from '@/shared/const/apiEndPoint.ts';
 import {
   BackendError,
   DbTrajectory,
   FsTrajectory,
   TRAJECTORY_DATA_TYPE,
+  TrajectoryBackendError,
   TrajectoryState,
   Types,
   WarningMessage,
@@ -29,6 +32,7 @@ import { fetchWithProgress } from '@/shared/services/progressService.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { fetchWarningMessagesFromType } from './warningService';
+import { isBusinessError } from '@/shared/utils/errorUtils.ts';
 
 /**
  * Retrieve a list of trajectories by type and horizon from database
@@ -37,15 +41,18 @@ import { fetchWarningMessagesFromType } from './warningService';
  * @param {string} horizon - Horizon value (ex: 2020-2021)
  * @param {string | undefined} fileName - Autocompletion - filter trajectories by file name
  * @param {string | undefined} area - To use just in thermal capacity case
+ * @param {string | undefined} technology - Technology
  * @returns {Promise<DbTrajectory[]>} - Promise object that represents a list of trajectories
+ * @throws {Error}
  */
 export const fetchTrajectoriesFromDB = async (
   trajectoryType: string,
   horizon: string,
   fileName?: string,
   area?: string,
+  technology?: string,
 ): Promise<DbTrajectory[]> => {
-  const urlApi = `${TRAJECTORY_DATA_BASE_ENDPOINT}?trajectoryType=${trajectoryType}&horizon=${horizon}&fileNameContains=${fileName ?? ''}&loadArea=${area ?? ''}`;
+  const urlApi = `${TRAJECTORY_DATA_BASE_ENDPOINT}?trajectoryType=${trajectoryType}&horizon=${horizon}&fileNameContains=${fileName ?? ''}&area=${area ?? ''}&technology=${technology ?? ''}`;
   try {
     const response = await AuthService.authFetch(urlApi);
     return (await (response as Response).json()) as DbTrajectory[];
@@ -58,18 +65,19 @@ export const fetchTrajectoriesFromDB = async (
  * Retrieve a list of trajectories by type and thermal capacity area from file system
  *
  * @param {TRAJECTORY_TYPE} trajectoryType - Partial name of a study
- * @param {string | undefined} thermalCapacityArea - To use just in thermal capacity case
+ * @param {string | undefined} area - To use just in thermal capacity case
  * @param {string | undefined} searchTerm - Autocompletion - filter trajectories by file name
  * @returns {Promise<FsTrajectory[]>} - Promise object that represents a list of trajectories
+ * @throws {Error}
  */
 export const fetchTrajectoriesFromFS = async (
-  trajectoryType: string,
+  trajectoryType: TRAJECTORY_TYPE,
   searchTerm?: string | undefined,
-  thermalCapacityArea?: string | undefined,
+  area?: string | undefined,
 ): Promise<FsTrajectory[]> => {
   const queryString = new URLSearchParams({
-    trajectoryType: trajectoryType ?? '',
-    thermalCapacityArea: thermalCapacityArea ?? '',
+    trajectoryType,
+    area: area ?? '',
     fileNameContains: searchTerm ?? '',
   }).toString();
 
@@ -83,15 +91,18 @@ export const fetchTrajectoriesFromFS = async (
 };
 
 /**
- * Import a trajectory file into database
+ * Asynchronously uploads a trajectory into the data base and tracks the progress of the operation.
  *
- * @param {TRAJECTORY_TYPE} trajectoryType - Trajectory type
- * @param {string} trajectoryName - Name of trajectory to add to data base
- * @param {string} horizon - Study horizon
- * @param {number} studyId - Study id
- * @param {(progress: number) => void} onProgress - Set progress value
- * @param {string | undefined} area - Area to use in thermal capacity case
- * @returns {Promise<DbTrajectory>} - Promise object that represents a trajectory inserted into database
+ * @param {TRAJECTORY_TYPE} trajectoryType - Type of the trajectory (AREA, LINK, LOAD...)
+ * @param {string | undefined} area - The geographical area associated with the trajectory, may be undefined.
+ * @param {string} trajectoryName - The name of the trajectory to be uploaded.
+ * @param {string} horizon - The time horizon associated with the trajectory.
+ * @param {number} studyId - The unique identifier for the associated study.
+ * @param {boolean} isCivilYear - Indicates whether the horizon is based on the civil or a different calendar year.
+ * @param {(progress: number) => void} onProgress - A callback function invoked to report progress updates. Receives a numeric progress value.
+ * @param {string} technology - The technology associated with the trajectory.
+ * @returns {Promise<DbTrajectory>} A promise that resolves to the uploaded trajectory object.
+ * @throws {Error} If the upload process fails or an invalid response is encountered.
  */
 export const uploadTrajectory = async (
   trajectoryType: TRAJECTORY_TYPE,
@@ -100,12 +111,21 @@ export const uploadTrajectory = async (
   studyId: number,
   area: string | undefined,
   onProgress: (progress: number) => void,
+  isCivilYear?: boolean,
+  technology?: string,
 ): Promise<DbTrajectory> => {
-  const urlApi = `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
-  const urlLoadApi = `${TRAJECTORY_ENDPOINT}/load?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
+  let urlApi;
+  if (trajectoryType === TRAJECTORY_TYPE.LOAD) {
+    urlApi = `${TRAJECTORY_ENDPOINT}/load?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
+  } else if (trajectoryType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
+    urlApi = `${TRAJECTORY_THERMAL_INSTALLED_POWER_IMPORT}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}&technology=${technology ?? ''}`;
+  } else {
+    urlApi = `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
+  }
+
   try {
     const response = await fetchWithProgress(
-      trajectoryType === TRAJECTORY_TYPE.LOAD ? urlLoadApi : urlApi,
+      urlApi,
       {
         method: 'POST',
         headers: {
@@ -117,7 +137,7 @@ export const uploadTrajectory = async (
 
     return (await response.json()) as DbTrajectory;
   } catch (error) {
-    throw new Error((error as Error)?.message ?? '');
+    throw new Error((error as Error)?.message);
   }
 };
 
@@ -128,6 +148,7 @@ export const uploadTrajectory = async (
  * @param {number} studyId - Study id
  *
  * @return {Promise<DbTrajectory>} - Trajectory linked to a study
+ * @throws {Error}
  */
 
 export const linkTrajectoryToStudy = async (
@@ -155,22 +176,33 @@ export const linkTrajectoryToStudy = async (
  *
  * @param {number} trajectoryId - Trajectory id
  * @param {number} studyId - Study id
+ * @throws {BackendError}
  */
 export const unlinkTrajectoryFromStudy = async (trajectoryId: number, studyId: number): Promise<void> => {
-  const urlApi = `${TRAJECTORY_UNLINK_TO_STUDY_ENDPOINT}?trajectoryId=${trajectoryId}&studyId=${studyId}`;
+  const params = new URLSearchParams({
+    trajectoryId: trajectoryId.toString(),
+    studyId: studyId.toString(),
+  });
+  const urlApi = `${TRAJECTORY_UNLINK_TO_STUDY_ENDPOINT}?${params.toString()}`;
+
   try {
     await AuthService.authFetch(urlApi, {
       method: 'DELETE',
     });
-  } catch (error) {
-    throw new Error(`${(error as BackendError)?.antaresErrorMessage}`);
+  } catch (error: unknown) {
+    if (isBusinessError(error)) {
+      throw new TrajectoryBackendError(`${error.antaresErrorMessage}`, error);
+    } else {
+      throw new TrajectoryBackendError(`Failed to unlink trajectory ${trajectoryId} from study ${studyId}`, error);
+    }
   }
 };
 
 /**
  * Delete all trajectories linked to a study
- *
  * @param {number} studyId - Study id
+ * @return {Promise<void>}
+ * @throws {Error}
  */
 export const unlinkAllTrajectoriesFromStudy = async (studyId: number): Promise<void> => {
   const urlApi = `${TRAJECTORY_UNLINK_ALL_TO_STUDY_ENDPOINT}?studyId=${studyId}`;
@@ -179,7 +211,29 @@ export const unlinkAllTrajectoriesFromStudy = async (studyId: number): Promise<v
       method: 'DELETE',
     });
   } catch (error) {
-    throw new Error(`${(error as BackendError)?.antaresErrorMessage}`);
+    throw new Error((error as BackendError)?.antaresErrorMessage);
+  }
+};
+
+/**
+ * Delete all trajectories linked to a study
+ * @param {number} studyId - Study id
+ * @param {number[]} trajectoryIds - Trajectory id list to delete
+ * @return {Promise<void>}
+ * @throws {Error}
+ */
+export const unlinkMultipleTrajectoriesFromStudy = async (studyId: number, trajectoryIds: number[]): Promise<void> => {
+  const urlApi = `${TRAJECTORY_UNLINK_MULTIPLE_TO_STUDY_ENDPOINT}?studyId=${studyId}`;
+  try {
+    await AuthService.authFetch(urlApi, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(trajectoryIds),
+    });
+  } catch (error) {
+    throw new Error((error as BackendError)?.antaresErrorMessage);
   }
 };
 
@@ -189,6 +243,7 @@ export const unlinkAllTrajectoriesFromStudy = async (studyId: number): Promise<v
  * @param {TRAJECTORY_TYPE} trajectoryType - Trajectory type
  * @param {number} trajectoryId - Trajectory id
  * @return {Promise<Types<TRAJECTORY_DATA_TYPE>[]>}
+ * @throws {Error}
  */
 export const getTrajectoryDataByTypeAndId = async (
   trajectoryType: TRAJECTORY_TYPE,
@@ -206,6 +261,7 @@ export const getTrajectoryDataByTypeAndId = async (
 /**
  * Fetch load default hypothesis (LOAD_OTHERS, LOAD_FR...)
  * @return {Promise<{ name: string }[]>}
+ * @throws {Error}
  */
 export const getDefaultLoadHypothesis = async (): Promise<{ name: string }[]> => {
   try {
@@ -220,6 +276,7 @@ export const getDefaultLoadHypothesis = async (): Promise<{ name: string }[]> =>
  * Count the number of warning messages per trajectory type for a study
  * @param {number} id - Study i
  * @returns {Promise<{ [key in keyof typeof TRAJECTORY_TYPE]: number }>} - Number of warning messages per trajectory type
+ * @throws {Error}
  */
 
 export const getNbMessagesFromTrajectoryType = async (
