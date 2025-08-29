@@ -25,6 +25,7 @@ export interface ProjectInfo extends ProjectResponse {
 export type ProjectActionType =
   | { type: PROJECT_ACTION.ADD_PINNED_PROJECT; payload: ProjectInfo }
   | { type: PROJECT_ACTION.ADD_PROJECT; payload: ProjectInfo }
+  | { type: PROJECT_ACTION.UPDATE_PROJECT; payload: ProjectInfo }
   | {
       type: PROJECT_ACTION.REMOVE_PROJECT;
       payload: string;

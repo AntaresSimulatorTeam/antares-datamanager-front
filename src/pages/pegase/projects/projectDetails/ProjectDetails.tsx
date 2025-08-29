@@ -16,12 +16,15 @@ import { fetchProjectDetails } from '@/shared/services/projectService.ts';
 import DetailsContent from '@/components/banner/DetailsContent.tsx';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { LocationProject } from '@/shared/types';
+import { ProjectCreationModal } from '@common/modal/ProjectCreationModal.tsx';
+import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 
 const ProjectDetails = () => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState<string | undefined>('');
   const [activeChip, setActiveChip] = useState<boolean | null>(false);
   const { user } = useUser();
+  const { isModalOpen, toggleModal } = useNewStudyModal();
 
   const searchStudy = (value?: string | undefined) => {
     setSearchTerm(value);
@@ -76,7 +79,7 @@ const ProjectDetails = () => {
       <ProjectDetailsHeader projectName={projectInfo.name} />
       <RdsDivider />
       <div className="flex flex-col">
-        <DetailsContent content={projectInfo} />
+        <DetailsContent content={projectInfo} onClickButton={toggleModal} />
       </div>
       <div className="flex flex-col gap-4 p-3">
         <div className="flex items-center gap-4">
@@ -89,6 +92,7 @@ const ProjectDetails = () => {
         </div>
         <StudyTableDisplay searchStudy={searchTerm} projectId={projectInfo.id} projectInfoName={projectInfo.name} />
       </div>
+      {isModalOpen && <ProjectCreationModal onClose={toggleModal} projectInfo={projectInfo} />}
     </div>
   );
 };

@@ -14,14 +14,25 @@ import { RdsIcon, RdsIconId, RdsTagList } from 'rte-design-system-react';
 import { useHandlePinnedProjectList } from '@/hooks/useHandlePinnedProjectList.ts';
 import { useProject } from '@/store/contexts/ProjectContext.tsx';
 import { useDeleteProject } from '@/hooks/useDeleteProject.ts';
+import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
+import { ProjectCreationModal } from '@common/modal/ProjectCreationModal.tsx';
+import { useState } from 'react';
+import { ProjectInfo, ProjectResponse } from '@/shared/types';
 
 const PinnedProjectCards = () => {
   const { t } = useTranslation();
   const { navigateToProject } = useProjectNavigation();
-  const { settingOption, deleteOption, pinOption } = useDropdownOptions();
+  const { editOption, deleteOption, pinOption } = useDropdownOptions();
   const { pinnedProjects } = useProject();
   const { handleUnpinProject } = useHandlePinnedProjectList();
   const { deleteProject } = useDeleteProject();
+  const { isModalOpen, toggleModal } = useNewStudyModal();
+  const [selectedProject, setSelectedProject] = useState<ProjectResponse | null>(null);
+
+  const openModalProject = (project: ProjectInfo) => {
+    setSelectedProject(project);
+    toggleModal();
+  };
 
   return (
     <>
@@ -30,8 +41,8 @@ const PinnedProjectCards = () => {
           <PegaseCard
             title={project.name}
             dropdownOptions={[
-              pinOption(project.pinned ?? false, () => void handleUnpinProject(project.id)), // Toggle pin/unpin
-              settingOption(() => {}, t('project.@setting')),
+              pinOption(project.pinned ?? false, () => void handleUnpinProject(project.id)),
+              editOption(() => void openModalProject(project), t('project.@edit')),
               deleteOption(() => void deleteProject(project.id), t('project.@delete'), project.studies?.length > 0),
             ]}
             id={project.id}
@@ -70,6 +81,7 @@ const PinnedProjectCards = () => {
           </PegaseCard>
         </div>
       ))}
+      {isModalOpen && <ProjectCreationModal onClose={toggleModal} projectInfo={selectedProject} />}
     </>
   );
 };

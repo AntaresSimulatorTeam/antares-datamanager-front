@@ -43,6 +43,7 @@
   "project": {
     "@setting": "Setting",
     "@delete": "Supprimer",
+    "@edit": "Editer",
     "@pin": "Épingler",
     "@unpin": "Désépingler",
     "@close": "Fermer",

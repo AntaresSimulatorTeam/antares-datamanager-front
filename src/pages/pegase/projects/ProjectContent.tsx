@@ -19,6 +19,9 @@ import { useHandlePinnedProjectList } from '@/hooks/useHandlePinnedProjectList.t
 import { useDeleteProject } from '@/hooks/useDeleteProject.ts';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { useProject } from '@/store/contexts/ProjectContext.tsx';
+import { ProjectInfo, ProjectResponse } from '@/shared/types';
+import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
+import { ProjectCreationModal } from '@common/modal/ProjectCreationModal.tsx';
 
 const ProjectContent = () => {
   const { t } = useTranslation();
@@ -32,10 +35,9 @@ const ProjectContent = () => {
   const { handlePinProject } = useHandlePinnedProjectList();
   const { projects } = useProject();
   const { deleteProject } = useDeleteProject();
-
-  const searchProject = (value?: string | undefined) => {
-    setSearchTerm(value);
-  };
+  const { editOption, deleteOption, pinOption } = useDropdownOptions();
+  const { isModalOpen, toggleModal } = useNewStudyModal();
+  const [selectedProject, setSelectedProject] = useState<ProjectResponse | null>(null);
 
   const handleChipClick = () => {
     if (activeChip) {
@@ -56,12 +58,15 @@ const ProjectContent = () => {
     }
   };
 
-  const { settingOption, deleteOption, pinOption } = useDropdownOptions();
+  const openModalProject = (project: ProjectInfo) => {
+    setSelectedProject(project);
+    toggleModal();
+  };
 
   return (
     <div className="flex w-full flex-1 flex-col gap-3">
       <div className="flex gap-4 py-2">
-        <SearchBar onSearch={searchProject} />
+        <SearchBar onSearch={(value?: string) => setSearchTerm(value)} />
         <RdsChip
           label={t('home.@my_projects')}
           onClick={handleChipClick}
@@ -72,7 +77,7 @@ const ProjectContent = () => {
         {(projects.length > intervalSize ? projects.splice(0, 9) : projects || []).map((project) => {
           const dropdownItems = [
             pinOption(false, () => void handlePinProject(project.id)),
-            settingOption(() => {}, t('project.@setting')),
+            editOption(() => void openModalProject(project), t('project.@edit')),
             deleteOption(() => void handleDeleteProject(project.id), t('project.@delete'), project.studies?.length > 0),
           ];
           return (
@@ -109,6 +114,7 @@ const ProjectContent = () => {
             </PegaseCard>
           );
         })}
+        {isModalOpen && <ProjectCreationModal onClose={toggleModal} projectInfo={selectedProject} />}
       </div>
       <div className="flex h-[60px] items-center justify-between bg-gray-200 px-[32px]">
         <StudiesPagination count={count} intervalSize={intervalSize} current={current} onChange={setCurrent} />

@@ -12,6 +12,11 @@ export const addProject = (currentState: ProjectState, payload: ProjectInfo) => 
   const { pinnedProjects, projects } = currentState;
   return { projects: [payload, ...projects], pinnedProjects };
 };
+export const updateProject = (currentState: ProjectState, payload: ProjectInfo) => {
+  const { pinnedProjects, projects } = currentState;
+  const updateProjects = projects.map((project) => (project.id === payload.id ? payload : project));
+  return { projects: updateProjects, pinnedProjects };
+};
 export const removeProject = (currentState: ProjectState, payload: string) => {
   const { pinnedProjects, projects } = currentState;
   return {
@@ -35,6 +40,8 @@ const projectReducer = (prevState: ProjectState, action?: ProjectActionType): Pr
     switch (action.type) {
       case PROJECT_ACTION.ADD_PROJECT:
         return addProject(prevState, action.payload);
+      case PROJECT_ACTION.UPDATE_PROJECT:
+        return updateProject(prevState, action.payload);
       case PROJECT_ACTION.REMOVE_PROJECT:
         return removeProject(prevState, action.payload);
       case PROJECT_ACTION.INIT_PROJECT_LIST:

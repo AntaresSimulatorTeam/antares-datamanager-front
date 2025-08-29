@@ -111,3 +111,27 @@ export const createProject = async (
     throw new Error(`${(error as BackendError)?.antaresErrorMessage}`);
   }
 };
+
+/**
+ * Modify a project
+ * @param {number} projectId
+ * @param {Pick<ProjectInfo, 'description' | 'tags'>} projectInfos
+ * @return {ProjectResponse}
+ */
+export const updateProject = async (
+  projectId: number,
+  projectInfos: Pick<ProjectInfo, 'description' | 'tags'>,
+): Promise<ProjectResponse> => {
+  try {
+    const response = await AuthService.authFetch(`${PROJECT_ENDPOINT}?projectId=${projectId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(projectInfos),
+    });
+    return (await (response as Response).json()) as ProjectResponse;
+  } catch (error) {
+    throw new Error(`${(error as BackendError)?.antaresErrorMessage}`);
+  }
+};
