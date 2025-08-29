@@ -35,7 +35,7 @@ export const unpinPinnedProject = (currentState: ProjectState, payload: string) 
   return { projects, pinnedProjects: [...pinnedProjects.filter((p) => p.id !== payload)] };
 };
 
-const projectReducer = (prevState: ProjectState, action?: ProjectActionType): ProjectState => {
+export const projectReducer = (prevState: ProjectState, action?: ProjectActionType): ProjectState => {
   if (action) {
     switch (action.type) {
       case PROJECT_ACTION.ADD_PROJECT:
@@ -59,5 +59,3 @@ const projectReducer = (prevState: ProjectState, action?: ProjectActionType): Pr
 
   return prevState;
 };
-
-export default projectReducer;

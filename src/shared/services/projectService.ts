@@ -115,12 +115,12 @@ export const createProject = async (
 /**
  * Modify a project
  * @param {number} projectId
- * @param {Pick<ProjectInfo, 'description' | 'tags'>} projectInfos
+ * @param {Pick<ProjectResponse, 'name' | description' | 'tags'>} projectInfos
  * @return {ProjectResponse}
  */
 export const updateProject = async (
   projectId: number,
-  projectInfos: Pick<ProjectInfo, 'description' | 'tags'>,
+  projectInfos: Pick<ProjectInfo, 'name' | 'description' | 'tags'>,
 ): Promise<ProjectResponse> => {
   try {
     const response = await AuthService.authFetch(`${PROJECT_ENDPOINT}?projectId=${projectId}`, {
