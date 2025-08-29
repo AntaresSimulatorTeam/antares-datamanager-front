@@ -18,7 +18,7 @@ import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 interface ProjectCreationModalProps {
   onClose: () => void;
-  projectInfo: ProjectResponse | null;
+  projectInfo?: ProjectResponse | null;
 }
 
 export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationModalProps) => {
