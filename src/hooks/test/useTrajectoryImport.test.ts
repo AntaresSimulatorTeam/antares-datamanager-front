@@ -77,7 +77,7 @@ describe('useTrajectoryImport', () => {
       'study-001',
       'Solar',
       expect.any(Function),
-      true,
+      false,
       'Tech A',
     );
 
@@ -178,7 +178,7 @@ describe('useTrajectoryImport', () => {
       'study-001',
       OTHER_AREAS,
       expect.any(Function),
-      true,
+      false,
       undefined,
     );
   });
