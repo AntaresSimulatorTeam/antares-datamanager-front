@@ -43,7 +43,7 @@ const getExpandableHypothesisTableHeaders = (
 ): TableOptions<HypothesisRowData>['columns'] => [
   columnHelper.accessor('hypothesis', {
     header: t('studyDetails.@area'),
-    size: 50,
+    size: 120,
     cell: ({ getValue, row }) => {
       const { status } = row.original;
       const getAlignment = () => {

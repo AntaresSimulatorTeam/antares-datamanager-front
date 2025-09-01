@@ -216,11 +216,8 @@ export const ThermalOptions = [
   'CCGT',
   'CHP',
   'Coal',
-  'DSR',
   'Nuclear',
   'Other',
   'Reserves',
-  'Storage battery',
-  'Storage VE',
   'TAC',
 ];

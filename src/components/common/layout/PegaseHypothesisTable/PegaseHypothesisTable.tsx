@@ -82,9 +82,7 @@ export const PegaseHypothesisTable = ({
         getSubRows={(originalRow) => originalRow.subRows ?? undefined}
         search={(value: string, rowId: string) => handleSearch(value, rowId)}
         importData={async (rowId: string) => await onHandleImport(rowId)}
-        removeRow={(value: string, rowId?: string) => {
-          void removeRow?.(value, rowId);
-        }}
+        removeRow={(value: string, rowId?: string) => void removeRow?.(value, rowId)}
         updateData={(rowId: string, value: unknown, status: RowStatus) => void updateData?.(rowId, value, status)}
       />
     </div>

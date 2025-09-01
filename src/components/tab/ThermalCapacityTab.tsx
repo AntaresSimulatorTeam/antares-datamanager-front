@@ -30,7 +30,6 @@ import { useLocation } from 'react-router-dom';
 import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
 import StdCheckbox from '@common/forms/stdCheckbox/StdCheckbox.tsx';
 import StdCheckboxGroupWrapper from '@common/forms/stdCheckboxGroup/StdCheckboxGroupWrapper.tsx';
-import { DeletionModal } from '@common/modal/DeletionModal.tsx';
 import { addRow, handleFetchTrajectoriesFS, handleTrajectorySearch } from '@/shared/services/hypothesisTableService.ts';
 import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
@@ -39,6 +38,7 @@ import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
 import { shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig';
 import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
+import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
 
 interface ThermalTabProps {
   defaultAreas: { name: string }[];
@@ -201,17 +201,16 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
           area={getAreaTrajectoryName(rowIdSelected, data)}
         />
       )}
-      {isDeletionModalOpen && (
-        <DeletionModal
-          onClose={() => setIsDeletionModalOpen(false)}
-          handleDeletionRow={async () => {
-            if (rowToDelete?.value) {
-              await removeRow(TRAJECTORY_TYPE.THERMAL_CAPACITY, rowToDelete?.value, rowToDelete.index, data);
-              setIsDeletionModalOpen(false);
-            }
-          }}
-        />
-      )}
+      <AreaDeletionConfirmationModal
+        isOpen={isDeletionModalOpen}
+        onClose={() => setIsDeletionModalOpen(false)}
+        onConfirm={async () => {
+          if (rowToDelete?.value) {
+            await removeRow(TRAJECTORY_TYPE.THERMAL_CAPACITY, rowToDelete?.value, rowToDelete.index, data);
+            setIsDeletionModalOpen(false);
+          }
+        }}
+      />
     </div>
   );
 };

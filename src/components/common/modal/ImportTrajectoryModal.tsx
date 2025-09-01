@@ -33,13 +33,14 @@ export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, area }
   const handleSearchTerm = useCallback(
     async (searchTerm?: string) => {
       try {
-        const results = await fetchTrajectoriesFromFS(trajectoryType, searchTerm);
+        const searchArea = trajectoryType === TRAJECTORY_TYPE.THERMAL_CAPACITY && area?.includes('FR') ? 'FR' : '';
+        const results = await fetchTrajectoriesFromFS(trajectoryType, searchTerm, searchArea);
         return convertToFSSelectionOptionType(results);
       } catch (error) {
         // silent handler
       }
     },
-    [trajectoryType],
+    [trajectoryType, area],
   );
 
   return (
