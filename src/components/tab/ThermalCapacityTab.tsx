@@ -177,7 +177,6 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
               }
             }}
             removeRow={(value: string, rowId?: string) => {
-              console.log('===============  removeRow  ===============');
               if (shouldOpenDeletionModal(TRAJECTORY_TYPE.THERMAL_CAPACITY, Number(rowId), data)) {
                 setRowToDelete({ index: Number(rowId), value });
                 setIsDeletionModalOpen(true);
@@ -207,7 +206,6 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
           isOpen={isDeletionModalOpen}
           onClose={() => setIsDeletionModalOpen(false)}
           onConfirm={async () => {
-            console.log('================  onConfirm  ================', rowToDelete?.value);
             if (rowToDelete?.value) {
               await removeRow(TRAJECTORY_TYPE.THERMAL_CAPACITY, rowToDelete?.value, rowToDelete.index, data);
               setIsDeletionModalOpen(false);

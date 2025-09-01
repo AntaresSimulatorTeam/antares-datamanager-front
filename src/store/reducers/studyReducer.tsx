@@ -9,7 +9,11 @@ import {
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
-import { isMatchingTrajectoryType, removeDuplicate, removeDuplicateById } from '@/shared/utils/trajectoryUtils.ts';
+import {
+  isMatchingTrajectoryType,
+  removeDuplicateById,
+  removeDuplicateByTechnology,
+} from '@/shared/utils/trajectoryUtils.ts';
 
 export const addTrajectories = (prevState: Partial<StudyState>, data: StudyTrajectoriesData): Partial<StudyState> => {
   const studyState: Partial<StudyState> = { ...prevState };
@@ -24,7 +28,7 @@ export const addTrajectories = (prevState: Partial<StudyState>, data: StudyTraje
       ];
       Object.assign(studyState, {
         [keyType]: {
-          trajectories: removeDuplicate(newTrajectories),
+          trajectories: removeDuplicateByTechnology(newTrajectories),
           warningMessages: removeDuplicateById(newWarningMessages),
         },
       });
@@ -69,7 +73,7 @@ export const updateTrajectory = (
     : null;
   if (trajectories?.length) {
     const newTrajectories = trajectories.map((trajectoryDb) => {
-      if (trajectoryDb.area === trajectory.area && trajectoryDb.technology === trajectory.technology) {
+      if (trajectoryDb.area === trajectory.area && trajectory?.technology === trajectoryDb.technology) {
         return {
           ...trajectoryDb,
           trajectoryName: status === 'success' ? trajectory.trajectoryName : '',

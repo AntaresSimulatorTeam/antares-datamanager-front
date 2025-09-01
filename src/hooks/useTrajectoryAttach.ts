@@ -26,7 +26,7 @@ export const useTrajectoryAttach = (
 
         if (newDbTrajectory) {
           const alreadyExists = studyState[newDbTrajectory.type]?.trajectories?.some(
-            (item) => item.area === newDbTrajectory.area,
+            (item) => item.area === newDbTrajectory.area && item.technology === newDbTrajectory.technology,
           );
 
           if (alreadyExists) {
@@ -49,6 +49,7 @@ export const useTrajectoryAttach = (
               },
             });
           }
+
           const newTrajectory = {
             trajectory: newDbTrajectory,
             status: TRAJECTORY_SELECTION_STATUS.OK,
