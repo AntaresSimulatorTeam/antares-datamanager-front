@@ -6,6 +6,7 @@ import { SelectOption } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { fetchTrajectoriesFromFS } from '@/shared/services/trajectoryService.ts';
 import { convertToFSSelectionOptionType } from '@/shared/utils/formFormatter.ts';
+import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
 
 interface ImportTrajectoryModalProps {
   options: SelectOption[] | undefined;
@@ -33,7 +34,8 @@ export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, area }
   const handleSearchTerm = useCallback(
     async (searchTerm?: string) => {
       try {
-        const searchArea = trajectoryType === TRAJECTORY_TYPE.THERMAL_CAPACITY && area?.includes('FR') ? 'FR' : '';
+        const searchArea =
+          trajectoryType === TRAJECTORY_TYPE.THERMAL_CAPACITY && area?.includes('FR') ? 'FR' : OTHER_AREAS;
         const results = await fetchTrajectoriesFromFS(trajectoryType, searchTerm, searchArea);
         return convertToFSSelectionOptionType(results);
       } catch (error) {

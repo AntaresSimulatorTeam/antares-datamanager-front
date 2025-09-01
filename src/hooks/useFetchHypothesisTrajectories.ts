@@ -122,7 +122,7 @@ export const useFetchHypothesisTrajectories = (
         // Silent handler
       }
     },
-    [defaultAreas, emptyAreaSelected, dispatch, areas],
+    [defaultAreas, emptyAreaSelected, dispatch, areas, isStudyGenerated],
   );
 
   useEffect(() => {
