@@ -490,6 +490,6 @@ describe('uploadTrajectory', () => {
 
     await expect(async () =>
       uploadTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026', 2, 'FR', onProgress),
-    ).rejects.toThrowError('Failed to import trajectory to data base');
+    ).rejects.toThrowError('Failed to upload trajectory area_BP_23_v6');
   });
 });

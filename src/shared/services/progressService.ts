@@ -1,5 +1,6 @@
 import { AuthService } from '@/shared/services/authService.ts';
-import { BackendError } from '@/shared/types';
+import { TrajectoryBackendError } from '@/shared/types';
+import { isBusinessError } from '@/shared/utils/errorUtils.ts';
 
 const simulateProgress = async (duration: number, onProgress: (value: number) => void) =>
   new Promise((resolve) => {
@@ -32,6 +33,10 @@ export const fetchWithProgress = async (
     await simulateProgress(duration, onProgress);
     return (await AuthService.authFetch(url, options)) as Response;
   } catch (error) {
-    throw new Error((error as BackendError)?.antaresErrorMessage ?? '');
+    if (isBusinessError(error)) {
+      throw error;
+    } else {
+      throw new TrajectoryBackendError(`Failed to upload trajectory`, error);
+    }
   }
 };

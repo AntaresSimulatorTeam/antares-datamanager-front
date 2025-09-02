@@ -6,6 +6,7 @@ import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { generateId } from '@/shared/utils/defaultUtils.ts';
 import { Row } from '@tanstack/react-table';
+import { ThermalOptions } from '@/mocks/data/list/names.ts';
 
 /**
  * Get trajectory status from row status
@@ -82,6 +83,15 @@ export const removeDuplicate = (array?: DbTrajectory[]): DbTrajectory[] =>
     return acc;
   }, []);
 
+export const removeDuplicateByTechnology = (array?: DbTrajectory[]): DbTrajectory[] =>
+  (array || []).reduce((acc: DbTrajectory[], current: DbTrajectory) => {
+    const x = acc.find((item) => item.area === current.area && item.technology === current.technology);
+    if (!x) {
+      acc.push(current);
+    }
+    return acc;
+  }, []);
+
 /**
  * Removes duplicate objects from an array of WarningMessage objects based on their 'id' property.
  *
@@ -114,10 +124,11 @@ export const buildRowData = (areaName: string, isDefault: boolean, trajectory?: 
 /**
  * Create empty data base trajectory
  * @param {string} area
- * @param type
+ * @param {TRAJECTORY_TYPE} type
+ * @param {string} technology
  * @return {DbTrajectory}
  */
-export const buildEmptyTrajectory = (area: string, type: TRAJECTORY_TYPE): DbTrajectory => ({
+export const buildEmptyTrajectory = (area: string, type: TRAJECTORY_TYPE, technology?: string): DbTrajectory => ({
   id: generateId(),
   trajectoryName: '',
   type,
@@ -125,7 +136,7 @@ export const buildEmptyTrajectory = (area: string, type: TRAJECTORY_TYPE): DbTra
   userName: 'user',
   creationDate: new Date(),
   area,
-  technology: '',
+  technology: technology ?? '',
   state: TRAJECTORY_SELECTION_STATUS.MISSING,
 });
 
@@ -169,6 +180,56 @@ export const buildRowWithSubRowsData = (
         })
       : null,
 });
+
+export const convertIntoHypothesisRowWithTechnologies = (
+  data: DbTrajectory[],
+  areasNotInTrajectoryArea: string[],
+  defaultAreas: { name: string }[] | undefined,
+) => {
+  const groupedByArea: Record<string, DbTrajectory[]> = data.reduce(
+    (acc, item) => {
+      if (item.area && !acc[item.area]) acc[item.area] = [];
+      item.area && acc[item.area].push(item);
+      return acc;
+    },
+    {} as Record<string, DbTrajectory[]>,
+  );
+
+  return Object.entries(groupedByArea).map(([area, entries]) => {
+    const mainEntry = entries.find((e) => e.technology === '');
+
+    const subRows: HypothesisRowData[] | null =
+      mainEntry?.area !== OTHER_AREAS && !areasNotInTrajectoryArea?.some((item) => item === mainEntry?.area)
+        ? ThermalOptions.map((option: string) => {
+            const trajectoryTechnology: DbTrajectory | undefined = entries.find(
+              (entry) => entry?.technology === option,
+            );
+            return {
+              hypothesis: option,
+              trajectory: trajectoryTechnology?.trajectoryName ? trajectoryTechnology : null,
+              status: trajectoryTechnology?.trajectoryName
+                ? TRAJECTORY_SELECTION_STATUS.OK
+                : TRAJECTORY_SELECTION_STATUS.MISSING,
+              isDefault: true,
+              subRows: null,
+            };
+          })
+        : null;
+
+    return {
+      hypothesis: area === OTHER_AREAS ? OTHER_AREAS_LABEL : area,
+      trajectory: mainEntry?.trajectoryName ? mainEntry : null,
+      status:
+        mainEntry?.trajectoryName && !mainEntry?.technology
+          ? TRAJECTORY_SELECTION_STATUS.OK
+          : TRAJECTORY_SELECTION_STATUS.MISSING,
+      isDefault:
+        defaultAreas?.some((item: { name: string }) => item.name === mainEntry?.area) ||
+        OTHER_AREAS === mainEntry?.area,
+      subRows: subRows?.length ? subRows : null,
+    };
+  });
+};
 
 /**
  * Create read only mapping from the read only item indexes array

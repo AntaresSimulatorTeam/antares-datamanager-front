@@ -6,13 +6,14 @@ import { getStudyTrajectoriesWithWarnings } from '@/shared/services/trajectorySe
 import {
   buildEmptyTrajectory,
   buildRowWithSubRowsData,
+  convertIntoHypothesisRowWithTechnologies,
   removeDuplicate,
+  removeDuplicateByTechnology,
   retrieveReadOnlyArea,
 } from '@/shared/utils/trajectoryUtils.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
 import { sortWithFixedPosition } from '@/shared/utils/sortUtils';
-import { ThermalOptions } from '@/mocks/data/list/names.ts';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { getReadOnlyForGeneratedStudy } from '@/shared/helpers/hypothesisTableHelper.ts';
 
@@ -53,9 +54,10 @@ export const useFetchHypothesisTrajectories = (
             buildEmptyTrajectory(defaultArea.name, type),
           );
 
-          const arrayWithoutDuplicate: DbTrajectory[] = removeDuplicate(
-            result?.trajectories?.concat(emptyAreaSelected).concat(defaultEmptyAreas),
-          );
+          const arrayWithoutDuplicate: DbTrajectory[] =
+            type === TRAJECTORY_TYPE.THERMAL_CAPACITY
+              ? removeDuplicateByTechnology(result?.trajectories?.concat(emptyAreaSelected).concat(defaultEmptyAreas))
+              : removeDuplicate(result?.trajectories?.concat(emptyAreaSelected).concat(defaultEmptyAreas));
 
           dispatch?.({
             type: STUDY_ACTION.ADD_TRAJECTORIES,
@@ -99,16 +101,18 @@ export const useFetchHypothesisTrajectories = (
             .filter(Boolean) as string[];
 
           // Hypothesis table
-          const areaData = arrayWithoutDuplicate
-            .map((trajectory) =>
-              buildRowWithSubRowsData(
-                trajectory,
-                defaultAreas,
-                defaultAreaListNotIncludedInList,
-                type === TRAJECTORY_TYPE.THERMAL_CAPACITY ? ThermalOptions : null,
-              ),
-            )
-            .filter(Boolean);
+          const areaData =
+            type === TRAJECTORY_TYPE.THERMAL_CAPACITY
+              ? convertIntoHypothesisRowWithTechnologies(
+                  arrayWithoutDuplicate,
+                  defaultAreaListNotIncludedInList,
+                  defaultAreas,
+                )
+              : arrayWithoutDuplicate
+                  .map((trajectory) =>
+                    buildRowWithSubRowsData(trajectory, defaultAreas, defaultAreaListNotIncludedInList, null),
+                  )
+                  .filter(Boolean);
           const dataTrajectories = sortWithFixedPosition(areaData);
           setHypothesisTrajectories(dataTrajectories);
           if (isStudyGenerated) {
@@ -122,7 +126,7 @@ export const useFetchHypothesisTrajectories = (
         // Silent handler
       }
     },
-    [defaultAreas, emptyAreaSelected, dispatch, areas],
+    [defaultAreas, emptyAreaSelected, dispatch, areas, isStudyGenerated],
   );
 
   useEffect(() => {

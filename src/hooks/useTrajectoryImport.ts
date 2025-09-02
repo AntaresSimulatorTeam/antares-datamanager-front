@@ -44,7 +44,7 @@ export const useTrajectoryImport = (
           (progressValue: number) => {
             setProgress(+progressValue.toFixed(0));
           },
-          !!TRAJECTORY_TYPE.THERMAL_CAPACITY,
+          false, //TODO: should be configurable
           technology,
         );
 

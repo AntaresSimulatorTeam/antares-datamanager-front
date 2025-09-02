@@ -3,13 +3,13 @@ import { RdsButton, RdsModal } from 'rte-design-system-react';
 import { useTranslation } from 'react-i18next';
 
 interface AreaDeletionConfirmationModalProps {
-  isOpen: boolean;
+  isOpen?: boolean;
   onClose: () => void;
   onConfirm: () => Promise<void>;
 }
 
 export const AreaDeletionConfirmationModal: React.FC<AreaDeletionConfirmationModalProps> = ({
-  isOpen,
+  isOpen = false,
   onClose,
   onConfirm,
 }) => {

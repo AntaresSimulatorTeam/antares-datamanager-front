@@ -22,14 +22,25 @@ export const useHypothesisTableRemoveRow = (
         const row = data[indexRow];
         if (indexRow != null && row?.hypothesis) {
           const { trajectory, status, subRows } = row;
+          const hasTrajectoryOK =
+            subRows?.some((subRow) => subRow.trajectory != null && subRow.status === TRAJECTORY_SELECTION_STATUS.OK) ||
+            (trajectory && status === TRAJECTORY_SELECTION_STATUS.OK);
 
-          if (study.id && trajectory && status === TRAJECTORY_SELECTION_STATUS.OK) {
-            const trajectoryIds = subRows?.map((r) => r.trajectory?.id).filter(Boolean) as number[];
+          if (study.id && hasTrajectoryOK) {
+            const subRowTrajectoryIds = subRows
+              ?.map((subRow) => {
+                if (subRow.trajectory != null && subRow.status === TRAJECTORY_SELECTION_STATUS.OK) {
+                  return subRow.trajectory?.id;
+                }
+                return null;
+              })
+              .filter(Boolean) as number[];
+            const trajectoryIds = [trajectory?.id, ...subRowTrajectoryIds].filter(Boolean) as number[];
 
             if (trajectoryIds?.length > 1) {
               await unlinkMultipleTrajectoriesFromStudy(study.id, trajectoryIds);
             } else {
-              await unlinkTrajectoryFromStudy(trajectory.id, study.id);
+              await unlinkTrajectoryFromStudy(trajectoryIds[0], study.id);
             }
           }
 
