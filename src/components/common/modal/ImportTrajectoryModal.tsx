@@ -17,12 +17,10 @@ interface ImportTrajectoryModalProps {
 
 export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, area }: ImportTrajectoryModalProps) => {
   const { t } = useTranslation();
-  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [trajectorySelected, setTrajectorySelected] = useState<SelectOption | null>(null);
 
   const handleSelectOption = (value: SelectOption | null) => {
     if (value) {
-      setIsButtonDisabled(false);
       setTrajectorySelected(value);
     }
   };
@@ -74,7 +72,7 @@ export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, area }
               onClick={() => trajectorySelected && void onClose(trajectorySelected)}
               variant="contained"
               color="primary"
-              disabled={isButtonDisabled}
+              disabled={!trajectorySelected}
             />
           </div>
         </div>
