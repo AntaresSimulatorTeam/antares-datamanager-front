@@ -1,5 +1,5 @@
 export const GIT_INFO = {
   branch: "fix/useImportTrajectory_error_technical",
-  commit: "a838944",
-  commitTime: "2025-09-01T19:09:23.179Z"
+  commit: "8b8a4b4",
+  commitTime: "2025-09-02T07:37:59.891Z"
 };

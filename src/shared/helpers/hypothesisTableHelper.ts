@@ -27,19 +27,20 @@ export const shouldOpenDeletionModal = (
   indexRow: number,
   data: HypothesisRowData[],
 ): boolean => {
-  const hasTrajectoryLinkedToTechnology =
+  const technologiesTrajectoryOk =
     indexRow != null
-      ? (data[indexRow]?.subRows || [])?.some(
+      ? (data[indexRow]?.subRows || [])?.filter(
           (item: HypothesisRowData) => item.trajectory && item.status === TRAJECTORY_SELECTION_STATUS.OK,
         )
-      : false;
-  const hasTrajectoryLinkedToArea =
-    indexRow != null
-      ? !!(data[indexRow]?.trajectory && data[indexRow]?.status === TRAJECTORY_SELECTION_STATUS.OK)
-      : false;
+      : [];
+  const technologiesAreaOk =
+    indexRow != null && data[indexRow]?.trajectory && data[indexRow]?.status === TRAJECTORY_SELECTION_STATUS.OK
+      ? data[indexRow]?.trajectory
+      : null;
 
   return (
-    (hasTrajectoryLinkedToArea && type !== TRAJECTORY_TYPE.THERMAL_CAPACITY) ||
-    (hasTrajectoryLinkedToArea && hasTrajectoryLinkedToTechnology)
+    (technologiesAreaOk && type !== TRAJECTORY_TYPE.THERMAL_CAPACITY) ||
+    technologiesTrajectoryOk.length > 1 ||
+    (!!technologiesAreaOk && technologiesTrajectoryOk.length > 0)
   );
 };

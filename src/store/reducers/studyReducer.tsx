@@ -50,7 +50,7 @@ export const deleteTrajectory = (prevState: Partial<StudyState>, payload: { area
     Object.assign(prevState, { [type]: { trajectories: [], warningMessages: [] } });
   } else {
     const trajectoryId = (trajectories ?? []).find((trajectory) => trajectory.area === area)?.id;
-    const newTrajectories = (trajectories ?? []).filter((trajectory) => trajectory.id !== trajectoryId);
+    const newTrajectories = (trajectories ?? []).filter((trajectory) => trajectory.area !== area);
     const newWarningMessages = (warningMessages ?? []).filter((message) => message.trajectoryId !== trajectoryId);
     const newStudyState = {
       ...prevState[`${type}`],
