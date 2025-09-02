@@ -54,3 +54,5 @@ export type CheckBoxData = {
 export const AnchorDefaultAsType = 'a';
 
 export type FileInputStatus = 'success' | 'error' | 'loading' | 'empty' | 'emptyError';
+
+export type ExpandedState = true | Record<string, boolean>;
