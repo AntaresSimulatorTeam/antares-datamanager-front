@@ -45,13 +45,13 @@ export const projectReducer = (prevState: ProjectState, action?: ProjectActionTy
       case PROJECT_ACTION.REMOVE_PROJECT:
         return removeProject(prevState, action.payload);
       case PROJECT_ACTION.INIT_PROJECT_LIST:
-        return { projects: [...action.payload], pinnedProjects: [...prevState.pinnedProjects] };
+        return { projects: [...(action.payload as ProjectInfo[])], pinnedProjects: [...prevState.pinnedProjects] };
       case PROJECT_ACTION.ADD_PINNED_PROJECT:
         return addPinnedProject(prevState, action.payload);
       case PROJECT_ACTION.UNPIN_PINNED_PROJECT:
         return unpinPinnedProject(prevState, action.payload);
       case PROJECT_ACTION.INIT_PINNED_PROJECT_LIST:
-        return { projects: [...prevState.projects], pinnedProjects: [...action.payload] };
+        return { projects: [...prevState.projects], pinnedProjects: [...(action.payload as ProjectInfo[])] };
       default:
         return prevState;
     }
