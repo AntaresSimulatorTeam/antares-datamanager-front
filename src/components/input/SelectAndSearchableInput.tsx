@@ -49,6 +49,7 @@ const SelectAndSearchableInput = ({
           setOptionsSelection([]);
         }
       } else {
+        resetField?.();
         setValueInput('');
         setIsSelectEnable(true);
         setIsDropdownOpen(false);
