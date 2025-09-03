@@ -10,6 +10,7 @@ import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter';
 import { createColumnHelper } from '@tanstack/react-table';
 import { RdsTagList } from 'rte-design-system-react';
 import StdRadioButton from '@/components/forms/stdRadioButton/StdRadioButton.tsx';
+import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 
 const columnHelper = createColumnHelper<StudyDTO>();
 
@@ -34,7 +35,11 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
   columnHelper.accessor('name', {
     header: t('home.@study_name'),
     size: 250,
-    cell: ({ getValue }) => <span className="text-primary-600 transition-colors">{getValue()}</span>,
+    cell: ({ getValue, row }) => {
+      const status = row.original.status;
+      const textClass = status === StudyStatus.GENERATED ? 'text-primary-600' : 'group-hover:text-green-500';
+      return <span className={`transition-colors ${textClass}`}>{getValue()}</span>;
+    },
   }),
 
   columnHelper.accessor('project', {
