@@ -1,5 +1,7 @@
-import { RdsButton, RdsIconId, RdsModal } from 'rte-design-system-react';
+import { RdsModal } from 'rte-design-system-react';
 import { useTranslation } from 'react-i18next';
+import StdButton from '@common/base/stdButton/StdButton';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 interface DeletionModalProps {
   onClose: () => void;
@@ -13,9 +15,9 @@ export const DeletionModal = ({ onClose, handleDeletionRow }: DeletionModalProps
       <RdsModal.Title onClose={onClose}>{t('deletionModal.@title')}</RdsModal.Title>
       <RdsModal.Content>{t('deletionModal.@content')}</RdsModal.Content>
       <RdsModal.Footer>
-        <RdsButton label="Cancel" onClick={onClose} color="secondary" />
-        <RdsButton
-          icon={RdsIconId.Delete}
+        <StdButton label="Cancel" onClick={onClose} color="secondary" />
+        <StdButton
+          icon={StdIconId.Delete}
           label={t('study.@delete')}
           onClick={() => void handleDeletionRow()}
           variant="text"

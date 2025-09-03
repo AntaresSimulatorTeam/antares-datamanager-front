@@ -36,21 +36,13 @@ export function addSortColumn(
             <div>
               {sortBy[column.accessorKey as string] && sortedColumn === column.accessorKey ? (
                 sortBy[column.accessorKey as string] === 'asc' ? (
-                  <span className="font-bold text-primary-600">
-                    <StdIcon name={StdIconId.ArrowUpwardAlt} />
-                  </span>
+                  <StdIcon name={StdIconId.ArrowUpwardAlt} color="primary" />
                 ) : (
-                  <span className="font-bold text-primary-600">
-                    <StdIcon name={StdIconId.ArrowUpwardAlt} />
-                  </span>
+                  <StdIcon name={StdIconId.ArrowUpwardAlt} color="primary" />
                 )
               ) : (
-                <span
-                  className={`text-primary-900 ${
-                    isHeaderHovered ? 'opacity-100' : 'opacity-0'
-                  } transition-opacity duration-100`}
-                >
-                  <StdIcon name={StdIconId.ArrowUpwardAlt} />
+                <span className={`${isHeaderHovered ? 'opacity-100' : 'opacity-0'} transition-opacity duration-100`}>
+                  <StdIcon name={StdIconId.ArrowUpwardAlt} color="primary" />
                 </span>
               )}
             </div>

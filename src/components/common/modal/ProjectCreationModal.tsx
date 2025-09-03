@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { RdsButton, RdsIconId, RdsInputText, RdsInputTextArea, RdsModal } from 'rte-design-system-react';
+import { RdsInputText, RdsInputTextArea, RdsModal } from 'rte-design-system-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import KeywordsInput from '@/components/input/KeywordsInput.tsx';
@@ -13,6 +13,8 @@ import { notifyToast } from '@/shared/notification/notification.tsx';
 import { PROJECT_ACTION } from '@/shared/enum/project.ts';
 import { ProjectActionType } from '@/shared/types/Project.type.ts';
 import { useProjectDispatch } from '@/store/contexts/ProjectContext.tsx';
+import StdButton from '@common/base/stdButton/StdButton';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 interface ProjectCreationModalProps {
   onClose: () => void;
@@ -111,9 +113,9 @@ export const ProjectCreationModal = ({ onClose }: ProjectCreationModalProps) => 
         </div>
       </RdsModal.Content>
       <RdsModal.Footer>
-        <RdsButton label="Cancel" onClick={onClose} color="secondary" />
-        <RdsButton
-          icon={RdsIconId.Add}
+        <StdButton label="Cancel" onClick={onClose} color="secondary" />
+        <StdButton
+          icon={StdIconId.Add}
           label="Create"
           onClick={() => void handleCreateProject()}
           variant="contained"

@@ -7,15 +7,15 @@
 import { ReactElement } from 'react';
 import cardTitleClassBuilder from './cardTitleClassBuilder';
 import {
-  RdsButton,
   RdsDropdown,
   RdsDropdownOption,
   RdsFloatingWrapper,
   RdsIconButtonProps,
-  RdsIconId,
   RdsTag,
   RdsTagProps,
 } from 'rte-design-system-react';
+import StdButton from '@common/base/stdButton/StdButton';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 export type PegaseCardTitleProps = {
   id: string;
@@ -53,11 +53,11 @@ const PegaseCardTitle = ({ title, dropdownOptions, icons, tag, lineClamp, onClic
       <div className="interactive" onClick={(e) => e.stopPropagation()}>
         <RdsFloatingWrapper placement={'bottom-start'} fallbackPlacements={['bottom-end']} autoClose>
           <Trigger>
-            <RdsButton
+            <StdButton
               id={`${id}-button`}
               variant="text"
               size="small"
-              icon={RdsIconId.MoreVert}
+              icon={StdIconId.MoreVert}
               disabled={dropdownOptions.length === 0}
             />
           </Trigger>

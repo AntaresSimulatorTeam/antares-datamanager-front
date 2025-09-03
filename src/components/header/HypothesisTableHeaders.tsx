@@ -74,7 +74,7 @@ const getHypothesisTableHeaders = (
         <div className="flex w-full items-center gap-2">
           <LabelWithDeleteButton
             label={trajectory.trajectoryName}
-            isDeletable={!(studyStatus === StudyStatus.GENERATED)}
+            isDeletable={studyStatus !== StudyStatus.GENERATED}
             onClick={() => {
               setErrorInfo({ index, message: '' });
               void handleUpdate(
@@ -95,7 +95,9 @@ const getHypothesisTableHeaders = (
             }}
             onSearch={async (value?: string) => await handlerSearch(value, index)}
             placeHolder={
-              getReadOnly() && index === 1 ? t('studyDetails.@select_area') : t('studyDetails.@select_trajectory')
+              getReadOnly() && index === 1 && studyStatus !== StudyStatus.GENERATED
+                ? t('studyDetails.@select_area')
+                : t('studyDetails.@select_trajectory')
             }
             onClickButton={() => {
               setErrorInfo({ index, message: '' });

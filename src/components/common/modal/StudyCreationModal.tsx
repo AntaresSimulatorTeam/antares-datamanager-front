@@ -5,7 +5,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { RdsButton, RdsIconId, RdsInputText, RdsModal } from 'rte-design-system-react';
+import { RdsInputText, RdsModal } from 'rte-design-system-react';
 import { useTranslation } from 'react-i18next';
 import KeywordsInput from '@/components/input/KeywordsInput.tsx';
 import HorizonInput from '@/components/input/HorizonInput';
@@ -16,6 +16,8 @@ import { useUser } from '@/store/contexts/UserContext.tsx';
 import { notifyToast } from '@/shared/notification/notification';
 import { validateMaxLength } from '@/shared/utils/validateMaxTextLength';
 import { MAX_STUDY_NAME_LENGTH } from '@/shared/const/studyConfig';
+import StdButton from '@common/base/stdButton/StdButton';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 interface StudyCreationModalProps {
   isOpen?: boolean;
@@ -227,9 +229,9 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
         </div>
       </RdsModal.Content>
       <RdsModal.Footer>
-        <RdsButton label={t('components.quickAccess.@cancel')} onClick={onClose} color="secondary" />
-        <RdsButton
-          icon={study ? RdsIconId.ContentCopy : RdsIconId.Add}
+        <StdButton label={t('components.quickAccess.@cancel')} onClick={onClose} color="secondary" />
+        <StdButton
+          icon={study ? StdIconId.ContentCopy : StdIconId.Add}
           label={study ? t('study.@duplicate') : t('studyModal.@button_create')}
           onClick={() => void (study ? duplicateStudyHandler() : saveStudyHandler())}
           variant="contained"

@@ -5,10 +5,12 @@
  */
 
 import { Dispatch, SetStateAction, useState } from 'react';
-import { RdsButton, RdsIcon, RdsIconId, RdsInputText } from 'rte-design-system-react';
+import { RdsIcon, RdsIconId, RdsInputText } from 'rte-design-system-react';
 import { fetchSuggestedKeywords } from '@/shared/services/studyService.ts';
 import { clsx } from 'clsx';
 import { useTranslation } from 'react-i18next';
+import StdButton from '@common/base/stdButton/StdButton';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 interface KeywordsInputProps {
   keywords: string[];
@@ -120,9 +122,9 @@ const KeywordsInput = ({
             />
           </div>
           {shouldAddKeywordButton(keywordInput) && (
-            <RdsButton
+            <StdButton
               onClick={() => handleAddKeyword()}
-              icon={RdsIconId.Add}
+              icon={StdIconId.Add}
               color="secondary"
               size="extraSmall"
               variant="transparent"
@@ -156,8 +158,8 @@ const KeywordsInput = ({
         {keywords.map((keyword, index) => (
           <div key={index} className="py-0.3 flex items-center gap-2 rounded bg-gray-200 px-1">
             <span>{keyword}</span>
-            <RdsButton
-              icon={RdsIconId.Close}
+            <StdButton
+              icon={StdIconId.Close}
               onClick={() => handleRemoveKeyword(index)}
               size="extraSmall"
               variant="text"

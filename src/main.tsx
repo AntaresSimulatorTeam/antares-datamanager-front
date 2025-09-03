@@ -17,14 +17,3 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     </BrowserRouter>
   </React.StrictMode>,
 );
-document.documentElement.style.setProperty('--colors-primary-50', '#fafce9');
-document.documentElement.style.setProperty('--colors-primary-100', '#f3f8cf');
-document.documentElement.style.setProperty('--colors-primary-200', '#e6f2a4');
-document.documentElement.style.setProperty('--colors-primary-300', '#d3e86e');
-document.documentElement.style.setProperty('--colors-primary-400', '#bed942');
-document.documentElement.style.setProperty('--colors-primary-500', '#a4c424');
-document.documentElement.style.setProperty('--colors-primary-600', '#7c9818');
-document.documentElement.style.setProperty('--colors-primary-700', '#5e7417');
-document.documentElement.style.setProperty('--colors-primary-800', '#4b5c18');
-document.documentElement.style.setProperty('--colors-primary-900', '#404e19');
-document.documentElement.style.setProperty('--colors-primary-950', '#212b08');

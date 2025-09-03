@@ -52,7 +52,7 @@ export const VARIANT_CLASSES = {
 
 export const VARIANT_CLASSES_DISABLED = {
   contained: 'bg-gray-200 text-gray-500 border border-gray-500 border-opacity-0 cursor-not-allowed pointer-events-none',
-  outlined: 'bg-gray-200 text-gray-500 border border-gray-500 cursor-not-allowed pointer-events-none',
+  outlined: 'bg-gray-w text-gray-500 border border-gray-500 cursor-not-allowed pointer-events-none',
   dashed: 'bg-gray-200 text-gray-500 border-dashed border border-gray-500 cursor-not-allowed pointer-events-none',
   text: 'bg-gray-200 text-gray-500 border border-gray-500 border-opacity-0 cursor-not-allowed pointer-events-none',
   transparent: 'text-gray-500 border border-transparent cursor-not-allowed pointer-events-none',

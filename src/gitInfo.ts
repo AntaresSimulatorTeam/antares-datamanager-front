@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "fix/ANT-3774-import-modal-reset-field-should-disable-button",
-  commit: "07a24bf",
-  commitTime: "2025-09-02T15:30:58.132Z"
+  branch: "feat/ANT-3515-Design_improve_table_display",
+  commit: "866d4b7",
+  commitTime: "2025-09-02T12:48:01.264Z"
 };

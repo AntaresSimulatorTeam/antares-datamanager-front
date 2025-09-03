@@ -4,7 +4,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { RdsButton, RdsButtonProps, RdsIconId } from 'rte-design-system-react';
+import { RdsButtonProps } from 'rte-design-system-react';
+import StdButton from '@common/base/stdButton/StdButton';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 type RdsCollapseIconProps = {
   onClick: RdsButtonProps['onClick'];
@@ -12,9 +14,9 @@ type RdsCollapseIconProps = {
 };
 
 const StdCollapseIcon = ({ onClick, isOpen }: RdsCollapseIconProps) => (
-  <RdsButton
+  <StdButton
     onClick={onClick}
-    icon={isOpen ? RdsIconId.KeyboardArrowDown : RdsIconId.KeyboardArrowRight}
+    icon={isOpen ? StdIconId.KeyboardArrowDown : StdIconId.KeyboardArrowRight}
     size="extraSmall"
     variant="text"
   />

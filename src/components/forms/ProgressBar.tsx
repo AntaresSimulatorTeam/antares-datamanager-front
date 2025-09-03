@@ -9,7 +9,7 @@ export interface ProgressBarProps {
 }
 
 export const ProgressBar = ({ progressValue, statusFile }: ProgressBarProps) => (
-  <div className="flex h-5 w-full items-center gap-2">
+  <div className="flex h-fit w-full items-center gap-2">
     <div className="h-1 w-4/5 rounded bg-gray-w">
       <div className={`h-1 rounded ${getBgColor(statusFile)}`} style={{ width: `${progressValue}%` }}></div>
     </div>

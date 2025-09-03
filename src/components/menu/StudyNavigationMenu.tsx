@@ -5,7 +5,6 @@
  */
 
 import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from 'react';
-import { RdsTabItem } from 'rte-design-system-react';
 import LoadTab from '@/components/tab/LoadTab.tsx';
 import EnrTab from '@/components/tab/EnrTab.tsx';
 import MiscTab from '@/components/tab/MiscLinkTab.tsx';
@@ -21,6 +20,7 @@ import { getStudyMenu } from '@/shared/utils/trajectoryUtils.ts';
 import { useFetchAreas } from '@/hooks/useFetchAreas.ts';
 import { countWarning } from '@/shared/utils/warningUtils.ts';
 import { getNbMessagesFromTrajectoryType } from '@/shared/services/trajectoryService.ts';
+import StdTabItem from '@common/layout/stdTabs/StdTabItem.tsx';
 
 type StudyNavigationMenuProps = {
   onRenderActiveComponent?: (content: ReactNode | null) => void;
@@ -96,7 +96,7 @@ const StudyNavigationMenu = ({
         return (
           <div className="flex items-center space-x-2" key={tab.name}>
             <StdIcon name={tab.icon} />
-            <RdsTabItem
+            <StdTabItem
               key={tab.name}
               name={tab.name}
               label={tab.label}

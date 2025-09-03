@@ -20,7 +20,7 @@ export const LabelWithButtonPreview = ({
   alignment = '',
 }: LabelWithButtonPreviewProps) => (
   <div className={`${alignment}`}>
-    <span className={`${status === TRAJECTORY_SELECTION_STATUS.OK ? 'text-primary-600' : 'text-gray-900'}`}>
+    <span className={`${status === TRAJECTORY_SELECTION_STATUS.OK ? 'text-primary-800' : 'text-gray-900'}`}>
       {value}
     </span>
     {hasPreview && (
@@ -28,8 +28,8 @@ export const LabelWithButtonPreview = ({
         label={'View'}
         icon={StdIconId.Preview}
         position={'left'}
-        color={isReadOnly ? 'gray-700' : 'primary-600'}
-        borderColor={isReadOnly ? 'gray-700' : 'acc1-600'}
+        color={isReadOnly ? 'gray-700' : 'primary-800'}
+        borderColor={isReadOnly ? 'gray-700' : 'acc1-800'}
         onClick={() => void onClick?.()}
       />
     )}

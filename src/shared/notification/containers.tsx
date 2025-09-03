@@ -37,7 +37,7 @@ export const PegaseAlertContainer = () => (
     position="bottom-right"
     limit={50}
     autoClose={false}
-    className="!bottom-8 font-body"
+    className="!bottom-8"
     style={{ width: '600px' }}
     hideProgressBar
     newestOnTop={true}
