@@ -7,9 +7,7 @@ import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { fetchTrajectoriesFromFS } from '@/shared/services/trajectoryService.ts';
 import { convertToFSSelectionOptionType } from '@/shared/utils/formFormatter.ts';
 import StdButton from '@common/base/stdButton/StdButton';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
-import StdButton from '@common/base/stdButton/StdButton.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 interface ImportTrajectoryModalProps {
