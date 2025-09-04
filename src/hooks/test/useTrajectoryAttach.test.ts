@@ -79,11 +79,12 @@ describe('useTrajectoryAttach', () => {
 
     expect(trajectoryService.linkTrajectoryToStudy).toHaveBeenCalledWith(TRAJECTORY_TYPE.LOAD, 42, 'study-001');
     expect(mockDispatch).toHaveBeenCalledWith({
-      type: STUDY_ACTION.UPDATE_TRAJECTORY,
+      type: STUDY_ACTION.ADD_TRAJECTORIES,
       payload: {
-        trajectory: newTrajectory,
-        warningMessages: [mockSingleWarningMessages],
-        status: 'success',
+        [TRAJECTORY_TYPE.LOAD]: {
+          trajectories: [newTrajectory],
+          warningMessages: [mockSingleWarningMessages],
+        },
       },
     });
     expect(mockSetData).toHaveBeenCalled();
