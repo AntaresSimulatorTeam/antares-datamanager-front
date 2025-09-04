@@ -80,7 +80,7 @@ const getExpandableHypothesisTableHeaders = (
   }),
   columnHelper.accessor('trajectory', {
     header: t('studyDetails.@trajectory'),
-    size: 300,
+    size: 350,
     cell: ({ row, table: { options } }) => {
       const { trajectory, status } = row.original;
 
