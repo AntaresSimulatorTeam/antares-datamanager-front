@@ -196,7 +196,7 @@ export const convertIntoHypothesisRowWithTechnologies = (
   );
 
   return Object.entries(groupedByArea).map(([area, entries]) => {
-    const mainEntry = entries.find((e) => e.technology === '');
+    const mainEntry = entries.find((e) => e.technology === '' || defaultAreas?.map((item) => item.name === e?.area));
 
     const subRows: HypothesisRowData[] | null =
       mainEntry?.area !== OTHER_AREAS && !areasNotInTrajectoryArea?.some((item) => item === mainEntry?.area)

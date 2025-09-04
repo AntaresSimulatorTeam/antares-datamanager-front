@@ -67,7 +67,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
     useFetchHypothesisTrajectories(study?.id, TRAJECTORY_TYPE.THERMAL_CAPACITY, defaultAreas, areas, isStudyGenerated);
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(study, studyState, dispatch, setData);
-  const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch, setData);
+  const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch, setData, defaultAreas);
   const { removeRow } = useHypothesisTableRemoveRow(study, dispatch, setData, setCheckedValues);
   const { detachTrajectory } = useTrajectoryDetach(study, dispatch, setData);
 
@@ -169,7 +169,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
               } else if (status === 'success') {
                 const dbTrajectory =
                   dbTrajectories.length > 0
-                    ? dbTrajectories.find((item) => item.trajectoryName === value)
+                    ? dbTrajectories.find((item) => item.id === value)
                     : getRowDataSelected(data, indexArray)?.trajectory;
                 if (dbTrajectory) {
                   void attachTrajectory(TRAJECTORY_TYPE.THERMAL_CAPACITY, indexArray, status, dbTrajectory);

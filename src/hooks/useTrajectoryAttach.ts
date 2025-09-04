@@ -7,15 +7,19 @@ import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.
 import { setNestedData } from '@/shared/utils/trajectoryUtils.ts';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { useTranslation } from 'react-i18next';
+import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
 
 export const useTrajectoryAttach = (
   study: StudyDTO,
   studyState: Partial<StudyState>,
   dispatch: Dispatch<StudyActionType> | null,
   setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
+  defaultAreas?: { name: string }[],
 ) => {
   const { user } = useUser();
   const { t } = useTranslation();
+  const isNotDefault = (area: string, defaultAreasName?: { name: string }[]) =>
+    defaultAreasName?.map((areaName) => areaName.name !== area && area !== OTHER_AREAS) ?? false;
 
   const attachTrajectory = useCallback(
     async (type: TRAJECTORY_TYPE, indexArray: number[], status: RowStatus, trajectory: DbTrajectory): Promise<void> => {
@@ -26,7 +30,10 @@ export const useTrajectoryAttach = (
 
         if (newDbTrajectory) {
           const alreadyExists = studyState[newDbTrajectory.type]?.trajectories?.some(
-            (item) => item.area === newDbTrajectory.area && item.technology === newDbTrajectory.technology,
+            (item) =>
+              item.area === newDbTrajectory.area &&
+              item.technology === newDbTrajectory.technology &&
+              isNotDefault(newDbTrajectory.area ?? '', defaultAreas),
           );
 
           if (alreadyExists) {

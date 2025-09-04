@@ -104,7 +104,7 @@ const getExpandableHypothesisTableHeaders = (
           <SelectInputWithButton
             onSelect={(value: SelectOption) => {
               setErrorInfo({ index: row.index, message: '' });
-              void options?.meta?.updateData?.(row.id, value.label, 'success');
+              void options?.meta?.updateData?.(row.id, value.id, 'success');
             }}
             onSearch={async (value?: string) => options?.meta?.search?.(value ?? '', row.id)}
             onClickButton={() => {
