@@ -71,7 +71,7 @@ export const DetailsContent = ({ content, onClickButton }: DetailsContentProps) 
           {'tags' in content && (
             <StdButton
               icon={StdIconId.Edit}
-              label={t('studyModal.@button_update')}
+              label={t('project.@edit')}
               onClick={onClickButton}
               variant="text"
               color="primary"

@@ -118,7 +118,7 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
           onClick={() => void handleCreateProject()}
           variant="contained"
           color="primary"
-          disabled={!projectInfo || !isFormValid}
+          disabled={!projectInfo && !isFormValid}
         />
       </RdsModal.Footer>
     </RdsModal>
