@@ -67,7 +67,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
     useFetchHypothesisTrajectories(study?.id, TRAJECTORY_TYPE.THERMAL_CAPACITY, defaultAreas, areas, isStudyGenerated);
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(study, studyState, dispatch, setData);
-  const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch, setData, defaultAreas);
+  const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch, setData);
   const { removeRow } = useHypothesisTableRemoveRow(study, dispatch, setData, setCheckedValues);
   const { detachTrajectory } = useTrajectoryDetach(study, dispatch, setData);
 
