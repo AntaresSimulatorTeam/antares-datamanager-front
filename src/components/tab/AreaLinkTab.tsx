@@ -50,6 +50,7 @@ import { FileInputStatus } from 'rte-design-system-react';
 import { notifyAlert } from '@/shared/notification/notification.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
+import { isBusinessError } from '@/shared/utils/errorUtils.ts';
 
 interface AreaLinkTabProps {
   setErrorMessage: Dispatch<SetStateAction<string>>;
@@ -374,7 +375,15 @@ export const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
       }
     } catch (error) {
       setFileStatus('error');
-      await handleTrajectoryUpdate(rowIndexSelected, value.id, 'error', value.label, (error as Error)?.message);
+      if (isBusinessError(error)) {
+        await handleTrajectoryUpdate(
+          rowIndexSelected,
+          value.id,
+          'error',
+          value.label,
+          error?.antaresErrorMessage ?? '',
+        );
+      }
     }
   };
 
