@@ -85,7 +85,7 @@ const ProjectContent = () => {
               key={project.id}
               title={project.name}
               dropdownOptions={dropdownItems}
-              onClick={() => void navigateToProject(project.id, project.name)}
+              onClick={() => void navigateToProject(project.id)}
               id={project.id}
             >
               <div className="flex flex-col items-start justify-between">

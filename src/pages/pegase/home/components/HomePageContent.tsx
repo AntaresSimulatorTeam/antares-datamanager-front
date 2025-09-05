@@ -43,7 +43,7 @@ const HomePageContent = () => {
           status={activeChip ? 'secondary' : 'primary'}
         />
       </div>
-      <StudyTableDisplay searchStudy={searchTerm} projectId={''} />
+      <StudyTableDisplay searchStudy={searchTerm} />
     </div>
   );
 };

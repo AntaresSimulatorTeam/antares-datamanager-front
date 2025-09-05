@@ -5,7 +5,7 @@
  */
 
 import { useState } from 'react';
-import { StudyDTO } from '@/shared/types';
+import { ProjectInfo, StudyDTO } from '@/shared/types';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type';
 import getStudyTableHeaders from './StudyTableHeaders';
 import { addSortColumn } from './StudyTableUtils';
@@ -22,11 +22,10 @@ import StdButton from '@common/base/stdButton/StdButton';
 
 interface StudyTableDisplayProps {
   searchStudy: string | undefined;
-  projectId?: string;
-  projectInfoName?: string;
+  projectInfo?: ProjectInfo;
 }
 
-const StudyTableDisplay = ({ searchStudy, projectId, projectInfoName }: StudyTableDisplayProps) => {
+const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps) => {
   const { t } = useTranslation();
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [isHeaderHovered, setIsHeaderHovered] = useState<boolean>(false);
@@ -35,12 +34,13 @@ const StudyTableDisplay = ({ searchStudy, projectId, projectInfoName }: StudyTab
   const [reloadStudies, setReloadStudies] = useState<boolean>(false);
   const [sortBy, setSortBy] = useState<{ [key: string]: 'asc' | 'desc' }>({});
   const [sortedColumn, setSortedColumn] = useState<string | null>('status');
+  console.log('=================== projectInfo', projectInfo);
 
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const { navigateToStudy } = useStudyNavigation();
   const { rows, count, intervalSize, currentPage, setPage } = useStudyTableDisplay({
     searchTerm: searchStudy,
-    projectId,
+    projectInfo,
     sortBy,
     reloadStudies, // Key change here
   });
@@ -129,7 +129,7 @@ const StudyTableDisplay = ({ searchStudy, projectId, projectInfoName }: StudyTab
               />
             </>
           ) : (
-            projectId !== '' && <StdButton label={t('studyModal.@new_study')} onClick={toggleModal} />
+            projectInfo?.id !== '' && <StdButton label={t('studyModal.@new_study')} onClick={toggleModal} />
           )}
         </div>
         <StudiesPagination count={count} intervalSize={intervalSize} current={currentPage} onChange={setPage} />
@@ -140,7 +140,7 @@ const StudyTableDisplay = ({ searchStudy, projectId, projectInfoName }: StudyTab
           onClose={handleModalClose}
           study={selectedStudy}
           setReloadStudies={setReloadStudies}
-          projectInfoName={projectInfoName}
+          projectInfoName={projectInfo?.name}
         />
       )}
     </div>

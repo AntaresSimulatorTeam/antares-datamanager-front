@@ -106,7 +106,7 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
             setKeywords={setKeywords}
             maxNbKeywords={6}
             maxNbCharacters={15}
-            minNbCharacters={3}
+            minNbCharacters={1}
           />
         </div>
       </RdsModal.Content>
