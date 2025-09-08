@@ -15,7 +15,10 @@ export const addProject = (currentState: ProjectState, payload: ProjectInfo) => 
 export const updateProject = (currentState: ProjectState, payload: ProjectInfo) => {
   const { pinnedProjects, projects } = currentState;
   const updateProjects = projects.map((project) => (project.id === payload.id ? payload : project));
-  return { projects: updateProjects, pinnedProjects };
+  const updatePinnedProjects = pinnedProjects.map((project) =>
+    project.id === payload.id ? { ...payload, pinned: true } : project,
+  );
+  return { projects: updateProjects, pinnedProjects: updatePinnedProjects };
 };
 export const removeProject = (currentState: ProjectState, payload: string) => {
   const { pinnedProjects, projects } = currentState;

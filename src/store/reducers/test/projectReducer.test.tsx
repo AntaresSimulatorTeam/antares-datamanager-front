@@ -5,6 +5,7 @@ import {
   projectReducer,
   removeProject,
   unpinPinnedProject,
+  updateProject,
 } from '@/store/reducers/projectReducer.tsx';
 import { mockProjectInfo, mockProjectInfoArray } from '@/mocks/data/tests/project.mock.ts';
 import { mockPinProjectResponseArray } from '@/mocks/data/tests/pinnedProject.mock.ts';
@@ -35,6 +36,44 @@ describe('addProject', () => {
 
     expect(result.projects).toEqual([mockProjectInfo]);
     expect(result.pinnedProjects).toEqual([]);
+  });
+});
+
+describe('updateProject', () => {
+  it('should update a project and the corresponding pinned project of the projects list', () => {
+    const payload = {
+      ...mockProjectInfo,
+      name: 'Updated Project',
+      description: 'Project Description 2',
+      tags: ['tag3'],
+    };
+    const result = updateProject(initialState, payload);
+    const projectUpdated = result.projects.find((project) => project.id === payload.id);
+    expect(projectUpdated?.name).toEqual('Updated Project');
+    expect(projectUpdated?.description).toEqual('Project Description 2');
+    expect(projectUpdated?.tags).toEqual(['tag3']);
+    const pinnedProjectUpdated = result.pinnedProjects.find((project) => project.id === payload.id);
+    expect(pinnedProjectUpdated?.name).toEqual('Updated Project');
+    expect(pinnedProjectUpdated?.description).toEqual('Project Description 2');
+    expect(pinnedProjectUpdated?.tags).toEqual(['tag3']);
+    expect(pinnedProjectUpdated?.pinned).toBeTruthy();
+  });
+
+  it('should update a project but not the pinned project list', () => {
+    const payload = {
+      ...mockProjectInfoArray[1],
+      name: 'Updated Project not pinned',
+      description: 'Project Description 5',
+      tags: ['tag3', 'tag5'],
+    };
+
+    const result = updateProject(initialState, payload);
+
+    const projectUpdated = result.projects.find((project) => project.id === payload.id);
+    expect(projectUpdated?.name).toEqual('Updated Project not pinned');
+    expect(projectUpdated?.description).toEqual('Project Description 5');
+    expect(projectUpdated?.tags).toEqual(['tag3', 'tag5']);
+    expect(result.pinnedProjects).toEqual(mockPinProjectResponseArray);
   });
 });
 

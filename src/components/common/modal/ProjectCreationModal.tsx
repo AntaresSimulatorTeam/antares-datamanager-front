@@ -25,7 +25,7 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
   const { t } = useTranslation();
   const [name, setName] = useState<string>(projectInfo?.name ?? '');
   const [description, setDescription] = useState<string>(projectInfo?.description ?? '');
-  const [keywords, setKeywords] = useState<string[]>(projectInfo?.tags.length ? projectInfo?.tags : []);
+  const [keywords, setKeywords] = useState<string[]>(projectInfo?.tags ?? []);
   const [isFormValid, setIsFormValid] = useState(false);
   const dispatch = useProjectDispatch();
 
