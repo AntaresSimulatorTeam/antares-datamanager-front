@@ -1,5 +1,6 @@
 import {
   addNestedRow,
+  buildDefaultEmptyTrajectoryList,
   buildEmptyTrajectory,
   buildErrorTrajectory,
   buildReadOnlyRow,
@@ -13,6 +14,7 @@ import {
   getStatus,
   getStudyMenu,
   isMatchingTrajectoryType,
+  isTrajectoryLinked,
   removeDuplicate,
   retrieveReadOnlyArea,
   setNestedData,
@@ -278,6 +280,82 @@ describe('buildRowWithSubRowsData', () => {
     const result = buildRowWithSubRowsData(trajectory, defaultAreas, [], subRowOptions);
 
     expect(result.isDefault).toBe(false);
+  });
+});
+
+describe('isTrajectoryLinked', () => {
+  it('should return true when a matching trajectory with empty technology exists', () => {
+    const area = { name: 'ZoneA' };
+    const trajectories: DbTrajectory[] = [
+      { area: 'ZoneA', technology: '' } as DbTrajectory,
+      { area: 'ZoneB', technology: 'TechY' } as DbTrajectory,
+    ];
+
+    expect(isTrajectoryLinked(area, trajectories)).toBe(true);
+  });
+
+  it('should return false when no matching trajectory with empty technology exists', () => {
+    const area = { name: 'ZoneA' };
+    const trajectories: DbTrajectory[] = [
+      { area: 'ZoneA', technology: 'TechX' } as DbTrajectory,
+      { area: 'ZoneB', technology: '' } as DbTrajectory,
+    ];
+
+    expect(isTrajectoryLinked(area, trajectories)).toBe(false);
+  });
+
+  it('should return false when trajectories list is empty', () => {
+    const area = { name: 'ZoneA' };
+    const trajectories: DbTrajectory[] = [];
+
+    expect(isTrajectoryLinked(area, trajectories)).toBe(false);
+  });
+});
+
+describe('buildDefaultEmptyTrajectoryList', () => {
+  it('should return default areas when trajectories are empty', () => {
+    const type = TRAJECTORY_TYPE.LOAD;
+    const trajectories: DbTrajectory[] = [];
+    const defaultAreas = [{ name: 'ZoneA' }, { name: 'ZoneB' }];
+
+    const result = buildDefaultEmptyTrajectoryList(type, trajectories, defaultAreas);
+
+    expect(result[0].area).toEqual(OTHER_AREAS);
+    expect(result[1].area).toEqual('ZoneA');
+    expect(result[2].area).toEqual('ZoneB');
+  });
+
+  it('should exclude areas already linked to a trajectory with empty technology', () => {
+    const type = TRAJECTORY_TYPE.LOAD;
+    const trajectories: DbTrajectory[] = [{ area: 'ZoneA', technology: '', type } as DbTrajectory];
+    const defaultAreas = [{ name: 'ZoneA' }, { name: 'ZoneB' }];
+
+    const result = buildDefaultEmptyTrajectoryList(type, trajectories, defaultAreas);
+
+    expect(result[0].area).toEqual(OTHER_AREAS);
+    expect(result[1].area).toEqual('ZoneB');
+  });
+
+  it('should return only OTHER_AREAS when no defaultAreas are provided and trajectories are empty', () => {
+    const type = TRAJECTORY_TYPE.LOAD;
+    const trajectories: DbTrajectory[] = [];
+
+    const result = buildDefaultEmptyTrajectoryList(type, trajectories);
+
+    expect(result[0].area).toEqual(OTHER_AREAS);
+  });
+
+  it('should return empty list if all default areas are already linked', () => {
+    const type = TRAJECTORY_TYPE.LOAD;
+    const trajectories: DbTrajectory[] = [
+      { area: OTHER_AREAS, technology: '', type } as DbTrajectory,
+      { area: 'ZoneA', technology: '', type } as DbTrajectory,
+    ];
+    const defaultAreas = [{ name: 'ZoneA' }];
+
+    const result = buildDefaultEmptyTrajectoryList(type, trajectories, defaultAreas);
+
+    expect(result).toEqual([]);
   });
 });
 

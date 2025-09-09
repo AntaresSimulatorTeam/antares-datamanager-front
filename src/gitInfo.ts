@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "fix/default_area_deletable",
-  commit: "b531c14",
-  commitTime: "2025-09-04T13:34:43.582Z"
+  branch: "fix/ANT-3822_thermal_installed_power_trash_icon_and_sort",
+  commit: "0117de5",
+  commitTime: "2025-09-09T13:21:56.510Z"
 };

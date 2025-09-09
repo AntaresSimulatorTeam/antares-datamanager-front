@@ -181,11 +181,62 @@ export const buildRowWithSubRowsData = (
       : null,
 });
 
+/**
+ * Determines if a given area is linked to any trajectory with an empty technology field in the provided trajectory list.
+ *
+ * @param {{ name: string; technology: string }} area - The area object containing the name and technology properties.
+ * @param {string} area.name - The name of the area.
+ * @param {string} area.technology - The technology associated with the area.
+ * @param {DbTrajectory[]} trajectories - An array of trajectory objects to be checked against the area.
+ * @returns {boolean} Returns true if the area is linked to at least one trajectory with a matching area name and an empty technology field; otherwise, false.
+ */
+export const isTrajectoryLinked = (area: { name: string }, trajectories: DbTrajectory[]): boolean =>
+  trajectories.some((trajectory) => area.name === trajectory.area && trajectory.technology === '');
+
+/**
+ * Function to build a default list of empty trajectories based on the provided trajectory type,
+ * existing trajectories, and optionally specified default areas.
+ *
+ * @param {TRAJECTORY_TYPE} type - The type of trajectory to build.
+ * @param {DbTrajectory[]} trajectories - An array of existing trajectories used to determine unlinked default areas.
+ * @param {{name: string}[]} [defaultAreas] - An optional array of default area objects with a `name` field.
+ * @returns {DbTrajectory[]} An array of empty trajectory objects built for areas that are not already linked to the existing trajectories.
+ */
+export const buildDefaultEmptyTrajectoryList = (
+  type: TRAJECTORY_TYPE,
+  trajectories: DbTrajectory[],
+  defaultAreas?: { name: string }[],
+): DbTrajectory[] => {
+  const areaDefault = [
+    { name: OTHER_AREAS },
+    ...(Array.isArray(defaultAreas) && defaultAreas.length > 0 ? defaultAreas : []),
+  ];
+
+  // Check if default areas (without technology) are not already linked to a trajectory
+  const defaultAreasNotLinkedToTrajectory =
+    trajectories.length === 0 ? areaDefault : areaDefault.filter((area) => !isTrajectoryLinked(area, trajectories));
+
+  // Then build default empty areas
+  return (defaultAreasNotLinkedToTrajectory || []).map((defaultArea) => buildEmptyTrajectory(defaultArea.name, type));
+};
+
+/**
+ * Transforms data into a structured array of hypothesis rows, enriched with associated technologies.
+ *
+ * @param {DbTrajectory[]} data - An array of trajectory data objects, where each object contains detailed information
+ *                                about a trajectory, including its area and associated technology.
+ * @param {string[]} areasNotInTrajectoryArea - A list of areas that should not be included in the main trajectory area.
+ * @param {{ name: string }[] | undefined} defaultAreas - An optional array of default area objects, where each object
+ *                                                       contains a name field that specifies a default area.
+ *
+ * @returns {HypothesisRowData[]} An array of hypothesis row objects, each containing trajectory details,
+ *                                technology-specific sub-rows, and metadata like status and default indicators.
+ */
 export const convertIntoHypothesisRowWithTechnologies = (
   data: DbTrajectory[],
   areasNotInTrajectoryArea: string[],
   defaultAreas: { name: string }[] | undefined,
-) => {
+): HypothesisRowData[] => {
   const groupedByArea: Record<string, DbTrajectory[]> = data.reduce(
     (acc, item) => {
       if (item.area && !acc[item.area]) acc[item.area] = [];
