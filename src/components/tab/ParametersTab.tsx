@@ -102,32 +102,45 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
     const newTechnicalDataSubRow = technicalData?.[0]?.subRows
       ? sortWithFixedPosition([...technicalData[0].subRows, newRow])
       : [newRow];
-    setTechnicalData([
-      {
-        hypothesis: t('thermal.@specific'),
-        trajectory: null,
-        status: TRAJECTORY_SELECTION_STATUS.MISSING,
-        isDefault: true,
-        subRows: sortWithFixedPosition(newTechnicalDataSubRow) || [],
-      },
-      {
-        hypothesis: t('thermal.@paramModulation'),
-        trajectory: null,
-        status: TRAJECTORY_SELECTION_STATUS.MISSING,
-        isDefault: true,
-      },
-      {
-        hypothesis: t('thermal.@common'),
-        trajectory: null,
-        status: TRAJECTORY_SELECTION_STATUS.MISSING,
-        isDefault: true,
-      },
+
+    setTechnicalData((prev) => [
+      ...prev.map((item) => {
+        if (item.hypothesis === t('thermal.@specific')) {
+          return {
+            hypothesis: t('thermal.@specific'),
+            trajectory: null,
+            status: TRAJECTORY_SELECTION_STATUS.MISSING,
+            isDefault: true,
+            subRows: sortWithFixedPosition(newTechnicalDataSubRow) || null,
+          };
+        } else {
+          return item;
+        }
+      }),
     ]);
   };
 
   const removeRow = (value: string) => {
     setCheckedValues((prev) => [...prev.filter((checkedValue) => checkedValue !== value)]);
-    setTechnicalData((prev) => [...prev.filter((itemData) => itemData.hypothesis !== value)]);
+    const newTechnicalDataSubRow = technicalData?.[0]?.subRows
+      ? technicalData[0].subRows?.filter((itemData) => itemData.hypothesis !== value)
+      : [];
+
+    setTechnicalData((prev) => [
+      ...prev.map((item) => {
+        if (item.hypothesis === t('thermal.@specific')) {
+          return {
+            hypothesis: t('thermal.@specific'),
+            trajectory: null,
+            status: TRAJECTORY_SELECTION_STATUS.MISSING,
+            isDefault: true,
+            subRows: sortWithFixedPosition(newTechnicalDataSubRow) || null,
+          };
+        } else {
+          return item;
+        }
+      }),
+    ]);
   };
 
   const handleSelectionChange = (value: string, isChecked: boolean) => {
