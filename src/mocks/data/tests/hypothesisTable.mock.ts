@@ -150,7 +150,7 @@ export const rowNotDefaultData = [
     '2024-07-22 15:13:56.860045' as unknown as Date,
   ),
   buildRowDataMock(
-    'OTHER areas',
+    OTHER_AREAS_LABEL,
     TRAJECTORY_SELECTION_STATUS.MISSING,
     true,
     null,
