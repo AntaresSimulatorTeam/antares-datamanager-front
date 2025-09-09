@@ -40,9 +40,10 @@ const getExpandableHypothesisTableHeaders = (
   progress: number,
   fileStatus: FileInputStatus,
   idSelected: string,
+  columnHeader?: string,
 ): TableOptions<HypothesisRowData>['columns'] => [
   columnHelper.accessor('hypothesis', {
-    header: t('studyDetails.@area'),
+    header: columnHeader || t('studyDetails.@area'),
     size: 120,
     cell: ({ getValue, row }) => {
       const { status } = row.original;

@@ -2,10 +2,8 @@ import SearchBar from '@/pages/pegase/home/components/SearchBar.tsx';
 import { FileInputStatus, RdsDivider } from 'rte-design-system-react';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
-import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
-import { CheckBoxData, HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
-import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
-import { buildRowData, retrieveReadOnlyArea } from '@/shared/utils/trajectoryUtils.ts';
+import { CheckBoxData, HypothesisRowData, LocationStudy, TrajectoryAreaData } from '@/shared/types';
+import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import getEditableHypothesisTableHeaders from '@/components/header/EditableHypothesisTableHeaders.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
@@ -14,6 +12,9 @@ import { useStudy } from '@/store/contexts/StudyContext.tsx';
 import StdCheckboxGroupWrapper from '@common/forms/stdCheckboxGroup/StdCheckboxGroupWrapper.tsx';
 import StdCheckbox from '@common/forms/stdCheckbox/StdCheckbox.tsx';
 import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
+import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
+import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
+import { useLocation } from 'react-router-dom';
 
 interface ParametersTabProps {
   defaultAreas: { name: string }[];
@@ -23,9 +24,11 @@ interface ParametersTabProps {
 export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
   const { t } = useTranslation();
   const studyState = useStudy();
-  const [areaDefault, setAreaDefault] = useState<CheckBoxData[]>([]);
+  const location = useLocation();
+  const study = (location.state as LocationStudy)?.study;
+  //const [areaDefault, setAreaDefault] = useState<CheckBoxData[]>([]);
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
-  const [defaultData, setDefaultData] = useState<HypothesisRowData[]>([]);
+  //const [defaultData, setDefaultData] = useState<HypothesisRowData[]>([]);
   const data: HypothesisRowData[] = [
     {
       hypothesis: t('thermal.@costs'),
@@ -44,39 +47,54 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
   const [fileStatus] = useState<FileInputStatus>('empty');
   const [rowIndexSelected] = useState('0');
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
-  const [readOnlyAreas, setReadOnlyAreas] = useState<string[]>([]);
+  //const [readOnlyAreas, setReadOnlyAreas] = useState<string[]>([]);
+  const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
+  const [technicalData, setTechnicalData] = useState<HypothesisRowData[]>([]);
+  const [isStudyGenerated] = useState(
+    studyState.studyStatus === StudyStatus.GENERATED || study.status === StudyStatus.GENERATED,
+  );
+  const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
+    useFetchHypothesisTrajectories(study?.id, TRAJECTORY_TYPE.THERMAL_CAPACITY, defaultAreas, areas, isStudyGenerated);
 
   useEffect(() => {
-    let newArea: CheckBoxData[] = [];
-    newArea = areas
-      .map((trajectoryArea) => {
-        if (!defaultAreas?.some((item) => item.name === trajectoryArea.areaName)) {
-          return { name: trajectoryArea.areaName, isDefault: false };
-        }
-      })
-      .filter(Boolean) as CheckBoxData[];
-    const defaultCheckBoxArea = defaultAreas.map((area) => ({ name: area.name, isDefault: true }));
-    setAreaDefault([...defaultCheckBoxArea, ...newArea]);
-    setCheckedValues(defaultAreas.map((area) => area.name));
-
-    // Find default area not included in areas trajectory list
-    const defaultAreaListNotIncludedInList: string[] = [];
-    defaultAreas.forEach((defaultArea) => {
-      if (!areas.some((trajectoryArea) => trajectoryArea.areaName === defaultArea.name)) {
-        defaultAreaListNotIncludedInList.push(defaultArea.name);
-      }
-    });
-    const areaDefaultData = [
-      ...defaultCheckBoxArea,
-      {
-        name: OTHER_AREAS,
-        isDefault: true,
-      },
-    ].map((area) => buildRowData(area.name, area.isDefault));
-    setDefaultData(areaDefaultData);
-
-    setReadOnly(retrieveReadOnlyArea(areaDefaultData, defaultAreaListNotIncludedInList));
-    setReadOnlyAreas(defaultAreaListNotIncludedInList);
+    const setHypothesis = () => {
+      areasTrajectoryOptions && setAreasOptions(areasTrajectoryOptions);
+      dropDownListOptions && setCheckedValues(dropDownListOptions);
+      hypothesisTrajectories && setTechnicalData(hypothesisTrajectories);
+      console.log('====================== hypothesisTrajectories', hypothesisTrajectories);
+      setReadOnly(readOnlyRow);
+    };
+    setHypothesis();
+    // let newArea: CheckBoxData[] = [];
+    // newArea = areas
+    //   .map((trajectoryArea) => {
+    //     if (!defaultAreas?.some((item) => item.name === trajectoryArea.areaName)) {
+    //       return { name: trajectoryArea.areaName, isDefault: false };
+    //     }
+    //   })
+    //   .filter(Boolean) as CheckBoxData[];
+    // const defaultCheckBoxArea = defaultAreas.map((area) => ({ name: area.name, isDefault: true }));
+    // setAreaDefault([...defaultCheckBoxArea, ...newArea]);
+    // setCheckedValues(defaultAreas.map((area) => area.name));
+    //
+    // // Find default area not included in areas trajectory list
+    // const defaultAreaListNotIncludedInList: string[] = [];
+    // defaultAreas.forEach((defaultArea) => {
+    //   if (!areas.some((trajectoryArea) => trajectoryArea.areaName === defaultArea.name)) {
+    //     defaultAreaListNotIncludedInList.push(defaultArea.name);
+    //   }
+    // });
+    // const areaDefaultData = [
+    //   ...defaultCheckBoxArea,
+    //   {
+    //     name: OTHER_AREAS,
+    //     isDefault: true,
+    //   },
+    // ].map((area) => buildRowData(area.name, area.isDefault));
+    // setDefaultData(areaDefaultData);
+    //
+    // setReadOnly(retrieveReadOnlyArea(areaDefaultData, defaultAreaListNotIncludedInList));
+    // setReadOnlyAreas(defaultAreaListNotIncludedInList);
   }, [areas, defaultAreas]);
 
   const addRow = (value: string) => {
@@ -87,17 +105,17 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
       isDefault: false,
     };
     setCheckedValues((prev) => [...prev, value]);
-    const newDataSorted = sortWithFixedPosition([...defaultData, newRow]) || [];
-    setDefaultData(newDataSorted);
-    if (readOnlyAreas.length > 0) {
-      const readOnlyRows = retrieveReadOnlyArea(newDataSorted, readOnlyAreas);
-      setReadOnly(readOnlyRows);
-    }
+    const newDataSorted = sortWithFixedPosition([...technicalData, newRow]) || [];
+    setTechnicalData(newDataSorted);
+    // if (readOnly) {
+    //   const readOnlyRows = retrieveReadOnlyArea(newDataSorted, readOnly);
+    //   setReadOnly(readOnlyRows);
+    // }
   };
 
   const removeRow = (value: string) => {
     setCheckedValues((prev) => [...prev.filter((checkedValue) => checkedValue !== value)]);
-    setDefaultData((prev) => [...prev.filter((itemData) => itemData.hypothesis !== value)]);
+    setTechnicalData((prev) => [...prev.filter((itemData) => itemData.hypothesis !== value)]);
   };
 
   const handleSelectionChange = (value: string, isChecked: boolean) => {
@@ -127,7 +145,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
           disabled={false}
           onChange={(value: string, isChecked?: boolean) => handleSelectionChange(value, isChecked ?? false)}
         >
-          {areaDefault?.map((area, index) => (
+          {areasOptions?.map((area, index) => (
             <div key={`${index}-${area.name}`} className="my-1">
               <StdCheckbox
                 key={`parameter-checkbox-${area.name}`}
@@ -145,23 +163,21 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
         </StdCheckboxGroupWrapper>
       </div>
       <div className="flex w-full flex-col gap-6">
-        {areaDefault.length > 0 && (
-          <PegaseHypothesisTable
-            id="default-parameters-table"
-            data={defaultData}
-            getTableHeaders={getEditableHypothesisTableHeaders}
-            columnHeader={t('thermal.@parametersTechnical')}
-            fileStatus={fileStatus}
-            studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
-            readOnly={readOnly}
-            progress={progress}
-            idSelected={rowIndexSelected}
-            handleSearch={handleTrajectorySearch}
-            handleImport={handleFetchTrajectoriesFS}
-            isReadOnlyEnable={true}
-            removeRow={removeRow}
-          />
-        )}
+        <PegaseHypothesisTable
+          id="default-parameters-table"
+          data={technicalData}
+          getTableHeaders={getExpandableHypothesisTableHeaders}
+          columnHeader={t('thermal.@parametersTechnical')}
+          fileStatus={fileStatus}
+          studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
+          readOnly={readOnly}
+          progress={progress}
+          idSelected={rowIndexSelected}
+          handleSearch={handleTrajectorySearch}
+          handleImport={handleFetchTrajectoriesFS}
+          isReadOnlyEnable={true}
+          removeRow={removeRow}
+        />
         <div className="flex h-fit w-full">
           <PegaseHypothesisTable
             id="default-parameters-table"
