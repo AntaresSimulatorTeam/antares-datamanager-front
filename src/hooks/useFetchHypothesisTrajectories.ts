@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CheckBoxData, DbTrajectory, HypothesisRowData, TrajectoryAreaData, TrajectoryState } from '@/shared/types';
 import { getStudyTrajectoriesWithWarnings } from '@/shared/services/trajectoryService';
 import {
-  buildEmptyTrajectory,
+  buildDefaultEmptyTrajectoryList,
   buildRowWithSubRowsData,
   convertIntoHypothesisRowWithTechnologies,
   removeDuplicate,
@@ -12,7 +12,6 @@ import {
   retrieveReadOnlyArea,
 } from '@/shared/utils/trajectoryUtils.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
-import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
 import { sortWithFixedPosition } from '@/shared/utils/sortUtils';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { getReadOnlyForGeneratedStudy } from '@/shared/helpers/hypothesisTableHelper.ts';
@@ -40,24 +39,15 @@ export const useFetchHypothesisTrajectories = (
       try {
         if (id != null && type) {
           const result: TrajectoryState = await getStudyTrajectoriesWithWarnings(id, type);
-          const areaDefault = [
-            { name: OTHER_AREAS },
-            ...(Array.isArray(defaultAreas) && defaultAreas.length > 0 ? defaultAreas : []),
-          ];
+          // Build default empty areas (default area not linked to a trajectory)
+          const defaultEmptyAreas = buildDefaultEmptyTrajectoryList(type, result?.trajectories, defaultAreas);
 
-          // check if default areas are not already linked to a trajectory
-          const defaultAreasNotLinkedToStudy =
-            result?.trajectories.length > 0
-              ? areaDefault?.filter((area) => result?.trajectories.find((trajectory) => area.name !== trajectory.area))
-              : areaDefault;
-          const defaultEmptyAreas = (defaultAreasNotLinkedToStudy || []).map((defaultArea) =>
-            buildEmptyTrajectory(defaultArea.name, type),
-          );
+          const allAreas = result?.trajectories?.concat(emptyAreaSelected).concat(defaultEmptyAreas);
 
           const arrayWithoutDuplicate: DbTrajectory[] =
             type === TRAJECTORY_TYPE.THERMAL_CAPACITY
-              ? removeDuplicateByTechnology(result?.trajectories?.concat(emptyAreaSelected).concat(defaultEmptyAreas))
-              : removeDuplicate(result?.trajectories?.concat(emptyAreaSelected).concat(defaultEmptyAreas));
+              ? removeDuplicateByTechnology(allAreas)
+              : removeDuplicate(allAreas);
 
           dispatch?.({
             type: STUDY_ACTION.ADD_TRAJECTORIES,

@@ -26,6 +26,7 @@ vi.mock('@/shared/utils/trajectoryUtils', async (importOriginal) => {
   return {
     ...actual,
     buildEmptyTrajectory: vi.fn(),
+    buildDefaultEmptyTrajectoryList: vi.fn(),
   };
 });
 vi.mock('@/store/contexts/StudyContext', async (importOriginal) => {
@@ -71,7 +72,9 @@ describe('useFetchTrajectoriesLinked', () => {
       trajectories: mockDbTrajectoryArrayLoad,
       warningMessages: [],
     });
-    vi.mocked(trajectoryUtils.buildEmptyTrajectory).mockImplementation(() => mockEmptyDbTrajectoryLoadOthers);
+    vi.mocked(trajectoryUtils.buildDefaultEmptyTrajectoryList).mockImplementation(() => [
+      mockEmptyDbTrajectoryLoadOthers,
+    ]);
     const { result } = renderHook(() => useFetchHypothesisTrajectories(5, TRAJECTORY_TYPE.LOAD));
 
     await waitFor(() => {
@@ -160,8 +163,10 @@ describe('useFetchTrajectoriesLinked', () => {
       trajectories: mockDbTrajectoryArrayLoad,
       warningMessages: [],
     });
-    vi.mocked(trajectoryUtils.buildEmptyTrajectory).mockImplementationOnce(() => mockEmptyDbTrajectoryLoadOthers);
-    vi.mocked(trajectoryUtils.buildEmptyTrajectory).mockImplementationOnce(() => mockEmptyDbTrajectoryLoadFR);
+    vi.mocked(trajectoryUtils.buildDefaultEmptyTrajectoryList).mockImplementationOnce(() => [
+      mockEmptyDbTrajectoryLoadFR,
+      mockEmptyDbTrajectoryLoadOthers,
+    ]);
     const { result } = renderHook(() => useFetchHypothesisTrajectories(5, TRAJECTORY_TYPE.LOAD, [{ name: 'FR' }]));
 
     await waitFor(() => {
@@ -174,8 +179,8 @@ describe('useFetchTrajectoriesLinked', () => {
             trajectories: [
               ...mockDbTrajectoryArrayLoad,
               ...mockEmptyDbTrajectoryArrayLoad,
-              mockEmptyDbTrajectoryLoadOthers,
               mockEmptyDbTrajectoryLoadFR,
+              mockEmptyDbTrajectoryLoadOthers,
             ],
             warningMessages: [],
           },
@@ -258,8 +263,10 @@ describe('useFetchTrajectoriesLinked', () => {
       trajectories: mockDbTrajectoryArrayLoad,
       warningMessages: [],
     });
-    vi.mocked(trajectoryUtils.buildEmptyTrajectory).mockImplementationOnce(() => mockEmptyDbTrajectoryLoadOthers);
-    vi.mocked(trajectoryUtils.buildEmptyTrajectory).mockImplementationOnce(() => mockEmptyDbTrajectoryLoadFR);
+    vi.mocked(trajectoryUtils.buildDefaultEmptyTrajectoryList).mockImplementationOnce(() => [
+      mockEmptyDbTrajectoryLoadFR,
+      mockEmptyDbTrajectoryLoadOthers,
+    ]);
     const { result } = renderHook(() => useFetchHypothesisTrajectories(5, TRAJECTORY_TYPE.LOAD, [{ name: 'FR' }]));
 
     await waitFor(() => {
@@ -269,7 +276,7 @@ describe('useFetchTrajectoriesLinked', () => {
         type: STUDY_ACTION.ADD_TRAJECTORIES,
         payload: {
           [TRAJECTORY_TYPE.LOAD]: {
-            trajectories: [...mockDbTrajectoryArrayLoad, mockEmptyDbTrajectoryLoadOthers, mockEmptyDbTrajectoryLoadFR],
+            trajectories: [...mockDbTrajectoryArrayLoad, mockEmptyDbTrajectoryLoadFR, mockEmptyDbTrajectoryLoadOthers],
             warningMessages: [],
           },
         },
@@ -330,8 +337,10 @@ describe('useFetchTrajectoriesLinked', () => {
       trajectories: mockDbTrajectoryArrayLoad,
       warningMessages: [],
     });
-    vi.mocked(trajectoryUtils.buildEmptyTrajectory).mockImplementationOnce(() => mockEmptyDbTrajectoryLoadOthers);
-    vi.mocked(trajectoryUtils.buildEmptyTrajectory).mockImplementationOnce(() => mockEmptyDbTrajectoryLoadFR);
+    vi.mocked(trajectoryUtils.buildDefaultEmptyTrajectoryList).mockImplementationOnce(() => [
+      mockEmptyDbTrajectoryLoadFR,
+      mockEmptyDbTrajectoryLoadOthers,
+    ]);
     const { result } = renderHook(() =>
       useFetchHypothesisTrajectories(5, TRAJECTORY_TYPE.LOAD, [{ name: 'FR' }, { name: 'BE' }]),
     );
@@ -343,7 +352,7 @@ describe('useFetchTrajectoriesLinked', () => {
         type: STUDY_ACTION.ADD_TRAJECTORIES,
         payload: {
           [TRAJECTORY_TYPE.LOAD]: {
-            trajectories: [...mockDbTrajectoryArrayLoad, mockEmptyDbTrajectoryLoadOthers, mockEmptyDbTrajectoryLoadFR],
+            trajectories: [...mockDbTrajectoryArrayLoad, mockEmptyDbTrajectoryLoadFR, mockEmptyDbTrajectoryLoadOthers],
             warningMessages: [],
           },
         },
