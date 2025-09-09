@@ -46,13 +46,16 @@ import { isBusinessError } from '@/shared/utils/errorUtils.ts';
  * @throws {Error}
  */
 export const fetchTrajectoriesFromDB = async (
-  trajectoryType: string,
+  trajectoryType: TRAJECTORY_TYPE,
   horizon: string,
   fileName?: string,
   area?: string,
   technology?: string,
 ): Promise<DbTrajectory[]> => {
-  const urlApi = `${TRAJECTORY_DATA_BASE_ENDPOINT}?trajectoryType=${trajectoryType}&horizon=${horizon}&fileNameContains=${fileName ?? ''}&area=${area ?? ''}&technology=${technology ?? ''}`;
+  const baseParams = `trajectoryType=${trajectoryType}&horizon=${horizon}&fileNameContains=${fileName ?? ''}&area=${area ?? ''}`;
+  const techParam = trajectoryType === TRAJECTORY_TYPE.THERMAL_CAPACITY ? `&technology=${technology ?? ''}` : '';
+  const urlApi = `${TRAJECTORY_DATA_BASE_ENDPOINT}?${baseParams}${techParam}`;
+
   try {
     const response = await AuthService.authFetch(urlApi);
     return (await (response as Response).json()) as DbTrajectory[];
