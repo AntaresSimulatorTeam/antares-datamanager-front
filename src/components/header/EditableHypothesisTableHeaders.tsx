@@ -30,7 +30,7 @@ const getEditableHypothesisTableHeaders = (
 ) => [
   columnHelper.accessor('hypothesis', {
     header: columnHeader || t('studyDetails.@area'),
-    size: 50,
+    size: 120,
     cell: ({ getValue, row }) => {
       const { status } = row.original;
       return (
@@ -40,7 +40,7 @@ const getEditableHypothesisTableHeaders = (
   }),
   columnHelper.accessor('trajectory', {
     header: t('studyDetails.@trajectory'),
-    size: 300,
+    size: 350,
     cell: ({ row, table: { options } }) => {
       const { trajectory, status } = row.original;
 

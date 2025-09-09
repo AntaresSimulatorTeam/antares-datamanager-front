@@ -132,6 +132,9 @@
     "@installedPower": "Installed Power",
     "@parameters": "Parameters",
     "@parametersTechnical": "Technical Parameters",
+    "@specific": "Specific",
+    "@paramModulation": "Param modulation",
+    "@common": "Common",
     "@parametersEconomic": "Economic Parameters",
     "@costs": "Costs",
     "@economics": "Economics"

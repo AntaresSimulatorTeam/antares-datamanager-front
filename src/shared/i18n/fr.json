@@ -91,6 +91,8 @@
     "@installedPower": "Capacités installées",
     "@parameters": "Paramètres",
     "@parametersTechnical": "Paramètres techniques",
+    "@parametersModulation": "Param modulation",
+    "@parametersCommon": "Common",
     "@parametersEconomic": "Paramètres économiques",
     "@costs": "Coûts",
     "@economics": "Économique"
