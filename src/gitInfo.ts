@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "feat/ANT-3692_thermal_update_parameters_hypothesis_table",
-  commit: "b90a95e",
-  commitTime: "2025-09-11T08:33:41.997Z"
+  branch: "fix/ANT-3822_thermal_installed_power_trash_icon_and_sort",
+  commit: "0117de5",
+  commitTime: "2025-09-09T13:21:56.510Z"
 };
