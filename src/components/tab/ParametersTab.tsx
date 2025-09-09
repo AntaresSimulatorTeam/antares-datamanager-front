@@ -62,7 +62,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
     useFetchHypothesisTrajectories(
       study?.id,
-      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, // TODO : to replace by a generic trajectory type (ex: THERMAL_PARAMETER) ? or an array of type
+      TRAJECTORY_TYPE.THERMAL_CAPACITY, //TODO : TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER
       defaultAreas,
       areas,
       isStudyGenerated,
