@@ -426,6 +426,7 @@ export const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
             }
           }}
           trajectoryType={rowIndexSelected === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK}
+          area={rowIndexSelected === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK}
         />
       )}
       {isViewModalOpen && trajectoryData && (
