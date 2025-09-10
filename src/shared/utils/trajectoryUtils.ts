@@ -567,9 +567,9 @@ export const getTrajectoryTypeByIndex = (index: number): TRAJECTORY_TYPE => {
  * Determines the file path based on the trajectory type.
  *
  * @param {TRAJECTORY_TYPE} type - The trajectory type used to select the corresponding file path.
- * @returns {string} The file path associated with the given trajectory type.
+ * @returns {string | null} The file path associated with the given trajectory type.
  */
-export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE): string => {
+export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE): string | null => {
   switch (type) {
     case TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER:
       return '\\\\thermal\\economic parameters\\economic';
@@ -579,8 +579,9 @@ export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE): string => {
       return '\\\\thermal\\technical parameters\\param_modulation';
     case TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER:
     case TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER:
-    default:
       return '\\\\thermal\\technical parameters';
+    default:
+      return null;
   }
 };
 
