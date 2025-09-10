@@ -54,7 +54,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
     useFetchHypothesisTrajectories(
       study?.id,
-      TRAJECTORY_TYPE.THERMAL_PARAMETER, //TODO : TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER
+      TRAJECTORY_TYPE.THERMAL_CAPACITY, //TODO : TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER
       defaultAreas,
       areas,
       isStudyGenerated,
