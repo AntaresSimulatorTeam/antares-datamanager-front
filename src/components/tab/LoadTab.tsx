@@ -152,7 +152,14 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
               return await handleTrajectorySearch(TRAJECTORY_TYPE.LOAD, value, area, setDbTrajectories, study);
             }}
             handleImport={async (rowId: string) =>
-              await handleFetchTrajectoriesFS(TRAJECTORY_TYPE.LOAD, rowId, setOptionsFS, setRowIdSelected, toggleModal)
+              await handleFetchTrajectoriesFS(
+                TRAJECTORY_TYPE.LOAD,
+                rowId,
+                setOptionsFS,
+                setRowIdSelected,
+                toggleModal,
+                data[Number(rowId)]?.hypothesis,
+              )
             }
             removeRow={(value: string, rowId?: string) => {
               if (shouldOpenDeletionModal(TRAJECTORY_TYPE.LOAD, Number(rowId), data)) {

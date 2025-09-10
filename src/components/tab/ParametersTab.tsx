@@ -1,8 +1,8 @@
 import SearchBar from '@/pages/pegase/home/components/SearchBar.tsx';
-import { FileInputStatus, RdsDivider } from 'rte-design-system-react';
+import { RdsDivider } from 'rte-design-system-react';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
-import { CheckBoxData, HypothesisRowData, LocationStudy, TrajectoryAreaData } from '@/shared/types';
+import { CheckBoxData, HypothesisRowData, LocationStudy, SelectOption, TrajectoryAreaData } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import getEditableHypothesisTableHeaders from '@/components/header/EditableHypothesisTableHeaders.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
@@ -15,7 +15,11 @@ import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
 import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
 import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
 import { useLocation } from 'react-router-dom';
-import { rowNotDefaultData } from '@/mocks/data/tests/hypothesisTable.mock.ts';
+import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
+import { getAreaTrajectoryName, getTrajectoryType } from '@/shared/utils/trajectoryUtils.ts';
+import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
+import { handleFetchTrajectoriesFS } from '@/shared/services/hypothesisTableService.ts';
+import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { getDefaultLabel } from '@/shared/utils/trajectoryUtils.ts';
 
 interface ParametersTabProps {
@@ -28,6 +32,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
   const studyState = useStudy();
   const location = useLocation();
   const study = (location.state as LocationStudy)?.study;
+  const { isModalOpen, toggleModal } = useNewStudyModal();
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
   const data: HypothesisRowData[] = [
     {
@@ -43,19 +48,19 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
       isDefault: true,
     },
   ];
-  const [progress] = useState(0);
-  const [fileStatus] = useState<FileInputStatus>('empty');
   const [rowIndexSelected] = useState('0');
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
   const [technicalData, setTechnicalData] = useState<HypothesisRowData[]>([]);
+  const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
+  const [rowIdSelected, setRowIdSelected] = useState<string>('0');
   const [isStudyGenerated] = useState(
     studyState.studyStatus === StudyStatus.GENERATED || study.status === StudyStatus.GENERATED,
   );
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
     useFetchHypothesisTrajectories(
       study?.id,
-      TRAJECTORY_TYPE.THERMAL_CAPACITY, //TODO : TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
       defaultAreas,
       areas,
       isStudyGenerated,
@@ -72,7 +77,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
             trajectory: null,
             status: TRAJECTORY_SELECTION_STATUS.MISSING,
             isDefault: true,
-            subRows: rowNotDefaultData, // TODO : hypothesisTrajectories,
+            subRows: hypothesisTrajectories,
           },
           {
             hypothesis: t('thermal.@paramModulation'),
@@ -153,10 +158,6 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
   };
 
   const handleTrajectorySearch = async () => Promise.resolve([]);
-  const handleFetchTrajectoriesFS = async (rowId: string) => {
-    console.log('=== rowId', rowId);
-    return Promise.resolve();
-  };
 
   return (
     <div className="flex h-full w-full gap-6">
@@ -194,13 +195,24 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
           data={technicalData}
           getTableHeaders={getExpandableHypothesisTableHeaders}
           columnHeader={t('thermal.@parametersTechnical')}
-          fileStatus={fileStatus}
+          fileStatus={'success'}
           studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
           readOnly={readOnly}
-          progress={progress}
+          progress={0}
           idSelected={rowIndexSelected}
           handleSearch={handleTrajectorySearch}
-          handleImport={handleFetchTrajectoriesFS}
+          handleImport={async (rowId: string) => {
+            const indexArray = rowId.split('.').map(Number);
+            const area = technicalData[indexArray[0]]?.subRows?.[indexArray[1]]?.hypothesis;
+            await handleFetchTrajectoriesFS(
+              getTrajectoryType(indexArray[0]),
+              rowId,
+              setOptionsFS,
+              setRowIdSelected,
+              toggleModal,
+              area === OTHER_AREAS_LABEL ? OTHER_AREAS : area?.replace(/\s*\(default\)/i, ''),
+            );
+          }}
           isReadOnlyEnable={true}
           removeRow={removeRow}
         />
@@ -210,15 +222,27 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
             data={data}
             getTableHeaders={getEditableHypothesisTableHeaders}
             columnHeader={t('thermal.@parametersEconomic')}
-            fileStatus={fileStatus}
+            fileStatus={'success'}
             studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
-            progress={progress}
             idSelected={rowIndexSelected}
+            progress={0}
             handleSearch={handleTrajectorySearch}
-            handleImport={handleFetchTrajectoriesFS}
+            handleImport={() => Promise.resolve()}
           />
         </div>
       </div>
+      {isModalOpen && (
+        <ImportTrajectoryModal
+          options={optionsFS}
+          onClose={(value?: SelectOption) => {
+            toggleModal();
+            console.log('================= value', value);
+            return Promise.resolve(); // TODO: replace by importTrajectory
+          }}
+          trajectoryType={TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER}
+          area={getAreaTrajectoryName(rowIdSelected, data)}
+        />
+      )}
     </div>
   );
 };
