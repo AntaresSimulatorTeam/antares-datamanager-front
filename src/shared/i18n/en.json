@@ -126,7 +126,8 @@
     "@search_area": "Search area",
     "@or": "or",
     "@viewLog": "View Log",
-    "@notificationAlert": "Error: {{studyName}} - {{trajectoryName}} no parameter cannot be saved for {{trajectoryType}}"
+    "@notificationAlert": "Error: {{studyName}} - {{trajectoryName}} no parameter cannot be saved for {{trajectoryType}}",
+    "default": "Default"
   },
   "thermal": {
     "@installedPower": "Installed Power",

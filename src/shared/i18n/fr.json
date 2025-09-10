@@ -85,7 +85,8 @@
     "@import_status_missing": "Missing",
     "@import_status_error": "Error",
     "@generate": "Générer",
-    "@notificationAlert": "Erreur: {{studyName}} - {{trajectoryName}} aucun paramètre n'a pas être enregistré pour {{trajectoryType}}"
+    "@notificationAlert": "Erreur: {{studyName}} - {{trajectoryName}} aucun paramètre n'a pas être enregistré pour {{trajectoryType}}",
+    "default": "Par defaut"
   },
   "thermal": {
     "@installedPower": "Capacités installées",
