@@ -111,6 +111,7 @@
     "@import_file": "Import",
     "@select_file_fs_error": "Not such files on file system",
     "@import_from_file_system": "Import a trajectory for {{area}}",
+    "@select_from": "Select from {{path}}",
     "@import": "Import",
     "@import_status_done": "OK",
     "@import_status_missing": "Missing",

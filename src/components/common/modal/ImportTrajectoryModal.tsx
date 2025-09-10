@@ -9,6 +9,7 @@ import { convertToFSSelectionOptionType } from '@/shared/utils/formFormatter.ts'
 import StdButton from '@common/base/stdButton/StdButton';
 import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
+import { getPathFromTrajectoryType } from '@/shared/utils/trajectoryUtils.ts';
 
 interface ImportTrajectoryModalProps {
   options: SelectOption[] | undefined;
@@ -56,6 +57,9 @@ export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, area }
         })}
       </RdsModal.Title>
       <RdsModal.Content>
+        <span className="mb-1 flex text-body-s text-gray-600">
+          {t('studyDetails.@select_from', { path: getPathFromTrajectoryType(trajectoryType) })}
+        </span>
         <div className="flex h-full flex-col">
           <div className="absolute z-10">
             <div className="w-[400px]">

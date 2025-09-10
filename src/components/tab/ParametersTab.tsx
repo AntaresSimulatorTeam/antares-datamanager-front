@@ -16,7 +16,7 @@ import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableH
 import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
 import { useLocation } from 'react-router-dom';
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
-import { getAreaTrajectoryName, getTrajectoryType } from '@/shared/utils/trajectoryUtils.ts';
+import { getAreaTrajectoryName, getTrajectoryTypeByIndex } from '@/shared/utils/trajectoryUtils.ts';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { handleFetchTrajectoriesFS } from '@/shared/services/hypothesisTableService.ts';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
@@ -60,7 +60,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
     useFetchHypothesisTrajectories(
       study?.id,
-      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, // TODO : to replace by a generic trajectory type (ex: THERMAL_PARAMETER) ? or an array of type
       defaultAreas,
       areas,
       isStudyGenerated,
@@ -157,8 +157,6 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
     }
   };
 
-  const handleTrajectorySearch = async () => Promise.resolve([]);
-
   return (
     <div className="flex h-full w-full gap-6">
       <div className="flex h-fit w-28 flex-col rounded border border-gray-400 p-2">
@@ -191,7 +189,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
       </div>
       <div className="flex w-full flex-col gap-6">
         <PegaseHypothesisTable
-          id="default-parameters-table"
+          id="technical-parameters-table"
           data={technicalData}
           getTableHeaders={getExpandableHypothesisTableHeaders}
           columnHeader={t('thermal.@parametersTechnical')}
@@ -200,12 +198,12 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
           readOnly={readOnly}
           progress={0}
           idSelected={rowIndexSelected}
-          handleSearch={handleTrajectorySearch}
+          handleSearch={async (_value: string, _rowId: string) => Promise.resolve(undefined)}
           handleImport={async (rowId: string) => {
             const indexArray = rowId.split('.').map(Number);
             const area = technicalData[indexArray[0]]?.subRows?.[indexArray[1]]?.hypothesis;
             await handleFetchTrajectoriesFS(
-              getTrajectoryType(indexArray[0]),
+              getTrajectoryTypeByIndex(indexArray[0]),
               rowId,
               setOptionsFS,
               setRowIdSelected,
@@ -218,7 +216,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
         />
         <div className="flex h-fit w-full">
           <PegaseHypothesisTable
-            id="default-parameters-table"
+            id="economics-parameters-table"
             data={data}
             getTableHeaders={getEditableHypothesisTableHeaders}
             columnHeader={t('thermal.@parametersEconomic')}
@@ -226,7 +224,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
             studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
             idSelected={rowIndexSelected}
             progress={0}
-            handleSearch={handleTrajectorySearch}
+            handleSearch={async (_value: string, _rowId: string) => Promise.resolve(undefined)}
             handleImport={() => Promise.resolve()}
           />
         </div>
@@ -234,13 +232,12 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
       {isModalOpen && (
         <ImportTrajectoryModal
           options={optionsFS}
-          onClose={(value?: SelectOption) => {
+          onClose={(_value?: SelectOption) => {
             toggleModal();
-            console.log('================= value', value);
             return Promise.resolve(); // TODO: replace by importTrajectory
           }}
-          trajectoryType={TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER}
-          area={getAreaTrajectoryName(rowIdSelected, data)}
+          trajectoryType={getTrajectoryTypeByIndex(Number(rowIdSelected))}
+          area={getAreaTrajectoryName(rowIdSelected, technicalData)}
         />
       )}
     </div>

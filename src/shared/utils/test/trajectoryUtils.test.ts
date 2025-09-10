@@ -11,9 +11,11 @@ import {
   getChildrenList,
   getDefaultLabel,
   getHypothesis,
+  getPathFromTrajectoryType,
   getRowDataSelected,
   getStatus,
   getStudyMenu,
+  getTrajectoryTypeByIndex,
   isMatchingTrajectoryType,
   isTrajectoryLinked,
   removeDuplicate,
@@ -693,6 +695,61 @@ describe('getAreaTrajectoryName', () => {
   it('should return empty string if both hypotheses are missing', () => {
     const emptyData: HypothesisRowData[] = [{}, {}] as HypothesisRowData[];
     expect(getAreaTrajectoryName('0.0', emptyData)).toBe('');
+  });
+});
+
+describe('getTrajectoryTypeByIndex', () => {
+  it('should return SPECIFIC for index 0', () => {
+    expect(getTrajectoryTypeByIndex(0)).toBe(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER);
+  });
+
+  it('should return COMMON for index 1', () => {
+    expect(getTrajectoryTypeByIndex(1)).toBe(TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER);
+  });
+
+  it('should return MODULATION for index 2', () => {
+    expect(getTrajectoryTypeByIndex(2)).toBe(TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER);
+  });
+
+  it('should return SPECIFIC for any other index', () => {
+    expect(getTrajectoryTypeByIndex(99)).toBe(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER);
+    expect(getTrajectoryTypeByIndex(-1)).toBe(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER);
+  });
+});
+
+describe('getPathFromTrajectoryType', () => {
+  it('should return economic path for THERMAL_ECONOMIC_PARAMETER', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER)).toBe(
+      '\\\\thermal\\economic parameters\\economic',
+    );
+  });
+
+  it('should return cost path for THERMAL_ECONOMIC_COST_PARAMETER', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER)).toBe(
+      '\\\\thermal\\economic parameters\\costs',
+    );
+  });
+
+  it('should return modulation path for THERMAL_TECHNICAL_MODULATION_PARAMETER', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER)).toBe(
+      '\\\\thermal\\technical parameters\\param_modulation',
+    );
+  });
+
+  it('should return technical path for THERMAL_TECHNICAL_SPECIFIC_PARAMETER', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER)).toBe(
+      '\\\\thermal\\technical parameters',
+    );
+  });
+
+  it('should return technical path for THERMAL_TECHNICAL_COMMON_PARAMETER', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER)).toBe(
+      '\\\\thermal\\technical parameters',
+    );
+  });
+
+  it('should return technical path for unknown type', () => {
+    expect(getPathFromTrajectoryType('UNKNOWN_TYPE' as TRAJECTORY_TYPE)).toBe('\\\\thermal\\technical parameters');
   });
 });
 
