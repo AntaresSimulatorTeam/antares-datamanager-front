@@ -34,7 +34,6 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
   const [reloadStudies, setReloadStudies] = useState<boolean>(false);
   const [sortBy, setSortBy] = useState<{ [key: string]: 'asc' | 'desc' }>({});
   const [sortedColumn, setSortedColumn] = useState<string | null>('status');
-  console.log('=================== projectInfo', projectInfo);
 
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const { navigateToStudy } = useStudyNavigation();
