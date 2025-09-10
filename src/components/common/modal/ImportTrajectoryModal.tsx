@@ -21,6 +21,7 @@ interface ImportTrajectoryModalProps {
 export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, area }: ImportTrajectoryModalProps) => {
   const { t } = useTranslation();
   const [trajectorySelected, setTrajectorySelected] = useState<SelectOption | null>(null);
+  const path = getPathFromTrajectoryType(trajectoryType);
 
   const handleSelectOption = (value: SelectOption | null) => {
     if (value) {
@@ -57,9 +58,9 @@ export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, area }
         })}
       </RdsModal.Title>
       <RdsModal.Content>
-        <span className="mb-1 flex text-body-s text-gray-600">
-          {t('studyDetails.@select_from', { path: getPathFromTrajectoryType(trajectoryType) })}
-        </span>
+        {path && (
+          <span className="mb-1 flex text-body-s text-gray-600">{t('studyDetails.@select_from', { path })}</span>
+        )}
         <div className="flex h-full flex-col">
           <div className="absolute z-10">
             <div className="w-[400px]">

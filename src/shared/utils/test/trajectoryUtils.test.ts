@@ -749,7 +749,7 @@ describe('getPathFromTrajectoryType', () => {
   });
 
   it('should return technical path for unknown type', () => {
-    expect(getPathFromTrajectoryType('UNKNOWN_TYPE' as TRAJECTORY_TYPE)).toBe('\\\\thermal\\technical parameters');
+    expect(getPathFromTrajectoryType('UNKNOWN_TYPE' as TRAJECTORY_TYPE)).toBeNull();
   });
 });
 
