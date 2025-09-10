@@ -542,6 +542,18 @@ export const getChildrenList = (row: Row<HypothesisRowData>): string[] =>
       }, [])
     : [];
 
+export const getTrajectoryType = (index: number): TRAJECTORY_TYPE => {
+  switch (index) {
+    case 1:
+      return TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER;
+    case 2:
+      return TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER;
+    case 0:
+    default:
+      return TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER;
+  }
+};
+
 /**
  * Determines the trajectory type based on the provided index value.
  *
