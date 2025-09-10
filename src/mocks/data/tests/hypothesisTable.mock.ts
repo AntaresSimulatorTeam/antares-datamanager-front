@@ -139,7 +139,7 @@ export const rowDataTwo: HypothesisRowData[] = [
 
 export const rowNotDefaultData = [
   buildRowDataMock(
-    'FR',
+    'FR (default)',
     TRAJECTORY_SELECTION_STATUS.MISSING,
     true,
     null,
