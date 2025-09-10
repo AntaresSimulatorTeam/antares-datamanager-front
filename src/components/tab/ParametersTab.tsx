@@ -62,7 +62,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
     useFetchHypothesisTrajectories(
       study?.id,
-      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, // TODO : to replace by a generic trajectory type (ex: THERMAL_PARAMETER) ? or an array of type
       defaultAreas,
       areas,
       isStudyGenerated,
@@ -119,8 +119,6 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
       removeRow(value);
     }
   };
-
-  const handleTrajectorySearch = async () => Promise.resolve([]);
 
   return (
     <div className="flex h-full w-full gap-6">
@@ -193,7 +191,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
             studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
             idSelected={rowIdSelected}
             progress={0}
-            handleSearch={handleTrajectorySearch}
+            handleSearch={async (_value: string, _rowId: string) => Promise.resolve(undefined)}
             handleImport={() => Promise.resolve()}
           />
         </div>

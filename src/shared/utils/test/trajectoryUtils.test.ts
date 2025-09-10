@@ -729,11 +729,11 @@ describe('getTrajectoryTypeByIndex', () => {
   });
 
   it('should return COMMON for index 1', () => {
-    expect(getTrajectoryTypeByIndex(1)).toBe(TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER);
+    expect(getTrajectoryTypeByIndex(1)).toBe(TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER);
   });
 
   it('should return MODULATION for index 2', () => {
-    expect(getTrajectoryTypeByIndex(2)).toBe(TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER);
+    expect(getTrajectoryTypeByIndex(2)).toBe(TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER);
   });
 
   it('should return SPECIFIC for any other index', () => {
@@ -774,7 +774,7 @@ describe('getPathFromTrajectoryType', () => {
   });
 
   it('should return technical path for unknown type', () => {
-    expect(getPathFromTrajectoryType('UNKNOWN_TYPE' as TRAJECTORY_TYPE)).toBeNull();
+    expect(getPathFromTrajectoryType('UNKNOWN_TYPE' as TRAJECTORY_TYPE)).toBe('\\\\thermal\\technical parameters');
   });
 });
 

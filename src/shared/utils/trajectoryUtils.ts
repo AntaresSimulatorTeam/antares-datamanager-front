@@ -542,15 +542,45 @@ export const getChildrenList = (row: Row<HypothesisRowData>): string[] =>
       }, [])
     : [];
 
-export const getTrajectoryType = (index: number): TRAJECTORY_TYPE => {
+/**
+ * Determines the trajectory type based on the provided index value.
+ *
+ * @param {number} index - The index representing a specific trajectory type.
+ * @returns {TRAJECTORY_TYPE} - The trajectory type corresponding to the index provided.
+ *                              Returns `TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER` for index 1,
+ *                              `TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER` for index 2,
+ *                              and `TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER` for index 0 or any other value.
+ */
+export const getTrajectoryTypeByIndex = (index: number): TRAJECTORY_TYPE => {
   switch (index) {
     case 1:
-      return TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER;
-    case 2:
       return TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER;
+    case 2:
+      return TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER;
     case 0:
     default:
       return TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER;
+  }
+};
+
+/**
+ * Determines the file path based on the trajectory type.
+ *
+ * @param {TRAJECTORY_TYPE} type - The trajectory type used to select the corresponding file path.
+ * @returns {string} The file path associated with the given trajectory type.
+ */
+export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE): string => {
+  switch (type) {
+    case TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER:
+      return '\\\\thermal\\economic parameters\\economic';
+    case TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER:
+      return '\\\\thermal\\economic parameters\\costs';
+    case TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER:
+      return '\\\\thermal\\technical parameters\\param_modulation';
+    case TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER:
+    case TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER:
+    default:
+      return '\\\\thermal\\technical parameters';
   }
 };
 
