@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "feat/ANT-3796_thermal_parameter_get_trajectories_from_fs",
-  commit: "96def55",
-  commitTime: "2025-09-10T09:07:30.332Z"
+  branch: "feat/ANT-3692_thermal_update_parameters_hypothesis_table",
+  commit: "00773e5",
+  commitTime: "2025-09-10T13:01:54.381Z"
 };
