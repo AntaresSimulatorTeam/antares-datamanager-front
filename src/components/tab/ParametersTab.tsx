@@ -16,6 +16,7 @@ import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableH
 import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
 import { useLocation } from 'react-router-dom';
 import { rowNotDefaultData } from '@/mocks/data/tests/hypothesisTable.mock.ts';
+import { getDefaultLabel } from '@/shared/utils/trajectoryUtils.ts';
 
 interface ParametersTabProps {
   defaultAreas: { name: string }[];
@@ -174,7 +175,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
             <div key={`${index}-${area.name}`} className="my-1">
               <StdCheckbox
                 key={`parameter-checkbox-${area.name}`}
-                label={area.name}
+                label={getDefaultLabel(area, t('studyDetails.@default'))}
                 value={area.name}
                 name={''}
                 disabled={area.isDefault}

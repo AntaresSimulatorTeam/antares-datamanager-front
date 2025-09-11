@@ -1,4 +1,11 @@
-import { DbTrajectory, HypothesisRowData, HypothesisTab, RowStatus, WarningMessage } from '@/shared/types';
+import {
+  CheckBoxData,
+  DbTrajectory,
+  HypothesisRowData,
+  HypothesisTab,
+  RowStatus,
+  WarningMessage,
+} from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { FileInputStatus } from 'rte-design-system-react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
@@ -475,3 +482,17 @@ export const getChildrenList = (row: Row<HypothesisRowData>): string[] =>
         }
       }, [])
     : [];
+
+/**
+ * Generates the default label for a given area.
+ *
+ * @function
+ * @param {Object} area - The area object containing name and default status.
+ * @param {string} area.name - The name of the area.
+ * @param {boolean} area.isDefault - Indicates whether the area is the default area.
+ * @param {string} defaultLabel - The label to append if the area is marked as default and meets the condition.
+ * @returns {string} The generated label for the area. If the area is the default and its name does not
+ * match `OTHER_AREAS`, the label will include the area's name and the default label. Otherwise, only the area's name is returned.
+ */
+export const getDefaultLabel = (area: CheckBoxData, defaultLabel: string): string =>
+  area.isDefault && area.name !== OTHER_AREAS ? `${area.name} (${defaultLabel})` : area.name;
