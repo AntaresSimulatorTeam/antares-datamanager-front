@@ -208,7 +208,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
               setOptionsFS,
               setRowIdSelected,
               toggleModal,
-              area === OTHER_AREAS_LABEL ? OTHER_AREAS : area?.replace(/\s*\(default\)/i, ''),
+              area === OTHER_AREAS_LABEL ? OTHER_AREAS : area?.replace(t('studyDetails.@default'), ''),
             );
           }}
           isReadOnlyEnable={true}
