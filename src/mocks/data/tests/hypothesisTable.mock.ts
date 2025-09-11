@@ -137,7 +137,7 @@ export const rowDataTwo: HypothesisRowData[] = [
   ),
 ];
 
-export const rowNotDefaultData = [
+export const rowNotDefaultData: HypothesisRowData[] = [
   buildRowDataMock(
     'FR (default)',
     TRAJECTORY_SELECTION_STATUS.MISSING,
