@@ -784,6 +784,11 @@ describe('getDefaultLabel', () => {
     expect(result).toBe('Zone A');
   });
 
+  it('should append defaultLabel when isDefault is true and name is not OTHER_AREAS', () => {
+    const result = getDefaultLabel('Zone A', false, 'par défaut');
+    expect(result).toBe('Zone A');
+  });
+
   it('should return name when name is OTHER_AREAS even if isDefault is true', () => {
     const result = getDefaultLabel(OTHER_AREAS);
     expect(result).toBe(OTHER_AREAS_LABEL);
