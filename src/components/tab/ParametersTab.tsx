@@ -201,7 +201,6 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
               setOptionsFS,
               setRowIdSelected,
               toggleModal,
-              t('studyDetails.@default'),
               area,
             );
           }}

@@ -198,7 +198,7 @@ describe('buildRowWithSubRowsData', () => {
   it('returns correct data when loadArea is OTHER_AREAS', () => {
     const trajectory = { area: OTHER_AREAS, technology: '', trajectoryName: 'name' } as DbTrajectory;
 
-    const result = buildRowWithSubRowsData(trajectory, 'Default', [], [], subRowOptions);
+    const result = buildRowWithSubRowsData(trajectory, [], [], subRowOptions);
 
     expect(result).toEqual({
       hypothesis: OTHER_AREAS_LABEL,
@@ -213,10 +213,10 @@ describe('buildRowWithSubRowsData', () => {
     const trajectory = { area: 'Zone 1', trajectoryName: 'T1', technology: '' } as DbTrajectory;
     const defaultAreas = [{ name: 'Zone 1' }];
 
-    const result = buildRowWithSubRowsData(trajectory, 'Default', defaultAreas, [], subRowOptions);
+    const result = buildRowWithSubRowsData(trajectory, defaultAreas, [], subRowOptions);
 
     expect(result).toEqual({
-      hypothesis: 'Zone 1 (Default)',
+      hypothesis: 'Zone 1',
       trajectory,
       status: TRAJECTORY_SELECTION_STATUS.OK,
       isDefault: true,
@@ -242,7 +242,7 @@ describe('buildRowWithSubRowsData', () => {
   it('returns correct data when trajectory has name and technology', () => {
     const trajectory = { area: 'Zone 1', trajectoryName: 'T1', technology: 'Option A' } as DbTrajectory;
 
-    const result = buildRowWithSubRowsData(trajectory, 'Default', [], [], subRowOptions);
+    const result = buildRowWithSubRowsData(trajectory, [], [], subRowOptions);
 
     expect(result).toEqual({
       hypothesis: 'Zone 1',
@@ -272,7 +272,7 @@ describe('buildRowWithSubRowsData', () => {
     const trajectory = { area: 'Zone 2' } as DbTrajectory;
     const areasNotInTrajectoryArea = ['Zone 2'];
 
-    const result = buildRowWithSubRowsData(trajectory, 'Default', undefined, areasNotInTrajectoryArea, subRowOptions);
+    const result = buildRowWithSubRowsData(trajectory, undefined, areasNotInTrajectoryArea, subRowOptions);
 
     expect(result.subRows).toBeNull();
   });
@@ -281,7 +281,7 @@ describe('buildRowWithSubRowsData', () => {
     const trajectory = { area: 'Zone 3' } as DbTrajectory;
     const defaultAreas = [{ name: 'Zone 1' }];
 
-    const result = buildRowWithSubRowsData(trajectory, 'Default', defaultAreas, [], subRowOptions);
+    const result = buildRowWithSubRowsData(trajectory, defaultAreas, [], subRowOptions);
 
     expect(result.isDefault).toBe(false);
   });
@@ -756,44 +756,29 @@ describe('getPathFromTrajectoryType', () => {
 
 describe('getDefaultLabel', () => {
   it('should append defaultLabel when isDefault is true and name is not OTHER_AREAS', () => {
-    const result = getDefaultLabel('Zone A', true, 'par défaut');
-    expect(result).toBe('Zone A (par défaut)');
-  });
-
-  it('should append defaultLabel when isDefault is true and name is not OTHER_AREAS', () => {
-    const result = getDefaultLabel('Zone A', false, 'par défaut');
+    const result = getDefaultLabel('Zone A');
     expect(result).toBe('Zone A');
   });
 
   it('should return name when name is OTHER_AREAS even if isDefault is true', () => {
-    const result = getDefaultLabel(OTHER_AREAS, true, 'par défaut');
+    const result = getDefaultLabel(OTHER_AREAS);
     expect(result).toBe(OTHER_AREAS_LABEL);
   });
 });
 
 describe('getQueryParamAreaValue', () => {
   it('should return OTHER_AREAS when hypothesis equals OTHER_AREAS_LABEL', () => {
-    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD, OTHER_AREAS_LABEL, 'label');
+    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD, OTHER_AREAS_LABEL);
     expect(result).toBe(OTHER_AREAS);
   });
 
   it('should remove defaultLabel from hypothesis if type is not THERMAL_CAPACITY', () => {
-    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD, 'Paris (label)', 'label');
-    expect(result).toBe('Paris ');
-  });
-
-  it('should return FR if type is THERMAL_CAPACITY and hypothesis includes FR', () => {
-    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.THERMAL_CAPACITY, 'FR (label)', 'label');
-    expect(result).toBe('FR');
-  });
-
-  it('should return OTHER_AREAS if type is THERMAL_CAPACITY and hypothesis does not include FR', () => {
-    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.THERMAL_CAPACITY, 'DE (label)', 'label');
-    expect(result).toBe(OTHER_AREAS);
+    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD, 'Paris');
+    expect(result).toBe('Paris');
   });
 
   it('should handle undefined hypothesis gracefully', () => {
-    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD, undefined as unknown as string, 'label');
+    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD, undefined as unknown as string);
     expect(result).toBe('');
   });
 });

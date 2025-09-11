@@ -48,13 +48,10 @@ export const getBgColor = (status?: FileInputStatus) => {
  *
  * @function
  * @param {string} areaName - The name of the area.
- * @param {boolean} isDefault - The area is a default one
- * @param {string} defaultLabel - The label to append if the area is marked as default and meets the condition.
  * @returns {string} The generated label for the area. If the area is the default and its name does not
  * match `OTHER_AREAS`, the label will include the area's name and the default label. Otherwise, only the area's name is returned.
  */
-export const getDefaultLabel = (areaName: string, isDefault: boolean, defaultLabel: string): string =>
-  areaName === OTHER_AREAS ? OTHER_AREAS_LABEL : isDefault ? `${areaName} (${defaultLabel})` : areaName;
+export const getDefaultLabel = (areaName: string): string => (areaName === OTHER_AREAS ? OTHER_AREAS_LABEL : areaName);
 
 /**
  * Create row data for a trajectory with error status
@@ -83,7 +80,7 @@ export const buildErrorTrajectory = (
 });
 
 /**
- * Remove duplicate within an array of data base trajectory
+ * Remove duplicate within an array of database trajectory
  * @param {DbTrajectory[] | null} array
  * @return {DbTrajectory[]}
  */
@@ -135,7 +132,7 @@ export const buildRowData = (areaName: string, isDefault: boolean, trajectory?: 
 });
 
 /**
- * Create empty data base trajectory
+ * Create empty database trajectory
  * @param {string} area
  * @param {TRAJECTORY_TYPE} type
  * @param {string} technology
@@ -166,7 +163,6 @@ export const buildEmptyTrajectory = (area: string, type: TRAJECTORY_TYPE, techno
  */
 export const buildRowWithSubRowsData = (
   trajectory: DbTrajectory,
-  defaultLabel: string,
   defaultAreas?: {
     name: string;
   }[],
@@ -175,7 +171,7 @@ export const buildRowWithSubRowsData = (
 ): HypothesisRowData => {
   const isDefault = defaultAreas?.some((item: { name: string }) => item.name === trajectory.area) ?? false;
   return {
-    hypothesis: getDefaultLabel(trajectory.area ?? '', isDefault, defaultLabel),
+    hypothesis: getDefaultLabel(trajectory.area ?? ''),
     trajectory: trajectory.trajectoryName && !trajectory?.technology ? trajectory : null,
     status:
       trajectory.trajectoryName && !trajectory?.technology
@@ -246,7 +242,6 @@ export const buildDefaultEmptyTrajectoryList = (
  * @param {{ name: string }[] | undefined} defaultAreas - An optional array of default area objects, where each object
  *                                                       contains a name field that specifies a default area.
  *
- * @param defaultLabel
  * @returns {HypothesisRowData[]} An array of hypothesis row objects, each containing trajectory details,
  *                                technology-specific sub-rows, and metadata like status and default indicators.
  */
@@ -254,7 +249,6 @@ export const convertIntoHypothesisRowWithTechnologies = (
   data: DbTrajectory[],
   areasNotInTrajectoryArea: string[],
   defaultAreas: { name: string }[] | undefined,
-  defaultLabel: string,
 ): HypothesisRowData[] => {
   const groupedByArea: Record<string, DbTrajectory[]> = data.reduce(
     (acc, item) => {
@@ -288,7 +282,7 @@ export const convertIntoHypothesisRowWithTechnologies = (
 
     const isDefault = defaultAreas?.some((item: { name: string }) => item.name === mainEntry?.area) ?? false;
     return {
-      hypothesis: getDefaultLabel(area, isDefault, defaultLabel),
+      hypothesis: getDefaultLabel(area),
       trajectory: mainEntry?.trajectoryName ? mainEntry : null,
       status:
         mainEntry?.trajectoryName && !mainEntry?.technology
@@ -405,21 +399,16 @@ export const getRowDataSelected = (data: HypothesisRowData[], indexArray: number
  * @param {HypothesisRowData[]} data
  * @return {{area: string, technology: string}}
  */
-export const getAreaTrajectoryName = (
-  rowIdSelected: string,
-  data: HypothesisRowData[],
-): { area: string; technology: string } => {
+export const getAreaTrajectoryName = (rowIdSelected: string, data: HypothesisRowData[]): string => {
   const [mainIndex, subIndex] = rowIdSelected.split('.').map(Number);
 
   const mainRow = data[mainIndex];
+  if (!mainRow) return '';
 
   const subRow = mainRow.subRows?.[subIndex];
-  const technologyName = subRow?.hypothesis ? subRow.hypothesis : '';
+  const technologyName = subRow?.hypothesis ? ` - ${subRow.hypothesis}` : '';
 
-  return {
-    area: mainRow.hypothesis ?? '',
-    technology: technologyName,
-  };
+  return `${mainRow.hypothesis ?? ''}${technologyName}`;
 };
 
 /**
@@ -555,11 +544,10 @@ export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE): string | null 
  * Determines the area name according to the trajectory type and the hypothesis
  * @param {TRAJECTORY_TYPE} type
  * @param {string} hypothesis
- * @param {string} defaultLabel
  * @return {string}
  */
-export const getQueryParamAreaValue = (type: TRAJECTORY_TYPE, hypothesis: string, defaultLabel: string): string => {
-  let area = hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : hypothesis?.replace(`(${defaultLabel})`, '');
+export const getQueryParamAreaValue = (type: TRAJECTORY_TYPE, hypothesis: string): string => {
+  let area = hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : hypothesis;
   if (type === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
     area = hypothesis?.includes('FR') ? 'FR' : OTHER_AREAS;
   }

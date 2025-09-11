@@ -117,7 +117,7 @@ describe('handleFetchTrajectoriesFS', () => {
     const rowId = 'row-123';
     const hypothesis = 'Hypothesis X';
 
-    await handleFetchTrajectoriesFS(type, rowId, setOptionsFS, setRowIdSelected, toggleModal, 'default', hypothesis);
+    await handleFetchTrajectoriesFS(type, rowId, setOptionsFS, setRowIdSelected, toggleModal, hypothesis);
 
     expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith(type, '', hypothesis);
     expect(formFormatter.convertToFSSelectionOptionType).toHaveBeenCalledWith(mockResults);
@@ -140,15 +140,7 @@ describe('handleFetchTrajectoriesFS', () => {
     const type = TRAJECTORY_TYPE.LOAD;
     const rowId = 'row-123';
 
-    await handleFetchTrajectoriesFS(
-      type,
-      rowId,
-      setOptionsFS,
-      setRowIdSelected,
-      toggleModal,
-      'default',
-      OTHER_AREAS_LABEL,
-    );
+    await handleFetchTrajectoriesFS(type, rowId, setOptionsFS, setRowIdSelected, toggleModal, OTHER_AREAS_LABEL);
 
     expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith(type, '', OTHER_AREAS);
     expect(formFormatter.convertToFSSelectionOptionType).toHaveBeenCalledWith(mockResults);
@@ -172,7 +164,7 @@ describe('handleFetchTrajectoriesFS', () => {
     const rowId = 'row-123';
     const hypothesis = 'FR Default';
 
-    await handleFetchTrajectoriesFS(type, rowId, setOptionsFS, setRowIdSelected, toggleModal, 'default', hypothesis);
+    await handleFetchTrajectoriesFS(type, rowId, setOptionsFS, setRowIdSelected, toggleModal, hypothesis);
 
     expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith(type, '', 'FR');
     expect(formFormatter.convertToFSSelectionOptionType).toHaveBeenCalledWith(mockResults);
@@ -196,7 +188,7 @@ describe('handleFetchTrajectoriesFS', () => {
     const rowId = 'row-123';
     const hypothesis = 'CZ';
 
-    await handleFetchTrajectoriesFS(type, rowId, setOptionsFS, setRowIdSelected, toggleModal, 'default', hypothesis);
+    await handleFetchTrajectoriesFS(type, rowId, setOptionsFS, setRowIdSelected, toggleModal, hypothesis);
 
     expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith(type, '', OTHER_AREAS);
     expect(formFormatter.convertToFSSelectionOptionType).toHaveBeenCalledWith(mockResults);

@@ -188,7 +188,7 @@ describe('useFetchTrajectoriesLinked', () => {
       });
       expect(result.current.hypothesisTrajectories).toEqual([
         {
-          hypothesis: 'FR (Default)',
+          hypothesis: 'FR',
           isDefault: true,
           status: TRAJECTORY_SELECTION_STATUS.MISSING,
           subRows: null,
@@ -283,7 +283,7 @@ describe('useFetchTrajectoriesLinked', () => {
       });
       expect(result.current.hypothesisTrajectories).toEqual([
         {
-          hypothesis: 'FR (Default)',
+          hypothesis: 'FR',
           isDefault: true,
           status: TRAJECTORY_SELECTION_STATUS.MISSING,
           subRows: null,
@@ -359,7 +359,7 @@ describe('useFetchTrajectoriesLinked', () => {
       });
       expect(result.current.hypothesisTrajectories).toEqual([
         {
-          hypothesis: 'BE (Default)',
+          hypothesis: 'BE',
           isDefault: true,
           status: TRAJECTORY_SELECTION_STATUS.OK,
           subRows: null,
@@ -375,7 +375,7 @@ describe('useFetchTrajectoriesLinked', () => {
           },
         },
         {
-          hypothesis: 'FR (Default)',
+          hypothesis: 'FR',
           isDefault: true,
           status: TRAJECTORY_SELECTION_STATUS.MISSING,
           subRows: null,

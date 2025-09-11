@@ -46,11 +46,10 @@ export const handleFetchTrajectoriesFS = async (
   setOptionsFS: Dispatch<SetStateAction<SelectOption[] | undefined>>,
   setRowIdSelected: Dispatch<SetStateAction<string>>,
   toggleModal: () => void,
-  defaultLabel: string,
   hypothesis?: string,
 ): Promise<void> => {
   try {
-    const area = hypothesis ? getQueryParamAreaValue(type, hypothesis, defaultLabel) : '';
+    const area = hypothesis ? getQueryParamAreaValue(type, hypothesis) : '';
     const results = await fetchTrajectoriesFromFS(type, '', area);
     setOptionsFS(convertToFSSelectionOptionType(results));
     setRowIdSelected(rowId);
