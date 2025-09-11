@@ -162,6 +162,7 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
                 setOptionsFS,
                 setRowIdSelected,
                 toggleModal,
+                t('studyDetails.@default'),
                 data[Number(rowId)]?.hypothesis,
               );
             }}

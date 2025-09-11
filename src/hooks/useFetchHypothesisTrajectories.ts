@@ -97,7 +97,12 @@ export const useFetchHypothesisTrajectories = (
                 )
               : arrayWithoutDuplicate
                   .map((trajectory) =>
-                    buildRowWithSubRowsData(trajectory, defaultAreas, defaultAreaListNotIncludedInList, null),
+                    buildRowWithSubRowsData(
+                      trajectory,
+                      defaultAreas,
+                      defaultAreaListNotIncludedInList,
+                      null,
+                    ),
                   )
                   .filter(Boolean);
           const dataTrajectories = sortWithFixedPosition(areaData);

@@ -170,6 +170,7 @@ export const buildEmptyTrajectory = (area: string, type: TRAJECTORY_TYPE, techno
  */
 export const buildRowWithSubRowsData = (
   trajectory: DbTrajectory,
+  defaultLabel: string,
   defaultAreas?: {
     name: string;
   }[],
@@ -286,6 +287,7 @@ export const buildDefaultEmptyTrajectoryList = (
  * @param {{ name: string }[] | undefined} defaultAreas - An optional array of default area objects, where each object
  *                                                       contains a name field that specifies a default area.
  *
+ * @param defaultLabel
  * @returns {HypothesisRowData[]} An array of hypothesis row objects, each containing trajectory details,
  *                                technology-specific sub-rows, and metadata like status and default indicators.
  */
@@ -293,6 +295,7 @@ export const convertIntoHypothesisRowWithTechnologies = (
   data: DbTrajectory[],
   areasNotInTrajectoryArea: string[],
   defaultAreas: { name: string }[] | undefined,
+  defaultLabel: string,
 ): HypothesisRowData[] => {
   const groupedByArea: Record<string, DbTrajectory[]> = data.reduce(
     (acc, item) => {
@@ -541,49 +544,6 @@ export const getChildrenList = (row: Row<HypothesisRowData>): string[] =>
         }
       }, [])
     : [];
-
-/**
- * Determines the trajectory type based on the provided index value.
- *
- * @param {number} index - The index representing a specific trajectory type.
- * @returns {TRAJECTORY_TYPE} - The trajectory type corresponding to the index provided.
- *                              Returns `TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER` for index 1,
- *                              `TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER` for index 2,
- *                              and `TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER` for index 0 or any other value.
- */
-export const getTrajectoryTypeByIndex = (index: number): TRAJECTORY_TYPE => {
-  switch (index) {
-    case 1:
-      return TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER;
-    case 2:
-      return TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER;
-    case 0:
-    default:
-      return TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER;
-  }
-};
-
-/**
- * Determines the file path based on the trajectory type.
- *
- * @param {TRAJECTORY_TYPE} type - The trajectory type used to select the corresponding file path.
- * @returns {string | null} The file path associated with the given trajectory type.
- */
-export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE): string | null => {
-  switch (type) {
-    case TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER:
-      return '\\\\thermal\\economic parameters\\economic';
-    case TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER:
-      return '\\\\thermal\\economic parameters\\costs';
-    case TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER:
-      return '\\\\thermal\\technical parameters\\param_modulation';
-    case TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER:
-    case TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER:
-      return '\\\\thermal\\technical parameters';
-    default:
-      return null;
-  }
-};
 
 /**
  * Determines the trajectory type based on the provided index value.

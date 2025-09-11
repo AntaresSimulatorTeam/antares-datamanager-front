@@ -118,7 +118,7 @@ describe('handleFetchTrajectoriesFS', () => {
     const rowId = 'row-123';
     const hypothesis = 'Hypothesis X';
 
-    await handleFetchTrajectoriesFS(type, rowId, setOptionsFS, setRowIdSelected, toggleModal, hypothesis);
+    await handleFetchTrajectoriesFS(type, rowId, setOptionsFS, setRowIdSelected, toggleModal, 'default', hypothesis);
 
     expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith(type, '', hypothesis);
     expect(formFormatter.convertToFSSelectionOptionType).toHaveBeenCalledWith(mockResults);
