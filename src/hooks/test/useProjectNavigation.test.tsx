@@ -55,10 +55,10 @@ describe('useProjectNavigation', () => {
     expectTypeOf(result.current.navigateToProject).toBeFunction();
 
     await waitFor(() => {
-      void result.current.navigateToProject('project123', 'projectName');
+      void result.current.navigateToProject('project123');
     });
 
-    expect(mockNavigate).toHaveBeenCalledWith(`/project/${encodeURIComponent('projectName')}`, {
+    expect(mockNavigate).toHaveBeenCalledWith(`/project/${encodeURIComponent('project123')}`, {
       state: { projectId: 'project123' },
     });
   });
@@ -79,7 +79,7 @@ describe('useProjectNavigation', () => {
     expectTypeOf(result.current.navigateToProject).toBeFunction();
 
     await waitFor(() => {
-      void result.current.navigateToProject('project123', 'projectName');
+      void result.current.navigateToProject('project123');
     });
 
     expect(mockNavigate).toHaveBeenCalledWith('/', {

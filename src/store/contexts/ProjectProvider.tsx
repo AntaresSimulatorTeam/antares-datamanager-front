@@ -6,7 +6,7 @@
 
 import { ReactNode, Reducer, useReducer } from 'react';
 import { ProjectActionType, ProjectState } from '@/shared/types/Project.type.ts';
-import projectReducer from '@/store/reducers/projectReducer';
+import { projectReducer } from '@/store/reducers/projectReducer';
 import { ProjectContext, ProjectDispatchContext } from '@/store/contexts/ProjectContext';
 
 export interface ProjectProviderProps {

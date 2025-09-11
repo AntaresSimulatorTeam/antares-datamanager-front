@@ -29,7 +29,7 @@ export const VARIANT_CLASSES = {
     outlined: 'bg-gray-w hover:bg-primary-50 active:bg-primary-100 text-primary-600 border border-primary-600',
     dashed:
       'bg-transparent hover:bg-primary-50 active:bg-primary-100 text-primary-600 border-dashed border border-primary-600',
-    text: 'bg-transparent hover:bg-primary-50 active:bg-primary-100 text-primary-600 border border-primary-600 border-opacity-0',
+    text: 'bg-transparent hover:bg-primary-50 active:bg-primary-100 text-primary-600 border border-primary-600 border-opacity-1',
     transparent:
       'bg-transparent hover:text-primary-700 active:text-primary-900 text-primary-600 border border-transparent',
   },
@@ -45,7 +45,7 @@ export const VARIANT_CLASSES = {
       'text-gray-w bg-error-700 hover:bg-error-800 active:bg-error-900 border border-gray-200 border-opacity-0',
     outlined: 'bg-gray-w hover:bg-error-50 active:bg-error-100 text-error-700 border border-error-700',
     dashed: 'bg-transparent hover:bg-error-50 active:bg-error-100 text-error-700 border-dashed border border-error-700',
-    text: 'bg-transparent hover:bg-error-50 active:bg-error-100 text-error-700 border border-error-700 border-opacity-0',
+    text: 'bg-transparent hover:bg-error-50 active:bg-error-100 text-error-700 border border-error-700 border-opacity-1',
     transparent: 'bg-transparent hover:text-gray-700 active:text-gray-600 text-gray-900 border border-transparent',
   },
 };

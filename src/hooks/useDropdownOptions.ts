@@ -14,15 +14,15 @@ export const NO_WRAP_CLASS = 'whitespace-nowrap';
 export const useDropdownOptions = () => {
   const { t } = useTranslation();
 
-  const settingOption = useCallback(
+  const editOption = useCallback(
     (onClick: () => void, label?: string, disabled?: boolean): RdsDropdownOption =>
       ({
-        key: 'setting',
-        label: label ?? t('project.@setting'),
-        value: 'setting',
+        key: 'edit',
+        label: label ?? t('project.@edit'),
+        value: 'edit',
         onItemClick: onClick,
         disabled,
-        icon: RdsIconId.Settings,
+        icon: RdsIconId.Edit,
         extraClasses: NO_WRAP_CLASS,
       }) as RdsDropdownOption,
     [t],
@@ -56,7 +56,7 @@ export const useDropdownOptions = () => {
   );
 
   return {
-    settingOption,
+    editOption,
     deleteOption,
     pinOption,
   };

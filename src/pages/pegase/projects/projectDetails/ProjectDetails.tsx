@@ -4,91 +4,69 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { ProjectInfo } from '@/shared/types/Project.type.ts';
 import ProjectDetailsHeader from './ProjectDetailsHeader';
 import StudyTableDisplay from '@/pages/pegase/home/components/StudyTableDisplay';
 import SearchBar from '@/pages/pegase/home/components/SearchBar';
 import { useTranslation } from 'react-i18next';
 import { RdsChip, RdsDivider } from 'rte-design-system-react';
-import { fetchProjectDetails } from '@/shared/services/projectService.ts';
 import DetailsContent from '@/components/banner/DetailsContent.tsx';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { LocationProject } from '@/shared/types';
+import { ProjectCreationModal } from '@common/modal/ProjectCreationModal.tsx';
+import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
+import { useGetProjectDetails } from '@/hooks/useGetProjectDetails.ts';
 
 const ProjectDetails = () => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState<string | undefined>('');
   const [activeChip, setActiveChip] = useState<boolean | null>(false);
+  const [reFetchProject, setReFetchProject] = useState(0);
   const { user } = useUser();
-
-  const searchStudy = (value?: string | undefined) => {
-    setSearchTerm(value);
-  };
+  const { isModalOpen, toggleModal } = useNewStudyModal();
+  const location = useLocation();
+  const projectId = (location.state as LocationProject)?.projectId as string | null;
+  const { projectDetails } = useGetProjectDetails(projectId, reFetchProject);
 
   const handleChipClick = () => {
     if (activeChip) {
       setActiveChip(false);
-      searchStudy('');
+      setSearchTerm('');
     } else {
       setActiveChip(true);
-      searchStudy(user?.profile.sub);
+      setSearchTerm(user?.profile.sub);
     }
   };
 
-  const [projectInfo, setProjectDetails] = useState<ProjectInfo>({} as ProjectInfo);
-  const location = useLocation();
-  const projectId = (location.state as LocationProject)?.projectId as string | null;
+  const onCloseModal = () => {
+    toggleModal();
+    setReFetchProject((prev) => prev + 1);
+  };
 
-  useEffect(() => {
-    const getProjectDetails = async (id: string) => {
-      try {
-        const data = await fetchProjectDetails(id);
-
-        setProjectDetails({
-          id: data.id,
-          name: data.name,
-          description: data.description,
-          createdBy: data.createdBy,
-          creationDate: data.creationDate,
-          archived: false,
-          pinned: false,
-          path: '',
-          tags: data.tags,
-          studies: [],
-        });
-      } catch (error) {
-        console.error(`Error retrieving project details: ${id}`, error);
-      }
-    };
-    if (projectId && !projectInfo.id) {
-      void getProjectDetails(projectId);
-    }
-  }, [projectId, projectInfo.id]);
-
-  return !projectInfo.id ? (
+  return !projectDetails.id ? (
     <div className="flex h-screen items-center justify-center">
       <p>{t('projectDetails.@loading')}</p>
     </div>
   ) : (
     <div className="flex flex-col">
-      <ProjectDetailsHeader projectName={projectInfo.name} />
+      <ProjectDetailsHeader projectName={projectDetails.name} />
       <RdsDivider />
       <div className="flex flex-col">
-        <DetailsContent content={projectInfo} />
+        <DetailsContent content={projectDetails} onClickButton={toggleModal} />
       </div>
       <div className="flex flex-col gap-4 p-3">
         <div className="flex items-center gap-4">
-          <SearchBar onSearch={searchStudy} />
+          <SearchBar onSearch={(value?: string) => setSearchTerm(value)} />
           <RdsChip
             label={t('home.@my_studies')}
             onClick={handleChipClick}
             status={activeChip ? 'secondary' : 'primary'}
           />
         </div>
-        <StudyTableDisplay searchStudy={searchTerm} projectId={projectInfo.id} projectInfoName={projectInfo.name} />
+        <StudyTableDisplay searchStudy={searchTerm} projectInfo={projectDetails} />
       </div>
+      {isModalOpen && <ProjectCreationModal onClose={onCloseModal} projectInfo={projectDetails} />}
     </div>
   );
 };

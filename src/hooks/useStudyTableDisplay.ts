@@ -5,7 +5,7 @@
  */
 
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { StudyDTO } from '@/shared/types';
+import { ProjectInfo, StudyDTO } from '@/shared/types';
 import { fetchSearchStudies } from '@/shared/services/studyService.ts';
 
 const ITEMS_PER_PAGE = 12;
@@ -14,7 +14,7 @@ const intervalSize = ITEMS_PER_PAGE;
 
 interface UseStudyTableDisplayProps {
   searchTerm: string | undefined;
-  projectId?: string;
+  projectInfo?: ProjectInfo;
   sortBy: { [key: string]: 'asc' | 'desc' };
   reloadStudies: boolean;
 }
@@ -30,7 +30,7 @@ interface UseStudyTableDisplayReturn {
 
 export const useStudyTableDisplay = ({
   searchTerm,
-  projectId,
+  projectInfo,
   sortBy,
   reloadStudies,
 }: UseStudyTableDisplayProps): UseStudyTableDisplayReturn => {
@@ -48,7 +48,7 @@ export const useStudyTableDisplay = ({
       try {
         const { content, totalElements } = await fetchSearchStudies(
           searchTerm,
-          projectId,
+          projectInfo?.id,
           currentPage,
           intervalSize,
           sortBy,
@@ -60,7 +60,7 @@ export const useStudyTableDisplay = ({
       }
     };
     void fetchStudyList();
-  }, [currentPage, searchTerm, projectId, sortBy, reloadStudies]);
+  }, [currentPage, searchTerm, projectInfo, sortBy, reloadStudies]);
 
   return { rows, count, intervalSize, currentPage, setPage: setCurrentPage, error: errorValue };
 };

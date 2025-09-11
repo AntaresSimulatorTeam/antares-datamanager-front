@@ -9,6 +9,7 @@ import { useStudyTableDisplay } from '@/hooks/useStudyTableDisplay';
 import { vi } from 'vitest';
 import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
 import { mockStudyResponse, mockStudyResponse2 } from '@/mocks/data/tests/study.mock.ts';
+import { ProjectInfo } from '@/shared/types';
 
 vi.mock('@/envVariables', () => ({
   getEnvVariables: vi.fn(() => 'https://mockapi.com'),
@@ -85,7 +86,7 @@ describe('useStudyTableDisplay', () => {
     const { result } = renderHook(() =>
       useStudyTableDisplay({
         searchTerm: 'study1',
-        projectId: 'projectId',
+        projectInfo: { id: 'projectId' } as ProjectInfo,
         sortBy: { status: 'desc' },
         reloadStudies: true,
       }),
