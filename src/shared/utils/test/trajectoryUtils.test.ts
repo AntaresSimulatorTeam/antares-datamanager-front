@@ -12,6 +12,7 @@ import {
   getDefaultLabel,
   getHypothesis,
   getPathFromTrajectoryType,
+  getQueryParamAreaValue,
   getRowDataSelected,
   getStatus,
   getStudyMenu,
@@ -767,5 +768,32 @@ describe('getDefaultLabel', () => {
   it('should return name when name is OTHER_AREAS even if isDefault is true', () => {
     const result = getDefaultLabel(OTHER_AREAS, true, 'par défaut');
     expect(result).toBe(OTHER_AREAS_LABEL);
+  });
+});
+
+describe('getQueryParamAreaValue', () => {
+  it('should return OTHER_AREAS when hypothesis equals OTHER_AREAS_LABEL', () => {
+    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD, OTHER_AREAS_LABEL, 'label');
+    expect(result).toBe(OTHER_AREAS);
+  });
+
+  it('should remove defaultLabel from hypothesis if type is not THERMAL_CAPACITY', () => {
+    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD, 'Paris (label)', 'label');
+    expect(result).toBe('Paris ');
+  });
+
+  it('should return FR if type is THERMAL_CAPACITY and hypothesis includes FR', () => {
+    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.THERMAL_CAPACITY, 'FR (label)', 'label');
+    expect(result).toBe('FR');
+  });
+
+  it('should return OTHER_AREAS if type is THERMAL_CAPACITY and hypothesis does not include FR', () => {
+    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.THERMAL_CAPACITY, 'DE (label)', 'label');
+    expect(result).toBe(OTHER_AREAS);
+  });
+
+  it('should handle undefined hypothesis gracefully', () => {
+    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD, undefined as unknown as string, 'label');
+    expect(result).toBe('');
   });
 });

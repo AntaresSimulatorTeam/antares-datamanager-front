@@ -1,4 +1,9 @@
-import { buildEmptyTrajectory, buildErrorTrajectory, setNestedData } from '@/shared/utils/trajectoryUtils.ts';
+import {
+  buildEmptyTrajectory,
+  buildErrorTrajectory,
+  getQueryParamAreaValue,
+  setNestedData,
+} from '@/shared/utils/trajectoryUtils.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { notifyAlert } from '@/shared/notification/notification.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
@@ -9,7 +14,6 @@ import { ThermalOptions } from '@/mocks/data/list/names.ts';
 import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
 import { fetchTrajectoriesFromDB, fetchTrajectoriesFromFS } from '@/shared/services/trajectoryService.ts';
 import { convertToFSSelectionOptionType, convertToSelectionOptionType } from '@/shared/utils/formFormatter.ts';
-import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 
 export const handleTrajectoryError = (
   type: TRAJECTORY_TYPE,
@@ -46,10 +50,7 @@ export const handleFetchTrajectoriesFS = async (
   hypothesis?: string,
 ): Promise<void> => {
   try {
-    let area = hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : hypothesis?.replace(`(${defaultLabel})`, '');
-    if (type === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
-      area = hypothesis?.includes('FR') ? 'FR' : OTHER_AREAS;
-    }
+    const area = hypothesis ? getQueryParamAreaValue(type, hypothesis, defaultLabel) : '';
     const results = await fetchTrajectoriesFromFS(type, '', area);
     setOptionsFS(convertToFSSelectionOptionType(results));
     setRowIdSelected(rowId);

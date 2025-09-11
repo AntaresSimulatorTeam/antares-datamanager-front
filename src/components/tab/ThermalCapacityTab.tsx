@@ -139,7 +139,9 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
             handleSearch={async (value: string, rowId: string) => {
               const indexArray = rowId.split('.').map(Number);
               const area =
-                data[indexArray[0]]?.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : data[indexArray[0]]?.hypothesis;
+                data[indexArray[0]]?.hypothesis === OTHER_AREAS_LABEL
+                  ? OTHER_AREAS
+                  : data[indexArray[0]]?.hypothesis.replace(`(${t('studyDetails.@default')})`, '').trim();
               const technology =
                 indexArray?.length > 1 ? data[indexArray[0]]?.subRows?.[indexArray[1]]?.hypothesis : undefined;
               return await handleTrajectorySearch(
@@ -204,7 +206,8 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
             }
           }}
           trajectoryType={TRAJECTORY_TYPE.THERMAL_CAPACITY}
-          area={getAreaTrajectoryName(rowIdSelected, data)}
+          area={getAreaTrajectoryName(rowIdSelected, data)?.area}
+          technology={getAreaTrajectoryName(rowIdSelected, data)?.technology}
         />
       )}
       {isDeletionModalOpen && (

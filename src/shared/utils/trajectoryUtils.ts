@@ -403,18 +403,23 @@ export const getRowDataSelected = (data: HypothesisRowData[], indexArray: number
  * Get a name composed of an area name and a technology name
  * @param {string} rowIdSelected
  * @param {HypothesisRowData[]} data
- * @return {string}
+ * @return {{area: string, technology: string}}
  */
-export const getAreaTrajectoryName = (rowIdSelected: string, data: HypothesisRowData[]): string => {
+export const getAreaTrajectoryName = (
+  rowIdSelected: string,
+  data: HypothesisRowData[],
+): { area: string; technology: string } => {
   const [mainIndex, subIndex] = rowIdSelected.split('.').map(Number);
 
   const mainRow = data[mainIndex];
-  if (!mainRow) return '';
 
   const subRow = mainRow.subRows?.[subIndex];
-  const technologyName = subRow?.hypothesis ? ` - ${subRow.hypothesis}` : '';
+  const technologyName = subRow?.hypothesis ? subRow.hypothesis : '';
 
-  return `${mainRow.hypothesis ?? ''}${technologyName}`;
+  return {
+    area: mainRow.hypothesis ?? '',
+    technology: technologyName,
+  };
 };
 
 /**
@@ -544,4 +549,19 @@ export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE): string | null 
     default:
       return null;
   }
+};
+
+/**
+ * Determines the area name according to the trajectory type and the hypothesis
+ * @param {TRAJECTORY_TYPE} type
+ * @param {string} hypothesis
+ * @param {string} defaultLabel
+ * @return {string}
+ */
+export const getQueryParamAreaValue = (type: TRAJECTORY_TYPE, hypothesis: string, defaultLabel: string): string => {
+  let area = hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : hypothesis?.replace(`(${defaultLabel})`, '');
+  if (type === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
+    area = hypothesis?.includes('FR') ? 'FR' : OTHER_AREAS;
+  }
+  return area ?? '';
 };

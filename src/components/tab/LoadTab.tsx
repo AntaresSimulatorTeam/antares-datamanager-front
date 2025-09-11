@@ -152,7 +152,9 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
             idSelected={String(rowIdSelected)}
             handleSearch={async (value: string, rowId: string) => {
               const area =
-                data[Number(rowId)]?.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : data[Number(rowId)]?.hypothesis;
+                data[Number(rowId)]?.hypothesis === OTHER_AREAS_LABEL
+                  ? OTHER_AREAS
+                  : data[Number(rowId)]?.hypothesis?.replace(`(${t('studyDetails.@default')})`, '').trim();
               return await handleTrajectorySearch(TRAJECTORY_TYPE.LOAD, value, area, setDbTrajectories, study);
             }}
             handleImport={async (rowId: string) => {

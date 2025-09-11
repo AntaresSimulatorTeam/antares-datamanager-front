@@ -7,18 +7,24 @@ import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { fetchTrajectoriesFromFS } from '@/shared/services/trajectoryService.ts';
 import { convertToFSSelectionOptionType } from '@/shared/utils/formFormatter.ts';
 import StdButton from '@common/base/stdButton/StdButton';
-import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
-import { getPathFromTrajectoryType } from '@/shared/utils/trajectoryUtils.ts';
+import { getPathFromTrajectoryType, getQueryParamAreaValue } from '@/shared/utils/trajectoryUtils.ts';
 
 interface ImportTrajectoryModalProps {
   options: SelectOption[] | undefined;
   onClose: (value?: SelectOption) => Promise<void>;
   trajectoryType: TRAJECTORY_TYPE;
   area?: string;
+  technology?: string;
 }
 
-export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, area }: ImportTrajectoryModalProps) => {
+export const ImportTrajectoryModal = ({
+  options,
+  onClose,
+  trajectoryType,
+  area,
+  technology,
+}: ImportTrajectoryModalProps) => {
   const { t } = useTranslation();
   const [trajectorySelected, setTrajectorySelected] = useState<SelectOption | null>(null);
   const path = getPathFromTrajectoryType(trajectoryType);
@@ -37,10 +43,7 @@ export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, area }
     async (searchTerm?: string) => {
       if (!searchTerm && !options?.length) return;
       try {
-        let searchArea = area;
-        if (trajectoryType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
-          searchArea = area?.includes('FR') ? 'FR' : OTHER_AREAS;
-        }
+        const searchArea = area ? getQueryParamAreaValue(trajectoryType, area, t('studyDetails.@default')) : '';
         const results = await fetchTrajectoriesFromFS(trajectoryType, searchTerm, searchArea);
         return convertToFSSelectionOptionType(results);
       } catch (error) {
@@ -54,7 +57,7 @@ export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, area }
     <RdsModal size="small">
       <RdsModal.Title onClose={() => void onClose()} icon="Upload">
         {t('studyDetails.@import_from_file_system', {
-          area,
+          area: `${area} - ${technology}`,
         })}
       </RdsModal.Title>
       <RdsModal.Content>
