@@ -102,12 +102,17 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
             }
           }}
           checkedValues={checkedValues}
+          disabled={isStudyGenerated}
         >
           {areasOptions?.map((area, index) => (
             <div key={`${area.name}`} className="my-1">
               <StdCheckbox
                 key={`nested-${area.name}`}
-                label={area.name}
+                label={
+                  area.name !== OTHER_AREAS && area.isDefault
+                    ? `${area.name} (${t('studyDetails.@default')})`
+                    : area.name
+                }
                 value={area.name}
                 name={''}
                 disabled={area.isDefault}
@@ -154,7 +159,8 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
                 setOptionsFS,
                 setRowIdSelected,
                 toggleModal,
-                data[indexArray[0]]?.hypothesis === 'FR' ? 'FR' : OTHER_AREAS,
+                t('studyDetails.@default'),
+                data[indexArray[0]]?.hypothesis,
               );
             }}
             isReadOnlyEnable={true}

@@ -15,6 +15,7 @@ import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { sortWithFixedPosition } from '@/shared/utils/sortUtils';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { getReadOnlyForGeneratedStudy } from '@/shared/helpers/hypothesisTableHelper.ts';
+import { useTranslation } from 'react-i18next';
 
 export const useFetchHypothesisTrajectories = (
   studyId?: number,
@@ -23,6 +24,7 @@ export const useFetchHypothesisTrajectories = (
   areas?: TrajectoryAreaData[],
   isStudyGenerated?: boolean,
 ) => {
+  const { t } = useTranslation();
   const [hypothesisTrajectories, setHypothesisTrajectories] = useState<HypothesisRowData[]>([]);
   const [areasTrajectoryOptions, setAreasTrajectoryOptions] = useState<CheckBoxData[] | undefined>([]);
   const [dropDownListOptions, setDropDownListOptions] = useState<string[] | undefined>([]);
@@ -97,10 +99,17 @@ export const useFetchHypothesisTrajectories = (
                   arrayWithoutDuplicate,
                   defaultAreaListNotIncludedInList,
                   defaultAreas,
+                  t('studyDetails.@default'),
                 )
               : arrayWithoutDuplicate
                   .map((trajectory) =>
-                    buildRowWithSubRowsData(trajectory, defaultAreas, defaultAreaListNotIncludedInList, null),
+                    buildRowWithSubRowsData(
+                      trajectory,
+                      t('studyDetails.@default'),
+                      defaultAreas,
+                      defaultAreaListNotIncludedInList,
+                      null,
+                    ),
                   )
                   .filter(Boolean);
           const dataTrajectories = sortWithFixedPosition(areaData);
@@ -117,7 +126,7 @@ export const useFetchHypothesisTrajectories = (
         console.error('Error when fetching areas');
       }
     },
-    [defaultAreas, emptyAreaSelected, dispatch, areas, isStudyGenerated],
+    [defaultAreas, emptyAreaSelected, dispatch, areas, t, isStudyGenerated],
   );
 
   useEffect(() => {

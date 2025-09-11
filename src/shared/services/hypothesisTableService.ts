@@ -9,6 +9,7 @@ import { ThermalOptions } from '@/mocks/data/list/names.ts';
 import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
 import { fetchTrajectoriesFromDB, fetchTrajectoriesFromFS } from '@/shared/services/trajectoryService.ts';
 import { convertToFSSelectionOptionType, convertToSelectionOptionType } from '@/shared/utils/formFormatter.ts';
+import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 
 export const handleTrajectoryError = (
   type: TRAJECTORY_TYPE,
@@ -41,10 +42,15 @@ export const handleFetchTrajectoriesFS = async (
   setOptionsFS: Dispatch<SetStateAction<SelectOption[] | undefined>>,
   setRowIdSelected: Dispatch<SetStateAction<string>>,
   toggleModal: () => void,
+  defaultLabel: string,
   hypothesis?: string,
 ): Promise<void> => {
   try {
-    const results = await fetchTrajectoriesFromFS(type, '', hypothesis);
+    let area = hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : hypothesis?.replace(`(${defaultLabel})`, '');
+    if (type === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
+      area = hypothesis?.includes('FR') ? 'FR' : OTHER_AREAS;
+    }
+    const results = await fetchTrajectoriesFromFS(type, '', area);
     setOptionsFS(convertToFSSelectionOptionType(results));
     setRowIdSelected(rowId);
     toggleModal();

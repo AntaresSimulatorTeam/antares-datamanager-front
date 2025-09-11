@@ -19,8 +19,7 @@ import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { getAreaTrajectoryName, getTrajectoryTypeByIndex } from '@/shared/utils/trajectoryUtils.ts';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { handleFetchTrajectoriesFS } from '@/shared/services/hypothesisTableService.ts';
-import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
-import { getDefaultLabel } from '@/shared/utils/trajectoryUtils.ts';
+import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
 
 interface ParametersTabProps {
   defaultAreas: { name: string }[];
@@ -97,6 +96,24 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
     setHypothesis();
   }, [areas, areasTrajectoryOptions, defaultAreas, dropDownListOptions, hypothesisTrajectories, readOnlyRow, t]);
 
+  const setTechnicalParamData = (updatedData: HypothesisRowData[]) => {
+    setTechnicalData((prev) => [
+      ...prev.map((item) => {
+        if (item?.subRows?.length) {
+          return {
+            hypothesis: t('thermal.@specific'),
+            trajectory: null,
+            status: TRAJECTORY_SELECTION_STATUS.MISSING,
+            isDefault: true,
+            subRows: sortWithFixedPosition(updatedData) || null,
+          };
+        } else {
+          return item;
+        }
+      }),
+    ]);
+  };
+
   const addRow = (value: string) => {
     const newRow: HypothesisRowData = {
       hypothesis: value,
@@ -109,21 +126,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
       ? sortWithFixedPosition([...technicalData[0].subRows, newRow])
       : [newRow];
 
-    setTechnicalData((prev) => [
-      ...prev.map((item) => {
-        if (item.hypothesis === t('thermal.@specific')) {
-          return {
-            hypothesis: t('thermal.@specific'),
-            trajectory: null,
-            status: TRAJECTORY_SELECTION_STATUS.MISSING,
-            isDefault: true,
-            subRows: sortWithFixedPosition(newTechnicalDataSubRow) || null,
-          };
-        } else {
-          return item;
-        }
-      }),
-    ]);
+    setTechnicalParamData(newTechnicalDataSubRow);
   };
 
   const removeRow = (value: string) => {
@@ -132,21 +135,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
       ? technicalData[0].subRows?.filter((itemData) => itemData.hypothesis !== value)
       : [];
 
-    setTechnicalData((prev) => [
-      ...prev.map((item) => {
-        if (item.hypothesis === t('thermal.@specific')) {
-          return {
-            hypothesis: t('thermal.@specific'),
-            trajectory: null,
-            status: TRAJECTORY_SELECTION_STATUS.MISSING,
-            isDefault: true,
-            subRows: sortWithFixedPosition(newTechnicalDataSubRow) || null,
-          };
-        } else {
-          return item;
-        }
-      }),
-    ]);
+    setTechnicalParamData(newTechnicalDataSubRow);
   };
 
   const handleSelectionChange = (value: string, isChecked: boolean) => {
@@ -174,7 +163,11 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
             <div key={`${index}-${area.name}`} className="my-1">
               <StdCheckbox
                 key={`parameter-checkbox-${area.name}`}
-                label={getDefaultLabel(area, t('studyDetails.@default'))}
+                label={
+                  area.name !== OTHER_AREAS && area.isDefault
+                    ? `${area.name} (${t('studyDetails.@default')})`
+                    : area.name
+                }
                 value={area.name}
                 name={''}
                 disabled={area.isDefault}
@@ -208,7 +201,8 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
               setOptionsFS,
               setRowIdSelected,
               toggleModal,
-              area === OTHER_AREAS_LABEL ? OTHER_AREAS : area?.replace(t('studyDetails.@default'), ''),
+              t('studyDetails.@default'),
+              area,
             );
           }}
           isReadOnlyEnable={true}

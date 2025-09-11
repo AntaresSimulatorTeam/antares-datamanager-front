@@ -1,11 +1,4 @@
-import {
-  CheckBoxData,
-  DbTrajectory,
-  HypothesisRowData,
-  HypothesisTab,
-  RowStatus,
-  WarningMessage,
-} from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, HypothesisTab, RowStatus, WarningMessage } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { FileInputStatus } from 'rte-design-system-react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
@@ -49,6 +42,19 @@ export const getBgColor = (status?: FileInputStatus) => {
       return 'bg-gray-600';
   }
 };
+
+/**
+ * Generates the default label for a given area.
+ *
+ * @function
+ * @param {string} areaName - The name of the area.
+ * @param {boolean} isDefault - The area is a default one
+ * @param {string} defaultLabel - The label to append if the area is marked as default and meets the condition.
+ * @returns {string} The generated label for the area. If the area is the default and its name does not
+ * match `OTHER_AREAS`, the label will include the area's name and the default label. Otherwise, only the area's name is returned.
+ */
+export const getDefaultLabel = (areaName: string, isDefault: boolean, defaultLabel: string): string =>
+  areaName === OTHER_AREAS ? OTHER_AREAS_LABEL : isDefault ? `${areaName} (${defaultLabel})` : areaName;
 
 /**
  * Create row data for a trajectory with error status
@@ -151,6 +157,7 @@ export const buildEmptyTrajectory = (area: string, type: TRAJECTORY_TYPE, techno
  * Generates row data with optional sub-rows based on a trajectory and associated options.
  *
  * @param {DbTrajectory} trajectory - The trajectory object containing load area and other properties.
+ * @param defaultLabel
  * @param {string[]} subRowOptions - An array of sub-row options to be considered for sub-rows.
  * @param {{name: string}[]} [defaultAreas] - An optional array of default areas used to check if a trajectory is default.
  * @param {string[]} [areasNotInTrajectoryArea] - An optional array of area names not included in the trajectory's area.
@@ -159,34 +166,37 @@ export const buildEmptyTrajectory = (area: string, type: TRAJECTORY_TYPE, techno
  */
 export const buildRowWithSubRowsData = (
   trajectory: DbTrajectory,
+  defaultLabel: string,
   defaultAreas?: {
     name: string;
   }[],
   areasNotInTrajectoryArea?: string[],
   subRowOptions?: string[] | null,
-): HypothesisRowData => ({
-  hypothesis: trajectory.area === OTHER_AREAS ? OTHER_AREAS_LABEL : (trajectory.area as string),
-  trajectory: trajectory.trajectoryName && !trajectory?.technology ? trajectory : null,
-  status:
-    trajectory.trajectoryName && !trajectory?.technology
-      ? TRAJECTORY_SELECTION_STATUS.OK
-      : TRAJECTORY_SELECTION_STATUS.MISSING,
-  isDefault:
-    defaultAreas?.some((item: { name: string }) => item.name === trajectory.area) || OTHER_AREAS === trajectory.area,
-  subRows:
-    trajectory.area !== OTHER_AREAS && !areasNotInTrajectoryArea?.some((item) => item === trajectory.area)
-      ? subRowOptions?.map((option) => {
-          const hasTechnology = trajectory?.trajectoryName && option === trajectory?.technology;
-          return {
-            hypothesis: option,
-            trajectory: hasTechnology ? trajectory : null,
-            status: hasTechnology ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
-            isDefault: true,
-            subRows: null,
-          };
-        })
-      : null,
-});
+): HypothesisRowData => {
+  const isDefault = defaultAreas?.some((item: { name: string }) => item.name === trajectory.area) ?? false;
+  return {
+    hypothesis: getDefaultLabel(trajectory.area ?? '', isDefault, defaultLabel),
+    trajectory: trajectory.trajectoryName && !trajectory?.technology ? trajectory : null,
+    status:
+      trajectory.trajectoryName && !trajectory?.technology
+        ? TRAJECTORY_SELECTION_STATUS.OK
+        : TRAJECTORY_SELECTION_STATUS.MISSING,
+    isDefault: isDefault || OTHER_AREAS === trajectory.area,
+    subRows:
+      trajectory.area !== OTHER_AREAS && !areasNotInTrajectoryArea?.some((item) => item === trajectory.area)
+        ? subRowOptions?.map((option) => {
+            const hasTechnology = trajectory?.trajectoryName && option === trajectory?.technology;
+            return {
+              hypothesis: option,
+              trajectory: hasTechnology ? trajectory : null,
+              status: hasTechnology ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+              isDefault: true,
+              subRows: null,
+            };
+          })
+        : null,
+  };
+};
 
 /**
  * Determines if a given area is linked to any trajectory with an empty technology field in the provided trajectory list.
@@ -236,6 +246,7 @@ export const buildDefaultEmptyTrajectoryList = (
  * @param {{ name: string }[] | undefined} defaultAreas - An optional array of default area objects, where each object
  *                                                       contains a name field that specifies a default area.
  *
+ * @param defaultLabel
  * @returns {HypothesisRowData[]} An array of hypothesis row objects, each containing trajectory details,
  *                                technology-specific sub-rows, and metadata like status and default indicators.
  */
@@ -243,6 +254,7 @@ export const convertIntoHypothesisRowWithTechnologies = (
   data: DbTrajectory[],
   areasNotInTrajectoryArea: string[],
   defaultAreas: { name: string }[] | undefined,
+  defaultLabel: string,
 ): HypothesisRowData[] => {
   const groupedByArea: Record<string, DbTrajectory[]> = data.reduce(
     (acc, item) => {
@@ -274,16 +286,15 @@ export const convertIntoHypothesisRowWithTechnologies = (
           })
         : null;
 
+    const isDefault = defaultAreas?.some((item: { name: string }) => item.name === mainEntry?.area) ?? false;
     return {
-      hypothesis: area === OTHER_AREAS ? OTHER_AREAS_LABEL : area,
+      hypothesis: getDefaultLabel(area, isDefault, defaultLabel),
       trajectory: mainEntry?.trajectoryName ? mainEntry : null,
       status:
         mainEntry?.trajectoryName && !mainEntry?.technology
           ? TRAJECTORY_SELECTION_STATUS.OK
           : TRAJECTORY_SELECTION_STATUS.MISSING,
-      isDefault:
-        defaultAreas?.some((item: { name: string }) => item.name === mainEntry?.area) ||
-        OTHER_AREAS === mainEntry?.area,
+      isDefault: isDefault || OTHER_AREAS === mainEntry?.area,
       subRows: subRows?.length ? subRows : null,
     };
   });
@@ -367,8 +378,17 @@ export const getStudyMenu = (t: (value: string) => string, isTrajectoryAreaLinke
   { name: TRAJECTORY_TYPE.MISC, label: t('studyDetails.@misc'), icon: StdIconId.Category, isDisabled: true },
 ];
 
-export const isMatchingTrajectoryType = (trajectoryKey: TRAJECTORY_TYPE) => (trajectoryType: TRAJECTORY_TYPE) =>
-  trajectoryType === trajectoryKey;
+/**
+ * A higher-order function that checks if a given trajectory type matches a specified trajectory key.
+ *
+ * @param {TRAJECTORY_TYPE} trajectoryKey - The key representing the trajectory type to match.
+ * @returns {function(TRAJECTORY_TYPE): boolean} A function that takes a trajectory type and returns `true`
+ * if it matches the trajectory key, otherwise returns `false`.
+ */
+export const isMatchingTrajectoryType =
+  (trajectoryKey: TRAJECTORY_TYPE): ((arg0: TRAJECTORY_TYPE) => boolean) =>
+  (trajectoryType: TRAJECTORY_TYPE) =>
+    trajectoryType === trajectoryKey;
 
 /**
  * Select data row according to index array provided
@@ -525,17 +545,3 @@ export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE): string | null 
       return null;
   }
 };
-
-/**
- * Generates the default label for a given area.
- *
- * @function
- * @param {Object} area - The area object containing name and default status.
- * @param {string} area.name - The name of the area.
- * @param {boolean} area.isDefault - Indicates whether the area is the default area.
- * @param {string} defaultLabel - The label to append if the area is marked as default and meets the condition.
- * @returns {string} The generated label for the area. If the area is the default and its name does not
- * match `OTHER_AREAS`, the label will include the area's name and the default label. Otherwise, only the area's name is returned.
- */
-export const getDefaultLabel = (area: CheckBoxData, defaultLabel: string): string =>
-  area.isDefault && area.name !== OTHER_AREAS ? `${area.name} (${defaultLabel})` : area.name;

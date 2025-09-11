@@ -34,7 +34,7 @@ import {
   mockRowDataTrajectoryC,
 } from '@/mocks/data/tests/trajectory.mock.ts';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
-import { CheckBoxData, DbTrajectory, HypothesisRowData, HypothesisTab } from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, HypothesisTab } from '@/shared/types';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { Row } from '@tanstack/react-table';
 
@@ -197,7 +197,7 @@ describe('buildRowWithSubRowsData', () => {
   it('returns correct data when loadArea is OTHER_AREAS', () => {
     const trajectory = { area: OTHER_AREAS, technology: '', trajectoryName: 'name' } as DbTrajectory;
 
-    const result = buildRowWithSubRowsData(trajectory, [], [], subRowOptions);
+    const result = buildRowWithSubRowsData(trajectory, 'Default', [], [], subRowOptions);
 
     expect(result).toEqual({
       hypothesis: OTHER_AREAS_LABEL,
@@ -212,10 +212,10 @@ describe('buildRowWithSubRowsData', () => {
     const trajectory = { area: 'Zone 1', trajectoryName: 'T1', technology: '' } as DbTrajectory;
     const defaultAreas = [{ name: 'Zone 1' }];
 
-    const result = buildRowWithSubRowsData(trajectory, defaultAreas, [], subRowOptions);
+    const result = buildRowWithSubRowsData(trajectory, 'Default', defaultAreas, [], subRowOptions);
 
     expect(result).toEqual({
-      hypothesis: 'Zone 1',
+      hypothesis: 'Zone 1 (Default)',
       trajectory,
       status: TRAJECTORY_SELECTION_STATUS.OK,
       isDefault: true,
@@ -241,7 +241,7 @@ describe('buildRowWithSubRowsData', () => {
   it('returns correct data when trajectory has name and technology', () => {
     const trajectory = { area: 'Zone 1', trajectoryName: 'T1', technology: 'Option A' } as DbTrajectory;
 
-    const result = buildRowWithSubRowsData(trajectory, [], [], subRowOptions);
+    const result = buildRowWithSubRowsData(trajectory, 'Default', [], [], subRowOptions);
 
     expect(result).toEqual({
       hypothesis: 'Zone 1',
@@ -271,7 +271,7 @@ describe('buildRowWithSubRowsData', () => {
     const trajectory = { area: 'Zone 2' } as DbTrajectory;
     const areasNotInTrajectoryArea = ['Zone 2'];
 
-    const result = buildRowWithSubRowsData(trajectory, undefined, areasNotInTrajectoryArea, subRowOptions);
+    const result = buildRowWithSubRowsData(trajectory, 'Default', undefined, areasNotInTrajectoryArea, subRowOptions);
 
     expect(result.subRows).toBeNull();
   });
@@ -280,7 +280,7 @@ describe('buildRowWithSubRowsData', () => {
     const trajectory = { area: 'Zone 3' } as DbTrajectory;
     const defaultAreas = [{ name: 'Zone 1' }];
 
-    const result = buildRowWithSubRowsData(trajectory, defaultAreas, [], subRowOptions);
+    const result = buildRowWithSubRowsData(trajectory, 'Default', defaultAreas, [], subRowOptions);
 
     expect(result.isDefault).toBe(false);
   });
@@ -755,20 +755,12 @@ describe('getPathFromTrajectoryType', () => {
 
 describe('getDefaultLabel', () => {
   it('should append defaultLabel when isDefault is true and name is not OTHER_AREAS', () => {
-    const area: CheckBoxData = { name: 'Zone A', isDefault: true };
-    const result = getDefaultLabel(area, 'par défaut');
+    const result = getDefaultLabel('Zone A', true, 'par défaut');
     expect(result).toBe('Zone A (par défaut)');
   });
 
-  it('should return name when isDefault is false', () => {
-    const area: CheckBoxData = { name: 'Zone B', isDefault: false };
-    const result = getDefaultLabel(area, 'par défaut');
-    expect(result).toBe('Zone B');
-  });
-
   it('should return name when name is OTHER_AREAS even if isDefault is true', () => {
-    const area: CheckBoxData = { name: OTHER_AREAS, isDefault: true };
-    const result = getDefaultLabel(area, 'par défaut');
-    expect(result).toBe(OTHER_AREAS);
+    const result = getDefaultLabel(OTHER_AREAS, true, 'par défaut');
+    expect(result).toBe(OTHER_AREAS_LABEL);
   });
 });
