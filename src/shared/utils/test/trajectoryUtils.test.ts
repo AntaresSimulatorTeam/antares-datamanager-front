@@ -200,7 +200,7 @@ describe('buildRowWithSubRowsData', () => {
   it('returns correct data when area is OTHER_AREAS', () => {
     const trajectory = { area: OTHER_AREAS, technology: '', trajectoryName: 'name' } as DbTrajectory;
 
-    const result = buildRowWithSubRowsData(trajectory, 'Default', [], [], subRowOptions);
+    const result = buildRowWithSubRowsData(trajectory, [], [], subRowOptions);
 
     expect(result).toEqual({
       hypothesis: OTHER_AREAS_LABEL,
@@ -231,10 +231,10 @@ describe('buildRowWithSubRowsData', () => {
     const trajectory = { area: 'Zone 1', trajectoryName: 'T1', technology: '' } as DbTrajectory;
     const defaultAreas = [{ name: 'Zone 1' }];
 
-    const result = buildRowWithSubRowsData(trajectory, 'Default', defaultAreas, [], subRowOptions);
+    const result = buildRowWithSubRowsData(trajectory, defaultAreas, [], subRowOptions);
 
     expect(result).toEqual({
-      hypothesis: 'Zone 1 (Default)',
+      hypothesis: 'Zone 1',
       trajectory,
       status: TRAJECTORY_SELECTION_STATUS.OK,
       isDefault: true,
@@ -263,7 +263,7 @@ describe('buildRowWithSubRowsData', () => {
   it('returns correct data when trajectory has name and technology', () => {
     const trajectory = { area: 'Zone 1', trajectoryName: 'T1', technology: 'Option A' } as DbTrajectory;
 
-    const result = buildRowWithSubRowsData(trajectory, 'Default', [], [], subRowOptions);
+    const result = buildRowWithSubRowsData(trajectory, [], [], subRowOptions);
 
     expect(result).toEqual({
       hypothesis: 'Zone 1',
@@ -296,7 +296,7 @@ describe('buildRowWithSubRowsData', () => {
     const trajectory = { area: 'Zone 2' } as DbTrajectory;
     const areasNotInTrajectoryArea = ['Zone 2'];
 
-    const result = buildRowWithSubRowsData(trajectory, 'Default', undefined, areasNotInTrajectoryArea, subRowOptions);
+    const result = buildRowWithSubRowsData(trajectory, undefined, areasNotInTrajectoryArea, subRowOptions);
 
     expect(result.subRows).toBeNull();
   });
@@ -305,7 +305,7 @@ describe('buildRowWithSubRowsData', () => {
     const trajectory = { area: 'Zone 3' } as DbTrajectory;
     const defaultAreas = [{ name: 'Zone 1' }];
 
-    const result = buildRowWithSubRowsData(trajectory, 'Default', defaultAreas, [], subRowOptions);
+    const result = buildRowWithSubRowsData(trajectory, defaultAreas, [], subRowOptions);
 
     expect(result.isDefault).toBe(false);
   });

@@ -170,7 +170,6 @@ export const buildEmptyTrajectory = (area: string, type: TRAJECTORY_TYPE, techno
  */
 export const buildRowWithSubRowsData = (
   trajectory: DbTrajectory,
-  defaultLabel: string,
   defaultAreas?: {
     name: string;
   }[],
@@ -287,7 +286,6 @@ export const buildDefaultEmptyTrajectoryList = (
  * @param {{ name: string }[] | undefined} defaultAreas - An optional array of default area objects, where each object
  *                                                       contains a name field that specifies a default area.
  *
- * @param defaultLabel
  * @returns {HypothesisRowData[]} An array of hypothesis row objects, each containing trajectory details,
  *                                technology-specific sub-rows, and metadata like status and default indicators.
  */
@@ -295,7 +293,6 @@ export const convertIntoHypothesisRowWithTechnologies = (
   data: DbTrajectory[],
   areasNotInTrajectoryArea: string[],
   defaultAreas: { name: string }[] | undefined,
-  defaultLabel: string,
 ): HypothesisRowData[] => {
   const groupedByArea: Record<string, DbTrajectory[]> = data.reduce(
     (acc, item) => {
@@ -447,21 +444,16 @@ export const getRowDataSelected = (data: HypothesisRowData[], indexArray: number
  * @param {HypothesisRowData[]} data
  * @return {{area: string, technology: string}}
  */
-export const getAreaTrajectoryName = (
-  rowIdSelected: string,
-  data: HypothesisRowData[],
-): { area: string; technology: string } => {
+export const getAreaTrajectoryName = (rowIdSelected: string, data: HypothesisRowData[]): string => {
   const [mainIndex, subIndex] = rowIdSelected.split('.').map(Number);
 
   const mainRow = data[mainIndex];
+  if (!mainRow) return '';
 
   const subRow = mainRow.subRows?.[subIndex];
-  const technologyName = subRow?.hypothesis ? subRow.hypothesis : '';
+  const technologyName = subRow?.hypothesis ? ` - ${subRow.hypothesis}` : '';
 
-  return {
-    area: mainRow.hypothesis ?? '',
-    technology: technologyName,
-  };
+  return `${mainRow.hypothesis ?? ''}${technologyName}`;
 };
 
 /**

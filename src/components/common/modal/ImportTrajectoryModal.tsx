@@ -15,16 +15,9 @@ interface ImportTrajectoryModalProps {
   onClose: (value?: SelectOption) => Promise<void>;
   trajectoryType: TRAJECTORY_TYPE;
   area?: string;
-  technology?: string;
 }
 
-export const ImportTrajectoryModal = ({
-  options,
-  onClose,
-  trajectoryType,
-  area,
-  technology,
-}: ImportTrajectoryModalProps) => {
+export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, area }: ImportTrajectoryModalProps) => {
   const { t } = useTranslation();
   const [trajectorySelected, setTrajectorySelected] = useState<SelectOption | null>(null);
   const path = getPathFromTrajectoryType(trajectoryType);
@@ -57,7 +50,7 @@ export const ImportTrajectoryModal = ({
     <RdsModal size="small">
       <RdsModal.Title onClose={() => void onClose()} icon="Upload">
         {t('studyDetails.@import_from_file_system', {
-          area: `${area} - ${technology}`,
+          area,
         })}
       </RdsModal.Title>
       <RdsModal.Content>
