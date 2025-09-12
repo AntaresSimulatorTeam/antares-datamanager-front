@@ -97,6 +97,7 @@ describe('useFetchTrajectoriesLinked', () => {
         {
           hypothesis: 'AT',
           isDefault: false,
+          isDeletable: true,
           status: TRAJECTORY_SELECTION_STATUS.OK,
           subRows: undefined,
           trajectory: {
@@ -113,6 +114,7 @@ describe('useFetchTrajectoriesLinked', () => {
         {
           hypothesis: 'BE',
           isDefault: false,
+          isDeletable: true,
           status: TRAJECTORY_SELECTION_STATUS.OK,
           subRows: undefined,
           trajectory: {
@@ -129,6 +131,7 @@ describe('useFetchTrajectoriesLinked', () => {
         {
           hypothesis: 'DEkf',
           isDefault: false,
+          isDeletable: true,
           status: TRAJECTORY_SELECTION_STATUS.MISSING,
           subRows: undefined,
           trajectory: null,
@@ -136,6 +139,7 @@ describe('useFetchTrajectoriesLinked', () => {
         {
           hypothesis: 'ES',
           isDefault: false,
+          isDeletable: true,
           status: TRAJECTORY_SELECTION_STATUS.MISSING,
           subRows: undefined,
           trajectory: null,
@@ -143,6 +147,7 @@ describe('useFetchTrajectoriesLinked', () => {
         {
           hypothesis: OTHER_AREAS_LABEL,
           isDefault: true,
+          isDeletable: false,
           status: TRAJECTORY_SELECTION_STATUS.MISSING,
           subRows: null,
           trajectory: null,
@@ -190,6 +195,7 @@ describe('useFetchTrajectoriesLinked', () => {
         {
           hypothesis: 'FR',
           isDefault: true,
+          isDeletable: false,
           status: TRAJECTORY_SELECTION_STATUS.MISSING,
           subRows: null,
           trajectory: null,
@@ -197,6 +203,7 @@ describe('useFetchTrajectoriesLinked', () => {
         {
           hypothesis: 'AT',
           isDefault: false,
+          isDeletable: true,
           status: TRAJECTORY_SELECTION_STATUS.OK,
           subRows: undefined,
           trajectory: {
@@ -213,6 +220,7 @@ describe('useFetchTrajectoriesLinked', () => {
         {
           hypothesis: 'BE',
           isDefault: false,
+          isDeletable: true,
           status: TRAJECTORY_SELECTION_STATUS.OK,
           subRows: undefined,
           trajectory: {
@@ -229,6 +237,7 @@ describe('useFetchTrajectoriesLinked', () => {
         {
           hypothesis: 'DEkf',
           isDefault: false,
+          isDeletable: true,
           status: TRAJECTORY_SELECTION_STATUS.MISSING,
           subRows: undefined,
           trajectory: null,
@@ -236,6 +245,7 @@ describe('useFetchTrajectoriesLinked', () => {
         {
           hypothesis: 'ES',
           isDefault: false,
+          isDeletable: true,
           status: TRAJECTORY_SELECTION_STATUS.MISSING,
           subRows: undefined,
           trajectory: null,
@@ -243,6 +253,7 @@ describe('useFetchTrajectoriesLinked', () => {
         {
           hypothesis: OTHER_AREAS_LABEL,
           isDefault: true,
+          isDeletable: false,
           status: TRAJECTORY_SELECTION_STATUS.MISSING,
           subRows: null,
           trajectory: null,
@@ -285,6 +296,7 @@ describe('useFetchTrajectoriesLinked', () => {
         {
           hypothesis: 'FR',
           isDefault: true,
+          isDeletable: false,
           status: TRAJECTORY_SELECTION_STATUS.MISSING,
           subRows: null,
           trajectory: null,
@@ -292,6 +304,7 @@ describe('useFetchTrajectoriesLinked', () => {
         {
           hypothesis: 'AT',
           isDefault: false,
+          isDeletable: true,
           status: TRAJECTORY_SELECTION_STATUS.OK,
           subRows: undefined,
           trajectory: {
@@ -308,6 +321,7 @@ describe('useFetchTrajectoriesLinked', () => {
         {
           hypothesis: 'BE',
           isDefault: false,
+          isDeletable: true,
           status: TRAJECTORY_SELECTION_STATUS.OK,
           subRows: undefined,
           trajectory: {
@@ -324,6 +338,7 @@ describe('useFetchTrajectoriesLinked', () => {
         {
           hypothesis: OTHER_AREAS_LABEL,
           isDefault: true,
+          isDeletable: false,
           status: TRAJECTORY_SELECTION_STATUS.MISSING,
           subRows: null,
           trajectory: null,
@@ -361,6 +376,7 @@ describe('useFetchTrajectoriesLinked', () => {
         {
           hypothesis: 'BE',
           isDefault: true,
+          isDeletable: false,
           status: TRAJECTORY_SELECTION_STATUS.OK,
           subRows: null,
           trajectory: {
@@ -377,6 +393,7 @@ describe('useFetchTrajectoriesLinked', () => {
         {
           hypothesis: 'FR',
           isDefault: true,
+          isDeletable: false,
           status: TRAJECTORY_SELECTION_STATUS.MISSING,
           subRows: null,
           trajectory: null,
@@ -384,6 +401,7 @@ describe('useFetchTrajectoriesLinked', () => {
         {
           hypothesis: 'AT',
           isDefault: false,
+          isDeletable: true,
           status: TRAJECTORY_SELECTION_STATUS.OK,
           subRows: undefined,
           trajectory: {
@@ -400,6 +418,7 @@ describe('useFetchTrajectoriesLinked', () => {
         {
           hypothesis: OTHER_AREAS_LABEL,
           isDefault: true,
+          isDeletable: false,
           status: TRAJECTORY_SELECTION_STATUS.MISSING,
           subRows: null,
           trajectory: null,

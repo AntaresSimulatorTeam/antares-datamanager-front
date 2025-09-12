@@ -205,6 +205,7 @@ describe('buildRowWithSubRowsData', () => {
       trajectory,
       status: TRAJECTORY_SELECTION_STATUS.OK,
       isDefault: true,
+      isDeletable: false,
       subRows: null,
     });
   });
@@ -220,6 +221,7 @@ describe('buildRowWithSubRowsData', () => {
       trajectory,
       status: TRAJECTORY_SELECTION_STATUS.OK,
       isDefault: true,
+      isDeletable: false,
       subRows: [
         {
           hypothesis: 'Option A',
@@ -249,6 +251,7 @@ describe('buildRowWithSubRowsData', () => {
       trajectory: null,
       status: TRAJECTORY_SELECTION_STATUS.MISSING,
       isDefault: false,
+      isDeletable: true,
       subRows: [
         {
           hypothesis: 'Option A',

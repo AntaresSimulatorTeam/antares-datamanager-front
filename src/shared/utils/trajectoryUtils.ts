@@ -178,7 +178,7 @@ export const buildRowWithSubRowsData = (
         ? TRAJECTORY_SELECTION_STATUS.OK
         : TRAJECTORY_SELECTION_STATUS.MISSING,
     isDefault: isDefault || OTHER_AREAS === trajectory.area,
-    isDeletable: !isDefault || OTHER_AREAS === trajectory.area,
+    isDeletable: !isDefault && OTHER_AREAS !== trajectory.area,
     subRows:
       trajectory.area !== OTHER_AREAS && !areasNotInTrajectoryArea?.some((item) => item === trajectory.area)
         ? subRowOptions?.map((option) => {
