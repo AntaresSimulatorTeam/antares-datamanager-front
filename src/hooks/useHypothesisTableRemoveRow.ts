@@ -25,7 +25,6 @@ export const useHypothesisTableRemoveRow = (
           const hasTrajectoryOK =
             subRows?.some((subRow) => subRow.trajectory != null && subRow.status === TRAJECTORY_SELECTION_STATUS.OK) ||
             (trajectory && status === TRAJECTORY_SELECTION_STATUS.OK);
-          console.log('=================== hasTrajectoryOK', hasTrajectoryOK);
           if (study.id && hasTrajectoryOK) {
             const subRowTrajectoryIds = subRows
               ?.map((subRow) => {
