@@ -1,6 +1,80 @@
-import { describe, expect, it } from 'vitest';
-import { getDefaultAreaNotIncludedInAreaList, transformToSubRowKeys } from '@/shared/utils/hypothesisTableUtils.ts';
-import { TrajectoryAreaData } from '@/shared/types';
+import { describe, expect, it, Mock } from 'vitest';
+import {
+  getAlignment,
+  getDefaultAreaNotIncludedInAreaList,
+  hasLabelDefault,
+  transformToSubRowKeys,
+} from '@/shared/utils/hypothesisTableUtils.ts';
+import { HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
+import { Row } from '@tanstack/react-table';
+import { isTechnology } from '@/shared/utils/trajectoryUtils.ts';
+import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
+
+describe('getAlignment', () => {
+  it('should return "pl-0" when depth is 0 and row can expand', () => {
+    const row = {
+      depth: 0,
+      getCanExpand: () => true,
+    } as unknown as Row<HypothesisRowData>;
+
+    expect(getAlignment(row)).toBe('pl-0');
+  });
+
+  it('should return "pl-1" when depth is 0 and row cannot expand', () => {
+    const row = {
+      depth: 0,
+      getCanExpand: () => false,
+    } as unknown as Row<HypothesisRowData>;
+
+    expect(getAlignment(row)).toBe('pl-1');
+  });
+
+  it('should return "pl-4" when depth is greater than 0', () => {
+    const row = {
+      depth: 1,
+      getCanExpand: () => true, // irrelevant in this case
+    } as unknown as Row<HypothesisRowData>;
+
+    expect(getAlignment(row)).toBe('pl-4');
+  });
+});
+
+vi.mock('@/shared/utils/trajectoryUtils', () => ({
+  isTechnology: vi.fn(),
+}));
+
+describe('hasLabelDefault', () => {
+  it('returns true for depth 1, isDefault true, not technology, not OTHER_AREAS_LABEL', () => {
+    (isTechnology as Mock).mockReturnValue(false);
+    expect(hasLabelDefault(1, true, 'AI')).toBe(true);
+  });
+
+  it('returns false for depth 1 if hypothesis is technology', () => {
+    (isTechnology as Mock).mockReturnValue(true);
+    expect(hasLabelDefault(1, true, 'Tech')).toBe(false);
+  });
+
+  it('returns false for depth 1 if hypothesis is OTHER_AREAS_LABEL', () => {
+    (isTechnology as Mock).mockReturnValue(false);
+    expect(hasLabelDefault(1, true, OTHER_AREAS_LABEL)).toBe(false);
+  });
+
+  it('returns true for depth 0, isDefault true, not OTHER_AREAS_LABEL', () => {
+    expect(hasLabelDefault(0, true, 'AI')).toBe(true);
+  });
+
+  it('returns false for depth 0 if isDefault is false', () => {
+    expect(hasLabelDefault(0, false, 'AI')).toBe(false);
+  });
+
+  it('returns false for depth 0 if hypothesis is OTHER_AREAS_LABEL', () => {
+    expect(hasLabelDefault(0, true, OTHER_AREAS_LABEL)).toBe(false);
+  });
+
+  it('returns false for other depths', () => {
+    expect(hasLabelDefault(2, true, 'AI')).toBe(false);
+  });
+});
 
 describe('getDefaultAreaNotIncludedInAreaList', () => {
   it('retourne toutes les zones par défaut si areas est undefined', () => {
