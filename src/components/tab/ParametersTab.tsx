@@ -79,8 +79,8 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
             trajectory: null,
             status: TRAJECTORY_SELECTION_STATUS.MISSING,
             isDefault: false,
-            subRows: hypothesisTrajectories,
             isDeletable: false,
+            subRows: hypothesisTrajectories,
           },
           {
             hypothesis: t('thermal.@paramModulation'),
@@ -110,7 +110,8 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
             hypothesis: t('thermal.@specific'),
             trajectory: null,
             status: TRAJECTORY_SELECTION_STATUS.MISSING,
-            isDefault: true,
+            isDefault: false,
+            isDeletable: false,
             subRows: sortWithFixedPosition(updatedData) || null,
           };
         } else {
