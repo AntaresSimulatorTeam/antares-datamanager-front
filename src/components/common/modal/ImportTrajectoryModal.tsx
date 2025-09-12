@@ -43,7 +43,7 @@ export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, area }
         // silent handler
       }
     },
-    [options?.length, area, trajectoryType],
+    [options, area, trajectoryType],
   );
 
   return (
