@@ -9,6 +9,7 @@ import {
   getAreaTrajectoryName,
   getBgColor,
   getChildrenList,
+  getDefaultLabel,
   getHypothesis,
   getRowDataSelected,
   getStatus,
@@ -31,7 +32,7 @@ import {
   mockRowDataTrajectoryC,
 } from '@/mocks/data/tests/trajectory.mock.ts';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
-import { DbTrajectory, HypothesisRowData, HypothesisTab } from '@/shared/types';
+import { CheckBoxData, DbTrajectory, HypothesisRowData, HypothesisTab } from '@/shared/types';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { Row } from '@tanstack/react-table';
 
@@ -692,5 +693,25 @@ describe('getAreaTrajectoryName', () => {
   it('should return empty string if both hypotheses are missing', () => {
     const emptyData: HypothesisRowData[] = [{}, {}] as HypothesisRowData[];
     expect(getAreaTrajectoryName('0.0', emptyData)).toBe('');
+  });
+});
+
+describe('getDefaultLabel', () => {
+  it('should append defaultLabel when isDefault is true and name is not OTHER_AREAS', () => {
+    const area: CheckBoxData = { name: 'Zone A', isDefault: true };
+    const result = getDefaultLabel(area, 'par défaut');
+    expect(result).toBe('Zone A (par défaut)');
+  });
+
+  it('should return name when isDefault is false', () => {
+    const area: CheckBoxData = { name: 'Zone B', isDefault: false };
+    const result = getDefaultLabel(area, 'par défaut');
+    expect(result).toBe('Zone B');
+  });
+
+  it('should return name when name is OTHER_AREAS even if isDefault is true', () => {
+    const area: CheckBoxData = { name: OTHER_AREAS, isDefault: true };
+    const result = getDefaultLabel(area, 'par défaut');
+    expect(result).toBe(OTHER_AREAS);
   });
 });

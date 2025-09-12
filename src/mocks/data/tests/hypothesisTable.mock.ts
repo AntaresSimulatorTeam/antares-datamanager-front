@@ -136,3 +136,28 @@ export const rowDataTwo: HypothesisRowData[] = [
     '2023-05-18 15:13:56' as unknown as Date,
   ),
 ];
+
+export const rowNotDefaultData: HypothesisRowData[] = [
+  buildRowDataMock(
+    'FR (default)',
+    TRAJECTORY_SELECTION_STATUS.MISSING,
+    true,
+    null,
+    '',
+    TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+    1,
+    'unknown',
+    '2024-07-22 15:13:56.860045' as unknown as Date,
+  ),
+  buildRowDataMock(
+    OTHER_AREAS_LABEL,
+    TRAJECTORY_SELECTION_STATUS.MISSING,
+    true,
+    null,
+    '',
+    TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+    0,
+    'unknown',
+    '2024-07-22 15:13:56.860045' as unknown as Date,
+  ),
+];

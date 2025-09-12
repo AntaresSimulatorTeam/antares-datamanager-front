@@ -126,12 +126,16 @@
     "@search_area": "Search area",
     "@or": "or",
     "@viewLog": "View Log",
-    "@notificationAlert": "Error: {{studyName}} - {{trajectoryName}} no parameter cannot be saved for {{trajectoryType}}"
+    "@notificationAlert": "Error: {{studyName}} - {{trajectoryName}} no parameter cannot be saved for {{trajectoryType}}",
+    "@default": "Default"
   },
   "thermal": {
     "@installedPower": "Installed Power",
     "@parameters": "Parameters",
     "@parametersTechnical": "Technical Parameters",
+    "@specific": "Specific",
+    "@paramModulation": "Param modulation",
+    "@common": "Common",
     "@parametersEconomic": "Economic Parameters",
     "@costs": "Costs",
     "@economics": "Economics"

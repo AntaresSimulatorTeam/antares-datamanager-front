@@ -85,12 +85,16 @@
     "@import_status_missing": "Missing",
     "@import_status_error": "Error",
     "@generate": "Générer",
-    "@notificationAlert": "Erreur: {{studyName}} - {{trajectoryName}} aucun paramètre n'a pas être enregistré pour {{trajectoryType}}"
+    "@notificationAlert": "Erreur: {{studyName}} - {{trajectoryName}} aucun paramètre n'a pas être enregistré pour {{trajectoryType}}",
+    "@default": "Par défaut"
   },
   "thermal": {
     "@installedPower": "Capacités installées",
     "@parameters": "Paramètres",
     "@parametersTechnical": "Paramètres techniques",
+    "@specific": "Spécifique",
+    "@parametersModulation": "Param modulation",
+    "@parametersCommon": "Common",
     "@parametersEconomic": "Paramètres économiques",
     "@costs": "Coûts",
     "@economics": "Économique"

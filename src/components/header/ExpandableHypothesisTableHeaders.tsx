@@ -40,9 +40,10 @@ const getExpandableHypothesisTableHeaders = (
   progress: number,
   fileStatus: FileInputStatus,
   idSelected: string,
+  columnHeader?: string,
 ): TableOptions<HypothesisRowData>['columns'] => [
   columnHelper.accessor('hypothesis', {
-    header: t('studyDetails.@area'),
+    header: columnHeader || t('studyDetails.@area'),
     size: 120,
     cell: ({ getValue, row }) => {
       const { status } = row.original;
@@ -52,7 +53,7 @@ const getExpandableHypothesisTableHeaders = (
       };
       const childrenArray: string[] = getChildrenList(row);
       return (
-        <div className="flex gap-1">
+        <div className="flex gap-1 py-1">
           {row.getCanExpand() && (
             <button onClick={row.getToggleExpandedHandler()} style={{ cursor: 'pointer' }}>
               {row.getIsExpanded() ? (
@@ -82,8 +83,8 @@ const getExpandableHypothesisTableHeaders = (
     header: t('studyDetails.@trajectory'),
     size: 350,
     cell: ({ row, table: { options } }) => {
-      const { trajectory, status } = row.original;
-
+      const { trajectory, status, hypothesis } = row.original;
+      if (hypothesis === t('thermal.@specific')) return null;
       return trajectory?.trajectoryName && status !== TRAJECTORY_SELECTION_STATUS.MISSING ? (
         <div className="flex w-full items-center gap-2">
           <LabelWithDeleteButton
@@ -123,6 +124,7 @@ const getExpandableHypothesisTableHeaders = (
     header: t('home.@status'),
     cell: ({ row, table: { options } }) => {
       const { status, isDefault, hypothesis } = row.original;
+      if (hypothesis === t('thermal.@specific')) return null;
       return progress > 0 && fileStatus === 'loading' && idSelected === row.id ? (
         <ProgressBar statusFile={fileStatus} progressValue={progress} />
       ) : (
