@@ -82,7 +82,6 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
             isDefault: false,
             isDeletable: false,
             subRows: hypothesisTrajectories,
-            isDeletable: false,
           },
           {
             hypothesis: t('thermal.@paramModulation'),
