@@ -2,7 +2,14 @@ import SearchBar from '@/pages/pegase/home/components/SearchBar.tsx';
 import { RdsDivider } from 'rte-design-system-react';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
-import { CheckBoxData, HypothesisRowData, LocationStudy, SelectOption, TrajectoryAreaData } from '@/shared/types';
+import {
+  CheckBoxData,
+  DbTrajectory,
+  HypothesisRowData,
+  LocationStudy,
+  SelectOption,
+  TrajectoryAreaData,
+} from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import getEditableHypothesisTableHeaders from '@/components/header/EditableHypothesisTableHeaders.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
@@ -18,8 +25,8 @@ import { useLocation } from 'react-router-dom';
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { getAreaTrajectoryName, getTrajectoryTypeByIndex } from '@/shared/utils/trajectoryUtils.ts';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
-import { handleFetchTrajectoriesFS } from '@/shared/services/hypothesisTableService.ts';
-import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
+import { handleFetchTrajectoriesFS, handleTrajectorySearch } from '@/shared/services/hypothesisTableService.ts';
+import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { transformToSubRowKeys } from '@/shared/utils/hypothesisTableUtils.ts';
 
 interface ParametersTabProps {
@@ -56,6 +63,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
   const [technicalData, setTechnicalData] = useState<HypothesisRowData[]>([]);
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
   const [rowIdSelected, setRowIdSelected] = useState<string>('0');
+  const [_, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const [isStudyGenerated] = useState(
     studyState.studyStatus === StudyStatus.GENERATED || study.status === StudyStatus.GENERATED,
   );
@@ -199,7 +207,24 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
           readOnly={readOnly}
           progress={0}
           idSelected={rowIndexSelected}
-          handleSearch={async (_value: string, _rowId: string) => Promise.resolve(undefined)}
+          handleSearch={async (value: string, rowId: string) => {
+            const indexArray = rowId.split('.').map(Number);
+            let area = '';
+            const subRowHypothesis = technicalData?.[indexArray[0]]?.subRows?.[indexArray[1]]?.hypothesis;
+            if (indexArray[0] === 0 && subRowHypothesis) {
+              area = subRowHypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : subRowHypothesis;
+            } else {
+              area = '';
+            }
+
+            return await handleTrajectorySearch(
+              getTrajectoryTypeByIndex(indexArray[0]),
+              value,
+              area,
+              setDbTrajectories,
+              study,
+            );
+          }}
           handleImport={async (rowId: string) => {
             const indexArray = rowId.split('.').map(Number);
             const area = technicalData[indexArray[0]]?.subRows?.[indexArray[1]]?.hypothesis;
