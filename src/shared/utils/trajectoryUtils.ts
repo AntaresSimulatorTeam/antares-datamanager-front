@@ -178,6 +178,7 @@ export const buildRowWithSubRowsData = (
         ? TRAJECTORY_SELECTION_STATUS.OK
         : TRAJECTORY_SELECTION_STATUS.MISSING,
     isDefault: isDefault || OTHER_AREAS === trajectory.area,
+    isDeletable: !isDefault || OTHER_AREAS === trajectory.area,
     subRows:
       trajectory.area !== OTHER_AREAS && !areasNotInTrajectoryArea?.some((item) => item === trajectory.area)
         ? subRowOptions?.map((option) => {
@@ -205,6 +206,12 @@ export const buildRowWithSubRowsData = (
  */
 export const isTrajectoryLinked = (area: { name: string }, trajectories: DbTrajectory[]): boolean =>
   trajectories.some((trajectory) => area.name === trajectory.area && trajectory.technology === '');
+
+/**
+ *
+ * @param {string} area
+ */
+export const isTechnology = (area: string): boolean => ThermalOptions.some((option) => option === area);
 
 /**
  * Function to build a default list of empty trajectories based on the provided trajectory type,
@@ -290,6 +297,7 @@ export const convertIntoHypothesisRowWithTechnologies = (
           : TRAJECTORY_SELECTION_STATUS.MISSING,
       isDefault: isDefault || OTHER_AREAS === mainEntry?.area,
       subRows: subRows?.length ? subRows : null,
+      isDeletable: true,
     };
   });
 };

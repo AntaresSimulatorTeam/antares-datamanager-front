@@ -20,6 +20,7 @@ import { getAreaTrajectoryName, getTrajectoryTypeByIndex } from '@/shared/utils/
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { handleFetchTrajectoriesFS } from '@/shared/services/hypothesisTableService.ts';
 import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
+import { transformToSubRowKeys } from '@/shared/utils/hypothesisTableUtils.ts';
 
 interface ParametersTabProps {
   defaultAreas: { name: string }[];
@@ -38,13 +39,15 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
       hypothesis: t('thermal.@costs'),
       trajectory: null,
       status: TRAJECTORY_SELECTION_STATUS.MISSING,
-      isDefault: true,
+      isDefault: false,
+      isDeletable: false,
     },
     {
       hypothesis: t('thermal.@economics'),
       trajectory: null,
       status: TRAJECTORY_SELECTION_STATUS.MISSING,
-      isDefault: true,
+      isDefault: false,
+      isDeletable: false,
     },
   ];
   const [rowIndexSelected] = useState('0');
@@ -75,23 +78,26 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
             hypothesis: t('thermal.@specific'),
             trajectory: null,
             status: TRAJECTORY_SELECTION_STATUS.MISSING,
-            isDefault: true,
+            isDefault: false,
             subRows: hypothesisTrajectories,
+            isDeletable: false,
           },
           {
             hypothesis: t('thermal.@paramModulation'),
             trajectory: null,
             status: TRAJECTORY_SELECTION_STATUS.MISSING,
-            isDefault: true,
+            isDefault: false,
+            isDeletable: false,
           },
           {
             hypothesis: t('thermal.@common'),
             trajectory: null,
             status: TRAJECTORY_SELECTION_STATUS.MISSING,
-            isDefault: true,
+            isDefault: false,
+            isDeletable: false,
           },
         ]);
-      setReadOnly(readOnlyRow);
+      setReadOnly(transformToSubRowKeys(readOnlyRow));
     };
     setHypothesis();
   }, [areas, areasTrajectoryOptions, defaultAreas, dropDownListOptions, hypothesisTrajectories, readOnlyRow, t]);
@@ -120,6 +126,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
       trajectory: null,
       status: TRAJECTORY_SELECTION_STATUS.MISSING,
       isDefault: false,
+      isDeletable: true,
     };
     setCheckedValues((prev) => [...prev, value]);
     const newTechnicalDataSubRow = technicalData?.[0]?.subRows

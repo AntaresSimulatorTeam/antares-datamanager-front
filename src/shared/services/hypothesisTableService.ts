@@ -98,6 +98,7 @@ export const addRow = (
     trajectory: null,
     status: TRAJECTORY_SELECTION_STATUS.MISSING,
     isDefault: false,
+    isDeletable: true,
     subRows: hasSubRows
       ? ThermalOptions.map((option) => ({
           hypothesis: option,
