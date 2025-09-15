@@ -52,7 +52,6 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
       isDeletable: false,
     },
   ];
-  const [rowIndexSelected] = useState('0');
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
   const [technicalData, setTechnicalData] = useState<HypothesisRowData[]>([]);
@@ -201,7 +200,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
           studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
           readOnly={readOnly}
           progress={progress}
-          idSelected={rowIndexSelected}
+          idSelected={rowIdSelected}
           handleSearch={async (_value: string, _rowId: string) => Promise.resolve(undefined)}
           handleImport={async (rowId: string) => {
             const indexArray = rowId.split('.').map(Number);
@@ -226,7 +225,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
             columnHeader={t('thermal.@parametersEconomic')}
             fileStatus={'success'}
             studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
-            idSelected={rowIndexSelected}
+            idSelected={rowIdSelected}
             progress={0}
             handleSearch={async (_value: string, _rowId: string) => Promise.resolve(undefined)}
             handleImport={() => Promise.resolve()}

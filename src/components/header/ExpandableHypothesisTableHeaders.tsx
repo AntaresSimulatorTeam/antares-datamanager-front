@@ -126,7 +126,9 @@ const getExpandableHypothesisTableHeaders = (
     cell: ({ row, table: { options } }) => {
       const { status, isDefault, hypothesis, isDeletable } = row.original;
       if (hypothesis === t('thermal.@specific')) return null;
-      return progress > 0 && fileStatus === 'loading' && idSelected === row.id ? (
+      const shouldShowProgressBar = progress > 0 && fileStatus === 'loading' && idSelected === row.id;
+
+      return shouldShowProgressBar ? (
         <ProgressBar statusFile={fileStatus} progressValue={progress} />
       ) : (
         <CellWithStatus
