@@ -12,6 +12,7 @@ import {
   TRAJECTORY_ENDPOINT,
   TRAJECTORY_FILE_SYSTEM_ENDPOINT,
   TRAJECTORY_LINK_TO_STUDY_ENDPOINT,
+  TRAJECTORY_THERMAL_COMMON_PARAMETER_IMPORT,
   TRAJECTORY_THERMAL_INSTALLED_POWER_IMPORT,
   TRAJECTORY_UNLINK_ALL_TO_STUDY_ENDPOINT,
   TRAJECTORY_UNLINK_MULTIPLE_TO_STUDY_ENDPOINT,
@@ -122,6 +123,8 @@ export const uploadTrajectory = async (
     urlApi = `${TRAJECTORY_ENDPOINT}/load?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   } else if (trajectoryType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
     urlApi = `${TRAJECTORY_THERMAL_INSTALLED_POWER_IMPORT}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}&technology=${technology ?? ''}`;
+  } else if (trajectoryType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER) {
+    urlApi = `${TRAJECTORY_THERMAL_COMMON_PARAMETER_IMPORT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   } else {
     urlApi = `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   }
