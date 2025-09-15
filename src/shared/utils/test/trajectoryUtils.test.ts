@@ -6,14 +6,18 @@ import {
   buildReadOnlyRow,
   buildRowData,
   buildRowWithSubRowsData,
+  convertIntoHypothesisRowWithTechnologies,
   getAreaTrajectoryName,
   getBgColor,
   getChildrenList,
   getDefaultLabel,
   getHypothesis,
+  getPathFromTrajectoryType,
+  getQueryParamAreaValue,
   getRowDataSelected,
   getStatus,
   getStudyMenu,
+  getTrajectoryTypeByIndex,
   isMatchingTrajectoryType,
   isTrajectoryLinked,
   removeDuplicate,
@@ -32,9 +36,10 @@ import {
   mockRowDataTrajectoryC,
 } from '@/mocks/data/tests/trajectory.mock.ts';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
-import { CheckBoxData, DbTrajectory, HypothesisRowData, HypothesisTab } from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, HypothesisTab } from '@/shared/types';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { Row } from '@tanstack/react-table';
+import { ThermalOptions } from '@/mocks/data/list/names.ts';
 
 describe('getStatus', () => {
   it("should return an ERROR selection status for 'error' status", () => {
@@ -192,7 +197,7 @@ describe('buildEmptyTrajectory', () => {
 describe('buildRowWithSubRowsData', () => {
   const subRowOptions = ['Option A', 'Option B'];
 
-  it('returns correct data when loadArea is OTHER_AREAS', () => {
+  it('returns correct data when area is OTHER_AREAS et que ', () => {
     const trajectory = { area: OTHER_AREAS, technology: '', trajectoryName: 'name' } as DbTrajectory;
 
     const result = buildRowWithSubRowsData(trajectory, [], [], subRowOptions);
@@ -202,6 +207,22 @@ describe('buildRowWithSubRowsData', () => {
       trajectory,
       status: TRAJECTORY_SELECTION_STATUS.OK,
       isDefault: true,
+      isDeletable: false,
+      subRows: null,
+    });
+  });
+
+  it('returns correct data when area is undefined', () => {
+    const trajectory = { technology: '', trajectoryName: 'name' } as DbTrajectory;
+
+    const result = buildRowWithSubRowsData(trajectory, [], [], subRowOptions);
+
+    expect(result).toEqual({
+      hypothesis: '',
+      trajectory,
+      status: TRAJECTORY_SELECTION_STATUS.OK,
+      isDefault: false,
+      isDeletable: true,
       subRows: null,
     });
   });
@@ -217,12 +238,14 @@ describe('buildRowWithSubRowsData', () => {
       trajectory,
       status: TRAJECTORY_SELECTION_STATUS.OK,
       isDefault: true,
+      isDeletable: false,
       subRows: [
         {
           hypothesis: 'Option A',
           trajectory: null,
           status: TRAJECTORY_SELECTION_STATUS.MISSING,
           isDefault: true,
+          isDeletable: false,
           subRows: null,
         },
         {
@@ -230,6 +253,7 @@ describe('buildRowWithSubRowsData', () => {
           trajectory: null,
           status: TRAJECTORY_SELECTION_STATUS.MISSING,
           isDefault: true,
+          isDeletable: false,
           subRows: null,
         },
       ],
@@ -246,12 +270,14 @@ describe('buildRowWithSubRowsData', () => {
       trajectory: null,
       status: TRAJECTORY_SELECTION_STATUS.MISSING,
       isDefault: false,
+      isDeletable: true,
       subRows: [
         {
           hypothesis: 'Option A',
           trajectory,
           status: TRAJECTORY_SELECTION_STATUS.OK,
           isDefault: true,
+          isDeletable: false,
           subRows: null,
         },
         {
@@ -259,6 +285,7 @@ describe('buildRowWithSubRowsData', () => {
           trajectory: null,
           status: TRAJECTORY_SELECTION_STATUS.MISSING,
           isDefault: true,
+          isDeletable: false,
           subRows: null,
         },
       ],
@@ -696,22 +723,142 @@ describe('getAreaTrajectoryName', () => {
   });
 });
 
-describe('getDefaultLabel', () => {
-  it('should append defaultLabel when isDefault is true and name is not OTHER_AREAS', () => {
-    const area: CheckBoxData = { name: 'Zone A', isDefault: true };
-    const result = getDefaultLabel(area, 'par défaut');
-    expect(result).toBe('Zone A (par défaut)');
+describe('getTrajectoryTypeByIndex', () => {
+  it('should return SPECIFIC for index 0', () => {
+    expect(getTrajectoryTypeByIndex(0)).toBe(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER);
   });
 
-  it('should return name when isDefault is false', () => {
-    const area: CheckBoxData = { name: 'Zone B', isDefault: false };
-    const result = getDefaultLabel(area, 'par défaut');
-    expect(result).toBe('Zone B');
+  it('should return COMMON for index 1', () => {
+    expect(getTrajectoryTypeByIndex(1)).toBe(TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER);
+  });
+
+  it('should return MODULATION for index 2', () => {
+    expect(getTrajectoryTypeByIndex(2)).toBe(TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER);
+  });
+
+  it('should return SPECIFIC for any other index', () => {
+    expect(getTrajectoryTypeByIndex(99)).toBe(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER);
+    expect(getTrajectoryTypeByIndex(-1)).toBe(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER);
+  });
+});
+
+describe('getPathFromTrajectoryType', () => {
+  it('should return economic path for THERMAL_ECONOMIC_PARAMETER', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER)).toBe(
+      '\\\\thermal\\economic parameters\\economic',
+    );
+  });
+
+  it('should return cost path for THERMAL_ECONOMIC_COST_PARAMETER', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER)).toBe(
+      '\\\\thermal\\economic parameters\\costs',
+    );
+  });
+
+  it('should return modulation path for THERMAL_TECHNICAL_MODULATION_PARAMETER', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER)).toBe(
+      '\\\\thermal\\technical parameters\\param_modulation',
+    );
+  });
+
+  it('should return technical path for THERMAL_TECHNICAL_SPECIFIC_PARAMETER', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER)).toBe(
+      '\\\\thermal\\technical parameters',
+    );
+  });
+
+  it('should return technical path for THERMAL_TECHNICAL_COMMON_PARAMETER', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER)).toBe(
+      '\\\\thermal\\technical parameters',
+    );
+  });
+
+  it('should return technical path for unknown type', () => {
+    expect(getPathFromTrajectoryType('UNKNOWN_TYPE' as TRAJECTORY_TYPE)).toBeNull();
+  });
+});
+
+describe('getDefaultLabel', () => {
+  it('should append defaultLabel when isDefault is true and name is not OTHER_AREAS', () => {
+    const result = getDefaultLabel('Zone A');
+    expect(result).toBe('Zone A');
   });
 
   it('should return name when name is OTHER_AREAS even if isDefault is true', () => {
-    const area: CheckBoxData = { name: OTHER_AREAS, isDefault: true };
-    const result = getDefaultLabel(area, 'par défaut');
+    const result = getDefaultLabel(OTHER_AREAS);
+    expect(result).toBe(OTHER_AREAS_LABEL);
+  });
+});
+
+describe('getQueryParamAreaValue', () => {
+  it('should return OTHER_AREAS when hypothesis equals OTHER_AREAS_LABEL', () => {
+    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD, OTHER_AREAS_LABEL);
     expect(result).toBe(OTHER_AREAS);
+  });
+
+  it('should remove defaultLabel from hypothesis if type is not THERMAL_CAPACITY', () => {
+    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD, 'Paris');
+    expect(result).toBe('Paris');
+  });
+
+  it('should handle undefined hypothesis gracefully', () => {
+    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD, undefined as unknown as string);
+    expect(result).toBe('');
+  });
+});
+
+describe('convertIntoHypothesisRowWithTechnologies', () => {
+  it('should group by area and generate main entry with subRows', () => {
+    const data = [
+      { area: 'ZoneA', technology: '', trajectoryName: 'MainTrajectory' },
+      { area: 'ZoneA', technology: 'Additional power', trajectoryName: 'Trajectory1' },
+      { area: 'ZoneA', technology: 'Biomass', trajectoryName: 'Trajectory2' },
+    ] as DbTrajectory[];
+
+    const result = convertIntoHypothesisRowWithTechnologies(data, [], [{ name: 'ZoneA' }]);
+
+    expect(result).toHaveLength(1);
+    expect(result[0]).toMatchObject({
+      hypothesis: getDefaultLabel('ZoneA'),
+      trajectory: { trajectoryName: 'MainTrajectory' },
+      status: TRAJECTORY_SELECTION_STATUS.OK,
+      isDefault: true,
+      isDeletable: true,
+    });
+    expect(result[0].subRows).toHaveLength(ThermalOptions.length);
+    expect(result[0].subRows?.[0].status).toBe(TRAJECTORY_SELECTION_STATUS.OK);
+  });
+
+  it('should return subRows as null if area is OTHER_AREAS', () => {
+    const data = [{ area: OTHER_AREAS, technology: '', trajectoryName: 'MainTrajectory' }] as DbTrajectory[];
+    const result = convertIntoHypothesisRowWithTechnologies(data, [], []);
+
+    expect(result[0].subRows).toBeNull();
+    expect(result[0].isDefault).toBe(true);
+  });
+
+  it('should return status MISSING if trajectoryName is missing', () => {
+    const data = [{ area: 'ZoneB', technology: '', trajectoryName: '' }] as DbTrajectory[];
+    const result = convertIntoHypothesisRowWithTechnologies(data, [], []);
+
+    expect(result[0].status).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
+    expect(result[0].trajectory).toBeNull();
+  });
+
+  it('should handle undefined defaultAreas', () => {
+    const data = [{ area: 'ZoneC', technology: '', trajectoryName: 'TrajectoryX' }] as DbTrajectory[];
+    const result = convertIntoHypothesisRowWithTechnologies(data, [], undefined);
+
+    expect(result[0].isDefault).toBe(false);
+  });
+
+  it('should skip subRows if area is in areasNotInTrajectoryArea', () => {
+    const data = [
+      { area: 'ZoneD', technology: '', trajectoryName: 'MainTrajectory' },
+      { area: 'ZoneD', technology: 'Tech1', trajectoryName: 'Trajectory1' },
+    ] as DbTrajectory[];
+    const result = convertIntoHypothesisRowWithTechnologies(data, ['ZoneD'], []);
+
+    expect(result[0].subRows).toBeNull();
   });
 });

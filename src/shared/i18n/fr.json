@@ -79,6 +79,7 @@
     "@select_trajectory": "Selectionner une trajectoire",
     "@select_file": "Selectionner un fichier",
     "@import_from_file_system": "Importer une trajectoire pour {{area}}",
+    "@select_from": "Select from {{path}}",
     "@import": "Importer",
     "@preview": "Prévisualisation",
     "@import_status_done": "OK",

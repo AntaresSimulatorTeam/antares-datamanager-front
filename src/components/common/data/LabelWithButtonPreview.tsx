@@ -6,6 +6,7 @@ interface LabelWithButtonPreviewProps {
   value: string;
   status: TRAJECTORY_SELECTION_STATUS;
   isReadOnly: boolean;
+  extraValue: string;
   onClick?: () => void;
   hasPreview?: boolean;
   alignment?: string;
@@ -15,13 +16,14 @@ export const LabelWithButtonPreview = ({
   value,
   status,
   isReadOnly,
+  extraValue,
   onClick,
   hasPreview = true,
   alignment = '',
 }: LabelWithButtonPreviewProps) => (
   <div className={`${alignment}`}>
     <span className={`${status === TRAJECTORY_SELECTION_STATUS.OK ? 'text-primary-800' : 'text-gray-900'}`}>
-      {value}
+      {`${value} ${extraValue}`}
     </span>
     {hasPreview && (
       <ButtonPreview

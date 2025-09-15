@@ -19,6 +19,7 @@ import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 import { RdsTextTooltip } from 'rte-design-system-react';
 import { getChildrenList } from '@/shared/utils/trajectoryUtils.ts';
+import { getAlignment, hasLabelDefault } from '@/shared/utils/hypothesisTableUtils.ts';
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
 
@@ -46,12 +47,9 @@ const getExpandableHypothesisTableHeaders = (
     header: columnHeader || t('studyDetails.@area'),
     size: 120,
     cell: ({ getValue, row }) => {
-      const { status } = row.original;
-      const getAlignment = () => {
-        if (row.depth === 0) return !row.getCanExpand() ? 'pl-1' : 'pl-0';
-        return 'pl-4';
-      };
+      const { status, isDefault, hypothesis } = row.original;
       const childrenArray: string[] = getChildrenList(row);
+
       return (
         <div className="flex gap-1 py-1">
           {row.getCanExpand() && (
@@ -68,7 +66,10 @@ const getExpandableHypothesisTableHeaders = (
             status={status}
             isReadOnly={row.getReadOnly()}
             hasPreview={false}
-            alignment={getAlignment()}
+            alignment={getAlignment(row)}
+            extraValue={
+              hasLabelDefault(row.depth, isDefault ?? false, hypothesis) ? `(${t('studyDetails.@default')})` : ''
+            }
           />
           {row.getCanExpand() && childrenArray.length > 0 && (
             <RdsTextTooltip text={childrenArray.toString()} offset={5} placement="right">
@@ -123,14 +124,14 @@ const getExpandableHypothesisTableHeaders = (
   columnHelper.accessor('status', {
     header: t('home.@status'),
     cell: ({ row, table: { options } }) => {
-      const { status, isDefault, hypothesis } = row.original;
+      const { status, isDefault, hypothesis, isDeletable } = row.original;
       if (hypothesis === t('thermal.@specific')) return null;
       return progress > 0 && fileStatus === 'loading' && idSelected === row.id ? (
         <ProgressBar statusFile={fileStatus} progressValue={progress} />
       ) : (
         <CellWithStatus
           status={status}
-          isDeletable={!isDefault && studyStatus !== StudyStatus.GENERATED}
+          isDeletable={!isDefault && studyStatus !== StudyStatus.GENERATED && (isDeletable ?? false)}
           onClick={() => {
             void options?.meta?.removeRow?.(hypothesis, row.id);
           }}

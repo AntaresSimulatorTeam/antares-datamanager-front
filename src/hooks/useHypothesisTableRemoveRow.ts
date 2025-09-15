@@ -25,7 +25,6 @@ export const useHypothesisTableRemoveRow = (
           const hasTrajectoryOK =
             subRows?.some((subRow) => subRow.trajectory != null && subRow.status === TRAJECTORY_SELECTION_STATUS.OK) ||
             (trajectory && status === TRAJECTORY_SELECTION_STATUS.OK);
-
           if (study.id && hasTrajectoryOK) {
             const subRowTrajectoryIds = subRows
               ?.map((subRow) => {
@@ -35,7 +34,10 @@ export const useHypothesisTableRemoveRow = (
                 return null;
               })
               .filter(Boolean) as number[];
-            const trajectoryIds = [trajectory?.id, ...subRowTrajectoryIds].filter(Boolean) as number[];
+
+            const trajectoryIds = [...(trajectory?.id ? [trajectory.id] : []), ...(subRowTrajectoryIds ?? [])].filter(
+              Boolean,
+            );
 
             if (trajectoryIds?.length > 1) {
               await unlinkMultipleTrajectoriesFromStudy(study.id, trajectoryIds);
@@ -49,7 +51,7 @@ export const useHypothesisTableRemoveRow = (
             payload: { area: row.hypothesis, type },
           });
 
-          const newDataSorted = sortWithFixedPosition(data.filter((item) => item.hypothesis !== value));
+          const newDataSorted = sortWithFixedPosition(data?.filter((item) => item.hypothesis !== value));
           setData(newDataSorted);
 
           if (value) {

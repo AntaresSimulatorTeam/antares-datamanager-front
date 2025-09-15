@@ -1,11 +1,4 @@
-import {
-  CheckBoxData,
-  DbTrajectory,
-  HypothesisRowData,
-  HypothesisTab,
-  RowStatus,
-  WarningMessage,
-} from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, HypothesisTab, RowStatus, WarningMessage } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { FileInputStatus } from 'rte-design-system-react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
@@ -51,6 +44,16 @@ export const getBgColor = (status?: FileInputStatus) => {
 };
 
 /**
+ * Generates the default label for a given area.
+ *
+ * @function
+ * @param {string} areaName - The name of the area.
+ * @returns {string} The generated label for the area. If the area is the default and its name does not
+ * match `OTHER_AREAS`, the label will include the area's name and the default label. Otherwise, only the area's name is returned.
+ */
+export const getDefaultLabel = (areaName: string): string => (areaName === OTHER_AREAS ? OTHER_AREAS_LABEL : areaName);
+
+/**
  * Create row data for a trajectory with error status
  * @param {TRAJECTORY_TYPE} type
  * @param {number} trajectoryId
@@ -77,7 +80,7 @@ export const buildErrorTrajectory = (
 });
 
 /**
- * Remove duplicate within an array of data base trajectory
+ * Remove duplicate within an array of database trajectory
  * @param {DbTrajectory[] | null} array
  * @return {DbTrajectory[]}
  */
@@ -129,7 +132,7 @@ export const buildRowData = (areaName: string, isDefault: boolean, trajectory?: 
 });
 
 /**
- * Create empty data base trajectory
+ * Create empty database trajectory
  * @param {string} area
  * @param {TRAJECTORY_TYPE} type
  * @param {string} technology
@@ -151,6 +154,7 @@ export const buildEmptyTrajectory = (area: string, type: TRAJECTORY_TYPE, techno
  * Generates row data with optional sub-rows based on a trajectory and associated options.
  *
  * @param {DbTrajectory} trajectory - The trajectory object containing load area and other properties.
+ * @param defaultLabel
  * @param {string[]} subRowOptions - An array of sub-row options to be considered for sub-rows.
  * @param {{name: string}[]} [defaultAreas] - An optional array of default areas used to check if a trajectory is default.
  * @param {string[]} [areasNotInTrajectoryArea] - An optional array of area names not included in the trajectory's area.
@@ -164,29 +168,35 @@ export const buildRowWithSubRowsData = (
   }[],
   areasNotInTrajectoryArea?: string[],
   subRowOptions?: string[] | null,
-): HypothesisRowData => ({
-  hypothesis: trajectory.area === OTHER_AREAS ? OTHER_AREAS_LABEL : (trajectory.area as string),
-  trajectory: trajectory.trajectoryName && !trajectory?.technology ? trajectory : null,
-  status:
-    trajectory.trajectoryName && !trajectory?.technology
-      ? TRAJECTORY_SELECTION_STATUS.OK
-      : TRAJECTORY_SELECTION_STATUS.MISSING,
-  isDefault:
-    defaultAreas?.some((item: { name: string }) => item.name === trajectory.area) || OTHER_AREAS === trajectory.area,
-  subRows:
-    trajectory.area !== OTHER_AREAS && !areasNotInTrajectoryArea?.some((item) => item === trajectory.area)
-      ? subRowOptions?.map((option) => {
-          const hasTechnology = trajectory?.trajectoryName && option === trajectory?.technology;
-          return {
-            hypothesis: option,
-            trajectory: hasTechnology ? trajectory : null,
-            status: hasTechnology ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
-            isDefault: true,
-            subRows: null,
-          };
-        })
-      : null,
-});
+): HypothesisRowData => {
+  const isDefault = defaultAreas?.some((item: { name: string }) => item.name === trajectory.area) ?? false;
+  return {
+    hypothesis: getDefaultLabel(trajectory.area ?? ''),
+    trajectory: trajectory.trajectoryName && !trajectory?.technology ? trajectory : null,
+    status:
+      trajectory.trajectoryName && !trajectory?.technology
+        ? TRAJECTORY_SELECTION_STATUS.OK
+        : TRAJECTORY_SELECTION_STATUS.MISSING,
+    isDefault: isDefault || OTHER_AREAS === trajectory.area,
+    isDeletable: !isDefault && OTHER_AREAS !== trajectory.area,
+    subRows:
+      trajectory.area &&
+      trajectory.area !== OTHER_AREAS &&
+      !areasNotInTrajectoryArea?.some((item) => item === trajectory.area)
+        ? subRowOptions?.map((option) => {
+            const hasTechnology = trajectory?.trajectoryName && option === trajectory?.technology;
+            return {
+              hypothesis: option,
+              trajectory: hasTechnology ? trajectory : null,
+              status: hasTechnology ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+              isDefault: true,
+              isDeletable: false,
+              subRows: null,
+            };
+          })
+        : null,
+  };
+};
 
 /**
  * Determines if a given area is linked to any trajectory with an empty technology field in the provided trajectory list.
@@ -199,6 +209,12 @@ export const buildRowWithSubRowsData = (
  */
 export const isTrajectoryLinked = (area: { name: string }, trajectories: DbTrajectory[]): boolean =>
   trajectories.some((trajectory) => area.name === trajectory.area && trajectory.technology === '');
+
+/**
+ *
+ * @param {string} area
+ */
+export const isTechnology = (area: string): boolean => ThermalOptions.some((option) => option === area);
 
 /**
  * Function to build a default list of empty trajectories based on the provided trajectory type,
@@ -274,17 +290,17 @@ export const convertIntoHypothesisRowWithTechnologies = (
           })
         : null;
 
+    const isDefault = defaultAreas?.some((item: { name: string }) => item.name === mainEntry?.area) ?? false;
     return {
-      hypothesis: area === OTHER_AREAS ? OTHER_AREAS_LABEL : area,
+      hypothesis: getDefaultLabel(area),
       trajectory: mainEntry?.trajectoryName ? mainEntry : null,
       status:
         mainEntry?.trajectoryName && !mainEntry?.technology
           ? TRAJECTORY_SELECTION_STATUS.OK
           : TRAJECTORY_SELECTION_STATUS.MISSING,
-      isDefault:
-        defaultAreas?.some((item: { name: string }) => item.name === mainEntry?.area) ||
-        OTHER_AREAS === mainEntry?.area,
+      isDefault: isDefault || OTHER_AREAS === mainEntry?.area,
       subRows: subRows?.length ? subRows : null,
+      isDeletable: true,
     };
   });
 };
@@ -367,8 +383,17 @@ export const getStudyMenu = (t: (value: string) => string, isTrajectoryAreaLinke
   { name: TRAJECTORY_TYPE.MISC, label: t('studyDetails.@misc'), icon: StdIconId.Category, isDisabled: true },
 ];
 
-export const isMatchingTrajectoryType = (trajectoryKey: TRAJECTORY_TYPE) => (trajectoryType: TRAJECTORY_TYPE) =>
-  trajectoryType === trajectoryKey;
+/**
+ * A higher-order function that checks if a given trajectory type matches a specified trajectory key.
+ *
+ * @param {TRAJECTORY_TYPE} trajectoryKey - The key representing the trajectory type to match.
+ * @returns {function(TRAJECTORY_TYPE): boolean} A function that takes a trajectory type and returns `true`
+ * if it matches the trajectory key, otherwise returns `false`.
+ */
+export const isMatchingTrajectoryType =
+  (trajectoryKey: TRAJECTORY_TYPE): ((arg0: TRAJECTORY_TYPE) => boolean) =>
+  (trajectoryType: TRAJECTORY_TYPE) =>
+    trajectoryType === trajectoryKey;
 
 /**
  * Select data row according to index array provided
@@ -383,7 +408,7 @@ export const getRowDataSelected = (data: HypothesisRowData[], indexArray: number
  * Get a name composed of an area name and a technology name
  * @param {string} rowIdSelected
  * @param {HypothesisRowData[]} data
- * @return {string}
+ * @return {{area: string, technology: string}}
  */
 export const getAreaTrajectoryName = (rowIdSelected: string, data: HypothesisRowData[]): string => {
   const [mainIndex, subIndex] = rowIdSelected.split('.').map(Number);
@@ -484,15 +509,58 @@ export const getChildrenList = (row: Row<HypothesisRowData>): string[] =>
     : [];
 
 /**
- * Generates the default label for a given area.
+ * Determines the trajectory type based on the provided index value.
  *
- * @function
- * @param {Object} area - The area object containing name and default status.
- * @param {string} area.name - The name of the area.
- * @param {boolean} area.isDefault - Indicates whether the area is the default area.
- * @param {string} defaultLabel - The label to append if the area is marked as default and meets the condition.
- * @returns {string} The generated label for the area. If the area is the default and its name does not
- * match `OTHER_AREAS`, the label will include the area's name and the default label. Otherwise, only the area's name is returned.
+ * @param {number} index - The index representing a specific trajectory type.
+ * @returns {TRAJECTORY_TYPE} - The trajectory type corresponding to the index provided.
+ *                              Returns `TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER` for index 1,
+ *                              `TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER` for index 2,
+ *                              and `TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER` for index 0 or any other value.
  */
-export const getDefaultLabel = (area: CheckBoxData, defaultLabel: string): string =>
-  area.isDefault && area.name !== OTHER_AREAS ? `${area.name} (${defaultLabel})` : area.name;
+export const getTrajectoryTypeByIndex = (index: number): TRAJECTORY_TYPE => {
+  switch (index) {
+    case 1:
+      return TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER;
+    case 2:
+      return TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER;
+    case 0:
+    default:
+      return TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER;
+  }
+};
+
+/**
+ * Determines the file path based on the trajectory type.
+ *
+ * @param {TRAJECTORY_TYPE} type - The trajectory type used to select the corresponding file path.
+ * @returns {string | null} The file path associated with the given trajectory type.
+ */
+export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE): string | null => {
+  switch (type) {
+    case TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER:
+      return '\\\\thermal\\economic parameters\\economic';
+    case TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER:
+      return '\\\\thermal\\economic parameters\\costs';
+    case TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER:
+      return '\\\\thermal\\technical parameters\\param_modulation';
+    case TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER:
+    case TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER:
+      return '\\\\thermal\\technical parameters';
+    default:
+      return null;
+  }
+};
+
+/**
+ * Determines the area name according to the trajectory type and the hypothesis
+ * @param {TRAJECTORY_TYPE} type
+ * @param {string} hypothesis
+ * @return {string}
+ */
+export const getQueryParamAreaValue = (type: TRAJECTORY_TYPE, hypothesis: string): string => {
+  let area = hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : hypothesis;
+  if (type === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
+    area = hypothesis?.includes('FR') ? 'FR' : OTHER_AREAS;
+  }
+  return area ?? '';
+};

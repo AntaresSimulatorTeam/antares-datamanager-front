@@ -15,6 +15,7 @@ import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { sortWithFixedPosition } from '@/shared/utils/sortUtils';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { getReadOnlyForGeneratedStudy } from '@/shared/helpers/hypothesisTableHelper.ts';
+import { getDefaultAreaNotIncludedInAreaList } from '@/shared/utils/hypothesisTableUtils.ts';
 
 export const useFetchHypothesisTrajectories = (
   studyId?: number,
@@ -83,12 +84,8 @@ export const useFetchHypothesisTrajectories = (
           // Build row data for hypothesis table
           // Find default area not included in areas trajectory list
           const defaultAreaListNotIncludedInList: string[] = defaultAreas
-            ?.map((defaultArea) => {
-              if (!areas?.some((trajectoryArea) => trajectoryArea.areaName === defaultArea.name)) {
-                return defaultArea.name;
-              }
-            })
-            .filter(Boolean) as string[];
+            ? getDefaultAreaNotIncludedInAreaList(defaultAreas, areas)
+            : [];
 
           // Hypothesis table
           const areaData =
@@ -113,7 +110,7 @@ export const useFetchHypothesisTrajectories = (
           }
         }
       } catch {
-        // Silent handler
+        // Silent handlers
       }
     },
     [defaultAreas, emptyAreaSelected, dispatch, areas, isStudyGenerated],

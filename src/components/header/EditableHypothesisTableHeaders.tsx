@@ -15,6 +15,7 @@ import { LabelWithDeleteButton } from '@common/data/LabelWithDeleteButton.tsx';
 import { SelectInputWithButton } from '@common/data/SelectInputWithButton.tsx';
 import { ErrorMessageType } from '@/shared/types/Generic.type.ts';
 import { ProgressBar } from '@/components/forms/ProgressBar.tsx';
+import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
 
@@ -32,9 +33,15 @@ const getEditableHypothesisTableHeaders = (
     header: columnHeader || t('studyDetails.@area'),
     size: 120,
     cell: ({ getValue, row }) => {
-      const { status } = row.original;
+      const { status, isDefault } = row.original;
       return (
-        <LabelWithButtonPreview value={getValue()} status={status} isReadOnly={row.getReadOnly()} hasPreview={false} />
+        <LabelWithButtonPreview
+          value={getValue()}
+          extraValue={isDefault && getValue() !== OTHER_AREAS_LABEL ? `(${t('studyDetails.@default')})` : ''}
+          status={status}
+          isReadOnly={row.getReadOnly()}
+          hasPreview={false}
+        />
       );
     },
   }),
@@ -82,13 +89,13 @@ const getEditableHypothesisTableHeaders = (
   columnHelper.accessor('status', {
     header: t('home.@status'),
     cell: ({ row, table: { options } }) => {
-      const { status, hypothesis, isDefault } = row.original;
+      const { status, hypothesis, isDefault, isDeletable } = row.original;
       return progress > 0 && fileStatus === 'loading' && idSelected === row.id ? (
         <ProgressBar statusFile={fileStatus} progressValue={progress} />
       ) : (
         <CellWithStatus
           status={status}
-          isDeletable={!isDefault && !(studyStatus === StudyStatus.GENERATED)}
+          isDeletable={!isDefault && studyStatus !== StudyStatus.GENERATED && (isDeletable ?? false)}
           onClick={() => void options?.meta?.removeRow?.(hypothesis, row.id)}
         />
       );

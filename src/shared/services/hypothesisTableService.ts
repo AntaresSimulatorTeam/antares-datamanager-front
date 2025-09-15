@@ -1,4 +1,9 @@
-import { buildEmptyTrajectory, buildErrorTrajectory, setNestedData } from '@/shared/utils/trajectoryUtils.ts';
+import {
+  buildEmptyTrajectory,
+  buildErrorTrajectory,
+  getQueryParamAreaValue,
+  setNestedData,
+} from '@/shared/utils/trajectoryUtils.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { notifyAlert } from '@/shared/notification/notification.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
@@ -44,7 +49,8 @@ export const handleFetchTrajectoriesFS = async (
   hypothesis?: string,
 ): Promise<void> => {
   try {
-    const results = await fetchTrajectoriesFromFS(type, '', hypothesis);
+    const area = hypothesis ? getQueryParamAreaValue(type, hypothesis) : '';
+    const results = await fetchTrajectoriesFromFS(type, '', area);
     setOptionsFS(convertToFSSelectionOptionType(results));
     setRowIdSelected(rowId);
     toggleModal();
@@ -92,6 +98,7 @@ export const addRow = (
     trajectory: null,
     status: TRAJECTORY_SELECTION_STATUS.MISSING,
     isDefault: false,
+    isDeletable: true,
     subRows: hasSubRows
       ? ThermalOptions.map((option) => ({
           hypothesis: option,

@@ -7,8 +7,8 @@ import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { fetchTrajectoriesFromFS } from '@/shared/services/trajectoryService.ts';
 import { convertToFSSelectionOptionType } from '@/shared/utils/formFormatter.ts';
 import StdButton from '@common/base/stdButton/StdButton';
-import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
+import { getPathFromTrajectoryType, getQueryParamAreaValue } from '@/shared/utils/trajectoryUtils.ts';
 
 interface ImportTrajectoryModalProps {
   options: SelectOption[] | undefined;
@@ -20,6 +20,7 @@ interface ImportTrajectoryModalProps {
 export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, area }: ImportTrajectoryModalProps) => {
   const { t } = useTranslation();
   const [trajectorySelected, setTrajectorySelected] = useState<SelectOption | null>(null);
+  const path = getPathFromTrajectoryType(trajectoryType);
 
   const handleSelectOption = (value: SelectOption | null) => {
     if (value) {
@@ -33,16 +34,16 @@ export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, area }
 
   const handleSearchTerm = useCallback(
     async (searchTerm?: string) => {
+      if (!searchTerm && !options?.length) return;
       try {
-        const searchArea =
-          trajectoryType === TRAJECTORY_TYPE.THERMAL_CAPACITY && area?.includes('FR') ? 'FR' : OTHER_AREAS;
+        const searchArea = area ? getQueryParamAreaValue(trajectoryType, area) : '';
         const results = await fetchTrajectoriesFromFS(trajectoryType, searchTerm, searchArea);
         return convertToFSSelectionOptionType(results);
       } catch (error) {
         // silent handler
       }
     },
-    [trajectoryType, area],
+    [options, area, trajectoryType],
   );
 
   return (
@@ -53,6 +54,9 @@ export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, area }
         })}
       </RdsModal.Title>
       <RdsModal.Content>
+        {path && (
+          <span className="mb-1 flex text-body-s text-gray-600">{t('studyDetails.@select_from', { path })}</span>
+        )}
         <div className="flex h-full flex-col">
           <div className="absolute z-10">
             <div className="w-[400px]">

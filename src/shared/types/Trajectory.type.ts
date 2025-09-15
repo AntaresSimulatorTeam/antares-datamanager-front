@@ -34,6 +34,7 @@ export type HypothesisRowData = {
   status: TRAJECTORY_SELECTION_STATUS;
   isDefault?: boolean;
   subRows?: HypothesisRowData[] | null;
+  isDeletable?: boolean;
 };
 
 export type RowStatus = FileInputStatus | 'warning' | 'emptyError';

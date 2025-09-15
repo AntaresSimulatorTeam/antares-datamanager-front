@@ -76,7 +76,7 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
       hypothesisTrajectories && setData(hypothesisTrajectories);
       setReadOnly(readOnlyRow);
     };
-    void setHypothesis();
+    setHypothesis();
   }, [
     hypothesisTrajectories,
     areas,
@@ -123,7 +123,11 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
               <div key={`${index}-${area.name}`} className="my-1">
                 <StdCheckbox
                   key={`load-checkbox-${area.name}`}
-                  label={area.name}
+                  label={
+                    area.name !== OTHER_AREAS && area.isDefault
+                      ? `${area.name} (${t('studyDetails.@default')})`
+                      : area.name
+                  }
                   value={area.name}
                   name={''}
                   disabled={area.isDefault}
@@ -151,9 +155,16 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
                 data[Number(rowId)]?.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : data[Number(rowId)]?.hypothesis;
               return await handleTrajectorySearch(TRAJECTORY_TYPE.LOAD, value, area, setDbTrajectories, study);
             }}
-            handleImport={async (rowId: string) =>
-              await handleFetchTrajectoriesFS(TRAJECTORY_TYPE.LOAD, rowId, setOptionsFS, setRowIdSelected, toggleModal)
-            }
+            handleImport={async (rowId: string) => {
+              await handleFetchTrajectoriesFS(
+                TRAJECTORY_TYPE.LOAD,
+                rowId,
+                setOptionsFS,
+                setRowIdSelected,
+                toggleModal,
+                data[Number(rowId)]?.hypothesis,
+              );
+            }}
             removeRow={(value: string, rowId?: string) => {
               if (shouldOpenDeletionModal(TRAJECTORY_TYPE.LOAD, Number(rowId), data)) {
                 setRowToDelete({ index: Number(rowId), value });

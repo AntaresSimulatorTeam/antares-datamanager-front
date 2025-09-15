@@ -83,7 +83,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
 
   return (
     <div className="flex h-full w-full gap-6">
-      <div className="flex h-fit w-28 flex-col gap-1 rounded border border-gray-400 p-2">
+      <div className="flex h-fit w-28 flex-col rounded border border-gray-400 p-2">
         <div className="border-b border-gray-400 pb-2">
           <SearchBar onSearch={() => {}} placeholder={t('studyDetails.@search_area')} />
         </div>
@@ -102,12 +102,17 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
             }
           }}
           checkedValues={checkedValues}
+          disabled={isStudyGenerated}
         >
           {areasOptions?.map((area, index) => (
             <div key={`${area.name}`} className="my-1">
               <StdCheckbox
                 key={`nested-${area.name}`}
-                label={area.name}
+                label={
+                  area.name !== OTHER_AREAS && area.isDefault
+                    ? `${area.name} (${t('studyDetails.@default')})`
+                    : area.name
+                }
                 value={area.name}
                 name={''}
                 disabled={area.isDefault}
@@ -154,7 +159,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
                 setOptionsFS,
                 setRowIdSelected,
                 toggleModal,
-                data[indexArray[0]]?.hypothesis === 'FR' ? 'FR' : OTHER_AREAS,
+                data[indexArray[0]]?.hypothesis,
               );
             }}
             isReadOnlyEnable={true}
