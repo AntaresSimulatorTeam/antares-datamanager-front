@@ -195,7 +195,7 @@ describe('buildEmptyTrajectory', () => {
 describe('buildRowWithSubRowsData', () => {
   const subRowOptions = ['Option A', 'Option B'];
 
-  it('returns correct data when loadArea is OTHER_AREAS', () => {
+  it('returns correct data when area is OTHER_AREAS et que ', () => {
     const trajectory = { area: OTHER_AREAS, technology: '', trajectoryName: 'name' } as DbTrajectory;
 
     const result = buildRowWithSubRowsData(trajectory, [], [], subRowOptions);
@@ -206,6 +206,21 @@ describe('buildRowWithSubRowsData', () => {
       status: TRAJECTORY_SELECTION_STATUS.OK,
       isDefault: true,
       isDeletable: false,
+      subRows: null,
+    });
+  });
+
+  it('returns correct data when area is undefined', () => {
+    const trajectory = { technology: '', trajectoryName: 'name' } as DbTrajectory;
+
+    const result = buildRowWithSubRowsData(trajectory, [], [], subRowOptions);
+
+    expect(result).toEqual({
+      hypothesis: '',
+      trajectory,
+      status: TRAJECTORY_SELECTION_STATUS.OK,
+      isDefault: false,
+      isDeletable: true,
       subRows: null,
     });
   });
@@ -228,6 +243,7 @@ describe('buildRowWithSubRowsData', () => {
           trajectory: null,
           status: TRAJECTORY_SELECTION_STATUS.MISSING,
           isDefault: true,
+          isDeletable: false,
           subRows: null,
         },
         {
@@ -235,6 +251,7 @@ describe('buildRowWithSubRowsData', () => {
           trajectory: null,
           status: TRAJECTORY_SELECTION_STATUS.MISSING,
           isDefault: true,
+          isDeletable: false,
           subRows: null,
         },
       ],
@@ -258,6 +275,7 @@ describe('buildRowWithSubRowsData', () => {
           trajectory,
           status: TRAJECTORY_SELECTION_STATUS.OK,
           isDefault: true,
+          isDeletable: false,
           subRows: null,
         },
         {
@@ -265,6 +283,7 @@ describe('buildRowWithSubRowsData', () => {
           trajectory: null,
           status: TRAJECTORY_SELECTION_STATUS.MISSING,
           isDefault: true,
+          isDeletable: false,
           subRows: null,
         },
       ],
