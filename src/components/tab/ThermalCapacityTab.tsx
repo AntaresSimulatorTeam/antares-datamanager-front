@@ -83,7 +83,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
 
   return (
     <div className="flex h-full w-full gap-6">
-      <div className="flex h-fit w-28 flex-col gap-1 rounded border border-gray-400 p-2">
+      <div className="flex h-fit w-28 flex-col rounded border border-gray-400 p-2">
         <div className="border-b border-gray-400 pb-2">
           <SearchBar onSearch={() => {}} placeholder={t('studyDetails.@search_area')} />
         </div>

@@ -62,6 +62,9 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
       isDeletable: false,
     },
   ];
+  const [progress] = useState(0);
+  const [fileStatus] = useState<FileInputStatus>('empty');
+  const [rowIndexSelected] = useState('0');
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
   const [technicalData, setTechnicalData] = useState<HypothesisRowData[]>([]);
@@ -211,7 +214,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
           data={technicalData}
           getTableHeaders={getExpandableHypothesisTableHeaders}
           columnHeader={t('thermal.@parametersTechnical')}
-          fileStatus={fileStatus}
+          fileStatus={'success'}
           studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
           readOnly={readOnly}
           progress={progress}

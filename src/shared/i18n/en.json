@@ -138,8 +138,8 @@
     "@paramModulation": "Param modulation",
     "@common": "Common",
     "@parametersEconomic": "Economic Parameters",
-    "@costs": "Costs",
-    "@economics": "Economics"
+    "@costs": "Cost",
+    "@economics": "Economic"
   },
   "trajectoryViewModal": {
     "@title_area": "Areas",

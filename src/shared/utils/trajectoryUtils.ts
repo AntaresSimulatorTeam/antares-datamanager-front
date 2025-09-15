@@ -180,7 +180,9 @@ export const buildRowWithSubRowsData = (
     isDefault: isDefault || OTHER_AREAS === trajectory.area,
     isDeletable: !isDefault && OTHER_AREAS !== trajectory.area,
     subRows:
-      trajectory.area !== OTHER_AREAS && !areasNotInTrajectoryArea?.some((item) => item === trajectory.area)
+      trajectory.area &&
+      trajectory.area !== OTHER_AREAS &&
+      !areasNotInTrajectoryArea?.some((item) => item === trajectory.area)
         ? subRowOptions?.map((option) => {
             const hasTechnology = trajectory?.trajectoryName && option === trajectory?.technology;
             return {
@@ -188,6 +190,7 @@ export const buildRowWithSubRowsData = (
               trajectory: hasTechnology ? trajectory : null,
               status: hasTechnology ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
               isDefault: true,
+              isDeletable: false,
               subRows: null,
             };
           })
