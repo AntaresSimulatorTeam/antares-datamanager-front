@@ -35,11 +35,9 @@ export const useHypothesisTableRemoveRow = (
               })
               .filter(Boolean) as number[];
 
-            const trajectoryIds = subRowTrajectoryIds
-              ? ([trajectory?.id, ...subRowTrajectoryIds].filter(Boolean) as number[])
-              : trajectory?.id
-                ? [trajectory?.id]
-                : [];
+            const trajectoryIds = [...(trajectory?.id ? [trajectory.id] : []), ...(subRowTrajectoryIds ?? [])].filter(
+              Boolean,
+            );
 
             if (trajectoryIds?.length > 1) {
               await unlinkMultipleTrajectoriesFromStudy(study.id, trajectoryIds);
@@ -61,7 +59,6 @@ export const useHypothesisTableRemoveRow = (
           }
         }
       } catch (error) {
-        console.log('=================== error', error);
         const errorMessage = t('studyDetails.@notificationAlert', {
           studyName: study.name,
           trajectoryName: value,
