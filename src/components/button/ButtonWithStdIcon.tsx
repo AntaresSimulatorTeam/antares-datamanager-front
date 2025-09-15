@@ -60,7 +60,7 @@ export const ButtonWithStdIcon = ({
     if (isLoading) {
       return (
         <div className="max-h-3 min-w-12">
-          <div className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-gray-600 border-b-transparent p-0"></div>
+          <div className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-gray-w border-b-transparent p-0"></div>
         </div>
       );
     } else {

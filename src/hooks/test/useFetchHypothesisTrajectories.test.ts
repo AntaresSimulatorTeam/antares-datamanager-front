@@ -519,4 +519,13 @@ describe('useFetchTrajectoriesLinked', () => {
       expect(result.current.hypothesisTrajectories).toEqual([]);
     });
   });
+
+  it('should throw error when api call throw an exception', async () => {
+    const { result } = renderHook(() => useFetchHypothesisTrajectories());
+
+    await waitFor(() => {
+      expect(studyService.getStudyTrajectories).toHaveBeenCalledTimes(0);
+      expect(result.current.hypothesisTrajectories).toEqual([]);
+    });
+  });
 });

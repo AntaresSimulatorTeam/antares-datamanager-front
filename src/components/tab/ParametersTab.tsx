@@ -196,7 +196,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
           data={technicalData}
           getTableHeaders={getExpandableHypothesisTableHeaders}
           columnHeader={t('thermal.@parametersTechnical')}
-          fileStatus={fileStatus}
+          fileStatus={'success'}
           studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
           readOnly={readOnly}
           progress={progress}
@@ -241,7 +241,6 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
               const indexArray = rowIdSelected.split('.').map(Number);
               await importTrajectory(getTrajectoryTypeByIndex(indexArray[0]), value, indexArray, technicalData);
             }
-          }}
           trajectoryType={getTrajectoryTypeByIndex(Number(rowIdSelected))}
           area={getAreaTrajectoryName(rowIdSelected, technicalData)}
         />
