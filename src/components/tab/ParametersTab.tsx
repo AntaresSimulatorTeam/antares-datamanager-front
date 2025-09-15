@@ -8,7 +8,7 @@ import getEditableHypothesisTableHeaders from '@/components/header/EditableHypot
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
-import { useStudy } from '@/store/contexts/StudyContext.tsx';
+import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import StdCheckboxGroupWrapper from '@common/forms/stdCheckboxGroup/StdCheckboxGroupWrapper.tsx';
 import StdCheckbox from '@common/forms/stdCheckbox/StdCheckbox.tsx';
 import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
@@ -21,6 +21,7 @@ import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { handleFetchTrajectoriesFS } from '@/shared/services/hypothesisTableService.ts';
 import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
 import { transformToSubRowKeys } from '@/shared/utils/hypothesisTableUtils.ts';
+import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 
 interface ParametersTabProps {
   defaultAreas: { name: string }[];
@@ -32,6 +33,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
   const studyState = useStudy();
   const location = useLocation();
   const study = (location.state as LocationStudy)?.study;
+  const dispatch = useStudyDispatch();
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
   const data: HypothesisRowData[] = [
@@ -67,6 +69,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
       areas,
       isStudyGenerated,
     );
+  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(study, studyState, dispatch, setTechnicalData);
 
   useEffect(() => {
     const setHypothesis = () => {
@@ -194,10 +197,10 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
           data={technicalData}
           getTableHeaders={getExpandableHypothesisTableHeaders}
           columnHeader={t('thermal.@parametersTechnical')}
-          fileStatus={'success'}
+          fileStatus={fileStatus}
           studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
           readOnly={readOnly}
-          progress={0}
+          progress={progress}
           idSelected={rowIndexSelected}
           handleSearch={async (_value: string, _rowId: string) => Promise.resolve(undefined)}
           handleImport={async (rowId: string) => {
@@ -233,9 +236,12 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
       {isModalOpen && (
         <ImportTrajectoryModal
           options={optionsFS}
-          onClose={(_value?: SelectOption) => {
+          onClose={async (value?: SelectOption) => {
             toggleModal();
-            return Promise.resolve(); // TODO: replace by importTrajectory
+            if (value != null) {
+              const indexArray = rowIdSelected.split('.').map(Number);
+              await importTrajectory(getTrajectoryTypeByIndex(indexArray[0]), value, indexArray, technicalData);
+            }
           }}
           trajectoryType={getTrajectoryTypeByIndex(Number(rowIdSelected))}
           area={getAreaTrajectoryName(rowIdSelected, technicalData)}
