@@ -110,8 +110,7 @@ export const useFetchHypothesisTrajectories = (
           }
         }
       } catch {
-        // Silent handler
-        console.error('Error when fetching areas');
+        // Silent handlers
       }
     },
     [defaultAreas, emptyAreaSelected, dispatch, areas, isStudyGenerated],

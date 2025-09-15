@@ -6,6 +6,7 @@ import {
   buildReadOnlyRow,
   buildRowData,
   buildRowWithSubRowsData,
+  convertIntoHypothesisRowWithTechnologies,
   getAreaTrajectoryName,
   getBgColor,
   getChildrenList,
@@ -38,6 +39,7 @@ import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { DbTrajectory, HypothesisRowData, HypothesisTab } from '@/shared/types';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { Row } from '@tanstack/react-table';
+import { ThermalOptions } from '@/mocks/data/list/names.ts';
 
 describe('getStatus', () => {
   it("should return an ERROR selection status for 'error' status", () => {
@@ -802,5 +804,61 @@ describe('getQueryParamAreaValue', () => {
   it('should handle undefined hypothesis gracefully', () => {
     const result = getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD, undefined as unknown as string);
     expect(result).toBe('');
+  });
+});
+
+describe('convertIntoHypothesisRowWithTechnologies', () => {
+  it('should group by area and generate main entry with subRows', () => {
+    const data = [
+      { area: 'ZoneA', technology: '', trajectoryName: 'MainTrajectory' },
+      { area: 'ZoneA', technology: 'Additional power', trajectoryName: 'Trajectory1' },
+      { area: 'ZoneA', technology: 'Biomass', trajectoryName: 'Trajectory2' },
+    ] as DbTrajectory[];
+
+    const result = convertIntoHypothesisRowWithTechnologies(data, [], [{ name: 'ZoneA' }]);
+
+    expect(result).toHaveLength(1);
+    expect(result[0]).toMatchObject({
+      hypothesis: getDefaultLabel('ZoneA'),
+      trajectory: { trajectoryName: 'MainTrajectory' },
+      status: TRAJECTORY_SELECTION_STATUS.OK,
+      isDefault: true,
+      isDeletable: true,
+    });
+    expect(result[0].subRows).toHaveLength(ThermalOptions.length);
+    expect(result[0].subRows?.[0].status).toBe(TRAJECTORY_SELECTION_STATUS.OK);
+  });
+
+  it('should return subRows as null if area is OTHER_AREAS', () => {
+    const data = [{ area: OTHER_AREAS, technology: '', trajectoryName: 'MainTrajectory' }] as DbTrajectory[];
+    const result = convertIntoHypothesisRowWithTechnologies(data, [], []);
+
+    expect(result[0].subRows).toBeNull();
+    expect(result[0].isDefault).toBe(true);
+  });
+
+  it('should return status MISSING if trajectoryName is missing', () => {
+    const data = [{ area: 'ZoneB', technology: '', trajectoryName: '' }] as DbTrajectory[];
+    const result = convertIntoHypothesisRowWithTechnologies(data, [], []);
+
+    expect(result[0].status).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
+    expect(result[0].trajectory).toBeNull();
+  });
+
+  it('should handle undefined defaultAreas', () => {
+    const data = [{ area: 'ZoneC', technology: '', trajectoryName: 'TrajectoryX' }] as DbTrajectory[];
+    const result = convertIntoHypothesisRowWithTechnologies(data, [], undefined);
+
+    expect(result[0].isDefault).toBe(false);
+  });
+
+  it('should skip subRows if area is in areasNotInTrajectoryArea', () => {
+    const data = [
+      { area: 'ZoneD', technology: '', trajectoryName: 'MainTrajectory' },
+      { area: 'ZoneD', technology: 'Tech1', trajectoryName: 'Trajectory1' },
+    ] as DbTrajectory[];
+    const result = convertIntoHypothesisRowWithTechnologies(data, ['ZoneD'], []);
+
+    expect(result[0].subRows).toBeNull();
   });
 });
