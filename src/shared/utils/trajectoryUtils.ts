@@ -224,6 +224,7 @@ export const buildEmptyRowWithSubRowsData = (value: string, hasSubRows: boolean)
         trajectory: null,
         status: TRAJECTORY_SELECTION_STATUS.MISSING,
         isDefault: true,
+        isDeletable: false,
         subRows: null,
       }))
     : null,

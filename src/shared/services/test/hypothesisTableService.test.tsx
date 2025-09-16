@@ -345,6 +345,65 @@ describe('addRow', () => {
     });
   });
 
+  it('should include subRows for THERMAL_TECHNICAL_SPECIFIC_PARAMETER type', () => {
+    const mockDispatch = vi.fn();
+    const mockSetCheckedValues = vi.fn<Dispatch<SetStateAction<string[]>>>();
+    const mockSetData = vi.fn<Dispatch<SetStateAction<HypothesisRowData[]>>>();
+
+    const existingSubRow = [
+      {
+        hypothesis: 'FR',
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+        isDefault: true,
+        subRows: null,
+      },
+    ];
+    const prevData = [
+      {
+        hypothesis: 'specific',
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+        isDefault: false,
+        isDeletable: false,
+        subRows: existingSubRow,
+      },
+      {
+        hypothesis: 'paramModulation',
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+        isDefault: false,
+        isDeletable: false,
+      },
+      {
+        hypothesis: 'common',
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+        isDefault: false,
+        isDeletable: false,
+      },
+    ] as unknown as HypothesisRowData[];
+
+    addRow(
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+      'ThermalHypothesis',
+      mockDispatch,
+      mockSetCheckedValues,
+      mockSetData,
+    );
+
+    const updater = mockSetData.mock.calls[0][0] as (prev: HypothesisRowData[]) => HypothesisRowData[];
+    const newRow = updater(prevData);
+    expect(newRow[0].subRows).toHaveLength(2);
+    expect(newRow[0].subRows?.[1]).toMatchObject({
+      hypothesis: 'ThermalHypothesis',
+      trajectory: null,
+      status: TRAJECTORY_SELECTION_STATUS.MISSING,
+      isDefault: false,
+      subRows: null,
+    });
+  });
+
   it('should not crash if dispatch is null', () => {
     const mockSetCheckedValues = vi.fn<Dispatch<SetStateAction<string[]>>>();
     const mockSetData = vi.fn<Dispatch<SetStateAction<HypothesisRowData[]>>>();
