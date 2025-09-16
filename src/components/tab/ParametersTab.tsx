@@ -18,7 +18,6 @@ import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import StdCheckboxGroupWrapper from '@common/forms/stdCheckboxGroup/StdCheckboxGroupWrapper.tsx';
 import StdCheckbox from '@common/forms/stdCheckbox/StdCheckbox.tsx';
-import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
 import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
 import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
 import { useLocation } from 'react-router-dom';
@@ -122,32 +121,13 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
     setHypothesis();
   }, [areas, areasTrajectoryOptions, defaultAreas, dropDownListOptions, hypothesisTrajectories, readOnlyRow, t]);
 
-  const setTechnicalParamData = (updatedData: HypothesisRowData[]) => {
-    setTechnicalData((prev) => [
-      ...prev.map((item) => {
-        if (item?.subRows?.length) {
-          return {
-            hypothesis: t('thermal.@specific'),
-            trajectory: null,
-            status: TRAJECTORY_SELECTION_STATUS.MISSING,
-            isDefault: false,
-            isDeletable: false,
-            subRows: sortWithFixedPosition(updatedData) || null,
-          };
-        } else {
-          return item;
-        }
-      }),
-    ]);
-  };
-
   const removeRow = (value: string) => {
     setCheckedValues((prev) => [...prev.filter((checkedValue) => checkedValue !== value)]);
-    const newTechnicalDataSubRow = technicalData?.[0]?.subRows
-      ? technicalData[0].subRows?.filter((itemData) => itemData.hypothesis !== value)
-      : [];
 
-    setTechnicalParamData(newTechnicalDataSubRow);
+    setTechnicalData((prev: HypothesisRowData[]): HypothesisRowData[] => {
+      const newSubRows = prev?.[0]?.subRows ? prev[0].subRows?.filter((itemData) => itemData.hypothesis !== value) : [];
+      return [{ ...prev[0], subRows: newSubRows }, ...prev.slice(1)];
+    });
   };
 
   const handleSelectionChange = (value: string, isChecked: boolean) => {

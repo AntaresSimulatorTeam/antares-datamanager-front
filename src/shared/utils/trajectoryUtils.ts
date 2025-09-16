@@ -93,6 +93,14 @@ export const removeDuplicate = (array?: DbTrajectory[]): DbTrajectory[] =>
     return acc;
   }, []);
 
+/**
+ * Removes duplicate elements from an array of DbTrajectory objects based on the combination
+ * of `area` and `technology` properties. The first occurrence of each combination is retained,
+ * and subsequent duplicates are removed.
+ *
+ * @param {DbTrajectory[]} [array] - Optional array of DbTrajectory objects to process. Defaults to an empty array if not provided.
+ * @returns {DbTrajectory[]} - A new array with duplicates removed based on `area` and `technology` properties.
+ */
 export const removeDuplicateByTechnology = (array?: DbTrajectory[]): DbTrajectory[] =>
   (array || []).reduce((acc: DbTrajectory[], current: DbTrajectory) => {
     const x = acc.find((item) => item.area === current.area && item.technology === current.technology);
@@ -132,7 +140,7 @@ export const buildRowData = (areaName: string, isDefault: boolean, trajectory?: 
 });
 
 /**
- * Create empty database trajectory
+ * Create an empty database trajectory
  * @param {string} area
  * @param {TRAJECTORY_TYPE} type
  * @param {string} technology
@@ -154,7 +162,6 @@ export const buildEmptyTrajectory = (area: string, type: TRAJECTORY_TYPE, techno
  * Generates row data with optional sub-rows based on a trajectory and associated options.
  *
  * @param {DbTrajectory} trajectory - The trajectory object containing load area and other properties.
- * @param defaultLabel
  * @param {string[]} subRowOptions - An array of sub-row options to be considered for sub-rows.
  * @param {{name: string}[]} [defaultAreas] - An optional array of default areas used to check if a trajectory is default.
  * @param {string[]} [areasNotInTrajectoryArea] - An optional array of area names not included in the trajectory's area.
@@ -199,6 +206,30 @@ export const buildRowWithSubRowsData = (
 };
 
 /**
+ * Constructs an object representing a row with optional sub-rows data.
+ *
+ * @param {string} value - The hypothesis value for the main row.
+ * @param {boolean} hasSubRows - Indicates whether the row should include sub-rows.
+ * @returns {HypothesisRowData} An object representing the row, containing details such as hypothesis, trajectory, status, isDefault, isDeletable, and optionally subRows if hasSubRows is true.
+ */
+export const buildEmptyRowWithSubRowsData = (value: string, hasSubRows: boolean): HypothesisRowData => ({
+  hypothesis: value,
+  trajectory: null,
+  status: TRAJECTORY_SELECTION_STATUS.MISSING,
+  isDefault: false,
+  isDeletable: true,
+  subRows: hasSubRows
+    ? ThermalOptions.map((option) => ({
+        hypothesis: option,
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+        isDefault: true,
+        subRows: null,
+      }))
+    : null,
+});
+
+/**
  * Determines if a given area is linked to any trajectory with an empty technology field in the provided trajectory list.
  *
  * @param {{ name: string; technology: string }} area - The area object containing the name and technology properties.
@@ -211,8 +242,10 @@ export const isTrajectoryLinked = (area: { name: string }, trajectories: DbTraje
   trajectories.some((trajectory) => area.name === trajectory.area && trajectory.technology === '');
 
 /**
+ * Checks if the given area corresponds to a valid technology option.
  *
- * @param {string} area
+ * @param {string} area - The name of the area to check.
+ * @returns {boolean} - Returns true if the area matches any of the predefined technology options; otherwise, returns false.
  */
 export const isTechnology = (area: string): boolean => ThermalOptions.some((option) => option === area);
 
@@ -306,7 +339,7 @@ export const convertIntoHypothesisRowWithTechnologies = (
 };
 
 /**
- * Create read only mapping from the read only item indexes array
+ * Create read-only mapping from the read-only item indexes array
  * @param {(number | null)[]} indexes
  * @return {ReadOnlyObject}
  */
@@ -323,7 +356,7 @@ export const buildReadOnlyRow = (indexes?: (number | null)[]): ReadOnlyObject =>
 /**
  *
  * @param {HypothesisRowData[]} rowData
- * @param {string[]} itemsToReadOnly - Items that should be in read only state
+ * @param {string[]} itemsToReadOnly - Items that should be in read-only state
  *
  * @return {ReadOnlyObject}
  */
@@ -396,7 +429,7 @@ export const isMatchingTrajectoryType =
     trajectoryType === trajectoryKey;
 
 /**
- * Select data row according to index array provided
+ * Select the data row according to an index array provided
  * @param {HypothesisRowData[]} data
  * @param {number[]} indexArray
  * @return {HypothesisRowData | null} - Hypothesis row data
