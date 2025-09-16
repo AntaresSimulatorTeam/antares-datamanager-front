@@ -128,8 +128,6 @@ describe('handleFetchTrajectoriesFS', () => {
   });
 
   it('should fetch trajectories for OTHERS area and update state correctly', async () => {
-    const mockResults = [{ id: 1, label: 'Trajectory A' }] as unknown as FsTrajectory[];
-    const mockConvertedOptions = [{ value: '1', label: 'Trajectory A' }] as unknown as SelectOption[];
     vi.mocked(trajectoryService.fetchTrajectoriesFromFS).mockResolvedValueOnce(mockResults);
     vi.mocked(formFormatter.convertToFSSelectionOptionType).mockReturnValue(mockConvertedOptions);
 
@@ -151,8 +149,6 @@ describe('handleFetchTrajectoriesFS', () => {
   });
 
   it('should fetch trajectories for THERMAL CAPACITY area and update state correctly', async () => {
-    const mockResults = [{ id: 1, label: 'Trajectory A' }] as unknown as FsTrajectory[];
-    const mockConvertedOptions = [{ value: '1', label: 'Trajectory A' }] as unknown as SelectOption[];
     vi.mocked(trajectoryService.fetchTrajectoriesFromFS).mockResolvedValueOnce(mockResults);
     vi.mocked(formFormatter.convertToFSSelectionOptionType).mockReturnValue(mockConvertedOptions);
 
@@ -175,8 +171,6 @@ describe('handleFetchTrajectoriesFS', () => {
   });
 
   it('should fetch trajectories for THERMAL CAPACITY OTHERS area and update state correctly', async () => {
-    const mockResults = [{ id: 1, label: 'Trajectory A' }] as unknown as FsTrajectory[];
-    const mockConvertedOptions = [{ value: '1', label: 'Trajectory A' }] as unknown as SelectOption[];
     vi.mocked(trajectoryService.fetchTrajectoriesFromFS).mockResolvedValueOnce(mockResults);
     vi.mocked(formFormatter.convertToFSSelectionOptionType).mockReturnValue(mockConvertedOptions);
 
