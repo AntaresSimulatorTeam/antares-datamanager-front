@@ -82,7 +82,7 @@ const getExpandableHypothesisTableHeaders = (
   }),
   columnHelper.accessor('trajectory', {
     header: t('studyDetails.@trajectory'),
-    size: 350,
+    size: 380,
     cell: ({ row, table: { options } }) => {
       const { trajectory, status, hypothesis } = row.original;
       if (hypothesis === t('thermal.@specific')) return null;
