@@ -1,4 +1,5 @@
 import {
+  buildEmptyRowWithSubRowsData,
   buildEmptyTrajectory,
   buildErrorTrajectory,
   getQueryParamAreaValue,
@@ -10,7 +11,6 @@ import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { Dispatch, SetStateAction } from 'react';
 import { DbTrajectory, HypothesisRowData, SelectOption, StudyActionType, StudyDTO } from '@/shared/types';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
-import { ThermalOptions } from '@/mocks/data/list/names.ts';
 import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
 import { fetchTrajectoriesFromDB, fetchTrajectoriesFromFS } from '@/shared/services/trajectoryService.ts';
 import { convertToFSSelectionOptionType, convertToSelectionOptionType } from '@/shared/utils/formFormatter.ts';
@@ -93,31 +93,17 @@ export const addRow = (
     },
   });
   const hasSubRows = type === TRAJECTORY_TYPE.THERMAL_CAPACITY;
-  const newRow: HypothesisRowData = {
-    hypothesis: value,
-    trajectory: null,
-    status: TRAJECTORY_SELECTION_STATUS.MISSING,
-    isDefault: false,
-    isDeletable: true,
-    subRows: hasSubRows
-      ? ThermalOptions.map((option) => ({
-          hypothesis: option,
-          trajectory: null,
-          status: TRAJECTORY_SELECTION_STATUS.MISSING,
-          isDefault: true,
-          subRows: null,
-        }))
-      : null,
-  };
+  const newRow: HypothesisRowData = buildEmptyRowWithSubRowsData(value, hasSubRows);
   setCheckedValues((prev) => [...prev, value]);
 
   setData((prev) => {
     let updatedData: HypothesisRowData[];
     if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
-      updatedData = prev?.[0]?.subRows ? [...prev[0].subRows, newRow] : [newRow];
+      const newSubRows = prev?.[0]?.subRows ? sortWithFixedPosition([...prev[0].subRows, newRow]) : [newRow];
+      updatedData = [{ ...prev[0], subRows: newSubRows }, ...prev.slice(1)];
     } else {
-      updatedData = [newRow, ...prev];
+      updatedData = sortWithFixedPosition([newRow, ...prev]);
     }
-    return sortWithFixedPosition(updatedData);
+    return updatedData;
   });
 };
