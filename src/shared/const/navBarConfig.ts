@@ -6,11 +6,12 @@
 
 import { APP_NAME } from '@/shared/constants.ts';
 import { NavbarConfig } from '@common/layout/stdNavbar/StdNavbar.tsx';
+import packageJson from '../../../package.json';
 
 export const navBarConfig: NavbarConfig = {
   header: {
     appName: APP_NAME,
-    appVersion: `v${import.meta.env.VITE_APP_VERSION}`,
+    appVersion: `v${packageJson.version}`,
     variant: 'logo',
     logoConfig: {
       logoExpandedHref: 'brand/logo_antares_pegase_light_expand.svg',
