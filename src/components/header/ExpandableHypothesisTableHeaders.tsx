@@ -45,7 +45,7 @@ const getExpandableHypothesisTableHeaders = (
 ): TableOptions<HypothesisRowData>['columns'] => [
   columnHelper.accessor('hypothesis', {
     header: columnHeader || t('studyDetails.@area'),
-    size: 120,
+    size: 130,
     cell: ({ getValue, row }) => {
       const { status, isDefault, hypothesis } = row.original;
       const childrenArray: string[] = getChildrenList(row);
@@ -82,7 +82,7 @@ const getExpandableHypothesisTableHeaders = (
   }),
   columnHelper.accessor('trajectory', {
     header: t('studyDetails.@trajectory'),
-    size: 350,
+    size: 380,
     cell: ({ row, table: { options } }) => {
       const { trajectory, status, hypothesis } = row.original;
       if (hypothesis === t('thermal.@specific')) return null;
