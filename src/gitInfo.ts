@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "fix/column_size",
-  commit: "50d68fe",
-  commitTime: "2025-09-16T09:28:35.873Z"
+  branch: "version/1.4.0",
+  commit: "12b2182",
+  commitTime: "2025-09-16T13:11:47.555Z"
 };
