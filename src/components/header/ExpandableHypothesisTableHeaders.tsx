@@ -45,7 +45,7 @@ const getExpandableHypothesisTableHeaders = (
 ): TableOptions<HypothesisRowData>['columns'] => [
   columnHelper.accessor('hypothesis', {
     header: columnHeader || t('studyDetails.@area'),
-    size: 120,
+    size: 130,
     cell: ({ getValue, row }) => {
       const { status, isDefault, hypothesis } = row.original;
       const childrenArray: string[] = getChildrenList(row);
