@@ -785,7 +785,7 @@ describe('getDefaultLabel', () => {
   });
 
   it('should append defaultLabel when isDefault is true and name is not OTHER_AREAS', () => {
-    const result = getDefaultLabel('Zone A', false, 'par défaut');
+    const result = getDefaultLabel('Zone A');
     expect(result).toBe('Zone A');
   });
 
