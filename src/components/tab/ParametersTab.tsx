@@ -3,7 +3,8 @@ import { RdsDivider } from 'rte-design-system-react';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import {
-  CheckBoxData, DbTrajectory,
+  CheckBoxData,
+  DbTrajectory,
   HypothesisRowData,
   LocationStudy,
   RowStatus,
@@ -30,7 +31,6 @@ import { transformToSubRowKeys } from '@/shared/utils/hypothesisTableUtils.ts';
 import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach';
-
 
 interface ParametersTabProps {
   defaultAreas: { name: string }[];
@@ -61,9 +61,6 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
       isDeletable: false,
     },
   ];
-  const [progress] = useState(0);
-  const [fileStatus] = useState<FileInputStatus>('empty');
-  const [rowIndexSelected] = useState('0');
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
   const [technicalData, setTechnicalData] = useState<HypothesisRowData[]>([]);
@@ -85,7 +82,6 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
   const [dbTrajectories] = useState<DbTrajectory[]>([]);
   const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch, setTechnicalData);
   const { detachTrajectory } = useTrajectoryDetach(study, dispatch, setTechnicalData);
-
 
   useEffect(() => {
     const setHypothesis = () => {
@@ -199,13 +195,15 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
           updateData={(rowId: string, value: unknown, status: RowStatus) => {
             const [topIndex, subIndex] = rowId.split('.').map(Number);
             if (status === 'empty' || status === 'emptyError') {
-              const row =
-                subIndex != null
-                  ? technicalData[topIndex]?.subRows?.[subIndex]
-                  : technicalData[topIndex];
+              const row = subIndex != null ? technicalData[topIndex]?.subRows?.[subIndex] : technicalData[topIndex];
               const current = row?.trajectory ?? null;
               if (current) {
-                void detachTrajectory(getTrajectoryTypeByIndex(topIndex), [topIndex, subIndex].filter(n => n !== undefined), status, current);
+                void detachTrajectory(
+                  getTrajectoryTypeByIndex(topIndex),
+                  [topIndex, subIndex].filter((n) => n !== undefined),
+                  status,
+                  current,
+                );
               }
             }
 
@@ -213,7 +211,12 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
               const dbTrajectory =
                 dbTrajectories.find((traj) => traj.id === value || traj.trajectoryName === value) ?? null;
               if (dbTrajectory) {
-                void attachTrajectory(getTrajectoryTypeByIndex(topIndex), [topIndex, subIndex].filter(n => n !== undefined), status, dbTrajectory);
+                void attachTrajectory(
+                  getTrajectoryTypeByIndex(topIndex),
+                  [topIndex, subIndex].filter((n) => n !== undefined),
+                  status,
+                  dbTrajectory,
+                );
               }
             }
           }}
