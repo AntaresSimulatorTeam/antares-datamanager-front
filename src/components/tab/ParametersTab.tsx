@@ -25,7 +25,7 @@ import { useLocation } from 'react-router-dom';
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { getAreaTrajectoryName, getTrajectoryTypeByIndex } from '@/shared/utils/trajectoryUtils.ts';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
-import { handleFetchTrajectoriesFS } from '@/shared/services/hypothesisTableService.ts';
+import { addRow, handleFetchTrajectoriesFS } from '@/shared/services/hypothesisTableService.ts';
 import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
 import { transformToSubRowKeys } from '@/shared/utils/hypothesisTableUtils.ts';
 import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
@@ -141,22 +141,6 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
     ]);
   };
 
-  const addRow = (value: string) => {
-    const newRow: HypothesisRowData = {
-      hypothesis: value,
-      trajectory: null,
-      status: TRAJECTORY_SELECTION_STATUS.MISSING,
-      isDefault: false,
-      isDeletable: true,
-    };
-    setCheckedValues((prev) => [...prev, value]);
-    const newTechnicalDataSubRow = technicalData?.[0]?.subRows
-      ? sortWithFixedPosition([...technicalData[0].subRows, newRow])
-      : [newRow];
-
-    setTechnicalParamData(newTechnicalDataSubRow);
-  };
-
   const removeRow = (value: string) => {
     setCheckedValues((prev) => [...prev.filter((checkedValue) => checkedValue !== value)]);
     const newTechnicalDataSubRow = technicalData?.[0]?.subRows
@@ -168,7 +152,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
 
   const handleSelectionChange = (value: string, isChecked: boolean) => {
     if (isChecked) {
-      addRow(value);
+      addRow(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, value, dispatch, setCheckedValues, setTechnicalData);
     } else {
       removeRow(value);
     }
@@ -214,7 +198,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
           data={technicalData}
           getTableHeaders={getExpandableHypothesisTableHeaders}
           columnHeader={t('thermal.@parametersTechnical')}
-          fileStatus={'success'}
+          fileStatus={fileStatus}
           studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
           readOnly={readOnly}
           progress={progress}

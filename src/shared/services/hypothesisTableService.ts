@@ -110,5 +110,14 @@ export const addRow = (
       : null,
   };
   setCheckedValues((prev) => [...prev, value]);
-  setData((prev) => sortWithFixedPosition([newRow, ...prev]));
+
+  setData((prev) => {
+    let updatedData: HypothesisRowData[];
+    if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
+      updatedData = prev?.[0]?.subRows ? [...prev[0].subRows, newRow] : [newRow];
+    } else {
+      updatedData = [newRow, ...prev];
+    }
+    return sortWithFixedPosition(updatedData);
+  });
 };
