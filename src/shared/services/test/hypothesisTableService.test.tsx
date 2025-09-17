@@ -128,6 +128,77 @@ describe('handleFetchTrajectoriesFS', () => {
   });
 
   it('should fetch trajectories for OTHERS area and update state correctly', async () => {
+    const mockResults = [{ id: 1, label: 'Trajectory A' }] as unknown as FsTrajectory[];
+    const mockConvertedOptions = [{ value: '1', label: 'Trajectory A' }] as unknown as SelectOption[];
+    vi.mocked(trajectoryService.fetchTrajectoriesFromFS).mockResolvedValueOnce(mockResults);
+    vi.mocked(formFormatter.convertToFSSelectionOptionType).mockReturnValue(mockConvertedOptions);
+
+    // Mocks
+    const setOptionsFS = vi.fn();
+    const setRowIdSelected = vi.fn();
+    const toggleModal = vi.fn();
+
+    const type = TRAJECTORY_TYPE.LOAD;
+    const rowId = 'row-123';
+
+    await handleFetchTrajectoriesFS(type, rowId, setOptionsFS, setRowIdSelected, toggleModal, OTHER_AREAS_LABEL);
+
+    expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith(type, '', OTHER_AREAS);
+    expect(formFormatter.convertToFSSelectionOptionType).toHaveBeenCalledWith(mockResults);
+    expect(setOptionsFS).toHaveBeenCalledWith(mockConvertedOptions);
+    expect(setRowIdSelected).toHaveBeenCalledWith(rowId);
+    expect(toggleModal).toHaveBeenCalled();
+  });
+
+  it('should fetch trajectories for THERMAL CAPACITY area and update state correctly', async () => {
+    const mockResults = [{ id: 1, label: 'Trajectory A' }] as unknown as FsTrajectory[];
+    const mockConvertedOptions = [{ value: '1', label: 'Trajectory A' }] as unknown as SelectOption[];
+    vi.mocked(trajectoryService.fetchTrajectoriesFromFS).mockResolvedValueOnce(mockResults);
+    vi.mocked(formFormatter.convertToFSSelectionOptionType).mockReturnValue(mockConvertedOptions);
+
+    // Mocks
+    const setOptionsFS = vi.fn();
+    const setRowIdSelected = vi.fn();
+    const toggleModal = vi.fn();
+
+    const type = TRAJECTORY_TYPE.THERMAL_CAPACITY;
+    const rowId = 'row-123';
+    const hypothesis = 'FR Default';
+
+    await handleFetchTrajectoriesFS(type, rowId, setOptionsFS, setRowIdSelected, toggleModal, hypothesis);
+
+    expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith(type, '', 'FR');
+    expect(formFormatter.convertToFSSelectionOptionType).toHaveBeenCalledWith(mockResults);
+    expect(setOptionsFS).toHaveBeenCalledWith(mockConvertedOptions);
+    expect(setRowIdSelected).toHaveBeenCalledWith(rowId);
+    expect(toggleModal).toHaveBeenCalled();
+  });
+
+  it('should fetch trajectories for THERMAL CAPACITY OTHERS area and update state correctly', async () => {
+    const mockResults = [{ id: 1, label: 'Trajectory A' }] as unknown as FsTrajectory[];
+    const mockConvertedOptions = [{ value: '1', label: 'Trajectory A' }] as unknown as SelectOption[];
+    vi.mocked(trajectoryService.fetchTrajectoriesFromFS).mockResolvedValueOnce(mockResults);
+    vi.mocked(formFormatter.convertToFSSelectionOptionType).mockReturnValue(mockConvertedOptions);
+
+    // Mocks
+    const setOptionsFS = vi.fn();
+    const setRowIdSelected = vi.fn();
+    const toggleModal = vi.fn();
+
+    const type = TRAJECTORY_TYPE.THERMAL_CAPACITY;
+    const rowId = 'row-123';
+    const hypothesis = 'CZ';
+
+    await handleFetchTrajectoriesFS(type, rowId, setOptionsFS, setRowIdSelected, toggleModal, hypothesis);
+
+    expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith(type, '', OTHER_AREAS);
+    expect(formFormatter.convertToFSSelectionOptionType).toHaveBeenCalledWith(mockResults);
+    expect(setOptionsFS).toHaveBeenCalledWith(mockConvertedOptions);
+    expect(setRowIdSelected).toHaveBeenCalledWith(rowId);
+    expect(toggleModal).toHaveBeenCalled();
+  });
+
+  it('should fetch trajectories for OTHERS area and update state correctly', async () => {
     vi.mocked(trajectoryService.fetchTrajectoriesFromFS).mockResolvedValueOnce(mockResults);
     vi.mocked(formFormatter.convertToFSSelectionOptionType).mockReturnValue(mockConvertedOptions);
 

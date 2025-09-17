@@ -78,7 +78,6 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
       isStudyGenerated,
     );
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(study, studyState, dispatch, setTechnicalData);
-
   const [dbTrajectories] = useState<DbTrajectory[]>([]);
   const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch, setTechnicalData);
   const { detachTrajectory } = useTrajectoryDetach(study, dispatch, setTechnicalData);
