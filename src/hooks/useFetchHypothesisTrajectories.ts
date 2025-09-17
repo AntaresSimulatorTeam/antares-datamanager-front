@@ -156,7 +156,6 @@ export const useFetchHypothesisTrajectories = (
                 subRows: null,
               },
             ];
-            console.log('================= dataTrajectories', dataTrajectories);
           } else {
             const areaData =
               type === TRAJECTORY_TYPE.THERMAL_CAPACITY
