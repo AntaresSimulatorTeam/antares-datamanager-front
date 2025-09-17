@@ -10,7 +10,7 @@ import {
   TrajectoryAreaData,
   TrajectoryState,
 } from '@/shared/types';
-import { fetchMultipleTrajectoryType, getStudyTrajectoriesWithWarnings } from '@/shared/services/trajectoryService';
+import { getStudyTrajectoriesWithWarnings } from '@/shared/services/trajectoryService';
 import {
   buildDefaultEmptyTrajectoryList,
   buildRowWithSubRowsData,
@@ -25,6 +25,7 @@ import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { getReadOnlyForGeneratedStudy } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { getDefaultAreaNotIncludedInAreaList } from '@/shared/utils/hypothesisTableUtils.ts';
 import { useTranslation } from 'react-i18next';
+import { fetchMultipleTrajectoryType } from '@/shared/services/hypothesisTableService.ts';
 
 export const useFetchHypothesisTrajectories = (
   studyId?: number,
@@ -128,6 +129,7 @@ export const useFetchHypothesisTrajectories = (
             const paraCommonTrajectory = (result as ParamTrajectoryState)?.[
               TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER
             ].trajectories?.[0];
+
             dataTrajectories = [
               {
                 hypothesis: t('thermal.@specific'),
@@ -143,6 +145,7 @@ export const useFetchHypothesisTrajectories = (
                 status: paraModulationTrajectory ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
                 isDefault: false,
                 isDeletable: false,
+                subRows: null,
               },
               {
                 hypothesis: t('thermal.@common'),
@@ -150,8 +153,10 @@ export const useFetchHypothesisTrajectories = (
                 status: paraCommonTrajectory ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
                 isDefault: false,
                 isDeletable: false,
+                subRows: null,
               },
             ];
+            console.log('================= dataTrajectories', dataTrajectories);
           } else {
             const areaData =
               type === TRAJECTORY_TYPE.THERMAL_CAPACITY
@@ -180,7 +185,7 @@ export const useFetchHypothesisTrajectories = (
         // Silent handler
       }
     },
-    [defaultAreas, emptyAreaSelected, dispatch, areas, isStudyGenerated],
+    [areas, defaultAreas, isStudyGenerated, emptyAreaSelected, dispatch, t],
   );
 
   useEffect(() => {

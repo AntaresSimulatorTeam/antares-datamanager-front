@@ -9,10 +9,22 @@ import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/traj
 import { notifyAlert } from '@/shared/notification/notification.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { Dispatch, SetStateAction } from 'react';
-import { DbTrajectory, HypothesisRowData, SelectOption, StudyActionType, StudyDTO } from '@/shared/types';
+import {
+  DbTrajectory,
+  HypothesisRowData,
+  ParamTrajectoryState,
+  SelectOption,
+  StudyActionType,
+  StudyDTO,
+  ThermalParamTrajectoryType,
+} from '@/shared/types';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
-import { fetchTrajectoriesFromDB, fetchTrajectoriesFromFS } from '@/shared/services/trajectoryService.ts';
+import {
+  fetchTrajectoriesFromDB,
+  fetchTrajectoriesFromFS,
+  getStudyTrajectoriesWithWarnings,
+} from '@/shared/services/trajectoryService.ts';
 import { convertToFSSelectionOptionType, convertToSelectionOptionType } from '@/shared/utils/formFormatter.ts';
 
 export const handleTrajectoryError = (
@@ -106,4 +118,27 @@ export const addRow = (
     }
     return updatedData;
   });
+};
+
+/**
+ * Retrieve trajectory and warning messages according to the set of trajectory type provided
+ * @param {number} id - Study id
+ * @param {ThermalParamTrajectoryType[]} types - Trajectory type for Parameters hypothesis
+ */
+export const fetchMultipleTrajectoryType = async (
+  id: number,
+  types: ThermalParamTrajectoryType[],
+): Promise<ParamTrajectoryState> => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const entries = await Promise.all(
+      types.map(async (type) => {
+        const result = await getStudyTrajectoriesWithWarnings(id, type);
+        return [type, result] as const;
+      }),
+    );
+    return Object.fromEntries(entries) as ParamTrajectoryState;
+  } catch (error) {
+    throw error;
+  }
 };

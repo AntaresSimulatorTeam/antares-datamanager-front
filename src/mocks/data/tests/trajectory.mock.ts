@@ -180,6 +180,29 @@ export const mockDbTrajectoryArrayThermal: DbTrajectory[] = [
   },
 ];
 
+export const mockDbTrajectoryArraySpecificThermal: DbTrajectory[] = [
+  {
+    id: 1,
+    trajectoryName: 'area_PB_2024',
+    type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+    version: 3,
+    userName: 'mouad',
+    creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+    area: 'AT',
+    technology: '',
+  },
+  {
+    id: 2,
+    trajectoryName: 'area_PB_2026',
+    type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+    version: 3,
+    userName: 'mouad',
+    creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+    area: 'BE',
+    technology: '',
+  },
+];
+
 export const mockEmptyDbTrajectoryArrayLoad: DbTrajectory[] = [
   {
     id: 1,

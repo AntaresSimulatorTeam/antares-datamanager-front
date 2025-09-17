@@ -4,9 +4,11 @@ import { StudyState, TrajectoryAreaData } from '@/shared/types';
 import { renderHook, waitFor } from '@testing-library/react';
 import * as studyService from '@/shared/services/studyService.ts';
 import * as trajectoryService from '@/shared/services/trajectoryService.ts';
+import * as hypothesisTableService from '@/shared/services/hypothesisTableService';
 import {
   mockDbTrajectory,
   mockDbTrajectoryArrayLoad,
+  mockDbTrajectoryArraySpecificThermal,
   mockDbTrajectoryArrayThermal,
   mockEmptyDbTrajectoryArrayLoad,
   mockEmptyDbTrajectoryLoadFR,
@@ -20,6 +22,7 @@ import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { ThermalOptions } from '@/mocks/data/list/names.ts';
 
 vi.mock('@/shared/services/trajectoryService');
+vi.mock('@/shared/services/hypothesisTableService');
 vi.mock('@/shared/services/studyService');
 vi.mock('@/shared/utils/trajectoryUtils', async (importOriginal) => {
   const actual: Mock = await importOriginal();
@@ -47,7 +50,7 @@ vi.mock('@/shared/services/warningService', async (importOriginal) => {
   };
 });
 
-describe('useFetchTrajectoriesLinked', () => {
+describe('useFetchHypothesisTrajectories', () => {
   const mockUseStudyDispatch = useStudyDispatch as Mock<typeof useStudyDispatch>;
   const mockUseStudy = useStudy as Mock<typeof useStudy>;
   const mockDispatch = vi.fn().mockImplementation(vi.fn());
@@ -526,6 +529,31 @@ describe('useFetchTrajectoriesLinked', () => {
     await waitFor(() => {
       expect(studyService.getStudyTrajectories).toHaveBeenCalledTimes(0);
       expect(result.current.hypothesisTrajectories).toEqual([]);
+    });
+  });
+
+  it.skip('should include SPECIFIC, MODULATION and COMMON lines when trajectoryType is THERMAL_TECHNICAL_SPECIFIC_PARAMETER', async () => {
+    vi.mocked(hypothesisTableService.fetchMultipleTrajectoryType).mockResolvedValue({
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]: {
+        trajectories: mockDbTrajectoryArraySpecificThermal,
+        warningMessages: [],
+      },
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER]: {
+        trajectories: [],
+        warningMessages: [],
+      },
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]: {
+        trajectories: [],
+        warningMessages: [],
+      },
+    });
+
+    const { result } = renderHook(() =>
+      useFetchHypothesisTrajectories(5, TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER),
+    );
+
+    await waitFor(() => {
+      expect(result.current.hypothesisTrajectories[0]?.subRows).toEqual(mockDbTrajectoryArraySpecificThermal);
     });
   });
 });

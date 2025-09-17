@@ -22,8 +22,6 @@ import {
   BackendError,
   DbTrajectory,
   FsTrajectory,
-  ParamTrajectoryState,
-  ThermalParamTrajectoryType,
   TRAJECTORY_DATA_TYPE,
   TrajectoryBackendError,
   TrajectoryState,
@@ -323,22 +321,5 @@ export const getStudyTrajectoriesWithWarnings = async (
     return { trajectories, warningMessages };
   } catch (error) {
     throw new Error((error as BackendError).antaresErrorMessage);
-  }
-};
-
-export const fetchMultipleTrajectoryType = async (
-  id: number,
-  types: ThermalParamTrajectoryType[],
-): Promise<ParamTrajectoryState> => {
-  try {
-    const entries = await Promise.all(
-      types.map(async (type) => {
-        const result = await getStudyTrajectoriesWithWarnings(id, type);
-        return [type, result] as const;
-      }),
-    );
-    return Object.fromEntries(entries) as ParamTrajectoryState;
-  } catch (error) {
-    throw error;
   }
 };

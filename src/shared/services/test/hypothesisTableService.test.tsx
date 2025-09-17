@@ -2,14 +2,23 @@ import { afterEach, beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import {
   addRow,
+  fetchMultipleTrajectoryType,
   handleFetchTrajectoriesFS,
   handleTrajectoryError,
   handleTrajectorySearch,
 } from '@/shared/services/hypothesisTableService.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
-import { DbTrajectory, FsTrajectory, HypothesisRowData, SelectOption, StudyDTO } from '@/shared/types';
+import {
+  DbTrajectory,
+  FsTrajectory,
+  HypothesisRowData,
+  SelectOption,
+  StudyDTO,
+  ThermalParamTrajectoryType,
+} from '@/shared/types';
 import { notifyAlert } from '@/shared/notification/notification.tsx';
 import * as trajectoryService from '@/shared/services/trajectoryService.ts';
+import { getStudyTrajectoriesWithWarnings } from '@/shared/services/trajectoryService.ts';
 import * as formFormatter from '@/shared/utils/formFormatter';
 import { ThermalOptions } from '@/mocks/data/list/names.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
@@ -28,6 +37,7 @@ vi.mock('@/shared/services/trajectoryService', async (importOriginal) => {
     ...actual,
     fetchTrajectoriesFromFS: vi.fn(),
     fetchTrajectoriesFromDB: vi.fn(),
+    getStudyTrajectoriesWithWarnings: vi.fn(),
   };
 });
 
@@ -42,6 +52,8 @@ vi.mock('@/shared/utils/formFormatter', async (importOriginal) => {
 
 const mockResults = [{ id: 1, trajectoryName: 'Trajectory A' }] as unknown as FsTrajectory[];
 const mockConvertedOptions = [{ value: '1', label: 'Trajectory A' }] as unknown as SelectOption[];
+const mockResultsArray = [{ id: 1, label: 'Trajectory A' }] as unknown as FsTrajectory[];
+const mockConvertedOptionsArray = [{ value: '1', label: 'Trajectory A' }] as unknown as SelectOption[];
 
 describe('handleTrajectoryError', () => {
   it('should update data and trigger alert', () => {
@@ -128,10 +140,8 @@ describe('handleFetchTrajectoriesFS', () => {
   });
 
   it('should fetch trajectories for OTHERS area and update state correctly', async () => {
-    const mockResults = [{ id: 1, label: 'Trajectory A' }] as unknown as FsTrajectory[];
-    const mockConvertedOptions = [{ value: '1', label: 'Trajectory A' }] as unknown as SelectOption[];
-    vi.mocked(trajectoryService.fetchTrajectoriesFromFS).mockResolvedValueOnce(mockResults);
-    vi.mocked(formFormatter.convertToFSSelectionOptionType).mockReturnValue(mockConvertedOptions);
+    vi.mocked(trajectoryService.fetchTrajectoriesFromFS).mockResolvedValueOnce(mockResultsArray);
+    vi.mocked(formFormatter.convertToFSSelectionOptionType).mockReturnValue(mockConvertedOptionsArray);
 
     // Mocks
     const setOptionsFS = vi.fn();
@@ -151,10 +161,8 @@ describe('handleFetchTrajectoriesFS', () => {
   });
 
   it('should fetch trajectories for THERMAL CAPACITY area and update state correctly', async () => {
-    const mockResults = [{ id: 1, label: 'Trajectory A' }] as unknown as FsTrajectory[];
-    const mockConvertedOptions = [{ value: '1', label: 'Trajectory A' }] as unknown as SelectOption[];
-    vi.mocked(trajectoryService.fetchTrajectoriesFromFS).mockResolvedValueOnce(mockResults);
-    vi.mocked(formFormatter.convertToFSSelectionOptionType).mockReturnValue(mockConvertedOptions);
+    vi.mocked(trajectoryService.fetchTrajectoriesFromFS).mockResolvedValueOnce(mockResultsArray);
+    vi.mocked(formFormatter.convertToFSSelectionOptionType).mockReturnValue(mockConvertedOptionsArray);
 
     // Mocks
     const setOptionsFS = vi.fn();
@@ -175,10 +183,8 @@ describe('handleFetchTrajectoriesFS', () => {
   });
 
   it('should fetch trajectories for THERMAL CAPACITY OTHERS area and update state correctly', async () => {
-    const mockResults = [{ id: 1, label: 'Trajectory A' }] as unknown as FsTrajectory[];
-    const mockConvertedOptions = [{ value: '1', label: 'Trajectory A' }] as unknown as SelectOption[];
-    vi.mocked(trajectoryService.fetchTrajectoriesFromFS).mockResolvedValueOnce(mockResults);
-    vi.mocked(formFormatter.convertToFSSelectionOptionType).mockReturnValue(mockConvertedOptions);
+    vi.mocked(trajectoryService.fetchTrajectoriesFromFS).mockResolvedValueOnce(mockResultsArray);
+    vi.mocked(formFormatter.convertToFSSelectionOptionType).mockReturnValue(mockConvertedOptionsArray);
 
     // Mocks
     const setOptionsFS = vi.fn();
@@ -548,5 +554,45 @@ describe('addRow', () => {
 
     expect(mockSetCheckedValues).toHaveBeenCalled();
     expect(mockSetData).toHaveBeenCalled();
+  });
+});
+
+describe('fetchMultipleTrajectoryType', () => {
+  const mockedGetStudyTrajectoriesWithWarnings = getStudyTrajectoriesWithWarnings as ReturnType<typeof vi.fn>;
+
+  it('should fetch trajectories for all types and return a mapped object', async () => {
+    const studyId = 42;
+    const types: ThermalParamTrajectoryType[] = [
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER,
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+    ];
+
+    mockedGetStudyTrajectoriesWithWarnings.mockImplementation(async (_studyId, type) =>
+      Promise.resolve({ data: `result-for-${type}` }),
+    );
+
+    const result = await fetchMultipleTrajectoryType(studyId, types);
+
+    expect(mockedGetStudyTrajectoriesWithWarnings).toHaveBeenCalledTimes(2);
+    expect(result).toEqual({
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER]: { data: 'result-for-THERMAL_TECHNICAL_COMMON_PARAMETER' },
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]: {
+        data: 'result-for-THERMAL_TECHNICAL_SPECIFIC_PARAMETER',
+      },
+    });
+  });
+
+  it('should throw an error if one of the calls fails', async () => {
+    const id = 42;
+    const types: ThermalParamTrajectoryType[] = [
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER,
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+    ];
+
+    mockedGetStudyTrajectoriesWithWarnings.mockRejectedValueOnce({
+      message: 'Failed to fetch',
+    });
+
+    await expect(fetchMultipleTrajectoryType(id, types)).rejects.toThrow('Failed to fetch');
   });
 });
