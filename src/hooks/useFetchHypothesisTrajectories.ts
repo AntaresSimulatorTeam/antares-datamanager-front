@@ -177,11 +177,15 @@ export const useFetchHypothesisTrajectories = (
             const rows = getReadOnlyForGeneratedStudy(dataTrajectories);
             setReadOnlyRow(rows);
           } else if (defaultAreaListNotIncludedInList.length > 0 && !isStudyGenerated) {
-            setReadOnlyRow(retrieveReadOnlyArea(dataTrajectories, defaultAreaListNotIncludedInList));
+            const dataToCheck =
+              type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER && dataTrajectories?.[0]?.subRows
+                ? dataTrajectories[0].subRows
+                : dataTrajectories;
+            setReadOnlyRow(retrieveReadOnlyArea(dataToCheck, defaultAreaListNotIncludedInList));
           }
         }
-      } catch {
-        // Silent handler
+      } catch (error) {
+        console.error('============= error', error);
       }
     },
     [areas, defaultAreas, isStudyGenerated, emptyAreaSelected, dispatch, t],

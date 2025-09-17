@@ -129,16 +129,11 @@ export const fetchMultipleTrajectoryType = async (
   id: number,
   types: ThermalParamTrajectoryType[],
 ): Promise<ParamTrajectoryState> => {
-  // eslint-disable-next-line no-useless-catch
-  try {
-    const entries = await Promise.all(
-      types.map(async (type) => {
-        const result = await getStudyTrajectoriesWithWarnings(id, type);
-        return [type, result] as const;
-      }),
-    );
-    return Object.fromEntries(entries) as ParamTrajectoryState;
-  } catch (error) {
-    throw error;
-  }
+  const entries = await Promise.all(
+    types.map(async (type) => {
+      const result = await getStudyTrajectoriesWithWarnings(id, type);
+      return [type, result] as const;
+    }),
+  );
+  return Object.fromEntries(entries) as ParamTrajectoryState;
 };
