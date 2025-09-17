@@ -197,7 +197,7 @@ describe('buildEmptyTrajectory', () => {
 describe('buildRowWithSubRowsData', () => {
   const subRowOptions = ['Option A', 'Option B'];
 
-  it('returns correct data when area is OTHER_AREAS et que ', () => {
+  it('returns correct data when area is OTHER_AREAS', () => {
     const trajectory = { area: OTHER_AREAS, technology: '', trajectoryName: 'name' } as DbTrajectory;
 
     const result = buildRowWithSubRowsData(trajectory, [], [], subRowOptions);
@@ -779,6 +779,11 @@ describe('getPathFromTrajectoryType', () => {
 });
 
 describe('getDefaultLabel', () => {
+  it('should append defaultLabel when isDefault is true and name is not OTHER_AREAS', () => {
+    const result = getDefaultLabel('Zone A');
+    expect(result).toBe('Zone A');
+  });
+
   it('should append defaultLabel when isDefault is true and name is not OTHER_AREAS', () => {
     const result = getDefaultLabel('Zone A');
     expect(result).toBe('Zone A');

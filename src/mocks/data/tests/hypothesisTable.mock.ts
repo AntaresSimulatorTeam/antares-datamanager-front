@@ -137,9 +137,9 @@ export const rowDataTwo: HypothesisRowData[] = [
   ),
 ];
 
-export const rowNotDefaultData: HypothesisRowData[] = [
+export const rowNotDefaultData = [
   buildRowDataMock(
-    'FR (default)',
+    'FR',
     TRAJECTORY_SELECTION_STATUS.MISSING,
     true,
     null,
@@ -150,7 +150,7 @@ export const rowNotDefaultData: HypothesisRowData[] = [
     '2024-07-22 15:13:56.860045' as unknown as Date,
   ),
   buildRowDataMock(
-    OTHER_AREAS_LABEL,
+    'OTHER areas',
     TRAJECTORY_SELECTION_STATUS.MISSING,
     true,
     null,

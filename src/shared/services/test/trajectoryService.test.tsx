@@ -456,7 +456,7 @@ describe('uploadTrajectory', () => {
     vi.clearAllMocks();
   });
 
-  it('should import trajectory to data base', async () => {
+  it('should import AREA trajectory into data base', async () => {
     await uploadTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026', 2, 'FR', onProgress);
 
     await waitFor(() => {
@@ -469,7 +469,7 @@ describe('uploadTrajectory', () => {
     });
   });
 
-  it('should import trajectory to data base', async () => {
+  it('should import LOAD trajectory into data base', async () => {
     await uploadTrajectory(TRAJECTORY_TYPE.LOAD, 'area_BP_23_v6', '2025-2026', 2, 'FR', onProgress);
 
     await waitFor(() => {
@@ -482,7 +482,7 @@ describe('uploadTrajectory', () => {
     });
   });
 
-  it('should import trajectory without technology into data base', async () => {
+  it('should import THERMAL_CAPACITY trajectory without technology into data base', async () => {
     await uploadTrajectory(TRAJECTORY_TYPE.THERMAL_CAPACITY, 'area_BP_23_v6', '2025-2026', 2, 'FR', onProgress, true);
 
     await waitFor(() => {
@@ -495,7 +495,7 @@ describe('uploadTrajectory', () => {
     });
   });
 
-  it('should import trajectory with technology into data base', async () => {
+  it('should import THERMAL_CAPACITY trajectory with technology into data base', async () => {
     await uploadTrajectory(
       TRAJECTORY_TYPE.THERMAL_CAPACITY,
       'area_BP_23_v6',
@@ -511,6 +511,26 @@ describe('uploadTrajectory', () => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
       expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
         `https://mockapi.com/v1/trajectory/thermal-capacity?area=FR&trajectoryToUse=area_BP_23_v6&horizon=2025-2026&studyId=2&isCivilYear=true&technology=Nuclear`,
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
+
+  it('should import TRAJECTORY_THERMAL_COMMON_PARAMETER_IMPORT trajectory into data base', async () => {
+    await uploadTrajectory(
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER,
+      'common_param_BP_23_v6',
+      '2025-2026',
+      2,
+      'FR',
+      onProgress,
+    );
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        `https://mockapi.com/v1/trajectory/thermal-common-parameter?trajectoryType=THERMAL_TECHNICAL_COMMON_PARAMETER&trajectoryToUse=common_param_BP_23_v6&horizon=2025-2026&studyId=2`,
         requestOptions,
         onProgress,
       );

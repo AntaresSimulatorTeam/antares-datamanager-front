@@ -8,19 +8,19 @@ import getEditableHypothesisTableHeaders from '@/components/header/EditableHypot
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
-import { useStudy } from '@/store/contexts/StudyContext.tsx';
+import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import StdCheckboxGroupWrapper from '@common/forms/stdCheckboxGroup/StdCheckboxGroupWrapper.tsx';
 import StdCheckbox from '@common/forms/stdCheckbox/StdCheckbox.tsx';
-import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
 import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
 import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
 import { useLocation } from 'react-router-dom';
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { getAreaTrajectoryName, getTrajectoryTypeByIndex } from '@/shared/utils/trajectoryUtils.ts';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
-import { handleFetchTrajectoriesFS } from '@/shared/services/hypothesisTableService.ts';
+import { addRow, handleFetchTrajectoriesFS } from '@/shared/services/hypothesisTableService.ts';
 import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
 import { transformToSubRowKeys } from '@/shared/utils/hypothesisTableUtils.ts';
+import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 
 interface ParametersTabProps {
   defaultAreas: { name: string }[];
@@ -32,6 +32,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
   const studyState = useStudy();
   const location = useLocation();
   const study = (location.state as LocationStudy)?.study;
+  const dispatch = useStudyDispatch();
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
   const data: HypothesisRowData[] = [
@@ -50,7 +51,6 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
       isDeletable: false,
     },
   ];
-  const [rowIndexSelected] = useState('0');
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
   const [technicalData, setTechnicalData] = useState<HypothesisRowData[]>([]);
@@ -67,6 +67,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
       areas,
       isStudyGenerated,
     );
+  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(study, studyState, dispatch, setTechnicalData);
 
   useEffect(() => {
     const setHypothesis = () => {
@@ -102,53 +103,18 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
     setHypothesis();
   }, [areas, areasTrajectoryOptions, defaultAreas, dropDownListOptions, hypothesisTrajectories, readOnlyRow, t]);
 
-  const setTechnicalParamData = (updatedData: HypothesisRowData[]) => {
-    setTechnicalData((prev) => [
-      ...prev.map((item) => {
-        if (item?.subRows?.length) {
-          return {
-            hypothesis: t('thermal.@specific'),
-            trajectory: null,
-            status: TRAJECTORY_SELECTION_STATUS.MISSING,
-            isDefault: false,
-            isDeletable: false,
-            subRows: sortWithFixedPosition(updatedData) || null,
-          };
-        } else {
-          return item;
-        }
-      }),
-    ]);
-  };
-
-  const addRow = (value: string) => {
-    const newRow: HypothesisRowData = {
-      hypothesis: value,
-      trajectory: null,
-      status: TRAJECTORY_SELECTION_STATUS.MISSING,
-      isDefault: false,
-      isDeletable: true,
-    };
-    setCheckedValues((prev) => [...prev, value]);
-    const newTechnicalDataSubRow = technicalData?.[0]?.subRows
-      ? sortWithFixedPosition([...technicalData[0].subRows, newRow])
-      : [newRow];
-
-    setTechnicalParamData(newTechnicalDataSubRow);
-  };
-
   const removeRow = (value: string) => {
     setCheckedValues((prev) => [...prev.filter((checkedValue) => checkedValue !== value)]);
-    const newTechnicalDataSubRow = technicalData?.[0]?.subRows
-      ? technicalData[0].subRows?.filter((itemData) => itemData.hypothesis !== value)
-      : [];
 
-    setTechnicalParamData(newTechnicalDataSubRow);
+    setTechnicalData((prev: HypothesisRowData[]): HypothesisRowData[] => {
+      const newSubRows = prev?.[0]?.subRows ? prev[0].subRows?.filter((itemData) => itemData.hypothesis !== value) : [];
+      return [{ ...prev[0], subRows: newSubRows }, ...prev.slice(1)];
+    });
   };
 
   const handleSelectionChange = (value: string, isChecked: boolean) => {
     if (isChecked) {
-      addRow(value);
+      addRow(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, value, dispatch, setCheckedValues, setTechnicalData);
     } else {
       removeRow(value);
     }
@@ -194,11 +160,11 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
           data={technicalData}
           getTableHeaders={getExpandableHypothesisTableHeaders}
           columnHeader={t('thermal.@parametersTechnical')}
-          fileStatus={'success'}
+          fileStatus={fileStatus}
           studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
           readOnly={readOnly}
-          progress={0}
-          idSelected={rowIndexSelected}
+          progress={progress}
+          idSelected={rowIdSelected}
           handleSearch={async (_value: string, _rowId: string) => Promise.resolve(undefined)}
           handleImport={async (rowId: string) => {
             const indexArray = rowId.split('.').map(Number);
@@ -223,7 +189,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
             columnHeader={t('thermal.@parametersEconomic')}
             fileStatus={'success'}
             studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
-            idSelected={rowIndexSelected}
+            idSelected={rowIdSelected}
             progress={0}
             handleSearch={async (_value: string, _rowId: string) => Promise.resolve(undefined)}
             handleImport={() => Promise.resolve()}
@@ -233,9 +199,12 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
       {isModalOpen && (
         <ImportTrajectoryModal
           options={optionsFS}
-          onClose={(_value?: SelectOption) => {
+          onClose={async (value?: SelectOption) => {
             toggleModal();
-            return Promise.resolve(); // TODO: replace by importTrajectory
+            if (value != null) {
+              const indexArray = rowIdSelected.split('.').map(Number);
+              await importTrajectory(getTrajectoryTypeByIndex(indexArray[0]), value, indexArray, technicalData);
+            }
           }}
           trajectoryType={getTrajectoryTypeByIndex(Number(rowIdSelected))}
           area={getAreaTrajectoryName(rowIdSelected, technicalData)}
