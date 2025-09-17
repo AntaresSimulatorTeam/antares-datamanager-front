@@ -39,7 +39,13 @@ export const useFetchHypothesisTrajectories = (
     async (id?: number, type?: TRAJECTORY_TYPE) => {
       try {
         if (id != null && type) {
-          const result: TrajectoryState = await getStudyTrajectoriesWithWarnings(id, type);
+          let result: TrajectoryState = [];
+          // if (type === TRAJECTORY_TYPE.THERMAL_PARAMETER) {
+          //
+          // } else {
+          result = await getStudyTrajectoriesWithWarnings(id, type);
+          //}
+          console.log('============================= result', result);
           // Build default empty areas (default area not linked to a trajectory)
           const defaultEmptyAreas = buildDefaultEmptyTrajectoryList(type, result?.trajectories, defaultAreas);
 
@@ -97,12 +103,7 @@ export const useFetchHypothesisTrajectories = (
                 )
               : arrayWithoutDuplicate
                   .map((trajectory) =>
-                    buildRowWithSubRowsData(
-                      trajectory,
-                      defaultAreas,
-                      defaultAreaListNotIncludedInList,
-                      null,
-                    ),
+                    buildRowWithSubRowsData(trajectory, defaultAreas, defaultAreaListNotIncludedInList, null),
                   )
                   .filter(Boolean);
           const dataTrajectories = sortWithFixedPosition(areaData);
