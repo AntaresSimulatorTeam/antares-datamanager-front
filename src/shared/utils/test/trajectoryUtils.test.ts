@@ -729,11 +729,11 @@ describe('getTrajectoryTypeByIndex', () => {
   });
 
   it('should return COMMON for index 1', () => {
-    expect(getTrajectoryTypeByIndex(1)).toBe(TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER);
+    expect(getTrajectoryTypeByIndex(1)).toBe(TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER);
   });
 
   it('should return MODULATION for index 2', () => {
-    expect(getTrajectoryTypeByIndex(2)).toBe(TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER);
+    expect(getTrajectoryTypeByIndex(2)).toBe(TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER);
   });
 
   it('should return SPECIFIC for any other index', () => {
@@ -810,7 +810,6 @@ describe('getQueryParamAreaValue', () => {
     const result = getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD, undefined as unknown as string);
     expect(result).toBe('');
   });
-
 });
 
 describe('convertIntoHypothesisRowWithTechnologies', () => {
@@ -867,5 +866,4 @@ describe('convertIntoHypothesisRowWithTechnologies', () => {
 
     expect(result[0].subRows).toBeNull();
   });
-
 });
