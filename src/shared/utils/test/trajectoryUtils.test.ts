@@ -810,6 +810,16 @@ describe('getQueryParamAreaValue', () => {
     const result = getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD, undefined as unknown as string);
     expect(result).toBe('');
   });
+  
+  it('should remove defaultLabel from hypothesis if type is not THERMAL_CAPACITY', () => {
+    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD, 'Paris');
+    expect(result).toBe('Paris');
+  });
+
+  it('should handle undefined hypothesis gracefully', () => {
+    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD, undefined as unknown as string);
+    expect(result).toBe('');
+  });
 });
 
 describe('convertIntoHypothesisRowWithTechnologies', () => {

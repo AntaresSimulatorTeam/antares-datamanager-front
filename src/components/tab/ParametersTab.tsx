@@ -2,7 +2,15 @@ import SearchBar from '@/pages/pegase/home/components/SearchBar.tsx';
 import { RdsDivider } from 'rte-design-system-react';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
-import { CheckBoxData, HypothesisRowData, LocationStudy, SelectOption, TrajectoryAreaData } from '@/shared/types';
+import {
+  CheckBoxData,
+  DbTrajectory,
+  HypothesisRowData,
+  LocationStudy,
+  RowStatus,
+  SelectOption,
+  TrajectoryAreaData,
+} from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import getEditableHypothesisTableHeaders from '@/components/header/EditableHypothesisTableHeaders.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
@@ -21,6 +29,8 @@ import { addRow, handleFetchTrajectoriesFS } from '@/shared/services/hypothesisT
 import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
 import { transformToSubRowKeys } from '@/shared/utils/hypothesisTableUtils.ts';
 import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
+import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach';
+import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach';
 
 interface ParametersTabProps {
   defaultAreas: { name: string }[];
@@ -68,6 +78,9 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
       isStudyGenerated,
     );
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(study, studyState, dispatch, setTechnicalData);
+  const [dbTrajectories] = useState<DbTrajectory[]>([]);
+  const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch, setTechnicalData);
+  const { detachTrajectory } = useTrajectoryDetach(study, dispatch, setTechnicalData);
 
   useEffect(() => {
     const setHypothesis = () => {
@@ -177,6 +190,34 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
               toggleModal,
               area,
             );
+          }}
+          updateData={(rowId: string, value: unknown, status: RowStatus) => {
+            const [topIndex, subIndex] = rowId.split('.').map(Number);
+            if (status === 'empty' || status === 'emptyError') {
+              const row = subIndex != null ? technicalData[topIndex]?.subRows?.[subIndex] : technicalData[topIndex];
+              const current = row?.trajectory ?? null;
+              if (current) {
+                void detachTrajectory(
+                  getTrajectoryTypeByIndex(topIndex),
+                  [topIndex, subIndex].filter((n) => n !== undefined),
+                  status,
+                  current,
+                );
+              }
+            }
+
+            if (status === 'success') {
+              const dbTrajectory =
+                dbTrajectories.find((traj) => traj.id === value || traj.trajectoryName === value) ?? null;
+              if (dbTrajectory) {
+                void attachTrajectory(
+                  getTrajectoryTypeByIndex(topIndex),
+                  [topIndex, subIndex].filter((n) => n !== undefined),
+                  status,
+                  dbTrajectory,
+                );
+              }
+            }
           }}
           isReadOnlyEnable={true}
           removeRow={removeRow}
