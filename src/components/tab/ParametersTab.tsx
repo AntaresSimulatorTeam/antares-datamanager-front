@@ -73,7 +73,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
     useFetchHypothesisTrajectories(
       study?.id,
-      TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER, // TODO : to replace by a generic trajectory type (ex: THERMAL_PARAMETER) ? or an array of type
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
       defaultAreas,
       areas,
       isStudyGenerated,
@@ -86,31 +86,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
     const setHypothesis = () => {
       areasTrajectoryOptions && setAreasOptions(areasTrajectoryOptions);
       dropDownListOptions && setCheckedValues(dropDownListOptions);
-      hypothesisTrajectories &&
-        setTechnicalData([
-          {
-            hypothesis: t('thermal.@specific'),
-            trajectory: null,
-            status: TRAJECTORY_SELECTION_STATUS.MISSING,
-            isDefault: false,
-            isDeletable: false,
-            subRows: hypothesisTrajectories,
-          },
-          {
-            hypothesis: t('thermal.@paramModulation'),
-            trajectory: null,
-            status: TRAJECTORY_SELECTION_STATUS.MISSING,
-            isDefault: false,
-            isDeletable: false,
-          },
-          {
-            hypothesis: t('thermal.@common'),
-            trajectory: null,
-            status: TRAJECTORY_SELECTION_STATUS.MISSING,
-            isDefault: false,
-            isDeletable: false,
-          },
-        ]);
+      hypothesisTrajectories && setTechnicalData(hypothesisTrajectories);
       setReadOnly(transformToSubRowKeys(readOnlyRow));
     };
     setHypothesis();
