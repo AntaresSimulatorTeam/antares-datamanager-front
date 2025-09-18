@@ -9,6 +9,7 @@ import { FileInputStatus } from 'rte-design-system-react';
 // @ts-ignore
 import { AccessorKeyColumnDef } from '@tanstack/table-core/src/types.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
+import { TrajectoryState } from '@/shared/types/Study.type.ts';
 
 export interface FsTrajectory {
   trajectoryName: string;
@@ -109,3 +110,10 @@ export interface Tab {
   name: TRAJECTORY_TYPE;
   label: string;
 }
+
+export type ThermalParamTrajectoryType =
+  | TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER
+  | TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER
+  | TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER;
+
+export type ParamTrajectoryState = Record<ThermalParamTrajectoryType, TrajectoryState>;

@@ -25,8 +25,8 @@ import { useLocation } from 'react-router-dom';
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { getAreaTrajectoryName, getTrajectoryTypeByIndex } from '@/shared/utils/trajectoryUtils.ts';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
-import { addRow, handleFetchTrajectoriesFS } from '@/shared/services/hypothesisTableService.ts';
-import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
+import { addRow, handleFetchTrajectoriesFS, handleTrajectorySearch } from '@/shared/services/hypothesisTableService.ts';
+import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { transformToSubRowKeys } from '@/shared/utils/hypothesisTableUtils.ts';
 import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach';
@@ -69,16 +69,16 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
   const [isStudyGenerated] = useState(
     studyState.studyStatus === StudyStatus.GENERATED || study.status === StudyStatus.GENERATED,
   );
+  const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
     useFetchHypothesisTrajectories(
       study?.id,
-      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, // TODO : to replace by a generic trajectory type (ex: THERMAL_PARAMETER) ? or an array of type
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
       defaultAreas,
       areas,
       isStudyGenerated,
     );
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(study, studyState, dispatch, setTechnicalData);
-  const [dbTrajectories] = useState<DbTrajectory[]>([]);
   const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch, setTechnicalData);
   const { detachTrajectory } = useTrajectoryDetach(study, dispatch, setTechnicalData);
 
@@ -86,31 +86,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
     const setHypothesis = () => {
       areasTrajectoryOptions && setAreasOptions(areasTrajectoryOptions);
       dropDownListOptions && setCheckedValues(dropDownListOptions);
-      hypothesisTrajectories &&
-        setTechnicalData([
-          {
-            hypothesis: t('thermal.@specific'),
-            trajectory: null,
-            status: TRAJECTORY_SELECTION_STATUS.MISSING,
-            isDefault: false,
-            isDeletable: false,
-            subRows: hypothesisTrajectories,
-          },
-          {
-            hypothesis: t('thermal.@paramModulation'),
-            trajectory: null,
-            status: TRAJECTORY_SELECTION_STATUS.MISSING,
-            isDefault: false,
-            isDeletable: false,
-          },
-          {
-            hypothesis: t('thermal.@common'),
-            trajectory: null,
-            status: TRAJECTORY_SELECTION_STATUS.MISSING,
-            isDefault: false,
-            isDeletable: false,
-          },
-        ]);
+      hypothesisTrajectories && setTechnicalData(hypothesisTrajectories);
       setReadOnly(transformToSubRowKeys(readOnlyRow));
     };
     setHypothesis();
@@ -178,7 +154,23 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
           readOnly={readOnly}
           progress={progress}
           idSelected={rowIdSelected}
-          handleSearch={async (_value: string, _rowId: string) => Promise.resolve(undefined)}
+          handleSearch={async (value: string, rowId: string) => {
+            const indexArray = rowId.split('.').map(Number);
+            let area: string = '';
+            if (indexArray.length === 2) {
+              area =
+                technicalData[indexArray[0]]?.subRows?.[indexArray[1]]?.hypothesis === OTHER_AREAS_LABEL
+                  ? OTHER_AREAS
+                  : (technicalData[indexArray[0]]?.subRows?.[indexArray[1]]?.hypothesis ?? '');
+            }
+            return await handleTrajectorySearch(
+              getTrajectoryTypeByIndex(indexArray[0]),
+              value,
+              area,
+              setDbTrajectories,
+              study,
+            );
+          }}
           handleImport={async (rowId: string) => {
             const indexArray = rowId.split('.').map(Number);
             const area = technicalData[indexArray[0]]?.subRows?.[indexArray[1]]?.hypothesis;
