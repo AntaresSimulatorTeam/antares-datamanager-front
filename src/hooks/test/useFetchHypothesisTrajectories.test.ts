@@ -7,12 +7,15 @@ import * as trajectoryService from '@/shared/services/trajectoryService.ts';
 import * as hypothesisTableService from '@/shared/services/hypothesisTableService';
 import {
   mockDbTrajectory,
+  mockDbTrajectoryArrayCommonThermal,
   mockDbTrajectoryArrayLoad,
   mockDbTrajectoryArraySpecificThermal,
   mockDbTrajectoryArrayThermal,
   mockEmptyDbTrajectoryArrayLoad,
   mockEmptyDbTrajectoryLoadFR,
   mockEmptyDbTrajectoryLoadOthers,
+  mockEmptyDbTrajectorySPECIFICCZ,
+  mockEmptyDbTrajectorySPECIFICFR,
 } from '@/mocks/data/tests/trajectory.mock.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
@@ -49,6 +52,19 @@ vi.mock('@/shared/services/warningService', async (importOriginal) => {
     fetchWarningMessages: vi.fn(),
   };
 });
+
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: Record<string, string> = {
+        'thermal.@specific': 'Specific',
+        'thermal.@paramModulation': 'Modulation',
+        'thermal.@common': 'Common',
+      };
+      return translations[key] || key;
+    },
+  }),
+}));
 
 describe('useFetchHypothesisTrajectories', () => {
   const mockUseStudyDispatch = useStudyDispatch as Mock<typeof useStudyDispatch>;
@@ -102,7 +118,7 @@ describe('useFetchHypothesisTrajectories', () => {
           isDefault: false,
           isDeletable: true,
           status: TRAJECTORY_SELECTION_STATUS.OK,
-          subRows: undefined,
+          subRows: null,
           trajectory: {
             id: 1,
             trajectoryName: 'area_PB_2024',
@@ -119,7 +135,7 @@ describe('useFetchHypothesisTrajectories', () => {
           isDefault: false,
           isDeletable: true,
           status: TRAJECTORY_SELECTION_STATUS.OK,
-          subRows: undefined,
+          subRows: null,
           trajectory: {
             id: 2,
             trajectoryName: 'area_PB_2026',
@@ -136,7 +152,7 @@ describe('useFetchHypothesisTrajectories', () => {
           isDefault: false,
           isDeletable: true,
           status: TRAJECTORY_SELECTION_STATUS.MISSING,
-          subRows: undefined,
+          subRows: null,
           trajectory: null,
         },
         {
@@ -144,7 +160,7 @@ describe('useFetchHypothesisTrajectories', () => {
           isDefault: false,
           isDeletable: true,
           status: TRAJECTORY_SELECTION_STATUS.MISSING,
-          subRows: undefined,
+          subRows: null,
           trajectory: null,
         },
         {
@@ -208,7 +224,7 @@ describe('useFetchHypothesisTrajectories', () => {
           isDefault: false,
           isDeletable: true,
           status: TRAJECTORY_SELECTION_STATUS.OK,
-          subRows: undefined,
+          subRows: null,
           trajectory: {
             id: 1,
             trajectoryName: 'area_PB_2024',
@@ -225,7 +241,7 @@ describe('useFetchHypothesisTrajectories', () => {
           isDefault: false,
           isDeletable: true,
           status: TRAJECTORY_SELECTION_STATUS.OK,
-          subRows: undefined,
+          subRows: null,
           trajectory: {
             id: 2,
             trajectoryName: 'area_PB_2026',
@@ -242,7 +258,7 @@ describe('useFetchHypothesisTrajectories', () => {
           isDefault: false,
           isDeletable: true,
           status: TRAJECTORY_SELECTION_STATUS.MISSING,
-          subRows: undefined,
+          subRows: null,
           trajectory: null,
         },
         {
@@ -250,7 +266,7 @@ describe('useFetchHypothesisTrajectories', () => {
           isDefault: false,
           isDeletable: true,
           status: TRAJECTORY_SELECTION_STATUS.MISSING,
-          subRows: undefined,
+          subRows: null,
           trajectory: null,
         },
         {
@@ -309,7 +325,7 @@ describe('useFetchHypothesisTrajectories', () => {
           isDefault: false,
           isDeletable: true,
           status: TRAJECTORY_SELECTION_STATUS.OK,
-          subRows: undefined,
+          subRows: null,
           trajectory: {
             id: 1,
             trajectoryName: 'area_PB_2024',
@@ -326,7 +342,7 @@ describe('useFetchHypothesisTrajectories', () => {
           isDefault: false,
           isDeletable: true,
           status: TRAJECTORY_SELECTION_STATUS.OK,
-          subRows: undefined,
+          subRows: null,
           trajectory: {
             id: 2,
             trajectoryName: 'area_PB_2026',
@@ -406,7 +422,7 @@ describe('useFetchHypothesisTrajectories', () => {
           isDefault: false,
           isDeletable: true,
           status: TRAJECTORY_SELECTION_STATUS.OK,
-          subRows: undefined,
+          subRows: null,
           trajectory: {
             id: 1,
             trajectoryName: 'area_PB_2024',
@@ -532,14 +548,14 @@ describe('useFetchHypothesisTrajectories', () => {
     });
   });
 
-  it.skip('should include SPECIFIC, MODULATION and COMMON lines when trajectoryType is THERMAL_TECHNICAL_SPECIFIC_PARAMETER', async () => {
-    vi.mocked(hypothesisTableService.fetchMultipleTrajectoryType).mockResolvedValue({
+  it('should include SPECIFIC, MODULATION and COMMON lines when trajectoryType is THERMAL_TECHNICAL_SPECIFIC_PARAMETER', async () => {
+    vi.mocked(hypothesisTableService.fetchMultipleTrajectoryType).mockResolvedValueOnce({
       [TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]: {
         trajectories: mockDbTrajectoryArraySpecificThermal,
         warningMessages: [],
       },
       [TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER]: {
-        trajectories: [],
+        trajectories: [mockDbTrajectoryArrayCommonThermal],
         warningMessages: [],
       },
       [TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]: {
@@ -553,7 +569,88 @@ describe('useFetchHypothesisTrajectories', () => {
     );
 
     await waitFor(() => {
-      expect(result.current.hypothesisTrajectories[0]?.subRows).toEqual(mockDbTrajectoryArraySpecificThermal);
+      expect(result.current.hypothesisTrajectories[0]?.hypothesis).toEqual('Specific');
+      expect(result.current.hypothesisTrajectories[0]?.status).toEqual(TRAJECTORY_SELECTION_STATUS.MISSING);
+      expect(result.current.hypothesisTrajectories[0]?.isDefault).toBeFalsy();
+      expect(result.current.hypothesisTrajectories[0]?.isDeletable).toBeFalsy();
+      expect(result.current.hypothesisTrajectories[0]?.subRows).toHaveLength(3);
+      expect(result.current.hypothesisTrajectories[0]?.subRows?.[0]).toEqual({
+        hypothesis: mockDbTrajectoryArraySpecificThermal[0]?.area,
+        trajectory: mockDbTrajectoryArraySpecificThermal[0],
+        status: TRAJECTORY_SELECTION_STATUS.OK,
+        isDefault: false,
+        isDeletable: true,
+        subRows: null,
+      });
+      expect(result.current.hypothesisTrajectories[0]?.subRows?.[1]).toEqual({
+        hypothesis: mockDbTrajectoryArraySpecificThermal[1]?.area,
+        trajectory: mockDbTrajectoryArraySpecificThermal[1],
+        status: TRAJECTORY_SELECTION_STATUS.OK,
+        isDefault: false,
+        isDeletable: true,
+        subRows: null,
+      });
+      expect(result.current.hypothesisTrajectories[0]?.subRows?.[2]).toEqual({
+        hypothesis: OTHER_AREAS_LABEL,
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+        isDefault: true,
+        isDeletable: false,
+        subRows: null,
+      });
+      expect(result.current.hypothesisTrajectories[1]?.hypothesis).toEqual('Modulation');
+      expect(result.current.hypothesisTrajectories[2]?.hypothesis).toEqual('Common');
+      expect(result.current.hypothesisTrajectories[2]?.trajectory).toEqual(mockDbTrajectoryArrayCommonThermal);
+      expect(result.current.hypothesisTrajectories[2]?.status).toEqual(TRAJECTORY_SELECTION_STATUS.OK);
+      expect(result.current.hypothesisTrajectories[2]?.isDefault).toBeFalsy();
+      expect(result.current.hypothesisTrajectories[2]?.isDeletable).toBeFalsy();
+      expect(result.current.hypothesisTrajectories[2]?.subRows).toBeNull();
+      expect(result.current.readOnlyRow).toEqual({});
+    });
+  });
+
+  it('should handle read-only area for THERMAL_TECHNICAL_SPECIFIC_PARAMETER trajectories', async () => {
+    const defaultAreasSpecific = [{ name: 'AT' }, { name: 'FR' }];
+    const areas = [{ areaName: 'AT' }, { areaName: 'CZ' }] as TrajectoryAreaData[];
+    vi.mocked(hypothesisTableService.fetchMultipleTrajectoryType).mockResolvedValueOnce({
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]: {
+        trajectories: mockDbTrajectoryArraySpecificThermal,
+        warningMessages: [],
+      },
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER]: {
+        trajectories: [],
+        warningMessages: [],
+      },
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]: {
+        trajectories: [],
+        warningMessages: [],
+      },
+    });
+    vi.mocked(trajectoryUtils.buildDefaultEmptyTrajectoryList).mockImplementationOnce(() => [
+      mockEmptyDbTrajectorySPECIFICFR,
+      mockEmptyDbTrajectorySPECIFICCZ,
+      mockEmptyDbTrajectoryLoadOthers,
+    ]);
+
+    const { result } = renderHook(() =>
+      useFetchHypothesisTrajectories(
+        5,
+        TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+        defaultAreasSpecific,
+        areas,
+      ),
+    );
+
+    await waitFor(() => {
+      expect(result.current.hypothesisTrajectories[0]?.subRows?.[0]?.hypothesis).toEqual('AT');
+      expect(result.current.hypothesisTrajectories[0]?.subRows?.[0]?.trajectory).toEqual(
+        mockDbTrajectoryArraySpecificThermal[0],
+      );
+      expect(result.current.hypothesisTrajectories[0]?.subRows?.[1]?.hypothesis).toEqual('FR');
+      expect(result.current.hypothesisTrajectories[0]?.subRows?.[2]?.hypothesis).toEqual('BE');
+      expect(result.current.hypothesisTrajectories[0]?.subRows?.[3]?.hypothesis).toEqual('CZ');
+      expect(result.current.hypothesisTrajectories[0]?.subRows?.[4]?.hypothesis).toEqual(OTHER_AREAS_LABEL);
+      expect(result.current.readOnlyRow).toEqual({ '1': true });
     });
   });
 });

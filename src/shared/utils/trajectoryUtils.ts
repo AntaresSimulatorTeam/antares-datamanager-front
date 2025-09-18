@@ -27,7 +27,7 @@ export const getStatus = (status?: RowStatus) => {
 };
 
 /**
- * Get background color from file status
+ * Get background color from a file status
  * @param {FileInputStatus | null} status
  */
 export const getBgColor = (status?: FileInputStatus) => {
@@ -96,7 +96,7 @@ export const removeDuplicate = (array?: DbTrajectory[]): DbTrajectory[] =>
 /**
  * Removes duplicate elements from an array of DbTrajectory objects based on the combination
  * of `area` and `technology` properties. The first occurrence of each combination is retained,
- * and subsequent duplicates are removed.
+ * and later duplicates are removed.
  *
  * @param {DbTrajectory[]} [array] - Optional array of DbTrajectory objects to process. Defaults to an empty array if not provided.
  * @returns {DbTrajectory[]} - A new array with duplicates removed based on `area` and `technology` properties.
@@ -126,7 +126,7 @@ export const removeDuplicateById = (array?: WarningMessage[]): WarningMessage[] 
   }, []);
 
 /**
- * Create row data for hypothesis table
+ * Create row data for a hypothesis table
  * @param {string} areaName
  * @param {boolean} isDefault
  * @param {DbTrajectory | null} trajectory
@@ -189,7 +189,8 @@ export const buildRowWithSubRowsData = (
     subRows:
       trajectory.area &&
       trajectory.area !== OTHER_AREAS &&
-      !areasNotInTrajectoryArea?.some((item) => item === trajectory.area)
+      !areasNotInTrajectoryArea?.some((item) => item === trajectory.area) &&
+      subRowOptions
         ? subRowOptions?.map((option) => {
             const hasTechnology = trajectory?.trajectoryName && option === trajectory?.technology;
             return {
@@ -422,7 +423,7 @@ export const getStudyMenu = (t: (value: string) => string, isTrajectoryAreaLinke
  *
  * @param {TRAJECTORY_TYPE} trajectoryKey - The key representing the trajectory type to match.
  * @returns {function(TRAJECTORY_TYPE): boolean} A function that takes a trajectory type and returns `true`
- * if it matches the trajectory key, otherwise returns `false`.
+ * if it matches the trajectory key otherwise returns `false`.
  */
 export const isMatchingTrajectoryType =
   (trajectoryKey: TRAJECTORY_TYPE): ((arg0: TRAJECTORY_TYPE) => boolean) =>

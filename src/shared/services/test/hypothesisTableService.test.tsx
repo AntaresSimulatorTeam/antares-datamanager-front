@@ -376,17 +376,17 @@ describe('handleFetchTrajectoriesFS', () => {
 
 describe('handleTrajectorySearch', () => {
   it('should fetch trajectories and return converted options', async () => {
-    const mockResultsArray = [
+    const mockResultsArraySearch = [
       { id: 1, label: 'Trajectory A' },
       { id: 2, label: 'Trajectory B' },
     ] as unknown as DbTrajectory[];
-    const mockConvertedOptionsArray = [
+    const mockConvertedOptionsArraySearch = [
       { value: '1', label: 'Trajectory A' },
       { value: '2', label: 'Trajectory B' },
     ] as unknown as SelectOption[];
 
-    vi.mocked(trajectoryService.fetchTrajectoriesFromDB).mockResolvedValue(mockResultsArray);
-    vi.mocked(formFormatter.convertToSelectionOptionType).mockReturnValue(mockConvertedOptionsArray);
+    vi.mocked(trajectoryService.fetchTrajectoriesFromDB).mockResolvedValue(mockResultsArraySearch);
+    vi.mocked(formFormatter.convertToSelectionOptionType).mockReturnValue(mockConvertedOptionsArraySearch);
     const setDbTrajectories = vi.fn();
 
     const type = 'TYPE_A' as TRAJECTORY_TYPE;
@@ -397,9 +397,9 @@ describe('handleTrajectorySearch', () => {
     const result = await handleTrajectorySearch(type, value, area, setDbTrajectories, study);
 
     expect(trajectoryService.fetchTrajectoriesFromDB).toHaveBeenCalledWith(type, study.horizon, value, area, undefined);
-    expect(setDbTrajectories).toHaveBeenCalledWith(mockResultsArray);
-    expect(formFormatter.convertToSelectionOptionType).toHaveBeenCalledWith(mockResultsArray);
-    expect(result).toEqual(mockConvertedOptionsArray);
+    expect(setDbTrajectories).toHaveBeenCalledWith(mockResultsArraySearch);
+    expect(formFormatter.convertToSelectionOptionType).toHaveBeenCalledWith(mockResultsArraySearch);
+    expect(result).toEqual(mockConvertedOptionsArraySearch);
   });
 
   it('should handle errors silently and return undefined', async () => {

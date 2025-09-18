@@ -62,7 +62,7 @@ export const useFetchHypothesisTrajectories = (
             result = await fetchMultipleTrajectoryType(id, types);
 
             const specificAreas: DbTrajectory[] = result?.[type]?.trajectories;
-            defaultEmptyAreas = buildDefaultEmptyTrajectoryList(type, specificAreas, defaultAreas);
+            defaultEmptyAreas = buildDefaultEmptyTrajectoryList(type, specificAreas, defaultAreas) ?? [];
             const allAreas = specificAreas?.concat(emptyAreaSelected).concat(defaultEmptyAreas);
             arrayWithoutDuplicate = removeDuplicate(allAreas);
           } else {
