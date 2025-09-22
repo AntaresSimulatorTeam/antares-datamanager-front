@@ -18,7 +18,7 @@ const resources = {
   },
 };
 
-const urlParams = new URLSearchParams(window.location.search);
+const urlParams = new URLSearchParams(globalThis.location.search);
 const i18nMode = urlParams.get('i18nMode');
 
 await i18n.use(initReactI18next).init({
