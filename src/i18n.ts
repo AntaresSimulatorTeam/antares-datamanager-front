@@ -18,9 +18,12 @@ const resources = {
   },
 };
 
+const urlParams = new URLSearchParams(globalThis.location.search);
+const i18nMode = urlParams.get('i18nMode');
+
 await i18n.use(initReactI18next).init({
   resources,
-  lng: 'en',
+  lng: i18nMode === 'key' ? 'key' : 'en',
   interpolation: {
     escapeValue: false,
   },
