@@ -4,8 +4,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import SearchBar from '@/pages/pegase/home/components/SearchBar.tsx';
-import { RdsDivider } from 'rte-design-system-react';
 import {
   CheckBoxData,
   DbTrajectory,
@@ -15,8 +13,7 @@ import {
   SelectOption,
   TrajectoryAreaData,
 } from '@/shared/types';
-import { useTranslation } from 'react-i18next';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
@@ -28,8 +25,6 @@ import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { useLocation } from 'react-router-dom';
 import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
-import StdCheckbox from '@common/forms/stdCheckbox/StdCheckbox.tsx';
-import StdCheckboxGroupWrapper from '@common/forms/stdCheckboxGroup/StdCheckboxGroupWrapper.tsx';
 import { addRow, handleFetchTrajectoriesFS, handleTrajectorySearch } from '@/shared/services/hypothesisTableService.ts';
 import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
@@ -39,6 +34,7 @@ import { shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.
 import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig';
 import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
 import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
+import { CheckBoxListWithSearchBar } from '@/components/list/CheckBoxListWithSearchBar.tsx';
 
 interface ThermalTabProps {
   defaultAreas: { name: string }[];
@@ -46,7 +42,6 @@ interface ThermalTabProps {
 }
 
 const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
-  const { t } = useTranslation();
   const studyState = useStudy();
   const location = useLocation();
   const study = (location.state as LocationStudy)?.study;
@@ -81,50 +76,31 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
     setHypothesis();
   }, [areas, areasTrajectoryOptions, defaultAreas, dropDownListOptions, hypothesisTrajectories, readOnlyRow]);
 
+  const handleSelectionChange = useCallback(
+    async (value: string, isChecked?: boolean) => {
+      {
+        const indexRow = data.findIndex((row) => row.hypothesis === value);
+        if (isChecked) {
+          addRow(TRAJECTORY_TYPE.THERMAL_CAPACITY, value, dispatch, setCheckedValues, setData);
+        } else if (shouldOpenDeletionModal(TRAJECTORY_TYPE.THERMAL_CAPACITY, indexRow, data)) {
+          setRowToDelete({ index: indexRow, value });
+          setIsDeletionModalOpen(true);
+        } else {
+          await removeRow(TRAJECTORY_TYPE.THERMAL_CAPACITY, value, indexRow, data);
+        }
+      }
+    },
+    [data, dispatch, removeRow, setCheckedValues, setData],
+  );
+
   return (
     <div className="flex h-full w-full gap-6">
-      <div className="flex h-fit w-28 flex-col rounded border border-gray-400 p-2">
-        <div className="border-b border-gray-400 pb-2">
-          <SearchBar onSearch={() => {}} placeholder={t('studyDetails.@search_area')} />
-        </div>
-        <StdCheckboxGroupWrapper
-          label={''}
-          name={''}
-          onChange={(value: string, isChecked?: boolean) => {
-            const indexRow = data.findIndex((row) => row.hypothesis === value);
-            if (isChecked) {
-              addRow(TRAJECTORY_TYPE.THERMAL_CAPACITY, value, dispatch, setCheckedValues, setData);
-            } else if (shouldOpenDeletionModal(TRAJECTORY_TYPE.THERMAL_CAPACITY, indexRow, data)) {
-              setRowToDelete({ index: indexRow, value });
-              setIsDeletionModalOpen(true);
-            } else {
-              void removeRow(TRAJECTORY_TYPE.THERMAL_CAPACITY, value, indexRow, data);
-            }
-          }}
-          checkedValues={checkedValues}
-          disabled={isStudyGenerated}
-        >
-          {areasOptions?.map((area, index) => (
-            <div key={`${area.name}`} className="my-1">
-              <StdCheckbox
-                key={`nested-${area.name}`}
-                label={
-                  area.name !== OTHER_AREAS && area.isDefault
-                    ? `${area.name} (${t('studyDetails.@default')})`
-                    : area.name
-                }
-                value={area.name}
-                name={''}
-                disabled={area.isDefault}
-                checked={area.isDefault}
-              />
-              {defaultAreas?.length > 0 && index === Math.max(defaultAreas?.length - 1, 0) && (
-                <RdsDivider extraClasses="mt-1" />
-              )}
-            </div>
-          ))}
-        </StdCheckboxGroupWrapper>
-      </div>
+      <CheckBoxListWithSearchBar
+        checkedValues={checkedValues}
+        options={areasOptions}
+        handleSelectionChange={handleSelectionChange}
+        dividerPosition={defaultAreas.length}
+      />
       <div className="flex w-full flex-col gap-6">
         {defaultAreas.length > 0 && (
           <PegaseHypothesisTable

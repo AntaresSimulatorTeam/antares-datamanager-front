@@ -1,7 +1,5 @@
-import SearchBar from '@/pages/pegase/home/components/SearchBar.tsx';
-import { RdsDivider } from 'rte-design-system-react';
 import { useTranslation } from 'react-i18next';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   CheckBoxData,
   DbTrajectory,
@@ -17,8 +15,6 @@ import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
-import StdCheckboxGroupWrapper from '@common/forms/stdCheckboxGroup/StdCheckboxGroupWrapper.tsx';
-import StdCheckbox from '@common/forms/stdCheckbox/StdCheckbox.tsx';
 import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
 import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
 import { useLocation } from 'react-router-dom';
@@ -31,6 +27,7 @@ import { transformToSubRowKeys } from '@/shared/utils/hypothesisTableUtils.ts';
 import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach';
+import { CheckBoxListWithSearchBar } from '@/components/list/CheckBoxListWithSearchBar.tsx';
 
 interface ParametersTabProps {
   defaultAreas: { name: string }[];
@@ -92,57 +89,45 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
     setHypothesis();
   }, [areas, areasTrajectoryOptions, defaultAreas, dropDownListOptions, hypothesisTrajectories, readOnlyRow, t]);
 
-  const removeRow = (value: string) => {
-    setCheckedValues((prev) => [...prev.filter((checkedValue) => checkedValue !== value)]);
+  const removeRow = useCallback(
+    (value: string) => {
+      setCheckedValues((prev) => [...prev.filter((checkedValue) => checkedValue !== value)]);
 
-    setTechnicalData((prev: HypothesisRowData[]): HypothesisRowData[] => {
-      const newSubRows = prev?.[0]?.subRows ? prev[0].subRows?.filter((itemData) => itemData.hypothesis !== value) : [];
-      return [{ ...prev[0], subRows: newSubRows }, ...prev.slice(1)];
-    });
-  };
+      setTechnicalData((prev: HypothesisRowData[]): HypothesisRowData[] => {
+        const newSubRows = prev?.[0]?.subRows
+          ? prev[0].subRows?.filter((itemData) => itemData.hypothesis !== value)
+          : [];
+        return [{ ...prev[0], subRows: newSubRows }, ...prev.slice(1)];
+      });
+    },
+    [setCheckedValues, setTechnicalData],
+  );
 
-  const handleSelectionChange = (value: string, isChecked: boolean) => {
-    if (isChecked) {
-      addRow(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, value, dispatch, setCheckedValues, setTechnicalData);
-    } else {
-      removeRow(value);
-    }
-  };
+  const handleSelectionChange = useCallback(
+    (value: string, isChecked: boolean) => {
+      if (isChecked) {
+        addRow(
+          TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+          value,
+          dispatch,
+          setCheckedValues,
+          setTechnicalData,
+        );
+      } else {
+        removeRow(value);
+      }
+    },
+    [dispatch, removeRow, setCheckedValues, setTechnicalData],
+  );
 
   return (
     <div className="flex h-full w-full gap-6">
-      <div className="flex h-fit w-28 flex-col rounded border border-gray-400 p-2">
-        <div className="border-b border-gray-400 pb-2">
-          <SearchBar onSearch={() => {}} placeholder={t('studyDetails.@search_area')} />
-        </div>
-        <StdCheckboxGroupWrapper
-          label={''}
-          name={''}
-          checkedValues={checkedValues}
-          disabled={false}
-          onChange={(value: string, isChecked?: boolean) => handleSelectionChange(value, isChecked ?? false)}
-        >
-          {areasOptions?.map((area, index) => (
-            <div key={`${index}-${area.name}`} className="my-1">
-              <StdCheckbox
-                key={`parameter-checkbox-${area.name}`}
-                label={
-                  area.name !== OTHER_AREAS && area.isDefault
-                    ? `${area.name} (${t('studyDetails.@default')})`
-                    : area.name
-                }
-                value={area.name}
-                name={''}
-                disabled={area.isDefault}
-                checked={area.isDefault}
-              />
-              {defaultAreas?.length > 0 && index === Math.max(defaultAreas?.length - 1, 0) && (
-                <RdsDivider extraClasses="mt-1" />
-              )}
-            </div>
-          ))}
-        </StdCheckboxGroupWrapper>
-      </div>
+      <CheckBoxListWithSearchBar
+        checkedValues={checkedValues}
+        options={areasOptions}
+        handleSelectionChange={handleSelectionChange}
+        dividerPosition={defaultAreas.length}
+      />
       <div className="flex w-full flex-col gap-6">
         <PegaseHypothesisTable
           id="technical-parameters-table"

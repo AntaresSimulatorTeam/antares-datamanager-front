@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   CheckBoxData,
   DbTrajectory,
@@ -15,11 +15,8 @@ import {
   TrajectoryAreaData,
 } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { useTranslation } from 'react-i18next';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { useLocation } from 'react-router-dom';
-import SearchBar from '@/pages/pegase/home/components/SearchBar.tsx';
-import { RdsDivider } from 'rte-design-system-react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import getEditableHypothesisTableHeaders from '@/components/header/EditableHypothesisTableHeaders.tsx';
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
@@ -30,13 +27,12 @@ import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/Pega
 import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
 import { addRow, handleFetchTrajectoriesFS, handleTrajectorySearch } from '@/shared/services/hypothesisTableService.ts';
 import { getReadOnlyForGeneratedStudy, shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
-import StdCheckboxGroupWrapper from '@common/forms/stdCheckboxGroup/StdCheckboxGroupWrapper.tsx';
-import StdCheckbox from '@common/forms/stdCheckbox/StdCheckbox.tsx';
 import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
 import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow.ts';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
+import { CheckBoxListWithSearchBar } from '@/components/list/CheckBoxListWithSearchBar.tsx';
 
 interface LoadTabProps {
   defaultAreas: { name: string }[];
@@ -44,7 +40,6 @@ interface LoadTabProps {
 }
 
 const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
-  const { t } = useTranslation();
   const studyState = useStudy();
   const location = useLocation();
   const study = (location.state as LocationStudy)?.study;
@@ -95,51 +90,30 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
     }
   }, [studyState.studyStatus, study?.status, data]);
 
+  const handleSelectionChange = useCallback(
+    async (value: string, isChecked?: boolean): Promise<void> => {
+      const indexRow = data.findIndex((row) => row.hypothesis === value);
+      if (isChecked) {
+        addRow(TRAJECTORY_TYPE.LOAD, value, dispatch, setCheckedValues, setData);
+      } else if (shouldOpenDeletionModal(TRAJECTORY_TYPE.LOAD, indexRow, data)) {
+        setRowToDelete({ index: indexRow, value });
+        setIsDeletionModalOpen(true);
+      } else {
+        await removeRow(TRAJECTORY_TYPE.LOAD, value, indexRow, data);
+      }
+    },
+    [data, dispatch, removeRow, setCheckedValues],
+  );
+
   return (
     <div className="flex h-full w-full flex-col gap-4">
       <div className="flex h-full w-full gap-6">
-        <div className="flex h-fit w-28 flex-col rounded border border-gray-400 p-2">
-          <div className="border-b border-gray-400 pb-2">
-            <SearchBar onSearch={() => {}} placeholder={t('studyDetails.@search_area')} />
-          </div>
-          <StdCheckboxGroupWrapper
-            label={''}
-            name={''}
-            onChange={(value: string, isChecked?: boolean) => {
-              const indexRow = data.findIndex((row) => row.hypothesis === value);
-              if (isChecked) {
-                addRow(TRAJECTORY_TYPE.LOAD, value, dispatch, setCheckedValues, setData);
-              } else if (shouldOpenDeletionModal(TRAJECTORY_TYPE.LOAD, indexRow, data)) {
-                setRowToDelete({ index: indexRow, value });
-                setIsDeletionModalOpen(true);
-              } else {
-                void removeRow(TRAJECTORY_TYPE.LOAD, value, indexRow, data);
-              }
-            }}
-            checkedValues={checkedValues}
-            disabled={isStudyGenerated}
-          >
-            {areasOptions?.map((area, index) => (
-              <div key={`${index}-${area.name}`} className="my-1">
-                <StdCheckbox
-                  key={`load-checkbox-${area.name}`}
-                  label={
-                    area.name !== OTHER_AREAS && area.isDefault
-                      ? `${area.name} (${t('studyDetails.@default')})`
-                      : area.name
-                  }
-                  value={area.name}
-                  name={''}
-                  disabled={area.isDefault}
-                  checked={area.isDefault}
-                />
-                {defaultAreas?.length > 0 && index === Math.max(defaultAreas?.length - 1, 0) && (
-                  <RdsDivider extraClasses="mt-1" />
-                )}
-              </div>
-            ))}
-          </StdCheckboxGroupWrapper>
-        </div>
+        <CheckBoxListWithSearchBar
+          checkedValues={checkedValues}
+          options={areasOptions}
+          handleSelectionChange={handleSelectionChange}
+          dividerPosition={defaultAreas.length}
+        />
         <div className="flex h-fit w-full">
           <PegaseHypothesisTable
             id="load-table"
