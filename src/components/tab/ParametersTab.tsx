@@ -91,7 +91,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
 
   const removeRow = useCallback(
     (value: string) => {
-      setCheckedValues((prev) => [...prev.filter((checkedValue) => checkedValue !== value)]);
+      setCheckedValues((prev) => prev.filter((checkedValue) => checkedValue !== value));
 
       setTechnicalData((prev: HypothesisRowData[]): HypothesisRowData[] => {
         const newSubRows = prev?.[0]?.subRows
