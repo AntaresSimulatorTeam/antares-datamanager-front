@@ -30,7 +30,7 @@ export const ThermalMenu = ({ defaultAreas, areas }: ThermalMenuProps) => {
   };
 
   return (
-    <div className="flex h-full w-full flex-col gap-4">
+    <div className="flex h-full min-h-0 w-full flex-col gap-4">
       <StdTabs
         renderPrimary={(item) => (
           <StdTabItem

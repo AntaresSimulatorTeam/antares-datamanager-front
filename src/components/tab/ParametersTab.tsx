@@ -121,13 +121,12 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
   );
 
   return (
-    <div className="flex h-full w-full gap-6">
+    <div className="flex h-full min-h-0 w-full gap-6">
       <CheckBoxListWithSearchBar
         checkedValues={checkedValues}
         options={areasOptions}
         handleSelectionChange={handleSelectionChange}
         dividerPosition={defaultAreas.length}
-        height={'aspect-wide:h-3/6'}
       />
       <div className="flex w-full flex-col gap-6">
         <PegaseHypothesisTable

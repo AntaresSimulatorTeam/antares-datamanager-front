@@ -11,7 +11,6 @@ interface CheckBoxListProps {
   handleSelectionChange: (value: string, isChecked: boolean) => Promise<void> | void;
   options: CheckBoxData[];
   dividerPosition: number;
-  height?: string;
   handleSearch?: (_value?: string) => Promise<void>;
 }
 
@@ -20,20 +19,19 @@ export const CheckBoxListWithSearchBar = ({
   handleSelectionChange,
   options,
   dividerPosition = 0,
-  height = 'aspect-wide:h-3/5',
   handleSearch,
 }: CheckBoxListProps) => {
   const { t } = useTranslation();
 
   return (
-    <div className={`flex w-28 flex-col rounded border border-gray-400 p-2 aspect-medium:h-4/6 ${height}`}>
+    <div className="flex h-full w-28 flex-col rounded border border-gray-400 p-2">
       <div className="border-b border-gray-400 pb-2">
         <SearchBar
           onSearch={(value?: string) => void handleSearch?.(value)}
           placeholder={t('studyDetails.@search_area')}
         />
       </div>
-      <div className="overflow-y-auto">
+      <div className="min-h-0 flex-1 overflow-y-auto">
         <StdCheckboxGroupWrapper
           label={''}
           name={''}
