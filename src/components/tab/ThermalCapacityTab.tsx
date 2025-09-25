@@ -94,80 +94,77 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
   );
 
   return (
-    <div className="flex h-full min-h-0 w-full gap-6">
+    <div className="flex h-fit w-full gap-6">
       <CheckBoxListWithSearchBar
         checkedValues={checkedValues}
         options={areasOptions}
         handleSelectionChange={handleSelectionChange}
         dividerPosition={defaultAreas.length}
       />
-      <div className="flex w-full flex-col gap-6">
-        {defaultAreas.length > 0 && (
-          <PegaseHypothesisTable
-            id="thermal-table"
-            data={data}
-            getTableHeaders={getExpandableHypothesisTableHeaders}
-            fileStatus={fileStatus}
-            studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
-            readOnly={readOnly}
-            progress={progress}
-            idSelected={rowIdSelected}
-            handleSearch={async (value: string, rowId: string) => {
-              const indexArray = rowId.split('.').map(Number);
-              const area =
-                data[indexArray[0]]?.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : data[indexArray[0]]?.hypothesis;
-              const technology =
-                indexArray?.length > 1 ? data[indexArray[0]]?.subRows?.[indexArray[1]]?.hypothesis : undefined;
-              return await handleTrajectorySearch(
-                TRAJECTORY_TYPE.THERMAL_CAPACITY,
-                value,
-                area,
-                setDbTrajectories,
-                study,
-                technology,
-              );
-            }}
-            handleImport={async (rowId: string) => {
-              const indexArray = rowId.split('.').map(Number);
-              await handleFetchTrajectoriesFS(
-                TRAJECTORY_TYPE.THERMAL_CAPACITY,
-                rowId,
-                setOptionsFS,
-                setRowIdSelected,
-                toggleModal,
-                data[indexArray[0]]?.hypothesis,
-              );
-            }}
-            isReadOnlyEnable={true}
-            updateData={(rowId: string, value: unknown, status: RowStatus) => {
-              const indexArray = rowId.split('.').map(Number);
-              if (status === 'empty' || status === 'emptyError') {
-                const trajectorySelected: DbTrajectory | null =
-                  getRowDataSelected(data, indexArray)?.trajectory ?? null;
-                if (trajectorySelected) {
-                  void detachTrajectory(TRAJECTORY_TYPE.THERMAL_CAPACITY, indexArray, status, trajectorySelected);
-                }
-              } else if (status === 'success') {
-                const dbTrajectory =
-                  dbTrajectories.length > 0
-                    ? dbTrajectories.find((item) => item.id === value)
-                    : getRowDataSelected(data, indexArray)?.trajectory;
-                if (dbTrajectory) {
-                  void attachTrajectory(TRAJECTORY_TYPE.THERMAL_CAPACITY, indexArray, status, dbTrajectory);
-                }
+      {defaultAreas.length > 0 && (
+        <PegaseHypothesisTable
+          id="thermal-table"
+          data={data}
+          getTableHeaders={getExpandableHypothesisTableHeaders}
+          fileStatus={fileStatus}
+          studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
+          readOnly={readOnly}
+          progress={progress}
+          idSelected={rowIdSelected}
+          handleSearch={async (value: string, rowId: string) => {
+            const indexArray = rowId.split('.').map(Number);
+            const area =
+              data[indexArray[0]]?.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : data[indexArray[0]]?.hypothesis;
+            const technology =
+              indexArray?.length > 1 ? data[indexArray[0]]?.subRows?.[indexArray[1]]?.hypothesis : undefined;
+            return await handleTrajectorySearch(
+              TRAJECTORY_TYPE.THERMAL_CAPACITY,
+              value,
+              area,
+              setDbTrajectories,
+              study,
+              technology,
+            );
+          }}
+          handleImport={async (rowId: string) => {
+            const indexArray = rowId.split('.').map(Number);
+            await handleFetchTrajectoriesFS(
+              TRAJECTORY_TYPE.THERMAL_CAPACITY,
+              rowId,
+              setOptionsFS,
+              setRowIdSelected,
+              toggleModal,
+              data[indexArray[0]]?.hypothesis,
+            );
+          }}
+          isReadOnlyEnable={true}
+          updateData={(rowId: string, value: unknown, status: RowStatus) => {
+            const indexArray = rowId.split('.').map(Number);
+            if (status === 'empty' || status === 'emptyError') {
+              const trajectorySelected: DbTrajectory | null = getRowDataSelected(data, indexArray)?.trajectory ?? null;
+              if (trajectorySelected) {
+                void detachTrajectory(TRAJECTORY_TYPE.THERMAL_CAPACITY, indexArray, status, trajectorySelected);
               }
-            }}
-            removeRow={(value: string, rowId?: string) => {
-              if (shouldOpenDeletionModal(TRAJECTORY_TYPE.THERMAL_CAPACITY, Number(rowId), data)) {
-                setRowToDelete({ index: Number(rowId), value });
-                setIsDeletionModalOpen(true);
-              } else {
-                void removeRow(TRAJECTORY_TYPE.THERMAL_CAPACITY, value, Number(rowId), data);
+            } else if (status === 'success') {
+              const dbTrajectory =
+                dbTrajectories.length > 0
+                  ? dbTrajectories.find((item) => item.id === value)
+                  : getRowDataSelected(data, indexArray)?.trajectory;
+              if (dbTrajectory) {
+                void attachTrajectory(TRAJECTORY_TYPE.THERMAL_CAPACITY, indexArray, status, dbTrajectory);
               }
-            }}
-          />
-        )}
-      </div>
+            }
+          }}
+          removeRow={(value: string, rowId?: string) => {
+            if (shouldOpenDeletionModal(TRAJECTORY_TYPE.THERMAL_CAPACITY, Number(rowId), data)) {
+              setRowToDelete({ index: Number(rowId), value });
+              setIsDeletionModalOpen(true);
+            } else {
+              void removeRow(TRAJECTORY_TYPE.THERMAL_CAPACITY, value, Number(rowId), data);
+            }
+          }}
+        />
+      )}
       {isModalOpen && (
         <ImportTrajectoryModal
           options={optionsFS}

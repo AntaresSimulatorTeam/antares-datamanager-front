@@ -106,59 +106,57 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
   );
 
   return (
-    <div className="flex h-full min-h-0 w-full gap-6">
+    <div className="flex min-h-0 w-full gap-6">
       <CheckBoxListWithSearchBar
         checkedValues={checkedValues}
         options={areasOptions}
         handleSelectionChange={handleSelectionChange}
         dividerPosition={defaultAreas.length}
       />
-      <div className="flex h-fit w-full">
-        <PegaseHypothesisTable
-          id="load-table"
-          data={data}
-          getTableHeaders={getEditableHypothesisTableHeaders}
-          fileStatus={fileStatus}
-          studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
-          readOnly={readOnly}
-          progress={progress}
-          idSelected={String(rowIdSelected)}
-          handleSearch={async (value: string, rowId: string) => {
-            const area =
-              data[Number(rowId)]?.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : data[Number(rowId)]?.hypothesis;
-            return await handleTrajectorySearch(TRAJECTORY_TYPE.LOAD, value, area, setDbTrajectories, study);
-          }}
-          handleImport={async (rowId: string) => {
-            await handleFetchTrajectoriesFS(
-              TRAJECTORY_TYPE.LOAD,
-              rowId,
-              setOptionsFS,
-              setRowIdSelected,
-              toggleModal,
-              data[Number(rowId)]?.hypothesis,
-            );
-          }}
-          removeRow={(value: string, rowId?: string) => {
-            if (shouldOpenDeletionModal(TRAJECTORY_TYPE.LOAD, Number(rowId), data)) {
-              setRowToDelete({ index: Number(rowId), value });
-              setIsDeletionModalOpen(true);
-            } else {
-              void removeRow(TRAJECTORY_TYPE.LOAD, value, Number(rowId), data);
-            }
-          }}
-          updateData={(rowId: string, value: unknown, status: RowStatus) => {
-            const index = Number(rowId);
-            const trajectory = data[index]?.trajectory;
-            if ((status === 'empty' && trajectory) || (status === 'emptyError' && trajectory)) {
-              void detachTrajectory(TRAJECTORY_TYPE.LOAD, [index], status, trajectory);
-            } else if (status === 'success') {
-              const dbTrajectory = dbTrajectories.find((item) => item.trajectoryName === value) ?? trajectory;
-              if (dbTrajectory) void attachTrajectory(TRAJECTORY_TYPE.LOAD, [Number(rowId)], status, dbTrajectory);
-            }
-          }}
-          isReadOnlyEnable={true}
-        />
-      </div>
+      <PegaseHypothesisTable
+        id="load-table"
+        data={data}
+        getTableHeaders={getEditableHypothesisTableHeaders}
+        fileStatus={fileStatus}
+        studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
+        readOnly={readOnly}
+        progress={progress}
+        idSelected={String(rowIdSelected)}
+        handleSearch={async (value: string, rowId: string) => {
+          const area =
+            data[Number(rowId)]?.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : data[Number(rowId)]?.hypothesis;
+          return await handleTrajectorySearch(TRAJECTORY_TYPE.LOAD, value, area, setDbTrajectories, study);
+        }}
+        handleImport={async (rowId: string) => {
+          await handleFetchTrajectoriesFS(
+            TRAJECTORY_TYPE.LOAD,
+            rowId,
+            setOptionsFS,
+            setRowIdSelected,
+            toggleModal,
+            data[Number(rowId)]?.hypothesis,
+          );
+        }}
+        removeRow={(value: string, rowId?: string) => {
+          if (shouldOpenDeletionModal(TRAJECTORY_TYPE.LOAD, Number(rowId), data)) {
+            setRowToDelete({ index: Number(rowId), value });
+            setIsDeletionModalOpen(true);
+          } else {
+            void removeRow(TRAJECTORY_TYPE.LOAD, value, Number(rowId), data);
+          }
+        }}
+        updateData={(rowId: string, value: unknown, status: RowStatus) => {
+          const index = Number(rowId);
+          const trajectory = data[index]?.trajectory;
+          if ((status === 'empty' && trajectory) || (status === 'emptyError' && trajectory)) {
+            void detachTrajectory(TRAJECTORY_TYPE.LOAD, [index], status, trajectory);
+          } else if (status === 'success') {
+            const dbTrajectory = dbTrajectories.find((item) => item.trajectoryName === value) ?? trajectory;
+            if (dbTrajectory) void attachTrajectory(TRAJECTORY_TYPE.LOAD, [Number(rowId)], status, dbTrajectory);
+          }
+        }}
+        isReadOnlyEnable={true}
+      />
       {isModalOpen && (
         <ImportTrajectoryModal
           options={optionsFS}
