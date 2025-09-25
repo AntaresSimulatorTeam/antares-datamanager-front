@@ -24,14 +24,14 @@ export const CheckBoxListWithSearchBar = ({
   const { t } = useTranslation();
 
   return (
-    <div className="flex h-full w-28 flex-col rounded border border-gray-400 p-2">
+    <div className="flex max-h-[45vh] w-28 flex-none flex-col self-start rounded border border-gray-400 p-2">
       <div className="border-b border-gray-400 pb-2">
         <SearchBar
           onSearch={(value?: string) => void handleSearch?.(value)}
           placeholder={t('studyDetails.@search_area')}
         />
       </div>
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div className="min-h-0 overflow-y-auto">
         <StdCheckboxGroupWrapper
           label={''}
           name={''}
