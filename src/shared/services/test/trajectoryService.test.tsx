@@ -530,7 +530,7 @@ describe('uploadTrajectory', () => {
     await waitFor(() => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
       expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
-        `https://mockapi.com/v1/trajectory/thermal-common-parameter?trajectoryType=THERMAL_TECHNICAL_COMMON_PARAMETER&trajectoryToUse=common_param_BP_23_v6&horizon=2025-2026&studyId=2`,
+        `https://mockapi.com/v1/trajectory/thermal-common-parameter?trajectoryToUse=common_param_BP_23_v6&horizon=2025-2026&studyId=2`,
         requestOptions,
         onProgress,
       );
