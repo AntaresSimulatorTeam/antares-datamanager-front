@@ -100,7 +100,6 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
         options={areasOptions}
         handleSelectionChange={handleSelectionChange}
         dividerPosition={defaultAreas.length}
-        height={'aspect-wide:h-3/6'}
       />
       {defaultAreas.length > 0 && (
         <PegaseHypothesisTable

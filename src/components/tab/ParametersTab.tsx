@@ -127,7 +127,6 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
         options={areasOptions}
         handleSelectionChange={handleSelectionChange}
         dividerPosition={defaultAreas.length}
-        height={'aspect-wide:h-3/6'}
       />
       <div className="flex w-full flex-col gap-6">
         <PegaseHypothesisTable
