@@ -83,7 +83,7 @@ const StudyDetails = () => {
               content={getWarningMessages(studyState, activeTab.name, study.id)}
               placeholder={t('studyDetails.@noWarnings')}
             />
-            <div className="flex h-full min-h-0 w-full">{activeContent}</div>
+            <div className="flex h-screen min-h-0 w-full">{activeContent}</div>
           </div>
           <div className="fixed bottom-0 right-0 w-full border-t bg-gray-w px-1 py-1.5">
             <div className="flex h-fit w-full items-center justify-end">
