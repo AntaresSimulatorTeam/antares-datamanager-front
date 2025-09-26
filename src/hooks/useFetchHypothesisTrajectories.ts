@@ -186,9 +186,11 @@ export const useFetchHypothesisTrajectories = (
               const hasSpecificTrajectory = dataToCheck?.some((row) => row.status === TRAJECTORY_SELECTION_STATUS.OK);
               const readOnlySubRows = transformToSubRowKeys(readOnlyRows);
               if (!hasSpecificTrajectory) {
-                Object.assign(readOnlySubRows, { ['1']: true });
+                const next = { ...readOnlySubRows, ['1']: true };
+                setReadOnlyRow(next);
+              } else {
+                setReadOnlyRow(readOnlySubRows);
               }
-              setReadOnlyRow(readOnlySubRows);
             } else {
               setReadOnlyRow(readOnlyRows);
             }
