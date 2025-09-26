@@ -23,7 +23,6 @@ import { getAreaTrajectoryName, getTrajectoryTypeByIndex } from '@/shared/utils/
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { addRow, handleFetchTrajectoriesFS, handleTrajectorySearch } from '@/shared/services/hypothesisTableService.ts';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
-import { transformToSubRowKeys } from '@/shared/utils/hypothesisTableUtils.ts';
 import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach';
@@ -84,10 +83,16 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
       areasTrajectoryOptions && setAreasOptions(areasTrajectoryOptions);
       dropDownListOptions && setCheckedValues(dropDownListOptions);
       hypothesisTrajectories && setTechnicalData(hypothesisTrajectories);
-      setReadOnly(transformToSubRowKeys(readOnlyRow));
+      setReadOnly(readOnlyRow);
     };
     setHypothesis();
   }, [areas, areasTrajectoryOptions, defaultAreas, dropDownListOptions, hypothesisTrajectories, readOnlyRow, t]);
+
+  useEffect(() => {
+    const hasSpecificTrajectory = technicalData[0]?.subRows?.some((row) => row.trajectory);
+    Object.assign(readOnlyRow, { ['1']: !hasSpecificTrajectory });
+    setReadOnly(readOnlyRow);
+  }, [technicalData]);
 
   const removeRow = useCallback(
     (value: string) => {

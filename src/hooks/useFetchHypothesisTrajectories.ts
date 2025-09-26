@@ -23,7 +23,7 @@ import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { sortWithFixedPosition } from '@/shared/utils/sortUtils';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { getReadOnlyForGeneratedStudy } from '@/shared/helpers/hypothesisTableHelper.ts';
-import { getDefaultAreaNotIncludedInAreaList } from '@/shared/utils/hypothesisTableUtils.ts';
+import { getDefaultAreaNotIncludedInAreaList, transformToSubRowKeys } from '@/shared/utils/hypothesisTableUtils.ts';
 import { useTranslation } from 'react-i18next';
 import { fetchMultipleTrajectoryType } from '@/shared/services/hypothesisTableService.ts';
 
@@ -177,11 +177,17 @@ export const useFetchHypothesisTrajectories = (
             const rows = getReadOnlyForGeneratedStudy(dataTrajectories);
             setReadOnlyRow(rows);
           } else if (defaultAreaListNotIncludedInList.length > 0 && !isStudyGenerated) {
-            const dataToCheck =
-              type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER && dataTrajectories?.[0]?.subRows
-                ? dataTrajectories[0].subRows
-                : dataTrajectories;
-            setReadOnlyRow(retrieveReadOnlyArea(dataToCheck, defaultAreaListNotIncludedInList));
+            const readOnlyRows = retrieveReadOnlyArea(dataTrajectories, defaultAreaListNotIncludedInList);
+            if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
+              const hasSpecificTrajectory = dataTrajectories[0].subRows?.some((row) => row.trajectory);
+              const readOnlySubRows = transformToSubRowKeys(readOnlyRows);
+              if (!hasSpecificTrajectory) {
+                Object.assign(readOnlySubRows, { ['1']: true });
+              }
+              setReadOnlyRow(readOnlySubRows);
+            } else {
+              setReadOnlyRow(readOnlyRows);
+            }
           }
         }
       } catch (error) {
