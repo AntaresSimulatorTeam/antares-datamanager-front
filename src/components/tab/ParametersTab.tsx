@@ -93,7 +93,6 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
       (row) => row.status === TRAJECTORY_SELECTION_STATUS.OK,
     );
     const newReadOnlyRow = { ...readOnlyRow, ['1']: !hasSpecificTrajectory };
-    Object.assign(readOnlyRow, { ['1']: !hasSpecificTrajectory });
     setReadOnly(newReadOnlyRow);
   }, [technicalData]);
 
