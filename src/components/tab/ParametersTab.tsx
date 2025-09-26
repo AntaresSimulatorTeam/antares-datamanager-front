@@ -89,7 +89,9 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
   }, [areas, areasTrajectoryOptions, defaultAreas, dropDownListOptions, hypothesisTrajectories, readOnlyRow, t]);
 
   useEffect(() => {
-    const hasSpecificTrajectory = technicalData[0]?.subRows?.some((row) => row.trajectory);
+    const hasSpecificTrajectory = technicalData[0]?.subRows?.some(
+      (row) => row.status === TRAJECTORY_SELECTION_STATUS.OK,
+    );
     Object.assign(readOnlyRow, { ['1']: !hasSpecificTrajectory });
     setReadOnly(readOnlyRow);
   }, [technicalData]);

@@ -176,10 +176,14 @@ export const useFetchHypothesisTrajectories = (
           if (isStudyGenerated) {
             const rows = getReadOnlyForGeneratedStudy(dataTrajectories);
             setReadOnlyRow(rows);
-          } else if (defaultAreaListNotIncludedInList.length > 0 && !isStudyGenerated) {
-            const readOnlyRows = retrieveReadOnlyArea(dataTrajectories, defaultAreaListNotIncludedInList);
+          } else {
+            const dataToCheck =
+              type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER && dataTrajectories[0].subRows
+                ? dataTrajectories[0].subRows
+                : dataTrajectories;
+            const readOnlyRows = retrieveReadOnlyArea(dataToCheck, defaultAreaListNotIncludedInList);
             if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
-              const hasSpecificTrajectory = dataTrajectories[0].subRows?.some((row) => row.trajectory);
+              const hasSpecificTrajectory = dataToCheck?.some((row) => row.status === TRAJECTORY_SELECTION_STATUS.OK);
               const readOnlySubRows = transformToSubRowKeys(readOnlyRows);
               if (!hasSpecificTrajectory) {
                 Object.assign(readOnlySubRows, { ['1']: true });

@@ -76,6 +76,11 @@ const getExpandableHypothesisTableHeaders = (
               <div className={'text-gray-600'}>{` | +${childrenArray.length}`}</div>
             </RdsTextTooltip>
           )}
+          {row.index === 1 && hypothesis === t('thermal.@paramModulation') && (
+            <RdsTextTooltip text={t('thermal.@paramModulationMessage')} offset={5} placement="right">
+              <StdIcon name={StdIconId.Info} />
+            </RdsTextTooltip>
+          )}
         </div>
       );
     },
