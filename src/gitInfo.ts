@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "feat/ANT-3853_checkbox_list_add_scroll_bar",
-  commit: "8ffd775",
-  commitTime: "2025-09-23T07:53:57.710Z"
+  branch: "feat/ANT-3776_thermal_parameters_specific_params_import",
+  commit: "226391c",
+  commitTime: "2025-09-25T15:50:47.179Z"
 };

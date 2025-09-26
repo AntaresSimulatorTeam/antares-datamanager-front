@@ -530,7 +530,29 @@ describe('uploadTrajectory', () => {
     await waitFor(() => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
       expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
-        `https://mockapi.com/v1/trajectory/thermal-common-parameter?trajectoryType=THERMAL_TECHNICAL_COMMON_PARAMETER&trajectoryToUse=common_param_BP_23_v6&horizon=2025-2026&studyId=2`,
+        `https://mockapi.com/v1/trajectory/thermal-common-parameter?trajectoryToUse=common_param_BP_23_v6&horizon=2025-2026&studyId=2`,
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
+
+  it('should import THERMAL_TECHNICAL_SPECIFIC_PARAMETER trajectory into data base', async () => {
+    await uploadTrajectory(
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+      'specific_param_BP_23',
+      '2030-2031',
+      25,
+      'Specific',
+      onProgress,
+      false,
+      'FR',
+    );
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        `https://mockapi.com/v1/trajectory/thermal-specific-parameter?area=FR&trajectoryToUse=specific_param_BP_23&horizon=2030-2031&studyId=25`,
         requestOptions,
         onProgress,
       );

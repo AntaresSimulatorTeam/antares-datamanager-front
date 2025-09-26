@@ -14,6 +14,7 @@ import {
   TRAJECTORY_LINK_TO_STUDY_ENDPOINT,
   TRAJECTORY_THERMAL_COMMON_PARAMETER_IMPORT,
   TRAJECTORY_THERMAL_INSTALLED_POWER_IMPORT,
+  TRAJECTORY_THERMAL_SPECIFIC_PARAMETER_IMPORT,
   TRAJECTORY_UNLINK_ALL_TO_STUDY_ENDPOINT,
   TRAJECTORY_UNLINK_MULTIPLE_TO_STUDY_ENDPOINT,
   TRAJECTORY_UNLINK_TO_STUDY_ENDPOINT,
@@ -104,7 +105,7 @@ export const fetchTrajectoriesFromFS = async (
  * @param {number} studyId - The unique identifier for the associated study.
  * @param {boolean} isCivilYear - Indicates whether the horizon is based on the civil or a different calendar year.
  * @param {(progress: number) => void} onProgress - A callback function invoked to report progress updates. Receives a numeric progress value.
- * @param {string} technology - The technology associated with the trajectory.
+ * @param {string | undefined} subArea - The subarea associated with the trajectory, may be undefined.
  * @returns {Promise<DbTrajectory>} A promise that resolves to the uploaded trajectory object.
  * @throws {Error} If the upload process fails or an invalid response is encountered.
  */
@@ -116,15 +117,17 @@ export const uploadTrajectory = async (
   area: string | undefined,
   onProgress: (progress: number) => void,
   isCivilYear?: boolean,
-  technology?: string,
+  subArea?: string,
 ): Promise<DbTrajectory> => {
   let urlApi;
   if (trajectoryType === TRAJECTORY_TYPE.LOAD) {
     urlApi = `${TRAJECTORY_ENDPOINT}/load?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   } else if (trajectoryType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
-    urlApi = `${TRAJECTORY_THERMAL_INSTALLED_POWER_IMPORT}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}&technology=${technology ?? ''}`;
+    urlApi = `${TRAJECTORY_THERMAL_INSTALLED_POWER_IMPORT}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}&technology=${subArea ?? ''}`;
   } else if (trajectoryType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER) {
-    urlApi = `${TRAJECTORY_THERMAL_COMMON_PARAMETER_IMPORT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
+    urlApi = `${TRAJECTORY_THERMAL_COMMON_PARAMETER_IMPORT}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
+  } else if (trajectoryType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
+    urlApi = `${TRAJECTORY_THERMAL_SPECIFIC_PARAMETER_IMPORT}?area=${subArea ?? ''}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   } else {
     urlApi = `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   }

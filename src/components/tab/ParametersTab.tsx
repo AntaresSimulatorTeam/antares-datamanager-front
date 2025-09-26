@@ -121,7 +121,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
   );
 
   return (
-    <div className="flex h-full w-full gap-6">
+    <div className="flex h-full min-h-0 w-full gap-6">
       <CheckBoxListWithSearchBar
         checkedValues={checkedValues}
         options={areasOptions}

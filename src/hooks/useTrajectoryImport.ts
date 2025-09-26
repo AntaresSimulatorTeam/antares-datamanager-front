@@ -32,7 +32,7 @@ export const useTrajectoryImport = (
   const importTrajectory = useCallback(
     async (type: TRAJECTORY_TYPE, value: SelectOption, indexArray: number[], data: HypothesisRowData[]) => {
       const hypothesis = data[indexArray[0]]?.hypothesis;
-      const technology = indexArray?.length > 1 ? data[indexArray[0]]?.subRows?.[indexArray[1]]?.hypothesis : undefined;
+      const subArea = indexArray?.length > 1 ? data[indexArray[0]]?.subRows?.[indexArray[1]]?.hypothesis : undefined;
       setFileStatus('loading');
       try {
         const newTrajectory = await uploadTrajectory(
@@ -45,7 +45,7 @@ export const useTrajectoryImport = (
             setProgress(+progressValue.toFixed(0));
           },
           false, //TODO: should be configurable
-          technology,
+          subArea === OTHER_AREAS_LABEL ? OTHER_AREAS : subArea,
         );
 
         setFileStatus('success');
@@ -59,13 +59,13 @@ export const useTrajectoryImport = (
           const message = t('studyDetails.@notificationAlert', {
             studyName: study.name,
             trajectoryName: value.label,
-            trajectoryType: technology ?? hypothesis,
+            trajectoryType: subArea ?? hypothesis,
           });
           handleTrajectoryError(
             type,
             indexArray,
             { id: value.id, label: value.label },
-            technology ?? hypothesis,
+            subArea ?? hypothesis,
             user?.profile?.sub ?? '',
             setData,
             { message, content: error.antaresErrorMessage },

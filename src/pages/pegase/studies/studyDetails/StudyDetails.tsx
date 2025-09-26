@@ -59,7 +59,7 @@ const StudyDetails = () => {
       <p>{t('studyDetails.@loading')}</p>
     </div>
   ) : (
-    <div className="flex h-full w-full flex-col pb-20">
+    <div className="flex h-full w-full flex-col pb-16">
       <StudyHeader study={study} />
       <div className="relative flex h-full w-full flex-col">
         <RdsDivider />
@@ -67,7 +67,7 @@ const StudyDetails = () => {
           <DetailsContent content={study} />
         </div>
         <div className="flex px-3 pt-2">
-          <div className="flex h-10 items-end self-stretch">
+          <div className="flex items-end self-stretch">
             <StudyNavigationMenu
               onRenderActiveComponent={setActiveContent}
               setActiveTab={setActiveTab}
@@ -83,7 +83,7 @@ const StudyDetails = () => {
               content={getWarningMessages(studyState, activeTab.name, study.id)}
               placeholder={t('studyDetails.@noWarnings')}
             />
-            <div className="flex w-full">{activeContent}</div>
+            <div className="flex h-screen w-full">{activeContent}</div>
           </div>
           <div className="fixed bottom-0 right-0 w-full border-t bg-gray-w px-1 py-1.5">
             <div className="flex h-fit w-full items-center justify-end">
