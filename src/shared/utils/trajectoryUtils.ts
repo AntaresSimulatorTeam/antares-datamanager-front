@@ -599,3 +599,8 @@ export const getQueryParamAreaValue = (type: TRAJECTORY_TYPE, hypothesis: string
   }
   return area ?? '';
 };
+
+export const isTrajectoryParameter = (type: TRAJECTORY_TYPE): boolean =>
+  type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER ||
+  type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER ||
+  type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER;

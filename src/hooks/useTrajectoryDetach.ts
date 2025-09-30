@@ -4,7 +4,7 @@ import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/traj
 import { unlinkTrajectoryFromStudy } from '@/shared/services/trajectoryService.ts';
 import { fetchWarningMessagesFromType } from '@/shared/services/warningService.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
-import { setNestedData } from '@/shared/utils/trajectoryUtils.ts';
+import { isTrajectoryParameter, setNestedData } from '@/shared/utils/trajectoryUtils.ts';
 import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.ts';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { useTranslation } from 'react-i18next';
@@ -35,17 +35,9 @@ export const useTrajectoryDetach = (
 
         const newWarningMessages = await fetchWarningMessagesFromType(type, study.id);
 
-        const warningMessages =
-          type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER ||
-          type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER ||
-          type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER
-            ? [
-                ...(studyState?.[TRAJECTORY_TYPE.THERMAL_PARAMETER]?.warningMessages ?? []),
-                ...(newWarningMessages ?? []),
-              ]
-            : newWarningMessages;
-        console.log('============= warningMessages', warningMessages);
-        console.log('============= trajectorySelected', trajectorySelected);
+        const warningMessages = isTrajectoryParameter(type)
+          ? [...(studyState?.[TRAJECTORY_TYPE.THERMAL_PARAMETER]?.warningMessages ?? []), ...(newWarningMessages ?? [])]
+          : newWarningMessages;
 
         dispatch?.({
           type: STUDY_ACTION.UPDATE_TRAJECTORY,

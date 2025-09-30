@@ -11,6 +11,7 @@ import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import {
   isMatchingTrajectoryType,
+  isTrajectoryParameter,
   removeDuplicateById,
   removeDuplicateByTechnology,
 } from '@/shared/utils/trajectoryUtils.ts';
@@ -67,12 +68,7 @@ export const updateTrajectory = (
   payload: { trajectory: DbTrajectory; warningMessages: WarningMessage[]; status: RowStatus },
 ) => {
   const { trajectory, warningMessages, status } = payload;
-  const trajectoryType =
-    trajectory.type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER ||
-    trajectory.type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER ||
-    trajectory.type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER
-      ? TRAJECTORY_TYPE.THERMAL_PARAMETER
-      : trajectory.type;
+  const trajectoryType = isTrajectoryParameter(trajectory.type) ? TRAJECTORY_TYPE.THERMAL_PARAMETER : trajectory.type;
   const trajectories = Array.isArray(prevState[`${trajectoryType}`]?.trajectories)
     ? (prevState[`${trajectoryType}`]?.trajectories as DbTrajectory[])
     : null;

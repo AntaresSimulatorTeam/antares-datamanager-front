@@ -4,7 +4,7 @@ import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/traj
 import { getStudyTrajectoriesWithWarnings, linkTrajectoryToStudy } from '@/shared/services/trajectoryService.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.ts';
-import { setNestedData } from '@/shared/utils/trajectoryUtils.ts';
+import { isTrajectoryParameter, setNestedData } from '@/shared/utils/trajectoryUtils.ts';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { useTranslation } from 'react-i18next';
 
@@ -28,12 +28,7 @@ export const useTrajectoryAttach = (
           const alreadyExists = studyState[newDbTrajectory.type]?.trajectories?.some(
             (item) => item.area === newDbTrajectory.area && item.technology === newDbTrajectory.technology,
           );
-          const typeToAdd =
-            type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER ||
-            type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER ||
-            type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER
-              ? TRAJECTORY_TYPE.THERMAL_PARAMETER
-              : type;
+          const typeToAdd = isTrajectoryParameter(type) ? TRAJECTORY_TYPE.THERMAL_PARAMETER : type;
 
           const warnings =
             typeToAdd === TRAJECTORY_TYPE.THERMAL_PARAMETER
