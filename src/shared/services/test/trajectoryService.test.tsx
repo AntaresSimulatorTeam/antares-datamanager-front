@@ -559,6 +559,28 @@ describe('uploadTrajectory', () => {
     });
   });
 
+  it('should import THERMAL_TECHNICAL_SPECIFIC_PARAMETER trajectory into data base', async () => {
+    await uploadTrajectory(
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+      'specific_param_BP_23',
+      '2030-2031',
+      25,
+      'Specific',
+      onProgress,
+      false,
+      'FR',
+    );
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        `https://mockapi.com/v1/trajectory/thermal-specific-parameter?area=FR&trajectoryToUse=specific_param_BP_23&horizon=2030-2031&studyId=25`,
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
+
   it('should handle fetch failure gracefully', async () => {
     vi.mocked(progressService.fetchWithProgress).mockRejectedValueOnce({
       message: 'Failed to import trajectory to data base',

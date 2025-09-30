@@ -139,7 +139,8 @@
     "@common": "Common",
     "@parametersEconomic": "Economic Parameters",
     "@costs": "Cost",
-    "@economics": "Economic"
+    "@economics": "Economic",
+    "@paramModulationMessage": "At least one \"Specific\" trajectory must be defined in order to complete the \"Param modulation\" trajectory."
   },
   "trajectoryViewModal": {
     "@title_area": "Areas",

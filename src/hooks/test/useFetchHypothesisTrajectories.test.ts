@@ -609,7 +609,7 @@ describe('useFetchHypothesisTrajectories', () => {
     });
   });
 
-  it('should handle read-only area for THERMAL_TECHNICAL_SPECIFIC_PARAMETER trajectories', async () => {
+  it('should not have read-only area if THERMAL_TECHNICAL_SPECIFIC_PARAMETER trajectories are set', async () => {
     const defaultAreasSpecific = [{ name: 'AT' }, { name: 'FR' }];
     const areas = [{ areaName: 'AT' }, { areaName: 'CZ' }] as TrajectoryAreaData[];
     vi.mocked(hypothesisTableService.fetchMultipleTrajectoryType).mockResolvedValueOnce({
@@ -650,6 +650,83 @@ describe('useFetchHypothesisTrajectories', () => {
       expect(result.current.hypothesisTrajectories[0]?.subRows?.[2]?.hypothesis).toEqual('BE');
       expect(result.current.hypothesisTrajectories[0]?.subRows?.[3]?.hypothesis).toEqual('CZ');
       expect(result.current.hypothesisTrajectories[0]?.subRows?.[4]?.hypothesis).toEqual(OTHER_AREAS_LABEL);
+      expect(result.current.readOnlyRow).toEqual({ '0.1': true });
+    });
+  });
+
+  it('should set read-only status to default area not in area list and param modulation line if no specific trajectory', async () => {
+    const defaultAreasSpecific = [{ name: 'AT' }, { name: 'FR' }];
+    const areas = [{ areaName: 'AT' }, { areaName: 'CZ' }] as TrajectoryAreaData[];
+    vi.mocked(hypothesisTableService.fetchMultipleTrajectoryType).mockResolvedValueOnce({
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]: {
+        trajectories: [],
+        warningMessages: [],
+      },
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER]: {
+        trajectories: [],
+        warningMessages: [],
+      },
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]: {
+        trajectories: [],
+        warningMessages: [],
+      },
+    });
+    vi.mocked(trajectoryUtils.buildDefaultEmptyTrajectoryList).mockImplementationOnce(() => [
+      mockEmptyDbTrajectorySPECIFICFR,
+      mockEmptyDbTrajectorySPECIFICCZ,
+      mockEmptyDbTrajectoryLoadOthers,
+    ]);
+
+    const { result } = renderHook(() =>
+      useFetchHypothesisTrajectories(
+        5,
+        TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+        defaultAreasSpecific,
+        areas,
+      ),
+    );
+
+    await waitFor(() => {
+      expect(result.current.readOnlyRow).toEqual({ '0.0': true, '1': true });
+    });
+  });
+
+  it('should set read-only status for param modulation line if no specific param', async () => {
+    const defaultAreasSpecific = [{ name: 'AT' }, { name: 'FR' }];
+    const areas = [{ areaName: 'AT' }, { areaName: 'CZ' }, { areaName: 'FR' }] as TrajectoryAreaData[];
+    vi.mocked(hypothesisTableService.fetchMultipleTrajectoryType).mockResolvedValueOnce({
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]: {
+        trajectories: [],
+        warningMessages: [],
+      },
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER]: {
+        trajectories: [],
+        warningMessages: [],
+      },
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]: {
+        trajectories: [],
+        warningMessages: [],
+      },
+    });
+    vi.mocked(trajectoryUtils.buildDefaultEmptyTrajectoryList).mockImplementationOnce(() => [
+      mockEmptyDbTrajectorySPECIFICFR,
+      mockEmptyDbTrajectorySPECIFICCZ,
+      mockEmptyDbTrajectoryLoadOthers,
+    ]);
+
+    const { result } = renderHook(() =>
+      useFetchHypothesisTrajectories(
+        5,
+        TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+        defaultAreasSpecific,
+        areas,
+      ),
+    );
+
+    await waitFor(() => {
+      expect(result.current.hypothesisTrajectories[0]?.subRows?.[0]?.hypothesis).toEqual('FR');
+      expect(result.current.hypothesisTrajectories[0]?.subRows?.[1]?.hypothesis).toEqual('CZ');
+      expect(result.current.hypothesisTrajectories[0]?.subRows?.[2]?.hypothesis).toEqual(OTHER_AREAS_LABEL);
       expect(result.current.readOnlyRow).toEqual({ '1': true });
     });
   });
