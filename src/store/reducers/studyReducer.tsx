@@ -67,7 +67,12 @@ export const updateTrajectory = (
   payload: { trajectory: DbTrajectory; warningMessages: WarningMessage[]; status: RowStatus },
 ) => {
   const { trajectory, warningMessages, status } = payload;
-  const trajectoryType = trajectory.type;
+  const trajectoryType =
+    trajectory.type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER ||
+    trajectory.type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER ||
+    trajectory.type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER
+      ? TRAJECTORY_TYPE.THERMAL_PARAMETER
+      : trajectory.type;
   const trajectories = Array.isArray(prevState[`${trajectoryType}`]?.trajectories)
     ? (prevState[`${trajectoryType}`]?.trajectories as DbTrajectory[])
     : null;

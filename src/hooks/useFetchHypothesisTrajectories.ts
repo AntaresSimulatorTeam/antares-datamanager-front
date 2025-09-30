@@ -9,6 +9,7 @@ import {
   ThermalParamTrajectoryType,
   TrajectoryAreaData,
   TrajectoryState,
+  WarningMessage,
 } from '@/shared/types';
 import { getStudyTrajectoriesWithWarnings } from '@/shared/services/trajectoryService';
 import {
@@ -65,6 +66,20 @@ export const useFetchHypothesisTrajectories = (
             defaultEmptyAreas = buildDefaultEmptyTrajectoryList(type, specificAreas, defaultAreas) ?? [];
             const allAreas = specificAreas?.concat(emptyAreaSelected).concat(defaultEmptyAreas);
             arrayWithoutDuplicate = removeDuplicate(allAreas);
+            const warnings: WarningMessage[] = [
+              ...(result?.THERMAL_TECHNICAL_SPECIFIC_PARAMETER?.warningMessages ?? []),
+              ...(result?.THERMAL_TECHNICAL_COMMON_PARAMETER?.warningMessages ?? []),
+              ...(result?.THERMAL_TECHNICAL_MODULATION_PARAMETER?.warningMessages ?? []),
+            ];
+            dispatch?.({
+              type: STUDY_ACTION.ADD_TRAJECTORIES,
+              payload: {
+                [TRAJECTORY_TYPE.THERMAL_PARAMETER]: {
+                  trajectories: arrayWithoutDuplicate,
+                  warningMessages: warnings,
+                },
+              },
+            });
           } else {
             result = await getStudyTrajectoriesWithWarnings(id, type);
             // Build default empty areas (default area not linked to a trajectory)

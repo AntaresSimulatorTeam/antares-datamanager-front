@@ -76,7 +76,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
     );
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(study, studyState, dispatch, setTechnicalData);
   const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch, setTechnicalData);
-  const { detachTrajectory } = useTrajectoryDetach(study, dispatch, setTechnicalData);
+  const { detachTrajectory } = useTrajectoryDetach(study, dispatch, setTechnicalData, studyState);
 
   useEffect(() => {
     const setHypothesis = () => {

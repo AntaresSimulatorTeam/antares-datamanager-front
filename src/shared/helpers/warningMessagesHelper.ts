@@ -33,6 +33,21 @@ export const getWarningMessages = (
     const dataWarningMessageArea = buildDataWarningMessage(activeTabWarning, activeTabName, isNotGenerated, studyId);
     const dataWarningMessageLink = buildDataWarningMessage(warningLink, TRAJECTORY_TYPE.LINK, isNotGenerated, studyId);
     return dataWarningMessageArea.concat(dataWarningMessageLink);
+  } else if (activeTabName === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
+    const warningParameters: WarningMessage[] = state[`${TRAJECTORY_TYPE.THERMAL_PARAMETER}`]?.warningMessages ?? [];
+    const dataWarningMessageThermalCapacity = buildDataWarningMessage(
+      activeTabWarning,
+      activeTabName,
+      isNotGenerated,
+      studyId,
+    );
+    const dataWarningMessageThermalParameters = buildDataWarningMessage(
+      warningParameters,
+      TRAJECTORY_TYPE.THERMAL_PARAMETER,
+      isNotGenerated,
+      studyId,
+    );
+    return [...dataWarningMessageThermalCapacity, ...dataWarningMessageThermalParameters];
   } else {
     return buildDataWarningMessage(activeTabWarning, activeTabName, isNotGenerated, studyId);
   }

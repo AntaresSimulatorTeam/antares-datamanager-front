@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useCallback } from 'react';
-import { DbTrajectory, HypothesisRowData, RowStatus, StudyActionType, StudyDTO } from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, RowStatus, StudyActionType, StudyDTO, StudyState } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { unlinkTrajectoryFromStudy } from '@/shared/services/trajectoryService.ts';
 import { fetchWarningMessagesFromType } from '@/shared/services/warningService.ts';
@@ -14,6 +14,7 @@ export const useTrajectoryDetach = (
   study: StudyDTO,
   dispatch: Dispatch<StudyActionType> | null,
   setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
+  studyState?: Partial<StudyState>,
 ) => {
   const { user } = useUser();
   const { t } = useTranslation();
@@ -32,7 +33,19 @@ export const useTrajectoryDetach = (
           await unlinkTrajectoryFromStudy(trajectorySelected.id, study.id);
         }
 
-        const warningMessages = await fetchWarningMessagesFromType(type, study.id);
+        const newWarningMessages = await fetchWarningMessagesFromType(type, study.id);
+
+        const warningMessages =
+          type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER ||
+          type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER ||
+          type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER
+            ? [
+                ...(studyState?.[TRAJECTORY_TYPE.THERMAL_PARAMETER]?.warningMessages ?? []),
+                ...(newWarningMessages ?? []),
+              ]
+            : newWarningMessages;
+        console.log('============= warningMessages', warningMessages);
+        console.log('============= trajectorySelected', trajectorySelected);
 
         dispatch?.({
           type: STUDY_ACTION.UPDATE_TRAJECTORY,

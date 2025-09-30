@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "fix/police",
-  commit: "9421c77a",
-  commitTime: "2025-10-02T13:50:09.697Z"
+  branch: "feat/ANT-3936_specific_trajectory_warning_display",
+  commit: "6c4ef1ef",
+  commitTime: "2025-09-30T16:01:12.448Z"
 };

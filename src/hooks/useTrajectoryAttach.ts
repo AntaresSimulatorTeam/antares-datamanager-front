@@ -28,13 +28,27 @@ export const useTrajectoryAttach = (
           const alreadyExists = studyState[newDbTrajectory.type]?.trajectories?.some(
             (item) => item.area === newDbTrajectory.area && item.technology === newDbTrajectory.technology,
           );
+          const typeToAdd =
+            type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER ||
+            type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER ||
+            type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER
+              ? TRAJECTORY_TYPE.THERMAL_PARAMETER
+              : type;
+
+          const warnings =
+            typeToAdd === TRAJECTORY_TYPE.THERMAL_PARAMETER
+              ? [
+                  ...(studyState?.[TRAJECTORY_TYPE.THERMAL_PARAMETER]?.warningMessages ?? []),
+                  ...(result.warningMessages ?? []),
+                ]
+              : result.warningMessages;
 
           if (alreadyExists) {
             dispatch?.({
               type: STUDY_ACTION.UPDATE_TRAJECTORY,
               payload: {
                 trajectory: newDbTrajectory,
-                warningMessages: result.warningMessages,
+                warningMessages: warnings,
                 status,
               },
             });
@@ -42,9 +56,9 @@ export const useTrajectoryAttach = (
             dispatch?.({
               type: STUDY_ACTION.ADD_TRAJECTORIES,
               payload: {
-                [type]: {
+                [typeToAdd]: {
                   trajectories: [newDbTrajectory],
-                  warningMessages: result.warningMessages,
+                  warningMessages: warnings,
                 },
               },
             });
