@@ -157,7 +157,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
           setIsFormValid(false);
         }
       } else {
-        if (studyName && projectName && horizon && isHorizonValid) {
+        if (studyName && horizon && isHorizonValid) {
           setIsFormValid(true);
         } else {
           setIsFormValid(false);
