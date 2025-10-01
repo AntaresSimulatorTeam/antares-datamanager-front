@@ -33,7 +33,7 @@ const HomePageContent = () => {
   };
 
   return (
-    <div className="flex w-full flex-1 flex-col justify-between">
+    <div className="flex w-full flex-1 flex-col justify-start">
       <StdHeading title={t('home.@study_table_title')} />
       <div className="flex gap-4 py-2">
         <SearchBar onSearch={searchStudy} />
