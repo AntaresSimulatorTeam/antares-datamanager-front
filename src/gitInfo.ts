@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "feat/ANT-3852_thermal_common_read_only",
-  commit: "eb042787",
-  commitTime: "2025-09-26T14:36:34.123Z"
+  branch: "fix/ANT-3945_home_remote_create_study_button",
+  commit: "6c4ef1ef",
+  commitTime: "2025-10-01T08:48:14.784Z"
 };

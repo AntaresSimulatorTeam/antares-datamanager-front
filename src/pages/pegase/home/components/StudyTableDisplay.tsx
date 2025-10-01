@@ -128,7 +128,7 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
               />
             </>
           ) : (
-            projectInfo?.id !== '' && <StdButton label={t('studyModal.@new_study')} onClick={toggleModal} />
+            projectInfo?.id && <StdButton label={t('studyModal.@new_study')} onClick={toggleModal} />
           )}
         </div>
         <StudiesPagination count={count} intervalSize={intervalSize} current={currentPage} onChange={setPage} />
