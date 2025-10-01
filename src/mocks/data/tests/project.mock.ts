@@ -13,6 +13,19 @@ export const mockProjectInfo: ProjectInfo = {
   pinned: false,
 };
 
+export const mockPinnedProjectInfo: ProjectInfo = {
+  id: '123',
+  name: 'Project Name',
+  description: 'Project Description',
+  createdBy: 'User A',
+  creationDate: '2024-01-01' as unknown as Date,
+  tags: ['tag1', 'tag2'],
+  path: '',
+  studies: [],
+  archived: false,
+  pinned: true,
+};
+
 export const mockProjectInfoArray: ProjectInfo[] = [
   {
     id: '123',

@@ -10,7 +10,7 @@ import { fetchProjectFromSearchTerm } from '@/shared/services/projectService.ts'
 import { PROJECT_ACTION } from '@/shared/enum/project.ts';
 import { useProjectDispatch } from '@/store/contexts/ProjectContext.tsx';
 
-export const useFetchProjectList = (current: number, intervalSize: number, searchTerm?: string) => {
+export const useFetchProjectList = (current: number, intervalSize: number, searchTerm?: string, reload?: number) => {
   const [projects, setProjects] = useState<ProjectResponse[]>([]);
   const [count, setCount] = useState(0);
   const dispatch = useProjectDispatch();
@@ -30,12 +30,12 @@ export const useFetchProjectList = (current: number, intervalSize: number, searc
         console.error(error);
       }
     },
-    [current, intervalSize, searchTerm],
+    [dispatch],
   );
 
   useEffect(() => {
     void fetchProjects(current, intervalSize, searchTerm ?? '');
-  }, [current, searchTerm, intervalSize]);
+  }, [current, searchTerm, intervalSize, reload]);
 
-  return { projects, count, refetch: fetchProjects };
+  return { projects, count, refetch: fetchProjects, reload };
 };

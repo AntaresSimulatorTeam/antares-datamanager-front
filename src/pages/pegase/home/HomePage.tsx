@@ -11,8 +11,8 @@ import PinnedProjectCards from '@/pages/pegase/home/pinnedProjects/PinnedProject
 
 const HomePage = () => (
   <ProjectProvider initialValue={{ pinnedProjects: [], projects: [] }}>
-    <div className="flex flex-col items-center gap-6 p-3">
-      <div className="flex w-full gap-3">
+    <div className="flex h-screen flex-col items-center justify-between gap-[clamp(0.5rem,2vw,2rem)] p-3">
+      <div className="flex h-1/6 w-full gap-3">
         <ProjectCreator />
         <PinnedProjectCards />
       </div>

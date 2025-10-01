@@ -30,10 +30,10 @@ const ProjectContent = () => {
   const [searchTerm, setSearchTerm] = useState<string | undefined>();
   const [activeChip, setActiveChip] = useState<boolean | null>(false);
   const [current, setCurrent] = useState(0);
-  const { count, refetch } = useFetchProjectList(current, intervalSize, searchTerm);
+  const { projects } = useProject();
+  const { count, refetch } = useFetchProjectList(current, intervalSize, searchTerm, projects.length);
   const { navigateToProject } = useProjectNavigation();
   const { handlePinProject } = useHandlePinnedProjectList();
-  const { projects } = useProject();
   const { deleteProject } = useDeleteProject();
   const { editOption, deleteOption, pinOption } = useDropdownOptions();
   const { isModalOpen, toggleModal } = useNewStudyModal();
