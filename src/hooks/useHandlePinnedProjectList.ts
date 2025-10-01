@@ -6,13 +6,14 @@
 
 import { useCallback, useEffect } from 'react';
 import { ProjectActionType } from '@/shared/types/Project.type';
-import { fetchPinnedProjects, pinProject, unpinProject } from '@/shared/services/pinnedProjectService';
+import { pinProject, unpinProject } from '@/shared/services/pinnedProjectService';
 import { v4 as uuidv4 } from 'uuid';
 import { notifyToast } from '@/shared/notification/notification.tsx';
 import { useTranslation } from 'react-i18next';
 import { useProjectDispatch } from '@/store/contexts/ProjectContext';
 import { PROJECT_ACTION } from '@/shared/enum/project.ts';
 import { useUser } from '@/store/contexts/UserContext.tsx';
+import { mockPinnedProjectInfo } from '@/mocks/data/tests/project.mock.ts';
 
 export const useHandlePinnedProjectList = () => {
   const { user } = useUser();
@@ -21,7 +22,7 @@ export const useHandlePinnedProjectList = () => {
 
   const getPinnedProjects = useCallback(async () => {
     try {
-      const projects = await fetchPinnedProjects(user?.profile.sub);
+      const projects = [mockPinnedProjectInfo]; //await fetchPinnedProjects(user?.profile.sub);
       if (projects?.length) {
         dispatch?.({
           type: PROJECT_ACTION.INIT_PINNED_PROJECT_LIST,
