@@ -189,7 +189,7 @@ export default {
       transparent: 'transparent',
     },
     fontFamily: {
-      body: ['Nunito Sans Variable'],
+      body: ['Nunito Sans Variable system-ui, sans-serif'],
       sans: ['Nunito Sans Variable'],
     },
     spacing: {
