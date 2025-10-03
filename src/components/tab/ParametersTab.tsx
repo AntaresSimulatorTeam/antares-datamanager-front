@@ -70,7 +70,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
     useFetchHypothesisThermalParameters(
       study?.id,
-      TRAJECTORY_TYPE.THERMAL_PARAMETER,
+      TRAJECTORY_TYPE.THERMAL_CAPACITY,
       THERMAL_TYPES,
       defaultAreas,
       areas,

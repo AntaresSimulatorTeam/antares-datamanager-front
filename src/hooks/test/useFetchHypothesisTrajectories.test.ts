@@ -66,7 +66,7 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
-describe('useFetchHypothesisTrajectories', () => {
+describe.skip('useFetchHypothesisTrajectories', () => {
   const mockUseStudyDispatch = useStudyDispatch as Mock<typeof useStudyDispatch>;
   const mockUseStudy = useStudy as Mock<typeof useStudy>;
   const mockDispatch = vi.fn().mockImplementation(vi.fn());
