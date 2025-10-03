@@ -81,7 +81,7 @@ export const useFetchHypothesisTrajectories = (
               payload: {
                 [type]: {
                   trajectories: arrayWithoutDuplicate,
-                  warningMessages: result?.warningMessages,
+                  //warningMessages: result?.warningMessages,
                 },
               },
             });

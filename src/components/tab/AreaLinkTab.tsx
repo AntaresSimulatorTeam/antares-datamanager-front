@@ -39,7 +39,7 @@ import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { buildErrorTrajectory, getStatus } from '@/shared/utils/trajectoryUtils.ts';
-import { getStudyById } from '@/shared/services/studyService.ts';
+import { getStudyById, getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { TrajectoryDataVisualisation } from '@common/modal/TrajectoryDataVisualisation.tsx';
 import { generateTrajectoryViewHeader } from '@/components/header/TrajectoryViewHeader.tsx';
 import { useLocation } from 'react-router-dom';
@@ -93,27 +93,29 @@ export const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
         setErrorMessage('');
         [studyData, trajectoryAreaResult, trajectoryLinkResult] = await Promise.all([
           getStudyById(study.id),
-          getStudyTrajectoriesWithWarnings(study.id, TRAJECTORY_TYPE.AREA),
-          getStudyTrajectoriesWithWarnings(study.id, TRAJECTORY_TYPE.LINK),
+          getStudyTrajectories(study.id, TRAJECTORY_TYPE.AREA),
+          getStudyTrajectories(study.id, TRAJECTORY_TYPE.LINK),
+          // getStudyTrajectoriesWithWarnings(study.id, TRAJECTORY_TYPE.AREA),
+          // getStudyTrajectoriesWithWarnings(study.id, TRAJECTORY_TYPE.LINK),
         ]);
-        const trajectoryArea: DbTrajectory | null = trajectoryAreaResult?.trajectories[0] ?? null;
-        const trajectoryLink: DbTrajectory | null = trajectoryLinkResult?.trajectories[0] ?? null;
+        const trajectoryArea: DbTrajectory[] | null = trajectoryAreaResult ?? null;
+        const trajectoryLink: DbTrajectory[] | null = trajectoryLinkResult ?? null;
         dispatch?.({
           type: STUDY_ACTION.ADD_TRAJECTORIES,
           payload: {
-            ...(trajectoryArea && { [TRAJECTORY_TYPE.AREA]: trajectoryAreaResult }),
-            ...(trajectoryLink && { [TRAJECTORY_TYPE.LINK]: trajectoryLinkResult }),
+            ...(trajectoryArea && { [TRAJECTORY_TYPE.AREA]: { trajectories: trajectoryArea } }),
+            ...(trajectoryLink && { [TRAJECTORY_TYPE.LINK]: { trajectories: trajectoryLink } }),
           },
         });
         setData([
           {
             hypothesis: 'Areas',
-            trajectory: trajectoryArea,
+            trajectory: trajectoryArea?.[0],
             status: trajectoryArea ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
           },
           {
             hypothesis: 'Links',
-            trajectory: trajectoryLink,
+            trajectory: trajectoryLink?.[0],
             status: trajectoryLink ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
           },
         ]);
