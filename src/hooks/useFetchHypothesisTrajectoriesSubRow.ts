@@ -32,7 +32,10 @@ export const useFetchHypothesisTrajectoriesSubRow = (
   const [readOnlyRow, setReadOnlyRow] = useState<ReadOnlyObject>({});
   const studyState = useStudy();
   const dispatch = useStudyDispatch();
-  const emptyAreaSelected = useMemo(() => (mainType ? (studyState?.[mainType]?.trajectories ?? []) : []), [mainType]);
+  const emptyAreaSelected = useMemo(
+    () => (mainType ? (studyState?.[mainType]?.trajectories?.find((traj) => traj.type === mainType) ?? []) : []),
+    [mainType],
+  );
 
   const fetchAreas = useCallback(
     async (id: number, type: TRAJECTORY_TYPE, otherTypes?: TRAJECTORY_TYPE[]) => {
