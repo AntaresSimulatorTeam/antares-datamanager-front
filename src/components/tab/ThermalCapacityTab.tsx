@@ -24,7 +24,6 @@ import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableH
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { useLocation } from 'react-router-dom';
-import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
 import { addRow, handleFetchTrajectoriesFS, handleTrajectorySearch } from '@/shared/services/hypothesisTableService.ts';
 import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
@@ -35,6 +34,8 @@ import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig';
 import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
 import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
 import { CheckBoxListWithSearchBar } from '@/components/list/CheckBoxListWithSearchBar.tsx';
+import { useFetchHypothesisTrajectoriesSubRow } from '@/hooks/useFetchHypothesisTrajectoriesSubRow.ts';
+import { THERMAL_TYPES } from '@/shared/const/thermalConst.ts';
 
 interface ThermalTabProps {
   defaultAreas: { name: string }[];
@@ -60,7 +61,14 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
     studyState.studyStatus === StudyStatus.GENERATED || study.status === StudyStatus.GENERATED,
   );
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
-    useFetchHypothesisTrajectories(study?.id, TRAJECTORY_TYPE.THERMAL_CAPACITY, defaultAreas, areas, isStudyGenerated);
+    useFetchHypothesisTrajectoriesSubRow(
+      study?.id,
+      TRAJECTORY_TYPE.THERMAL_CAPACITY,
+      THERMAL_TYPES,
+      defaultAreas,
+      areas,
+      isStudyGenerated,
+    );
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(study, studyState, dispatch, setData);
   const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch, setData);
   const { removeRow } = useHypothesisTableRemoveRow(study, dispatch, setData, setCheckedValues);

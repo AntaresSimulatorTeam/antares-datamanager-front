@@ -30,7 +30,7 @@ export interface PaginatedResponse<T> {
 
 export type TrajectoryState = {
   trajectories: DbTrajectory[];
-  warningMessages: WarningMessage[];
+  warningMessages?: WarningMessage[];
 };
 
 export type StudyTrajectoriesData = {

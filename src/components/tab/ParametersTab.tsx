@@ -16,7 +16,6 @@ import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/Pega
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
-import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
 import { useLocation } from 'react-router-dom';
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { getAreaTrajectoryName, getTrajectoryTypeByIndex } from '@/shared/utils/trajectoryUtils.ts';
@@ -27,6 +26,8 @@ import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach';
 import { CheckBoxListWithSearchBar } from '@/components/list/CheckBoxListWithSearchBar.tsx';
+import { useFetchHypothesisThermalParameters } from '@/hooks/useFetchHypothesisThermalParameters.ts';
+import { THERMAL_TYPES } from '@/shared/const/thermalConst.ts';
 
 interface ParametersTabProps {
   defaultAreas: { name: string }[];
@@ -67,9 +68,10 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
   );
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
-    useFetchHypothesisTrajectories(
+    useFetchHypothesisThermalParameters(
       study?.id,
-      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+      TRAJECTORY_TYPE.THERMAL_PARAMETER,
+      THERMAL_TYPES,
       defaultAreas,
       areas,
       isStudyGenerated,

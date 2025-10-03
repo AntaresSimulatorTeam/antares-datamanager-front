@@ -2,11 +2,10 @@ import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CheckBoxData, HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
-import { getStudyTrajectoriesWithWarnings } from '@/shared/services/trajectoryService';
 import {
   buildDefaultEmptyTrajectoryList,
-  buildRowWithSubRowsData,
-  removeDuplicate,
+  convertIntoHypothesisRowWithTechnologies,
+  removeDuplicateByTechnology,
 } from '@/shared/utils/trajectoryUtils.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { sortWithFixedPosition } from '@/shared/utils/sortUtils';
@@ -16,10 +15,13 @@ import {
   buildReadOnlyRows,
   getDefaultAreaNotIncludedInAreaList,
 } from '@/shared/utils/hypothesisTableUtils.ts';
+import { getStudyTrajectories } from '@/shared/services/studyService.ts';
+import { fetchWarningMessagesFromType } from '@/shared/services/warningService.ts';
 
-export const useFetchHypothesisTrajectories = (
-  studyId?: number,
-  trajectoryType?: TRAJECTORY_TYPE,
+export const useFetchHypothesisTrajectoriesSubRow = (
+  studyId: number,
+  mainType: TRAJECTORY_TYPE,
+  subTypes: TRAJECTORY_TYPE[],
   defaultAreas?: { name: string }[],
   areas?: TrajectoryAreaData[],
   isStudyGenerated?: boolean,
@@ -30,27 +32,31 @@ export const useFetchHypothesisTrajectories = (
   const [readOnlyRow, setReadOnlyRow] = useState<ReadOnlyObject>({});
   const studyState = useStudy();
   const dispatch = useStudyDispatch();
-  const emptyAreaSelected = useMemo(
-    () => (trajectoryType ? (studyState?.[trajectoryType]?.trajectories ?? []) : []),
-    [trajectoryType],
-  );
+  const emptyAreaSelected = useMemo(() => (mainType ? (studyState?.[mainType]?.trajectories ?? []) : []), [mainType]);
 
   const fetchAreas = useCallback(
-    async (id: number, type: TRAJECTORY_TYPE) => {
+    async (id: number, type: TRAJECTORY_TYPE, otherTypes?: TRAJECTORY_TYPE[]) => {
       try {
-        const result = await getStudyTrajectoriesWithWarnings(id, type);
+        const result = await getStudyTrajectories(id, type);
+        const typesForWarnings = otherTypes?.length ? [type, ...otherTypes] : [type];
+        const temporaryWarnings = await Promise.all(
+          typesForWarnings.map(
+            async (warningType: TRAJECTORY_TYPE) => await fetchWarningMessagesFromType(warningType, id),
+          ),
+        );
+        const warningMessages = temporaryWarnings?.flat();
         // Build default empty areas (default area not linked to a trajectory)
-        const defaultEmptyAreas = buildDefaultEmptyTrajectoryList(type, result?.trajectories, defaultAreas);
-        const allAreas = result?.trajectories?.concat(emptyAreaSelected).concat(defaultEmptyAreas);
+        const defaultEmptyAreas = buildDefaultEmptyTrajectoryList(type, result, defaultAreas);
+        const allAreas = result?.concat(emptyAreaSelected).concat(defaultEmptyAreas);
 
-        const arrayWithoutDuplicate = removeDuplicate(allAreas);
+        const arrayWithoutDuplicate = removeDuplicateByTechnology(allAreas);
 
         dispatch?.({
           type: STUDY_ACTION.ADD_TRAJECTORIES,
           payload: {
             [type]: {
               trajectories: arrayWithoutDuplicate,
-              warningMessages: result?.warningMessages,
+              warningMessages,
             },
           },
         });
@@ -61,19 +67,18 @@ export const useFetchHypothesisTrajectories = (
         setDropDownListOptions(resultList?.checkedValues);
 
         // Build row data for hypothesis table
-        let dataTrajectories: HypothesisRowData[] = [];
         // Find default area not included in areas trajectory list
         const defaultAreaListNotIncludedInList: string[] = defaultAreas
           ? getDefaultAreaNotIncludedInAreaList(defaultAreas, areas)
           : [];
 
         // Hypothesis table
-        const areaData = arrayWithoutDuplicate
-          .map((trajectory) =>
-            buildRowWithSubRowsData(trajectory, defaultAreas, defaultAreaListNotIncludedInList, null),
-          )
-          .filter(Boolean);
-        dataTrajectories = sortWithFixedPosition(areaData);
+        const areaData = convertIntoHypothesisRowWithTechnologies(
+          arrayWithoutDuplicate,
+          defaultAreaListNotIncludedInList,
+          defaultAreas,
+        );
+        const dataTrajectories: HypothesisRowData[] = sortWithFixedPosition(areaData);
         setHypothesisTrajectories(dataTrajectories);
 
         const readOnlyRows: ReadOnlyObject = buildReadOnlyRows(
@@ -90,10 +95,10 @@ export const useFetchHypothesisTrajectories = (
   );
 
   useEffect(() => {
-    if (studyId != null && trajectoryType) {
-      void fetchAreas(studyId, trajectoryType);
+    if (studyId != null && mainType) {
+      void fetchAreas(studyId, mainType, subTypes);
     }
-  }, [studyId, trajectoryType]);
+  }, [studyId, mainType]);
 
   return { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow };
 };
