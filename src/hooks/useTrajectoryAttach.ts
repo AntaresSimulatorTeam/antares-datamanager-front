@@ -28,12 +28,12 @@ export const useTrajectoryAttach = (
           const alreadyExists = studyState[newDbTrajectory.type]?.trajectories?.some(
             (item) => item.area === newDbTrajectory.area && item.technology === newDbTrajectory.technology,
           );
-          const typeToAdd = isTrajectoryParameter(type) ? TRAJECTORY_TYPE.THERMAL_PARAMETER : type;
+          const typeToAdd = isTrajectoryParameter(type) ? TRAJECTORY_TYPE.THERMAL_CAPACITY : type;
 
           const warnings =
-            typeToAdd === TRAJECTORY_TYPE.THERMAL_PARAMETER
+            typeToAdd === TRAJECTORY_TYPE.THERMAL_CAPACITY
               ? [
-                  ...(studyState?.[TRAJECTORY_TYPE.THERMAL_PARAMETER]?.warningMessages ?? []),
+                  ...(studyState?.[TRAJECTORY_TYPE.THERMAL_CAPACITY]?.warningMessages ?? []),
                   ...(result.warningMessages ?? []),
                 ]
               : result.warningMessages;

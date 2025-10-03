@@ -36,7 +36,7 @@ export const useTrajectoryDetach = (
         const newWarningMessages = await fetchWarningMessagesFromType(type, study.id);
 
         const warningMessages = isTrajectoryParameter(type)
-          ? [...(studyState?.[TRAJECTORY_TYPE.THERMAL_PARAMETER]?.warningMessages ?? []), ...(newWarningMessages ?? [])]
+          ? [...(studyState?.[TRAJECTORY_TYPE.THERMAL_CAPACITY]?.warningMessages ?? []), ...(newWarningMessages ?? [])]
           : newWarningMessages;
 
         dispatch?.({
