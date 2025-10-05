@@ -1,5 +1,5 @@
 export const GIT_INFO = {
   branch: "feat/ANT-3936_thermal_display_warnings",
-  commit: "32ff864b",
-  commitTime: "2025-10-03T13:35:58.404Z"
+  commit: "242e3554",
+  commitTime: "2025-10-05T19:54:59.406Z"
 };

@@ -2,7 +2,6 @@ import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
 import { CardDataType, DataWarningMessage, WarningMessage, WarningTrajectoryType } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { discardWarningMessage } from '@/shared/services/messagesWarningService.ts';
 
 /**
  * Sort the messages list according to the warning level (typeof WARNING_MESSAGE_LEVEL)
@@ -35,6 +34,7 @@ export const sortByLevel = (a: WarningMessage, b: WarningMessage): number => {
  * @param {TRAJECTORY_TYPE} tabName - Tab name is defined as typeof TRAJECTORY_TYPE
  * @param {boolean} isNotGenerated
  * @param {number} studyId
+ * @param {(id: number, trajectoryType: TRAJECTORY_TYPE, studyId: number) => Promise<void>} handleClickItem
  * @return {DataWarningMessage[]} - Data that can be used into card component
  */
 export const buildDataWarningMessage = (
@@ -42,11 +42,12 @@ export const buildDataWarningMessage = (
   tabName: TRAJECTORY_TYPE,
   isNotGenerated: boolean,
   studyId: number,
+  handleClickItem: ((id: number, trajectoryType: TRAJECTORY_TYPE, studyId: number) => Promise<void>) | null,
 ): DataWarningMessage[] =>
   (messages || []).map((message: WarningMessage) => ({
     ...message,
     trajectoryType: tabName,
-    onClickItem: isNotGenerated ? discardWarningMessage : null,
+    onClickItem: isNotGenerated ? handleClickItem : null,
     studyId,
   }));
 

@@ -1,7 +1,6 @@
-import { StudyTrajectoriesData, WarningMessage } from '@/shared/types';
-import { StudyStatus } from '../types/common/StudyStatus.type';
-import { TRAJECTORY_TYPE } from '../enum/trajectory';
-import { buildDataWarningMessage } from '@/shared/utils/warningUtils.ts';
+// import { StudyTrajectoriesData, WarningMessage } from '@/shared/types';
+// import { StudyStatus } from '../types/common/StudyStatus.type';
+// import { TRAJECTORY_TYPE } from '../enum/trajectory';
 
 /**
  * Retrieves warning messages for the selected trajectory type from the system's state.
@@ -20,20 +19,20 @@ import { buildDataWarningMessage } from '@/shared/utils/warningUtils.ts';
  * @returns {WarningMessage[]}
  *        Returns an array of warning messages for the given trajectory type and study.
  */
-export const getWarningMessages = (
-  state: Partial<StudyTrajectoriesData & { studyStatus?: StudyStatus }>,
-  activeTabName: TRAJECTORY_TYPE,
-  studyId: number,
-): WarningMessage[] => {
-  const activeTabWarning: WarningMessage[] = state?.[`${activeTabName}`]?.warningMessages ?? [];
-  const isNotGenerated = state.studyStatus !== StudyStatus.GENERATED;
-
-  if (activeTabName === TRAJECTORY_TYPE.AREA) {
-    const warningLink: WarningMessage[] = state[`${TRAJECTORY_TYPE.LINK}`]?.warningMessages ?? [];
-    const dataWarningMessageArea = buildDataWarningMessage(activeTabWarning, activeTabName, isNotGenerated, studyId);
-    const dataWarningMessageLink = buildDataWarningMessage(warningLink, TRAJECTORY_TYPE.LINK, isNotGenerated, studyId);
-    return dataWarningMessageArea.concat(dataWarningMessageLink);
-  } else {
-    return buildDataWarningMessage(activeTabWarning, activeTabName, isNotGenerated, studyId);
-  }
-};
+// export const getWarningMessages = (
+//   state: Partial<StudyTrajectoriesData & { studyStatus?: StudyStatus }>,
+//   activeTabName: TRAJECTORY_TYPE,
+//   studyId: number,
+// ): WarningMessage[] => {
+//   //const activeTabWarning: WarningMessage[] = state?.[`${activeTabName}`]?.warningMessages ?? [];
+//   const isNotGenerated = state.studyStatus !== StudyStatus.GENERATED;
+//
+//   if (activeTabName === TRAJECTORY_TYPE.AREA) {
+//     const warningLink: WarningMessage[] = state[`${TRAJECTORY_TYPE.LINK}`]?.warningMessages ?? [];
+//     const dataWarningMessageArea = buildDataWarningMessage(activeTabWarning, activeTabName, isNotGenerated, studyId);
+//     const dataWarningMessageLink = buildDataWarningMessage(warningLink, TRAJECTORY_TYPE.LINK, isNotGenerated, studyId);
+//     return dataWarningMessageArea.concat(dataWarningMessageLink);
+//   } else {
+//     return buildDataWarningMessage(activeTabWarning, activeTabName, isNotGenerated, studyId);
+//   }
+// };

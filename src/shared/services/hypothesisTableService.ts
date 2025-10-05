@@ -135,5 +135,5 @@ export const fetchMultipleTrajectoryType = async (
       return [type, result] as const;
     }),
   );
-  return Object.fromEntries(entries) as ParamTrajectoryState;
+  return Object.fromEntries(entries) as unknown as ParamTrajectoryState;
 };

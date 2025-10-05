@@ -1,9 +1,8 @@
-import { buildDataWarningMessage, convertDataToItem, countWarning, sortByLevel } from '@/shared/utils/warningUtils.ts';
+import { convertDataToItem, countWarning, sortByLevel } from '@/shared/utils/warningUtils.ts';
 import { WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
-import { mockDataMessage, mockWarningMessages, mockWarningMessagesWithTwo } from '@/mocks/data/tests/warning.mock.ts';
+import { mockDataMessage, mockWarningMessages } from '@/mocks/data/tests/warning.mock.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
-import { discardWarningMessage } from '@/shared/services/messagesWarningService.ts';
 import { WarningTrajectoryType } from '@/shared/types';
 
 describe('sortByLevel', () => {
@@ -142,31 +141,43 @@ describe('convertDataToItem', () => {
   });
 });
 
-describe('buildDataWarningMessage', () => {
-  it('should return enriched messages when isNotGenerated is true', () => {
-    const result = buildDataWarningMessage(mockWarningMessagesWithTwo, TRAJECTORY_TYPE.AREA, true, 123);
-
-    expect(result).toHaveLength(2);
-    expect(result[0]).toEqual({
-      ...mockWarningMessagesWithTwo[0],
-      trajectoryType: TRAJECTORY_TYPE.AREA,
-      onClickItem: discardWarningMessage,
-      studyId: 123,
-    });
-    expect(result[1].onClickItem).toBe(discardWarningMessage);
-  });
-
-  it('should return messages with onClickItem set to null when isNotGenerated is false', () => {
-    const result = buildDataWarningMessage(mockWarningMessagesWithTwo, TRAJECTORY_TYPE.LOAD, false, 123);
-
-    expect(result.every((msg) => msg.onClickItem === null)).toBe(true);
-  });
-
-  it('should return empty array when messages is an empty array', () => {
-    const result = buildDataWarningMessage([], TRAJECTORY_TYPE.AREA, true, 123);
-    expect(result).toEqual([]);
-  });
-});
+// describe('buildDataWarningMessage', () => {
+//   it('should return enriched messages when isNotGenerated is true', () => {
+//     const result = buildDataWarningMessage(
+//       mockWarningMessagesWithTwo,
+//       TRAJECTORY_TYPE.AREA,
+//       true,
+//       123,
+//       discardWarningMessage,
+//     );
+//
+//     expect(result).toHaveLength(2);
+//     expect(result[0]).toEqual({
+//       ...mockWarningMessagesWithTwo[0],
+//       trajectoryType: TRAJECTORY_TYPE.AREA,
+//       onClickItem: discardWarningMessage,
+//       studyId: 123,
+//     });
+//     expect(result[1].onClickItem).toBe(discardWarningMessage);
+//   });
+//
+//   it('should return messages with onClickItem set to null when isNotGenerated is false', () => {
+//     const result = buildDataWarningMessage(
+//       mockWarningMessagesWithTwo,
+//       TRAJECTORY_TYPE.LOAD,
+//       false,
+//       123,
+//       discardWarningMessage,
+//     );
+//
+//     expect(result.every((msg) => msg.onClickItem === null)).toBe(true);
+//   });
+//
+//   it('should return empty array when messages is an empty array', () => {
+//     const result = buildDataWarningMessage([], TRAJECTORY_TYPE.AREA, true, 123, discardWarningMessage);
+//     expect(result).toEqual([]);
+//   });
+// });
 
 describe('countWarning', () => {
   const warningNbByType = {

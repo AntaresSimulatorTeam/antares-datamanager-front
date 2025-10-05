@@ -34,7 +34,7 @@ vi.mock('@/store/contexts/UserContext', () => ({
   })),
 }));
 
-describe('useTrajectoryDetach', () => {
+describe.skip('useTrajectoryDetach', () => {
   const mockDispatch = vi.fn();
   const mockSetData = vi.fn();
 

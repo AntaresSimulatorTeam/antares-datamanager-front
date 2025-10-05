@@ -4,12 +4,12 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { Location, useLocation } from 'react-router-dom';
 import StudyHeader from './StudyHeader.tsx';
 import { RdsDivider } from 'rte-design-system-react';
 import StudyNavigationMenu from '@/components/menu/StudyNavigationMenu.tsx';
-import { HypothesisTab, StudyDTO, WarningMessage } from '@/shared/types';
+import { HypothesisTab, StudyDTO } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { createStudy } from '@/shared/services/studyService.ts';
@@ -20,8 +20,7 @@ import { DetailsContent } from '@/components/banner/DetailsContent.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { ContainerWithExpander } from '@/components/banner/ContainerWithExpander.tsx';
-import { fetchWarningMessagesFromType } from '@/shared/services/warningService.ts';
-import { buildDataWarningMessage } from '@/shared/utils/warningUtils.ts';
+import { useFetchWarningMessages } from '@/hooks/useFetchWarningMessages.ts';
 
 interface StudyState {
   study: StudyDTO;
@@ -43,7 +42,8 @@ const StudyDetails = () => {
     isDisabled: false,
   });
   const [errorMessage, setErrorMessage] = useState<string>('');
-  const [warningMessages, setWarningMessages] = useState<WarningMessage[]>([]);
+  const { warningMessages } = useFetchWarningMessages(study.id, activeTab.name, studyState);
+  console.log('========================  warningMessages', warningMessages, ' =======================');
 
   const handleGenerateStudy = async () => {
     try {
@@ -55,38 +55,6 @@ const StudyDetails = () => {
       setIsGenerating(false);
     }
   };
-
-  useEffect(() => {
-    const fetchWarnings = async (trajectoryType: TRAJECTORY_TYPE, studyId: number) => {
-      const warningMessagesFromType: WarningMessage[] = await fetchWarningMessagesFromType(trajectoryType, studyId);
-      //const truc = getWarningMessages();
-      //console.log('============= warningMessages', warningMessages);
-      //const activeTabWarning: WarningMessage[] = warningMessages;
-      const isNotGenerated = studyState.studyStatus !== StudyStatus.GENERATED;
-
-      if (activeTab.name === TRAJECTORY_TYPE.AREA) {
-        const dataWarningMessageArea = buildDataWarningMessage(
-          warningMessagesFromType,
-          activeTab.name,
-          isNotGenerated,
-          studyId,
-        );
-        const warningLink: WarningMessage[] = await fetchWarningMessagesFromType(TRAJECTORY_TYPE.LINK, studyId);
-        const dataWarningMessageLink = buildDataWarningMessage(
-          warningLink,
-          TRAJECTORY_TYPE.LINK,
-          isNotGenerated,
-          studyId,
-        );
-        setWarningMessages(dataWarningMessageArea.concat(dataWarningMessageLink));
-      } else {
-        setWarningMessages(buildDataWarningMessage(warningMessagesFromType, activeTab.name, isNotGenerated, studyId));
-      }
-    };
-    if (activeTab.name && study.id) {
-      void fetchWarnings(activeTab.name, study.id);
-    }
-  }, [activeTab.name, studyState[activeTab.name]?.trajectories, study.id]);
 
   return !study.id ? (
     <div className="flex h-screen items-center justify-center">
