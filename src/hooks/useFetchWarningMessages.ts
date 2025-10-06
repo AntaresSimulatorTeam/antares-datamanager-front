@@ -68,7 +68,8 @@ export const useFetchWarningMessages = (studyId: number, type: TRAJECTORY_TYPE, 
     type,
     studyState[type]?.trajectories,
     studyState[TRAJECTORY_TYPE.LINK]?.trajectories,
-    studyState[TRAJECTORY_TYPE.THERMAL_PARAMETER]?.trajectories,
+    studyState[TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]?.trajectories,
+    studyState[TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]?.trajectories,
     studyId,
   ]);
 
