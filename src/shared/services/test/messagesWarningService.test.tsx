@@ -1,4 +1,3 @@
-import { useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { Mock, vi } from 'vitest';
 import { discardWarningMessage } from '@/shared/services/messagesWarningService.ts';
 import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning';
@@ -13,21 +12,17 @@ vi.mock('@/shared/services/warningService', async (importOriginal) => {
 });
 
 describe('discardWarningMessage', () => {
-  const mockUseStudyDispatch = useStudyDispatch as Mock<typeof useStudyDispatch>;
-  const mockDispatch = vi.fn().mockImplementation(vi.fn());
   afterEach(() => {
     vi.clearAllMocks();
   });
 
   it('should call authFetch with proper parameters', async () => {
-    mockUseStudyDispatch.mockReturnValue(mockDispatch);
     await discardWarningMessage(105);
-
     expect(skipMessage).toHaveBeenCalledWith(105);
   });
 
   it('should handle discard warning message failure gracefully', async () => {
-    vi.mocked(discardWarningMessage).mockRejectedValueOnce({
+    vi.mocked(skipMessage).mockRejectedValueOnce({
       antaresErrorMessage: 'Failed to discard warning message',
       date: new Date(),
       type: ERROR_MESSAGE_TYPE.BUSINESS,
