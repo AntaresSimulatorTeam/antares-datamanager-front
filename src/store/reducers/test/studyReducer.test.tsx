@@ -490,14 +490,18 @@ describe('studyReducer', () => {
   });
 
   it('should handle SKIP_MESSAGE action', () => {
-    // const action: StudyActionType = {
-    //   type: STUDY_ACTION.SKIP_MESSAGE,
-    //   payload: {
-    //     trajectoryType: TRAJECTORY_TYPE.AREA,
-    //     warningMessages: [mockWarningMessages[2], mockWarningMessages[3]],
-    //   },
-    // };
-    //const result = studyReducer(mockPrevStateAreaWithWarnings(), action);
+    const action: StudyActionType = {
+      type: STUDY_ACTION.SKIP_MESSAGE,
+      payload: {
+        discardActionTriggered: true,
+      },
+    };
+    const mockPrevState = () => ({
+      studyStatus: StudyStatus.IN_PROGRESS,
+      discardActionTriggered: false,
+    });
+    const result = studyReducer(mockPrevState(), action);
+    expect(result?.discardActionTriggered).toBeTruthy();
   });
 
   it('should handles UPDATE_TRAJECTORY action', () => {
