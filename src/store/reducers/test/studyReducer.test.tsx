@@ -2,7 +2,6 @@ import {
   addTrajectories,
   clearByType,
   deleteTrajectory,
-  skipWarningMessage,
   studyReducer,
   updateTrajectory,
 } from '@/store/reducers/studyReducer';
@@ -17,16 +16,11 @@ import {
 } from '@/shared/types';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { describe, expect, it } from 'vitest';
-import {
-  mockSingleWarningMessages,
-  mockSingleWarningMessagesSkipped,
-  mockWarningMessages,
-  mockWarningMessagesWithTwo,
-} from '@/mocks/data/tests/warning.mock.ts';
+import { mockSingleWarningMessagesSkipped, mockWarningMessagesWithTwo } from '@/mocks/data/tests/warning.mock.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { mockDataBaseTrajectory, mockPrevStateArea, mockPrevStateLoad } from '@/mocks/data/tests/trajectory.mock.ts';
 
-describe.skip('addTrajectories', () => {
+describe('addTrajectories', () => {
   it('should add new trajectories to empty state', () => {
     const trajectory = mockDataBaseTrajectory(TRAJECTORY_TYPE.AREA, 67, 'AT');
 
@@ -42,7 +36,6 @@ describe.skip('addTrajectories', () => {
     const prevState = {
       [TRAJECTORY_TYPE.LOAD]: {
         trajectories: [existingTrajectory],
-        warningMessages: [],
       },
     };
 
@@ -203,7 +196,7 @@ describe.skip('addTrajectories', () => {
   });
 });
 
-describe.skip('deleteTrajectory', () => {
+describe('deleteTrajectory', () => {
   const trajectorySample = mockDataBaseTrajectory(TRAJECTORY_TYPE.AREA, 123, 'zoneA');
 
   it('should removes the specified trajectory from the correct type array', () => {
@@ -284,69 +277,6 @@ describe.skip('deleteTrajectory', () => {
   });
 });
 
-describe.skip('skipWarningMessage', () => {
-  const trajectorySample = mockDataBaseTrajectory(TRAJECTORY_TYPE.AREA, 123, 'zoneA');
-
-  it('should removes the mutate warningMessages from the correct type array', () => {
-    // const prevState = {
-    //   [TRAJECTORY_TYPE.LOAD]: {
-    //     trajectories: [trajectorySample],
-    //     warningMessages: mockWarningMessagesWithTwo,
-    //   },
-    // };
-    // const payload = { trajectoryType: TRAJECTORY_TYPE.LOAD, warningMessages: mockWarningMessages };
-    //const result = skipWarningMessage(prevState, payload);
-  });
-
-  it('should returns the same state if the warningMessages list is not an array', () => {
-    const prevState = {
-      studyStatus: StudyStatus.IN_PROGRESS,
-      [TRAJECTORY_TYPE.AREA]: {
-        trajectories: [trajectorySample],
-        warningMessages: mockSingleWarningMessages as unknown as Array<WarningMessage>,
-      },
-    };
-
-    const payload = { trajectoryType: TRAJECTORY_TYPE.LOAD, warningMessages: mockWarningMessages };
-
-    const result = skipWarningMessage(prevState, payload);
-
-    expect(result).toEqual(prevState);
-  });
-
-  it('should returns the same state if the warningMessages list is an empty array', () => {
-    const prevState = {
-      studyStatus: StudyStatus.IN_PROGRESS,
-      [TRAJECTORY_TYPE.AREA]: {
-        trajectories: [],
-        warningMessages: [],
-      },
-    };
-
-    const payload = { trajectoryType: TRAJECTORY_TYPE.LOAD, warningMessages: mockWarningMessages };
-
-    const result = skipWarningMessage(prevState, payload);
-
-    expect(result).toEqual(prevState);
-  });
-
-  it('should returns the same state if the warningMessages list is null', () => {
-    const prevState = {
-      studyStatus: StudyStatus.IN_PROGRESS,
-      [TRAJECTORY_TYPE.AREA]: {
-        trajectories: [],
-        warningMessages: null,
-      },
-    } as unknown as Partial<StudyState>;
-
-    const payload = { trajectoryType: TRAJECTORY_TYPE.LOAD, warningMessages: mockWarningMessages };
-
-    const result = skipWarningMessage(prevState, payload);
-
-    expect(result).toEqual(prevState);
-  });
-});
-
 vi.mock(import('@/shared/utils/trajectoryUtils'), async (importOriginal) => {
   const actual = await importOriginal();
   return {
@@ -355,7 +285,7 @@ vi.mock(import('@/shared/utils/trajectoryUtils'), async (importOriginal) => {
   };
 });
 
-describe.skip('clearByType', () => {
+describe('clearByType', () => {
   const prevState = {
     studyStatus: StudyStatus.IN_PROGRESS,
     AREA: {
@@ -406,7 +336,7 @@ describe.skip('clearByType', () => {
   });
 });
 
-describe.skip('updateTrajectory', () => {
+describe('updateTrajectory', () => {
   const baseTrajectory: DbTrajectory = mockDataBaseTrajectory(TRAJECTORY_TYPE.LINK, 123, 'ZoneA');
 
   const prevState: Partial<StudyState> = {
@@ -507,7 +437,7 @@ vi.mock('./studyReducer.tsx', () => ({
   updateTrajectory: vi.fn(() => ({ updated: true })),
 }));
 
-describe.skip('studyReducer', () => {
+describe('studyReducer', () => {
   it('should handle SET_STUDY_STATUS action', () => {
     const action: StudyActionType = {
       type: STUDY_ACTION.SET_STUDY_STATUS,

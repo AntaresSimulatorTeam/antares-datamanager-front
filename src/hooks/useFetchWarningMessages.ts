@@ -64,7 +64,13 @@ export const useFetchWarningMessages = (studyId: number, type: TRAJECTORY_TYPE, 
     if (studyId != null && type) {
       void fetchWarningMessages(studyId, type, studyState);
     }
-  }, [type, studyState[type]?.trajectories, studyState[TRAJECTORY_TYPE.LINK]?.trajectories, studyId]);
+  }, [
+    type,
+    studyState[type]?.trajectories,
+    studyState[TRAJECTORY_TYPE.LINK]?.trajectories,
+    studyState[TRAJECTORY_TYPE.THERMAL_PARAMETER]?.trajectories,
+    studyId,
+  ]);
 
   return { warningMessages };
 };
