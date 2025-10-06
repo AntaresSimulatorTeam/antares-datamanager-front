@@ -42,7 +42,7 @@ const StudyDetails = () => {
     isDisabled: false,
   });
   const [errorMessage, setErrorMessage] = useState<string>('');
-  const { warningMessages } = useFetchWarningMessages(study.id, activeTab.name, studyState);
+  const { warningMessages } = useFetchWarningMessages(study.id, activeTab.name);
 
   const handleGenerateStudy = async () => {
     try {

@@ -42,6 +42,7 @@ export type StudyTrajectoriesData = {
 };
 export type StudyState = StudyTrajectoriesData & {
   studyStatus?: StudyStatus;
+  discardActionTriggered?: boolean;
   discardWarningMessage?: (id: number, trajectoryType: TRAJECTORY_TYPE, studyId: number) => Promise<void>;
 };
 
@@ -63,7 +64,7 @@ export type StudyActionType =
   | { type: STUDY_ACTION.SET_STUDY_STATUS; payload: StudyStatus }
   | {
       type: STUDY_ACTION.SKIP_MESSAGE;
-      payload: { trajectoryType: TRAJECTORY_TYPE; warningMessages: WarningMessage[] };
+      payload: { discardActionTriggered: true };
     }
   | { type: STUDY_ACTION.RESET_STUDY_STATE };
 

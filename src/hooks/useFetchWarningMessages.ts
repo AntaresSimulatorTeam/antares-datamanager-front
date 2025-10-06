@@ -4,9 +4,11 @@ import { fetchWarningMessagesFromType } from '@/shared/services/warningService.t
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { buildDataWarningMessage } from '@/shared/utils/warningUtils.ts';
+import { useStudy } from '@/store/contexts/StudyContext.tsx';
 
-export const useFetchWarningMessages = (studyId: number, type: TRAJECTORY_TYPE, studyState: Partial<StudyState>) => {
+export const useFetchWarningMessages = (studyId: number, type: TRAJECTORY_TYPE) => {
   const [warningMessages, setWarningMessages] = useState<WarningMessage[]>([]);
+  const studyState = useStudy();
 
   useEffect(() => {
     const fetchWarningMessages = async (id: number, trajectoryType: TRAJECTORY_TYPE, state: Partial<StudyState>) => {
@@ -71,6 +73,7 @@ export const useFetchWarningMessages = (studyId: number, type: TRAJECTORY_TYPE, 
     studyState[TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]?.trajectories,
     studyState[TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]?.trajectories,
     studyId,
+    studyState.discardActionTriggered,
   ]);
 
   return { warningMessages };

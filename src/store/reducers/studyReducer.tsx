@@ -78,18 +78,12 @@ export const updateTrajectory = (
 export const skipWarningMessage = (
   prevState: Partial<StudyState>,
   payload: {
-    trajectoryType: TRAJECTORY_TYPE;
+    discardActionTriggered: boolean;
   },
-): Partial<StudyState> => {
-  const { trajectoryType } = payload;
-
-  return {
-    ...prevState,
-    [trajectoryType]: {
-      trajectories: prevState[trajectoryType]?.trajectories,
-    },
-  };
-};
+): Partial<StudyState> => ({
+  ...prevState,
+  discardActionTriggered: payload.discardActionTriggered,
+});
 
 export const clearByType = (prevState: Partial<StudyState>, payload: TRAJECTORY_TYPE[]) => {
   const studyState: Partial<StudyState> = { ...prevState };

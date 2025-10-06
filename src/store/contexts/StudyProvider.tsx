@@ -5,6 +5,7 @@ import { StudyContext, StudyDispatchContext } from '@/store/contexts/StudyContex
 import { useLocation } from 'react-router-dom';
 import { discardWarningMessage } from '@/shared/services/messagesWarningService.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { STUDY_ACTION } from '@/shared/enum/study.ts';
 
 export interface StudyProviderProps {
   children: ReactNode;
@@ -21,6 +22,7 @@ export const StudyProvider = ({ children }: StudyProviderProps) => {
     async (id: number, trajectoryType: TRAJECTORY_TYPE, studyId: number): Promise<void> => {
       try {
         await discardWarningMessage(id, trajectoryType, studyId, dispatch);
+        dispatch({ type: STUDY_ACTION.SKIP_MESSAGE, payload: { discardActionTriggered: true } });
       } catch (error) {
         console.error('Failed to discard warning message:', error);
       }
