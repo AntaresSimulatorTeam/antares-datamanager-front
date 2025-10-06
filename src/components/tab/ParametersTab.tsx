@@ -67,13 +67,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
   );
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
-    useFetchHypothesisTrajectories(
-      study?.id,
-      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
-      defaultAreas,
-      areas,
-      isStudyGenerated,
-    );
+    useFetchHypothesisTrajectories(study?.id, TRAJECTORY_TYPE.THERMAL_PARAMETER, defaultAreas, areas, isStudyGenerated);
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(study, studyState, dispatch, setTechnicalData);
   const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch, setTechnicalData);
   const { detachTrajectory } = useTrajectoryDetach(study, dispatch, setTechnicalData);

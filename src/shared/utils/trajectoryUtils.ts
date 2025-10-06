@@ -593,7 +593,7 @@ export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE): string | null 
  * @return {string}
  */
 export const getQueryParamAreaValue = (type: TRAJECTORY_TYPE, hypothesis: string): string => {
-  let area = hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : hypothesis;
+  let area = hypothesis.includes(OTHER_AREAS_LABEL) ? OTHER_AREAS : hypothesis;
   if (type === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
     area = hypothesis?.includes('FR') ? 'FR' : OTHER_AREAS;
   }

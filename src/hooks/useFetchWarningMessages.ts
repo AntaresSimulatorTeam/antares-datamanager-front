@@ -10,8 +10,8 @@ export const useFetchWarningMessages = (studyId: number, type: TRAJECTORY_TYPE, 
 
   useEffect(() => {
     const fetchWarningMessages = async (id: number, trajectoryType: TRAJECTORY_TYPE, state: Partial<StudyState>) => {
-      const warningMessagesFromType: WarningMessage[] = await fetchWarningMessagesFromType(trajectoryType, id);
       const isNotGenerated = state.studyStatus !== StudyStatus.GENERATED;
+      const warningMessagesFromType: WarningMessage[] = await fetchWarningMessagesFromType(trajectoryType, id);
 
       if (trajectoryType === TRAJECTORY_TYPE.AREA) {
         const dataWarningMessageArea = buildDataWarningMessage(
@@ -30,6 +30,25 @@ export const useFetchWarningMessages = (studyId: number, type: TRAJECTORY_TYPE, 
           studyState.discardWarningMessage ?? null,
         );
         setWarningMessages(dataWarningMessageArea.concat(dataWarningMessageLink));
+      } else if (trajectoryType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
+        const warningParameters: WarningMessage[] = (
+          await Promise.all(
+            [
+              TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+              TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER,
+              TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER,
+            ].map(async (thermalType: TRAJECTORY_TYPE) => await fetchWarningMessagesFromType(thermalType, id)),
+          )
+        ).flat();
+        setWarningMessages(
+          buildDataWarningMessage(
+            warningMessagesFromType.concat(warningParameters),
+            trajectoryType,
+            isNotGenerated,
+            id,
+            studyState.discardWarningMessage ?? null,
+          ),
+        );
       } else {
         setWarningMessages(
           buildDataWarningMessage(

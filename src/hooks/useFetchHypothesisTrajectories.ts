@@ -38,10 +38,20 @@ export const useFetchHypothesisTrajectories = (
   const studyState = useStudy();
   const dispatch = useStudyDispatch();
   const { t } = useTranslation();
-  const emptyAreaSelected = useMemo(
-    () => (trajectoryType ? (studyState?.[trajectoryType]?.trajectories ?? []) : []),
-    [trajectoryType],
-  );
+  const emptyAreaSelected: DbTrajectory[] = useMemo(() => {
+    if (trajectoryType) {
+      if (trajectoryType === TRAJECTORY_TYPE.THERMAL_PARAMETER) {
+        return (
+          studyState?.[trajectoryType]?.trajectories?.filter(
+            (trajectory) => trajectory.type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+          ) ?? []
+        );
+      } else {
+        return studyState?.[trajectoryType]?.trajectories ?? [];
+      }
+    }
+    return [];
+  }, [trajectoryType]);
 
   const fetchAreas = useCallback(
     async (id?: number, trajType?: TRAJECTORY_TYPE) => {
@@ -51,7 +61,7 @@ export const useFetchHypothesisTrajectories = (
           let defaultEmptyAreas: DbTrajectory[];
           let arrayWithoutDuplicate: DbTrajectory[];
           const resultObject: Partial<Record<ThermalParamTrajectoryType, DbTrajectory[]>> = {};
-          if (trajType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
+          if (trajType === TRAJECTORY_TYPE.THERMAL_PARAMETER) {
             const types: ThermalParamTrajectoryType[] = [
               TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
               TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER,
@@ -118,7 +128,7 @@ export const useFetchHypothesisTrajectories = (
             : [];
 
           // Hypothesis table
-          if (trajType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
+          if (trajType === TRAJECTORY_TYPE.THERMAL_PARAMETER) {
             const specificAreaData = arrayWithoutDuplicate
               .map((trajectory) =>
                 buildRowWithSubRowsData(trajectory, defaultAreas, defaultAreaListNotIncludedInList, null),
@@ -176,11 +186,11 @@ export const useFetchHypothesisTrajectories = (
             setReadOnlyRow(rows);
           } else {
             const dataToCheck =
-              trajType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER && dataTrajectories[0].subRows
+              trajType === TRAJECTORY_TYPE.THERMAL_PARAMETER && dataTrajectories[0].subRows
                 ? dataTrajectories[0].subRows
                 : dataTrajectories;
             const readOnlyRows = retrieveReadOnlyArea(dataToCheck, defaultAreaListNotIncludedInList);
-            if (trajType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
+            if (trajType === TRAJECTORY_TYPE.THERMAL_PARAMETER) {
               const hasSpecificTrajectory = dataToCheck?.some((row) => row.status === TRAJECTORY_SELECTION_STATUS.OK);
               const readOnlySubRows = transformToSubRowKeys(readOnlyRows);
               if (!hasSpecificTrajectory) {
