@@ -1,7 +1,6 @@
 import { fetchWarningMessagesFromType } from '@/shared/services/warningService.ts';
 import { buildDataWarningMessage } from '@/shared/utils/warningUtils.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useFetchWarningMessages } from '@/hooks/useFetchWarningMessages.ts';
 import { Mock, vi } from 'vitest';
@@ -35,13 +34,7 @@ describe('useFetchWarningMessages', () => {
     (fetchWarningMessagesFromType as Mock).mockResolvedValueOnce(mockMessages);
     (buildDataWarningMessage as Mock).mockReturnValue(mockBuiltMessages);
 
-    const studyState = {
-      studyStatus: StudyStatus.IN_PROGRESS,
-      [TRAJECTORY_TYPE.AREA]: { trajectories: [] },
-      [TRAJECTORY_TYPE.LINK]: { trajectories: [] },
-    };
-
-    const { result } = renderHook(() => useFetchWarningMessages(123, TRAJECTORY_TYPE.AREA, studyState));
+    const { result } = renderHook(() => useFetchWarningMessages(123, TRAJECTORY_TYPE.AREA));
 
     await waitFor(() => {
       expect(result.current.warningMessages.length).toBeGreaterThan(0);
@@ -60,12 +53,7 @@ describe('useFetchWarningMessages', () => {
     (fetchWarningMessagesFromType as Mock).mockResolvedValueOnce(mockMessages);
     (buildDataWarningMessage as Mock).mockReturnValue(mockBuiltMessages);
 
-    const studyState = {
-      studyStatus: StudyStatus.IN_PROGRESS,
-      [TRAJECTORY_TYPE.LOAD]: { trajectories: [] },
-    };
-
-    const { result } = renderHook(() => useFetchWarningMessages(123, TRAJECTORY_TYPE.LOAD, studyState));
+    const { result } = renderHook(() => useFetchWarningMessages(123, TRAJECTORY_TYPE.LOAD));
 
     await waitFor(() => {
       expect(result.current.warningMessages.length).toBeGreaterThan(0);
@@ -83,12 +71,7 @@ describe('useFetchWarningMessages', () => {
     (fetchWarningMessagesFromType as Mock).mockResolvedValueOnce(mockMessages);
     (buildDataWarningMessage as Mock).mockReturnValue(mockBuiltMessages);
 
-    const studyState = {
-      studyStatus: StudyStatus.IN_PROGRESS,
-      [TRAJECTORY_TYPE.THERMAL_CAPACITY]: { trajectories: [] },
-    };
-
-    const { result } = renderHook(() => useFetchWarningMessages(123, TRAJECTORY_TYPE.THERMAL_CAPACITY, studyState));
+    const { result } = renderHook(() => useFetchWarningMessages(123, TRAJECTORY_TYPE.THERMAL_CAPACITY));
 
     await waitFor(() => {
       expect(result.current.warningMessages.length).toBeGreaterThan(0);

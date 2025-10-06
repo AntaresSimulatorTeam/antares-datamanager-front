@@ -1,5 +1,4 @@
 import { WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
-import { StudyActionType } from '@/shared/types/Study.type.ts';
 import { ButtonColor } from '@/components/button/ButtonWithStdIcon.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { WithNullableFields } from '@/shared/types/Generic.type.ts';
@@ -36,14 +35,7 @@ export interface CardDataType
   colorBorder: string;
   icon: StdIconId;
   title: string;
-  onClickItem:
-    | ((
-        id: number,
-        trajectoryType: TRAJECTORY_TYPE | null,
-        trajectoryId: number | null,
-        dispatch: React.Dispatch<StudyActionType>,
-      ) => Promise<void>)
-    | null;
+  onClickItem: ((id: number) => Promise<void>) | null;
   buttonLabel: string;
   buttonTooltipText: string;
   studyId: number | null;

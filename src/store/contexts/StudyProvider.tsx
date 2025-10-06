@@ -4,7 +4,6 @@ import { studyReducer } from '@/store/reducers/studyReducer.tsx';
 import { StudyContext, StudyDispatchContext } from '@/store/contexts/StudyContext';
 import { useLocation } from 'react-router-dom';
 import { discardWarningMessage } from '@/shared/services/messagesWarningService.ts';
-import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 
 export interface StudyProviderProps {
@@ -19,9 +18,9 @@ export const StudyProvider = ({ children }: StudyProviderProps) => {
   });
 
   const handleDiscardWarningMessage = useCallback(
-    async (id: number, trajectoryType: TRAJECTORY_TYPE, studyId: number): Promise<void> => {
+    async (id: number): Promise<void> => {
       try {
-        await discardWarningMessage(id, trajectoryType, studyId, dispatch);
+        await discardWarningMessage(id);
         dispatch({ type: STUDY_ACTION.SKIP_MESSAGE, payload: { discardActionTriggered: true } });
       } catch (error) {
         console.error('Failed to discard warning message:', error);

@@ -43,7 +43,7 @@ export type StudyTrajectoriesData = {
 export type StudyState = StudyTrajectoriesData & {
   studyStatus?: StudyStatus;
   discardActionTriggered?: boolean;
-  discardWarningMessage?: (id: number, trajectoryType: TRAJECTORY_TYPE, studyId: number) => Promise<void>;
+  discardWarningMessage?: (id: number) => Promise<void>;
 };
 
 export type StudyActionType =
