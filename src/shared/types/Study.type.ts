@@ -64,7 +64,7 @@ export type StudyActionType =
   | { type: STUDY_ACTION.SET_STUDY_STATUS; payload: StudyStatus }
   | {
       type: STUDY_ACTION.SKIP_MESSAGE;
-      payload: { discardActionTriggered: true };
+      payload: { discardActionTriggered: boolean };
     }
   | { type: STUDY_ACTION.RESET_STUDY_STATE };
 

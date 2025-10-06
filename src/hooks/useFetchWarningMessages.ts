@@ -4,63 +4,68 @@ import { fetchWarningMessagesFromType } from '@/shared/services/warningService.t
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { buildDataWarningMessage } from '@/shared/utils/warningUtils.ts';
-import { useStudy } from '@/store/contexts/StudyContext.tsx';
+import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
+import { STUDY_ACTION } from '@/shared/enum/study.ts';
 
 export const useFetchWarningMessages = (studyId: number, type: TRAJECTORY_TYPE) => {
   const [warningMessages, setWarningMessages] = useState<WarningMessage[]>([]);
   const studyState = useStudy();
+  const dispatch = useStudyDispatch();
 
   useEffect(() => {
     const fetchWarningMessages = async (id: number, trajectoryType: TRAJECTORY_TYPE, state: Partial<StudyState>) => {
       const isNotGenerated = state.studyStatus !== StudyStatus.GENERATED;
       const warningMessagesFromType: WarningMessage[] = await fetchWarningMessagesFromType(trajectoryType, id);
-
-      if (trajectoryType === TRAJECTORY_TYPE.AREA) {
-        const dataWarningMessageArea = buildDataWarningMessage(
-          warningMessagesFromType,
-          type,
-          isNotGenerated,
-          id,
-          studyState.discardWarningMessage ?? null,
-        );
-        const warningLink: WarningMessage[] = await fetchWarningMessagesFromType(TRAJECTORY_TYPE.LINK, id);
-        const dataWarningMessageLink = buildDataWarningMessage(
-          warningLink,
-          TRAJECTORY_TYPE.LINK,
-          isNotGenerated,
-          id,
-          studyState.discardWarningMessage ?? null,
-        );
-        setWarningMessages(dataWarningMessageArea.concat(dataWarningMessageLink));
-      } else if (trajectoryType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
-        const warningParameters: WarningMessage[] = (
-          await Promise.all(
-            [
-              TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
-              TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER,
-              TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER,
-            ].map(async (thermalType: TRAJECTORY_TYPE) => await fetchWarningMessagesFromType(thermalType, id)),
-          )
-        ).flat();
-        setWarningMessages(
-          buildDataWarningMessage(
-            warningMessagesFromType.concat(warningParameters),
-            trajectoryType,
-            isNotGenerated,
-            id,
-            studyState.discardWarningMessage ?? null,
-          ),
-        );
-      } else {
-        setWarningMessages(
-          buildDataWarningMessage(
+      try {
+        if (trajectoryType === TRAJECTORY_TYPE.AREA) {
+          const dataWarningMessageArea = buildDataWarningMessage(
             warningMessagesFromType,
-            trajectoryType,
+            type,
             isNotGenerated,
             id,
             studyState.discardWarningMessage ?? null,
-          ),
-        );
+          );
+          const warningLink: WarningMessage[] = await fetchWarningMessagesFromType(TRAJECTORY_TYPE.LINK, id);
+          const dataWarningMessageLink = buildDataWarningMessage(
+            warningLink,
+            TRAJECTORY_TYPE.LINK,
+            isNotGenerated,
+            id,
+            studyState.discardWarningMessage ?? null,
+          );
+          setWarningMessages(dataWarningMessageArea.concat(dataWarningMessageLink));
+        } else if (trajectoryType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
+          const warningParameters: WarningMessage[] = (
+            await Promise.all(
+              [
+                TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+                TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER,
+                TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER,
+              ].map(async (thermalType: TRAJECTORY_TYPE) => await fetchWarningMessagesFromType(thermalType, id)),
+            )
+          ).flat();
+          setWarningMessages(
+            buildDataWarningMessage(
+              warningMessagesFromType.concat(warningParameters),
+              trajectoryType,
+              isNotGenerated,
+              id,
+              studyState.discardWarningMessage ?? null,
+            ),
+          );
+        } else {
+          setWarningMessages(
+            buildDataWarningMessage(
+              warningMessagesFromType,
+              trajectoryType,
+              isNotGenerated,
+              id,
+              studyState.discardWarningMessage ?? null,
+            ),
+          );
+        }
+      } finally {
+        dispatch?.({ type: STUDY_ACTION.SKIP_MESSAGE, payload: { discardActionTriggered: false } });
       }
     };
     if (studyId != null && type) {
