@@ -407,6 +407,28 @@ export const mockEmptyDbTrajectorySPECIFICFR: DbTrajectory = {
   technology: '',
 };
 
+export const mockEmptyDbTrajectorySPECIFICAT: DbTrajectory = {
+  id: 1,
+  trajectoryName: 'area_PB_2024',
+  type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+  version: 3,
+  userName: 'mouad',
+  creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+  area: 'AT',
+  technology: '',
+};
+
+export const mockEmptyDbTrajectorySPECIFICBE: DbTrajectory = {
+  id: 1,
+  trajectoryName: 'area_PB_2024',
+  type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+  version: 3,
+  userName: 'mouad',
+  creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+  area: 'BE',
+  technology: '',
+};
+
 export const mockEmptyDbTrajectorySPECIFICCZ: DbTrajectory = {
   id: 1,
   trajectoryName: '',
@@ -415,5 +437,16 @@ export const mockEmptyDbTrajectorySPECIFICCZ: DbTrajectory = {
   userName: 'mouad',
   creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
   area: 'CZ',
+  technology: '',
+};
+
+export const mockEmptyDbTrajectorySpecificOthers: DbTrajectory = {
+  id: 1,
+  trajectoryName: '',
+  type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+  version: 0,
+  userName: 'mouad',
+  creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+  area: 'OTHERS',
   technology: '',
 };

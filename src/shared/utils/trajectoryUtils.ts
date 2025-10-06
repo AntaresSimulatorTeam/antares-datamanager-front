@@ -273,7 +273,6 @@ export const buildDefaultEmptyTrajectoryList = (
   // Check if default areas (without technology) are not already linked to a trajectory
   const defaultAreasNotLinkedToTrajectory =
     trajectories.length === 0 ? areaDefault : areaDefault.filter((area) => !isTrajectoryLinked(area, trajectories));
-
   // Then build default empty areas
   return (defaultAreasNotLinkedToTrajectory || []).map((defaultArea) => buildEmptyTrajectory(defaultArea.name, type));
 };
@@ -593,7 +592,7 @@ export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE): string | null 
  * @return {string}
  */
 export const getQueryParamAreaValue = (type: TRAJECTORY_TYPE, hypothesis: string): string => {
-  let area = hypothesis.includes(OTHER_AREAS_LABEL) ? OTHER_AREAS : hypothesis;
+  let area = hypothesis?.includes(OTHER_AREAS_LABEL) ? OTHER_AREAS : hypothesis;
   if (type === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
     area = hypothesis?.includes('FR') ? 'FR' : OTHER_AREAS;
   }

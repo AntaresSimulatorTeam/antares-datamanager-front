@@ -2,7 +2,6 @@ import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { DbTrajectory, RowStatus, StudyDTO, UserState } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory';
-import { fetchWarningMessagesFromType } from '@/shared/services/warningService.ts';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
 import { unlinkTrajectoryFromStudy } from '@/shared/services/trajectoryService.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
@@ -34,7 +33,7 @@ vi.mock('@/store/contexts/UserContext', () => ({
   })),
 }));
 
-describe.skip('useTrajectoryDetach', () => {
+describe('useTrajectoryDetach', () => {
   const mockDispatch = vi.fn();
   const mockSetData = vi.fn();
 
@@ -52,19 +51,15 @@ describe.skip('useTrajectoryDetach', () => {
   });
 
   it('should unlink trajectory when status is "empty" and update state', async () => {
-    (fetchWarningMessagesFromType as Mock).mockResolvedValue(['warning']);
-
     const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch, mockSetData));
 
     await result.current.detachTrajectory(TRAJECTORY_TYPE.LOAD, [1], 'empty', trajectory);
 
     expect(unlinkTrajectoryFromStudy).toHaveBeenCalledWith(99, 'study-001');
-    expect(fetchWarningMessagesFromType).toHaveBeenCalledWith(TRAJECTORY_TYPE.LOAD, 'study-001');
     expect(mockDispatch).toHaveBeenCalledWith({
       type: STUDY_ACTION.UPDATE_TRAJECTORY,
       payload: {
         trajectory,
-        warningMessages: ['warning'],
         status: 'empty',
       },
     });
@@ -72,8 +67,6 @@ describe.skip('useTrajectoryDetach', () => {
   });
 
   it('should skip unlink if status is not "empty" but still update trajectory', async () => {
-    (fetchWarningMessagesFromType as Mock).mockResolvedValue([]);
-
     const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch, mockSetData));
 
     await result.current.detachTrajectory(TRAJECTORY_TYPE.LOAD, [2], 'success', trajectory);
@@ -83,7 +76,6 @@ describe.skip('useTrajectoryDetach', () => {
       type: STUDY_ACTION.UPDATE_TRAJECTORY,
       payload: {
         trajectory,
-        warningMessages: [],
         status: 'success',
       },
     });

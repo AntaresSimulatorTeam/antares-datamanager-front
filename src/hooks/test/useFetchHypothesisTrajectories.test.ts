@@ -3,7 +3,6 @@ import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { StudyState, TrajectoryAreaData } from '@/shared/types';
 import { renderHook, waitFor } from '@testing-library/react';
 import * as studyService from '@/shared/services/studyService.ts';
-import * as trajectoryService from '@/shared/services/trajectoryService.ts';
 import * as hypothesisTableService from '@/shared/services/hypothesisTableService';
 import {
   mockDbTrajectory,
@@ -14,8 +13,11 @@ import {
   mockEmptyDbTrajectoryArrayLoad,
   mockEmptyDbTrajectoryLoadFR,
   mockEmptyDbTrajectoryLoadOthers,
+  mockEmptyDbTrajectorySPECIFICAT,
+  mockEmptyDbTrajectorySPECIFICBE,
   mockEmptyDbTrajectorySPECIFICCZ,
   mockEmptyDbTrajectorySPECIFICFR,
+  mockEmptyDbTrajectorySpecificOthers,
 } from '@/mocks/data/tests/trajectory.mock.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
@@ -66,7 +68,7 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
-describe.skip('useFetchHypothesisTrajectories', () => {
+describe('useFetchHypothesisTrajectories', () => {
   const mockUseStudyDispatch = useStudyDispatch as Mock<typeof useStudyDispatch>;
   const mockUseStudy = useStudy as Mock<typeof useStudy>;
   const mockDispatch = vi.fn().mockImplementation(vi.fn());
@@ -87,17 +89,14 @@ describe.skip('useFetchHypothesisTrajectories', () => {
           ['LOAD']: { trajectories: mockEmptyDbTrajectoryArrayLoad, warningMessages: [] },
         }) as Partial<StudyState>,
     );
-    vi.mocked(trajectoryService.getStudyTrajectoriesWithWarnings).mockResolvedValue({
-      trajectories: mockDbTrajectoryArrayLoad,
-      warningMessages: [],
-    });
+    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArrayLoad);
     vi.mocked(trajectoryUtils.buildDefaultEmptyTrajectoryList).mockImplementation(() => [
       mockEmptyDbTrajectoryLoadOthers,
     ]);
     const { result } = renderHook(() => useFetchHypothesisTrajectories(5, TRAJECTORY_TYPE.LOAD));
 
     await waitFor(() => {
-      expect(trajectoryService.getStudyTrajectoriesWithWarnings).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.LOAD);
+      expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.LOAD);
       expect(mockDispatch).toHaveBeenCalledTimes(1);
       expect(mockDispatch).toHaveBeenCalledWith({
         type: STUDY_ACTION.ADD_TRAJECTORIES,
@@ -108,7 +107,6 @@ describe.skip('useFetchHypothesisTrajectories', () => {
               ...mockEmptyDbTrajectoryArrayLoad,
               mockEmptyDbTrajectoryLoadOthers,
             ],
-            warningMessages: [],
           },
         },
       });
@@ -183,10 +181,7 @@ describe.skip('useFetchHypothesisTrajectories', () => {
           ['LOAD']: { trajectories: mockEmptyDbTrajectoryArrayLoad, warningMessages: [] },
         }) as Partial<StudyState>,
     );
-    vi.mocked(trajectoryService.getStudyTrajectoriesWithWarnings).mockResolvedValue({
-      trajectories: mockDbTrajectoryArrayLoad,
-      warningMessages: [],
-    });
+    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArrayLoad);
     vi.mocked(trajectoryUtils.buildDefaultEmptyTrajectoryList).mockImplementationOnce(() => [
       mockEmptyDbTrajectoryLoadFR,
       mockEmptyDbTrajectoryLoadOthers,
@@ -194,7 +189,7 @@ describe.skip('useFetchHypothesisTrajectories', () => {
     const { result } = renderHook(() => useFetchHypothesisTrajectories(5, TRAJECTORY_TYPE.LOAD, [{ name: 'FR' }]));
 
     await waitFor(() => {
-      expect(trajectoryService.getStudyTrajectoriesWithWarnings).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.LOAD);
+      expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.LOAD);
       expect(mockDispatch).toHaveBeenCalledTimes(1);
       expect(mockDispatch).toHaveBeenCalledWith({
         type: STUDY_ACTION.ADD_TRAJECTORIES,
@@ -289,10 +284,7 @@ describe.skip('useFetchHypothesisTrajectories', () => {
           ['LOAD']: { trajectories: [], warningMessages: [] },
         }) as Partial<StudyState>,
     );
-    vi.mocked(trajectoryService.getStudyTrajectoriesWithWarnings).mockResolvedValue({
-      trajectories: mockDbTrajectoryArrayLoad,
-      warningMessages: [],
-    });
+    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArrayLoad);
     vi.mocked(trajectoryUtils.buildDefaultEmptyTrajectoryList).mockImplementationOnce(() => [
       mockEmptyDbTrajectoryLoadFR,
       mockEmptyDbTrajectoryLoadOthers,
@@ -300,14 +292,13 @@ describe.skip('useFetchHypothesisTrajectories', () => {
     const { result } = renderHook(() => useFetchHypothesisTrajectories(5, TRAJECTORY_TYPE.LOAD, [{ name: 'FR' }]));
 
     await waitFor(() => {
-      expect(trajectoryService.getStudyTrajectoriesWithWarnings).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.LOAD);
+      expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.LOAD);
       expect(mockDispatch).toHaveBeenCalledTimes(1);
       expect(mockDispatch).toHaveBeenCalledWith({
         type: STUDY_ACTION.ADD_TRAJECTORIES,
         payload: {
           [TRAJECTORY_TYPE.LOAD]: {
             trajectories: [...mockDbTrajectoryArrayLoad, mockEmptyDbTrajectoryLoadFR, mockEmptyDbTrajectoryLoadOthers],
-            //warningMessages: [],
           },
         },
       });
@@ -367,10 +358,7 @@ describe.skip('useFetchHypothesisTrajectories', () => {
   });
 
   it('should return correct hypothesis trajectory array if empty one default trajectory not linked to study', async () => {
-    vi.mocked(trajectoryService.getStudyTrajectoriesWithWarnings).mockResolvedValue({
-      trajectories: mockDbTrajectoryArrayLoad,
-      warningMessages: [],
-    });
+    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArrayLoad);
     vi.mocked(trajectoryUtils.buildDefaultEmptyTrajectoryList).mockImplementationOnce(() => [
       mockEmptyDbTrajectoryLoadFR,
       mockEmptyDbTrajectoryLoadOthers,
@@ -380,14 +368,13 @@ describe.skip('useFetchHypothesisTrajectories', () => {
     );
 
     await waitFor(() => {
-      expect(trajectoryService.getStudyTrajectoriesWithWarnings).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.LOAD);
+      expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.LOAD);
       expect(mockDispatch).toHaveBeenCalledTimes(1);
       expect(mockDispatch).toHaveBeenCalledWith({
         type: STUDY_ACTION.ADD_TRAJECTORIES,
         payload: {
           [TRAJECTORY_TYPE.LOAD]: {
             trajectories: [...mockDbTrajectoryArrayLoad, mockEmptyDbTrajectoryLoadFR, mockEmptyDbTrajectoryLoadOthers],
-            warningMessages: [],
           },
         },
       });
@@ -450,10 +437,7 @@ describe.skip('useFetchHypothesisTrajectories', () => {
     const defaultAreas = [{ name: 'FR' }, { name: 'BE' }];
     const areas = [{ areaName: 'FR' }, { areaName: 'AT' }] as TrajectoryAreaData[];
 
-    vi.mocked(trajectoryService.getStudyTrajectoriesWithWarnings).mockResolvedValue({
-      trajectories: mockDbTrajectoryArrayLoad,
-      warningMessages: [],
-    });
+    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArrayLoad);
 
     const { result } = renderHook(() => useFetchHypothesisTrajectories(5, TRAJECTORY_TYPE.LOAD, defaultAreas, areas));
 
@@ -468,10 +452,7 @@ describe.skip('useFetchHypothesisTrajectories', () => {
 
   it('should build correct dropDownListOptions from default and fetched trajectories', async () => {
     const defaultAreas = [{ name: 'FR' }];
-    vi.mocked(trajectoryService.getStudyTrajectoriesWithWarnings).mockResolvedValue({
-      trajectories: mockDbTrajectoryArrayLoad,
-      warningMessages: [],
-    });
+    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArrayLoad);
 
     const { result } = renderHook(() => useFetchHypothesisTrajectories(5, TRAJECTORY_TYPE.LOAD, defaultAreas));
 
@@ -489,10 +470,7 @@ describe.skip('useFetchHypothesisTrajectories', () => {
           ['LOAD']: { trajectories: mockEmptyDbTrajectoryArrayLoad, warningMessages: [] },
         }) as Partial<StudyState>,
     );
-    vi.mocked(trajectoryService.getStudyTrajectoriesWithWarnings).mockResolvedValue({
-      trajectories: mockDbTrajectoryArrayLoad,
-      warningMessages: [],
-    });
+    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArrayLoad);
 
     const { result } = renderHook(() =>
       useFetchHypothesisTrajectories(5, TRAJECTORY_TYPE.LOAD, defaultAreas, areas, true),
@@ -504,10 +482,7 @@ describe.skip('useFetchHypothesisTrajectories', () => {
   });
 
   it('should include ThermalOptions when trajectoryType is THERMAL_CAPACITY', async () => {
-    vi.mocked(trajectoryService.getStudyTrajectoriesWithWarnings).mockResolvedValue({
-      trajectories: mockDbTrajectoryArrayThermal,
-      warningMessages: [],
-    });
+    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArrayThermal);
     const technologiesHypothesis = ThermalOptions.map((option) => ({
       hypothesis: option,
       isDefault: true,
@@ -548,25 +523,20 @@ describe.skip('useFetchHypothesisTrajectories', () => {
     });
   });
 
-  it('should include SPECIFIC, MODULATION and COMMON lines when trajectoryType is THERMAL_TECHNICAL_SPECIFIC_PARAMETER', async () => {
-    vi.mocked(hypothesisTableService.fetchMultipleTrajectoryType).mockResolvedValueOnce({
-      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]: {
-        trajectories: mockDbTrajectoryArraySpecificThermal,
-        //warningMessages: [],
-      },
-      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER]: {
-        trajectories: [mockDbTrajectoryArrayCommonThermal],
-        //warningMessages: [],
-      },
-      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]: {
-        trajectories: [],
-        //warningMessages: [],
-      },
+  it('should include SPECIFIC, MODULATION and COMMON lines when trajectoryType is THERMAL_PARAMETER', async () => {
+    vi.mocked(hypothesisTableService.fetchTrajectoriesFromTypes).mockResolvedValueOnce({
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]: mockDbTrajectoryArraySpecificThermal,
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER]: [mockDbTrajectoryArrayCommonThermal],
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]: [],
     });
 
-    const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories(5, TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER),
-    );
+    vi.mocked(trajectoryUtils.buildDefaultEmptyTrajectoryList).mockImplementationOnce(() => [
+      mockEmptyDbTrajectorySPECIFICAT,
+      mockEmptyDbTrajectorySPECIFICBE,
+      mockEmptyDbTrajectorySpecificOthers,
+    ]);
+
+    const { result } = renderHook(() => useFetchHypothesisTrajectories(5, TRAJECTORY_TYPE.THERMAL_PARAMETER));
 
     await waitFor(() => {
       expect(result.current.hypothesisTrajectories[0]?.hypothesis).toEqual('Specific');
@@ -612,33 +582,19 @@ describe.skip('useFetchHypothesisTrajectories', () => {
   it('should not have read-only area if THERMAL_TECHNICAL_SPECIFIC_PARAMETER trajectories are set', async () => {
     const defaultAreasSpecific = [{ name: 'AT' }, { name: 'FR' }];
     const areas = [{ areaName: 'AT' }, { areaName: 'CZ' }] as TrajectoryAreaData[];
-    vi.mocked(hypothesisTableService.fetchMultipleTrajectoryType).mockResolvedValueOnce({
-      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]: {
-        trajectories: mockDbTrajectoryArraySpecificThermal,
-        //warningMessages: [],
-      },
-      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER]: {
-        trajectories: [],
-        //warningMessages: [],
-      },
-      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]: {
-        trajectories: [],
-        //warningMessages: [],
-      },
+    vi.mocked(hypothesisTableService.fetchTrajectoriesFromTypes).mockResolvedValueOnce({
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]: mockDbTrajectoryArraySpecificThermal,
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER]: [],
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]: [],
     });
     vi.mocked(trajectoryUtils.buildDefaultEmptyTrajectoryList).mockImplementationOnce(() => [
       mockEmptyDbTrajectorySPECIFICFR,
       mockEmptyDbTrajectorySPECIFICCZ,
-      mockEmptyDbTrajectoryLoadOthers,
+      mockEmptyDbTrajectorySpecificOthers,
     ]);
 
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories(
-        5,
-        TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
-        defaultAreasSpecific,
-        areas,
-      ),
+      useFetchHypothesisTrajectories(5, TRAJECTORY_TYPE.THERMAL_PARAMETER, defaultAreasSpecific, areas),
     );
 
     await waitFor(() => {
@@ -657,33 +613,19 @@ describe.skip('useFetchHypothesisTrajectories', () => {
   it('should set read-only status to default area not in area list and param modulation line if no specific trajectory', async () => {
     const defaultAreasSpecific = [{ name: 'AT' }, { name: 'FR' }];
     const areas = [{ areaName: 'AT' }, { areaName: 'CZ' }] as TrajectoryAreaData[];
-    vi.mocked(hypothesisTableService.fetchMultipleTrajectoryType).mockResolvedValueOnce({
-      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]: {
-        trajectories: [],
-        //warningMessages: [],
-      },
-      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER]: {
-        trajectories: [],
-        //warningMessages: [],
-      },
-      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]: {
-        trajectories: [],
-        //warningMessages: [],
-      },
+    vi.mocked(hypothesisTableService.fetchTrajectoriesFromTypes).mockResolvedValueOnce({
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]: [],
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER]: [],
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]: [],
     });
     vi.mocked(trajectoryUtils.buildDefaultEmptyTrajectoryList).mockImplementationOnce(() => [
       mockEmptyDbTrajectorySPECIFICFR,
       mockEmptyDbTrajectorySPECIFICCZ,
-      mockEmptyDbTrajectoryLoadOthers,
+      mockEmptyDbTrajectorySpecificOthers,
     ]);
 
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories(
-        5,
-        TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
-        defaultAreasSpecific,
-        areas,
-      ),
+      useFetchHypothesisTrajectories(5, TRAJECTORY_TYPE.THERMAL_PARAMETER, defaultAreasSpecific, areas),
     );
 
     await waitFor(() => {
@@ -694,19 +636,10 @@ describe.skip('useFetchHypothesisTrajectories', () => {
   it('should set read-only status for param modulation line if no specific param', async () => {
     const defaultAreasSpecific = [{ name: 'AT' }, { name: 'FR' }];
     const areas = [{ areaName: 'AT' }, { areaName: 'CZ' }, { areaName: 'FR' }] as TrajectoryAreaData[];
-    vi.mocked(hypothesisTableService.fetchMultipleTrajectoryType).mockResolvedValueOnce({
-      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]: {
-        trajectories: [],
-        //warningMessages: [],
-      },
-      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER]: {
-        trajectories: [],
-        //warningMessages: [],
-      },
-      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]: {
-        trajectories: [],
-        //warningMessages: [],
-      },
+    vi.mocked(hypothesisTableService.fetchTrajectoriesFromTypes).mockResolvedValueOnce({
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]: [],
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER]: [],
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]: [],
     });
     vi.mocked(trajectoryUtils.buildDefaultEmptyTrajectoryList).mockImplementationOnce(() => [
       mockEmptyDbTrajectorySPECIFICFR,
@@ -715,12 +648,7 @@ describe.skip('useFetchHypothesisTrajectories', () => {
     ]);
 
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories(
-        5,
-        TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
-        defaultAreasSpecific,
-        areas,
-      ),
+      useFetchHypothesisTrajectories(5, TRAJECTORY_TYPE.THERMAL_PARAMETER, defaultAreasSpecific, areas),
     );
 
     await waitFor(() => {

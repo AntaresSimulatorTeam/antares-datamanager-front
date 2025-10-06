@@ -26,6 +26,7 @@ import {
   getStudyTrajectoriesWithWarnings,
 } from '@/shared/services/trajectoryService.ts';
 import { convertToFSSelectionOptionType, convertToSelectionOptionType } from '@/shared/utils/formFormatter.ts';
+import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 
 export const handleTrajectoryError = (
   type: TRAJECTORY_TYPE,
@@ -136,4 +137,14 @@ export const fetchMultipleTrajectoryType = async (
     }),
   );
   return Object.fromEntries(entries) as unknown as ParamTrajectoryState;
+};
+
+export const fetchTrajectoriesFromTypes = async (id: number, types: TRAJECTORY_TYPE[]) => {
+  const resultObject: Partial<Record<TRAJECTORY_TYPE, DbTrajectory[]>> = {};
+  await Promise.all(
+    types.map(async (thermalType: TRAJECTORY_TYPE) => {
+      resultObject[thermalType] = await getStudyTrajectories(id, thermalType);
+    }),
+  );
+  return resultObject;
 };

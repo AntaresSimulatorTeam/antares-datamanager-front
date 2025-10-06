@@ -3,10 +3,10 @@ import { renderHook } from '@testing-library/react';
 import { DbTrajectory, StudyDTO, StudyState, UserState } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import * as trajectoryService from '@/shared/services/trajectoryService.ts';
+import * as studyService from '@/shared/services/studyService.ts';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
 import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
-import { mockSingleWarningMessages } from '@/mocks/data/tests/warning.mock.ts';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 
 vi.mock('@/shared/services/trajectoryService', async (importOriginal) => {
@@ -15,6 +15,14 @@ vi.mock('@/shared/services/trajectoryService', async (importOriginal) => {
     ...actual,
     getStudyTrajectoriesWithWarnings: vi.fn(),
     linkTrajectoryToStudy: vi.fn(),
+  };
+});
+
+vi.mock('@/shared/services/studyService', async (importOriginal) => {
+  const actual: Mock = await importOriginal();
+  return {
+    ...actual,
+    getStudyTrajectories: vi.fn(),
   };
 });
 
@@ -38,7 +46,7 @@ vi.mock('@/store/contexts/UserContext', async (importOriginal) => {
   };
 });
 
-describe.skip('useTrajectoryAttach', () => {
+describe('useTrajectoryAttach', () => {
   const mockDispatch = vi.fn();
   const mockSetData = vi.fn();
 
@@ -59,7 +67,6 @@ describe.skip('useTrajectoryAttach', () => {
   const studyState: Partial<StudyState> = {
     [TRAJECTORY_TYPE.LOAD]: {
       trajectories: [{ area: 'Zone A' } as DbTrajectory],
-      //warningMessages: [],
     },
   };
 
@@ -68,10 +75,7 @@ describe.skip('useTrajectoryAttach', () => {
   });
 
   it('should update existing trajectory', async () => {
-    vi.mocked(trajectoryService.getStudyTrajectoriesWithWarnings as ReturnType<typeof vi.fn>).mockResolvedValue({
-      trajectories: [newTrajectory],
-      warningMessages: [mockSingleWarningMessages],
-    });
+    vi.mocked(studyService.getStudyTrajectories as ReturnType<typeof vi.fn>).mockResolvedValue([newTrajectory]);
 
     const { result } = renderHook(() => useTrajectoryAttach(study, studyState, mockDispatch, mockSetData));
 
@@ -82,7 +86,6 @@ describe.skip('useTrajectoryAttach', () => {
       type: STUDY_ACTION.UPDATE_TRAJECTORY,
       payload: {
         trajectory: newTrajectory,
-        warningMessages: [mockSingleWarningMessages],
         status: 'success',
       },
     });
@@ -91,11 +94,7 @@ describe.skip('useTrajectoryAttach', () => {
 
   it('should add new trajectory if not already in state', async () => {
     const emptyState: Partial<StudyState> = {};
-
-    vi.mocked(trajectoryService.getStudyTrajectoriesWithWarnings).mockResolvedValue({
-      trajectories: [newTrajectory],
-      warningMessages: [],
-    });
+    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue([newTrajectory]);
 
     const { result } = renderHook(() => useTrajectoryAttach(study, emptyState, mockDispatch, mockSetData));
 
@@ -106,7 +105,6 @@ describe.skip('useTrajectoryAttach', () => {
       payload: {
         [TRAJECTORY_TYPE.LOAD]: {
           trajectories: [newTrajectory],
-          warningMessages: [],
         },
       },
     });
