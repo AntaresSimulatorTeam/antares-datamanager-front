@@ -41,15 +41,7 @@ export const useFetchHypothesisTrajectories = (
   const { t } = useTranslation();
   const emptyAreaSelected: DbTrajectory[] = useMemo(() => {
     if (trajectoryType) {
-      if (trajectoryType === TRAJECTORY_TYPE.THERMAL_PARAMETER) {
-        return (
-          studyState?.[trajectoryType]?.trajectories?.filter(
-            (trajectory) => trajectory.type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
-          ) ?? []
-        );
-      } else {
-        return studyState?.[trajectoryType]?.trajectories ?? [];
-      }
+      return studyState?.[trajectoryType]?.trajectories ?? [];
     }
     return [];
   }, [trajectoryType]);
@@ -62,7 +54,9 @@ export const useFetchHypothesisTrajectories = (
           let result: DbTrajectory[];
           let defaultEmptyAreas: DbTrajectory[];
           let arrayWithoutDuplicate: DbTrajectory[];
-          if (trajType === TRAJECTORY_TYPE.THERMAL_PARAMETER) {
+          let paraModulationTrajectory;
+          let paraCommonTrajectory;
+          if (trajType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
             const types: ThermalParamTrajectoryType[] = [
               TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
               TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER,
@@ -72,6 +66,9 @@ export const useFetchHypothesisTrajectories = (
 
             const specificAreas: DbTrajectory[] =
               resultObject?.[TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER] ?? [];
+            paraModulationTrajectory =
+              resultObject[TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]?.[0] ?? null;
+            paraCommonTrajectory = resultObject[TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER]?.[0] ?? null;
             defaultEmptyAreas =
               buildDefaultEmptyTrajectoryList(
                 TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
@@ -79,6 +76,7 @@ export const useFetchHypothesisTrajectories = (
                 defaultAreas,
               ) ?? [];
             const allAreas = specificAreas?.concat(emptyAreaSelected).concat(defaultEmptyAreas);
+
             arrayWithoutDuplicate = removeDuplicate(allAreas);
           } else {
             result = await getStudyTrajectories(id, trajType);
@@ -130,17 +128,12 @@ export const useFetchHypothesisTrajectories = (
             : [];
 
           // Hypothesis table
-          if (trajType === TRAJECTORY_TYPE.THERMAL_PARAMETER) {
-            // @ts-ignore
-            const resultToUse = { ...resultObject };
+          if (trajType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
             const specificAreaData = arrayWithoutDuplicate
               .map((trajectory) =>
                 buildRowWithSubRowsData(trajectory, defaultAreas, defaultAreaListNotIncludedInList, null),
               )
               .filter(Boolean);
-            const paraModulationTrajectory =
-              resultToUse[TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]?.[0] ?? null;
-            const paraCommonTrajectory = resultToUse[TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER]?.[0] ?? null;
             dataTrajectories = [
               {
                 hypothesis: t('thermal.@specific'),
@@ -189,11 +182,11 @@ export const useFetchHypothesisTrajectories = (
             setReadOnlyRow(rows);
           } else {
             const dataToCheck =
-              trajType === TRAJECTORY_TYPE.THERMAL_PARAMETER && dataTrajectories[0].subRows
+              trajType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER && dataTrajectories[0].subRows
                 ? dataTrajectories[0].subRows
                 : dataTrajectories;
             const readOnlyRows = retrieveReadOnlyArea(dataToCheck, defaultAreaListNotIncludedInList);
-            if (trajType === TRAJECTORY_TYPE.THERMAL_PARAMETER) {
+            if (trajType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
               const hasSpecificTrajectory = dataToCheck?.some((row) => row.status === TRAJECTORY_SELECTION_STATUS.OK);
               const readOnlySubRows = transformToSubRowKeys(readOnlyRows);
               if (!hasSpecificTrajectory) {

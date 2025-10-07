@@ -101,7 +101,6 @@ export const addRow = (
     payload: {
       [type]: {
         trajectories: [buildEmptyTrajectory(value, type)],
-        warningMessages: [],
       },
     },
   });

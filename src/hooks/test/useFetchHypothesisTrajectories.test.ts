@@ -536,7 +536,9 @@ describe('useFetchHypothesisTrajectories', () => {
       mockEmptyDbTrajectorySpecificOthers,
     ]);
 
-    const { result } = renderHook(() => useFetchHypothesisTrajectories(5, TRAJECTORY_TYPE.THERMAL_PARAMETER));
+    const { result } = renderHook(() =>
+      useFetchHypothesisTrajectories(5, TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER),
+    );
 
     await waitFor(() => {
       expect(result.current.hypothesisTrajectories[0]?.hypothesis).toEqual('Specific');
@@ -594,7 +596,12 @@ describe('useFetchHypothesisTrajectories', () => {
     ]);
 
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories(5, TRAJECTORY_TYPE.THERMAL_PARAMETER, defaultAreasSpecific, areas),
+      useFetchHypothesisTrajectories(
+        5,
+        TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+        defaultAreasSpecific,
+        areas,
+      ),
     );
 
     await waitFor(() => {
@@ -625,7 +632,12 @@ describe('useFetchHypothesisTrajectories', () => {
     ]);
 
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories(5, TRAJECTORY_TYPE.THERMAL_PARAMETER, defaultAreasSpecific, areas),
+      useFetchHypothesisTrajectories(
+        5,
+        TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+        defaultAreasSpecific,
+        areas,
+      ),
     );
 
     await waitFor(() => {
@@ -648,7 +660,12 @@ describe('useFetchHypothesisTrajectories', () => {
     ]);
 
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories(5, TRAJECTORY_TYPE.THERMAL_PARAMETER, defaultAreasSpecific, areas),
+      useFetchHypothesisTrajectories(
+        5,
+        TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+        defaultAreasSpecific,
+        areas,
+      ),
     );
 
     await waitFor(() => {
