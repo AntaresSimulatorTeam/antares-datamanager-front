@@ -181,27 +181,39 @@ describe('buildDataWarningMessage', () => {
 });
 
 describe('countWarning', () => {
-  const warningNbByType = {
-    AREA: 2,
-    LINK: 1,
-    THERMAL_CAPACITY: 0,
-    THERMAL_TECHNICAL_SPECIFIC_PARAMETER: 2,
-    THERMAL_TECHNICAL_MODULATION_PARAMETER: 1,
-  } as unknown as WarningTrajectoryType;
-
   it('returns correct count for AREA (sums AREA and LINK warnings)', () => {
-    expect(countWarning(warningNbByType, TRAJECTORY_TYPE.AREA)).toBe(3);
+    const warningNbByType = {
+      AREA: 2,
+    } as unknown as WarningTrajectoryType;
+    expect(countWarning(warningNbByType, TRAJECTORY_TYPE.AREA)).toBe(2);
   });
 
   it('returns correct count for LINK only', () => {
-    expect(countWarning(warningNbByType, TRAJECTORY_TYPE.LINK)).toBe(1);
+    const warningNbByType = {
+      AREA: 2,
+      LINK: 1,
+      THERMAL_CAPACITY: 0,
+    } as unknown as WarningTrajectoryType;
+    expect(countWarning(warningNbByType, TRAJECTORY_TYPE.AREA)).toBe(3);
   });
 
   it('returns correct count for THERMAL_CAPACITY only', () => {
+    const warningNbByType = {
+      AREA: 2,
+      LINK: 1,
+      THERMAL_CAPACITY: 0,
+      THERMAL_TECHNICAL_SPECIFIC_PARAMETER: 2,
+      THERMAL_TECHNICAL_MODULATION_PARAMETER: 1,
+    } as unknown as WarningTrajectoryType;
     expect(countWarning(warningNbByType, TRAJECTORY_TYPE.THERMAL_CAPACITY)).toBe(3);
   });
 
   it('returns 0 when warningMessages is undefined', () => {
+    const warningNbByType = {
+      AREA: 2,
+      LINK: 1,
+      THERMAL_CAPACITY: 0,
+    } as unknown as WarningTrajectoryType;
     expect(countWarning(warningNbByType, TRAJECTORY_TYPE.LOAD)).toBe(0);
   });
 });

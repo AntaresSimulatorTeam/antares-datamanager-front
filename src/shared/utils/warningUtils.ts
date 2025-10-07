@@ -103,15 +103,20 @@ export const convertDataToItem = <T>(data: T, t: (value: string) => string): Car
  * @returns {number} - The total warning count for the specified trajectory type.
  */
 export const countWarning = (warning: WarningTrajectoryType, tabName: TRAJECTORY_TYPE): number => {
+  const safeNumber = (value: unknown): number => {
+    const num = Number(value);
+    return isNaN(num) ? 0 : num;
+  };
+
   if (tabName === TRAJECTORY_TYPE.AREA) {
-    return +warning[TRAJECTORY_TYPE.AREA] + +warning[TRAJECTORY_TYPE.LINK];
+    return safeNumber(warning[TRAJECTORY_TYPE.AREA]) + safeNumber(warning[TRAJECTORY_TYPE.LINK]);
   } else if (tabName === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
     return (
-      +warning[TRAJECTORY_TYPE.THERMAL_CAPACITY] +
-      +warning[TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER] +
-      +warning[TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]
+      safeNumber(warning[TRAJECTORY_TYPE.THERMAL_CAPACITY]) +
+      safeNumber(warning[TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]) +
+      safeNumber(warning[TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER])
     );
   } else {
-    return warning[tabName] ?? 0;
+    return safeNumber(warning[tabName]);
   }
 };
