@@ -17,7 +17,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
-import { getAreaTrajectoryName, getRowDataSelected } from '@/shared/utils/trajectoryUtils.ts';
+import { generateReadOnlyIndexMap, getAreaTrajectoryName, getRowDataSelected } from '@/shared/utils/trajectoryUtils.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
@@ -56,7 +56,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const [rowToDelete, setRowToDelete] = useState<{ index: number; value?: string } | null>(null);
   const [isDeletionModalOpen, setIsDeletionModalOpen] = useState(false);
-  const [isStudyGenerated] = useState(
+  const [isStudyGenerated, setIsStudyGenerated] = useState(
     studyState.studyStatus === StudyStatus.GENERATED || study.status === StudyStatus.GENERATED,
   );
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
@@ -75,6 +75,14 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
     };
     setHypothesis();
   }, [areas, areasTrajectoryOptions, defaultAreas, dropDownListOptions, hypothesisTrajectories, readOnlyRow]);
+
+  useEffect(() => {
+    if (studyState.studyStatus === StudyStatus.GENERATED || study?.status === StudyStatus.GENERATED) {
+      setIsStudyGenerated(true);
+      const rows = generateReadOnlyIndexMap(data);
+      setReadOnly(rows);
+    }
+  }, [studyState.studyStatus, study?.status, data]);
 
   const handleSelectionChange = useCallback(
     async (value: string, isChecked?: boolean) => {
@@ -100,6 +108,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
         options={areasOptions}
         handleSelectionChange={handleSelectionChange}
         dividerPosition={defaultAreas.length}
+        disabled={isStudyGenerated}
       />
       {defaultAreas.length > 0 && (
         <PegaseHypothesisTable

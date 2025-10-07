@@ -12,6 +12,7 @@ import {
   buildDefaultEmptyTrajectoryList,
   buildRowWithSubRowsData,
   convertIntoHypothesisRowWithTechnologies,
+  generateReadOnlyIndexMap,
   removeDuplicate,
   removeDuplicateByTechnology,
   retrieveReadOnlyArea,
@@ -19,7 +20,6 @@ import {
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { sortWithFixedPosition } from '@/shared/utils/sortUtils';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
-import { getReadOnlyForGeneratedStudy } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { getDefaultAreaNotIncludedInAreaList, transformToSubRowKeys } from '@/shared/utils/hypothesisTableUtils.ts';
 import { useTranslation } from 'react-i18next';
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
@@ -177,7 +177,7 @@ export const useFetchHypothesisTrajectories = (
           setHypothesisTrajectories(dataTrajectories);
 
           if (isStudyGenerated) {
-            const rows = getReadOnlyForGeneratedStudy(dataTrajectories);
+            const rows = generateReadOnlyIndexMap(dataTrajectories);
             setReadOnlyRow(rows);
           } else {
             const dataToCheck =
@@ -188,11 +188,11 @@ export const useFetchHypothesisTrajectories = (
             if (trajType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
               const hasSpecificTrajectory = dataToCheck?.some((row) => row.status === TRAJECTORY_SELECTION_STATUS.OK);
               const readOnlySubRows = transformToSubRowKeys(readOnlyRows);
-              if (!hasSpecificTrajectory) {
+              if (hasSpecificTrajectory) {
+                setReadOnlyRow(readOnlySubRows);
+              } else {
                 const next = { ...readOnlySubRows, ['1']: true };
                 setReadOnlyRow(next);
-              } else {
-                setReadOnlyRow(readOnlySubRows);
               }
             } else {
               setReadOnlyRow(readOnlyRows);

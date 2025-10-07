@@ -370,6 +370,38 @@ export const retrieveReadOnlyArea = (rowData: HypothesisRowData[], itemsToReadOn
 };
 
 /**
+ * Generates a read-only map of index paths for a hierarchical data structure.
+ *
+ * This function creates a flattened map where each key represents the path to an item
+ * in the hierarchy (using dot notation for nesting levels), and the value is a boolean
+ * `true` indicating the presence of that item. The resulting map is immutable.
+ *
+ * @param {HypothesisRowData[]} data - The hierarchical data to process, where each item can have subRows.
+ * @returns {Readonly<Record<number, true>>} A frozen record with keys representing
+ * paths to items in the input hierarchy, and values always set to `true`.
+ */
+export const generateReadOnlyIndexMap = (data: HypothesisRowData[]): Readonly<Record<number, true>> => {
+  const indexMap: Record<string, true> = {};
+
+  function traverse(items: HypothesisRowData[], parentIndex: string = '') {
+    let i = 0;
+    for (const item of items) {
+      const currentIndex = parentIndex ? `${parentIndex}.${i}` : `${i}`;
+      indexMap[currentIndex] = true;
+
+      if (item.subRows && item.subRows.length > 0) {
+        traverse(item.subRows, currentIndex);
+      }
+
+      i += 1;
+    }
+  }
+
+  traverse(data);
+  return Object.freeze(indexMap);
+};
+
+/**
  * Add data to nested row
  * @param data
  * @param newRow

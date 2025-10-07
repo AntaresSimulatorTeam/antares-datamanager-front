@@ -112,6 +112,7 @@ const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
         options={areasOptions}
         handleSelectionChange={handleSelectionChange}
         dividerPosition={defaultAreas.length}
+        disabled={isStudyGenerated}
       />
       <PegaseHypothesisTable
         id="load-table"

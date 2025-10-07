@@ -19,7 +19,11 @@ import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableH
 import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
 import { useLocation } from 'react-router-dom';
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
-import { getAreaTrajectoryName, getTrajectoryTypeByIndex } from '@/shared/utils/trajectoryUtils.ts';
+import {
+  generateReadOnlyIndexMap,
+  getAreaTrajectoryName,
+  getTrajectoryTypeByIndex,
+} from '@/shared/utils/trajectoryUtils.ts';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { addRow, handleFetchTrajectoriesFS, handleTrajectorySearch } from '@/shared/services/hypothesisTableService.ts';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
@@ -62,7 +66,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
   const [technicalData, setTechnicalData] = useState<HypothesisRowData[]>([]);
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
   const [rowIdSelected, setRowIdSelected] = useState<string>('0');
-  const [isStudyGenerated] = useState(
+  const [isStudyGenerated, setIsStudyGenerated] = useState(
     studyState.studyStatus === StudyStatus.GENERATED || study.status === StudyStatus.GENERATED,
   );
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
@@ -95,6 +99,14 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
     const newReadOnlyRow = { ...readOnlyRow, ['1']: !hasSpecificTrajectory };
     setReadOnly(newReadOnlyRow);
   }, [technicalData]);
+
+  useEffect(() => {
+    if (studyState.studyStatus === StudyStatus.GENERATED || study?.status === StudyStatus.GENERATED) {
+      setIsStudyGenerated(true);
+      const rows = generateReadOnlyIndexMap(technicalData);
+      setReadOnly(rows);
+    }
+  }, [studyState.studyStatus, study?.status, technicalData]);
 
   const removeRow = useCallback(
     (value: string) => {
@@ -132,6 +144,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
         options={areasOptions}
         handleSelectionChange={handleSelectionChange}
         dividerPosition={defaultAreas.length}
+        disabled={isStudyGenerated}
       />
       <div className="flex w-full flex-col gap-6">
         <PegaseHypothesisTable

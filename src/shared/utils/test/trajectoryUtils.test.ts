@@ -7,6 +7,7 @@ import {
   buildRowData,
   buildRowWithSubRowsData,
   convertIntoHypothesisRowWithTechnologies,
+  generateReadOnlyIndexMap,
   getAreaTrajectoryName,
   getBgColor,
   getChildrenList,
@@ -810,7 +811,7 @@ describe('getQueryParamAreaValue', () => {
     const result = getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD, undefined as unknown as string);
     expect(result).toBe('');
   });
-  
+
   it('should remove defaultLabel from hypothesis if type is not THERMAL_CAPACITY', () => {
     const result = getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD, 'Paris');
     expect(result).toBe('Paris');
@@ -875,5 +876,68 @@ describe('convertIntoHypothesisRowWithTechnologies', () => {
     const result = convertIntoHypothesisRowWithTechnologies(data, ['ZoneD'], []);
 
     expect(result[0].subRows).toBeNull();
+  });
+});
+
+describe('generateReadOnlyIndexMap', () => {
+  it('génère un index plat sans subRows', () => {
+    const data = [{ hypothesis: 'A' }, { hypothesis: 'B' }, { hypothesis: 'C' }] as HypothesisRowData[];
+
+    const result = generateReadOnlyIndexMap(data);
+    expect(result).toEqual({
+      '0': true,
+      '1': true,
+      '2': true,
+    });
+  });
+
+  it('génère un index hiérarchique avec subRows', () => {
+    const data = [
+      {
+        hypothesis: 'Parent 1',
+        subRows: [{ hypothesis: 'Child 1' }, { hypothesis: 'Child 2' }],
+      },
+      {
+        name: 'Parent 2',
+        subRows: [{ hypothesis: 'Child 3' }],
+      },
+    ] as HypothesisRowData[];
+
+    const result = generateReadOnlyIndexMap(data);
+    expect(result).toEqual({
+      '0': true,
+      '0.0': true,
+      '0.1': true,
+      '1': true,
+      '1.0': true,
+    });
+  });
+
+  it('gère les niveaux de profondeur multiples', () => {
+    const data = [
+      {
+        hypothesis: 'Root',
+        subRows: [
+          {
+            hypothesis: 'Level 1',
+            subRows: [{ hypothesis: 'Level 2' }],
+          },
+        ],
+      },
+    ] as HypothesisRowData[];
+
+    const result = generateReadOnlyIndexMap(data);
+    expect(result).toEqual({
+      '0': true,
+      '0.0': true,
+      '0.0.0': true,
+    });
+  });
+
+  it('retourne un objet figé (readonly)', () => {
+    const data = [{ hypothesis: 'A' }] as HypothesisRowData[];
+    const result = generateReadOnlyIndexMap(data);
+
+    expect(Object.isFrozen(result)).toBe(true);
   });
 });
