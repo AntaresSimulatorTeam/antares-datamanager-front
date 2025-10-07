@@ -95,33 +95,29 @@ export const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
           getStudyById(study.id),
           getStudyTrajectories(study.id, TRAJECTORY_TYPE.AREA),
           getStudyTrajectories(study.id, TRAJECTORY_TYPE.LINK),
-          // getStudyTrajectoriesWithWarnings(study.id, TRAJECTORY_TYPE.AREA),
-          // getStudyTrajectoriesWithWarnings(study.id, TRAJECTORY_TYPE.LINK),
         ]);
-        const trajectoryArea: DbTrajectory[] | null = trajectoryAreaResult ?? null;
-        const trajectoryLink: DbTrajectory[] | null = trajectoryLinkResult ?? null;
         dispatch?.({
           type: STUDY_ACTION.ADD_TRAJECTORIES,
           payload: {
-            ...(trajectoryArea && { [TRAJECTORY_TYPE.AREA]: { trajectories: trajectoryArea } }),
-            ...(trajectoryLink && { [TRAJECTORY_TYPE.LINK]: { trajectories: trajectoryLink } }),
+            ...(trajectoryAreaResult && { [TRAJECTORY_TYPE.AREA]: { trajectories: trajectoryAreaResult } }),
+            ...(trajectoryLinkResult && { [TRAJECTORY_TYPE.LINK]: { trajectories: trajectoryLinkResult } }),
           },
         });
         setData([
           {
             hypothesis: 'Areas',
-            trajectory: trajectoryArea?.[0],
-            status: trajectoryArea ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+            trajectory: trajectoryAreaResult?.[0],
+            status: trajectoryAreaResult ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
           },
           {
             hypothesis: 'Links',
-            trajectory: trajectoryLink?.[0],
-            status: trajectoryLink ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+            trajectory: trajectoryLinkResult?.[0],
+            status: trajectoryLinkResult ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
           },
         ]);
         setReadOnly({
           '0': false,
-          '1': !trajectoryArea || (!trajectoryLink && studyData?.status === StudyStatus.GENERATED),
+          '1': !trajectoryAreaResult || (!trajectoryLinkResult && studyData?.status === StudyStatus.GENERATED),
         });
       } catch {
         //Silent handler
