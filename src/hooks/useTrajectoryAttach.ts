@@ -1,12 +1,13 @@
 import { Dispatch, SetStateAction, useCallback } from 'react';
 import { DbTrajectory, HypothesisRowData, RowStatus, StudyActionType, StudyDTO, StudyState } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { getStudyTrajectoriesWithWarnings, linkTrajectoryToStudy } from '@/shared/services/trajectoryService.ts';
+import { linkTrajectoryToStudy } from '@/shared/services/trajectoryService.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.ts';
 import { setNestedData } from '@/shared/utils/trajectoryUtils.ts';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { useTranslation } from 'react-i18next';
+import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 
 export const useTrajectoryAttach = (
   study: StudyDTO,
@@ -21,8 +22,8 @@ export const useTrajectoryAttach = (
     async (type: TRAJECTORY_TYPE, indexArray: number[], status: RowStatus, trajectory: DbTrajectory): Promise<void> => {
       try {
         await linkTrajectoryToStudy(type, trajectory.id, study.id);
-        const result = await getStudyTrajectoriesWithWarnings(study.id, type);
-        const newDbTrajectory = result?.trajectories?.find((dbTrajectory) => dbTrajectory.id === trajectory.id);
+        const result = await getStudyTrajectories(study.id, type);
+        const newDbTrajectory = result?.find((dbTrajectory) => dbTrajectory.id === trajectory.id);
 
         if (newDbTrajectory) {
           const alreadyExists = studyState[newDbTrajectory.type]?.trajectories?.some(
@@ -34,7 +35,6 @@ export const useTrajectoryAttach = (
               type: STUDY_ACTION.UPDATE_TRAJECTORY,
               payload: {
                 trajectory: newDbTrajectory,
-                warningMessages: result.warningMessages,
                 status,
               },
             });
@@ -44,7 +44,6 @@ export const useTrajectoryAttach = (
               payload: {
                 [type]: {
                   trajectories: [newDbTrajectory],
-                  warningMessages: result.warningMessages,
                 },
               },
             });

@@ -1,6 +1,5 @@
 import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter.ts';
 import { RdsIcon, RdsIconId, RdsTextTooltip } from 'rte-design-system-react';
-import { useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { CardDataType } from '@/shared/types';
 import { ButtonWithStdIcon } from '@/components/button/ButtonWithStdIcon.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
@@ -12,8 +11,6 @@ interface CardWithIconTitleProps {
 }
 
 export const CardWithIconTitle = ({ data, size, transform }: CardWithIconTitleProps) => {
-  const dispatch = useStudyDispatch();
-
   const getButtonWithIcon = () => (
     <ButtonWithStdIcon
       label={data.buttonLabel}
@@ -24,8 +21,8 @@ export const CardWithIconTitle = ({ data, size, transform }: CardWithIconTitlePr
       variant="outlined"
       disabled={data.isAck}
       onClick={() => {
-        if (data.id != null && data.onClickItem && dispatch) {
-          void data.onClickItem?.(data.id, data.trajectoryType, data.studyId, dispatch);
+        if (data.id != null) {
+          void data.onClickItem?.(data.id);
         }
       }}
     />

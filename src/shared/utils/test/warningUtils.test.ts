@@ -3,8 +3,8 @@ import { WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
 import { mockDataMessage, mockWarningMessages, mockWarningMessagesWithTwo } from '@/mocks/data/tests/warning.mock.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
-import { discardWarningMessage } from '@/shared/services/messagesWarningService.ts';
 import { WarningTrajectoryType } from '@/shared/types';
+import { skipMessage } from '@/shared/services/warningService.ts';
 
 describe('sortByLevel', () => {
   it('should sort messages according to the level priority', () => {
@@ -144,44 +144,64 @@ describe('convertDataToItem', () => {
 
 describe('buildDataWarningMessage', () => {
   it('should return enriched messages when isNotGenerated is true', () => {
-    const result = buildDataWarningMessage(mockWarningMessagesWithTwo, TRAJECTORY_TYPE.AREA, true, 123);
+    const result = buildDataWarningMessage(mockWarningMessagesWithTwo, TRAJECTORY_TYPE.AREA, true, 123, skipMessage);
 
     expect(result).toHaveLength(2);
     expect(result[0]).toEqual({
       ...mockWarningMessagesWithTwo[0],
       trajectoryType: TRAJECTORY_TYPE.AREA,
-      onClickItem: discardWarningMessage,
+      onClickItem: skipMessage,
       studyId: 123,
     });
-    expect(result[1].onClickItem).toBe(discardWarningMessage);
+    expect(result[1].onClickItem).toBe(skipMessage);
   });
 
   it('should return messages with onClickItem set to null when isNotGenerated is false', () => {
-    const result = buildDataWarningMessage(mockWarningMessagesWithTwo, TRAJECTORY_TYPE.LOAD, false, 123);
+    const result = buildDataWarningMessage(mockWarningMessagesWithTwo, TRAJECTORY_TYPE.LOAD, false, 123, skipMessage);
 
     expect(result.every((msg) => msg.onClickItem === null)).toBe(true);
   });
 
   it('should return empty array when messages is an empty array', () => {
-    const result = buildDataWarningMessage([], TRAJECTORY_TYPE.AREA, true, 123);
+    const result = buildDataWarningMessage([], TRAJECTORY_TYPE.AREA, true, 123, skipMessage);
     expect(result).toEqual([]);
   });
 });
 
 describe('countWarning', () => {
-  const warningNbByType = {
-    AREA: 2,
-    LINK: 1,
-  } as unknown as WarningTrajectoryType;
   it('returns correct count for AREA (sums AREA and LINK warnings)', () => {
-    expect(countWarning(warningNbByType, TRAJECTORY_TYPE.AREA)).toBe(3);
+    const warningNbByType = {
+      AREA: 2,
+    } as unknown as WarningTrajectoryType;
+    expect(countWarning(warningNbByType, TRAJECTORY_TYPE.AREA)).toBe(2);
   });
 
   it('returns correct count for LINK only', () => {
-    expect(countWarning(warningNbByType, TRAJECTORY_TYPE.LINK)).toBe(1);
+    const warningNbByType = {
+      AREA: 2,
+      LINK: 1,
+      THERMAL_CAPACITY: 0,
+    } as unknown as WarningTrajectoryType;
+    expect(countWarning(warningNbByType, TRAJECTORY_TYPE.AREA)).toBe(3);
+  });
+
+  it('returns correct count for THERMAL_CAPACITY only', () => {
+    const warningNbByType = {
+      AREA: 2,
+      LINK: 1,
+      THERMAL_CAPACITY: 0,
+      THERMAL_TECHNICAL_SPECIFIC_PARAMETER: 2,
+      THERMAL_TECHNICAL_MODULATION_PARAMETER: 1,
+    } as unknown as WarningTrajectoryType;
+    expect(countWarning(warningNbByType, TRAJECTORY_TYPE.THERMAL_CAPACITY)).toBe(3);
   });
 
   it('returns 0 when warningMessages is undefined', () => {
+    const warningNbByType = {
+      AREA: 2,
+      LINK: 1,
+      THERMAL_CAPACITY: 0,
+    } as unknown as WarningTrajectoryType;
     expect(countWarning(warningNbByType, TRAJECTORY_TYPE.LOAD)).toBe(0);
   });
 });

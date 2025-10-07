@@ -2,7 +2,6 @@ import { Dispatch, SetStateAction, useCallback } from 'react';
 import { DbTrajectory, HypothesisRowData, RowStatus, StudyActionType, StudyDTO } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { unlinkTrajectoryFromStudy } from '@/shared/services/trajectoryService.ts';
-import { fetchWarningMessagesFromType } from '@/shared/services/warningService.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { setNestedData } from '@/shared/utils/trajectoryUtils.ts';
 import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.ts';
@@ -32,11 +31,9 @@ export const useTrajectoryDetach = (
           await unlinkTrajectoryFromStudy(trajectorySelected.id, study.id);
         }
 
-        const warningMessages = await fetchWarningMessagesFromType(type, study.id);
-
         dispatch?.({
           type: STUDY_ACTION.UPDATE_TRAJECTORY,
-          payload: { trajectory: trajectorySelected, warningMessages, status },
+          payload: { trajectory: trajectorySelected, status },
         });
 
         const newEmptyTrajectory: Pick<HypothesisRowData, 'trajectory' | 'status'> = {

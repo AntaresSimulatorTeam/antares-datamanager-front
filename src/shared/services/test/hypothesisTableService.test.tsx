@@ -449,7 +449,6 @@ describe('addRow', () => {
               state: TRAJECTORY_SELECTION_STATUS.MISSING,
             },
           ],
-          warningMessages: [],
         },
       },
     });

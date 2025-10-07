@@ -25,7 +25,7 @@ import {
   FsTrajectory,
   TRAJECTORY_DATA_TYPE,
   TrajectoryBackendError,
-  TrajectoryState,
+  TrajectoryStateWithWarningMessages,
   Types,
   WarningMessage,
 } from '@/shared/types';
@@ -308,13 +308,13 @@ export const getNbMessagesFromTrajectoryType = async (
  * @param {number} studyId - Study id
  * @param {TRAJECTORY_TYPE} trajectoryType - Trajectory type
  *
- * @return {Promise<{trajectories: DbTrajectory[], warningMessages: WarningMessage[]}>} Array of trajectories (data base trajectories)
+ * @return {Promise<TrajectoryStateWithWarningMessages>} Array of trajectories (data base trajectories)
  * @throws {Error}
  */
 export const getStudyTrajectoriesWithWarnings = async (
   studyId: number,
   trajectoryType?: TRAJECTORY_TYPE,
-): Promise<TrajectoryState> => {
+): Promise<TrajectoryStateWithWarningMessages> => {
   try {
     const trajectories: DbTrajectory[] = await getStudyTrajectories(studyId, trajectoryType);
     let warningMessages: WarningMessage[] = [];

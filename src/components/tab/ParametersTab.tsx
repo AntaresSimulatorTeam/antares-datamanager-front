@@ -120,11 +120,9 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
           setCheckedValues,
           setTechnicalData,
         );
-      } else {
-        removeRow(value);
       }
     },
-    [dispatch, removeRow, setCheckedValues, setTechnicalData],
+    [dispatch],
   );
 
   return (

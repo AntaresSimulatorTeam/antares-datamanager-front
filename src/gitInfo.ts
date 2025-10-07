@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "fix/police",
-  commit: "9421c77a",
-  commitTime: "2025-10-02T13:50:09.697Z"
+  branch: "feat/ANT-3936_thermal_display_warnings",
+  commit: "946d83de",
+  commitTime: "2025-10-07T12:09:28.673Z"
 };

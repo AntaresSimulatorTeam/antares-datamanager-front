@@ -20,7 +20,7 @@ import { DetailsContent } from '@/components/banner/DetailsContent.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { ContainerWithExpander } from '@/components/banner/ContainerWithExpander.tsx';
-import { getWarningMessages } from '@/shared/helpers/warningMessagesHelper.ts';
+import { useFetchWarningMessages } from '@/hooks/useFetchWarningMessages.ts';
 
 interface StudyState {
   study: StudyDTO;
@@ -42,6 +42,7 @@ const StudyDetails = () => {
     isDisabled: false,
   });
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const { warningMessages } = useFetchWarningMessages(study.id, activeTab.name);
 
   const handleGenerateStudy = async () => {
     try {
@@ -79,10 +80,7 @@ const StudyDetails = () => {
         </div>
         <div className="relative flex flex-1 flex-col overflow-y-auto px-4">
           <div className="flex h-full w-full flex-col gap-4">
-            <ContainerWithExpander
-              content={getWarningMessages(studyState, activeTab.name, study.id)}
-              placeholder={t('studyDetails.@noWarnings')}
-            />
+            <ContainerWithExpander content={warningMessages} placeholder={t('studyDetails.@noWarnings')} />
             <div className="flex h-screen w-full">{activeContent}</div>
           </div>
           <div className="fixed bottom-0 right-0 w-full border-t bg-gray-w px-1 py-1.5">

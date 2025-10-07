@@ -5,12 +5,9 @@ import {
   CheckBoxData,
   DbTrajectory,
   HypothesisRowData,
-  ParamTrajectoryState,
   ThermalParamTrajectoryType,
   TrajectoryAreaData,
-  TrajectoryState,
 } from '@/shared/types';
-import { getStudyTrajectoriesWithWarnings } from '@/shared/services/trajectoryService';
 import {
   buildDefaultEmptyTrajectoryList,
   buildRowWithSubRowsData,
@@ -25,7 +22,8 @@ import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { getReadOnlyForGeneratedStudy } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { getDefaultAreaNotIncludedInAreaList, transformToSubRowKeys } from '@/shared/utils/hypothesisTableUtils.ts';
 import { useTranslation } from 'react-i18next';
-import { fetchMultipleTrajectoryType } from '@/shared/services/hypothesisTableService.ts';
+import { getStudyTrajectories } from '@/shared/services/studyService.ts';
+import { fetchTrajectoriesFromTypes } from '@/shared/services/hypothesisTableService.ts';
 
 export const useFetchHypothesisTrajectories = (
   studyId?: number,
@@ -41,51 +39,64 @@ export const useFetchHypothesisTrajectories = (
   const studyState = useStudy();
   const dispatch = useStudyDispatch();
   const { t } = useTranslation();
-  const emptyAreaSelected = useMemo(
-    () => (trajectoryType ? (studyState?.[trajectoryType]?.trajectories ?? []) : []),
-    [trajectoryType],
-  );
+  const emptyAreaSelected: DbTrajectory[] = useMemo(() => {
+    if (trajectoryType) {
+      return studyState?.[trajectoryType]?.trajectories ?? [];
+    }
+    return [];
+  }, [trajectoryType]);
 
   const fetchAreas = useCallback(
-    async (id?: number, type?: TRAJECTORY_TYPE) => {
+    async (id?: number, trajType?: TRAJECTORY_TYPE) => {
+      let resultObject: Partial<Record<ThermalParamTrajectoryType, DbTrajectory[]>>;
       try {
-        if (id != null && type) {
-          let result: TrajectoryState | ParamTrajectoryState;
+        if (id != null && trajType) {
+          let result: DbTrajectory[];
           let defaultEmptyAreas: DbTrajectory[];
           let arrayWithoutDuplicate: DbTrajectory[];
-          if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
+          let paraModulationTrajectory;
+          let paraCommonTrajectory;
+          if (trajType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
             const types: ThermalParamTrajectoryType[] = [
               TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
               TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER,
               TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER,
             ];
-            result = await fetchMultipleTrajectoryType(id, types);
+            resultObject = await fetchTrajectoriesFromTypes(id, types);
 
-            const specificAreas: DbTrajectory[] = result?.[type]?.trajectories;
-            defaultEmptyAreas = buildDefaultEmptyTrajectoryList(type, specificAreas, defaultAreas) ?? [];
+            const specificAreas: DbTrajectory[] =
+              resultObject?.[TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER] ?? [];
+            paraModulationTrajectory =
+              resultObject[TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]?.[0] ?? null;
+            paraCommonTrajectory = resultObject[TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER]?.[0] ?? null;
+            defaultEmptyAreas =
+              buildDefaultEmptyTrajectoryList(
+                TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+                specificAreas,
+                defaultAreas,
+              ) ?? [];
             const allAreas = specificAreas?.concat(emptyAreaSelected).concat(defaultEmptyAreas);
+
             arrayWithoutDuplicate = removeDuplicate(allAreas);
           } else {
-            result = await getStudyTrajectoriesWithWarnings(id, type);
+            result = await getStudyTrajectories(id, trajType);
             // Build default empty areas (default area not linked to a trajectory)
-            defaultEmptyAreas = buildDefaultEmptyTrajectoryList(type, result?.trajectories, defaultAreas);
-            const allAreas = result?.trajectories?.concat(emptyAreaSelected).concat(defaultEmptyAreas);
+            defaultEmptyAreas = buildDefaultEmptyTrajectoryList(trajType, result, defaultAreas);
+            const allAreas = result?.concat(emptyAreaSelected).concat(defaultEmptyAreas);
 
             arrayWithoutDuplicate =
-              type === TRAJECTORY_TYPE.THERMAL_CAPACITY
+              trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY
                 ? removeDuplicateByTechnology(allAreas)
                 : removeDuplicate(allAreas);
-
-            dispatch?.({
-              type: STUDY_ACTION.ADD_TRAJECTORIES,
-              payload: {
-                [type]: {
-                  trajectories: arrayWithoutDuplicate,
-                  warningMessages: result?.warningMessages,
-                },
-              },
-            });
           }
+          dispatch?.({
+            type: STUDY_ACTION.ADD_TRAJECTORIES,
+            payload: {
+              [trajType]: {
+                trajectories: arrayWithoutDuplicate,
+              },
+            },
+          });
 
           // Build checklist for dropdown list
           const newArea = (areas || [])
@@ -116,20 +127,12 @@ export const useFetchHypothesisTrajectories = (
             : [];
 
           // Hypothesis table
-          if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
+          if (trajType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
             const specificAreaData = arrayWithoutDuplicate
               .map((trajectory) =>
                 buildRowWithSubRowsData(trajectory, defaultAreas, defaultAreaListNotIncludedInList, null),
               )
               .filter(Boolean);
-
-            const paraModulationTrajectory = (result as ParamTrajectoryState)?.[
-              TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER
-            ].trajectories?.[0];
-            const paraCommonTrajectory = (result as ParamTrajectoryState)?.[
-              TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER
-            ].trajectories?.[0];
-
             dataTrajectories = [
               {
                 hypothesis: t('thermal.@specific'),
@@ -158,7 +161,7 @@ export const useFetchHypothesisTrajectories = (
             ];
           } else {
             const areaData =
-              type === TRAJECTORY_TYPE.THERMAL_CAPACITY
+              trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY
                 ? convertIntoHypothesisRowWithTechnologies(
                     arrayWithoutDuplicate,
                     defaultAreaListNotIncludedInList,
@@ -178,11 +181,11 @@ export const useFetchHypothesisTrajectories = (
             setReadOnlyRow(rows);
           } else {
             const dataToCheck =
-              type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER && dataTrajectories[0].subRows
+              trajType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER && dataTrajectories[0].subRows
                 ? dataTrajectories[0].subRows
                 : dataTrajectories;
             const readOnlyRows = retrieveReadOnlyArea(dataToCheck, defaultAreaListNotIncludedInList);
-            if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
+            if (trajType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
               const hasSpecificTrajectory = dataToCheck?.some((row) => row.status === TRAJECTORY_SELECTION_STATUS.OK);
               const readOnlySubRows = transformToSubRowKeys(readOnlyRows);
               if (!hasSpecificTrajectory) {

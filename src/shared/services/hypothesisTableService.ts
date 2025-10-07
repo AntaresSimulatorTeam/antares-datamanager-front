@@ -26,6 +26,7 @@ import {
   getStudyTrajectoriesWithWarnings,
 } from '@/shared/services/trajectoryService.ts';
 import { convertToFSSelectionOptionType, convertToSelectionOptionType } from '@/shared/utils/formFormatter.ts';
+import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 
 export const handleTrajectoryError = (
   type: TRAJECTORY_TYPE,
@@ -88,6 +89,17 @@ export const handleTrajectorySearch = async (
   }
 };
 
+/**
+ * Updates the application state by adding a new trajectory row and handling associated logic.
+ *
+ * @param {TRAJECTORY_TYPE} type - The type of trajectory to be added. Used to determine the structure of the row and sub-rows.
+ * @param {string} value - The value associated with the new trajectory. Typically used for unique identification.
+ * @param {Dispatch<StudyActionType> | null} dispatch - Dispatch function to update the study state. If null, the dispatch operation is skipped.
+ * @param {Dispatch<SetStateAction<string[]>>} setCheckedValues - State update function for maintaining the checked values in the UI.
+ * @param {Dispatch<SetStateAction<HypothesisRowData[]>>} setData - State update function for maintaining the overall row data structure.
+ *
+ * @returns {void}
+ */
 export const addRow = (
   type: TRAJECTORY_TYPE,
   value: string,
@@ -100,7 +112,6 @@ export const addRow = (
     payload: {
       [type]: {
         trajectories: [buildEmptyTrajectory(value, type)],
-        warningMessages: [],
       },
     },
   });
@@ -135,5 +146,27 @@ export const fetchMultipleTrajectoryType = async (
       return [type, result] as const;
     }),
   );
-  return Object.fromEntries(entries) as ParamTrajectoryState;
+  return Object.fromEntries(entries) as unknown as ParamTrajectoryState;
+};
+
+/**
+ * Fetches trajectories for a given study ID and a list of trajectory types.
+ *
+ * This asynchronous function retrieves trajectory data for the specified trajectory types
+ * and study ID. The results are returned in an object where each key corresponds to a
+ * trajectory type, and the value is an array of database trajectory objects associated
+ * with that type.
+ *
+ * @param {number} id - The unique identifier for the study.
+ * @param {TRAJECTORY_TYPE[]} types - An array of trajectory types to fetch trajectories for.
+ * @returns {Promise<Partial<Record<TRAJECTORY_TYPE, DbTrajectory[]>>>} A promise resolving to an object that maps trajectory types to their respective array of database trajectories.
+ */
+export const fetchTrajectoriesFromTypes = async (id: number, types: TRAJECTORY_TYPE[]) => {
+  const resultObject: Partial<Record<TRAJECTORY_TYPE, DbTrajectory[]>> = {};
+  await Promise.all(
+    types.map(async (thermalType: TRAJECTORY_TYPE) => {
+      resultObject[thermalType] = await getStudyTrajectories(id, thermalType);
+    }),
+  );
+  return resultObject;
 };

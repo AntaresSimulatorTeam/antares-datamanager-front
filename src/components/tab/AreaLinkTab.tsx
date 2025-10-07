@@ -39,7 +39,7 @@ import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { buildErrorTrajectory, getStatus } from '@/shared/utils/trajectoryUtils.ts';
-import { getStudyById } from '@/shared/services/studyService.ts';
+import { getStudyById, getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { TrajectoryDataVisualisation } from '@common/modal/TrajectoryDataVisualisation.tsx';
 import { generateTrajectoryViewHeader } from '@/components/header/TrajectoryViewHeader.tsx';
 import { useLocation } from 'react-router-dom';
@@ -86,40 +86,35 @@ export const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
 
   useEffect(() => {
     const getTrajectories = async () => {
-      let trajectoryAreaResult;
-      let trajectoryLinkResult;
-      let studyData;
       try {
         setErrorMessage('');
-        [studyData, trajectoryAreaResult, trajectoryLinkResult] = await Promise.all([
+        const [studyData, trajectoryAreaResult, trajectoryLinkResult] = await Promise.all([
           getStudyById(study.id),
-          getStudyTrajectoriesWithWarnings(study.id, TRAJECTORY_TYPE.AREA),
-          getStudyTrajectoriesWithWarnings(study.id, TRAJECTORY_TYPE.LINK),
+          getStudyTrajectories(study.id, TRAJECTORY_TYPE.AREA),
+          getStudyTrajectories(study.id, TRAJECTORY_TYPE.LINK),
         ]);
-        const trajectoryArea: DbTrajectory | null = trajectoryAreaResult?.trajectories[0] ?? null;
-        const trajectoryLink: DbTrajectory | null = trajectoryLinkResult?.trajectories[0] ?? null;
         dispatch?.({
           type: STUDY_ACTION.ADD_TRAJECTORIES,
           payload: {
-            ...(trajectoryArea && { [TRAJECTORY_TYPE.AREA]: trajectoryAreaResult }),
-            ...(trajectoryLink && { [TRAJECTORY_TYPE.LINK]: trajectoryLinkResult }),
+            ...(trajectoryAreaResult && { [TRAJECTORY_TYPE.AREA]: { trajectories: trajectoryAreaResult } }),
+            ...(trajectoryLinkResult && { [TRAJECTORY_TYPE.LINK]: { trajectories: trajectoryLinkResult } }),
           },
         });
-        setData([
-          {
-            hypothesis: 'Areas',
-            trajectory: trajectoryArea,
-            status: trajectoryArea ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
-          },
-          {
-            hypothesis: 'Links',
-            trajectory: trajectoryLink,
-            status: trajectoryLink ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
-          },
-        ]);
+        const trajectoryResult = [
+          { label: 'Areas', result: trajectoryAreaResult },
+          { label: 'Links', result: trajectoryLinkResult },
+        ];
+
+        setData(
+          trajectoryResult.map(({ label, result }) => ({
+            hypothesis: label,
+            trajectory: result?.[0],
+            status: result ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+          })),
+        );
         setReadOnly({
           '0': false,
-          '1': !trajectoryArea || (!trajectoryLink && studyData?.status === StudyStatus.GENERATED),
+          '1': !trajectoryAreaResult || (!trajectoryLinkResult && studyData?.status === StudyStatus.GENERATED),
         });
       } catch {
         //Silent handler

@@ -30,6 +30,10 @@ export interface PaginatedResponse<T> {
 
 export type TrajectoryState = {
   trajectories: DbTrajectory[];
+};
+
+export type TrajectoryStateWithWarningMessages = {
+  trajectories: DbTrajectory[];
   warningMessages: WarningMessage[];
 };
 
@@ -38,6 +42,8 @@ export type StudyTrajectoriesData = {
 };
 export type StudyState = StudyTrajectoriesData & {
   studyStatus?: StudyStatus;
+  discardActionTriggered?: boolean;
+  discardWarningMessage?: (id: number) => Promise<void>;
 };
 
 export type StudyActionType =
@@ -53,12 +59,12 @@ export type StudyActionType =
   | { type: STUDY_ACTION.DELETE_TRAJECTORY; payload: { area: string; type: TRAJECTORY_TYPE } }
   | {
       type: STUDY_ACTION.UPDATE_TRAJECTORY;
-      payload: { trajectory: DbTrajectory; warningMessages: WarningMessage[]; status: RowStatus };
+      payload: { trajectory: DbTrajectory; status: RowStatus };
     }
   | { type: STUDY_ACTION.SET_STUDY_STATUS; payload: StudyStatus }
   | {
       type: STUDY_ACTION.SKIP_MESSAGE;
-      payload: { trajectoryType: TRAJECTORY_TYPE; warningMessages: WarningMessage[] };
+      payload: { discardActionTriggered: boolean };
     }
   | { type: STUDY_ACTION.RESET_STUDY_STATE };
 
