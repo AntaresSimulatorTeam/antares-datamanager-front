@@ -33,7 +33,7 @@ export const useFetchWarningMessages = (studyId: number, type: TRAJECTORY_TYPE) 
             id,
             studyState.discardWarningMessage ?? null,
           );
-          setWarningMessages(dataWarningMessageArea.concat(dataWarningMessageLink));
+          setWarningMessages([...dataWarningMessageArea, ...dataWarningMessageLink]);
         } else if (trajectoryType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
           const warningParameters: WarningMessage[] = (
             await Promise.all(

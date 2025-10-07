@@ -86,12 +86,9 @@ export const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
 
   useEffect(() => {
     const getTrajectories = async () => {
-      let trajectoryAreaResult;
-      let trajectoryLinkResult;
-      let studyData;
       try {
         setErrorMessage('');
-        [studyData, trajectoryAreaResult, trajectoryLinkResult] = await Promise.all([
+        const [studyData, trajectoryAreaResult, trajectoryLinkResult] = await Promise.all([
           getStudyById(study.id),
           getStudyTrajectories(study.id, TRAJECTORY_TYPE.AREA),
           getStudyTrajectories(study.id, TRAJECTORY_TYPE.LINK),
@@ -103,18 +100,18 @@ export const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
             ...(trajectoryLinkResult && { [TRAJECTORY_TYPE.LINK]: { trajectories: trajectoryLinkResult } }),
           },
         });
-        setData([
-          {
-            hypothesis: 'Areas',
-            trajectory: trajectoryAreaResult?.[0],
-            status: trajectoryAreaResult ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
-          },
-          {
-            hypothesis: 'Links',
-            trajectory: trajectoryLinkResult?.[0],
-            status: trajectoryLinkResult ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
-          },
-        ]);
+        const trajectoryResult = [
+          { label: 'Areas', result: trajectoryAreaResult },
+          { label: 'Links', result: trajectoryLinkResult },
+        ];
+
+        setData(
+          trajectoryResult.map(({ label, result }) => ({
+            hypothesis: label,
+            trajectory: result?.[0],
+            status: result ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+          })),
+        );
         setReadOnly({
           '0': false,
           '1': !trajectoryAreaResult || (!trajectoryLinkResult && studyData?.status === StudyStatus.GENERATED),
