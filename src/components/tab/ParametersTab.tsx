@@ -112,7 +112,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
 
   const handleSelectionChange = useCallback(
     (value: string, isChecked: boolean) => {
-      if (isChecked)
+      if (isChecked) {
         addRow(
           TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
           value,
@@ -120,6 +120,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
           setCheckedValues,
           setTechnicalData,
         );
+      }
     },
     [dispatch],
   );
