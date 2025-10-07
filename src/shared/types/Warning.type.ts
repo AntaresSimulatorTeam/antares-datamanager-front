@@ -20,7 +20,7 @@ export interface WarningMessage {
 export interface DataWarningMessage extends WarningMessage {
   studyId: number;
   trajectoryType: TRAJECTORY_TYPE;
-  onClickItem: ((id: number, trajectoryType: TRAJECTORY_TYPE, studyId: number) => Promise<void>) | null;
+  onClickItem: ((id: number) => Promise<void>) | null;
 }
 
 export interface CardDataType

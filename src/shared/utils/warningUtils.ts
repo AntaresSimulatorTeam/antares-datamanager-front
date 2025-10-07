@@ -42,7 +42,7 @@ export const buildDataWarningMessage = (
   tabName: TRAJECTORY_TYPE,
   isNotGenerated: boolean,
   studyId: number,
-  handleClickItem: ((id: number, trajectoryType: TRAJECTORY_TYPE, studyId: number) => Promise<void>) | null,
+  handleClickItem: ((id: number) => Promise<void>) | null,
 ): DataWarningMessage[] =>
   (messages || []).map((message: WarningMessage) => ({
     ...message,

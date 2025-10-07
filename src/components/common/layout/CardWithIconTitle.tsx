@@ -21,7 +21,7 @@ export const CardWithIconTitle = ({ data, size, transform }: CardWithIconTitlePr
       variant="outlined"
       disabled={data.isAck}
       onClick={() => {
-        if (data.id != null && data.onClickItem) {
+        if (data.id != null) {
           void data.onClickItem?.(data.id);
         }
       }}
