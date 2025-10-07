@@ -88,16 +88,15 @@ export const useFetchHypothesisTrajectories = (
               trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY
                 ? removeDuplicateByTechnology(allAreas)
                 : removeDuplicate(allAreas);
-
-            dispatch?.({
-              type: STUDY_ACTION.ADD_TRAJECTORIES,
-              payload: {
-                [trajType]: {
-                  trajectories: arrayWithoutDuplicate,
-                },
-              },
-            });
           }
+          dispatch?.({
+            type: STUDY_ACTION.ADD_TRAJECTORIES,
+            payload: {
+              [trajType]: {
+                trajectories: arrayWithoutDuplicate,
+              },
+            },
+          });
 
           // Build checklist for dropdown list
           const newArea = (areas || [])
