@@ -4,7 +4,7 @@ import { mockDataMessage, mockWarningMessages, mockWarningMessagesWithTwo } from
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { WarningTrajectoryType } from '@/shared/types';
-import { discardWarningMessage } from '@/shared/services/messagesWarningService.ts';
+import { skipMessage } from '@/shared/services/warningService.ts';
 
 describe('sortByLevel', () => {
   it('should sort messages according to the level priority', () => {
@@ -144,38 +144,26 @@ describe('convertDataToItem', () => {
 
 describe('buildDataWarningMessage', () => {
   it('should return enriched messages when isNotGenerated is true', () => {
-    const result = buildDataWarningMessage(
-      mockWarningMessagesWithTwo,
-      TRAJECTORY_TYPE.AREA,
-      true,
-      123,
-      discardWarningMessage,
-    );
+    const result = buildDataWarningMessage(mockWarningMessagesWithTwo, TRAJECTORY_TYPE.AREA, true, 123, skipMessage);
 
     expect(result).toHaveLength(2);
     expect(result[0]).toEqual({
       ...mockWarningMessagesWithTwo[0],
       trajectoryType: TRAJECTORY_TYPE.AREA,
-      onClickItem: discardWarningMessage,
+      onClickItem: skipMessage,
       studyId: 123,
     });
-    expect(result[1].onClickItem).toBe(discardWarningMessage);
+    expect(result[1].onClickItem).toBe(skipMessage);
   });
 
   it('should return messages with onClickItem set to null when isNotGenerated is false', () => {
-    const result = buildDataWarningMessage(
-      mockWarningMessagesWithTwo,
-      TRAJECTORY_TYPE.LOAD,
-      false,
-      123,
-      discardWarningMessage,
-    );
+    const result = buildDataWarningMessage(mockWarningMessagesWithTwo, TRAJECTORY_TYPE.LOAD, false, 123, skipMessage);
 
     expect(result.every((msg) => msg.onClickItem === null)).toBe(true);
   });
 
   it('should return empty array when messages is an empty array', () => {
-    const result = buildDataWarningMessage([], TRAJECTORY_TYPE.AREA, true, 123, discardWarningMessage);
+    const result = buildDataWarningMessage([], TRAJECTORY_TYPE.AREA, true, 123, skipMessage);
     expect(result).toEqual([]);
   });
 });
