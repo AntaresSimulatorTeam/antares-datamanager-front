@@ -16,7 +16,7 @@ import { BackendError } from '@/shared/types';
  * @returns {Promise<ProjectInfo[]>} - Promise object that represents a list of projects
  */
 export const fetchPinnedProjects = async (userId: string | undefined): Promise<ProjectInfo[]> => {
-  const apiUrl = `${PROJECT_PINNED_ENDPOINT}?userId=${userId}`;
+  const apiUrl = `${PROJECT_PINNED_ENDPOINT}?userId=${userId ?? 'unknown_user'}`;
   try {
     const response = await AuthService.authFetch(apiUrl);
     const json = (await (response as Response).json()) as Partial<ProjectInfo>[];
@@ -41,7 +41,7 @@ export const fetchPinnedProjects = async (userId: string | undefined): Promise<P
  */
 
 export const pinProject = async (projectId: string, userId: string | undefined): Promise<ProjectInfo> => {
-  const apiUrl = `${PROJECT_PIN_ENDPOINT}?userId=${userId}&projectId=${projectId}`;
+  const apiUrl = `${PROJECT_PIN_ENDPOINT}?userId=${userId ?? 'unknown_user'}&projectId=${projectId}`;
   try {
     const response = await AuthService.authFetch(apiUrl, {
       method: 'POST',
@@ -62,7 +62,7 @@ export const pinProject = async (projectId: string, userId: string | undefined):
  * @param {string | undefined} userId
  */
 export const unpinProject = async (projectId: string, userId: string | undefined): Promise<void> => {
-  const apiUrl = `${PROJECT_UNPIN_ENDPOINT}?userId=${userId}&projectId=${projectId}`;
+  const apiUrl = `${PROJECT_UNPIN_ENDPOINT}?userId=${userId ?? 'unknown_user'}&projectId=${projectId}`;
 
   try {
     await AuthService.authFetch(apiUrl, {
