@@ -39,12 +39,6 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
   const [studyName, setStudyName] = useState<string>(study?.name.substring(0, study?.name.lastIndexOf('_')) || '');
   const [projectName, setProjectName] = useState<string>(study?.project || '');
   const [keywords, setKeywords] = useState<string[]>(study?.keywords || []);
-  const [trajectoryIds] = useState<number[]>(study?.trajectoryIds || []);
-  const [isFormValid, setIsFormValid] = useState(false);
-  const { user } = useUser();
-  const [isHorizonValid, setIsHorizonValid] = useState(false);
-  const [duplicateErrorMessage, setDuplicateErrorMessage] = useState<string>('');
-
   const [horizon, setHorizon] = useState<string>(() => {
     const rawHorizon = study?.horizon || '';
     const years = rawHorizon.match(/\d{4}/g)?.map(Number) || [];
@@ -65,8 +59,6 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
       keywords,
       project: projectName,
       horizon,
-      trajectoryIds,
-      studyId: study?.id,
     };
 
     try {
@@ -81,7 +73,6 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
       // Handle errors with toast notification
       notifyToast({
         type: 'error',
-        message: errorMsg,
         message: (error as BackendError).antaresErrorMessage || 'Error creating study',
       });
     }
