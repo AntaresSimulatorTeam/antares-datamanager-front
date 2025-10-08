@@ -142,11 +142,9 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
                 maxLength={75}
               />
             </div>
-            {study && (
-              <div className="w-1/2">
-                <ProjectInput value={projectName} onChange={handleProjectNameChange} required />
-              </div>
-            )}
+            <div className="w-1/2">
+              <ProjectInput value={projectName} onChange={handleProjectNameChange} required />
+            </div>
           </div>
           <HorizonInput
             horizon={horizon}
