@@ -16,7 +16,7 @@ interface UseStudyTableDisplayProps {
   searchTerm: string | undefined;
   projectInfo?: ProjectInfo;
   sortBy: { [key: string]: 'asc' | 'desc' };
-  reloadStudies: boolean;
+  reloadStudies: number;
 }
 
 interface UseStudyTableDisplayReturn {

@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "feat/ANT-ANT-3976_thermal_handle_study_generated",
-  commit: "082a4673",
-  commitTime: "2025-10-07T13:32:50.968Z"
+  branch: "feat/ANT-3168_study_modification",
+  commit: "ca0db964",
+  commitTime: "2025-10-07T16:31:23.166Z"
 };

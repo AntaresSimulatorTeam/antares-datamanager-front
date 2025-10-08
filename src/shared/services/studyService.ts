@@ -109,6 +109,29 @@ export const saveStudy = async (
     });
   }
 };
+
+export const updateStudy = async (studyData: StudyDTO): Promise<void> => {
+  try {
+    await AuthService.authFetch(`${STUDY_ENDPOINT}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(studyData),
+    });
+
+    notifyToast({
+      type: 'success',
+      message: 'Study created successfully',
+    });
+  } catch (error) {
+    notifyToast({
+      type: 'error',
+      message: (error as BackendError).antaresErrorMessage ?? '',
+    });
+  }
+};
+
 /**
  * Delete a study
  * Display toast if deletion succeeds or fails
