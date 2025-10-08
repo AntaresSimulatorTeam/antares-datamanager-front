@@ -63,6 +63,7 @@
   },
   "studyModal": {
     "@new_study": "Créer une étude",
+    "@update_study": "Modifier l'étude",
     "@study_creation_placeholder": "Saisissez un nom d'étude...",
     "@button_create": "Créer",
     "@button_update": "Modifier",

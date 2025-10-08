@@ -62,6 +62,7 @@ const StudyDetails = () => {
 
   const onCloseModal = () => {
     toggleModal();
+    setReloadStudy((prev) => prev + 1);
   };
 
   useEffect(() => {
@@ -120,8 +121,8 @@ const StudyDetails = () => {
           </div>
         </div>
       </div>
-      {isModalOpen && study && study.status !== StudyStatus.GENERATED && (
-        <StudyModificationModal onClose={onCloseModal} study={study} setReloadStudies={setReloadStudy} />
+      {isModalOpen && studyData && studyData.status !== StudyStatus.GENERATED && (
+        <StudyModificationModal onClose={onCloseModal} study={studyData} />
       )}
     </div>
   );

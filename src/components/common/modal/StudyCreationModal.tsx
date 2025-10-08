@@ -184,7 +184,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
         <StdButton
           icon={StdIconId.Add}
           label={t('studyModal.@button_create')}
-          onClick={() => saveStudyHandler()}
+          onClick={() => void saveStudyHandler()}
           variant="contained"
           color="primary"
           disabled={!isFormValid}
