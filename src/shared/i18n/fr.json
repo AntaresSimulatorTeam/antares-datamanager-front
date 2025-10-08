@@ -61,6 +61,14 @@
     "@keyword_maximum_error": "Le mot-clé ne doit pas dépasser {{max}} lettres",
     "@keyword_max_keys_errors": "Il n'est pas possible d'ajouter plus que {{maxNbKey}} mot-clés"
   },
+  "studyModal": {
+    "@new_study": "Créer une étude",
+    "@study_creation_placeholder": "Saisissez un nom d'étude...",
+    "@button_create": "Créer",
+    "@button_update": "Modifier",
+    "@button_edit": "Editer",
+    "@input_name": "Nom"
+  },
   "study": {
     "@open": "Ouvrir",
     "@duplicate": "Dupliquer",
