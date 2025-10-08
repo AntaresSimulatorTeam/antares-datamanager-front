@@ -80,6 +80,7 @@
   },
   "studyModal": {
     "@new_study": "Create a study",
+    "@update_study": "Update study",
     "@study_creation_placeholder": "Name your study...",
     "@button_create": "Create",
     "@button_update": "Update",
