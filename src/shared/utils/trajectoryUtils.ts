@@ -377,10 +377,10 @@ export const retrieveReadOnlyArea = (rowData: HypothesisRowData[], itemsToReadOn
  * `true` indicating the presence of that item. The resulting map is immutable.
  *
  * @param {HypothesisRowData[]} data - The hierarchical data to process, where each item can have subRows.
- * @returns {Readonly<Record<number, true>>} A frozen record with keys representing
+ * @returns {ReadOnlyObject} A frozen record with keys representing
  * paths to items in the input hierarchy, and values always set to `true`.
  */
-export const generateReadOnlyIndexMap = (data: HypothesisRowData[]): Readonly<Record<number, true>> => {
+export const generateReadOnlyIndexMap = (data: HypothesisRowData[]): ReadOnlyObject => {
   const indexMap: Record<string, true> = {};
 
   function traverse(items: HypothesisRowData[], parentIndex: string = '') {

@@ -68,15 +68,13 @@ export const DetailsContent = ({ content, onClickButton }: DetailsContentProps) 
               </>
             )}
           </div>
-          {'tags' in content && (
-            <StdButton
-              icon={StdIconId.Edit}
-              label={t('project.@edit')}
-              onClick={onClickButton}
-              variant="text"
-              color="primary"
-            ></StdButton>
-          )}
+          <StdButton
+            icon={StdIconId.Edit}
+            label={t('project.@edit')}
+            onClick={onClickButton}
+            variant="text"
+            color="primary"
+          ></StdButton>
         </div>
       </header>
     </div>
