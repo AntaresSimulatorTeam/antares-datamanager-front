@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { expect, Mock, vi } from 'vitest';
+import { describe, expect, Mock, vi } from 'vitest';
 import { waitFor } from '@testing-library/react';
 import {
   createStudy,
@@ -15,6 +15,7 @@ import {
   getStudyById,
   getStudyTrajectories,
   saveStudy,
+  updateStudy,
 } from '@/shared/services/studyService.ts';
 import { notifyToast } from '@/shared/notification/notification.tsx';
 import { mockStudy, mockStudyResponse } from '@/mocks/data/tests/study.mock.ts';
@@ -22,6 +23,7 @@ import { mockDbTrajectoryArray } from '@/mocks/data/tests/trajectory.mock.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
 import { AuthService } from '@/shared/services/authService.ts';
+import { StudyDTO } from '@/shared/types';
 
 vi.mock('@/shared/notification/notification');
 vi.mock('@/envVariables', () => ({
@@ -322,5 +324,55 @@ describe('getStudyById', () => {
     });
 
     await expect(async () => getStudyById(123)).rejects.toThrowError('Failed to study details');
+  });
+});
+
+describe('updateStudy', () => {
+  const mockStudyData = {
+    name: 'BP_study',
+    createdBy: 'unknown',
+    keywords: ['tag1'],
+    project: 'BP_REF_23',
+    horizon: '2021-2022',
+    trajectoryIds: [102, 123],
+  } as StudyDTO;
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('should generate a study', async () => {
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
+      ok: true,
+    });
+    await updateStudy(mockStudyData, 123);
+
+    expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
+    expect(AuthService.authFetch).toHaveBeenCalledWith('https://mockapi.com/v1/study/123', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(mockStudyData),
+    });
+    expect(notifyToast).toHaveBeenCalledWith({
+      type: 'success',
+      message: 'Study updated successfully',
+    });
+  });
+
+  it('should display an error notification', async () => {
+    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
+      antaresErrorMessage: 'Failed to update study',
+      date: new Date(),
+      type: ERROR_MESSAGE_TYPE.BUSINESS,
+    });
+
+    const result = await updateStudy(mockStudyData, 123);
+    expect(result).toEqual(undefined);
+    expect(notifyToast).toHaveBeenCalledWith({
+      type: 'error',
+      message: 'Failed to update study',
+    });
   });
 });

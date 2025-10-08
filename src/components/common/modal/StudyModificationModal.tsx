@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import KeywordsInput from '@/components/input/KeywordsInput.tsx';
 import HorizonInput from '@/components/input/HorizonInput';
 import ProjectInput from '@/components/input/ProjectInput.tsx';
-import { duplicateStudy, saveStudy } from '@/shared/services/studyService';
+import { duplicateStudy, updateStudy } from '@/shared/services/studyService';
 import { BackendError, StudyDTO } from '@/shared/types';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { notifyToast } from '@/shared/notification/notification';
@@ -18,12 +18,13 @@ import { validateMaxLength } from '@/shared/utils/validateMaxTextLength';
 import { MAX_STUDY_NAME_LENGTH } from '@/shared/const/studyConfig';
 import StdButton from '@common/base/stdButton/StdButton';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
+import { hasArrayChanged } from '@/shared/utils/arrayUtils.ts';
 
 interface StudyCreationModalProps {
   isOpen?: boolean;
   onClose: () => void;
   study: StudyDTO;
-  setReloadStudies: React.Dispatch<React.SetStateAction<number>>;
+  setReloadStudies?: React.Dispatch<React.SetStateAction<number>>;
   isDuplicateMode?: boolean;
 }
 
@@ -34,129 +35,64 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
   isDuplicateMode,
 }) => {
   const { t } = useTranslation();
+  const { user } = useUser();
   const [studyName, setStudyName] = useState<string>(study?.name.substring(0, study?.name.lastIndexOf('_')) || '');
   const [projectName, setProjectName] = useState<string>(study?.project || '');
   const [keywords, setKeywords] = useState<string[]>(study?.keywords || []);
-  const [trajectoryIds] = useState<number[]>(study?.trajectoryIds || []);
-  const [isFormValid, setIsFormValid] = useState(false);
-  const { user } = useUser();
-  const [isHorizonValid, setIsHorizonValid] = useState(false);
-  const [duplicateErrorMessage, setDuplicateErrorMessage] = useState<string>('');
-
   const [horizon, setHorizon] = useState<string>(() => {
     const rawHorizon = study?.horizon || '';
     const years = rawHorizon.match(/\d{4}/g)?.map(Number) || [];
     const maxYear = years.length ? Math.max(...years) : '';
     return maxYear.toString();
   });
-
-  const handleStudyNameChange = (value: string) => {
-    if (validateMaxLength(value, MAX_STUDY_NAME_LENGTH)) {
-      setStudyName(value || '');
-      // Clear duplication error message when study name changes
-      if (duplicateErrorMessage) {
-        setDuplicateErrorMessage('');
-      }
-    }
-  };
+  const [isFormValid, setIsFormValid] = useState(false);
+  const [isHorizonValid, setIsHorizonValid] = useState(false);
+  const [duplicateErrorMessage, setDuplicateErrorMessage] = useState<string>('');
 
   const updateStudyHandler = async () => {
-    if (study && studyName.trim() === study.name.trim()) {
-      notifyToast({
-        type: 'error',
-        message: 'A study with the same name already exists for the given project',
-      });
-      return;
-    }
+    setDuplicateErrorMessage('');
 
     const studyData = {
-      id: study?.id,
-      name: studyName,
+      ...study,
       createdBy: user?.profile.sub,
+      name: studyName,
       keywords,
       project: projectName,
       horizon,
-      trajectoryIds,
-      studyId: study?.id,
     };
 
     try {
-      await saveStudy(studyData);
-      setReloadStudies((prev) => prev + 1); // Trigger reload after successful save
-      setStudyName('');
-      setProjectName('');
-      setHorizon('');
-      setKeywords([]);
+      isDuplicateMode ? await duplicateStudy(studyData) : await updateStudy(studyData, study.id);
+      setReloadStudies?.((prev) => prev + 1); // Trigger reload after successful save
       onClose();
     } catch (error) {
+      const fallBackMessage = isDuplicateMode ? 'Error duplicating study' : 'Error updating study';
+      let errorMsg = (error as BackendError).antaresErrorMessage || fallBackMessage;
+      errorMsg = errorMsg.replace(/:\s+/g, ': ');
+      isDuplicateMode && setDuplicateErrorMessage(errorMsg);
       // Handle errors with toast notification
       notifyToast({
         type: 'error',
-        message: (error as BackendError).antaresErrorMessage || 'Error creating study',
+        message: errorMsg,
       });
-    }
-  };
-
-  const duplicateStudyHandler = async () => {
-    // Clear any previous error messages
-    setDuplicateErrorMessage('');
-
-    // if (!study?.id) {
-    //   notifyToast({
-    //     type: 'error',
-    //     message: 'Study ID is missing',
-    //   });
-    //   return;
-    // }
-    //
-    // if (study && studyName.trim() === study.name.trim()) {
-    //   notifyToast({
-    //     type: 'error',
-    //     message: 'A study with the same name already exists for the given project',
-    //   });
-    //   return;
-    // }
-
-    const studyData = {
-      name: studyName,
-      createdBy: user?.profile.sub,
-      keywords,
-      project: projectName,
-      horizon,
-      trajectoryIds,
-      id: study.id,
-    };
-
-    try {
-      await duplicateStudy(studyData);
-      setReloadStudies((prev) => prev + 1);
-      setStudyName('');
-      setProjectName('');
-      setHorizon('');
-      setKeywords([]);
-      onClose();
-    } catch (error) {
-      let errorMsg = (error as BackendError).antaresErrorMessage || 'Error duplicating study';
-
-      errorMsg = errorMsg.replace(/:\s+/g, ': ');
-
-      setDuplicateErrorMessage(errorMsg);
     }
   };
 
   useEffect(() => {
     const validateForm = () => {
-      const originalName = study?.name || '';
-      const nameChanged = studyName.trim() !== originalName.trim();
+      const originalName = study?.name.substring(0, study?.name.lastIndexOf('_')) || '';
+      const studyNameChanged = studyName.trim() !== originalName.trim();
+      const projectNameChanged = study.project.trim() !== projectName.trim();
+      const heywordsChanged = hasArrayChanged(study.keywords, keywords);
 
       if (isDuplicateMode) {
-        if (isHorizonValid || nameChanged) {
+        if (isHorizonValid || studyNameChanged) {
           setIsFormValid(true);
         } else {
           setIsFormValid(false);
         }
       } else {
-        if (studyName && horizon && isHorizonValid) {
+        if (studyNameChanged || projectNameChanged || heywordsChanged) {
           setIsFormValid(true);
         } else {
           setIsFormValid(false);
@@ -164,14 +100,18 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
       }
     };
     validateForm();
-  }, [study, studyName, projectName, horizon, keywords, isHorizonValid]);
+  }, [study, studyName, projectName, horizon, keywords, isHorizonValid, isDuplicateMode]);
+
+  const handleStudyNameChange = (value: string) => {
+    if (validateMaxLength(value, MAX_STUDY_NAME_LENGTH)) {
+      setStudyName(value || '');
+      isDuplicateMode && setDuplicateErrorMessage('');
+    }
+  };
 
   const handleHorizonChange = (value: string) => {
     setHorizon(value);
-    // Clear duplication error message when horizon changes
-    if (duplicateErrorMessage) {
-      setDuplicateErrorMessage('');
-    }
+    isDuplicateMode && setDuplicateErrorMessage('');
   };
 
   const handleHorizonValidityChange = (valid: boolean) => {
@@ -180,16 +120,13 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
 
   const handleProjectNameChange = (value: string) => {
     setProjectName(value);
-    // Clear duplication error message when project name changes
-    if (duplicateErrorMessage) {
-      setDuplicateErrorMessage('');
-    }
+    isDuplicateMode && setDuplicateErrorMessage('');
   };
 
   return (
     <RdsModal size="small">
       <RdsModal.Title onClose={onClose}>
-        {study ? t('home.@duplicate_study') : t('studyModal.@new_study')}
+        {isDuplicateMode ? t('home.@duplicate_study') : t('studyModal.@update_study')}
       </RdsModal.Title>
       <RdsModal.Content>
         <div className="flex flex-col gap-4 self-stretch">
@@ -216,23 +153,24 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
             onChange={handleHorizonChange}
             onValidChange={handleHorizonValidityChange}
             required
-            customErrorMessage={study ? duplicateErrorMessage : undefined}
+            customErrorMessage={isDuplicateMode ? duplicateErrorMessage : undefined}
+            disabled={!isDuplicateMode}
           />
           <KeywordsInput
             keywords={keywords}
             setKeywords={setKeywords}
             maxNbKeywords={6}
             maxNbCharacters={15}
-            minNbCharacters={3}
+            minNbCharacters={1}
           />
         </div>
       </RdsModal.Content>
       <RdsModal.Footer>
         <StdButton label={t('components.quickAccess.@cancel')} onClick={onClose} color="secondary" />
         <StdButton
-          icon={study ? StdIconId.ContentCopy : StdIconId.Edit}
-          label={study ? t('study.@duplicate') : t('studyModal.@button_edit')}
-          onClick={() => void (study ? duplicateStudyHandler() : updateStudyHandler())}
+          icon={isDuplicateMode ? StdIconId.ContentCopy : StdIconId.Edit}
+          label={isDuplicateMode ? t('study.@duplicate') : t('studyModal.@button_edit')}
+          onClick={() => void updateStudyHandler()}
           variant="contained"
           color="primary"
           disabled={!isFormValid}

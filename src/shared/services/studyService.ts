@@ -110,9 +110,18 @@ export const saveStudy = async (
   }
 };
 
-export const updateStudy = async (studyData: StudyDTO): Promise<void> => {
+/**
+ * A function to update an existing study by making an asynchronous HTTP PUT request to the server.
+ * It sends the updated study data as JSON and displays a notification upon success or failure.
+ *
+ * @param {StudyDTO} studyData - The updated study data to be sent to the server.
+ * @param {number} studyId - The unique identifier of the study to be updated.
+ * @returns {Promise<void>} A promise that resolves when the update operation is completed.
+ * @throws {BackendError} Throws an error if the update fails on the server-side.
+ */
+export const updateStudy = async (studyData: StudyDTO, studyId: number): Promise<void> => {
   try {
-    await AuthService.authFetch(`${STUDY_ENDPOINT}`, {
+    await AuthService.authFetch(`${STUDY_ENDPOINT}/${studyId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -122,7 +131,7 @@ export const updateStudy = async (studyData: StudyDTO): Promise<void> => {
 
     notifyToast({
       type: 'success',
-      message: 'Study created successfully',
+      message: 'Study updated successfully',
     });
   } catch (error) {
     notifyToast({
