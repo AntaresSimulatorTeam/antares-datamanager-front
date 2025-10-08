@@ -10,6 +10,7 @@ import { waitFor } from '@testing-library/react';
 import { mockPinProjectResponseArray, mockResponse } from '@/mocks/data/tests/pinnedProject.mock.ts';
 import { AuthService } from '@/shared/services/authService.ts';
 import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
+import { DEFAULT_USER } from '@/shared/const/authConfig.ts';
 
 vi.mock('@/shared/notification/notification');
 vi.mock('@/envVariables', () => ({
@@ -52,6 +53,23 @@ describe('pinProject', () => {
     expect(response).toEqual(mockResponse);
   });
 
+  it('should call pin project service with default user id when no one is provided', async () => {
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
+      ok: true,
+      json: async () => Promise.resolve(mockResponse),
+    });
+
+    await pinProject(projectId, undefined);
+
+    expect(AuthService.authFetch).toHaveBeenCalledWith(
+      `https://mockapi.com/v1/project/pin?userId=${DEFAULT_USER}&projectId=test-project-id`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      },
+    );
+  });
+
   it('should handle pin project error ', async () => {
     vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
       antaresErrorMessage: 'Failed to pin project',
@@ -92,6 +110,19 @@ describe('fetchPinnedProjects', () => {
     });
   });
 
+  it('should call fetchPinnedProjects service with default user id when no one is provided', async () => {
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
+      ok: true,
+      json: async () => Promise.resolve(mockPinProjectResponseArray),
+    });
+    await fetchPinnedProjects(undefined);
+    await waitFor(() => {
+      expect(AuthService.authFetch).toHaveBeenCalledWith(
+        `https://mockapi.com/v1/project/pinned?userId=${DEFAULT_USER}`,
+      );
+    });
+  });
+
   it('should handle fetch failure gracefully', async () => {
     vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
       antaresErrorMessage: 'Failed to fetch project details',
@@ -123,6 +154,26 @@ describe('unpinProject', () => {
       expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
       expect(AuthService.authFetch).toHaveBeenCalledWith(
         `https://mockapi.com/v1/project/unpin?userId=${userId}&projectId=${projectId}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+    });
+  });
+
+  it('should call unpinProject service with default user id when no one is provided', async () => {
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
+      ok: true,
+    });
+
+    await unpinProject(projectId, undefined);
+
+    await waitFor(() => {
+      expect(AuthService.authFetch).toHaveBeenCalledWith(
+        `https://mockapi.com/v1/project/unpin?userId=${DEFAULT_USER}&projectId=${projectId}`,
         {
           method: 'PUT',
           headers: {

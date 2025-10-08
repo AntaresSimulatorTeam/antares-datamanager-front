@@ -1,35 +1,7 @@
 import { AuthService } from '@/shared/services/authService.ts';
 import { TrajectoryBackendError } from '@/shared/types';
 import { isBusinessError } from '@/shared/utils/errorUtils.ts';
-
-/**
- * Simulates progress over a specified duration, invoking a callback function with the
- * current progress percentage as it updates. The progress is calculated linearly from 0% to 100%.
- *
- * @param {number} duration - The total duration of the simulated progress in milliseconds.
- * @param {(value: number) => void} onProgress - A callback function invoked with the current progress percentage (0 to 100).
- * The progress value represents the completion percentage of the simulation.
- * @returns {Promise<void>} A Promise that resolves when the progress simulation reaches 100%.
- */
-const simulateProgress = async (duration: number, onProgress: (value: number) => void): Promise<void> =>
-  new Promise((resolve) => {
-    let startTime: number | null = null;
-
-    function updateProgress(timestamp: number) {
-      if (!startTime) startTime = timestamp;
-      const elapsed = timestamp - startTime;
-      const progress = Math.min((elapsed / duration) * 100, 100);
-      onProgress(progress);
-
-      if (progress < 100) {
-        requestAnimationFrame(updateProgress);
-      } else {
-        resolve();
-      }
-    }
-
-    requestAnimationFrame(updateProgress);
-  });
+import { simulateProgress } from '@/shared/utils/hypothesisTableUtils.ts';
 
 /**
  * Fetches a resource from a specified URL while reporting progress.

@@ -1,8 +1,9 @@
-import { describe, expect, it, Mock } from 'vitest';
+import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import {
   getAlignment,
   getDefaultAreaNotIncludedInAreaList,
   hasLabelDefault,
+  simulateProgress,
   transformToSubRowKeys,
 } from '@/shared/utils/hypothesisTableUtils.ts';
 import { HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
@@ -164,5 +165,39 @@ describe('transformToSubRowKeys', () => {
     const input = { '1': false };
     const expected = { '0.1': false };
     expect(transformToSubRowKeys(input)).toEqual(expected);
+  });
+});
+
+let rafCallbacks: FrameRequestCallback[] = [];
+
+global.requestAnimationFrame = (cb: FrameRequestCallback): number => {
+  rafCallbacks.push(cb);
+  return rafCallbacks.length - 1;
+};
+
+global.cancelAnimationFrame = vi.fn();
+
+describe('simulateProgress', () => {
+  let onProgress: (value: number) => void;
+
+  beforeEach(() => {
+    rafCallbacks = [];
+    onProgress = vi.fn();
+  });
+
+  it('should call onProgress with increasing values and end at 100%', async () => {
+    const promise = simulateProgress(1000, onProgress);
+    let timestamp = 0;
+    while (rafCallbacks.length > 0) {
+      const cb = rafCallbacks.shift()!;
+      timestamp += 250;
+      cb(timestamp);
+    }
+
+    await promise;
+
+    const calls = (onProgress as Mock).mock.calls.map((call: number[]) => call[0]);
+    expect(calls[calls.length - 1]).toBe(100);
+    expect(calls.length).toBeGreaterThan(1);
   });
 });
