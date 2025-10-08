@@ -9,7 +9,6 @@ import { RdsInputText, RdsModal } from 'rte-design-system-react';
 import { useTranslation } from 'react-i18next';
 import KeywordsInput from '@/components/input/KeywordsInput.tsx';
 import HorizonInput from '@/components/input/HorizonInput';
-import ProjectInput from '@/components/input/ProjectInput.tsx';
 import { saveStudy } from '@/shared/services/studyService';
 import { BackendError, StudyDTO } from '@/shared/types';
 import { useUser } from '@/store/contexts/UserContext.tsx';
@@ -49,16 +48,6 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
     const maxYear = years.length ? Math.max(...years) : '';
     return maxYear.toString();
   });
-
-  const handleStudyNameChange = (value: string) => {
-    if (validateMaxLength(value, MAX_STUDY_NAME_LENGTH)) {
-      setStudyName(value || '');
-      // Clear duplication error message when study name changes
-      if (duplicateErrorMessage) {
-        setDuplicateErrorMessage('');
-      }
-    }
-  };
 
   const saveStudyHandler = async () => {
     if (study && studyName.trim() === study.name.trim()) {
@@ -120,6 +109,16 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
     validateForm();
   }, [study, studyName, projectName, horizon, keywords, isHorizonValid]);
 
+  const handleStudyNameChange = (value: string) => {
+    if (validateMaxLength(value, MAX_STUDY_NAME_LENGTH)) {
+      setStudyName(value || '');
+      // Clear duplication error message when study name changes
+      if (duplicateErrorMessage) {
+        setDuplicateErrorMessage('');
+      }
+    }
+  };
+
   const handleHorizonChange = (value: string) => {
     setHorizon(value);
     // Clear duplication error message when horizon changes
@@ -130,14 +129,6 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
 
   const handleHorizonValidityChange = (valid: boolean) => {
     setIsHorizonValid(valid);
-  };
-
-  const handleProjectNameChange = (value: string) => {
-    setProjectName(value);
-    // Clear duplication error message when project name changes
-    if (duplicateErrorMessage) {
-      setDuplicateErrorMessage('');
-    }
   };
 
   return (
@@ -157,11 +148,6 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
                 maxLength={75}
               />
             </div>
-            {study && (
-              <div className="w-1/2">
-                <ProjectInput value={projectName} onChange={handleProjectNameChange} required />
-              </div>
-            )}
           </div>
           <HorizonInput
             horizon={horizon}
@@ -175,7 +161,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
             setKeywords={setKeywords}
             maxNbKeywords={6}
             maxNbCharacters={15}
-            minNbCharacters={3}
+            minNbCharacters={1}
           />
         </div>
       </RdsModal.Content>
