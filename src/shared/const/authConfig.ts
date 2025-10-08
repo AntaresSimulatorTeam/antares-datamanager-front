@@ -26,3 +26,5 @@ export const config: AuthConfig = {
   scope: 'openid email profile',
   maxExpiresIn: 600,
 };
+
+export const DEFAULT_USER = 'CF93132T';
