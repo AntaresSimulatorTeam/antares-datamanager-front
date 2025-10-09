@@ -142,10 +142,7 @@ export const deleteStudy = async (id: number): Promise<void> => {
       message: 'Study deleted successfully',
     });
   } catch (error: unknown) {
-    notifyToast({
-      type: 'error',
-      message: `${(error as BackendError).antaresErrorMessage}`,
-    });
+    throw new Error((error as BackendError).antaresErrorMessage);
   }
 };
 
@@ -180,9 +177,9 @@ export const createStudy = async (id: number): Promise<void> => {
 
 export const getStudyTrajectories = async (
   studyId: number,
-  trajectoryType?: TRAJECTORY_TYPE,
+  trajectoryType: TRAJECTORY_TYPE,
 ): Promise<DbTrajectory[]> => {
-  const urlApi = `${TRAJECTORY_ENDPOINT}?studyId=${studyId}&trajectoryType=${trajectoryType ?? ''}`;
+  const urlApi = `${TRAJECTORY_ENDPOINT}?studyId=${studyId}&trajectoryType=${trajectoryType}`;
 
   try {
     const response = await AuthService.authFetch(urlApi);

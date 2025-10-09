@@ -93,6 +93,20 @@ describe('fetchSuggestedKeywords', () => {
     expect(result).toEqual(mockResponse);
   });
 
+  it('should return suggested keywords', async () => {
+    const mockResponse = [] as string[];
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
+      ok: true,
+      json: async () => Promise.resolve(mockResponse),
+    });
+
+    const result = await fetchSuggestedKeywords('');
+
+    expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
+    expect(AuthService.authFetch).toHaveBeenCalledWith('https://mockapi.com/v1/study/keywords/search?partialName=');
+    expect(result).toEqual(mockResponse);
+  });
+
   it('should handle fetch failure gracefully', async () => {
     vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
       antaresErrorMessage: 'Failed to fetch suggested keywords',
@@ -168,12 +182,7 @@ describe('deleteStudy', () => {
       type: ERROR_MESSAGE_TYPE.BUSINESS,
     });
 
-    const result = await deleteStudy(2);
-    expect(result).toEqual(undefined);
-    expect(notifyToast).toHaveBeenCalledWith({
-      type: 'error',
-      message: 'Failed to delete study',
-    });
+    await expect(async () => deleteStudy(2)).rejects.toThrowError('Failed to delete study');
   });
 });
 
@@ -244,6 +253,14 @@ describe('getStudyTrajectories', () => {
 });
 
 describe('duplicateStudy', () => {
+  const mockStudyData = {
+    name: 'BP_study',
+    createdBy: 'unknown',
+    keywords: ['tag1'],
+    project: 'BP_REF_23',
+    horizon: '2021-2022',
+    trajectoryIds: [102, 123],
+  };
   afterEach(() => {
     vi.restoreAllMocks();
   });
@@ -252,14 +269,6 @@ describe('duplicateStudy', () => {
     vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
       ok: true,
     });
-    const mockStudyData = {
-      name: 'BP_study',
-      createdBy: 'unknown',
-      keywords: ['tag1'],
-      project: 'BP_REF_23',
-      horizon: '2021-2022',
-      trajectoryIds: [102, 123],
-    };
     await duplicateStudy(mockStudyData);
 
     expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
@@ -279,7 +288,7 @@ describe('duplicateStudy', () => {
       type: ERROR_MESSAGE_TYPE.BUSINESS,
     });
 
-    await expect(async () => createStudy(1)).rejects.toThrowError('Failed to duplicate study');
+    await expect(async () => duplicateStudy(mockStudyData)).rejects.toThrowError('Failed to duplicate study');
   });
 });
 
