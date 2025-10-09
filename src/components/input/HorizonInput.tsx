@@ -74,7 +74,7 @@ const HorizonInput: React.FC<YearInputProps> = ({
   };
 
   return (
-    <div className="flex items-center">
+    <div className="flex items-center gap-2">
       <div className="flex w-1/2">
         <RdsInputText
           label="Horizon"
