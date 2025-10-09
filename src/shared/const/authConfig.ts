@@ -27,4 +27,4 @@ export const config: AuthConfig = {
   maxExpiresIn: 600,
 };
 
-export const DEFAULT_USER = 'CF93132T';
+export const DEFAULT_USER = 'CF93131T';
