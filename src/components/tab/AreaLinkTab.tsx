@@ -114,7 +114,9 @@ export const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
         );
         setReadOnly({
           '0': false,
-          '1': !trajectoryAreaResult || (!trajectoryLinkResult && studyData?.status === StudyStatus.GENERATED),
+          '1':
+            !trajectoryAreaResult.length > 0 ||
+            (!trajectoryLinkResult.length > 0 && studyData?.status === StudyStatus.GENERATED),
         });
       } catch {
         //Silent handler
