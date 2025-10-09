@@ -109,12 +109,14 @@ export const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
           trajectoryResult.map(({ label, result }) => ({
             hypothesis: label,
             trajectory: result?.[0],
-            status: result ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+            status: result.length > 0 ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
           })),
         );
         setReadOnly({
           '0': false,
-          '1': !trajectoryAreaResult || (!trajectoryLinkResult && studyData?.status === StudyStatus.GENERATED),
+          '1':
+            trajectoryAreaResult?.length === 0 ||
+            (trajectoryLinkResult?.length === 0 && studyData?.status === StudyStatus.GENERATED),
         });
       } catch {
         //Silent handler

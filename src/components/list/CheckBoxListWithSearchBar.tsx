@@ -12,6 +12,7 @@ interface CheckBoxListProps {
   options: CheckBoxData[];
   dividerPosition: number;
   handleSearch?: (_value?: string) => Promise<void>;
+  disabled: boolean;
 }
 
 export const CheckBoxListWithSearchBar = ({
@@ -20,6 +21,7 @@ export const CheckBoxListWithSearchBar = ({
   options,
   dividerPosition = 0,
   handleSearch,
+  disabled = false,
 }: CheckBoxListProps) => {
   const { t } = useTranslation();
 
@@ -36,7 +38,7 @@ export const CheckBoxListWithSearchBar = ({
           label={''}
           name={''}
           checkedValues={checkedValues}
-          disabled={false}
+          disabled={disabled}
           onChange={(value: string, isChecked?: boolean) => void handleSelectionChange(value, isChecked ?? false)}
         >
           {options?.map((area, index) => (
