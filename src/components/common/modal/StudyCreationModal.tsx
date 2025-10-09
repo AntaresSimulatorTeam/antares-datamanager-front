@@ -17,6 +17,7 @@ import { validateMaxLength } from '@/shared/utils/validateMaxTextLength';
 import { MAX_STUDY_NAME_LENGTH } from '@/shared/const/studyConfig';
 import StdButton from '@common/base/stdButton/StdButton';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
+import { isBusinessError } from '@/shared/utils/errorUtils.ts';
 
 interface StudyCreationModalProps {
   isOpen?: boolean;
@@ -50,14 +51,6 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
   });
 
   const saveStudyHandler = async () => {
-    if (study && studyName.trim() === study.name.trim()) {
-      notifyToast({
-        type: 'error',
-        message: 'A study with the same name already exists for the given project',
-      });
-      return;
-    }
-
     const studyData = {
       id: study?.id,
       name: studyName,
@@ -82,13 +75,15 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
       });
       onClose();
     } catch (error) {
-      notifyAlert({
-        icon: StdIconId.Close,
-        message: 'Failed to create study',
-        content: (error as Error).message,
-        type: 'error',
-        filledIcon: true,
-      });
+      if (isBusinessError(error)) {
+        notifyAlert({
+          icon: StdIconId.Close,
+          message: `Failed to create study`,
+          content: error.antaresErrorMessage,
+          type: 'error',
+          filledIcon: true,
+        });
+      }
     }
   };
 

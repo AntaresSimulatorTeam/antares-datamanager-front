@@ -7,9 +7,11 @@
 import { BackendError, DbTrajectory, PaginatedResponse, StudyDTO } from '@/shared/types';
 import { STUDY_GENERATE_ENDPOINT, STUDY_SEARCH_ENDPOINT, TRAJECTORY_ENDPOINT } from '@/shared/const/apiEndPoint';
 import { STUDY_ENDPOINT, STUDY_KEYWORDS_SEARCH_ENDPOINT } from '@/shared/const/apiEndPoint.ts';
-import { notifyToast } from '@/shared/notification/notification.tsx';
+import { notifyAlert, notifyToast } from '@/shared/notification/notification.tsx';
 import { AuthService } from '@/shared/services/authService.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { isBusinessError } from '@/shared/utils/errorUtils.ts';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 /**
  * Retrieve a list of studies from a term
@@ -98,7 +100,16 @@ export const saveStudy = async (
       body: JSON.stringify(studyData),
     });
   } catch (error) {
-    throw new Error((error as BackendError).antaresErrorMessage);
+    if (isBusinessError(error)) {
+      notifyAlert({
+        icon: StdIconId.Close,
+        message: 'Failed to create study',
+        content: error.antaresErrorMessage,
+        type: 'error',
+        filledIcon: true,
+      });
+    }
+    throw new Error((error as Error).message || (error as BackendError).antaresErrorMessage);
   }
 };
 
@@ -112,17 +123,13 @@ export const saveStudy = async (
  * @throws {BackendError} Throws an error if the update fails on the server-side.
  */
 export const updateStudy = async (studyData: StudyDTO, studyId: number): Promise<void> => {
-  try {
-    await AuthService.authFetch(`${STUDY_ENDPOINT}/${studyId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(studyData),
-    });
-  } catch (error) {
-    throw new Error((error as BackendError).antaresErrorMessage);
-  }
+  await AuthService.authFetch(`${STUDY_ENDPOINT}/${studyId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(studyData),
+  });
 };
 
 /**
@@ -218,15 +225,11 @@ export const getStudyById = async (studyId: number): Promise<StudyDTO> => {
 export const duplicateStudy = async (
   studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate' | 'projectId'>,
 ): Promise<void> => {
-  try {
-    await AuthService.authFetch(`${STUDY_ENDPOINT}/duplicate`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(studyData),
-    });
-  } catch (error) {
-    throw new Error((error as BackendError).antaresErrorMessage);
-  }
+  await AuthService.authFetch(`${STUDY_ENDPOINT}/duplicate`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(studyData),
+  });
 };

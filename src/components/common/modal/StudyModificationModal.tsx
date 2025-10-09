@@ -19,6 +19,7 @@ import { MAX_STUDY_NAME_LENGTH } from '@/shared/const/studyConfig';
 import StdButton from '@common/base/stdButton/StdButton';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { hasArrayChanged } from '@/shared/utils/arrayUtils.ts';
+import { isBusinessError } from '@/shared/utils/errorUtils.ts';
 
 interface StudyCreationModalProps {
   isOpen?: boolean;
@@ -68,13 +69,15 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
       });
       onClose();
     } catch (error) {
-      notifyAlert({
-        icon: StdIconId.Close,
-        message: `Failed to ${isDuplicateMode ? 'duplicate' : 'update'} study`,
-        content: (error as Error).message,
-        type: 'error',
-        filledIcon: true,
-      });
+      if (isBusinessError(error)) {
+        notifyAlert({
+          icon: StdIconId.Close,
+          message: `Failed to ${isDuplicateMode ? 'duplicate' : 'update'} study`,
+          content: error.antaresErrorMessage,
+          type: 'error',
+          filledIcon: true,
+        });
+      }
     }
   };
 

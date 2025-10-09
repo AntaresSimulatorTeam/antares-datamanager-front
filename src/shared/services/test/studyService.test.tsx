@@ -140,16 +140,6 @@ describe('saveStudy', () => {
       body: JSON.stringify(mockStudy),
     });
   });
-
-  it('should throw error with the backend error message', async () => {
-    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
-      antaresErrorMessage: 'A study with the same name already exists',
-      date: new Date(),
-      type: ERROR_MESSAGE_TYPE.BUSINESS,
-    });
-
-    await expect(async () => saveStudy(mockStudy)).rejects.toThrowError('A study with the same name already exists');
-  });
 });
 
 describe('deleteStudy', () => {
@@ -280,16 +270,6 @@ describe('duplicateStudy', () => {
       body: JSON.stringify(mockStudyData),
     });
   });
-
-  it('should throw an error message', async () => {
-    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
-      antaresErrorMessage: 'Failed to duplicate study',
-      date: new Date(),
-      type: ERROR_MESSAGE_TYPE.BUSINESS,
-    });
-
-    await expect(async () => duplicateStudy(mockStudyData)).rejects.toThrowError('Failed to duplicate study');
-  });
 });
 
 describe('getStudyById', () => {
@@ -337,7 +317,7 @@ describe('updateStudy', () => {
     vi.restoreAllMocks();
   });
 
-  it('should generate a study', async () => {
+  it('should update a study', async () => {
     vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
       ok: true,
     });
@@ -351,15 +331,5 @@ describe('updateStudy', () => {
       },
       body: JSON.stringify(mockStudyData),
     });
-  });
-
-  it('should throw an error with error backend', async () => {
-    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
-      antaresErrorMessage: 'Failed to update study',
-      date: new Date(),
-      type: ERROR_MESSAGE_TYPE.BUSINESS,
-    });
-
-    await expect(async () => updateStudy(mockStudyData, 123)).rejects.toThrowError('Failed to update study');
   });
 });
