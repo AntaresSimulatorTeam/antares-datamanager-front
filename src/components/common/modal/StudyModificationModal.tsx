@@ -165,7 +165,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
         <StdButton label={t('components.quickAccess.@cancel')} onClick={onClose} color="secondary" />
         <StdButton
           icon={isDuplicateMode ? StdIconId.ContentCopy : StdIconId.Edit}
-          label={isDuplicateMode ? t('study.@duplicate') : t('studyModal.@button_edit')}
+          label={isDuplicateMode ? t('study.@duplicate') : t('studyModal.@button_update')}
           onClick={() => void updateStudyHandler()}
           variant="contained"
           color="primary"
