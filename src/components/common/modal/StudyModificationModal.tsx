@@ -13,7 +13,7 @@ import ProjectInput from '@/components/input/ProjectInput.tsx';
 import { duplicateStudy, updateStudy } from '@/shared/services/studyService';
 import { StudyDTO } from '@/shared/types';
 import { useUser } from '@/store/contexts/UserContext.tsx';
-import { notifyToast } from '@/shared/notification/notification';
+import { notifyAlert, notifyToast } from '@/shared/notification/notification';
 import { validateMaxLength } from '@/shared/utils/validateMaxTextLength';
 import { MAX_STUDY_NAME_LENGTH } from '@/shared/const/studyConfig';
 import StdButton from '@common/base/stdButton/StdButton';
@@ -48,11 +48,8 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
   });
   const [isFormValid, setIsFormValid] = useState(false);
   const [isHorizonValid, setIsHorizonValid] = useState(false);
-  const [duplicateErrorMessage, setDuplicateErrorMessage] = useState<string>('');
 
   const updateStudyHandler = async () => {
-    setDuplicateErrorMessage('');
-
     const studyData = {
       ...study,
       createdBy: user?.profile.sub,
@@ -71,9 +68,13 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
       });
       onClose();
     } catch (error) {
-      let errorMsg = (error as Error).message;
-      errorMsg = errorMsg.replace(/:\s+/g, ': ');
-      isDuplicateMode && setDuplicateErrorMessage(errorMsg);
+      notifyAlert({
+        icon: StdIconId.Close,
+        message: `Failed to ${isDuplicateMode ? 'duplicate' : 'update'} study`,
+        content: (error as Error).message,
+        type: 'error',
+        filledIcon: true,
+      });
     }
   };
 
@@ -103,22 +104,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
   const handleStudyNameChange = (value: string) => {
     if (validateMaxLength(value, MAX_STUDY_NAME_LENGTH)) {
       setStudyName(value || '');
-      isDuplicateMode && setDuplicateErrorMessage('');
     }
-  };
-
-  const handleHorizonChange = (value: string) => {
-    setHorizon(value);
-    isDuplicateMode && setDuplicateErrorMessage('');
-  };
-
-  const handleHorizonValidityChange = (valid: boolean) => {
-    setIsHorizonValid(valid);
-  };
-
-  const handleProjectNameChange = (value: string) => {
-    setProjectName(value);
-    isDuplicateMode && setDuplicateErrorMessage('');
   };
 
   return (
@@ -141,15 +127,14 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
               />
             </div>
             <div className="w-1/2">
-              <ProjectInput value={projectName} onChange={handleProjectNameChange} required />
+              <ProjectInput value={projectName} onChange={setProjectName} required />
             </div>
           </div>
           <HorizonInput
             horizon={horizon}
-            onChange={handleHorizonChange}
-            onValidChange={handleHorizonValidityChange}
+            onChange={setHorizon}
+            onValidChange={setIsHorizonValid}
             required
-            customErrorMessage={isDuplicateMode ? duplicateErrorMessage : undefined}
             disabled={!isDuplicateMode}
           />
           <KeywordsInput

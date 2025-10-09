@@ -12,7 +12,7 @@ import HorizonInput from '@/components/input/HorizonInput';
 import { saveStudy } from '@/shared/services/studyService';
 import { StudyDTO } from '@/shared/types';
 import { useUser } from '@/store/contexts/UserContext.tsx';
-import { notifyToast } from '@/shared/notification/notification';
+import { notifyAlert, notifyToast } from '@/shared/notification/notification';
 import { validateMaxLength } from '@/shared/utils/validateMaxTextLength';
 import { MAX_STUDY_NAME_LENGTH } from '@/shared/const/studyConfig';
 import StdButton from '@common/base/stdButton/StdButton';
@@ -82,7 +82,13 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
       });
       onClose();
     } catch (error) {
-      // Silent handler
+      notifyAlert({
+        icon: StdIconId.Close,
+        message: 'Failed to create study',
+        content: (error as Error).message,
+        type: 'error',
+        filledIcon: true,
+      });
     }
   };
 
