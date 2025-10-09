@@ -154,7 +154,6 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
             onChange={handleHorizonChange}
             onValidChange={handleHorizonValidityChange}
             required
-            customErrorMessage={undefined}
           />
           <KeywordsInput
             keywords={keywords}
