@@ -31,7 +31,7 @@ describe('useStudyTableDisplay', () => {
     });
 
     const { result } = renderHook(() =>
-      useStudyTableDisplay({ searchTerm: 'test', sortBy: { status: 'desc' }, reloadStudies: false }),
+      useStudyTableDisplay({ searchTerm: 'test', sortBy: { status: 'desc' }, reloadStudies: 1 }),
     );
     await waitFor(() => {
       expect(result.current.rows).toHaveLength(2);
@@ -45,7 +45,7 @@ describe('useStudyTableDisplay', () => {
     });
 
     act(() => {
-      renderHook(() => useStudyTableDisplay({ searchTerm: 'mouad', sortBy: { project: 'asc' }, reloadStudies: false }));
+      renderHook(() => useStudyTableDisplay({ searchTerm: 'mouad', sortBy: { project: 'asc' }, reloadStudies: 1 }));
     });
 
     //expect(global.fetch).toHaveBeenCalledTimes(1);  TODO: ANT-2719
@@ -67,7 +67,7 @@ describe('useStudyTableDisplay', () => {
     });
 
     const { result } = renderHook(() =>
-      useStudyTableDisplay({ searchTerm: 'test', sortBy: { status: 'desc' }, reloadStudies: true }),
+      useStudyTableDisplay({ searchTerm: 'test', sortBy: { status: 'desc' }, reloadStudies: 2 }),
     );
 
     await waitFor(() => {
@@ -88,7 +88,7 @@ describe('useStudyTableDisplay', () => {
         searchTerm: 'study1',
         projectInfo: { id: 'projectId' } as ProjectInfo,
         sortBy: { status: 'desc' },
-        reloadStudies: true,
+        reloadStudies: 3,
       }),
     );
 
