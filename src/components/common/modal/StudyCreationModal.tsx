@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import KeywordsInput from '@/components/input/KeywordsInput.tsx';
 import HorizonInput from '@/components/input/HorizonInput';
 import { saveStudy } from '@/shared/services/studyService';
-import { BackendError, StudyDTO } from '@/shared/types';
+import { StudyDTO } from '@/shared/types';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { notifyToast } from '@/shared/notification/notification';
 import { validateMaxLength } from '@/shared/utils/validateMaxTextLength';
@@ -76,13 +76,13 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
       setProjectName('');
       setHorizon('');
       setKeywords([]);
+      notifyToast({
+        type: 'success',
+        message: 'Study created successfully',
+      });
       onClose();
     } catch (error) {
-      // Handle errors with toast notification
-      notifyToast({
-        type: 'error',
-        message: (error as BackendError).antaresErrorMessage || 'Error creating study',
-      });
+      // Silent handler
     }
   };
 

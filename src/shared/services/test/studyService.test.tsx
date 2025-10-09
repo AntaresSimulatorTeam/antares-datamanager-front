@@ -125,25 +125,16 @@ describe('saveStudy', () => {
       },
       body: JSON.stringify(mockStudy),
     });
-    expect(notifyToast).toHaveBeenCalledWith({
-      type: 'success',
-      message: 'Study created successfully',
-    });
   });
 
-  it('should display a toast with the backend error message', async () => {
+  it('should throw error with the backend error message', async () => {
     vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
       antaresErrorMessage: 'A study with the same name already exists',
       date: new Date(),
       type: ERROR_MESSAGE_TYPE.BUSINESS,
     });
 
-    await saveStudy(mockStudy);
-
-    expect(notifyToast).toHaveBeenCalledWith({
-      type: 'error',
-      message: 'A study with the same name already exists',
-    });
+    await expect(async () => saveStudy(mockStudy)).rejects.toThrowError('A study with the same name already exists');
   });
 });
 
@@ -279,10 +270,6 @@ describe('duplicateStudy', () => {
       },
       body: JSON.stringify(mockStudyData),
     });
-    expect(notifyToast).toHaveBeenCalledWith({
-      type: 'success',
-      message: 'Study duplicated successfully',
-    });
   });
 
   it('should throw an error message', async () => {
@@ -355,24 +342,15 @@ describe('updateStudy', () => {
       },
       body: JSON.stringify(mockStudyData),
     });
-    expect(notifyToast).toHaveBeenCalledWith({
-      type: 'success',
-      message: 'Study updated successfully',
-    });
   });
 
-  it('should display an error notification', async () => {
+  it('should throw an error with error backend', async () => {
     vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
       antaresErrorMessage: 'Failed to update study',
       date: new Date(),
       type: ERROR_MESSAGE_TYPE.BUSINESS,
     });
 
-    const result = await updateStudy(mockStudyData, 123);
-    expect(result).toEqual(undefined);
-    expect(notifyToast).toHaveBeenCalledWith({
-      type: 'error',
-      message: 'Failed to update study',
-    });
+    await expect(async () => updateStudy(mockStudyData, 123)).rejects.toThrowError('Failed to update study');
   });
 });

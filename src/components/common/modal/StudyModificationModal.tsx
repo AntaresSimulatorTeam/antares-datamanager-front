@@ -11,7 +11,7 @@ import KeywordsInput from '@/components/input/KeywordsInput.tsx';
 import HorizonInput from '@/components/input/HorizonInput';
 import ProjectInput from '@/components/input/ProjectInput.tsx';
 import { duplicateStudy, updateStudy } from '@/shared/services/studyService';
-import { BackendError, StudyDTO } from '@/shared/types';
+import { StudyDTO } from '@/shared/types';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { notifyToast } from '@/shared/notification/notification';
 import { validateMaxLength } from '@/shared/utils/validateMaxTextLength';
@@ -64,17 +64,15 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
     try {
       isDuplicateMode ? await duplicateStudy(studyData) : await updateStudy(studyData, study.id);
       setReloadStudies?.((prev) => prev + 1); // Trigger reload after successful save
+      notifyToast({
+        type: 'success',
+        message: `Study ${isDuplicateMode ? 'duplicated' : 'updated'} successfully`,
+      });
       onClose();
     } catch (error) {
-      const fallBackMessage = isDuplicateMode ? 'Error duplicating study' : 'Error updating study';
-      let errorMsg = (error as BackendError).antaresErrorMessage || fallBackMessage;
+      let errorMsg = (error as Error).message;
       errorMsg = errorMsg.replace(/:\s+/g, ': ');
       isDuplicateMode && setDuplicateErrorMessage(errorMsg);
-      // Handle errors with toast notification
-      notifyToast({
-        type: 'error',
-        message: (error as BackendError).antaresErrorMessage || 'Error creating study',
-      });
     }
   };
 

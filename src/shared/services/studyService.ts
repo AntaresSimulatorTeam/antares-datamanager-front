@@ -97,16 +97,8 @@ export const saveStudy = async (
       },
       body: JSON.stringify(studyData),
     });
-
-    notifyToast({
-      type: 'success',
-      message: 'Study created successfully',
-    });
   } catch (error) {
-    notifyToast({
-      type: 'error',
-      message: (error as BackendError).antaresErrorMessage ?? '',
-    });
+    throw new Error((error as BackendError).antaresErrorMessage);
   }
 };
 
@@ -128,16 +120,8 @@ export const updateStudy = async (studyData: StudyDTO, studyId: number): Promise
       },
       body: JSON.stringify(studyData),
     });
-
-    notifyToast({
-      type: 'success',
-      message: 'Study updated successfully',
-    });
   } catch (error) {
-    notifyToast({
-      type: 'error',
-      message: (error as BackendError).antaresErrorMessage ?? '',
-    });
+    throw new Error((error as BackendError).antaresErrorMessage);
   }
 };
 
@@ -237,16 +221,15 @@ export const getStudyById = async (studyId: number): Promise<StudyDTO> => {
 export const duplicateStudy = async (
   studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate' | 'projectId'>,
 ): Promise<void> => {
-  await AuthService.authFetch(`${STUDY_ENDPOINT}/duplicate`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(studyData),
-  });
-
-  notifyToast({
-    type: 'success',
-    message: 'Study duplicated successfully',
-  });
+  try {
+    await AuthService.authFetch(`${STUDY_ENDPOINT}/duplicate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(studyData),
+    });
+  } catch (error) {
+    throw new Error((error as BackendError).antaresErrorMessage);
+  }
 };
