@@ -36,7 +36,8 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
 }) => {
   const { t } = useTranslation();
   const { user } = useUser();
-  const [studyName, setStudyName] = useState<string>(study?.name.substring(0, study?.name.lastIndexOf('_')) || '');
+  const baseStudyName = study.name.substring(0, study.name.lastIndexOf('_'));
+  const [studyName, setStudyName] = useState<string>(baseStudyName);
   const [projectName, setProjectName] = useState<string>(study?.project || '');
   const [keywords, setKeywords] = useState<string[]>(study?.keywords || []);
   const [horizon, setHorizon] = useState<string>(() => {
@@ -78,10 +79,9 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
 
   useEffect(() => {
     const validateForm = () => {
-      const originalName = study?.name.substring(0, study?.name.lastIndexOf('_')) || '';
-      const studyNameChanged = studyName.trim() !== originalName.trim();
+      const studyNameChanged = studyName.trim() !== baseStudyName.trim();
       const projectNameChanged = study.project.trim() !== projectName.trim();
-      const heywordsChanged = hasArrayChanged(study.keywords, keywords);
+      const keywordsChanged = hasArrayChanged(study.keywords, keywords);
 
       if (isDuplicateMode) {
         if (isHorizonValid || studyNameChanged) {
@@ -90,7 +90,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
           setIsFormValid(false);
         }
       } else {
-        if (studyNameChanged || projectNameChanged || heywordsChanged) {
+        if (studyNameChanged || projectNameChanged || keywordsChanged) {
           setIsFormValid(true);
         } else {
           setIsFormValid(false);
