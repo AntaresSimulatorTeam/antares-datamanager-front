@@ -70,6 +70,9 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
       });
       onClose();
     } catch (error) {
+      const errorMessages = (error as Error)?.message;
+      if (errorMessages.includes('horizon')) {
+      }
       setBackendErrorMessage((error as Error)?.message);
       console.log('==============================error', error);
     }
@@ -114,9 +117,9 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
                 maxLength={75}
               />
               <div
-                className={`text-error-500 ${backendErrorMessage ? 'opacity-100' : 'opacity-0'} flex h-2 justify-start`}
+                className={`text-error-500 ${backendErrorMessage.includes('study') && backendErrorMessage ? 'opacity-100' : 'opacity-0'} flex h-2 justify-start`}
               >
-                {backendErrorMessage}
+                {backendErrorMessage.includes('study') ? backendErrorMessage : ''}
               </div>
             </div>
             <div className="w-1/2">
@@ -129,7 +132,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
             onValidChange={setIsHorizonValid}
             required
             disabled={!isDuplicateMode}
-            customErrorMessage={isDuplicateMode ? backendErrorMessage : ''}
+            customErrorMessage={isDuplicateMode && backendErrorMessage.includes('horizon') ? backendErrorMessage : ''}
           />
           <KeywordsInput
             keywords={keywords}
