@@ -75,9 +75,9 @@ const HorizonInput: React.FC<YearInputProps> = ({
 
   return (
     <div className="flex items-center gap-2">
-      <div className="flex w-1/2">
+      <div className="flex w-1/2 flex-col">
         <RdsInputText
-          label="Horizon"
+          label={t('home.@horizon')}
           value={horizon}
           onChange={handleInputChange}
           onBlur={handleBlur}
@@ -87,9 +87,9 @@ const HorizonInput: React.FC<YearInputProps> = ({
           maxLength={4}
           disabled={disabled}
         />
-      </div>
-      <div className={`text-error-500 ${customErrorMessage || errorMessage ? 'opacity-100' : 'opacity-0'} w-1/2`}>
-        {customErrorMessage || errorMessage || t('horizonInput.@errorMessage')}
+        <div className={`text-error-500 ${customErrorMessage || errorMessage ? 'opacity-100' : 'opacity-0'} h-2`}>
+          {customErrorMessage || errorMessage || t('horizonInput.@errorMessage')}
+        </div>
       </div>
     </div>
   );

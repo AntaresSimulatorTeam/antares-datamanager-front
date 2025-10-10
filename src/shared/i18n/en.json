@@ -109,6 +109,7 @@
     "@misc": "Misc",
     "@trajectory": "Trajectory to use",
     "@select_trajectory": "Select a trajectory",
+    "@select_project": "Selecta project",
     "@select_area": "Add an area first",
     "@import_file": "Import",
     "@select_file_fs_error": "Not such files on file system",

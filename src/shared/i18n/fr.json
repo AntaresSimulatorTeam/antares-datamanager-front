@@ -86,6 +86,7 @@
     "@misc": "Misc",
     "@trajectory": "Trajectoire",
     "@select_trajectory": "Selectionner une trajectoire",
+    "@select_project": "Selectionner un nom de projet",
     "@select_file": "Selectionner un fichier",
     "@import_from_file_system": "Importer une trajectoire pour {{area}}",
     "@select_from": "Select from {{path}}",

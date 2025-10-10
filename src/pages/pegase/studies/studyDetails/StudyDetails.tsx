@@ -12,7 +12,7 @@ import StudyNavigationMenu from '@/components/menu/StudyNavigationMenu.tsx';
 import { HypothesisTab, StudyDTO } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
-import { createStudy, getStudyById } from '@/shared/services/studyService.ts';
+import { generateStudy, getStudyById } from '@/shared/services/studyService.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { ButtonWithStdIcon } from '@/components/button/ButtonWithStdIcon.tsx';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
@@ -52,7 +52,7 @@ const StudyDetails = () => {
   const handleGenerateStudy = async () => {
     try {
       setIsGenerating(true);
-      await createStudy(study.id);
+      await generateStudy(study.id);
       setIsGenerating(false);
       dispatch?.({ type: STUDY_ACTION.SET_STUDY_STATUS, payload: StudyStatus.GENERATED });
     } catch {

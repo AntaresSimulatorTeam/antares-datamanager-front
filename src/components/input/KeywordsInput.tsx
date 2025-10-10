@@ -113,7 +113,7 @@ const KeywordsInput = ({
         <div className="flex w-full items-center gap-2">
           <div className="max-w-3/4 flex">
             <RdsInputText
-              label="Keywords"
+              label={t('home.@keywords')}
               value={keywordInput}
               onChange={handleKeywordChange}
               placeHolder="Add a keyword"

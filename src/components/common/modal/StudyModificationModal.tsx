@@ -9,17 +9,16 @@ import { RdsInputText, RdsModal } from 'rte-design-system-react';
 import { useTranslation } from 'react-i18next';
 import KeywordsInput from '@/components/input/KeywordsInput.tsx';
 import HorizonInput from '@/components/input/HorizonInput';
-import ProjectInput from '@/components/input/ProjectInput.tsx';
 import { duplicateStudy, updateStudy } from '@/shared/services/studyService';
 import { StudyDTO } from '@/shared/types';
 import { useUser } from '@/store/contexts/UserContext.tsx';
-import { notifyAlert, notifyToast } from '@/shared/notification/notification';
+import { notifyToast } from '@/shared/notification/notification';
 import { validateMaxLength } from '@/shared/utils/validateMaxTextLength';
 import { MAX_STUDY_NAME_LENGTH } from '@/shared/const/studyConfig';
 import StdButton from '@common/base/stdButton/StdButton';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { hasArrayChanged } from '@/shared/utils/arrayUtils.ts';
-import { isBusinessError } from '@/shared/utils/errorUtils.ts';
+import ProjectInput from '@/components/input/ProjectInput.tsx';
 
 interface StudyCreationModalProps {
   isOpen?: boolean;
@@ -49,8 +48,10 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
   });
   const [isFormValid, setIsFormValid] = useState(false);
   const [isHorizonValid, setIsHorizonValid] = useState(false);
+  const [backendErrorMessage, setBackendErrorMessage] = useState<string>('');
 
   const updateStudyHandler = async () => {
+    setBackendErrorMessage('');
     const studyData = {
       ...study,
       createdBy: user?.profile.sub,
@@ -62,22 +63,15 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
 
     try {
       isDuplicateMode ? await duplicateStudy(studyData) : await updateStudy(studyData, study.id);
-      setReloadStudies?.((prev) => prev + 1); // Trigger reload after successful save
+      setReloadStudies?.((prev) => prev + 1);
       notifyToast({
         type: 'success',
         message: `Study ${isDuplicateMode ? 'duplicated' : 'updated'} successfully`,
       });
       onClose();
     } catch (error) {
-      if (isBusinessError(error)) {
-        notifyAlert({
-          icon: StdIconId.Close,
-          message: `Failed to ${isDuplicateMode ? 'duplicate' : 'update'} study`,
-          content: error.antaresErrorMessage,
-          type: 'error',
-          filledIcon: true,
-        });
-      }
+      setBackendErrorMessage((error as Error)?.message);
+      console.log('==============================error', error);
     }
   };
 
@@ -87,24 +81,15 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
       const projectNameChanged = study.project.trim() !== projectName.trim();
       const keywordsChanged = hasArrayChanged(study.keywords, keywords);
 
-      if (isDuplicateMode) {
-        if (isHorizonValid || studyNameChanged) {
-          setIsFormValid(true);
-        } else {
-          setIsFormValid(false);
-        }
-      } else {
-        if (studyNameChanged || projectNameChanged || keywordsChanged) {
-          setIsFormValid(true);
-        } else {
-          setIsFormValid(false);
-        }
-      }
+      isDuplicateMode
+        ? setIsFormValid(isHorizonValid || studyNameChanged)
+        : setIsFormValid(studyNameChanged || projectNameChanged || keywordsChanged);
     };
     validateForm();
-  }, [study, studyName, projectName, horizon, keywords, isHorizonValid, isDuplicateMode]);
+  }, [study, studyName, projectName, horizon, keywords, isHorizonValid, isDuplicateMode, baseStudyName]);
 
   const handleStudyNameChange = (value: string) => {
+    setBackendErrorMessage('');
     if (validateMaxLength(value, MAX_STUDY_NAME_LENGTH)) {
       setStudyName(value || '');
     }
@@ -128,6 +113,11 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
                 required
                 maxLength={75}
               />
+              <div
+                className={`text-error-500 ${backendErrorMessage ? 'opacity-100' : 'opacity-0'} flex h-2 justify-start`}
+              >
+                {backendErrorMessage}
+              </div>
             </div>
             <div className="w-1/2">
               <ProjectInput value={projectName} onChange={setProjectName} required />
@@ -139,6 +129,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
             onValidChange={setIsHorizonValid}
             required
             disabled={!isDuplicateMode}
+            customErrorMessage={isDuplicateMode ? backendErrorMessage : ''}
           />
           <KeywordsInput
             keywords={keywords}

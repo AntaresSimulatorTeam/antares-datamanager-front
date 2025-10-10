@@ -7,11 +7,11 @@
 import { describe, expect, Mock, vi } from 'vitest';
 import { waitFor } from '@testing-library/react';
 import {
-  createStudy,
   deleteStudy,
   duplicateStudy,
   fetchSearchStudies,
   fetchSuggestedKeywords,
+  generateStudy,
   getStudyById,
   getStudyTrajectories,
   saveStudy,
@@ -186,7 +186,7 @@ describe('createStudy', () => {
       ok: true,
     });
 
-    await createStudy(5);
+    await generateStudy(5);
 
     expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
     expect(AuthService.authFetch).toHaveBeenCalledWith('https://mockapi.com/v1/study/generate?id=5', {
@@ -204,7 +204,7 @@ describe('createStudy', () => {
       type: ERROR_MESSAGE_TYPE.BUSINESS,
     });
 
-    await expect(async () => createStudy(1)).rejects.toThrowError('Failed to generate a study');
+    await expect(async () => generateStudy(1)).rejects.toThrowError('Failed to generate a study');
   });
 });
 
