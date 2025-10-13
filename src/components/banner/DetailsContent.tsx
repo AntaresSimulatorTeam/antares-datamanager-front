@@ -11,6 +11,7 @@ import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import { useTranslation } from 'react-i18next';
 import StdTagList from '@common/base/StdTagList/StdTagList.tsx';
 import StdButton from '@common/base/stdButton/StdButton.tsx';
+import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 
 type DetailsContentProps = {
   content: StudyDTO | ProjectInfo;
@@ -68,7 +69,7 @@ export const DetailsContent = ({ content, onClickButton }: DetailsContentProps) 
               </>
             )}
           </div>
-          {'tags' in content && (
+          {(('status' in content && content?.status !== StudyStatus.GENERATED) || 'studies' in content) && (
             <StdButton
               icon={StdIconId.Edit}
               label={t('project.@edit')}

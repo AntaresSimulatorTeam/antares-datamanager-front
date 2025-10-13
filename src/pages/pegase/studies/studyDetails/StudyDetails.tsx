@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { ReactNode, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { Location, useLocation } from 'react-router-dom';
 import StudyHeader from './StudyHeader.tsx';
 import { RdsDivider } from 'rte-design-system-react';
@@ -12,7 +12,7 @@ import StudyNavigationMenu from '@/components/menu/StudyNavigationMenu.tsx';
 import { HypothesisTab, StudyDTO } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
-import { createStudy } from '@/shared/services/studyService.ts';
+import { generateStudy, getStudyById } from '@/shared/services/studyService.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { ButtonWithStdIcon } from '@/components/button/ButtonWithStdIcon.tsx';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
@@ -21,6 +21,8 @@ import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { ContainerWithExpander } from '@/components/banner/ContainerWithExpander.tsx';
 import { useFetchWarningMessages } from '@/hooks/useFetchWarningMessages.ts';
+import StudyModificationModal from '@common/modal/StudyModificationModal.tsx';
+import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 
 interface StudyState {
   study: StudyDTO;
@@ -34,6 +36,7 @@ const StudyDetails = () => {
   const { t } = useTranslation();
   const studyState = useStudy();
   const dispatch = useStudyDispatch();
+  const { isModalOpen, toggleModal } = useNewStudyModal();
   const [isGenerating, setIsGenerating] = useState(false);
   const [activeTab, setActiveTab] = useState<HypothesisTab>({
     name: TRAJECTORY_TYPE.AREA,
@@ -43,11 +46,13 @@ const StudyDetails = () => {
   });
   const [errorMessage, setErrorMessage] = useState<string>('');
   const { warningMessages } = useFetchWarningMessages(study.id, activeTab.name);
+  const [reloadStudy, setReloadStudy] = useState(0);
+  const [studyData, setStudyData] = useState<StudyDTO>(study);
 
   const handleGenerateStudy = async () => {
     try {
       setIsGenerating(true);
-      await createStudy(study.id);
+      await generateStudy(study.id);
       setIsGenerating(false);
       dispatch?.({ type: STUDY_ACTION.SET_STUDY_STATUS, payload: StudyStatus.GENERATED });
     } catch {
@@ -55,17 +60,32 @@ const StudyDetails = () => {
     }
   };
 
+  const onCloseModal = () => {
+    toggleModal();
+    setReloadStudy((prev) => prev + 1);
+  };
+
+  useEffect(() => {
+    const fetchStudyData = async (id: number) => {
+      const studyUpdated = await getStudyById(id);
+      setStudyData(studyUpdated);
+    };
+    if (study.id != null) {
+      void fetchStudyData(study.id);
+    }
+  }, [reloadStudy, study.id]);
+
   return !study.id ? (
     <div className="flex h-screen items-center justify-center">
       <p>{t('studyDetails.@loading')}</p>
     </div>
   ) : (
     <div className="flex h-full w-full flex-col pb-16">
-      <StudyHeader study={study} />
+      <StudyHeader study={studyData} />
       <div className="relative flex h-full w-full flex-col">
         <RdsDivider />
         <div className="flex flex-col">
-          <DetailsContent content={study} />
+          <DetailsContent content={studyData} onClickButton={toggleModal} />
         </div>
         <div className="flex px-3 pt-2">
           <div className="flex items-end self-stretch">
@@ -101,6 +121,9 @@ const StudyDetails = () => {
           </div>
         </div>
       </div>
+      {isModalOpen && studyData && studyData.status !== StudyStatus.GENERATED && (
+        <StudyModificationModal onClose={onCloseModal} study={studyData} />
+      )}
     </div>
   );
 };

@@ -61,6 +61,15 @@
     "@keyword_maximum_error": "Le mot-clé ne doit pas dépasser {{max}} lettres",
     "@keyword_max_keys_errors": "Il n'est pas possible d'ajouter plus que {{maxNbKey}} mot-clés"
   },
+  "studyModal": {
+    "@new_study": "Créer une étude",
+    "@update_study": "Modifier l'étude",
+    "@study_creation_placeholder": "Saisissez un nom d'étude...",
+    "@button_create": "Créer",
+    "@button_update": "Modifier",
+    "@button_edit": "Editer",
+    "@input_name": "Nom"
+  },
   "study": {
     "@open": "Ouvrir",
     "@duplicate": "Dupliquer",
@@ -77,6 +86,7 @@
     "@misc": "Misc",
     "@trajectory": "Trajectoire",
     "@select_trajectory": "Selectionner une trajectoire",
+    "@select_project": "Selectionner un nom de projet",
     "@select_file": "Selectionner un fichier",
     "@import_from_file_system": "Importer une trajectoire pour {{area}}",
     "@select_from": "Select from {{path}}",

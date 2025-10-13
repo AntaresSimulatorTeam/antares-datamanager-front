@@ -80,9 +80,11 @@
   },
   "studyModal": {
     "@new_study": "Create a study",
+    "@update_study": "Update study",
     "@study_creation_placeholder": "Name your study...",
     "@button_create": "Create",
     "@button_update": "Update",
+    "@button_edit": "Edit",
     "@input_name": "Name"
   },
   "study": {
@@ -107,6 +109,7 @@
     "@misc": "Misc",
     "@trajectory": "Trajectory to use",
     "@select_trajectory": "Select a trajectory",
+    "@select_project": "Selecta project",
     "@select_area": "Add an area first",
     "@import_file": "Import",
     "@select_file_fs_error": "Not such files on file system",

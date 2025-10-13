@@ -85,6 +85,7 @@ export const fetchSuggestedKeywords = async (partialName: string): Promise<strin
  *
  * @param {Omit<StudyDTO, 'id' | 'status' | 'creationDate'>} studyData - Partial study data
  * @return {Promise<void>}
+ * @throws {BackendError} Throws an error if the update fails on the server-side.
  */
 export const saveStudy = async (
   studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate' | 'projectId'> & { id: number | undefined },
@@ -97,18 +98,58 @@ export const saveStudy = async (
       },
       body: JSON.stringify(studyData),
     });
-
-    notifyToast({
-      type: 'success',
-      message: 'Study created successfully',
-    });
-  } catch (error) {
-    notifyToast({
-      type: 'error',
-      message: (error as BackendError).antaresErrorMessage ?? '',
-    });
+  } catch (error: unknown) {
+    throw new Error((error as BackendError).antaresErrorMessage);
   }
 };
+
+/**
+ * A function to update an existing study by making an asynchronous HTTP PUT request to the server.
+ * It sends the updated study data as JSON and displays a notification upon success or failure.
+ *
+ * @param {StudyDTO} studyData - The updated study data to be sent to the server.
+ * @param {number} studyId - The unique identifier of the study to be updated.
+ * @returns {Promise<void>} A promise that resolves when the update operation is completed.
+ * @throws {BackendError} Throws an error if the update fails on the server-side.
+ */
+export const updateStudy = async (studyData: StudyDTO, studyId: number): Promise<void> => {
+  try {
+    await AuthService.authFetch(`${STUDY_ENDPOINT}/${studyId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(studyData),
+    });
+  } catch (error: unknown) {
+    throw new Error((error as BackendError).antaresErrorMessage);
+  }
+};
+
+/**
+ * Duplicate a study
+ * Throws error if duplication fails, displays success toast if successful
+ *
+ * @param {Omit<StudyDTO, 'id' | 'status' | 'creationDate' | 'projectId'>} studyData - Partial study data
+ * @return {Promise<void>}
+ * @throws {BackendError} Throws an error if the update fails on the server-side.
+ */
+export const duplicateStudy = async (
+  studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate' | 'projectId'>,
+): Promise<void> => {
+  try {
+    await AuthService.authFetch(`${STUDY_ENDPOINT}/duplicate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(studyData),
+    });
+  } catch (error: unknown) {
+    throw new Error((error as BackendError).antaresErrorMessage);
+  }
+};
+
 /**
  * Delete a study
  * Display toast if deletion succeeds or fails
@@ -126,10 +167,7 @@ export const deleteStudy = async (id: number): Promise<void> => {
       message: 'Study deleted successfully',
     });
   } catch (error: unknown) {
-    notifyToast({
-      type: 'error',
-      message: `${(error as BackendError).antaresErrorMessage}`,
-    });
+    throw new Error((error as BackendError).antaresErrorMessage);
   }
 };
 
@@ -139,7 +177,7 @@ export const deleteStudy = async (id: number): Promise<void> => {
  * @param {number} id - Study id
  * @throws {Error}
  */
-export const createStudy = async (id: number): Promise<void> => {
+export const generateStudy = async (id: number): Promise<void> => {
   const urlApi = `${STUDY_GENERATE_ENDPOINT}?id=${id}`;
   try {
     await AuthService.authFetch(urlApi, {
@@ -164,9 +202,9 @@ export const createStudy = async (id: number): Promise<void> => {
 
 export const getStudyTrajectories = async (
   studyId: number,
-  trajectoryType?: TRAJECTORY_TYPE,
+  trajectoryType: TRAJECTORY_TYPE,
 ): Promise<DbTrajectory[]> => {
-  const urlApi = `${TRAJECTORY_ENDPOINT}?studyId=${studyId}&trajectoryType=${trajectoryType ?? ''}`;
+  const urlApi = `${TRAJECTORY_ENDPOINT}?studyId=${studyId}&trajectoryType=${trajectoryType}`;
 
   try {
     const response = await AuthService.authFetch(urlApi);
@@ -192,29 +230,4 @@ export const getStudyById = async (studyId: number): Promise<StudyDTO> => {
   } catch (error) {
     throw new Error((error as BackendError).antaresErrorMessage);
   }
-};
-
-/**
- * Duplicate a study
- * Throws error if duplication fails, displays success toast if successful
- *
- * @param {Omit<StudyDTO, 'id' | 'status' | 'creationDate' | 'projectId'>} studyData - Partial study data
- * @return {Promise<void>}
- * @throws {Error} If duplication fails
- */
-export const duplicateStudy = async (
-  studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate' | 'projectId'>,
-): Promise<void> => {
-  await AuthService.authFetch(`${STUDY_ENDPOINT}/duplicate`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(studyData),
-  });
-
-  notifyToast({
-    type: 'success',
-    message: 'Study duplicated successfully',
-  });
 };
