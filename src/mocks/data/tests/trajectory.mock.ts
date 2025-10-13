@@ -335,6 +335,24 @@ export const mockFsTrajectoryThermalCapacityArray: FsTrajectory[] = [
   },
 ];
 
+export const mockFsTrajectoryParaModulationArray: FsTrajectory[] = [
+  {
+    trajectoryName: 'params',
+    type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER,
+    lastModifiedDate: '2025-07-02T11:57:48.493018687' as unknown as Date,
+  },
+  {
+    trajectoryName: 'params_2',
+    type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER,
+    lastModifiedDate: '2025-07-02T11:57:48.493018687' as unknown as Date,
+  },
+  {
+    trajectoryName: 'params_PEMMDB',
+    type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER,
+    lastModifiedDate: '2025-06-27T10:40:47.410233' as unknown as Date,
+  },
+];
+
 export const mockTrajectoryAreaData: TrajectoryAreaData[] = [
   {
     areaName: 'CH',

@@ -1,9 +1,15 @@
-import { convertToFSSelectionOptionType, convertToSelectionOptionType } from '@/shared/utils/formFormatter.ts';
+import {
+  convertToFSSelectionOptionType,
+  convertToSelectionOptionType,
+  isRepositoryTrajectory,
+} from '@/shared/utils/formFormatter.ts';
 import {
   mockDbTrajectoryArray,
   mockFsTrajectoryAreaArray,
   mockFsTrajectoryLoadArray,
+  mockFsTrajectoryParaModulationArray,
 } from '@/mocks/data/tests/trajectory.mock.ts';
+import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 
 describe('convertToSelectionOptionType', () => {
   it('should return an array of SelectOption type when array of DbTrajectory as an argument', () => {
@@ -33,7 +39,29 @@ describe('convertToFSSelectionOptionType', () => {
       { id: 3, label: 'BP23_AREF_EU_CBN_VIDE' },
     ]);
   });
+  it('should return an array of SelectOption type in which label is the trajectory name when array of THERMAL_TECHNICAL_MODULATION_PARAMETER as an argument', () => {
+    expect(convertToFSSelectionOptionType(mockFsTrajectoryParaModulationArray)).toEqual([
+      { id: 0, label: 'params' },
+      { id: 1, label: 'params_2' },
+      { id: 2, label: 'params_PEMMDB' },
+    ]);
+  });
   it('should return an empty array when empty array as an argument', () => {
     expect(convertToSelectionOptionType([])).toEqual([]);
+  });
+});
+
+describe('isRepositoryTrajectory', () => {
+  it('should return false for TRAJECTORY_TYPE AREA', () => {
+    expect(isRepositoryTrajectory(TRAJECTORY_TYPE.AREA)).toBeFalsy();
+  });
+  it('should return false for TRAJECTORY_TYPE LINK', () => {
+    expect(isRepositoryTrajectory(TRAJECTORY_TYPE.LINK)).toBeFalsy();
+  });
+  it('should return true for TRAJECTORY_TYPE LOAD', () => {
+    expect(isRepositoryTrajectory(TRAJECTORY_TYPE.LOAD)).toBeTruthy();
+  });
+  it('should return false for TRAJECTORY_TYPE THERMAL_TECHNICAL_MODULATION_PARAMETER', () => {
+    expect(isRepositoryTrajectory(TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER)).toBeTruthy();
   });
 });
