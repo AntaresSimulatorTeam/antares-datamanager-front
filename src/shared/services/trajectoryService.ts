@@ -317,7 +317,7 @@ export const getNbMessagesFromTrajectoryType = async (
  */
 export const getStudyTrajectoriesWithWarnings = async (
   studyId: number,
-  trajectoryType?: TRAJECTORY_TYPE,
+  trajectoryType: TRAJECTORY_TYPE,
 ): Promise<TrajectoryStateWithWarningMessages> => {
   try {
     const trajectories: DbTrajectory[] = await getStudyTrajectories(studyId, trajectoryType);

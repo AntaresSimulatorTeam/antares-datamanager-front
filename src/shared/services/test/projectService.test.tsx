@@ -134,7 +134,7 @@ describe('fetchProjectsFromPartialName', () => {
       expect(AuthService.authFetch).toHaveBeenCalledWith(
         'https://mockapi.com/v1/project/autocomplete?partialName=name',
       );
-      expect(result).toEqual(['Bilan prévisionnel 2023', 'Bilan prévisionnel 2019']);
+      expect(result).toEqual(mockProjectInfoArray);
     });
   });
 

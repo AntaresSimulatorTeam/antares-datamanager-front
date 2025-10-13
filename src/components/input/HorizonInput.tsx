@@ -8,9 +8,17 @@ interface YearInputProps {
   required: boolean;
   onValidChange?: (isValid: boolean) => void;
   customErrorMessage?: string;
+  disabled?: boolean;
 }
 
-const HorizonInput: React.FC<YearInputProps> = ({ horizon, onChange, required = true, onValidChange, customErrorMessage }) => {
+const HorizonInput: React.FC<YearInputProps> = ({
+  horizon,
+  onChange,
+  required = true,
+  onValidChange,
+  customErrorMessage,
+  disabled = false,
+}) => {
   const { t } = useTranslation();
   const [errorMessage, setErrorMessage] = useState<string>('');
 
@@ -66,21 +74,24 @@ const HorizonInput: React.FC<YearInputProps> = ({ horizon, onChange, required = 
   };
 
   return (
-    <div className="flex items-center">
-    <div className="flex w-1/2">
-      <RdsInputText
-        label="Horizon"
-        value={horizon}
-        onChange={handleInputChange}
-        onBlur={handleBlur}
-        placeHolder={t('horizonInput.@horizonPlaceholder')}
-        variant="outlined"
-        required={required}
-        maxLength={4}
-      />
-  </div>
-      <div className={`text-error-500 ${customErrorMessage || errorMessage ? 'opacity-100' : 'opacity-0'} w-1/2`}>
-        {customErrorMessage || errorMessage || t('horizonInput.@errorMessage')}
+    <div className="flex items-center gap-2">
+      <div className="flex w-1/2 flex-col">
+        <RdsInputText
+          label={t('home.@horizon')}
+          value={horizon}
+          onChange={handleInputChange}
+          onBlur={handleBlur}
+          placeHolder={t('horizonInput.@horizonPlaceholder')}
+          variant="outlined"
+          required={required}
+          maxLength={4}
+          disabled={disabled}
+        />
+        <div
+          className={`text-error-500 ${customErrorMessage || errorMessage ? 'opacity-100' : 'opacity-0'} h-2 text-left text-body-s leading-4`}
+        >
+          {customErrorMessage || errorMessage || t('horizonInput.@errorMessage')}
+        </div>
       </div>
     </div>
   );

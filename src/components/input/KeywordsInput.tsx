@@ -113,7 +113,7 @@ const KeywordsInput = ({
         <div className="flex w-full items-center gap-2">
           <div className="max-w-3/4 flex">
             <RdsInputText
-              label="Keywords"
+              label={t('home.@keywords')}
               value={keywordInput}
               onChange={handleKeywordChange}
               placeHolder="Add a keyword"
@@ -131,7 +131,7 @@ const KeywordsInput = ({
             />
           )}
           {/* Error Message */}
-          {errorMessage && <div className="my-2 text-error-500">{errorMessage}</div>}
+          {errorMessage && <div className="text-left text-body-s leading-4 text-error-500">{errorMessage}</div>}
         </div>
 
         {/* Suggested Keywords Dropdown */}

@@ -402,7 +402,7 @@ describe('getStudyTrajectoriesWithWarnings', () => {
       type: ERROR_MESSAGE_TYPE.BUSINESS,
     });
 
-    await expect(async () => getStudyTrajectoriesWithWarnings(5)).rejects.toThrowError(
+    await expect(async () => getStudyTrajectoriesWithWarnings(5, TRAJECTORY_TYPE.LINK)).rejects.toThrowError(
       'Failed to fetch warning message',
     );
   });
