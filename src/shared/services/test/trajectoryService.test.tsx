@@ -559,10 +559,10 @@ describe('uploadTrajectory', () => {
     });
   });
 
-  it('should import THERMAL_TECHNICAL_SPECIFIC_PARAMETER trajectory into data base', async () => {
+  it('should import TRAJECTORY_THERMAL_MODULATION_PARAMETER_IMPORT trajectory into data base', async () => {
     await uploadTrajectory(
-      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
-      'specific_param_BP_23',
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER,
+      'param',
       '2030-2031',
       25,
       'Specific',
@@ -574,7 +574,7 @@ describe('uploadTrajectory', () => {
     await waitFor(() => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
       expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
-        `https://mockapi.com/v1/trajectory/thermal-specific-parameter?area=FR&trajectoryToUse=specific_param_BP_23&horizon=2030-2031&studyId=25`,
+        `https://mockapi.com/v1/trajectory/thermal-modulation-parameter?area=FR&trajectoryToUse=param&horizon=2030-2031&studyId=25`,
         requestOptions,
         onProgress,
       );

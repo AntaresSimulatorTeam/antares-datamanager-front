@@ -13,11 +13,14 @@ export const convertToSelectionOptionType = (trajectories: DbTrajectory[]): Sele
     label: trajectory.trajectoryName,
   }));
 
+export const isRepositoryTrajectory = (type: TRAJECTORY_TYPE) =>
+  type === TRAJECTORY_TYPE.LOAD || type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER;
+
 export const convertToFSSelectionOptionType = (options: FsTrajectory[]): SelectOption[] =>
   options.map((option, indexTrajectory) => ({
     id: indexTrajectory,
     label:
-      option.trajectoryName && option.type !== TRAJECTORY_TYPE.LOAD
+      option.trajectoryName && !isRepositoryTrajectory(option.type)
         ? option.trajectoryName.substring(0, option.trajectoryName.lastIndexOf('.'))
         : option.trajectoryName,
   }));
