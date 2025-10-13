@@ -4,15 +4,15 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { fetchProjectsFromPartialName } from '@/shared/services/projectService.ts';
 import SelectAndSearchableInput from '@/components/input/SelectAndSearchableInput.tsx';
 import { SelectOption } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 
 interface ProjectManagerProps {
-  value: string;
-  onChange: (value: string) => void;
+  value: SelectOption;
+  onChange: (value: SelectOption) => void;
   required?: boolean;
 }
 
@@ -32,12 +32,8 @@ const ProjectInput: React.FC<ProjectManagerProps> = ({ value, onChange, required
     }
   };
 
-  useEffect(() => {
-    void loadProjects();
-  }, []);
-
   const onSelect = (project: SelectOption) => {
-    onChange(project.label);
+    onChange(project);
   };
 
   return (
@@ -49,11 +45,11 @@ const ProjectInput: React.FC<ProjectManagerProps> = ({ value, onChange, required
       <SelectAndSearchableInput
         onSelect={(valueSelected: SelectOption) => void onSelect(valueSelected)}
         setSearchTerm={async (valueSearch?: string) => await loadProjects(valueSearch)}
-        defaultPlaceHolder={value ?? t('studyDetails.@select_project')}
+        defaultPlaceHolder={value?.label ?? t('studyDetails.@select_project')}
         isSearchable={true}
         options={projects}
         errorMessage={errorMessage}
-        defaultValue={value}
+        defaultValue={value?.label}
       />
     </div>
   );

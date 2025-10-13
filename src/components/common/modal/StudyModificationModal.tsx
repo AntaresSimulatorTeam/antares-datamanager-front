@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import KeywordsInput from '@/components/input/KeywordsInput.tsx';
 import HorizonInput from '@/components/input/HorizonInput';
 import { duplicateStudy, updateStudy } from '@/shared/services/studyService';
-import { StudyDTO } from '@/shared/types';
+import { SelectOption, StudyDTO } from '@/shared/types';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { notifyToast } from '@/shared/notification/notification';
 import { validateMaxLength } from '@/shared/utils/validateMaxTextLength';
@@ -38,7 +38,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
   const { user } = useUser();
   const baseStudyName = study.name.substring(0, study.name.lastIndexOf('_'));
   const [studyName, setStudyName] = useState<string>(baseStudyName);
-  const [projectName, setProjectName] = useState<string>(study?.project || '');
+  const [project, setProject] = useState<SelectOption>({ id: Number(study.projectId), label: study.project });
   const [keywords, setKeywords] = useState<string[]>(study?.keywords || []);
   const [horizon, setHorizon] = useState<string>(() => {
     const rawHorizon = study?.horizon || '';
@@ -63,7 +63,8 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
       createdBy: user?.profile.sub,
       name: studyName,
       keywords,
-      project: projectName,
+      project: project.label,
+      projectId: project?.id?.toString() || '',
       horizon,
     };
 
@@ -88,7 +89,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
   useEffect(() => {
     const validateForm = () => {
       const studyNameChanged = studyName.trim() !== baseStudyName.trim();
-      const projectNameChanged = study.project.trim() !== projectName.trim();
+      const projectNameChanged = study.project.trim() !== project?.label.trim();
       const keywordsChanged = hasArrayChanged(study.keywords, keywords);
 
       isDuplicateMode
@@ -96,7 +97,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
         : setIsFormValid(studyNameChanged || projectNameChanged || keywordsChanged);
     };
     validateForm();
-  }, [study, studyName, projectName, horizon, keywords, isHorizonValid, isDuplicateMode, baseStudyName]);
+  }, [study, studyName, project, horizon, keywords, isHorizonValid, isDuplicateMode, baseStudyName]);
 
   const handleStudyNameChange = (value: string) => {
     resetErrorMessage();
@@ -111,7 +112,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
         {isDuplicateMode ? t('home.@duplicate_study') : t('studyModal.@update_study')}
       </RdsModal.Title>
       <RdsModal.Content>
-        <div className="flex flex-col gap-2 self-stretch">
+        <div className="flex flex-col gap-4 self-stretch">
           <div className="flex justify-between gap-2">
             <div className="w-1/2">
               <RdsInputText
@@ -124,13 +125,13 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
                 maxLength={75}
               />
               <div
-                className={`text-error-500 ${studyErrorMessage ? 'opacity-100' : 'opacity-0'} flex justify-start text-left text-body-s leading-4`}
+                className={`text-error-500 ${studyErrorMessage ? 'opacity-100' : 'opacity-0'} flex h-2 justify-start text-left text-body-s leading-4`}
               >
                 {studyErrorMessage ?? ''}
               </div>
             </div>
             <div className="w-1/2">
-              <ProjectInput value={projectName} onChange={setProjectName} required />
+              <ProjectInput value={project} onChange={setProject} required />
             </div>
           </div>
           <HorizonInput

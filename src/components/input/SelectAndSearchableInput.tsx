@@ -36,7 +36,7 @@ const SelectAndSearchableInput = ({
   defaultValue,
 }: ProjectManagerProps) => {
   const [defaultOptions] = useState<SelectOption[] | undefined>(options);
-  const [optionsSelection, setOptionsSelection] = useState<SelectOption[] | undefined>(options);
+  const [optionsSelection, setOptionsSelection] = useState<SelectOption[] | undefined>(options ?? []);
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [isSelectEnable, setIsSelectEnable] = useState<boolean>(true);
   const [placeHolder] = useState<string>(defaultPlaceHolder);
@@ -76,7 +76,6 @@ const SelectAndSearchableInput = ({
 
   const handleClickOnKeyboard = async (event: MouseEvent<HTMLButtonElement>) => {
     try {
-      if (options?.length) return;
       const results = await setSearchTerm?.();
       if (results && results.length > 0) {
         setOptionsSelection(results);
