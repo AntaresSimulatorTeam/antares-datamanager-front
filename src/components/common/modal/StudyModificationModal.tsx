@@ -48,10 +48,16 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
   });
   const [isFormValid, setIsFormValid] = useState(false);
   const [isHorizonValid, setIsHorizonValid] = useState(false);
-  const [backendErrorMessage, setBackendErrorMessage] = useState<string>('');
+  const [studyErrorMessage, setStudyErrorMessage] = useState<string>('');
+  const [horizonErrorMessage, setHorizonErrorMessage] = useState<string>('');
+
+  const resetErrorMessage = () => {
+    setStudyErrorMessage('');
+    setHorizonErrorMessage('');
+  };
 
   const updateStudyHandler = async () => {
-    setBackendErrorMessage('');
+    resetErrorMessage();
     const studyData = {
       ...study,
       createdBy: user?.profile.sub,
@@ -71,10 +77,11 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
       onClose();
     } catch (error) {
       const errorMessages = (error as Error)?.message;
-      if (errorMessages.includes('horizon')) {
+      if (errorMessages?.includes('study')) {
+        setStudyErrorMessage(errorMessages);
+      } else if (errorMessages?.includes('horizon')) {
+        setHorizonErrorMessage(errorMessages);
       }
-      setBackendErrorMessage((error as Error)?.message);
-      console.log('==============================error', error);
     }
   };
 
@@ -92,7 +99,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
   }, [study, studyName, projectName, horizon, keywords, isHorizonValid, isDuplicateMode, baseStudyName]);
 
   const handleStudyNameChange = (value: string) => {
-    setBackendErrorMessage('');
+    resetErrorMessage();
     if (validateMaxLength(value, MAX_STUDY_NAME_LENGTH)) {
       setStudyName(value || '');
     }
@@ -104,7 +111,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
         {isDuplicateMode ? t('home.@duplicate_study') : t('studyModal.@update_study')}
       </RdsModal.Title>
       <RdsModal.Content>
-        <div className="flex flex-col gap-4 self-stretch">
+        <div className="flex flex-col gap-2 self-stretch">
           <div className="flex justify-between gap-2">
             <div className="w-1/2">
               <RdsInputText
@@ -117,9 +124,9 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
                 maxLength={75}
               />
               <div
-                className={`text-error-500 ${backendErrorMessage.includes('study') && backendErrorMessage ? 'opacity-100' : 'opacity-0'} flex h-2 justify-start`}
+                className={`text-error-500 ${studyErrorMessage ? 'opacity-100' : 'opacity-0'} flex justify-start text-left text-body-s leading-4`}
               >
-                {backendErrorMessage.includes('study') ? backendErrorMessage : ''}
+                {studyErrorMessage ?? ''}
               </div>
             </div>
             <div className="w-1/2">
@@ -132,7 +139,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
             onValidChange={setIsHorizonValid}
             required
             disabled={!isDuplicateMode}
-            customErrorMessage={isDuplicateMode && backendErrorMessage.includes('horizon') ? backendErrorMessage : ''}
+            customErrorMessage={isDuplicateMode && horizonErrorMessage ? horizonErrorMessage : ''}
           />
           <KeywordsInput
             keywords={keywords}

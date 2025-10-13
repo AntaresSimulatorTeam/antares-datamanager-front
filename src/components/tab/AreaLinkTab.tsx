@@ -37,7 +37,6 @@ import { convertToFSSelectionOptionType, convertToSelectionOptionType } from '@/
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
-import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { buildErrorTrajectory, getStatus } from '@/shared/utils/trajectoryUtils.ts';
 import { getStudyById, getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { TrajectoryDataVisualisation } from '@common/modal/TrajectoryDataVisualisation.tsx';
@@ -45,12 +44,12 @@ import { generateTrajectoryViewHeader } from '@/components/header/TrajectoryView
 import { useLocation } from 'react-router-dom';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { ErrorMessageType } from '@/shared/types/Generic.type.ts';
-import { computeReadOnlyState } from '@/shared/utils/computeReadOnlyState';
 import { FileInputStatus } from 'rte-design-system-react';
 import { notifyAlert } from '@/shared/notification/notification.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
 import { isBusinessError } from '@/shared/utils/errorUtils.ts';
+import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 
 interface AreaLinkTabProps {
   setErrorMessage: Dispatch<SetStateAction<string>>;
@@ -72,17 +71,8 @@ export const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
   const [data, setData] = useState<HypothesisRowData[]>([]);
   const [progress, setProgress] = useState(0);
   const [fileStatus, setFileStatus] = useState<FileInputStatus>('empty');
-  const [readOnly, setReadOnly] = useState<ReadOnlyObject>({ '0': false, '1': false });
+  const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
   const [isAreaDeletionConfirmOpen, setIsAreaDeletionConfirmOpen] = useState(false);
-
-  const areaTrajectory = data[0]?.trajectory;
-  const areaStatus = data[0]?.status;
-  const studyStatus = studyState.studyStatus!;
-  const hasLinkTrajectory = !!studyState?.[TRAJECTORY_TYPE.LINK];
-
-  useEffect(() => {
-    setReadOnly(computeReadOnlyState(areaTrajectory, areaStatus, studyStatus, hasLinkTrajectory));
-  }, [areaTrajectory, areaStatus, studyStatus, hasLinkTrajectory]);
 
   useEffect(() => {
     const getTrajectories = async () => {
@@ -112,11 +102,12 @@ export const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
             status: result.length > 0 ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
           })),
         );
+
         setReadOnly({
           '0': false,
           '1':
-            !!trajectoryAreaResult?.length ||
-            (!!trajectoryLinkResult?.length && studyData?.status === StudyStatus.GENERATED),
+            !trajectoryAreaResult?.length ||
+            (!trajectoryLinkResult?.length && studyData?.status === StudyStatus.GENERATED),
         });
       } catch {
         //Silent handler

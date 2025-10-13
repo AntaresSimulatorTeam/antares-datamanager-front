@@ -131,7 +131,7 @@ const KeywordsInput = ({
             />
           )}
           {/* Error Message */}
-          {errorMessage && <div className="my-2 text-error-500">{errorMessage}</div>}
+          {errorMessage && <div className="text-left text-body-s leading-4 text-error-500">{errorMessage}</div>}
         </div>
 
         {/* Suggested Keywords Dropdown */}

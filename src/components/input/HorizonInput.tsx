@@ -87,7 +87,9 @@ const HorizonInput: React.FC<YearInputProps> = ({
           maxLength={4}
           disabled={disabled}
         />
-        <div className={`text-error-500 ${customErrorMessage || errorMessage ? 'opacity-100' : 'opacity-0'} h-2`}>
+        <div
+          className={`text-error-500 ${customErrorMessage || errorMessage ? 'opacity-100' : 'opacity-0'} h-2 text-left text-body-s leading-4`}
+        >
           {customErrorMessage || errorMessage || t('horizonInput.@errorMessage')}
         </div>
       </div>
