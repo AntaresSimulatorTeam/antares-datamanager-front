@@ -18,6 +18,9 @@ interface ProjectManagerProps {
   isInputDisabled?: boolean;
   resetField?: () => void;
   options?: SelectOption[];
+  required?: boolean;
+  errorMessage?: string;
+  defaultValue?: string;
 }
 
 const SelectAndSearchableInput = ({
@@ -28,13 +31,16 @@ const SelectAndSearchableInput = ({
   isInputDisabled = false,
   resetField,
   options,
+  required = false,
+  errorMessage,
+  defaultValue,
 }: ProjectManagerProps) => {
   const [defaultOptions] = useState<SelectOption[] | undefined>(options);
-  const [optionsSelection, setOptionsSelection] = useState<SelectOption[] | undefined>(options);
+  const [optionsSelection, setOptionsSelection] = useState<SelectOption[] | undefined>(options ?? []);
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [isSelectEnable, setIsSelectEnable] = useState<boolean>(true);
   const [placeHolder] = useState<string>(defaultPlaceHolder);
-  const [valueInput, setValueInput] = useState<string>('');
+  const [valueInput, setValueInput] = useState<string>(defaultValue ?? '');
   const dropdownList = useRef<HTMLDivElement | null>(null);
 
   const handleInputChange = async (value: string) => {
@@ -70,7 +76,6 @@ const SelectAndSearchableInput = ({
 
   const handleClickOnKeyboard = async (event: MouseEvent<HTMLButtonElement>) => {
     try {
-      if (options?.length) return;
       const results = await setSearchTerm?.();
       if (results && results.length > 0) {
         setOptionsSelection(results);
@@ -91,7 +96,7 @@ const SelectAndSearchableInput = ({
       <div className="absolute right-0 top-1">
         {isSelectEnable && (
           <StdButton
-            icon={!isDropdownOpen ? StdIconId.KeyboardArrowRight : StdIconId.KeyboardArrowDown}
+            icon={isDropdownOpen ? StdIconId.KeyboardArrowDown : StdIconId.KeyboardArrowRight}
             size="extraSmall"
             variant="text"
             onClick={(e) => void handleClickOnKeyboard(e)}
@@ -114,7 +119,9 @@ const SelectAndSearchableInput = ({
         variant="outlined"
         value={valueInput}
         disabled={isInputDisabled}
+        required={required}
       />
+      {errorMessage && <div className="text-red-500 mt-2">{errorMessage}</div>}
       {isDropdownOpen && !!optionsSelection?.length && (
         <div
           className="absolute left-0 top-4 z-50 max-h-32 w-full overflow-y-auto rounded border border-gray-300 bg-gray-w shadow-2 outline-none"

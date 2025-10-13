@@ -4,17 +4,18 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { expect, Mock, vi } from 'vitest';
+import { describe, expect, Mock, vi } from 'vitest';
 import { waitFor } from '@testing-library/react';
 import {
-  createStudy,
   deleteStudy,
   duplicateStudy,
   fetchSearchStudies,
   fetchSuggestedKeywords,
+  generateStudy,
   getStudyById,
   getStudyTrajectories,
   saveStudy,
+  updateStudy,
 } from '@/shared/services/studyService.ts';
 import { notifyToast } from '@/shared/notification/notification.tsx';
 import { mockStudy, mockStudyResponse } from '@/mocks/data/tests/study.mock.ts';
@@ -22,6 +23,7 @@ import { mockDbTrajectoryArray } from '@/mocks/data/tests/trajectory.mock.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
 import { AuthService } from '@/shared/services/authService.ts';
+import { StudyDTO } from '@/shared/types';
 
 vi.mock('@/shared/notification/notification');
 vi.mock('@/envVariables', () => ({
@@ -91,6 +93,20 @@ describe('fetchSuggestedKeywords', () => {
     expect(result).toEqual(mockResponse);
   });
 
+  it('should return suggested keywords', async () => {
+    const mockResponse = [] as string[];
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
+      ok: true,
+      json: async () => Promise.resolve(mockResponse),
+    });
+
+    const result = await fetchSuggestedKeywords('');
+
+    expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
+    expect(AuthService.authFetch).toHaveBeenCalledWith('https://mockapi.com/v1/study/keywords/search?partialName=');
+    expect(result).toEqual(mockResponse);
+  });
+
   it('should handle fetch failure gracefully', async () => {
     vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
       antaresErrorMessage: 'Failed to fetch suggested keywords',
@@ -122,25 +138,6 @@ describe('saveStudy', () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(mockStudy),
-    });
-    expect(notifyToast).toHaveBeenCalledWith({
-      type: 'success',
-      message: 'Study created successfully',
-    });
-  });
-
-  it('should display a toast with the backend error message', async () => {
-    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
-      antaresErrorMessage: 'A study with the same name already exists',
-      date: new Date(),
-      type: ERROR_MESSAGE_TYPE.BUSINESS,
-    });
-
-    await saveStudy(mockStudy);
-
-    expect(notifyToast).toHaveBeenCalledWith({
-      type: 'error',
-      message: 'A study with the same name already exists',
     });
   });
 });
@@ -175,12 +172,7 @@ describe('deleteStudy', () => {
       type: ERROR_MESSAGE_TYPE.BUSINESS,
     });
 
-    const result = await deleteStudy(2);
-    expect(result).toEqual(undefined);
-    expect(notifyToast).toHaveBeenCalledWith({
-      type: 'error',
-      message: 'Failed to delete study',
-    });
+    await expect(async () => deleteStudy(2)).rejects.toThrowError('Failed to delete study');
   });
 });
 
@@ -194,7 +186,7 @@ describe('createStudy', () => {
       ok: true,
     });
 
-    await createStudy(5);
+    await generateStudy(5);
 
     expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
     expect(AuthService.authFetch).toHaveBeenCalledWith('https://mockapi.com/v1/study/generate?id=5', {
@@ -212,7 +204,7 @@ describe('createStudy', () => {
       type: ERROR_MESSAGE_TYPE.BUSINESS,
     });
 
-    await expect(async () => createStudy(1)).rejects.toThrowError('Failed to generate a study');
+    await expect(async () => generateStudy(1)).rejects.toThrowError('Failed to generate a study');
   });
 });
 
@@ -251,6 +243,14 @@ describe('getStudyTrajectories', () => {
 });
 
 describe('duplicateStudy', () => {
+  const mockStudyData = {
+    name: 'BP_study',
+    createdBy: 'unknown',
+    keywords: ['tag1'],
+    project: 'BP_REF_23',
+    horizon: '2021-2022',
+    trajectoryIds: [102, 123],
+  };
   afterEach(() => {
     vi.restoreAllMocks();
   });
@@ -259,14 +259,6 @@ describe('duplicateStudy', () => {
     vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
       ok: true,
     });
-    const mockStudyData = {
-      name: 'BP_study',
-      createdBy: 'unknown',
-      keywords: ['tag1'],
-      project: 'BP_REF_23',
-      horizon: '2021-2022',
-      trajectoryIds: [102, 123],
-    };
     await duplicateStudy(mockStudyData);
 
     expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
@@ -277,20 +269,6 @@ describe('duplicateStudy', () => {
       },
       body: JSON.stringify(mockStudyData),
     });
-    expect(notifyToast).toHaveBeenCalledWith({
-      type: 'success',
-      message: 'Study duplicated successfully',
-    });
-  });
-
-  it('should throw an error message', async () => {
-    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
-      antaresErrorMessage: 'Failed to duplicate study',
-      date: new Date(),
-      type: ERROR_MESSAGE_TYPE.BUSINESS,
-    });
-
-    await expect(async () => createStudy(1)).rejects.toThrowError('Failed to duplicate study');
   });
 });
 
@@ -322,5 +300,36 @@ describe('getStudyById', () => {
     });
 
     await expect(async () => getStudyById(123)).rejects.toThrowError('Failed to study details');
+  });
+});
+
+describe('updateStudy', () => {
+  const mockStudyData = {
+    name: 'BP_study',
+    createdBy: 'unknown',
+    keywords: ['tag1'],
+    project: 'BP_REF_23',
+    horizon: '2021-2022',
+    trajectoryIds: [102, 123],
+  } as StudyDTO;
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('should update a study', async () => {
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
+      ok: true,
+    });
+    await updateStudy(mockStudyData, 123);
+
+    expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
+    expect(AuthService.authFetch).toHaveBeenCalledWith('https://mockapi.com/v1/study/123', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(mockStudyData),
+    });
   });
 });

@@ -9,22 +9,22 @@ import { RdsInputText, RdsModal } from 'rte-design-system-react';
 import { useTranslation } from 'react-i18next';
 import KeywordsInput from '@/components/input/KeywordsInput.tsx';
 import HorizonInput from '@/components/input/HorizonInput';
-import ProjectInput from '@/components/input/ProjectInput.tsx';
-import { duplicateStudy, saveStudy } from '@/shared/services/studyService';
-import { BackendError, StudyDTO } from '@/shared/types';
+import { saveStudy } from '@/shared/services/studyService';
+import { StudyDTO } from '@/shared/types';
 import { useUser } from '@/store/contexts/UserContext.tsx';
-import { notifyToast } from '@/shared/notification/notification';
+import { notifyAlert, notifyToast } from '@/shared/notification/notification';
 import { validateMaxLength } from '@/shared/utils/validateMaxTextLength';
 import { MAX_STUDY_NAME_LENGTH } from '@/shared/const/studyConfig';
 import StdButton from '@common/base/stdButton/StdButton';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
+import { isBusinessError } from '@/shared/utils/errorUtils.ts';
 
 interface StudyCreationModalProps {
   isOpen?: boolean;
   onClose: () => void;
   study?: StudyDTO | null;
-  setReloadStudies: React.Dispatch<React.SetStateAction<boolean>>;
-  projectInfoName?: string;
+  setReloadStudies: React.Dispatch<React.SetStateAction<number>>;
+  projectInfoName: string;
 }
 
 const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
@@ -34,10 +34,10 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
   projectInfoName,
 }) => {
   const { t } = useTranslation();
-  const [studyName, setStudyName] = useState<string>(study?.name.substring(0, study?.name.lastIndexOf('_')) || '');
-  const [projectName, setProjectName] = useState<string>(study?.project || projectInfoName || '');
-  const [keywords, setKeywords] = useState<string[]>(study?.keywords || []);
-  const [trajectoryIds] = useState<number[]>(study?.trajectoryIds || []);
+  const [studyName, setStudyName] = useState<string>('');
+  const [projectName, setProjectName] = useState<string>('');
+  const [keywords, setKeywords] = useState<string[]>([]);
+  const [trajectoryIds] = useState<number[]>([]);
   const [isFormValid, setIsFormValid] = useState(false);
   const { user } = useUser();
   const [isHorizonValid, setIsHorizonValid] = useState(false);
@@ -50,31 +50,13 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
     return maxYear.toString();
   });
 
-  const handleStudyNameChange = (value: string) => {
-    if (validateMaxLength(value, MAX_STUDY_NAME_LENGTH)) {
-      setStudyName(value || '');
-      // Clear duplication error message when study name changes
-      if (duplicateErrorMessage) {
-        setDuplicateErrorMessage('');
-      }
-    }
-  };
-
   const saveStudyHandler = async () => {
-    if (study && studyName.trim() === study.name.trim()) {
-      notifyToast({
-        type: 'error',
-        message: 'A study with the same name already exists for the given project',
-      });
-      return;
-    }
-
     const studyData = {
       id: study?.id,
       name: studyName,
       createdBy: user?.profile.sub,
       keywords,
-      project: projectName,
+      project: projectInfoName,
       horizon,
       trajectoryIds,
       studyId: study?.id,
@@ -82,65 +64,26 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
 
     try {
       await saveStudy(studyData);
-      setReloadStudies((prev) => !prev); // Trigger reload after successful save
+      setReloadStudies((prev) => prev + 1); // Trigger reload after successful save
       setStudyName('');
       setProjectName('');
       setHorizon('');
       setKeywords([]);
+      notifyToast({
+        type: 'success',
+        message: 'Study created successfully',
+      });
       onClose();
     } catch (error) {
-      // Handle errors with toast notification
-      notifyToast({
-        type: 'error',
-        message: (error as BackendError).antaresErrorMessage || 'Error creating study',
-      });
-    }
-  };
-
-  const duplicateStudyHandler = async () => {
-    // Clear any previous error messages
-    setDuplicateErrorMessage('');
-
-    if (!study?.id) {
-      notifyToast({
-        type: 'error',
-        message: 'Study ID is missing',
-      });
-      return;
-    }
-
-    if (study && studyName.trim() === study.name.trim()) {
-      notifyToast({
-        type: 'error',
-        message: 'A study with the same name already exists for the given project',
-      });
-      return;
-    }
-
-    const studyData = {
-      name: studyName,
-      createdBy: user?.profile.sub,
-      keywords,
-      project: projectName,
-      horizon,
-      trajectoryIds,
-      id: study.id,
-    };
-
-    try {
-      await duplicateStudy(studyData);
-      setReloadStudies((prev) => !prev);
-      setStudyName('');
-      setProjectName('');
-      setHorizon('');
-      setKeywords([]);
-      onClose();
-    } catch (error) {
-      let errorMsg = (error as BackendError).antaresErrorMessage || 'Error duplicating study';
-
-      errorMsg = errorMsg.replace(/:\s+/g, ': ');
-
-      setDuplicateErrorMessage(errorMsg);
+      if (isBusinessError(error)) {
+        notifyAlert({
+          icon: StdIconId.Close,
+          message: `Failed to create study`,
+          content: error.antaresErrorMessage,
+          type: 'error',
+          filledIcon: true,
+        });
+      }
     }
   };
 
@@ -167,6 +110,16 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
     validateForm();
   }, [study, studyName, projectName, horizon, keywords, isHorizonValid]);
 
+  const handleStudyNameChange = (value: string) => {
+    if (validateMaxLength(value, MAX_STUDY_NAME_LENGTH)) {
+      setStudyName(value || '');
+      // Clear duplication error message when study name changes
+      if (duplicateErrorMessage) {
+        setDuplicateErrorMessage('');
+      }
+    }
+  };
+
   const handleHorizonChange = (value: string) => {
     setHorizon(value);
     // Clear duplication error message when horizon changes
@@ -179,19 +132,9 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
     setIsHorizonValid(valid);
   };
 
-  const handleProjectNameChange = (value: string) => {
-    setProjectName(value);
-    // Clear duplication error message when project name changes
-    if (duplicateErrorMessage) {
-      setDuplicateErrorMessage('');
-    }
-  };
-
   return (
     <RdsModal size="small">
-      <RdsModal.Title onClose={onClose}>
-        {study ? t('home.@duplicate_study') : t('studyModal.@new_study')}
-      </RdsModal.Title>
+      <RdsModal.Title onClose={onClose}>{t('studyModal.@new_study')}</RdsModal.Title>
       <RdsModal.Content>
         <div className="flex flex-col gap-4 self-stretch">
           <div className="flex justify-between gap-2">
@@ -206,34 +149,28 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
                 maxLength={75}
               />
             </div>
-            {study && (
-              <div className="w-1/2">
-                <ProjectInput value={projectName} onChange={handleProjectNameChange} required />
-              </div>
-            )}
           </div>
           <HorizonInput
             horizon={horizon}
             onChange={handleHorizonChange}
             onValidChange={handleHorizonValidityChange}
             required
-            customErrorMessage={study ? duplicateErrorMessage : undefined}
           />
           <KeywordsInput
             keywords={keywords}
             setKeywords={setKeywords}
             maxNbKeywords={6}
             maxNbCharacters={15}
-            minNbCharacters={3}
+            minNbCharacters={1}
           />
         </div>
       </RdsModal.Content>
       <RdsModal.Footer>
         <StdButton label={t('components.quickAccess.@cancel')} onClick={onClose} color="secondary" />
         <StdButton
-          icon={study ? StdIconId.ContentCopy : StdIconId.Add}
-          label={study ? t('study.@duplicate') : t('studyModal.@button_create')}
-          onClick={() => void (study ? duplicateStudyHandler() : saveStudyHandler())}
+          icon={StdIconId.Add}
+          label={t('studyModal.@button_create')}
+          onClick={() => void saveStudyHandler()}
           variant="contained"
           color="primary"
           disabled={!isFormValid}

@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal';
 import StudyCreationModal from '@common/modal/StudyCreationModal';
 import StdButton from '@common/base/stdButton/StdButton';
+import StudyModificationModal from '@common/modal/StudyModificationModal.tsx';
 
 interface StudyTableDisplayProps {
   searchStudy: string | undefined;
@@ -31,9 +32,10 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
   const [isHeaderHovered, setIsHeaderHovered] = useState<boolean>(false);
   const [selectedStudy, setSelectedStudy] = useState<StudyDTO | null>(null);
   // Reload trigger for re-fetching data
-  const [reloadStudies, setReloadStudies] = useState<boolean>(false);
+  const [reloadStudies, setReloadStudies] = useState<number>(0);
   const [sortBy, setSortBy] = useState<{ [key: string]: 'asc' | 'desc' }>({});
   const [sortedColumn, setSortedColumn] = useState<string | null>('status');
+  const [isDuplicateMode, setIsDuplicateMode] = useState(false);
 
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const { navigateToStudy } = useStudyNavigation();
@@ -63,15 +65,16 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
 
   const handleDuplicate = () => {
     setSelectedStudy(rows[Number.parseInt(selectedRowId || '-1')]);
+    setIsDuplicateMode(true);
     toggleModal();
-    setReloadStudies(!reloadStudies); // Trigger reload after deleting
+    setReloadStudies((prev) => prev + 1); // Trigger reload after deleting
   };
 
   const handleDeleteClick = () => {
     const selectedStudyId = rows[Number.parseInt(selectedRowId || '-1')]?.id;
     if (selectedStudyId) {
       void deleteStudy(selectedStudyId).then(() => {
-        setReloadStudies(!reloadStudies); // Trigger reload after deleting
+        setReloadStudies((prev) => prev + 1); // Trigger reload after deleting
       });
     }
   };
@@ -80,6 +83,7 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
     setSelectedStudy(null);
     setRowSelection({});
     toggleModal();
+    setIsDuplicateMode(false);
   };
 
   const sortedHeaders = addSortColumn(headers, handleSort, sortBy, sortedColumn, handleHeaderHover, isHeaderHovered);
@@ -133,13 +137,22 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
         </div>
         <StudiesPagination count={count} intervalSize={intervalSize} current={currentPage} onChange={setPage} />
       </div>
-      {isModalOpen && (
+      {isModalOpen && projectInfo?.name && (
         <StudyCreationModal
           isOpen={isModalOpen}
           onClose={handleModalClose}
           study={selectedStudy}
           setReloadStudies={setReloadStudies}
-          projectInfoName={projectInfo?.name}
+          projectInfoName={projectInfo.name}
+        />
+      )}
+      {isModalOpen && isDuplicateMode && selectedStudy && (
+        <StudyModificationModal
+          isOpen={isModalOpen}
+          onClose={handleModalClose}
+          study={selectedStudy}
+          setReloadStudies={setReloadStudies}
+          isDuplicateMode={isDuplicateMode}
         />
       )}
     </div>

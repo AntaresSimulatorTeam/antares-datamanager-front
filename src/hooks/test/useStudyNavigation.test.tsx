@@ -59,7 +59,7 @@ describe('useStudyNavigation', () => {
       void result.current.navigateToStudy(mockStudy);
     });
 
-    expect(mockNavigate).toHaveBeenCalledWith(`/study/${encodeURIComponent(mockStudy.name)}`, {
+    expect(mockNavigate).toHaveBeenCalledWith(`/study/${encodeURIComponent(mockStudy.id)}`, {
       state: { study: mockStudy },
     });
   });
