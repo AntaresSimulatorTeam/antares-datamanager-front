@@ -630,3 +630,13 @@ export const getQueryParamAreaValue = (type: TRAJECTORY_TYPE, hypothesis: string
   }
   return area ?? '';
 };
+
+export const shouldDeleteParamModulation = (index: number, data: HypothesisRowData[]) => {
+  const hasOnlyOneSpecificTrajectory =
+    index === 0 &&
+    data[0]?.subRows?.filter((subRow) => subRow.trajectory != null && subRow.status === TRAJECTORY_SELECTION_STATUS.OK)
+      ?.length === 1;
+  return (
+    (hasOnlyOneSpecificTrajectory && data[1].trajectory && data[1].status === TRAJECTORY_SELECTION_STATUS.OK) || false
+  );
+};

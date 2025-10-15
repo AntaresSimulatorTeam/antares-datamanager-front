@@ -28,7 +28,14 @@ export const deleteTrajectory = (prevState: Partial<StudyState>, payload: { area
     ? (prevState[`${payload.type}`]?.trajectories as DbTrajectory[])
     : null;
   if (type === TRAJECTORY_TYPE.AREA || type === TRAJECTORY_TYPE.LINK) {
-    Object.assign(prevState, { [type]: { trajectories: [], warningMessages: [] } });
+    Object.assign(prevState, { [type]: { trajectories: [] } });
+  } else if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
+    const newTrajectories = (trajectories ?? []).filter((trajectory) => trajectory.area !== area);
+    const newStudyState = {
+      ...prevState[`${type}`],
+      trajectories: newTrajectories,
+    };
+    Object.assign(prevState, { [type]: newStudyState });
   } else {
     const newTrajectories = (trajectories ?? []).filter((trajectory) => trajectory.area !== area);
     const newStudyState = {

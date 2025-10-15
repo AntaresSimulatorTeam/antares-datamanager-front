@@ -27,20 +27,22 @@ export const shouldOpenDeletionModal = (
   indexRow: number,
   data: HypothesisRowData[],
 ): boolean => {
-  const technologiesTrajectoryOk =
+  const subRowsWithTrajectory =
     indexRow != null
       ? (data[indexRow]?.subRows || [])?.filter(
           (item: HypothesisRowData) => item.trajectory && item.status === TRAJECTORY_SELECTION_STATUS.OK,
         )
       : [];
-  const technologiesAreaOk =
+
+  const rowsWithTrajectory =
     indexRow != null && data[indexRow]?.trajectory && data[indexRow]?.status === TRAJECTORY_SELECTION_STATUS.OK
       ? data[indexRow]?.trajectory
       : null;
 
   return (
-    (technologiesAreaOk && type !== TRAJECTORY_TYPE.THERMAL_CAPACITY) ||
-    technologiesTrajectoryOk.length > 1 ||
-    (!!technologiesAreaOk && technologiesTrajectoryOk.length > 0)
+    (rowsWithTrajectory && type !== TRAJECTORY_TYPE.THERMAL_CAPACITY) ||
+    subRowsWithTrajectory.length > 1 ||
+    (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER && subRowsWithTrajectory.length > 0) ||
+    (!!rowsWithTrajectory && subRowsWithTrajectory.length > 0)
   );
 };

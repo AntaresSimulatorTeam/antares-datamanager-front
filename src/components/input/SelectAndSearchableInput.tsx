@@ -42,6 +42,7 @@ const SelectAndSearchableInput = ({
   const [placeHolder] = useState<string>(defaultPlaceHolder);
   const [valueInput, setValueInput] = useState<string>(defaultValue ?? '');
   const dropdownList = useRef<HTMLDivElement | null>(null);
+  const selectInputClass = isInputDisabled ? `bg-gray-200 border-opacity-0 cursor-not-allowed pointer-events-none` : '';
 
   const handleInputChange = async (value: string) => {
     try {
@@ -92,7 +93,7 @@ const SelectAndSearchableInput = ({
   };
 
   return (
-    <div className="relative">
+    <div className={`relative ${selectInputClass}`}>
       <div className="absolute right-0 top-1">
         {isSelectEnable && (
           <StdButton

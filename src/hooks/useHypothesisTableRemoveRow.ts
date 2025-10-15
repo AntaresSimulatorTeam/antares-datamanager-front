@@ -25,6 +25,7 @@ export const useHypothesisTableRemoveRow = (
           const hasTrajectoryOK =
             subRows?.some((subRow) => subRow.trajectory != null && subRow.status === TRAJECTORY_SELECTION_STATUS.OK) ||
             (trajectory && status === TRAJECTORY_SELECTION_STATUS.OK);
+          let trajectoryIds = [];
           if (study.id && hasTrajectoryOK) {
             const subRowTrajectoryIds = subRows
               ?.map((subRow) => {
@@ -35,24 +36,52 @@ export const useHypothesisTableRemoveRow = (
               })
               .filter(Boolean) as number[];
 
-            const trajectoryIds = [...(trajectory?.id ? [trajectory.id] : []), ...(subRowTrajectoryIds ?? [])].filter(
-              Boolean,
-            );
+            if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER && subRowTrajectoryIds.length === 1) {
+              const paramModulationId = data[1]?.status === TRAJECTORY_SELECTION_STATUS.OK ? data[1]?.trajectory : null;
+              trajectoryIds = [
+                ...(paramModulationId?.id ? [paramModulationId.id] : []),
+                ...(subRowTrajectoryIds ?? []),
+              ].filter(Boolean);
+            } else {
+              trajectoryIds = [...(trajectory?.id ? [trajectory.id] : []), ...(subRowTrajectoryIds ?? [])].filter(
+                Boolean,
+              );
+            }
 
             if (trajectoryIds?.length > 1) {
               await unlinkMultipleTrajectoriesFromStudy(study.id, trajectoryIds);
+              dispatch?.({
+                type: STUDY_ACTION.DELETE_TRAJECTORY,
+                payload: { area: row.hypothesis, type },
+              });
             } else {
               await unlinkTrajectoryFromStudy(trajectoryIds[0], study.id);
+              dispatch?.({
+                type: STUDY_ACTION.DELETE_TRAJECTORY,
+                payload: { area: row.hypothesis, type },
+              });
             }
           }
 
-          dispatch?.({
-            type: STUDY_ACTION.DELETE_TRAJECTORY,
-            payload: { area: row.hypothesis, type },
-          });
-
-          const newDataSorted = sortWithFixedPosition(data?.filter((item) => item.hypothesis !== value));
-          setData(newDataSorted);
+          if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
+            setData((prev: HypothesisRowData[]): HypothesisRowData[] => {
+              const newSubRows = prev?.[0]?.subRows
+                ? prev[0].subRows?.filter((itemData) => itemData.hypothesis !== value)
+                : [];
+              if (trajectoryIds?.length > 1) {
+                return [
+                  { ...prev[0], subRows: newSubRows },
+                  { ...prev[1], trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING },
+                  ...prev.slice(2),
+                ];
+              } else {
+                return [{ ...prev[0], subRows: newSubRows }, ...prev.slice(1)];
+              }
+            });
+          } else {
+            const newDataSorted = sortWithFixedPosition(data?.filter((item) => item.hypothesis !== value));
+            setData(newDataSorted);
+          }
 
           if (value) {
             setCheckedValues((prev) => prev.filter((name) => name !== value));

@@ -23,6 +23,7 @@ import {
   generateReadOnlyIndexMap,
   getAreaTrajectoryName,
   getTrajectoryTypeByIndex,
+  shouldDeleteParamModulation,
 } from '@/shared/utils/trajectoryUtils.ts';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { addRow, handleFetchTrajectoriesFS, handleTrajectorySearch } from '@/shared/services/hypothesisTableService.ts';
@@ -31,6 +32,9 @@ import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach';
 import { CheckBoxListWithSearchBar } from '@/components/list/CheckBoxListWithSearchBar.tsx';
+import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow.ts';
+import { shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
+import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
 
 interface ParametersTabProps {
   defaultAreas: { name: string }[];
@@ -66,6 +70,8 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
   const [technicalData, setTechnicalData] = useState<HypothesisRowData[]>([]);
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
   const [rowIdSelected, setRowIdSelected] = useState<string>('0');
+  const [rowToDelete, setRowToDelete] = useState<{ index: number; value?: string } | null>(null);
+  const [isDeletionModalOpen, setIsDeletionModalOpen] = useState(false);
   const [isStudyGenerated, setIsStudyGenerated] = useState(
     studyState.studyStatus === StudyStatus.GENERATED || study.status === StudyStatus.GENERATED,
   );
@@ -80,6 +86,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
     );
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(study, studyState, dispatch, setTechnicalData);
   const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch, setTechnicalData);
+  const { removeRow } = useHypothesisTableRemoveRow(study, dispatch, setTechnicalData, setCheckedValues);
   const { detachTrajectory } = useTrajectoryDetach(study, dispatch, setTechnicalData);
 
   useEffect(() => {
@@ -90,15 +97,17 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
       setReadOnly(readOnlyRow);
     };
     setHypothesis();
-  }, [areas, areasTrajectoryOptions, defaultAreas, dropDownListOptions, hypothesisTrajectories, readOnlyRow, t]);
+  }, [areasTrajectoryOptions, dropDownListOptions, hypothesisTrajectories, t]);
 
   useEffect(() => {
-    const hasSpecificTrajectory = technicalData[0]?.subRows?.some(
-      (row) => row.status === TRAJECTORY_SELECTION_STATUS.OK,
-    );
-    const newReadOnlyRow = { ...readOnlyRow, ['1']: !hasSpecificTrajectory };
-    setReadOnly(newReadOnlyRow);
-  }, [technicalData]);
+    const updateHypothesisTable = () => {
+      const hasSpecificTrajectory =
+        technicalData[0]?.subRows?.some((row) => row.status === TRAJECTORY_SELECTION_STATUS.OK) ?? false;
+      const newReadOnlyRow = { ...readOnlyRow, ['1']: !hasSpecificTrajectory };
+      setReadOnly(newReadOnlyRow);
+    };
+    void updateHypothesisTable();
+  }, [detachTrajectory, technicalData]);
 
   useEffect(() => {
     if (studyState.studyStatus === StudyStatus.GENERATED || study?.status === StudyStatus.GENERATED) {
@@ -106,24 +115,10 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
       const rows = generateReadOnlyIndexMap(technicalData);
       setReadOnly(rows);
     }
-  }, [studyState.studyStatus, study?.status, technicalData]);
-
-  const removeRow = useCallback(
-    (value: string) => {
-      setCheckedValues((prev) => prev.filter((checkedValue) => checkedValue !== value));
-
-      setTechnicalData((prev: HypothesisRowData[]): HypothesisRowData[] => {
-        const newSubRows = prev?.[0]?.subRows
-          ? prev[0].subRows?.filter((itemData) => itemData.hypothesis !== value)
-          : [];
-        return [{ ...prev[0], subRows: newSubRows }, ...prev.slice(1)];
-      });
-    },
-    [setCheckedValues, setTechnicalData],
-  );
+  }, [studyState.studyStatus, study?.status]);
 
   const handleSelectionChange = useCallback(
-    (value: string, isChecked: boolean) => {
+    async (value: string, isChecked: boolean) => {
       if (isChecked) {
         addRow(
           TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
@@ -132,9 +127,14 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
           setCheckedValues,
           setTechnicalData,
         );
+      } else if (shouldOpenDeletionModal(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, 0, technicalData)) {
+        setRowToDelete({ index: 0, value });
+        setIsDeletionModalOpen(true);
+      } else {
+        await removeRow(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, value, 0, technicalData);
       }
     },
-    [dispatch],
+    [technicalData, dispatch, removeRow],
   );
 
   return (
@@ -192,11 +192,14 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
               const row = subIndex != null ? technicalData[topIndex]?.subRows?.[subIndex] : technicalData[topIndex];
               const current = row?.trajectory ?? null;
               if (current) {
+                const trajectories: DbTrajectory | DbTrajectory[] = shouldDeleteParamModulation(topIndex, technicalData)
+                  ? [current, ...(technicalData[1].trajectory ? [technicalData[1].trajectory] : [])].filter(Boolean)
+                  : current;
                 void detachTrajectory(
                   getTrajectoryTypeByIndex(topIndex),
                   [topIndex, subIndex].filter((n) => n !== undefined),
                   status,
-                  current,
+                  trajectories,
                 );
               }
             }
@@ -215,7 +218,14 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
             }
           }}
           isReadOnlyEnable={true}
-          removeRow={removeRow}
+          removeRow={(value: string, _rowId?: string) => {
+            if (shouldOpenDeletionModal(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, 0, technicalData)) {
+              setRowToDelete({ index: 0, value });
+              setIsDeletionModalOpen(true);
+            } else {
+              void removeRow(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, value, 0, technicalData);
+            }
+          }}
         />
         <div className="flex h-fit w-full">
           <PegaseHypothesisTable
@@ -244,6 +254,23 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
           }}
           trajectoryType={getTrajectoryTypeByIndex(Number(rowIdSelected))}
           area={getAreaTrajectoryName(rowIdSelected, technicalData)}
+        />
+      )}
+      {isDeletionModalOpen && (
+        <AreaDeletionConfirmationModal
+          isOpen={isDeletionModalOpen}
+          onClose={() => setIsDeletionModalOpen(false)}
+          onConfirm={async () => {
+            if (rowToDelete?.value) {
+              await removeRow(
+                TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+                rowToDelete?.value,
+                0,
+                technicalData,
+              );
+              setIsDeletionModalOpen(false);
+            }
+          }}
         />
       )}
     </div>
