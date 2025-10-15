@@ -62,12 +62,12 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
         type: 'success',
         message: 'Study created successfully',
       });
-      onClose();
     } catch (error) {
       notifyToast({
         type: 'error',
         message: (error as Error)?.message ?? '',
       });
+    } finally {
       onClose();
     }
   };
