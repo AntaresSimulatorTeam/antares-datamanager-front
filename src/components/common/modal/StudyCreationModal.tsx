@@ -68,6 +68,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
         type: 'error',
         message: (error as Error)?.message ?? '',
       });
+      onClose();
     }
   };
 
