@@ -12,12 +12,11 @@ import HorizonInput from '@/components/input/HorizonInput';
 import { saveStudy } from '@/shared/services/studyService';
 import { StudyDTO } from '@/shared/types';
 import { useUser } from '@/store/contexts/UserContext.tsx';
-import { notifyAlert, notifyToast } from '@/shared/notification/notification';
+import { notifyToast } from '@/shared/notification/notification';
 import { validateMaxLength } from '@/shared/utils/validateMaxTextLength';
 import { MAX_STUDY_NAME_LENGTH } from '@/shared/const/studyConfig';
 import StdButton from '@common/base/stdButton/StdButton';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
-import { isBusinessError } from '@/shared/utils/errorUtils.ts';
 
 interface StudyCreationModalProps {
   isOpen?: boolean;
@@ -35,20 +34,11 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
 }) => {
   const { t } = useTranslation();
   const [studyName, setStudyName] = useState<string>('');
-  const [projectName, setProjectName] = useState<string>('');
+  const [horizon, setHorizon] = useState<string>('');
   const [keywords, setKeywords] = useState<string[]>([]);
-  const [trajectoryIds] = useState<number[]>([]);
   const [isFormValid, setIsFormValid] = useState(false);
   const { user } = useUser();
   const [isHorizonValid, setIsHorizonValid] = useState(false);
-  const [duplicateErrorMessage, setDuplicateErrorMessage] = useState<string>('');
-
-  const [horizon, setHorizon] = useState<string>(() => {
-    const rawHorizon = study?.horizon || '';
-    const years = rawHorizon.match(/\d{4}/g)?.map(Number) || [];
-    const maxYear = years.length ? Math.max(...years) : '';
-    return maxYear.toString();
-  });
 
   const saveStudyHandler = async () => {
     const studyData = {
@@ -58,15 +48,14 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
       keywords,
       project: projectInfoName,
       horizon,
-      trajectoryIds,
+      trajectoryIds: [],
       studyId: study?.id,
     };
 
     try {
       await saveStudy(studyData);
-      setReloadStudies((prev) => prev + 1); // Trigger reload after successful save
+      setReloadStudies((prev) => prev + 1);
       setStudyName('');
-      setProjectName('');
       setHorizon('');
       setKeywords([]);
       notifyToast({
@@ -75,61 +64,28 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
       });
       onClose();
     } catch (error) {
-      if (isBusinessError(error)) {
-        notifyAlert({
-          icon: StdIconId.Close,
-          message: `Failed to create study`,
-          content: error.antaresErrorMessage,
-          type: 'error',
-          filledIcon: true,
-        });
-      }
+      notifyToast({
+        type: 'error',
+        message: (error as Error)?.message ?? '',
+      });
     }
   };
 
   useEffect(() => {
     const validateForm = () => {
-      const isDuplicateMode = Boolean(study);
-      const originalName = study?.name || '';
-      const nameChanged = studyName.trim() !== originalName.trim();
-
-      if (isDuplicateMode) {
-        if (isHorizonValid || nameChanged) {
-          setIsFormValid(true);
-        } else {
-          setIsFormValid(false);
-        }
+      if (studyName && horizon && isHorizonValid) {
+        setIsFormValid(true);
       } else {
-        if (studyName && horizon && isHorizonValid) {
-          setIsFormValid(true);
-        } else {
-          setIsFormValid(false);
-        }
+        setIsFormValid(false);
       }
     };
     validateForm();
-  }, [study, studyName, projectName, horizon, keywords, isHorizonValid]);
+  }, [studyName, horizon, isHorizonValid]);
 
   const handleStudyNameChange = (value: string) => {
     if (validateMaxLength(value, MAX_STUDY_NAME_LENGTH)) {
       setStudyName(value || '');
-      // Clear duplication error message when study name changes
-      if (duplicateErrorMessage) {
-        setDuplicateErrorMessage('');
-      }
     }
-  };
-
-  const handleHorizonChange = (value: string) => {
-    setHorizon(value);
-    // Clear duplication error message when horizon changes
-    if (duplicateErrorMessage) {
-      setDuplicateErrorMessage('');
-    }
-  };
-
-  const handleHorizonValidityChange = (valid: boolean) => {
-    setIsHorizonValid(valid);
   };
 
   return (
@@ -150,12 +106,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
               />
             </div>
           </div>
-          <HorizonInput
-            horizon={horizon}
-            onChange={handleHorizonChange}
-            onValidChange={handleHorizonValidityChange}
-            required
-          />
+          <HorizonInput horizon={horizon} onChange={setHorizon} onValidChange={setIsHorizonValid} required />
           <KeywordsInput
             keywords={keywords}
             setKeywords={setKeywords}
