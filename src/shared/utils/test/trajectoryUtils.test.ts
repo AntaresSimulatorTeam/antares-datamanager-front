@@ -21,9 +21,11 @@ import {
   getTrajectoryTypeByIndex,
   isMatchingTrajectoryType,
   isTrajectoryLinked,
+  isUniqueTrajectoryType,
   removeDuplicate,
   retrieveReadOnlyArea,
   setNestedData,
+  shouldDeleteParamModulation,
 } from '../trajectoryUtils';
 import { defaultAreaNotInAreaTrajectoryList, rowData, rowDataTwo } from '@/mocks/data/tests/hypothesisTable.mock.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
@@ -939,5 +941,101 @@ describe('generateReadOnlyIndexMap', () => {
     const result = generateReadOnlyIndexMap(data);
 
     expect(Object.isFrozen(result)).toBe(true);
+  });
+});
+
+describe('shouldDeleteParamModulation', () => {
+  it('returns true when index is 0, one valid subRow, and second row has valid trajectory/status', () => {
+    const data = [
+      {
+        subRows: [
+          { trajectory: 'T1', status: TRAJECTORY_SELECTION_STATUS.OK } as unknown as HypothesisRowData,
+          { trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING } as unknown as HypothesisRowData,
+        ],
+      },
+      {
+        trajectory: { trajectory: 'T2', status: TRAJECTORY_SELECTION_STATUS.OK } as unknown as DbTrajectory,
+        status: TRAJECTORY_SELECTION_STATUS.OK,
+      },
+    ] as HypothesisRowData[];
+    expect(shouldDeleteParamModulation(0, data)).toBe(true);
+  });
+
+  it('returns false when index is not 0', () => {
+    const data: HypothesisRowData[] = [
+      {
+        subRows: [
+          {
+            trajectory: { trajectoryName: 'T1', status: TRAJECTORY_SELECTION_STATUS.OK },
+            status: TRAJECTORY_SELECTION_STATUS.OK,
+          } as unknown as HypothesisRowData,
+        ],
+      },
+      {
+        trajectory: { trajectoryName: 'T2', status: TRAJECTORY_SELECTION_STATUS.OK } as unknown as DbTrajectory,
+        status: TRAJECTORY_SELECTION_STATUS.OK,
+      },
+    ] as HypothesisRowData[];
+    expect(shouldDeleteParamModulation(1, data)).toBe(false);
+  });
+
+  it('returns false when subRows has more than one valid trajectory', () => {
+    const data: HypothesisRowData[] = [
+      {
+        subRows: [
+          { trajectory: { trajectoryName: 'T1' }, status: TRAJECTORY_SELECTION_STATUS.OK },
+          { trajectory: { trajectoryName: 'T2' }, status: TRAJECTORY_SELECTION_STATUS.OK },
+        ] as unknown as HypothesisRowData[],
+      },
+      {
+        trajectory: { trajectoryName: 'T3', status: TRAJECTORY_SELECTION_STATUS.OK },
+        status: TRAJECTORY_SELECTION_STATUS.OK,
+      },
+    ] as unknown as HypothesisRowData[];
+    expect(shouldDeleteParamModulation(0, data)).toBe(false);
+  });
+
+  it('returns false when second row has no trajectory', () => {
+    const data = [
+      {
+        subRows: [{ trajectory: 'T1', status: TRAJECTORY_SELECTION_STATUS.OK }],
+      },
+      {
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.OK,
+      },
+    ] as unknown as HypothesisRowData[];
+    expect(shouldDeleteParamModulation(0, data)).toBe(false);
+  });
+
+  it('returns false when second row status is not OK', () => {
+    const data: HypothesisRowData[] = [
+      {
+        subRows: [{ trajectory: 'T1', status: TRAJECTORY_SELECTION_STATUS.OK }],
+      },
+      {
+        trajectory: 'T2',
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+      },
+    ] as unknown as HypothesisRowData[];
+    expect(shouldDeleteParamModulation(0, data)).toBe(false);
+  });
+});
+
+describe('isUniqueTrajectoryType', () => {
+  it('returns true for THERMAL_ECONOMIC_PARAMETER', () => {
+    expect(isUniqueTrajectoryType(TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER)).toBe(true);
+  });
+
+  it('returns true for THERMAL_TECHNICAL_MODULATION_PARAMETER', () => {
+    expect(isUniqueTrajectoryType(TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER)).toBe(true);
+  });
+
+  it('returns false for LOAD', () => {
+    expect(isUniqueTrajectoryType(TRAJECTORY_TYPE.LOAD)).toBe(false);
+  });
+
+  it('returns false for LINK', () => {
+    expect(isUniqueTrajectoryType(TRAJECTORY_TYPE.LINK)).toBe(false);
   });
 });
