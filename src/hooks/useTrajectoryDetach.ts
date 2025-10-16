@@ -6,7 +6,6 @@ import { setNestedData } from '@/shared/utils/trajectoryUtils.ts';
 import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.ts';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { useTranslation } from 'react-i18next';
-import { isBusinessError } from '@/shared/utils/errorUtils.ts';
 import { notifyAlert } from '@/shared/notification/notification.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
@@ -64,7 +63,7 @@ export const useTrajectoryDetach = (
           setData((prev) => setNestedData(prev, indexArray, newEmptyTrajectory));
         }
       } catch (error) {
-        if (!additionalTrajectory && indexArray.length && trajectorySelected?.area && isBusinessError(error)) {
+        if (!additionalTrajectory && trajectorySelected?.area) {
           const message = t('studyDetails.@notificationAlert', {
             studyName: study.name,
             trajectoryName: trajectorySelected.trajectoryName,
@@ -78,13 +77,13 @@ export const useTrajectoryDetach = (
             trajectorySelected.area,
             user?.profile?.sub ?? '',
             setData,
-            { message, content: error.antaresErrorMessage },
+            { message, content: (error as Error)?.message },
           );
-        } else if (isBusinessError(error)) {
+        } else {
           notifyAlert({
             icon: StdIconId.Close,
             message: 'Could not detach trajectories.',
-            content: error.antaresErrorMessage ?? '',
+            content: (error as Error)?.message ?? '',
             type: 'error',
             filledIcon: true,
           });

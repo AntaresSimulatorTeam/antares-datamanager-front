@@ -7,11 +7,15 @@ import { unlinkMultipleTrajectoriesFromStudy, unlinkTrajectoryFromStudy } from '
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.ts';
 import { useUser } from '@/store/contexts/UserContext.tsx';
-import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
+import { notifyAlert } from '@/shared/notification/notification.tsx';
 
 vi.mock('@/shared/services/trajectoryService', () => ({
   unlinkTrajectoryFromStudy: vi.fn(),
   unlinkMultipleTrajectoriesFromStudy: vi.fn(),
+}));
+
+vi.mock('@/shared/notification/notification', () => ({
+  notifyAlert: vi.fn(),
 }));
 
 vi.mock('@/shared/services/warningService', () => ({
@@ -118,7 +122,7 @@ describe('useTrajectoryDetach', () => {
   });
 
   it('should not handle error for multiple deletion', async () => {
-    (unlinkTrajectoryFromStudy as Mock).mockRejectedValue(new Error('unlink failed'));
+    (unlinkMultipleTrajectoriesFromStudy as Mock).mockRejectedValue(new Error('unlink failed'));
 
     const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch, mockSetData));
 
@@ -130,16 +134,11 @@ describe('useTrajectoryDetach', () => {
       trajectoryParam,
     );
 
-    expect(handleTrajectoryError).not.toHaveBeenCalled();
+    expect(notifyAlert).toHaveBeenCalled();
   });
 
   it('should handle error and call handleTrajectoryError when error is a business one', async () => {
-    (unlinkTrajectoryFromStudy as Mock).mockRejectedValue({
-      antaresErrorMessage: 'unlink failed',
-      errorMessageArguments: ['args'],
-      date: '2028-08-07T14:17:09.895028' as unknown as Date,
-      type: ERROR_MESSAGE_TYPE.BUSINESS,
-    });
+    (unlinkTrajectoryFromStudy as Mock).mockRejectedValue(new Error('unlink failed'));
 
     const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch, mockSetData));
 
@@ -160,18 +159,13 @@ describe('useTrajectoryDetach', () => {
   });
 
   it('should not handle error and not call handleTrajectoryError when error is a technical one', async () => {
-    (unlinkTrajectoryFromStudy as Mock).mockRejectedValue({
-      antaresErrorMessage: 'unlink failed',
-      errorMessageArguments: ['args'],
-      date: '2028-08-07T14:17:09.895028' as unknown as Date,
-      type: ERROR_MESSAGE_TYPE.TECHNICAL,
-    });
+    (unlinkTrajectoryFromStudy as Mock).mockRejectedValue(new Error('unlink failed'));
 
     const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch, mockSetData));
 
     await result.current.detachTrajectory(TRAJECTORY_TYPE.LOAD, [0], 'empty', trajectory);
 
-    expect(handleTrajectoryError).not.toHaveBeenCalled();
+    expect(handleTrajectoryError).toHaveBeenCalled();
   });
 
   it('should not handle error and not call handleTrajectoryError when error is not a business one', async () => {
@@ -181,16 +175,22 @@ describe('useTrajectoryDetach', () => {
 
     await result.current.detachTrajectory(TRAJECTORY_TYPE.LOAD, [0], 'empty', trajectory);
 
+    expect(handleTrajectoryError).toHaveBeenCalled();
+  });
+
+  it('should notify error with an alert when multiple unlink failed', async () => {
+    (unlinkMultipleTrajectoriesFromStudy as Mock).mockRejectedValue(new Error('unlink failed'));
+
+    const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch, mockSetData));
+
+    await result.current.detachTrajectory(TRAJECTORY_TYPE.LOAD, [0], 'empty', trajectory, trajectoryParam);
+
     expect(handleTrajectoryError).not.toHaveBeenCalled();
+    expect(notifyAlert).toHaveBeenCalled();
   });
 
   it('should handle error and call handleTrajectoryError with no user name', async () => {
-    (unlinkTrajectoryFromStudy as Mock).mockRejectedValue({
-      antaresErrorMessage: 'unlink failed',
-      errorMessageArguments: ['args'],
-      date: '2028-08-07T14:17:09.895028' as unknown as Date,
-      type: ERROR_MESSAGE_TYPE.BUSINESS,
-    });
+    (unlinkTrajectoryFromStudy as Mock).mockRejectedValue(new Error('unlink failed'));
     const mockUseUser = useUser as Mock<typeof useUser>;
     mockUseUser.mockImplementation(() => ({ user: { profile: {} } }) as UserState);
 
