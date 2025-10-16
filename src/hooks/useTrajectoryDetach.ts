@@ -25,14 +25,14 @@ export const useTrajectoryDetach = (
       indexArray: number[],
       status: RowStatus,
       trajectorySelected: DbTrajectory,
-      additionnalTrajectory?: DbTrajectory | null,
+      additionalTrajectory?: DbTrajectory | null,
     ): Promise<void> => {
       try {
         if (!trajectorySelected || !status) return;
 
         if (status === 'empty') {
-          if (additionnalTrajectory) {
-            const trajectoryIds = [trajectorySelected?.id, additionnalTrajectory.id];
+          if (additionalTrajectory) {
+            const trajectoryIds = [trajectorySelected?.id, additionalTrajectory.id];
             await unlinkMultipleTrajectoriesFromStudy(study.id, trajectoryIds);
           } else {
             await unlinkTrajectoryFromStudy(trajectorySelected.id, study.id);
@@ -49,7 +49,7 @@ export const useTrajectoryDetach = (
         };
         if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
           setData((prev: HypothesisRowData[]): HypothesisRowData[] => {
-            if (additionnalTrajectory?.type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER) {
+            if (additionalTrajectory?.type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER) {
               const newData = [
                 { ...prev[0] },
                 { ...prev[1], trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING },
@@ -64,7 +64,7 @@ export const useTrajectoryDetach = (
           setData((prev) => setNestedData(prev, indexArray, newEmptyTrajectory));
         }
       } catch (error) {
-        if (!additionnalTrajectory && indexArray.length && trajectorySelected?.area && isBusinessError(error)) {
+        if (!additionalTrajectory && indexArray.length && trajectorySelected?.area && isBusinessError(error)) {
           const message = t('studyDetails.@notificationAlert', {
             studyName: study.name,
             trajectoryName: trajectorySelected.trajectoryName,

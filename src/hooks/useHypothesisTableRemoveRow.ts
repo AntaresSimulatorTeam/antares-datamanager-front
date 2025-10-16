@@ -34,7 +34,7 @@ export const useHypothesisTableRemoveRow = (
                 ? trajectory
                 : null;
           let trajectoryIds = [];
-          if (study.id && trajectoryToDelete) {
+          if (study.id) {
             const subRowTrajectoryIds = subRows
               ?.map((subRow) => {
                 if (subRow.trajectory != null && subRow.status === TRAJECTORY_SELECTION_STATUS.OK) {
@@ -48,20 +48,27 @@ export const useHypothesisTableRemoveRow = (
             // The specific parameter and the modulation trajectory should be deleted if there's only one specific trajectory left
             if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER && subRowTrajectoryIds.length === 1) {
               paramModulationId = data[1]?.status === TRAJECTORY_SELECTION_STATUS.OK ? data[1]?.trajectory : null;
-            }
-            trajectoryIds = trajectoryIds = [
-              ...(paramModulationId ? [paramModulationId.id] : []),
-              ...(trajectoryToDelete ? [trajectoryToDelete?.id] : []),
-            ].filter(Boolean);
-
-            if (trajectoryIds?.length > 1) {
-              await unlinkMultipleTrajectoriesFromStudy(study.id, trajectoryIds);
+              trajectoryIds = [
+                ...(paramModulationId ? [paramModulationId.id] : []),
+                ...(trajectoryToDelete ? [trajectoryToDelete?.id] : []),
+              ].filter(Boolean);
             } else {
-              await unlinkTrajectoryFromStudy(trajectoryIds[0], study.id);
+              trajectoryIds = [
+                ...(trajectoryToDelete ? [trajectoryToDelete?.id] : []),
+                ...(subRowTrajectoryIds ?? []),
+              ].filter(Boolean);
+            }
+
+            if (trajectoryIds?.length > 0) {
+              if (trajectoryIds?.length > 1) {
+                await unlinkMultipleTrajectoriesFromStudy(study.id, trajectoryIds);
+              } else {
+                await unlinkTrajectoryFromStudy(trajectoryIds[0], study.id);
+              }
             }
             dispatch?.({
               type: STUDY_ACTION.DELETE_TRAJECTORY,
-              payload: { area: trajectoryToDelete.area ?? row.hypothesis, type },
+              payload: { area: trajectoryToDelete?.area ?? row.hypothesis, type },
             });
           }
 

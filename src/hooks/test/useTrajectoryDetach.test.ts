@@ -3,7 +3,7 @@ import { renderHook } from '@testing-library/react';
 import { DbTrajectory, RowStatus, StudyDTO, UserState } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
-import { unlinkTrajectoryFromStudy } from '@/shared/services/trajectoryService.ts';
+import { unlinkMultipleTrajectoriesFromStudy, unlinkTrajectoryFromStudy } from '@/shared/services/trajectoryService.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.ts';
 import { useUser } from '@/store/contexts/UserContext.tsx';
@@ -11,6 +11,7 @@ import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
 
 vi.mock('@/shared/services/trajectoryService', () => ({
   unlinkTrajectoryFromStudy: vi.fn(),
+  unlinkMultipleTrajectoriesFromStudy: vi.fn(),
 }));
 
 vi.mock('@/shared/services/warningService', () => ({
@@ -44,6 +45,20 @@ describe('useTrajectoryDetach', () => {
     trajectoryName: 'Traj X',
     area: 'Zone X',
     type: TRAJECTORY_TYPE.LOAD,
+  } as DbTrajectory;
+
+  const trajectorySpecific = {
+    id: 998,
+    trajectoryName: 'BE',
+    area: 'Zone X',
+    type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+  } as DbTrajectory;
+
+  const trajectoryParam = {
+    id: 20,
+    trajectoryName: 'param_2026',
+    area: 'Zone X',
+    type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER,
   } as DbTrajectory;
 
   beforeEach(() => {
@@ -80,6 +95,42 @@ describe('useTrajectoryDetach', () => {
       },
     });
     expect(mockSetData).toHaveBeenCalled();
+  });
+
+  it('should handle multiple detach if additionalTrajectory is provided', async () => {
+    const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch, mockSetData));
+
+    await result.current.detachTrajectory(
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+      [0],
+      'empty' as RowStatus,
+      trajectorySpecific,
+      trajectoryParam,
+    );
+
+    expect(unlinkTrajectoryFromStudy).not.toHaveBeenCalled();
+    expect(unlinkMultipleTrajectoriesFromStudy).toHaveBeenCalledWith('study-001', [998, 20]);
+    expect(mockDispatch).toHaveBeenCalledWith({
+      type: STUDY_ACTION.UPDATE_TRAJECTORY,
+      payload: { trajectory: trajectorySpecific, status: 'empty' },
+    });
+    expect(mockSetData).toHaveBeenCalled();
+  });
+
+  it('should not handle error for multiple deletion', async () => {
+    (unlinkTrajectoryFromStudy as Mock).mockRejectedValue(new Error('unlink failed'));
+
+    const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch, mockSetData));
+
+    await result.current.detachTrajectory(
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+      [0],
+      'empty' as RowStatus,
+      trajectorySpecific,
+      trajectoryParam,
+    );
+
+    expect(handleTrajectoryError).not.toHaveBeenCalled();
   });
 
   it('should handle error and call handleTrajectoryError when error is a business one', async () => {

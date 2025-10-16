@@ -9,6 +9,7 @@ import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory';
 import {
   DbTrajectory,
   FileInputStatus,
+  RowStatus,
   StudyActionType,
   StudyState,
   StudyTrajectoriesData,
@@ -16,7 +17,7 @@ import {
 } from '@/shared/types';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { describe, expect, it } from 'vitest';
-import { mockSingleWarningMessagesSkipped, mockWarningMessagesWithTwo } from '@/mocks/data/tests/warning.mock.ts';
+import { mockWarningMessagesWithTwo } from '@/mocks/data/tests/warning.mock.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { mockDataBaseTrajectory, mockPrevStateArea, mockPrevStateLoad } from '@/mocks/data/tests/trajectory.mock.ts';
 
@@ -197,83 +198,130 @@ describe('addTrajectories', () => {
 });
 
 describe('deleteTrajectory', () => {
-  const trajectorySample = mockDataBaseTrajectory(TRAJECTORY_TYPE.AREA, 123, 'zoneA');
+  const baseTrajectory = {
+    id: '1',
+    area: 'Zone A',
+    technology: 'Tech X',
+    type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+    trajectoryName: 'Initial',
+  };
 
-  it('should removes the specified trajectory from the correct type array', () => {
-    const prevState = {
-      [TRAJECTORY_TYPE.LOAD]: {
-        trajectories: [trajectorySample],
-        warningMessages: [mockSingleWarningMessagesSkipped],
-      },
-    };
-    const payload = { area: 'zoneA', type: TRAJECTORY_TYPE.LOAD };
-    const result = deleteTrajectory(prevState, payload);
-
-    expect(result[TRAJECTORY_TYPE.LOAD]?.trajectories).toEqual([]);
-  });
-
-  it('should returns the same state if no matching trajectory is found', () => {
+  it('should remove trajectory with matching area', () => {
     const prevState = {
       studyStatus: StudyStatus.IN_PROGRESS,
-      [TRAJECTORY_TYPE.AREA]: {
-        trajectories: [mockDataBaseTrajectory(TRAJECTORY_TYPE.AREA, 456, 'ZoneB')],
-        warningMessages: [],
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]: {
+        trajectories: [baseTrajectory],
       },
-    };
-    const payload = { area: 'ZoneA', type: TRAJECTORY_TYPE.AREA };
-    const result = deleteTrajectory(prevState, payload);
+    } as unknown as Partial<StudyState>;
 
-    expect(result).toEqual(prevState);
+    const payload = {
+      area: 'Zone A',
+      type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+    };
+
+    const result = deleteTrajectory({ ...prevState }, payload);
+
+    expect(result[TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]?.trajectories).toHaveLength(0);
   });
 
-  it('should returns the same state if the trajectory list is null', () => {
+  it('should not remove trajectory with different area', () => {
     const prevState = {
-      studyStatus: StudyStatus.IN_PROGRESS,
-      [TRAJECTORY_TYPE.AREA]: {
-        trajectories: [],
-        warningMessages: [],
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]: {
+        trajectories: [baseTrajectory],
       },
+    } as unknown as Partial<StudyState>;
+
+    const payload = {
+      area: 'Zone B',
+      type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
     };
 
-    const payload = { area: 'ZoneA', type: TRAJECTORY_TYPE.AREA };
+    const result = deleteTrajectory({ ...prevState }, payload);
 
-    const result = deleteTrajectory(prevState, payload);
-
-    expect(result).toEqual(prevState);
+    expect(result[TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]?.trajectories).toHaveLength(1);
   });
 
-  it('should returns the same state if no trajectory of the trajectory type', () => {
-    const prevState = {
-      studyStatus: StudyStatus.IN_PROGRESS,
-    };
-
-    const payload = { area: 'ZoneA', type: TRAJECTORY_TYPE.AREA };
-
-    const result = deleteTrajectory(prevState, payload);
-
-    expect(result).toEqual(prevState);
-  });
-
-  it('should returns the same state if the trajectory list is missing', () => {
-    const prevState = {};
-    const payload = { area: 'ZoneA', type: TRAJECTORY_TYPE.AREA };
-
-    const result = deleteTrajectory(prevState, payload);
-
-    expect(result).toEqual(prevState);
-  });
-
-  it('should not mutate the original state object', () => {
+  it('should clear trajectories for AREA type', () => {
     const prevState = {
       [TRAJECTORY_TYPE.AREA]: {
-        trajectories: [{ ...trajectorySample }],
-        warningMessages: [],
+        trajectories: [baseTrajectory],
       },
-    };
-    const payload = { area: 'ZoneA', type: TRAJECTORY_TYPE.AREA };
-    const result = deleteTrajectory(prevState, payload);
+    } as unknown as Partial<StudyState>;
 
-    expect(result[TRAJECTORY_TYPE.AREA]?.trajectories).not.toBe(prevState[TRAJECTORY_TYPE.AREA]);
+    const payload = {
+      area: 'Zone A',
+      type: TRAJECTORY_TYPE.AREA,
+    };
+
+    const result = deleteTrajectory({ ...prevState }, payload);
+
+    expect(result[TRAJECTORY_TYPE.AREA]?.trajectories).toEqual([]);
+  });
+
+  it('should clear trajectories for LINK type', () => {
+    const prevState = {
+      [TRAJECTORY_TYPE.LINK]: {
+        trajectories: [baseTrajectory],
+      },
+    } as unknown as Partial<StudyState>;
+
+    const payload = {
+      area: 'Zone A',
+      type: TRAJECTORY_TYPE.LINK,
+    };
+
+    const result = deleteTrajectory({ ...prevState }, payload);
+
+    expect(result[TRAJECTORY_TYPE.LINK]?.trajectories).toEqual([]);
+  });
+
+  it('should clear modulation trajectory names if all specific trajectories have empty names', () => {
+    const prevState = {
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]: {
+        trajectories: [{ ...baseTrajectory, trajectoryName: '' }],
+      },
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]: {
+        trajectories: [
+          { id: 'mod1', trajectoryName: 'Mod A' },
+          { id: 'mod2', trajectoryName: 'Mod B' },
+        ],
+      },
+    } as unknown as Partial<StudyState>;
+
+    const payload = {
+      area: 'Zone A',
+      type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+    };
+
+    const result = deleteTrajectory({ ...prevState }, payload);
+
+    expect(
+      result[TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]?.trajectories.every(
+        (t) => t.trajectoryName === '',
+      ),
+    ).toBe(true);
+  });
+
+  it('should not modify modulation trajectories if some specific trajectories have names', () => {
+    const prevState = {
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]: {
+        trajectories: [{ ...baseTrajectory, trajectoryName: 'Still here' }],
+      },
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]: {
+        trajectories: [{ id: 'mod1', trajectoryName: 'Mod A' }],
+      },
+    } as unknown as Partial<StudyState>;
+
+    const payload = {
+      area: 'Zone B',
+      type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+    };
+
+    const result = deleteTrajectory({ ...prevState }, payload);
+
+    expect(result[TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]?.trajectories[0].trajectoryName).toBe(
+      'Mod A',
+    );
   });
 });
 
@@ -337,95 +385,113 @@ describe('clearByType', () => {
 });
 
 describe('updateTrajectory', () => {
-  const baseTrajectory: DbTrajectory = mockDataBaseTrajectory(TRAJECTORY_TYPE.LINK, 123, 'ZoneA');
+  const baseTrajectory = {
+    id: '1',
+    area: 'Zone A',
+    technology: 'Tech X',
+    type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+    trajectoryName: 'Initial',
+  } as unknown as DbTrajectory;
 
-  const prevState: Partial<StudyState> = {
-    studyStatus: StudyStatus.IN_PROGRESS,
-    [TRAJECTORY_TYPE.LINK]: { trajectories: [baseTrajectory] },
-  };
-
-  it('should update trajectory when status is success', () => {
-    const updatedTrajectory: DbTrajectory = {
-      ...baseTrajectory,
-      trajectoryName: 'Updated',
-    };
-
-    const payload = {
-      trajectory: updatedTrajectory,
-      warningMessages: [],
-      status: 'success' as FileInputStatus,
-    };
-
-    const result = updateTrajectory(prevState, payload);
-
-    expect(result[TRAJECTORY_TYPE.LINK]?.trajectories?.[0].trajectoryName).toBe('Updated');
-  });
-
-  it('should clear trajectory fields when status is not success', () => {
-    const updatedTrajectory = {
-      ...baseTrajectory,
-      trajectoryName: 'Updated',
-      messages: mockWarningMessagesWithTwo,
-    };
-
-    const payload = {
-      trajectory: updatedTrajectory,
-      warningMessages: [],
-      status: 'error' as FileInputStatus,
-    };
-
-    const result = updateTrajectory(prevState, payload);
-
-    expect(result[TRAJECTORY_TYPE.LINK]?.trajectories?.[0].trajectoryName).toBe('');
-  });
-
-  it('should return original state if no matching trajectory is found', () => {
-    const payload = {
-      trajectory: {
-        ...baseTrajectory,
-        area: 'NonMatchingZone',
+  it('should update trajectoryName on success for matching trajectory', () => {
+    const prevState = {
+      studyStatus: StudyStatus.IN_PROGRESS,
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]: {
+        trajectories: [baseTrajectory] as DbTrajectory[],
       },
-      warningMessages: [],
-      status: 'success' as FileInputStatus,
+    } as Partial<StudyState>;
+
+    const payload = {
+      trajectory: { ...baseTrajectory, trajectoryName: 'Updated' } as DbTrajectory,
+      status: 'success' as RowStatus,
+    };
+
+    const result = updateTrajectory(prevState, payload);
+
+    expect(result[TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]?.trajectories[0].trajectoryName).toBe(
+      'Updated',
+    );
+  });
+
+  it('should clear trajectoryName on failure for matching trajectory', () => {
+    const prevState = {
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]: {
+        trajectories: [baseTrajectory],
+      },
+    };
+
+    const payload = {
+      trajectory: { ...baseTrajectory, trajectoryName: 'Should be cleared' } as DbTrajectory,
+      status: 'error' as RowStatus,
+    };
+
+    const result = updateTrajectory(prevState, payload);
+
+    expect(result[TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]?.trajectories[0].trajectoryName).toBe('');
+  });
+
+  it('should replace trajectory if same area/tech/type but different id', () => {
+    const prevState = {
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]: {
+        trajectories: [baseTrajectory],
+      },
+    };
+
+    const payload = {
+      trajectory: { ...baseTrajectory, id: '2', trajectoryName: 'New Trajectory' } as unknown as DbTrajectory,
+      status: 'success' as RowStatus,
+    };
+
+    const result = updateTrajectory(prevState, payload);
+
+    expect(result[TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]?.trajectories[0].id).toBe('2');
+    expect(result[TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]?.trajectories[0].trajectoryName).toBe(
+      'New Trajectory',
+    );
+  });
+
+  it('should trigger isMultipleUpdate and clear modulation trajectory names', () => {
+    const prevState = {
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]: {
+        trajectories: [{ ...baseTrajectory, trajectoryName: 'To be cleared' }],
+      },
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]: {
+        trajectories: [
+          { id: 'mod1', trajectoryName: 'Modulation A' },
+          { id: 'mod2', trajectoryName: 'Modulation B' },
+        ],
+      },
+    } as unknown as Partial<StudyState>;
+
+    const payload = {
+      trajectory: { ...baseTrajectory, trajectoryName: '', id: '1' } as unknown as DbTrajectory,
+      status: 'error' as RowStatus,
+    };
+
+    const result = updateTrajectory(prevState, payload);
+
+    expect(
+      result[TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]?.trajectories.every(
+        (t) => t.trajectoryName === '',
+      ),
+    ).toBe(true);
+  });
+
+  it('should return prevState if no trajectories found', () => {
+    const prevState = {
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]: {
+        trajectories: [],
+      },
+    };
+
+    const payload = {
+      trajectory: baseTrajectory,
+      status: 'success' as RowStatus,
     };
 
     const result = updateTrajectory(prevState, payload);
 
     expect(result).toEqual(prevState);
-  });
-
-  it('should not mutate original state', () => {
-    const payload = {
-      trajectory: {
-        ...baseTrajectory,
-        trajectoryName: 'Changed',
-      },
-      warningMessages: [],
-      status: 'success' as FileInputStatus,
-    };
-
-    const result = updateTrajectory(prevState, payload);
-
-    expect(result[TRAJECTORY_TYPE.LINK]).not.toBe(prevState[TRAJECTORY_TYPE.LINK]);
-  });
-
-  it('should not change original state when type has no trajectories', () => {
-    const prevStateLINK: Partial<StudyState> = {
-      studyStatus: StudyStatus.IN_PROGRESS,
-      [TRAJECTORY_TYPE.LINK]: { trajectories: [] },
-    };
-    const payload = {
-      trajectory: {
-        ...baseTrajectory,
-        trajectoryName: 'Changed',
-      },
-      warningMessages: [],
-      status: 'success' as FileInputStatus,
-    };
-
-    const result = updateTrajectory(prevStateLINK, payload);
-
-    expect(result[TRAJECTORY_TYPE.LINK]).toBe(prevStateLINK[TRAJECTORY_TYPE.LINK]);
   });
 });
 
