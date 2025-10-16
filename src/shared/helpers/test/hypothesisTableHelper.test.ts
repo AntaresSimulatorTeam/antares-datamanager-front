@@ -49,6 +49,25 @@ describe('shouldOpenDeletionModal', () => {
     expect(result).toBe(true);
   });
 
+  it('returns true when trajectory is linked to area and type is THERMAL_TECHNICAL_SPECIFIC_PARAMETER', () => {
+    const data: HypothesisRowData[] = [
+      {
+        hypothesis: 'Specific',
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+        subRows: [baseRow],
+      },
+      {
+        hypothesis: 'Param modulation',
+        trajectory: { id: 1, trajectoryName: 'Traj A', area: 'Zone A' } as DbTrajectory,
+        status: TRAJECTORY_SELECTION_STATUS.OK,
+        subRows: [],
+      },
+    ];
+    const result = shouldOpenDeletionModal(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, 0, data);
+    expect(result).toBe(true);
+  });
+
   it('returns false when trajectory is linked to area but type is THERMAL_CAPACITY and no subRows', () => {
     const data = [baseRow];
     const result = shouldOpenDeletionModal(TRAJECTORY_TYPE.THERMAL_CAPACITY, 0, data);
