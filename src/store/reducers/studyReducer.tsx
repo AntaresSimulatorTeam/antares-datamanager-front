@@ -35,7 +35,22 @@ export const deleteTrajectory = (prevState: Partial<StudyState>, payload: { area
       ...prevState[`${type}`],
       trajectories: newTrajectories,
     };
-    Object.assign(prevState, { [type]: newStudyState });
+    const shouldUpdateParam =
+      type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER &&
+      newTrajectories.every((traj) => !traj.trajectoryName);
+
+    Object.assign(prevState, {
+      [type]: newStudyState,
+      ...(shouldUpdateParam && {
+        [TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]: {
+          trajectories:
+            prevState[TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]?.trajectories.map((trajectoryDb) => ({
+              ...trajectoryDb,
+              trajectoryName: '',
+            })) ?? [],
+        },
+      }),
+    });
   }
   return prevState;
 };

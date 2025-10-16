@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useCallback } from 'react';
-import { HypothesisRowData, StudyActionType, StudyDTO } from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, StudyActionType, StudyDTO } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { unlinkMultipleTrajectoriesFromStudy, unlinkTrajectoryFromStudy } from '@/shared/services/trajectoryService.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
@@ -22,11 +22,19 @@ export const useHypothesisTableRemoveRow = (
         const row = data[indexRow];
         if (indexRow != null && row?.hypothesis) {
           const { trajectory, status, subRows } = row;
-          const hasTrajectoryOK =
-            subRows?.some((subRow) => subRow.trajectory != null && subRow.status === TRAJECTORY_SELECTION_STATUS.OK) ||
-            (trajectory && status === TRAJECTORY_SELECTION_STATUS.OK);
+          const trajectoryToDelete =
+            type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER
+              ? subRows?.find(
+                  (subRow) =>
+                    subRow.hypothesis === value &&
+                    subRow.trajectory != null &&
+                    subRow.status === TRAJECTORY_SELECTION_STATUS.OK,
+                )?.trajectory
+              : trajectory && status === TRAJECTORY_SELECTION_STATUS.OK
+                ? trajectory
+                : null;
           let trajectoryIds = [];
-          if (study.id && hasTrajectoryOK) {
+          if (study.id && trajectoryToDelete) {
             const subRowTrajectoryIds = subRows
               ?.map((subRow) => {
                 if (subRow.trajectory != null && subRow.status === TRAJECTORY_SELECTION_STATUS.OK) {
@@ -36,31 +44,25 @@ export const useHypothesisTableRemoveRow = (
               })
               .filter(Boolean) as number[];
 
+            let paramModulationId: DbTrajectory | null = null;
+            // The specific parameter and the modulation trajectory should be deleted if there's only one specific trajectory left
             if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER && subRowTrajectoryIds.length === 1) {
-              const paramModulationId = data[1]?.status === TRAJECTORY_SELECTION_STATUS.OK ? data[1]?.trajectory : null;
-              trajectoryIds = [
-                ...(paramModulationId?.id ? [paramModulationId.id] : []),
-                ...(subRowTrajectoryIds ?? []),
-              ].filter(Boolean);
-            } else {
-              trajectoryIds = [...(trajectory?.id ? [trajectory.id] : []), ...(subRowTrajectoryIds ?? [])].filter(
-                Boolean,
-              );
+              paramModulationId = data[1]?.status === TRAJECTORY_SELECTION_STATUS.OK ? data[1]?.trajectory : null;
             }
+            trajectoryIds = trajectoryIds = [
+              ...(paramModulationId ? [paramModulationId.id] : []),
+              ...(trajectoryToDelete ? [trajectoryToDelete?.id] : []),
+            ].filter(Boolean);
 
             if (trajectoryIds?.length > 1) {
               await unlinkMultipleTrajectoriesFromStudy(study.id, trajectoryIds);
-              dispatch?.({
-                type: STUDY_ACTION.DELETE_TRAJECTORY,
-                payload: { area: row.hypothesis, type },
-              });
             } else {
               await unlinkTrajectoryFromStudy(trajectoryIds[0], study.id);
-              dispatch?.({
-                type: STUDY_ACTION.DELETE_TRAJECTORY,
-                payload: { area: row.hypothesis, type },
-              });
             }
+            dispatch?.({
+              type: STUDY_ACTION.DELETE_TRAJECTORY,
+              payload: { area: trajectoryToDelete.area ?? row.hypothesis, type },
+            });
           }
 
           if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
