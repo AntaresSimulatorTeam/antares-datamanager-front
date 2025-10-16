@@ -51,7 +51,6 @@ describe('useFetchHypothesisParametersTrajectories', () => {
 
   it('should fetch and populate hypothesis trajectories', async () => {
     const mockUseStudyDispatch = useStudyDispatch as Mock<typeof useStudyDispatch>;
-    //const mockUseStudy = useStudy as Mock<typeof useStudy>;
     const mockDispatch = vi.fn().mockImplementation(vi.fn());
     mockUseStudyDispatch.mockReturnValue(mockDispatch);
     const mockSpecific = [{ id: '2', area: 'B', trajectoryName: 'T2' }] as unknown as DbTrajectory[];
@@ -114,6 +113,54 @@ describe('useFetchHypothesisParametersTrajectories', () => {
       expect(result.current.areasTrajectoryOptions).toEqual([{ name: 'B', isDefault: false }]);
       expect(result.current.dropDownListOptions).toEqual(['B']);
       expect(result.current.readOnlyRow).toEqual({ row1: true });
+    });
+  });
+
+  it('should handle missing modulation trajectory', async () => {
+    const mockTrajectories = {
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]: [{ trajectoryName: 'A' }],
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER]: [{ trajectoryName: 'C' }],
+    } as Partial<Record<TRAJECTORY_TYPE, DbTrajectory[]>>;
+
+    vi.mocked(hypothesisTableService.fetchTrajectoriesFromTypes).mockResolvedValue(mockTrajectories);
+    vi.mocked(trajectoryUtils.buildEmptyTrajectory).mockImplementation(
+      (_, type) =>
+        ({
+          trajectoryName: '',
+          trajectoryType: type,
+        }) as unknown as DbTrajectory,
+    );
+    vi.mocked(hypothesisTableUtils.buildCheckListBox).mockReturnValue({ areaOptions: [], checkedValues: [] });
+    vi.mocked(trajectoryUtils.buildRowWithSubRowsData).mockReturnValue({
+      status: TRAJECTORY_SELECTION_STATUS.OK,
+    } as unknown as HypothesisRowData);
+    vi.mocked(sortUtils.sortWithFixedPosition).mockImplementation((rows) => rows);
+
+    const { result } = renderHook(() => useFetchHypothesisParametersTrajectories(1, [{ name: 'A' }], [], false));
+
+    await waitFor(() => {
+      expect(result.current.hypothesisTrajectories[1].status).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
+    });
+  });
+
+  it('should handle empty trajectory response', async () => {
+    vi.mocked(hypothesisTableService.fetchTrajectoriesFromTypes).mockResolvedValue({});
+    vi.mocked(trajectoryUtils.buildEmptyTrajectory).mockImplementation(
+      (_, type) =>
+        ({
+          trajectoryName: '',
+          trajectoryType: type,
+        }) as unknown as DbTrajectory,
+    );
+    vi.mocked(hypothesisTableUtils.buildCheckListBox).mockReturnValue({ areaOptions: [], checkedValues: [] });
+    vi.mocked(sortUtils.sortWithFixedPosition).mockImplementation((rows) => rows);
+
+    const { result } = renderHook(() => useFetchHypothesisParametersTrajectories(1, [{ name: 'A' }], [], false));
+
+    await waitFor(() => {
+      expect(result.current.hypothesisTrajectories.every((h) => h.status === TRAJECTORY_SELECTION_STATUS.MISSING)).toBe(
+        true,
+      );
     });
   });
 });
