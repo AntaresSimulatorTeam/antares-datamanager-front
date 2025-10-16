@@ -39,6 +39,7 @@ export const useTrajectoryAttach = (
                   normalize(item.technology) === normalize(newDbTrajectory.technology),
               ) ?? false;
           }
+
           if (alreadyExists) {
             dispatch?.({
               type: STUDY_ACTION.UPDATE_TRAJECTORY,
