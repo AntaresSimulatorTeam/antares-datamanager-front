@@ -192,14 +192,12 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
               const row = subIndex != null ? technicalData[topIndex]?.subRows?.[subIndex] : technicalData[topIndex];
               const current = row?.trajectory ?? null;
               if (current) {
-                const trajectories: DbTrajectory | DbTrajectory[] = shouldDeleteParamModulation(topIndex, technicalData)
-                  ? [current, ...(technicalData[1].trajectory ? [technicalData[1].trajectory] : [])].filter(Boolean)
-                  : current;
                 void detachTrajectory(
                   getTrajectoryTypeByIndex(topIndex),
                   [topIndex, subIndex].filter((n) => n !== undefined),
                   status,
-                  trajectories,
+                  current,
+                  shouldDeleteParamModulation(0, technicalData) ? technicalData[1].trajectory : null,
                 );
               }
             }

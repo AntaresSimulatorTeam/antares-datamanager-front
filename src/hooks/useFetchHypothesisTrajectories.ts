@@ -10,6 +10,7 @@ import {
 } from '@/shared/types';
 import {
   buildDefaultEmptyTrajectoryList,
+  buildEmptyTrajectory,
   buildRowWithSubRowsData,
   convertIntoHypothesisRowWithTechnologies,
   generateReadOnlyIndexMap,
@@ -54,8 +55,8 @@ export const useFetchHypothesisTrajectories = (
           let result: DbTrajectory[];
           let defaultEmptyAreas: DbTrajectory[];
           let arrayWithoutDuplicate: DbTrajectory[];
-          let paraModulationTrajectory;
-          let paraCommonTrajectory;
+          let paraModulationTrajectory: DbTrajectory | null = null;
+          let paraCommonTrajectory: DbTrajectory | null = null;
           if (trajType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
             const types: ThermalParamTrajectoryType[] = [
               TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
@@ -67,17 +68,31 @@ export const useFetchHypothesisTrajectories = (
             const specificAreas: DbTrajectory[] =
               resultObject?.[TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER] ?? [];
             paraModulationTrajectory =
-              resultObject[TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]?.[0] ?? null;
-            paraCommonTrajectory = resultObject[TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER]?.[0] ?? null;
+              resultObject[TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]?.[0] ??
+              buildEmptyTrajectory('', TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER);
+            paraCommonTrajectory =
+              resultObject[TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER]?.[0] ??
+              buildEmptyTrajectory('', TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER);
             defaultEmptyAreas =
               buildDefaultEmptyTrajectoryList(
                 TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
                 specificAreas,
                 defaultAreas,
               ) ?? [];
+
             const allAreas = specificAreas?.concat(emptyAreaSelected).concat(defaultEmptyAreas);
 
             arrayWithoutDuplicate = removeDuplicate(allAreas);
+            dispatch?.({
+              type: STUDY_ACTION.ADD_TRAJECTORIES,
+              payload: {
+                [TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]: {
+                  trajectories: arrayWithoutDuplicate,
+                },
+                [TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]: { trajectories: [paraModulationTrajectory] },
+                [TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER]: { trajectories: [paraCommonTrajectory] },
+              },
+            });
           } else {
             result = await getStudyTrajectories(id, trajType);
             // Build default empty areas (default area not linked to a trajectory)
@@ -88,15 +103,15 @@ export const useFetchHypothesisTrajectories = (
               trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY
                 ? removeDuplicateByTechnology(allAreas)
                 : removeDuplicate(allAreas);
-          }
-          dispatch?.({
-            type: STUDY_ACTION.ADD_TRAJECTORIES,
-            payload: {
-              [trajType]: {
-                trajectories: arrayWithoutDuplicate,
+            dispatch?.({
+              type: STUDY_ACTION.ADD_TRAJECTORIES,
+              payload: {
+                [trajType]: {
+                  trajectories: arrayWithoutDuplicate,
+                },
               },
-            },
-          });
+            });
+          }
 
           // Build checklist for dropdown list
           const newArea = (areas || [])
@@ -145,7 +160,9 @@ export const useFetchHypothesisTrajectories = (
               {
                 hypothesis: t('thermal.@paramModulation'),
                 trajectory: paraModulationTrajectory ?? null,
-                status: paraModulationTrajectory ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+                status: paraModulationTrajectory?.trajectoryName
+                  ? TRAJECTORY_SELECTION_STATUS.OK
+                  : TRAJECTORY_SELECTION_STATUS.MISSING,
                 isDefault: false,
                 isDeletable: false,
                 subRows: null,
@@ -153,7 +170,9 @@ export const useFetchHypothesisTrajectories = (
               {
                 hypothesis: t('thermal.@common'),
                 trajectory: paraCommonTrajectory ?? null,
-                status: paraCommonTrajectory ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+                status: paraCommonTrajectory?.trajectoryName
+                  ? TRAJECTORY_SELECTION_STATUS.OK
+                  : TRAJECTORY_SELECTION_STATUS.MISSING,
                 isDefault: false,
                 isDeletable: false,
                 subRows: null,

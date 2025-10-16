@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { isBusinessError } from '@/shared/utils/errorUtils.ts';
 import { notifyAlert } from '@/shared/notification/notification.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
+import { STUDY_ACTION } from '@/shared/enum/study.ts';
 
 export const useTrajectoryDetach = (
   study: StudyDTO,
@@ -23,20 +24,23 @@ export const useTrajectoryDetach = (
       type: TRAJECTORY_TYPE,
       indexArray: number[],
       status: RowStatus,
-      trajectorySelected: DbTrajectory | DbTrajectory[],
+      trajectorySelected: DbTrajectory,
+      additionnalTrajectory: DbTrajectory | null,
     ): Promise<void> => {
       try {
         if (!trajectorySelected || !status) return;
 
         if (status === 'empty') {
-          if (Array.isArray(trajectorySelected) && trajectorySelected?.length > 1) {
-            await unlinkMultipleTrajectoriesFromStudy(
-              study.id,
-              trajectorySelected.map((trajectory) => trajectory.id),
-            );
+          if (additionnalTrajectory) {
+            const trajectoryIds = [trajectorySelected?.id, additionnalTrajectory.id];
+            await unlinkMultipleTrajectoriesFromStudy(study.id, trajectoryIds);
           } else {
-            await unlinkTrajectoryFromStudy((trajectorySelected as DbTrajectory).id, study.id);
+            await unlinkTrajectoryFromStudy(trajectorySelected.id, study.id);
           }
+          dispatch?.({
+            type: STUDY_ACTION.UPDATE_TRAJECTORY,
+            payload: { trajectory: trajectorySelected, status },
+          });
         }
 
         const newEmptyTrajectory: Pick<HypothesisRowData, 'trajectory' | 'status'> = {
@@ -45,7 +49,7 @@ export const useTrajectoryDetach = (
         };
         if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
           setData((prev: HypothesisRowData[]): HypothesisRowData[] => {
-            if (Array.isArray(trajectorySelected) && trajectorySelected?.length > 1) {
+            if (additionnalTrajectory?.type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER) {
               const newData = [
                 { ...prev[0] },
                 { ...prev[1], trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING },
@@ -60,12 +64,7 @@ export const useTrajectoryDetach = (
           setData((prev) => setNestedData(prev, indexArray, newEmptyTrajectory));
         }
       } catch (error) {
-        if (
-          !Array.isArray(trajectorySelected) &&
-          indexArray.length &&
-          trajectorySelected?.area &&
-          isBusinessError(error)
-        ) {
+        if (!additionnalTrajectory && indexArray.length && trajectorySelected?.area && isBusinessError(error)) {
           const message = t('studyDetails.@notificationAlert', {
             studyName: study.name,
             trajectoryName: trajectorySelected.trajectoryName,
