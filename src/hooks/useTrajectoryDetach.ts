@@ -25,7 +25,7 @@ export const useTrajectoryDetach = (
       indexArray: number[],
       status: RowStatus,
       trajectorySelected: DbTrajectory,
-      additionnalTrajectory: DbTrajectory | null,
+      additionnalTrajectory?: DbTrajectory | null,
     ): Promise<void> => {
       try {
         if (!trajectorySelected || !status) return;
@@ -37,11 +37,11 @@ export const useTrajectoryDetach = (
           } else {
             await unlinkTrajectoryFromStudy(trajectorySelected.id, study.id);
           }
-          dispatch?.({
-            type: STUDY_ACTION.UPDATE_TRAJECTORY,
-            payload: { trajectory: trajectorySelected, status },
-          });
         }
+        dispatch?.({
+          type: STUDY_ACTION.UPDATE_TRAJECTORY,
+          payload: { trajectory: trajectorySelected, status },
+        });
 
         const newEmptyTrajectory: Pick<HypothesisRowData, 'trajectory' | 'status'> = {
           trajectory: null,
