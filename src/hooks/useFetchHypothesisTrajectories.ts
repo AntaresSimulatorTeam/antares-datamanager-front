@@ -19,10 +19,10 @@ import { useTranslation } from 'react-i18next';
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 
 export const useFetchHypothesisTrajectories = (
+  areas: TrajectoryAreaData[],
   studyId?: number,
   trajectoryType?: TRAJECTORY_TYPE,
   defaultAreas?: { name: string }[],
-  areas?: TrajectoryAreaData[],
   isStudyGenerated?: boolean,
 ) => {
   const [hypothesisTrajectories, setHypothesisTrajectories] = useState<HypothesisRowData[]>([]);
@@ -46,7 +46,7 @@ export const useFetchHypothesisTrajectories = (
           const result = await getStudyTrajectories(id, trajType);
           // Build default empty areas (default area not linked to a trajectory)
           const defaultEmptyAreas = buildDefaultEmptyTrajectoryList(trajType, result, defaultAreas);
-          const allAreas = result?.concat(emptyAreaSelected).concat(defaultEmptyAreas);
+          const allAreas = [...(result || []), ...emptyAreaSelected, ...defaultEmptyAreas];
 
           const arrayWithoutDuplicate =
             trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY

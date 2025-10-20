@@ -3,9 +3,10 @@ import { useFetchHypothesisParametersTrajectories } from '@/hooks/useFetchHypoth
 import * as hypothesisTableService from '@/shared/services/hypothesisTableService.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
-import { DbTrajectory } from '@/shared/types';
+import { DbTrajectory, HypothesisRowData } from '@/shared/types';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
+import * as sortUtils from '@/shared/utils/sortUtils.ts';
 
 vi.mock('@/shared/services/trajectoryService');
 vi.mock('@/shared/services/hypothesisTableService');
@@ -40,11 +41,11 @@ describe('useFetchHypothesisParametersTrajectories', () => {
   const mockUseStudyDispatch = useStudyDispatch as Mock<typeof useStudyDispatch>;
   const mockDispatch = vi.fn().mockImplementation(vi.fn());
   mockUseStudyDispatch.mockReturnValue(mockDispatch);
-  beforeEach(() => {
+  afterEach(() => {
     vi.clearAllMocks();
   });
 
-  it('should fetch and populate hypothesis trajectories', async () => {
+  it('should fetch and populate hypothesis trajectories when one specific trajectories', async () => {
     const trajectoryData = [
       {
         areaName: 'B',
@@ -99,6 +100,43 @@ describe('useFetchHypothesisParametersTrajectories', () => {
     });
   });
 
+  it('should handle readonly rows when at least more than one specific trajectories', async () => {
+    const trajectoryData = [
+      {
+        areaName: 'B',
+        powerToGas: '',
+        shortTermStorage: null,
+      },
+      {
+        areaName: 'F',
+        powerToGas: '',
+        shortTermStorage: null,
+      },
+    ];
+    const mockTwoSpecific = [
+      { id: '2', area: 'A', trajectoryName: 'TA' },
+      { id: '6', area: 'F', trajectoryName: 'T6' },
+    ] as unknown as DbTrajectory[];
+    vi.mocked(hypothesisTableService.fetchTrajectoriesFromTypes).mockResolvedValue({
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]: mockTwoSpecific,
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]: mockModulation,
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER]: mockCommon,
+    });
+
+    vi.mocked(sortUtils.sortWithFixedPosition).mockReturnValue([
+      { hypothesis: 'A', trajectory: { id: 2, area: 'A', trajectoryName: 'TA' } },
+      { hypothesis: 'F', trajectory: { id: 6, area: 'F', trajectoryName: 'T6' } },
+    ] as HypothesisRowData[]);
+
+    const { result } = renderHook(() =>
+      useFetchHypothesisParametersTrajectories(1, [{ name: 'A' }], trajectoryData, false),
+    );
+
+    await waitFor(() => {
+      expect(result.current.readOnlyRow).toEqual({ '0.0': true, '1': true });
+    });
+  });
+
   it('should handle readonly rows when no specific trajectories', async () => {
     const mockTrajectories = {
       [TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER]: [{ trajectoryName: 'C' }],
@@ -123,7 +161,7 @@ describe('useFetchHypothesisParametersTrajectories', () => {
     );
 
     await waitFor(() => {
-      expect(result.current.readOnlyRow).toEqual({ '1': true });
+      expect(result.current.readOnlyRow).toEqual({ '0.0': true, '1': true });
     });
   });
 
@@ -156,7 +194,17 @@ describe('useFetchHypothesisParametersTrajectories', () => {
     );
 
     await waitFor(() => {
-      expect(result.current.readOnlyRow).toEqual({ '0': true, '1': true, '2': true });
+      expect(result.current.hypothesisTrajectories[0].subRows).toEqual([
+        {
+          hypothesis: 'A',
+          trajectory: { id: 2, area: 'A', trajectoryName: 'TA' },
+        },
+        {
+          hypothesis: 'F',
+          trajectory: { id: 6, area: 'F', trajectoryName: 'T6' },
+        },
+      ]);
+      expect(result.current.readOnlyRow).toEqual({ '0': true, '0.0': true, '0.1': true, '1': true, '2': true });
     });
   });
 

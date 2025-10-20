@@ -85,7 +85,7 @@ describe('useFetchHypothesisTrajectories', () => {
     vi.mocked(trajectoryUtils.buildDefaultEmptyTrajectoryList).mockImplementation(() => [
       mockEmptyDbTrajectoryLoadOthers,
     ]);
-    const { result } = renderHook(() => useFetchHypothesisTrajectories(5, TRAJECTORY_TYPE.LOAD));
+    const { result } = renderHook(() => useFetchHypothesisTrajectories([], 5, TRAJECTORY_TYPE.LOAD));
 
     await waitFor(() => {
       expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.LOAD);
@@ -178,7 +178,7 @@ describe('useFetchHypothesisTrajectories', () => {
       mockEmptyDbTrajectoryLoadFR,
       mockEmptyDbTrajectoryLoadOthers,
     ]);
-    const { result } = renderHook(() => useFetchHypothesisTrajectories(5, TRAJECTORY_TYPE.LOAD, [{ name: 'FR' }]));
+    const { result } = renderHook(() => useFetchHypothesisTrajectories([], 5, TRAJECTORY_TYPE.LOAD, [{ name: 'FR' }]));
 
     await waitFor(() => {
       expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.LOAD);
@@ -281,7 +281,7 @@ describe('useFetchHypothesisTrajectories', () => {
       mockEmptyDbTrajectoryLoadFR,
       mockEmptyDbTrajectoryLoadOthers,
     ]);
-    const { result } = renderHook(() => useFetchHypothesisTrajectories(5, TRAJECTORY_TYPE.LOAD, [{ name: 'FR' }]));
+    const { result } = renderHook(() => useFetchHypothesisTrajectories([], 5, TRAJECTORY_TYPE.LOAD, [{ name: 'FR' }]));
 
     await waitFor(() => {
       expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.LOAD);
@@ -356,7 +356,7 @@ describe('useFetchHypothesisTrajectories', () => {
       mockEmptyDbTrajectoryLoadOthers,
     ]);
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories(5, TRAJECTORY_TYPE.LOAD, [{ name: 'FR' }, { name: 'BE' }]),
+      useFetchHypothesisTrajectories([], 5, TRAJECTORY_TYPE.LOAD, [{ name: 'FR' }, { name: 'BE' }]),
     );
 
     await waitFor(() => {
@@ -431,7 +431,7 @@ describe('useFetchHypothesisTrajectories', () => {
 
     vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArrayLoad);
 
-    const { result } = renderHook(() => useFetchHypothesisTrajectories(5, TRAJECTORY_TYPE.LOAD, defaultAreas, areas));
+    const { result } = renderHook(() => useFetchHypothesisTrajectories(areas, 5, TRAJECTORY_TYPE.LOAD, defaultAreas));
 
     await waitFor(() => {
       expect(result.current.areasTrajectoryOptions).toEqual([
@@ -446,7 +446,7 @@ describe('useFetchHypothesisTrajectories', () => {
     const defaultAreas = [{ name: 'FR' }];
     vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArrayLoad);
 
-    const { result } = renderHook(() => useFetchHypothesisTrajectories(5, TRAJECTORY_TYPE.LOAD, defaultAreas));
+    const { result } = renderHook(() => useFetchHypothesisTrajectories([], 5, TRAJECTORY_TYPE.LOAD, defaultAreas));
 
     await waitFor(() => {
       expect(result.current.dropDownListOptions).toEqual(expect.arrayContaining(['FR', 'AT', 'BE']));
@@ -465,7 +465,7 @@ describe('useFetchHypothesisTrajectories', () => {
     vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArrayLoad);
 
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories(5, TRAJECTORY_TYPE.LOAD, defaultAreas, areas, true),
+      useFetchHypothesisTrajectories(areas, 5, TRAJECTORY_TYPE.LOAD, defaultAreas, true),
     );
 
     await waitFor(() => {
@@ -483,13 +483,13 @@ describe('useFetchHypothesisTrajectories', () => {
       trajectory: null,
     }));
 
-    const { result } = renderHook(() => useFetchHypothesisTrajectories(5, TRAJECTORY_TYPE.THERMAL_CAPACITY));
+    const { result } = renderHook(() => useFetchHypothesisTrajectories([], 5, TRAJECTORY_TYPE.THERMAL_CAPACITY));
 
     await waitFor(() => expect(result.current.hypothesisTrajectories[0].subRows).toEqual(technologiesHypothesis));
   });
 
   it('should not call api if only study id is provided', async () => {
-    const { result } = renderHook(() => useFetchHypothesisTrajectories(5));
+    const { result } = renderHook(() => useFetchHypothesisTrajectories([], 5));
 
     await waitFor(() => {
       expect(studyService.getStudyTrajectories).toHaveBeenCalledTimes(0);
@@ -498,7 +498,7 @@ describe('useFetchHypothesisTrajectories', () => {
   });
 
   it('should not call api when no arguments area provided', async () => {
-    const { result } = renderHook(() => useFetchHypothesisTrajectories());
+    const { result } = renderHook(() => useFetchHypothesisTrajectories([]));
 
     await waitFor(() => {
       expect(studyService.getStudyTrajectories).toHaveBeenCalledTimes(0);
@@ -507,7 +507,7 @@ describe('useFetchHypothesisTrajectories', () => {
   });
 
   it('should throw error when api call throw an exception', async () => {
-    const { result } = renderHook(() => useFetchHypothesisTrajectories());
+    const { result } = renderHook(() => useFetchHypothesisTrajectories([]));
 
     await waitFor(() => {
       expect(studyService.getStudyTrajectories).toHaveBeenCalledTimes(0);

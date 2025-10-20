@@ -66,7 +66,7 @@ export const buildErrorTrajectory = (
   trajectoryId: number,
   trajectoryLabel: string,
   userName: string | null,
-  area?: string | null,
+  area: string,
 ): DbTrajectory => ({
   id: trajectoryId,
   trajectoryName: trajectoryLabel,
@@ -81,17 +81,18 @@ export const buildErrorTrajectory = (
 
 /**
  * Remove duplicate within an array of database trajectory
- * @param {DbTrajectory[] | null} array
+ * @param {DbTrajectory[]} array
  * @return {DbTrajectory[]}
  */
-export const removeDuplicate = (array?: DbTrajectory[]): DbTrajectory[] =>
-  (array || []).reduce((acc: DbTrajectory[], current: DbTrajectory) => {
-    const x = acc.find((item) => item.area === current.area);
-    if (!x) {
-      acc.push(current);
+export const removeDuplicate = (array: DbTrajectory[]): DbTrajectory[] => {
+  const map = new Map<string, DbTrajectory>();
+  for (const item of array || []) {
+    if (!map.has(item.area)) {
+      map.set(item.area, item);
     }
-    return acc;
-  }, []);
+  }
+  return Array.from(map.values());
+};
 
 /**
  * Removes duplicate elements from an array of DbTrajectory objects based on the combination

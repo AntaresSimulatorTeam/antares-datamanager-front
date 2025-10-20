@@ -72,8 +72,9 @@ export const useFetchHypothesisParametersTrajectories = (
               defaultAreas,
             ) ?? [];
 
-          const allAreas = specificAreas?.concat(emptyAreaSelected).concat(defaultEmptyAreas);
-          const arrayWithoutDuplicate = allAreas.length > 1 ? removeDuplicate(allAreas) : allAreas;
+          const allAreas = [...(specificAreas || []), ...emptyAreaSelected, ...defaultEmptyAreas];
+          const arrayWithoutDuplicate =
+            !!emptyAreaSelected.length && !!defaultEmptyAreas.length ? removeDuplicate(allAreas) : allAreas;
 
           dispatch?.({
             type: STUDY_ACTION.ADD_TRAJECTORIES,
@@ -100,7 +101,7 @@ export const useFetchHypothesisParametersTrajectories = (
 
           // Hypothesis table
           const specificAreaData = arrayWithoutDuplicate
-            .map((trajectory) =>
+            ?.map((trajectory) =>
               buildRowWithSubRowsData(trajectory, defaultAreas, defaultAreaListNotIncludedInList, null),
             )
             .filter(Boolean);
