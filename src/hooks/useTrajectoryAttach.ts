@@ -4,7 +4,7 @@ import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/traj
 import { linkTrajectoryToStudy } from '@/shared/services/trajectoryService.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.ts';
-import { setNestedData } from '@/shared/utils/trajectoryUtils.ts';
+import { isUniqueTrajectoryType, normalize, setNestedData } from '@/shared/utils/trajectoryUtils.ts';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { useTranslation } from 'react-i18next';
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
@@ -26,9 +26,19 @@ export const useTrajectoryAttach = (
         const newDbTrajectory = result?.find((dbTrajectory) => dbTrajectory.id === trajectory.id);
 
         if (newDbTrajectory) {
-          const alreadyExists = studyState[newDbTrajectory.type]?.trajectories?.some(
-            (item) => item.area === newDbTrajectory.area && item.technology === newDbTrajectory.technology,
-          );
+          let alreadyExists = false;
+          if (isUniqueTrajectoryType(newDbTrajectory.type)) {
+            alreadyExists =
+              studyState[newDbTrajectory.type]?.trajectories?.some((item) => item.type === newDbTrajectory.type) ??
+              false;
+          } else {
+            alreadyExists =
+              studyState[newDbTrajectory.type]?.trajectories?.some(
+                (item) =>
+                  normalize(item.area ?? '') === normalize(newDbTrajectory.area ?? '') &&
+                  normalize(item.technology) === normalize(newDbTrajectory.technology),
+              ) ?? false;
+          }
 
           if (alreadyExists) {
             dispatch?.({

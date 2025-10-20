@@ -4,6 +4,7 @@ import { DbTrajectory, StudyDTO, StudyState, UserState } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import * as trajectoryService from '@/shared/services/trajectoryService.ts';
 import * as studyService from '@/shared/services/studyService.ts';
+import * as trajectoryUtils from '@/shared/utils/trajectoryUtils.ts';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
 import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
@@ -23,6 +24,14 @@ vi.mock('@/shared/services/studyService', async (importOriginal) => {
   return {
     ...actual,
     getStudyTrajectories: vi.fn(),
+  };
+});
+
+vi.mock('@/shared/utils/trajectoryUtils', async (importOriginal) => {
+  const actual: Mock = await importOriginal();
+  return {
+    ...actual,
+    isUniqueTrajectoryType: vi.fn(),
   };
 });
 
@@ -66,7 +75,7 @@ describe('useTrajectoryAttach', () => {
 
   const studyState: Partial<StudyState> = {
     [TRAJECTORY_TYPE.LOAD]: {
-      trajectories: [{ area: 'Zone A' } as DbTrajectory],
+      trajectories: [{ area: 'Zone A', type: TRAJECTORY_TYPE.LOAD } as DbTrajectory],
     },
   };
 
@@ -111,6 +120,43 @@ describe('useTrajectoryAttach', () => {
     expect(mockSetData).toHaveBeenCalled();
   });
 
+  it('should dispatch UPDATE_TRAJECTORY if unique type already exists', async () => {
+    const mockTrajectory = { id: '123', type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER };
+    const newTrajectory2 = {
+      id: '123',
+      trajectoryName: 'Traj A',
+      area: 'Zone A',
+      type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER,
+    } as unknown as DbTrajectory;
+    const studyState2: Partial<StudyState> = {
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]: {
+        trajectories: [
+          { area: 'Zone A', type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER } as DbTrajectory,
+        ],
+      },
+    };
+    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue([mockTrajectory] as unknown as DbTrajectory[]);
+    vi.mocked(trajectoryUtils.isUniqueTrajectoryType).mockResolvedValue(true);
+
+    const { result } = renderHook(() => useTrajectoryAttach(study, studyState2, mockDispatch, mockSetData));
+
+    await result.current.attachTrajectory(
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER,
+      [0],
+      'success',
+      newTrajectory2,
+    );
+
+    expect(mockDispatch).toHaveBeenCalledWith({
+      type: STUDY_ACTION.UPDATE_TRAJECTORY,
+      payload: {
+        trajectory: mockTrajectory,
+        status: 'success',
+      },
+    });
+    expect(mockSetData).toHaveBeenCalled();
+  });
+
   it('should handle error and call handleTrajectoryError', async () => {
     vi.mocked(trajectoryService.linkTrajectoryToStudy).mockRejectedValue(new Error('link failed'));
 
@@ -138,7 +184,7 @@ describe('useTrajectoryAttach', () => {
     mockUseUser.mockImplementation(() => ({ user: { profile: {} } }) as UserState);
     const { result } = renderHook(() => useTrajectoryAttach(study, studyState, mockDispatch, mockSetData));
 
-    const trajectoryArea: DbTrajectory = {
+    const trajectoryArea = {
       id: 100,
       trajectoryName: 'BP23_A_ref_v2',
       type: TRAJECTORY_TYPE.AREA,
@@ -146,7 +192,7 @@ describe('useTrajectoryAttach', () => {
       userName: '',
       technology: '',
       creationDate: '2025-08-07T14:17:09.895028' as unknown as Date,
-    };
+    } as DbTrajectory;
 
     await result.current.attachTrajectory(TRAJECTORY_TYPE.AREA, [0], 'success', trajectoryArea);
 

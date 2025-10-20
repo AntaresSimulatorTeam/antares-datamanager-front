@@ -2,7 +2,7 @@ import { DbTrajectory, RowStatus, StudyActionType, StudyState, StudyTrajectories
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
-import { isMatchingTrajectoryType, removeDuplicateByTechnology } from '@/shared/utils/trajectoryUtils.ts';
+import { isMatchingTrajectoryType, normalize, removeDuplicateByTechnology } from '@/shared/utils/trajectoryUtils.ts';
 
 export const addTrajectories = (prevState: Partial<StudyState>, data: StudyTrajectoriesData): Partial<StudyState> => {
   const studyState: Partial<StudyState> = { ...prevState };
@@ -28,14 +28,29 @@ export const deleteTrajectory = (prevState: Partial<StudyState>, payload: { area
     ? (prevState[`${payload.type}`]?.trajectories as DbTrajectory[])
     : null;
   if (type === TRAJECTORY_TYPE.AREA || type === TRAJECTORY_TYPE.LINK) {
-    Object.assign(prevState, { [type]: { trajectories: [], warningMessages: [] } });
+    Object.assign(prevState, { [type]: { trajectories: [] } });
   } else {
     const newTrajectories = (trajectories ?? []).filter((trajectory) => trajectory.area !== area);
     const newStudyState = {
       ...prevState[`${type}`],
       trajectories: newTrajectories,
     };
-    Object.assign(prevState, { [type]: newStudyState });
+    const shouldUpdateParam =
+      type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER &&
+      newTrajectories.every((traj) => !traj.trajectoryName);
+
+    Object.assign(prevState, {
+      [type]: newStudyState,
+      ...(shouldUpdateParam && {
+        [TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]: {
+          trajectories:
+            prevState[TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]?.trajectories.map((trajectoryDb) => ({
+              ...trajectoryDb,
+              trajectoryName: '',
+            })) ?? [],
+        },
+      }),
+    });
   }
   return prevState;
 };
@@ -51,15 +66,26 @@ export const updateTrajectory = (
     : null;
   if (trajectories?.length) {
     const newTrajectories = trajectories.map((trajectoryDb) => {
-      if (trajectoryDb.area === trajectory.area && trajectory?.technology === trajectoryDb.technology) {
-        return {
-          ...trajectoryDb,
-          trajectoryName: status === 'success' ? trajectory.trajectoryName : '',
-        };
-      } else {
-        return trajectoryDb;
+      const sameArea = normalize(trajectoryDb.area ?? '') === normalize(trajectory.area ?? '');
+      const sameTech = normalize(trajectoryDb.technology ?? '') === normalize(trajectory.technology ?? '');
+      const sameType = trajectoryDb.type === trajectory.type;
+      if (sameArea && sameTech && sameType) {
+        if (trajectoryDb.id === trajectory.id) {
+          return {
+            ...trajectoryDb,
+            trajectoryName: status === 'success' ? trajectory.trajectoryName : '',
+          };
+        } else {
+          return trajectory;
+        }
       }
+
+      return trajectoryDb;
     });
+
+    const isMultipleUpdate =
+      trajectoryType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER &&
+      newTrajectories.every((traj) => !traj.trajectoryName);
 
     const newStudyState = {
       ...prevState[`${trajectoryType}`],
@@ -69,6 +95,15 @@ export const updateTrajectory = (
     return {
       ...prevState,
       [trajectoryType]: newStudyState,
+      ...(isMultipleUpdate && {
+        [TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]: {
+          trajectories:
+            prevState[TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]?.trajectories.map((trajectoryDb) => ({
+              ...trajectoryDb,
+              trajectoryName: '',
+            })) ?? [],
+        },
+      }),
     };
   }
 

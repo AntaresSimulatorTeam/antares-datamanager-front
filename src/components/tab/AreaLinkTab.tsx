@@ -140,7 +140,7 @@ export const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
         trajectoryId,
         trajectoryLabel,
         user?.profile?.sub ?? null,
-        undefined,
+        '',
       );
 
       //Case: area control failed and a trajectory Links is linked to the study with ok status

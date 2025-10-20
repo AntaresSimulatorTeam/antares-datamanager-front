@@ -66,7 +66,7 @@ export const buildErrorTrajectory = (
   trajectoryId: number,
   trajectoryLabel: string,
   userName: string | null,
-  area?: string | null,
+  area: string,
 ): DbTrajectory => ({
   id: trajectoryId,
   trajectoryName: trajectoryLabel,
@@ -81,17 +81,18 @@ export const buildErrorTrajectory = (
 
 /**
  * Remove duplicate within an array of database trajectory
- * @param {DbTrajectory[] | null} array
+ * @param {DbTrajectory[]} array
  * @return {DbTrajectory[]}
  */
-export const removeDuplicate = (array?: DbTrajectory[]): DbTrajectory[] =>
-  (array || []).reduce((acc: DbTrajectory[], current: DbTrajectory) => {
-    const x = acc.find((item) => item.area === current.area);
-    if (!x) {
-      acc.push(current);
+export const removeDuplicate = (array: DbTrajectory[]): DbTrajectory[] => {
+  const map = new Map<string, DbTrajectory>();
+  for (const item of array || []) {
+    if (!map.has(item.area)) {
+      map.set(item.area, item);
     }
-    return acc;
-  }, []);
+  }
+  return Array.from(map.values());
+};
 
 /**
  * Removes duplicate elements from an array of DbTrajectory objects based on the combination
@@ -362,7 +363,7 @@ export const buildReadOnlyRow = (indexes?: (number | null)[]): ReadOnlyObject =>
  * @return {ReadOnlyObject}
  */
 export const retrieveReadOnlyArea = (rowData: HypothesisRowData[], itemsToReadOnly: string[]): ReadOnlyObject => {
-  const readOnlyIndexes: (number | null)[] = itemsToReadOnly.map((areaName) => {
+  const readOnlyIndexes: (number | null)[] = itemsToReadOnly?.map((areaName) => {
     const index = rowData.findIndex((trajectory) => areaName === trajectory.hypothesis);
     return index >= 0 ? index : null;
   });
@@ -630,3 +631,52 @@ export const getQueryParamAreaValue = (type: TRAJECTORY_TYPE, hypothesis: string
   }
   return area ?? '';
 };
+
+/**
+ * Determines if a parameter modulation should be deleted based on the provided index and data.
+ *
+ * The function evaluates certain conditions:
+ * 1. Checks if the index is zero, and the first data row contains exactly one subRow with a non-null trajectory
+ *    and a status of `TRAJECTORY_SELECTION_STATUS.OK`.
+ * 2. Verifies whether the second data row has a defined trajectory and a status of `TRAJECTORY_SELECTION_STATUS.OK`.
+ *
+ * If both conditions are met, the function returns `true`. Otherwise, it returns `false`.
+ *
+ * @param {number} index - The index of the current row being evaluated.
+ * @param {HypothesisRowData[]} data - An array of hypothesis row data to be analyzed.
+ * @returns {boolean} Whether the parameter modulation should be deleted.
+ */
+export const shouldDeleteParamModulation = (index: number, data: HypothesisRowData[]) => {
+  const hasOnlyOneSpecificTrajectory =
+    index === 0 &&
+    data[0]?.subRows?.filter((subRow) => subRow.trajectory != null && subRow.status === TRAJECTORY_SELECTION_STATUS.OK)
+      ?.length === 1;
+  return (
+    (hasOnlyOneSpecificTrajectory && data[1].trajectory && data[1].status === TRAJECTORY_SELECTION_STATUS.OK) || false
+  );
+};
+
+/**
+ * Determines if the given trajectory type is one of the unique trajectory types.
+ *
+ * This function checks if the provided trajectory type matches
+ * either the `THERMAL_ECONOMIC_PARAMETER` or the
+ * `THERMAL_TECHNICAL_MODULATION_PARAMETER` from the `TRAJECTORY_TYPE` enumeration.
+ *
+ * @param {TRAJECTORY_TYPE} type - The trajectory type to check.
+ * @returns {boolean} True if the trajectory type is considered unique, false otherwise.
+ */
+export const isUniqueTrajectoryType = (type: TRAJECTORY_TYPE): boolean =>
+  type === TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER ||
+  type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER;
+
+/**
+ * Normalizes the given value by ensuring a valid string is returned.
+ *
+ * If the provided value is null or an empty string, this function returns an empty string.
+ * Otherwise, it returns the original value.
+ *
+ * @param {string | null} value - The value to be normalized, which can be a string or null.
+ * @returns {string} The normalized string.
+ */
+export const normalize = (value: string | null): string => (value === null || value === '' ? '' : value);

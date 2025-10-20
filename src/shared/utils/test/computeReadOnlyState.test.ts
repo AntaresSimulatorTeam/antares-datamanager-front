@@ -12,7 +12,7 @@ describe('computeReadOnlyState', () => {
     userName: '',
     creationDate: new Date(),
     technology: '',
-  };
+  } as DbTrajectory;
 
   it('should disable Links (index 1) if no area trajectory', () => {
     const readOnly = computeReadOnlyState(null, TRAJECTORY_SELECTION_STATUS.OK, StudyStatus.IN_PROGRESS, true);

@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useCallback } from 'react';
-import { HypothesisRowData, StudyActionType, StudyDTO } from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, StudyActionType, StudyDTO } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { unlinkMultipleTrajectoriesFromStudy, unlinkTrajectoryFromStudy } from '@/shared/services/trajectoryService.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
@@ -22,10 +22,19 @@ export const useHypothesisTableRemoveRow = (
         const row = data[indexRow];
         if (indexRow != null && row?.hypothesis) {
           const { trajectory, status, subRows } = row;
-          const hasTrajectoryOK =
-            subRows?.some((subRow) => subRow.trajectory != null && subRow.status === TRAJECTORY_SELECTION_STATUS.OK) ||
-            (trajectory && status === TRAJECTORY_SELECTION_STATUS.OK);
-          if (study.id && hasTrajectoryOK) {
+          const trajectoryToDelete =
+            type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER
+              ? subRows?.find(
+                  (subRow) =>
+                    subRow.hypothesis === value &&
+                    subRow.trajectory != null &&
+                    subRow.status === TRAJECTORY_SELECTION_STATUS.OK,
+                )?.trajectory
+              : status === TRAJECTORY_SELECTION_STATUS.OK
+                ? trajectory
+                : null;
+          let trajectoryIds = [];
+          if (study.id) {
             const subRowTrajectoryIds = subRows
               ?.map((subRow) => {
                 if (subRow.trajectory != null && subRow.status === TRAJECTORY_SELECTION_STATUS.OK) {
@@ -35,24 +44,53 @@ export const useHypothesisTableRemoveRow = (
               })
               .filter(Boolean) as number[];
 
-            const trajectoryIds = [...(trajectory?.id ? [trajectory.id] : []), ...(subRowTrajectoryIds ?? [])].filter(
-              Boolean,
-            );
-
-            if (trajectoryIds?.length > 1) {
-              await unlinkMultipleTrajectoriesFromStudy(study.id, trajectoryIds);
+            let paramModulationId: DbTrajectory | null = null;
+            // The specific parameter and the modulation trajectory should be deleted if there's only one specific trajectory left
+            if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER && subRowTrajectoryIds.length === 1) {
+              paramModulationId = data[1]?.status === TRAJECTORY_SELECTION_STATUS.OK ? data[1]?.trajectory : null;
+              trajectoryIds = [
+                ...(paramModulationId ? [paramModulationId.id] : []),
+                ...(trajectoryToDelete ? [trajectoryToDelete?.id] : []),
+              ].filter(Boolean);
             } else {
-              await unlinkTrajectoryFromStudy(trajectoryIds[0], study.id);
+              trajectoryIds = [
+                ...(trajectoryToDelete ? [trajectoryToDelete?.id] : []),
+                ...(subRowTrajectoryIds ?? []),
+              ].filter(Boolean);
             }
+
+            if (trajectoryIds?.length > 0) {
+              if (trajectoryIds?.length > 1) {
+                await unlinkMultipleTrajectoriesFromStudy(study.id, trajectoryIds);
+              } else {
+                await unlinkTrajectoryFromStudy(trajectoryIds[0], study.id);
+              }
+            }
+            dispatch?.({
+              type: STUDY_ACTION.DELETE_TRAJECTORY,
+              payload: { area: trajectoryToDelete?.area ?? row.hypothesis, type },
+            });
           }
 
-          dispatch?.({
-            type: STUDY_ACTION.DELETE_TRAJECTORY,
-            payload: { area: row.hypothesis, type },
-          });
-
-          const newDataSorted = sortWithFixedPosition(data?.filter((item) => item.hypothesis !== value));
-          setData(newDataSorted);
+          if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
+            setData((prev: HypothesisRowData[]): HypothesisRowData[] => {
+              const newSubRows = prev?.[0]?.subRows
+                ? prev[0].subRows?.filter((itemData) => itemData.hypothesis !== value)
+                : [];
+              if (trajectoryIds?.length > 1) {
+                return [
+                  { ...prev[0], subRows: newSubRows },
+                  { ...prev[1], trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING },
+                  ...prev.slice(2),
+                ];
+              } else {
+                return [{ ...prev[0], subRows: newSubRows }, ...prev.slice(1)];
+              }
+            });
+          } else {
+            const newDataSorted = sortWithFixedPosition(data?.filter((item) => item.hypothesis !== value));
+            setData(newDataSorted);
+          }
 
           if (value) {
             setCheckedValues((prev) => prev.filter((name) => name !== value));

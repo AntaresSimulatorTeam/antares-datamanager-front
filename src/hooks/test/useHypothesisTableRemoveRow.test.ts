@@ -83,6 +83,32 @@ describe('useHypothesisTableRemoveRow', () => {
     ],
   };
 
+  const modulationTrajectory = {
+    id: 202,
+    type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER,
+    trajectoryName: 'traj',
+  };
+  const trajectory = { id: 101, area: 'Area A' };
+  const subRow = {
+    hypothesis: 'SubHypo',
+    trajectory,
+    status: TRAJECTORY_SELECTION_STATUS.OK,
+  };
+  const rowData = [
+    {
+      hypothesis: 'MainHypo',
+      trajectory: null,
+      status: TRAJECTORY_SELECTION_STATUS.MISSING,
+      subRows: [subRow],
+    },
+    {
+      hypothesis: 'Modulation',
+      trajectory: modulationTrajectory,
+      status: TRAJECTORY_SELECTION_STATUS.OK,
+      subRows: [],
+    },
+  ] as HypothesisRowData[];
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -159,6 +185,77 @@ describe('useHypothesisTableRemoveRow', () => {
     );
 
     await result.current.removeRow(TRAJECTORY_TYPE.LOAD, 'Zone A', 0, [row]);
+
+    expect(notifyAlert).toHaveBeenCalled();
+  });
+
+  it('should remove specific parameter and modulation trajectory when only one subRow exists', async () => {
+    const { result } = renderHook(() =>
+      useHypothesisTableRemoveRow(study, mockDispatch, mockSetData, mockSetCheckedValues),
+    );
+
+    await result.current.removeRow(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, 'SubHypo', 0, rowData);
+
+    expect(unlinkMultipleTrajectoriesFromStudy).toHaveBeenCalledWith('study-001', [202, 101]);
+    expect(mockDispatch).toHaveBeenCalledWith({
+      type: STUDY_ACTION.DELETE_TRAJECTORY,
+      payload: { area: 'Area A', type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER },
+    });
+    expect(mockSetData).toHaveBeenCalled();
+    expect(mockSetCheckedValues).toHaveBeenCalled();
+  });
+
+  it('should remove only the specific trajectory when multiple subRows exist', async () => {
+    const rowDataMultiple = [
+      {
+        hypothesis: 'MainHypo',
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+        subRows: [
+          {
+            hypothesis: 'OtherHypo',
+            trajectory: {
+              id: 303,
+              type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+            },
+            status: TRAJECTORY_SELECTION_STATUS.OK,
+          },
+        ],
+      },
+      {
+        hypothesis: 'Modulation',
+        trajectory: modulationTrajectory,
+        status: TRAJECTORY_SELECTION_STATUS.OK,
+        subRows: [],
+      },
+    ] as HypothesisRowData[];
+    const { result } = renderHook(() =>
+      useHypothesisTableRemoveRow(study, mockDispatch, mockSetData, mockSetCheckedValues),
+    );
+
+    await result.current.removeRow(
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+      'OtherHypo',
+      0,
+      rowDataMultiple,
+    );
+
+    expect(unlinkMultipleTrajectoriesFromStudy).toHaveBeenCalledWith('study-001', [202, 303]);
+    expect(mockSetData).toHaveBeenCalled();
+    expect(mockSetCheckedValues).toHaveBeenCalled();
+  });
+
+  it('should call notifyAlert on error', async () => {
+    const mockUnlinkMultipleTrajectoriesFromStudy = unlinkMultipleTrajectoriesFromStudy as Mock;
+    mockUnlinkMultipleTrajectoriesFromStudy.mockRejectedValue(() => {
+      throw new Error('unlink failed');
+    });
+
+    const { result } = renderHook(() =>
+      useHypothesisTableRemoveRow(study, mockDispatch, mockSetData, mockSetCheckedValues),
+    );
+
+    await result.current.removeRow(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, 'SubHypo', 0, rowData);
 
     expect(notifyAlert).toHaveBeenCalled();
   });

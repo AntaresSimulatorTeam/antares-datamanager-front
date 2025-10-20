@@ -1,13 +1,7 @@
-import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  CheckBoxData,
-  DbTrajectory,
-  HypothesisRowData,
-  ThermalParamTrajectoryType,
-  TrajectoryAreaData,
-} from '@/shared/types';
+import { CheckBoxData, DbTrajectory, HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
 import {
   buildDefaultEmptyTrajectoryList,
   buildRowWithSubRowsData,
@@ -20,16 +14,15 @@ import {
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { sortWithFixedPosition } from '@/shared/utils/sortUtils';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
-import { getDefaultAreaNotIncludedInAreaList, transformToSubRowKeys } from '@/shared/utils/hypothesisTableUtils.ts';
+import { buildCheckListBox, getDefaultAreaNotIncludedInAreaList } from '@/shared/utils/hypothesisTableUtils.ts';
 import { useTranslation } from 'react-i18next';
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
-import { fetchTrajectoriesFromTypes } from '@/shared/services/hypothesisTableService.ts';
 
 export const useFetchHypothesisTrajectories = (
+  areas: TrajectoryAreaData[],
   studyId?: number,
   trajectoryType?: TRAJECTORY_TYPE,
   defaultAreas?: { name: string }[],
-  areas?: TrajectoryAreaData[],
   isStudyGenerated?: boolean,
 ) => {
   const [hypothesisTrajectories, setHypothesisTrajectories] = useState<HypothesisRowData[]>([]);
@@ -48,47 +41,17 @@ export const useFetchHypothesisTrajectories = (
 
   const fetchAreas = useCallback(
     async (id?: number, trajType?: TRAJECTORY_TYPE) => {
-      let resultObject: Partial<Record<ThermalParamTrajectoryType, DbTrajectory[]>>;
       try {
         if (id != null && trajType) {
-          let result: DbTrajectory[];
-          let defaultEmptyAreas: DbTrajectory[];
-          let arrayWithoutDuplicate: DbTrajectory[];
-          let paraModulationTrajectory;
-          let paraCommonTrajectory;
-          if (trajType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
-            const types: ThermalParamTrajectoryType[] = [
-              TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
-              TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER,
-              TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER,
-            ];
-            resultObject = await fetchTrajectoriesFromTypes(id, types);
+          const result = await getStudyTrajectories(id, trajType);
+          // Build default empty areas (default area not linked to a trajectory)
+          const defaultEmptyAreas = buildDefaultEmptyTrajectoryList(trajType, result, defaultAreas);
+          const allAreas = [...(result || []), ...emptyAreaSelected, ...defaultEmptyAreas];
 
-            const specificAreas: DbTrajectory[] =
-              resultObject?.[TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER] ?? [];
-            paraModulationTrajectory =
-              resultObject[TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]?.[0] ?? null;
-            paraCommonTrajectory = resultObject[TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER]?.[0] ?? null;
-            defaultEmptyAreas =
-              buildDefaultEmptyTrajectoryList(
-                TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
-                specificAreas,
-                defaultAreas,
-              ) ?? [];
-            const allAreas = specificAreas?.concat(emptyAreaSelected).concat(defaultEmptyAreas);
-
-            arrayWithoutDuplicate = removeDuplicate(allAreas);
-          } else {
-            result = await getStudyTrajectories(id, trajType);
-            // Build default empty areas (default area not linked to a trajectory)
-            defaultEmptyAreas = buildDefaultEmptyTrajectoryList(trajType, result, defaultAreas);
-            const allAreas = result?.concat(emptyAreaSelected).concat(defaultEmptyAreas);
-
-            arrayWithoutDuplicate =
-              trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY
-                ? removeDuplicateByTechnology(allAreas)
-                : removeDuplicate(allAreas);
-          }
+          const arrayWithoutDuplicate =
+            trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY
+              ? removeDuplicateByTechnology(allAreas)
+              : removeDuplicate(allAreas);
           dispatch?.({
             type: STUDY_ACTION.ADD_TRAJECTORIES,
             payload: {
@@ -99,104 +62,39 @@ export const useFetchHypothesisTrajectories = (
           });
 
           // Build checklist for dropdown list
-          const newArea = (areas || [])
-            .map((trajectoryArea) => {
-              if (!defaultAreas?.some((item) => item.name === trajectoryArea.areaName)) {
-                return { name: trajectoryArea.areaName, isDefault: false };
-              }
-            })
-            .filter(Boolean) as CheckBoxData[];
-          setAreasTrajectoryOptions(
-            defaultAreas?.map((area) => ({ name: area.name, isDefault: true }))?.concat(newArea),
-          );
-
-          const checkList = arrayWithoutDuplicate
-            ?.map((trajectory) => {
-              if (trajectory.area) {
-                return trajectory.area;
-              }
-            })
-            .filter(Boolean) as string[];
-          setDropDownListOptions(defaultAreas?.map((item) => item.name).concat(checkList));
+          const resultList = buildCheckListBox(arrayWithoutDuplicate, areas, defaultAreas);
+          resultList?.areaOptions && setAreasTrajectoryOptions(resultList?.areaOptions);
+          setDropDownListOptions(resultList?.checkedValues);
 
           // Build row data for hypothesis table
-          let dataTrajectories: HypothesisRowData[] = [];
           // Find default area not included in areas trajectory list
-          const defaultAreaListNotIncludedInList: string[] = defaultAreas
-            ? getDefaultAreaNotIncludedInAreaList(defaultAreas, areas)
-            : [];
+          const defaultAreaListNotIncludedInList: string[] = getDefaultAreaNotIncludedInAreaList(
+            defaultAreas ?? [],
+            areas,
+          );
 
           // Hypothesis table
-          if (trajType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
-            const specificAreaData = arrayWithoutDuplicate
-              .map((trajectory) =>
-                buildRowWithSubRowsData(trajectory, defaultAreas, defaultAreaListNotIncludedInList, null),
-              )
-              .filter(Boolean);
-            dataTrajectories = [
-              {
-                hypothesis: t('thermal.@specific'),
-                trajectory: null,
-                status: TRAJECTORY_SELECTION_STATUS.MISSING,
-                isDefault: false,
-                isDeletable: false,
-                subRows: sortWithFixedPosition(specificAreaData),
-              },
-              {
-                hypothesis: t('thermal.@paramModulation'),
-                trajectory: paraModulationTrajectory ?? null,
-                status: paraModulationTrajectory ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
-                isDefault: false,
-                isDeletable: false,
-                subRows: null,
-              },
-              {
-                hypothesis: t('thermal.@common'),
-                trajectory: paraCommonTrajectory ?? null,
-                status: paraCommonTrajectory ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
-                isDefault: false,
-                isDeletable: false,
-                subRows: null,
-              },
-            ];
-          } else {
-            const areaData =
-              trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY
-                ? convertIntoHypothesisRowWithTechnologies(
-                    arrayWithoutDuplicate,
-                    defaultAreaListNotIncludedInList,
-                    defaultAreas,
+          const areaData =
+            trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY
+              ? convertIntoHypothesisRowWithTechnologies(
+                  arrayWithoutDuplicate,
+                  defaultAreaListNotIncludedInList,
+                  defaultAreas,
+                )
+              : arrayWithoutDuplicate
+                  .map((trajectory) =>
+                    buildRowWithSubRowsData(trajectory, defaultAreas, defaultAreaListNotIncludedInList, null),
                   )
-                : arrayWithoutDuplicate
-                    .map((trajectory) =>
-                      buildRowWithSubRowsData(trajectory, defaultAreas, defaultAreaListNotIncludedInList, null),
-                    )
-                    .filter(Boolean);
-            dataTrajectories = sortWithFixedPosition(areaData);
-          }
+                  .filter(Boolean);
+          const dataTrajectories = sortWithFixedPosition(areaData);
           setHypothesisTrajectories(dataTrajectories);
 
           if (isStudyGenerated) {
             const rows = generateReadOnlyIndexMap(dataTrajectories);
             setReadOnlyRow(rows);
           } else {
-            const dataToCheck =
-              trajType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER && dataTrajectories[0].subRows
-                ? dataTrajectories[0].subRows
-                : dataTrajectories;
-            const readOnlyRows = retrieveReadOnlyArea(dataToCheck, defaultAreaListNotIncludedInList);
-            if (trajType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
-              const hasSpecificTrajectory = dataToCheck?.some((row) => row.status === TRAJECTORY_SELECTION_STATUS.OK);
-              const readOnlySubRows = transformToSubRowKeys(readOnlyRows);
-              if (hasSpecificTrajectory) {
-                setReadOnlyRow(readOnlySubRows);
-              } else {
-                const next = { ...readOnlySubRows, ['1']: true };
-                setReadOnlyRow(next);
-              }
-            } else {
-              setReadOnlyRow(readOnlyRows);
-            }
+            const readOnlyRows = retrieveReadOnlyArea(dataTrajectories, defaultAreaListNotIncludedInList);
+            setReadOnlyRow(readOnlyRows);
           }
         }
       } catch (error) {
