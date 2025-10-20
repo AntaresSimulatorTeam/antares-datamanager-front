@@ -184,7 +184,7 @@ describe('useTrajectoryAttach', () => {
     mockUseUser.mockImplementation(() => ({ user: { profile: {} } }) as UserState);
     const { result } = renderHook(() => useTrajectoryAttach(study, studyState, mockDispatch, mockSetData));
 
-    const trajectoryArea: DbTrajectory = {
+    const trajectoryArea = {
       id: 100,
       trajectoryName: 'BP23_A_ref_v2',
       type: TRAJECTORY_TYPE.AREA,
@@ -192,7 +192,7 @@ describe('useTrajectoryAttach', () => {
       userName: '',
       technology: '',
       creationDate: '2025-08-07T14:17:09.895028' as unknown as Date,
-    };
+    } as DbTrajectory;
 
     await result.current.attachTrajectory(TRAJECTORY_TYPE.AREA, [0], 'success', trajectoryArea);
 
