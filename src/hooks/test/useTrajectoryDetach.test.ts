@@ -101,7 +101,7 @@ describe('useTrajectoryDetach', () => {
     expect(mockSetData).toHaveBeenCalled();
   });
 
-  it('should handle multiple detach if additionalTrajectory is provided', async () => {
+  it('should handle multiple detach if additionalTrajectory is provided and trajectory type is THERMAL_TECHNICAL_SPECIFIC_PARAMETER', async () => {
     const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch, mockSetData));
 
     await result.current.detachTrajectory(
@@ -121,7 +121,7 @@ describe('useTrajectoryDetach', () => {
     expect(mockSetData).toHaveBeenCalled();
   });
 
-  it('should not handle error for multiple deletion', async () => {
+  it('should notify error within notification alert for multiple deletion', async () => {
     (unlinkMultipleTrajectoriesFromStudy as Mock).mockRejectedValue(new Error('unlink failed'));
 
     const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch, mockSetData));

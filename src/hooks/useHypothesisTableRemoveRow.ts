@@ -30,7 +30,7 @@ export const useHypothesisTableRemoveRow = (
                     subRow.trajectory != null &&
                     subRow.status === TRAJECTORY_SELECTION_STATUS.OK,
                 )?.trajectory
-              : trajectory && status === TRAJECTORY_SELECTION_STATUS.OK
+              : status === TRAJECTORY_SELECTION_STATUS.OK
                 ? trajectory
                 : null;
           let trajectoryIds = [];

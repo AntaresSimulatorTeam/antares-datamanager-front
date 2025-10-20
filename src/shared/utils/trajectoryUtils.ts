@@ -362,7 +362,7 @@ export const buildReadOnlyRow = (indexes?: (number | null)[]): ReadOnlyObject =>
  * @return {ReadOnlyObject}
  */
 export const retrieveReadOnlyArea = (rowData: HypothesisRowData[], itemsToReadOnly: string[]): ReadOnlyObject => {
-  const readOnlyIndexes: (number | null)[] = itemsToReadOnly.map((areaName) => {
+  const readOnlyIndexes: (number | null)[] = itemsToReadOnly?.map((areaName) => {
     const index = rowData.findIndex((trajectory) => areaName === trajectory.hypothesis);
     return index >= 0 ? index : null;
   });

@@ -49,7 +49,7 @@ export const useFetchHypothesisParametersTrajectories = (
     async (id?: number) => {
       let resultObject: Partial<Record<ThermalParamTrajectoryType, DbTrajectory[]>>;
       try {
-        if (id != null) {
+        if (id != null && areas) {
           const types: ThermalParamTrajectoryType[] = [
             TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
             TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER,
@@ -73,8 +73,8 @@ export const useFetchHypothesisParametersTrajectories = (
             ) ?? [];
 
           const allAreas = specificAreas?.concat(emptyAreaSelected).concat(defaultEmptyAreas);
+          const arrayWithoutDuplicate = allAreas.length > 1 ? removeDuplicate(allAreas) : allAreas;
 
-          const arrayWithoutDuplicate = removeDuplicate(allAreas);
           dispatch?.({
             type: STUDY_ACTION.ADD_TRAJECTORIES,
             payload: {

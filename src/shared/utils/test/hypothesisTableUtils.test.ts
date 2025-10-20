@@ -1,12 +1,15 @@
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import {
+  buildAreaOptions,
+  buildCheckListBox,
+  buildCheckValuesList,
   getAlignment,
   getDefaultAreaNotIncludedInAreaList,
   hasLabelDefault,
   simulateProgress,
   transformToSubRowKeys,
 } from '@/shared/utils/hypothesisTableUtils.ts';
-import { HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
 import { Row } from '@tanstack/react-table';
 import { isTechnology } from '@/shared/utils/trajectoryUtils.ts';
 import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
@@ -199,5 +202,139 @@ describe('simulateProgress', () => {
     const calls = (onProgress as Mock).mock.calls.map((call: number[]) => call[0]);
     expect(calls[calls.length - 1]).toBe(100);
     expect(calls.length).toBeGreaterThan(1);
+  });
+});
+
+describe('buildCheckListBox', () => {
+  it('should return correct areaOptions and checkedValues with all inputs', () => {
+    const areaWithTrajectory = [{ area: 'Zone A' }, { area: 'Zone B' }] as DbTrajectory[];
+
+    const areas = [{ areaName: 'Zone A' }, { areaName: 'Zone C' }] as TrajectoryAreaData[];
+
+    const defaultAreas = [{ name: 'Zone D' }];
+
+    const result = buildCheckListBox(areaWithTrajectory, areas, defaultAreas);
+
+    expect(result.areaOptions).toEqual([
+      { name: 'Zone D', isDefault: true },
+      { name: 'Zone A', isDefault: false },
+      { name: 'Zone C', isDefault: false },
+    ]);
+
+    expect(result.checkedValues).toEqual(['Zone D', 'Zone A', 'Zone B']);
+  });
+
+  it('should handle empty areas and defaultAreas', () => {
+    const areaWithTrajectory = [{ area: 'Zone X' }] as DbTrajectory[];
+
+    const result = buildCheckListBox(areaWithTrajectory, [], []);
+
+    expect(result.areaOptions).toEqual([]);
+    expect(result.checkedValues).toEqual(['Zone X']);
+  });
+
+  it('should exclude defaultAreas from areaOptions and checkedValues', () => {
+    const areaWithTrajectory: DbTrajectory[] = [{ area: 'Zone D' }] as DbTrajectory[];
+    const areas: TrajectoryAreaData[] = [{ areaName: 'Zone D' }] as TrajectoryAreaData[];
+    const defaultAreas = [{ name: 'Zone D' }];
+
+    const result = buildCheckListBox(areaWithTrajectory, areas, defaultAreas);
+
+    expect(result.areaOptions).toEqual([{ name: 'Zone D', isDefault: true }]);
+    expect(result.checkedValues).toEqual(['Zone D']);
+  });
+
+  it('should return empty arrays when all inputs are empty', () => {
+    const result = buildCheckListBox([], [], []);
+
+    expect(result.areaOptions).toEqual([]);
+    expect(result.checkedValues).toEqual([]);
+  });
+});
+
+describe('buildAreaOptions', () => {
+  it('should return combined areas with correct isDefault flags', () => {
+    const trajectoryAreas = [
+      { areaName: 'Zone A' },
+      { areaName: 'Zone B' },
+      { areaName: 'Zone C' },
+    ] as TrajectoryAreaData[];
+    const defaultAreas = [{ name: 'Zone A' }, { name: 'Zone D' }];
+
+    const result = buildAreaOptions(trajectoryAreas, defaultAreas);
+
+    expect(result).toEqual([
+      { name: 'Zone A', isDefault: true },
+      { name: 'Zone D', isDefault: true },
+      { name: 'Zone B', isDefault: false },
+      { name: 'Zone C', isDefault: false },
+    ]);
+  });
+
+  it('should treat all trajectory areas as non-default if no defaultAreas provided', () => {
+    const trajectoryAreas = [{ areaName: 'Zone X' }, { areaName: 'Zone Y' }] as TrajectoryAreaData[];
+
+    const result = buildAreaOptions(trajectoryAreas);
+
+    expect(result).toEqual([
+      { name: 'Zone X', isDefault: false },
+      { name: 'Zone Y', isDefault: false },
+    ]);
+  });
+
+  it('should return only default areas if trajectoryAreas is empty', () => {
+    const defaultAreas = [{ name: 'Zone D' }];
+
+    const result = buildAreaOptions([], defaultAreas);
+
+    expect(result).toEqual([{ name: 'Zone D', isDefault: true }]);
+  });
+
+  it('should return empty array if both inputs are empty', () => {
+    const result = buildAreaOptions([], []);
+
+    expect(result).toEqual([]);
+  });
+});
+
+describe('buildCheckValuesList', () => {
+  it('should combine default areas and non-overlapping trajectory areas', () => {
+    const areaWithTrajectory = [{ area: 'Zone A' }, { area: 'Zone B' }, { area: 'Zone C' }] as DbTrajectory[];
+    const defaultAreas = [{ name: 'Zone A' }, { name: 'Zone D' }];
+
+    const result = buildCheckValuesList(areaWithTrajectory, defaultAreas);
+
+    expect(result).toEqual(['Zone A', 'Zone D', 'Zone B', 'Zone C']);
+  });
+
+  it('should return only trajectory areas if no defaultAreas provided', () => {
+    const areaWithTrajectory = [{ area: 'Zone X' }, { area: 'Zone Y' }] as DbTrajectory[];
+
+    const result = buildCheckValuesList(areaWithTrajectory);
+
+    expect(result).toEqual(['Zone X', 'Zone Y']);
+  });
+
+  it('should return only default areas if trajectory list is empty', () => {
+    const defaultAreas = [{ name: 'Zone D' }];
+
+    const result = buildCheckValuesList([], defaultAreas);
+
+    expect(result).toEqual(['Zone D']);
+  });
+
+  it('should return empty array if both inputs are empty', () => {
+    const result = buildCheckValuesList([], []);
+
+    expect(result).toEqual([]);
+  });
+
+  it('should skip trajectory areas that are also in defaultAreas', () => {
+    const areaWithTrajectory = [{ area: 'Zone A' }, { area: 'Zone B' }] as DbTrajectory[];
+    const defaultAreas = [{ name: 'Zone A' }];
+
+    const result = buildCheckValuesList(areaWithTrajectory, defaultAreas);
+
+    expect(result).toEqual(['Zone A', 'Zone B']);
   });
 });
