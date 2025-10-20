@@ -477,6 +477,40 @@ describe('updateTrajectory', () => {
     ).toBe(true);
   });
 
+  it('should not update if trajectory is not in prevState', () => {
+    const baseTrajectoryMock = [
+      {
+        id: '14',
+        area: 'Zone B',
+        technology: 'Tech X1',
+        type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER,
+        trajectoryName: 'Initial',
+      },
+      {
+        id: '15',
+        area: 'Zone F',
+        technology: 'Tech DE',
+        type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER,
+        trajectoryName: 'Initial',
+      },
+    ] as unknown as DbTrajectory[];
+
+    const prevState = {
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]: {
+        trajectories: baseTrajectoryMock,
+      },
+    };
+
+    const payload = {
+      trajectory: baseTrajectory,
+      status: 'success' as RowStatus,
+    };
+
+    const result = updateTrajectory(prevState, payload);
+
+    expect(result).toEqual(prevState);
+  });
+
   it('should return prevState if no trajectories found', () => {
     const prevState = {
       [TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]: {

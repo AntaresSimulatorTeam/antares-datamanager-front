@@ -100,7 +100,7 @@ describe('useFetchHypothesisParametersTrajectories', () => {
     });
   });
 
-  it('should handle readonly rows when at least more than one specific trajectories', async () => {
+  it("should not set readonly state to param modulation row when there's at least more than one specific trajectories", async () => {
     const trajectoryData = [
       {
         areaName: 'B',
@@ -124,8 +124,16 @@ describe('useFetchHypothesisParametersTrajectories', () => {
     });
 
     vi.mocked(sortUtils.sortWithFixedPosition).mockReturnValue([
-      { hypothesis: 'A', trajectory: { id: 2, area: 'A', trajectoryName: 'TA' } },
-      { hypothesis: 'F', trajectory: { id: 6, area: 'F', trajectoryName: 'T6' } },
+      {
+        hypothesis: 'A',
+        trajectory: { id: 2, area: 'A', trajectoryName: 'TA' },
+        status: TRAJECTORY_SELECTION_STATUS.OK,
+      },
+      {
+        hypothesis: 'F',
+        trajectory: { id: 6, area: 'F', trajectoryName: 'T6' },
+        status: TRAJECTORY_SELECTION_STATUS.OK,
+      },
     ] as HypothesisRowData[]);
 
     const { result } = renderHook(() =>
@@ -133,7 +141,7 @@ describe('useFetchHypothesisParametersTrajectories', () => {
     );
 
     await waitFor(() => {
-      expect(result.current.readOnlyRow).toEqual({ '0.0': true, '1': true });
+      expect(result.current.readOnlyRow).toEqual({ '0.0': true });
     });
   });
 

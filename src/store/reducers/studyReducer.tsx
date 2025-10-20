@@ -70,13 +70,13 @@ export const updateTrajectory = (
       const sameTech = normalize(trajectoryDb.technology ?? '') === normalize(trajectory.technology ?? '');
       const sameType = trajectoryDb.type === trajectory.type;
       if (sameArea && sameTech && sameType) {
-        if (trajectoryDb.id !== trajectory.id) {
-          return trajectory;
-        } else {
+        if (trajectoryDb.id === trajectory.id) {
           return {
             ...trajectoryDb,
             trajectoryName: status === 'success' ? trajectory.trajectoryName : '',
           };
+        } else {
+          return trajectory;
         }
       }
 
