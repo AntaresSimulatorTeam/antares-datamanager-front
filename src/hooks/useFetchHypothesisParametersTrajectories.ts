@@ -28,9 +28,9 @@ import { useTranslation } from 'react-i18next';
 import { fetchTrajectoriesFromTypes } from '@/shared/services/hypothesisTableService.ts';
 
 export const useFetchHypothesisParametersTrajectories = (
+  areas: TrajectoryAreaData[],
   studyId?: number,
   defaultAreas?: { name: string }[],
-  areas?: TrajectoryAreaData[],
   isStudyGenerated?: boolean,
 ) => {
   const [hypothesisTrajectories, setHypothesisTrajectories] = useState<HypothesisRowData[]>([]);
@@ -49,7 +49,7 @@ export const useFetchHypothesisParametersTrajectories = (
     async (id?: number) => {
       let resultObject: Partial<Record<ThermalParamTrajectoryType, DbTrajectory[]>>;
       try {
-        if (id != null && areas) {
+        if (id != null) {
           const types: ThermalParamTrajectoryType[] = [
             TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
             TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER,

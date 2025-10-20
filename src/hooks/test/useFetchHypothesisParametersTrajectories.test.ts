@@ -60,7 +60,7 @@ describe('useFetchHypothesisParametersTrajectories', () => {
       [TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER]: mockCommon,
     });
 
-    const { result } = renderHook(() => useFetchHypothesisParametersTrajectories(123, [{ name: 'B' }], trajectoryData));
+    const { result } = renderHook(() => useFetchHypothesisParametersTrajectories(trajectoryData, 123, [{ name: 'B' }]));
 
     await waitFor(() => {
       expect(mockDispatch).toHaveBeenCalledWith({
@@ -93,7 +93,7 @@ describe('useFetchHypothesisParametersTrajectories', () => {
 
     vi.mocked(hypothesisTableService.fetchTrajectoriesFromTypes).mockResolvedValue(mockTrajectories);
 
-    const { result } = renderHook(() => useFetchHypothesisParametersTrajectories(1, [{ name: 'A' }], [], false));
+    const { result } = renderHook(() => useFetchHypothesisParametersTrajectories([], 1, [{ name: 'A' }], false));
 
     await waitFor(() => {
       expect(result.current.hypothesisTrajectories[1].status).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
@@ -137,7 +137,7 @@ describe('useFetchHypothesisParametersTrajectories', () => {
     ] as HypothesisRowData[]);
 
     const { result } = renderHook(() =>
-      useFetchHypothesisParametersTrajectories(1, [{ name: 'A' }], trajectoryData, false),
+      useFetchHypothesisParametersTrajectories(trajectoryData, 1, [{ name: 'A' }], false),
     );
 
     await waitFor(() => {
@@ -165,11 +165,11 @@ describe('useFetchHypothesisParametersTrajectories', () => {
     vi.mocked(hypothesisTableService.fetchTrajectoriesFromTypes).mockResolvedValue(mockTrajectories);
 
     const { result } = renderHook(() =>
-      useFetchHypothesisParametersTrajectories(1, [{ name: 'A' }], trajectoryData, false),
+      useFetchHypothesisParametersTrajectories(trajectoryData, 1, [{ name: 'A' }], false),
     );
 
     await waitFor(() => {
-      expect(result.current.readOnlyRow).toEqual({ '0.0': true, '1': true });
+      expect(result.current.readOnlyRow).toEqual({ '0.0': true });
     });
   });
 
@@ -198,7 +198,7 @@ describe('useFetchHypothesisParametersTrajectories', () => {
     });
 
     const { result } = renderHook(() =>
-      useFetchHypothesisParametersTrajectories(1, [{ name: 'A' }], trajectoryData, true),
+      useFetchHypothesisParametersTrajectories(trajectoryData, 1, [{ name: 'A' }], true),
     );
 
     await waitFor(() => {
@@ -206,10 +206,12 @@ describe('useFetchHypothesisParametersTrajectories', () => {
         {
           hypothesis: 'A',
           trajectory: { id: 2, area: 'A', trajectoryName: 'TA' },
+          status: 'OK',
         },
         {
           hypothesis: 'F',
           trajectory: { id: 6, area: 'F', trajectoryName: 'T6' },
+          status: 'OK',
         },
       ]);
       expect(result.current.readOnlyRow).toEqual({ '0': true, '0.0': true, '0.1': true, '1': true, '2': true });
@@ -223,7 +225,7 @@ describe('useFetchHypothesisParametersTrajectories', () => {
 
     vi.mocked(hypothesisTableService.fetchTrajectoriesFromTypes).mockResolvedValue(mockTrajectories);
 
-    const { result } = renderHook(() => useFetchHypothesisParametersTrajectories(1, [{ name: 'A' }], [], false));
+    const { result } = renderHook(() => useFetchHypothesisParametersTrajectories([], 1, [{ name: 'A' }], false));
 
     await waitFor(() => {
       expect(result.current.hypothesisTrajectories).toHaveLength(3);
@@ -235,7 +237,7 @@ describe('useFetchHypothesisParametersTrajectories', () => {
   it('should handle empty trajectory response', async () => {
     vi.mocked(hypothesisTableService.fetchTrajectoriesFromTypes).mockResolvedValue({});
 
-    const { result } = renderHook(() => useFetchHypothesisParametersTrajectories(1, [{ name: 'A' }], [], false));
+    const { result } = renderHook(() => useFetchHypothesisParametersTrajectories([], 1, [{ name: 'A' }], false));
 
     await waitFor(() => {
       expect(result.current.hypothesisTrajectories.every((h) => h.status === TRAJECTORY_SELECTION_STATUS.MISSING)).toBe(

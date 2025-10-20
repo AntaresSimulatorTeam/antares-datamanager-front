@@ -77,7 +77,7 @@ export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
   );
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
-    useFetchHypothesisParametersTrajectories(study?.id, defaultAreas, areas, isStudyGenerated);
+    useFetchHypothesisParametersTrajectories(areas, study?.id, defaultAreas, isStudyGenerated);
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(study, studyState, dispatch, setTechnicalData);
   const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch, setTechnicalData);
   const { removeRow } = useHypothesisTableRemoveRow(study, dispatch, setTechnicalData, setCheckedValues);
