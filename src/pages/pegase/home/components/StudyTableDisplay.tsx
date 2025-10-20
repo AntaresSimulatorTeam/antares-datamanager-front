@@ -47,7 +47,7 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
   });
 
   useEffect(() => {
-    rows.length === 0 && setRowSelection({});
+    !rows?.some((row) => row.status === StudyStatus.IN_PROGRESS) && setRowSelection({});
   }, [rows.length]);
 
   const handleHeaderHover = (hovered: boolean) => {
