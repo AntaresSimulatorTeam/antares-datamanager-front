@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ProjectInfo, StudyDTO } from '@/shared/types';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type';
 import getStudyTableHeaders from './StudyTableHeaders';
@@ -46,6 +46,10 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
     reloadStudies, // Key change here
   });
 
+  useEffect(() => {
+    rows.length === 0 && setRowSelection({});
+  }, [rows.length]);
+
   const handleHeaderHover = (hovered: boolean) => {
     setIsHeaderHovered(hovered);
   };
@@ -70,12 +74,11 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
     setReloadStudies((prev) => prev + 1); // Trigger reload after deleting
   };
 
-  const handleDeleteClick = () => {
+  const handleDeleteClick = async () => {
     const selectedStudyId = rows[Number.parseInt(selectedRowId || '-1')]?.id;
     if (selectedStudyId) {
-      void deleteStudy(selectedStudyId).then(() => {
-        setReloadStudies((prev) => prev + 1); // Trigger reload after deleting
-      });
+      await deleteStudy(selectedStudyId);
+      setReloadStudies((prev) => prev + 1);
     }
   };
 
