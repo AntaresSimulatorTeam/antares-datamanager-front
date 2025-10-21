@@ -279,6 +279,20 @@ export const buildDefaultEmptyTrajectoryList = (
 };
 
 /**
+ * Determines whether a given trajectory should have sub-rows based on specified conditions.
+ *
+ * @param {string[]} areasToExclude - A list of area identifiers to exclude from consideration.
+ * @param {DbTrajectory} [mainEntry] - An optional trajectory data object containing information about type and area.
+ * @returns {boolean} True if the trajectory should have sub-rows, otherwise false.
+ */
+export const shouldHaveSubRows = (areasToExclude: string[], mainEntry?: DbTrajectory): boolean => {
+  const isThermal = mainEntry?.type === TRAJECTORY_TYPE.THERMAL_CAPACITY;
+  const isOtherArea = mainEntry?.area === OTHER_AREAS;
+  const isInExcludedAreas = areasToExclude?.includes(mainEntry?.area ?? '');
+  return isThermal ? !isOtherArea && !isInExcludedAreas : isOtherArea || !isInExcludedAreas;
+};
+
+/**
  * Transforms data into a structured array of hypothesis rows, enriched with associated technologies.
  *
  * @param {DbTrajectory[]} data - An array of trajectory data objects, where each object contains detailed information
@@ -308,12 +322,7 @@ export const convertIntoHypothesisRowWithTechnologies = (
 
   return Object.entries(groupedByArea).map(([area, entries]) => {
     const mainEntry = entries.find((e) => e.technology === '');
-    const shouldHaveSubRows =
-      mainEntry?.type === TRAJECTORY_TYPE.THERMAL_CAPACITY
-        ? mainEntry?.area !== OTHER_AREAS && !areasNotInTrajectoryArea?.some((item) => item === mainEntry?.area)
-        : mainEntry?.area === OTHER_AREAS || !areasNotInTrajectoryArea?.some((item) => item === mainEntry?.area);
-
-    const subRows: HypothesisRowData[] | null = shouldHaveSubRows
+    const subRows: HypothesisRowData[] | null = shouldHaveSubRows(areasNotInTrajectoryArea, mainEntry)
       ? options.map((option: string) => {
           const trajectoryTechnology: DbTrajectory | undefined = entries.find((entry) => entry?.technology === option);
           return {

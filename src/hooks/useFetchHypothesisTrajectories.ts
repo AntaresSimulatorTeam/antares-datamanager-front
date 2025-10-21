@@ -48,7 +48,7 @@ export const useFetchHypothesisTrajectories = (
           const result = trajType === TRAJECTORY_TYPE.STS ? [] : await getStudyTrajectories(id, trajType);
           // Build default empty areas (default area not linked to a trajectory)
           const defaultEmptyAreas = buildDefaultEmptyTrajectoryList(trajType, result, defaultAreas);
-          const allAreas = [...(result || []), ...emptyAreaSelected, ...defaultEmptyAreas];
+          const allAreas = [...(result || []), ...(emptyAreaSelected || []), ...(defaultEmptyAreas || [])];
 
           const arrayWithoutDuplicate =
             trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY

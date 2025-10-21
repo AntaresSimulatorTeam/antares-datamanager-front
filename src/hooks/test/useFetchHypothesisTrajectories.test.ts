@@ -16,7 +16,7 @@ import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
 import * as trajectoryUtils from '@/shared/utils/trajectoryUtils.ts';
 import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
-import { ThermalOptions } from '@/mocks/data/list/names.ts';
+import { STSTechnology, ThermalOptions } from '@/mocks/data/list/names.ts';
 
 vi.mock('@/shared/services/trajectoryService');
 vi.mock('@/shared/services/hypothesisTableService');
@@ -483,7 +483,26 @@ describe('useFetchHypothesisTrajectories', () => {
       trajectory: null,
     }));
 
-    const { result } = renderHook(() => useFetchHypothesisTrajectories([], 5, TRAJECTORY_TYPE.THERMAL_CAPACITY));
+    const { result } = renderHook(() =>
+      useFetchHypothesisTrajectories([], 5, TRAJECTORY_TYPE.THERMAL_CAPACITY, [], false, ThermalOptions),
+    );
+
+    await waitFor(() => expect(result.current.hypothesisTrajectories[0].subRows).toEqual(technologiesHypothesis));
+  });
+
+  it('should include STS options when trajectoryType is STS type', async () => {
+    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArrayThermal);
+    const technologiesHypothesis = STSTechnology.map((option) => ({
+      hypothesis: option,
+      isDefault: true,
+      status: TRAJECTORY_SELECTION_STATUS.MISSING,
+      subRows: null,
+      trajectory: null,
+    }));
+
+    const { result } = renderHook(() =>
+      useFetchHypothesisTrajectories([], 5, TRAJECTORY_TYPE.STS, [], false, STSTechnology),
+    );
 
     await waitFor(() => expect(result.current.hypothesisTrajectories[0].subRows).toEqual(technologiesHypothesis));
   });
