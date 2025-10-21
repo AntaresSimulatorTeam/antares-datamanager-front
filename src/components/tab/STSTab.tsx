@@ -6,7 +6,6 @@
 
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
-import getExpandableHypothesisTableTSHeaders from '@/components/header/ExpandableHypothesisTableTSHeaders.tsx';
 import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useLocation } from 'react-router-dom';
@@ -16,6 +15,7 @@ import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { useStudy } from '@/store/contexts/StudyContext.tsx';
 import { CheckBoxListWithSearchBar } from '@/components/list/CheckBoxListWithSearchBar.tsx';
 import { STSTechnology } from '@/mocks/data/list/names.ts';
+import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
 
 const STSTab = ({ defaultAreas, areas }: TabProps) => {
   const studyState = useStudy();
@@ -68,7 +68,7 @@ const STSTab = ({ defaultAreas, areas }: TabProps) => {
       <PegaseHypothesisTable
         id="sts-table"
         data={data}
-        getTableHeaders={getExpandableHypothesisTableTSHeaders}
+        getTableHeaders={getExpandableHypothesisTableHeaders}
         fileStatus={'empty'}
         studyState={StudyStatus.IN_PROGRESS}
         readOnly={readOnly}
@@ -77,6 +77,7 @@ const STSTab = ({ defaultAreas, areas }: TabProps) => {
         isReadOnlyEnable={true}
         handleSearch={() => Promise.resolve(undefined)}
         handleImport={() => Promise.resolve()}
+        type={TRAJECTORY_TYPE.STS}
       />
     </div>
   );
