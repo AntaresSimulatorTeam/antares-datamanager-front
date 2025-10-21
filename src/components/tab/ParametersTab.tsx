@@ -65,7 +65,7 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
   const [technicalData, setTechnicalData] = useState<HypothesisRowData[]>([]);
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
   const [rowIdSelected, setRowIdSelected] = useState<string>('0');
-  const [rowToDelete, setRowToDelete] = useState<{ index: number; value?: string } | null>(null);
+  const [rowToDelete, setRowToDelete] = useState<{ index: number | number[]; value?: string } | null>(null);
   const [isDeletionModalOpen, setIsDeletionModalOpen] = useState(false);
   const [isStudyGenerated, setIsStudyGenerated] = useState(
     studyState.studyStatus === StudyStatus.GENERATED || study.status === StudyStatus.GENERATED,
@@ -181,13 +181,18 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
               const row = subIndex != null ? technicalData[topIndex]?.subRows?.[subIndex] : technicalData[topIndex];
               const current = row?.trajectory ?? null;
               if (current) {
-                void detachTrajectory(
-                  getTrajectoryTypeByIndex(topIndex),
-                  [topIndex, subIndex].filter((n) => n !== undefined),
-                  status,
-                  current,
-                  shouldDeleteParamModulation(0, technicalData) ? technicalData[1].trajectory : null,
-                );
+                if (topIndex === 0 && shouldDeleteParamModulation(0, technicalData)) {
+                  setRowToDelete({ index: [topIndex, subIndex], value: value as string });
+                  setIsDeletionModalOpen(true);
+                } else {
+                  void detachTrajectory(
+                    getTrajectoryTypeByIndex(topIndex),
+                    [topIndex, subIndex].filter((n) => n !== undefined),
+                    status,
+                    current,
+                    shouldDeleteParamModulation(0, technicalData) ? technicalData[1].trajectory : null,
+                  );
+                }
               }
             }
 
@@ -247,14 +252,34 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
         <AreaDeletionConfirmationModal
           isOpen={isDeletionModalOpen}
           onClose={() => setIsDeletionModalOpen(false)}
+          message={
+            shouldDeleteParamModulation(0, technicalData)
+              ? t('trajectoryDeletionModal.@confirmMultipleDeletionParamMessage')
+              : t('trajectoryDeletionModal.@confirmDeletionParamMessage')
+          }
           onConfirm={async () => {
             if (rowToDelete?.value) {
-              await removeRow(
-                TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
-                rowToDelete?.value,
-                0,
-                technicalData,
-              );
+              if (Array.isArray(rowToDelete.index)) {
+                const [topIndex, subIndex] = rowToDelete.index;
+                const row = subIndex != null ? technicalData[topIndex]?.subRows?.[subIndex] : technicalData[topIndex];
+                const current = row?.trajectory ?? null;
+                if (current) {
+                  await detachTrajectory(
+                    TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+                    rowToDelete?.index,
+                    'empty',
+                    current,
+                    shouldDeleteParamModulation(0, technicalData) ? technicalData[1].trajectory : null,
+                  );
+                }
+              } else {
+                await removeRow(
+                  TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+                  rowToDelete?.value,
+                  0,
+                  technicalData,
+                );
+              }
               setIsDeletionModalOpen(false);
             }
           }}

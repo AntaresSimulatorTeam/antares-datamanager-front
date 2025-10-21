@@ -113,6 +113,47 @@
     "@economics": "Économique",
     "@paramModulationMessage": "Au moins une trajectoire \"Specific\" doit être renseignée afin de pouvoir renseigner une trajectoire \"Param modulation\"."
   },
+  "trajectoryViewModal": {
+    "@title_area": "Zones",
+    "@title_link": "Liens",
+    "@areaName": "Nom",
+    "@powerToGas": "Power to gas",
+    "@shortTermStorage": "Short term storage",
+    "@name": "Nom",
+    "@winterHpDirectMw": "Winter HP Direct MW",
+    "@winterHcDirectMw": "Winter HC Direct MW",
+    "@winterHpIndirectMw": "Winter HP Indirect MW",
+    "@winterHcIndirectMw": "Winter HC Indirect MW",
+    "@summerHpDirectMw": "Summer HP Direct MW",
+    "@summerHcDirectMw": "Summer HC Direct MW",
+    "@summerHpIndirectMw": "Summer HP Indirect MW",
+    "@summerHcIndirectMw": "Summer HC Indirect MW",
+    "@flowbasedPerimeter": "Flowbased perimeter",
+    "@hvdc": "HVDC",
+    "@specificTs": "Specific TS",
+    "@forcedOutageHvac": "Forced Outage HVAC",
+    "@hurdleCost": "Hurdle cost"
+  },
+  "trajectoryDeletionModal": {
+    "@confirmDeleteTitle": "Confirm you want to delete this area.",
+    "@confirmDeleteMessage": "You have entered the trajectory of one or more compliant technologies. This action will delete the associated trajectories. Please confirm you wish to proceed.",
+    "@confirmDeletionParamMessage": "This action will delete the associated trajectories. Please confirm you wish to proceed.",
+    "@confirmMultipleDeletionParamMessage": "This action will delete the associated trajectories with “Param modulation”. Please confirm you wish to proceed.",
+    "@confirm": "Confirm",
+    "@cancel": "Cancel"
+  },
+  "about": {
+    "@title": "About",
+    "@appName": "App Name",
+    "@appDescription": "App Description",
+    "@appVersion": "App Version",
+    "@appBranch": "Branch",
+    "@commitId": "Commit ID",
+    "@commitTime": "Commit Time",
+    "@information": "Information",
+    "@frontend": "Frontend",
+    "@backend": "Backend"
+  },
   "horizonInput":{
     "@validYearError": "Horizon doit être un numéro entre 2000 et 99999",
     "@horizon_placeholder": "Horizon",

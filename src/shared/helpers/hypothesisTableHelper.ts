@@ -41,8 +41,8 @@ export const shouldOpenDeletionModal = (
 
   return (
     (rowsWithTrajectory && type !== TRAJECTORY_TYPE.THERMAL_CAPACITY) ||
-    subRowsWithTrajectory.length > 1 ||
-    (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER && subRowsWithTrajectory.length > 0) ||
+    (subRowsWithTrajectory.length > 1 && type !== TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) ||
+    (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER && subRowsWithTrajectory.length === 1) ||
     (!!rowsWithTrajectory && subRowsWithTrajectory.length > 0)
   );
 };

@@ -7,12 +7,14 @@ interface AreaDeletionConfirmationModalProps {
   isOpen?: boolean;
   onClose: () => void;
   onConfirm: () => Promise<void>;
+  message?: string;
 }
 
 export const AreaDeletionConfirmationModal: React.FC<AreaDeletionConfirmationModalProps> = ({
   isOpen = false,
   onClose,
   onConfirm,
+  message,
 }) => {
   const { t } = useTranslation();
 
@@ -22,7 +24,7 @@ export const AreaDeletionConfirmationModal: React.FC<AreaDeletionConfirmationMod
     <RdsModal size="small">
       <RdsModal.Title onClose={onClose}>{t('trajectoryDeletionModal.@confirmDeleteTitle')}</RdsModal.Title>
       <RdsModal.Content>
-        <p>{t('trajectoryDeletionModal.@confirmDeleteMessage')}</p>
+        <p>{message ?? t('trajectoryDeletionModal.@confirmDeleteMessage')}</p>
       </RdsModal.Content>
       <RdsModal.Footer>
         <StdButton label={t('trajectoryDeletionModal.@cancel')} variant="text" color="secondary" onClick={onClose} />
