@@ -7,7 +7,7 @@ import {
   LocationStudy,
   RowStatus,
   SelectOption,
-  TrajectoryAreaData,
+  TabProps,
 } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import getEditableHypothesisTableHeaders from '@/components/header/EditableHypothesisTableHeaders.tsx';
@@ -36,12 +36,7 @@ import { shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.
 import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
 import { useFetchHypothesisParametersTrajectories } from '@/hooks/useFetchHypothesisParametersTrajectories.ts';
 
-interface ParametersTabProps {
-  defaultAreas: { name: string }[];
-  areas: TrajectoryAreaData[];
-}
-
-export const ParametersTab = ({ defaultAreas, areas }: ParametersTabProps) => {
+export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
   const { t } = useTranslation();
   const studyState = useStudy();
   const location = useLocation();

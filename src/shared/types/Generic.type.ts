@@ -1,6 +1,6 @@
 import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
 import { AccessorKeyColumnDefBase, DeepKeys, DeepValue, StringOrTemplateHeader } from '@tanstack/react-table';
-import { HypothesisRowData } from '@/shared/types/Trajectory.type.ts';
+import { HypothesisRowData, TrajectoryAreaData } from '@/shared/types/Trajectory.type.ts';
 
 export type Entries<T> = {
   [K in keyof T]: [K, T[K]];
@@ -56,3 +56,8 @@ export const AnchorDefaultAsType = 'a';
 export type FileInputStatus = 'success' | 'error' | 'loading' | 'empty' | 'emptyError';
 
 export type ExpandedState = true | Record<string, boolean>;
+
+export interface TabProps {
+  defaultAreas: { name: string }[];
+  areas: TrajectoryAreaData[];
+}

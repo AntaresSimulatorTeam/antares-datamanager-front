@@ -11,7 +11,7 @@ import {
   LocationStudy,
   RowStatus,
   SelectOption,
-  TrajectoryAreaData,
+  TabProps,
 } from '@/shared/types';
 import { useCallback, useEffect, useState } from 'react';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
@@ -35,13 +35,9 @@ import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig';
 import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
 import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
 import { CheckBoxListWithSearchBar } from '@/components/list/CheckBoxListWithSearchBar.tsx';
+import { ThermalOptions } from '@/mocks/data/list/names.ts';
 
-interface ThermalTabProps {
-  defaultAreas: { name: string }[];
-  areas: TrajectoryAreaData[];
-}
-
-const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
+const ThermalCapacityTab = ({ defaultAreas, areas }: TabProps) => {
   const studyState = useStudy();
   const location = useLocation();
   const study = (location.state as LocationStudy)?.study;
@@ -60,7 +56,14 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: ThermalTabProps) => {
     studyState.studyStatus === StudyStatus.GENERATED || study.status === StudyStatus.GENERATED,
   );
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
-    useFetchHypothesisTrajectories(areas, study?.id, TRAJECTORY_TYPE.THERMAL_CAPACITY, defaultAreas, isStudyGenerated);
+    useFetchHypothesisTrajectories(
+      areas,
+      study?.id,
+      TRAJECTORY_TYPE.THERMAL_CAPACITY,
+      defaultAreas,
+      isStudyGenerated,
+      ThermalOptions,
+    );
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(study, studyState, dispatch, setData);
   const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch, setData);
   const { removeRow } = useHypothesisTableRemoveRow(study, dispatch, setData, setCheckedValues);

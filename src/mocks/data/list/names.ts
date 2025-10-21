@@ -221,3 +221,7 @@ export const ThermalOptions = [
   'Reserves',
   'TAC',
 ];
+
+export const STSTechnology = ['Battery', 'DSR', 'EV', 'PSP'];
+
+export const Technologies = ThermalOptions.concat(STSTechnology);

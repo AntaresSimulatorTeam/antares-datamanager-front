@@ -38,7 +38,8 @@
     "@keywords": "Mots-clés",
     "@project": "Projet",
     "@my_studies": "Mes études",
-    "@my_projects": "Mes projets"
+    "@my_projects": "Mes projets",
+    "@time_series": "Time Series"
   },
   "project": {
     "@setting": "Setting",
@@ -84,6 +85,7 @@
     "@thermal": "Central thermique",
     "@enr": "Energie renouvelable",
     "@misc": "Misc",
+    "@sts": "STS",
     "@trajectory": "Trajectoire",
     "@select_trajectory": "Selectionner une trajectoire",
     "@select_project": "Selectionner un nom de projet",

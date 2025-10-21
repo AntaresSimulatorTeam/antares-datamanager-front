@@ -9,7 +9,6 @@ import { FileInputStatus } from 'rte-design-system-react';
 import { HypothesisRowData, RowStatus, SelectOption } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
-import { ButtonPreview } from '@/components/button/ButtonPreview.tsx';
 import { Dispatch, SetStateAction } from 'react';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { ErrorMessageType } from '@/shared/types/Generic.type.ts';
@@ -17,6 +16,7 @@ import { ProgressBar } from '@/components/forms/ProgressBar.tsx';
 import { CellWithStatus } from '@common/data/CellWithStatus.tsx';
 import { LabelWithDeleteButton } from '@common/data/LabelWithDeleteButton.tsx';
 import { SelectInputWithButton } from '@common/data/SelectInputWithButton.tsx';
+import StdButton from '@common/base/stdButton/StdButton.tsx';
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
 
@@ -52,13 +52,14 @@ const getHypothesisTableHeaders = (
             {getValue()}
           </span>
           {trajectory && status === TRAJECTORY_SELECTION_STATUS.OK && (
-            <ButtonPreview
-              label={'View'}
+            <StdButton
+              label={t('studyDetails.@preview')}
               icon={StdIconId.Preview}
               position={'left'}
-              color={row.getReadOnly() ? 'gray-700' : 'primary-600'}
-              borderColor={row.getReadOnly() ? 'gray-700' : 'acc1-600'}
+              disabled={row.getReadOnly()}
               onClick={() => void handleView(row.index)}
+              variant="outlined"
+              size="small"
             />
           )}
         </div>
