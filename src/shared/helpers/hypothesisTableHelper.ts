@@ -39,10 +39,11 @@ export const shouldOpenDeletionModal = (
       ? data[indexRow]?.trajectory
       : null;
 
-  return (
-    (rowsWithTrajectory && type !== TRAJECTORY_TYPE.THERMAL_CAPACITY) ||
-    (subRowsWithTrajectory.length > 1 && type !== TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) ||
-    (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER && subRowsWithTrajectory.length === 1) ||
-    (!!rowsWithTrajectory && subRowsWithTrajectory.length > 0)
-  );
+  if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
+    return subRowsWithTrajectory.length > 0;
+  } else if (type === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
+    return !!rowsWithTrajectory && subRowsWithTrajectory.length > 0;
+  } else {
+    return !!rowsWithTrajectory;
+  }
 };

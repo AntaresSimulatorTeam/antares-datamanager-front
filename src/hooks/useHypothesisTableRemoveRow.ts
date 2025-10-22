@@ -46,12 +46,16 @@ export const useHypothesisTableRemoveRow = (
 
             let paramModulationId: DbTrajectory | null = null;
             // The specific parameter and the modulation trajectory should be deleted if there's only one specific trajectory left
-            if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER && subRowTrajectoryIds.length === 1) {
-              paramModulationId = data[1]?.status === TRAJECTORY_SELECTION_STATUS.OK ? data[1]?.trajectory : null;
-              trajectoryIds = [
-                ...(paramModulationId ? [paramModulationId.id] : []),
-                ...(trajectoryToDelete ? [trajectoryToDelete?.id] : []),
-              ].filter(Boolean);
+            if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
+              if (subRowTrajectoryIds.length === 1) {
+                paramModulationId = data[1]?.status === TRAJECTORY_SELECTION_STATUS.OK ? data[1]?.trajectory : null;
+                trajectoryIds = [
+                  ...(paramModulationId ? [paramModulationId.id] : []),
+                  ...(trajectoryToDelete ? [trajectoryToDelete?.id] : []),
+                ].filter(Boolean);
+              } else {
+                trajectoryIds = trajectoryToDelete ? [trajectoryToDelete?.id] : [];
+              }
             } else {
               trajectoryIds = [
                 ...(trajectoryToDelete ? [trajectoryToDelete?.id] : []),

@@ -181,7 +181,12 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
               const row = subIndex != null ? technicalData[topIndex]?.subRows?.[subIndex] : technicalData[topIndex];
               const current = row?.trajectory ?? null;
               if (current) {
-                if (topIndex === 0 && shouldDeleteParamModulation(0, technicalData)) {
+                if (
+                  topIndex === 0 &&
+                  technicalData[topIndex]?.subRows?.[subIndex]?.trajectory &&
+                  technicalData[topIndex]?.subRows?.[subIndex]?.status === TRAJECTORY_SELECTION_STATUS.OK &&
+                  shouldDeleteParamModulation(0, technicalData)
+                ) {
                   setRowToDelete({ index: [topIndex, subIndex], value: value as string });
                   setIsDeletionModalOpen(true);
                 } else {
