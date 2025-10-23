@@ -6,7 +6,7 @@
 
 import { createColumnHelper, TableOptions } from '@tanstack/react-table';
 import { FileInputStatus, HypothesisRowData, SelectOption } from '@/shared/types';
-import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
+import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { Dispatch, SetStateAction } from 'react';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { CellWithStatus } from '@common/data/CellWithStatus.tsx';
@@ -20,19 +20,9 @@ import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 import { RdsTextTooltip } from 'rte-design-system-react';
 import { getChildrenList } from '@/shared/utils/trajectoryUtils.ts';
 import { getAlignment, hasLabelDefault } from '@/shared/utils/hypothesisTableUtils.ts';
+import StdButton from '@common/base/stdButton/StdButton.tsx';
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
-
-export interface ExpandableHypothesisTableHeadersProps {
-  t: (value: string) => string;
-  error: ErrorMessageType;
-  setErrorInfo: Dispatch<SetStateAction<ErrorMessageType>>;
-  studyStatus: StudyStatus | undefined;
-  progress: number;
-  fileStatus: FileInputStatus;
-  indexSelected: number;
-}
-
 const getExpandableHypothesisTableHeaders = (
   t: (value: string) => string,
   error: ErrorMessageType,
@@ -42,6 +32,7 @@ const getExpandableHypothesisTableHeaders = (
   fileStatus: FileInputStatus,
   idSelected: string,
   columnHeader?: string,
+  type?: TRAJECTORY_TYPE,
 ): TableOptions<HypothesisRowData>['columns'] => [
   columnHelper.accessor('hypothesis', {
     header: columnHeader || t('studyDetails.@area'),
@@ -90,7 +81,7 @@ const getExpandableHypothesisTableHeaders = (
     size: 380,
     cell: ({ row, table: { options } }) => {
       const { trajectory, status, hypothesis } = row.original;
-      if (hypothesis === t('thermal.@specific')) return null;
+      if (hypothesis === t('thermal.@specific') || (type === TRAJECTORY_TYPE.STS && row.depth === 0)) return null;
       return trajectory?.trajectoryName && status !== TRAJECTORY_SELECTION_STATUS.MISSING ? (
         <div className="flex w-full items-center gap-2">
           <LabelWithDeleteButton
@@ -125,12 +116,33 @@ const getExpandableHypothesisTableHeaders = (
       );
     },
   }),
+  ...(type === TRAJECTORY_TYPE.STS
+    ? [
+        columnHelper.accessor('timeSeries', {
+          header: t('home.@time_series'),
+          cell: ({ row }) => {
+            if (row.depth === 0) return null;
+            return (
+              <StdButton
+                label={t('studyDetails.@preview')}
+                icon={StdIconId.Preview}
+                position="left"
+                disabled={row.getReadOnly() || true} // TODO: to implement later
+                onClick={() => {}}
+                variant="outlined"
+                size="small"
+              />
+            );
+          },
+        }),
+      ]
+    : []),
 
   columnHelper.accessor('status', {
     header: t('home.@status'),
     cell: ({ row, table: { options } }) => {
       const { status, isDefault, hypothesis, isDeletable } = row.original;
-      if (hypothesis === t('thermal.@specific')) return null;
+      if (hypothesis === t('thermal.@specific') || (type === TRAJECTORY_TYPE.STS && row.depth === 0)) return null;
       const shouldShowProgressBar = progress > 0 && fileStatus === 'loading' && idSelected === row.id;
 
       return shouldShowProgressBar ? (

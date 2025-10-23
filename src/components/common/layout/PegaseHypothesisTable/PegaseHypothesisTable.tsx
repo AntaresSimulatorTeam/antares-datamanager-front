@@ -12,6 +12,7 @@ import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { useTranslation } from 'react-i18next';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { TableOptions } from '@tanstack/react-table';
+import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 
 interface PegaseHypothesisTableProps {
   id: string;
@@ -25,6 +26,7 @@ interface PegaseHypothesisTableProps {
     fileStatus: FileInputStatus,
     idSelected: string,
     columnHeader?: string,
+    type?: TRAJECTORY_TYPE,
   ) => TableOptions<HypothesisRowData>['columns'];
   studyState: StudyStatus;
   readOnly?: ReadOnlyObject;
@@ -37,6 +39,7 @@ interface PegaseHypothesisTableProps {
   removeRow?: (value: string, rowId?: string) => void | Promise<void>;
   updateData?: (rowId: string, value: unknown, status: RowStatus) => void;
   columnHeader?: string;
+  type?: TRAJECTORY_TYPE;
 }
 
 export const PegaseHypothesisTable = ({
@@ -54,6 +57,7 @@ export const PegaseHypothesisTable = ({
   removeRow,
   updateData,
   columnHeader,
+  type,
 }: PegaseHypothesisTableProps) => {
   const { t } = useTranslation();
   const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
@@ -64,7 +68,7 @@ export const PegaseHypothesisTable = ({
   }, [data.length]);
 
   const columns: TableOptions<HypothesisRowData>['columns'] = useMemo(
-    () => getTableHeaders(t, errorInfo, setErrorInfo, studyState, progress, fileStatus, idSelected, columnHeader),
+    () => getTableHeaders(t, errorInfo, setErrorInfo, studyState, progress, fileStatus, idSelected, columnHeader, type),
     [getTableHeaders, t, errorInfo, studyState, progress, fileStatus, idSelected, columnHeader],
   );
 

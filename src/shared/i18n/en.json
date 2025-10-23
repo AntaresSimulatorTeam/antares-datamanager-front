@@ -48,7 +48,8 @@
     "@new_project": "Create a project",
     "@update_project": "Update a project",
     "@duplicate_study": "Duplicate a study",
-    "@study_table_title": "Last studies"
+    "@study_table_title": "Last studies",
+    "@time_series": "Time Series"
   },
   "project": {
     "@setting": "Setting",
@@ -107,6 +108,7 @@
     "@thermal": "Thermal",
     "@enr": "ENR",
     "@misc": "Misc",
+    "@sts": "STS",
     "@trajectory": "Trajectory to use",
     "@select_trajectory": "Select a trajectory",
     "@select_project": "Selecta project",

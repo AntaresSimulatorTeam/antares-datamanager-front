@@ -18,10 +18,8 @@ export const getAlignment = (row: Row<HypothesisRowData>) => {
  * @param {boolean} isDefault
  * @param {string} hypothesis
  */
-export const hasLabelDefault = (rowDepth: number, isDefault: boolean, hypothesis: string) => {
-  if (rowDepth === 1 && isDefault && !isTechnology(hypothesis) && hypothesis !== OTHER_AREAS_LABEL) return true;
-  return rowDepth === 0 && isDefault && hypothesis !== OTHER_AREAS_LABEL;
-};
+export const hasLabelDefault = (rowDepth: number, isDefault: boolean, hypothesis: string) =>
+  isDefault && hypothesis !== OTHER_AREAS_LABEL && (rowDepth === 0 || (rowDepth === 1 && !isTechnology(hypothesis)));
 
 /**
  *
@@ -131,7 +129,7 @@ export const buildCheckValuesList = (
 ): string[] => {
   const areasValuesChecked: string[] = (areaWithTrajectory ?? [])
     .filter((trajectoryArea) => !defaultAreas?.some((item) => item.name === trajectoryArea.area))
-    .map((trajectory) => trajectory.area!);
+    .map((trajectory) => trajectory.area);
   const defaultCheckedValues = (defaultAreas ?? []).map((item) => item.name);
 
   return [...defaultCheckedValues, ...areasValuesChecked];

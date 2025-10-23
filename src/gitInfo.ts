@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "feat/ANT_3785_3903_parameters_handle_deletion",
-  commit: "5e053113",
-  commitTime: "2025-10-20T14:03:28.373Z"
+  branch: "feat/ANT-3769-STS_tab_initialisation2",
+  commit: "e44f24c9",
+  commitTime: "2025-10-21T15:20:55.392Z"
 };

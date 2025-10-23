@@ -12,7 +12,7 @@ import {
   LocationStudy,
   RowStatus,
   SelectOption,
-  TrajectoryAreaData,
+  TabProps,
 } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
@@ -34,12 +34,7 @@ import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { CheckBoxListWithSearchBar } from '@/components/list/CheckBoxListWithSearchBar.tsx';
 
-interface LoadTabProps {
-  defaultAreas: { name: string }[];
-  areas: TrajectoryAreaData[];
-}
-
-const LoadTab = ({ defaultAreas, areas }: LoadTabProps) => {
+const LoadTab = ({ defaultAreas, areas }: TabProps) => {
   const studyState = useStudy();
   const location = useLocation();
   const study = (location.state as LocationStudy)?.study;

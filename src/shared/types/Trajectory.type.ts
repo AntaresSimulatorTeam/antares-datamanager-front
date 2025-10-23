@@ -36,6 +36,7 @@ export type HypothesisRowData = {
   isDefault?: boolean;
   subRows?: HypothesisRowData[] | null;
   isDeletable?: boolean;
+  timeSeries?: string;
 };
 
 export type RowStatus = FileInputStatus | 'warning' | 'emptyError';

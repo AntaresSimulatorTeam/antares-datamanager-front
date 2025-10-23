@@ -26,6 +26,7 @@ import {
   retrieveReadOnlyArea,
   setNestedData,
   shouldDeleteParamModulation,
+  shouldHaveSubRows,
 } from '../trajectoryUtils';
 import { defaultAreaNotInAreaTrajectoryList, rowData, rowDataTwo } from '@/mocks/data/tests/hypothesisTable.mock.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
@@ -465,7 +466,7 @@ describe('getStudyMenu', () => {
   it('should return correct tab structure when area is not linked', () => {
     const result: HypothesisTab[] = getStudyMenu(mockTranslate, false);
 
-    expect(result.length).toBe(5);
+    expect(result.length).toBe(6);
 
     expect(result[0]).toEqual({
       name: TRAJECTORY_TYPE.AREA,
@@ -833,7 +834,7 @@ describe('convertIntoHypothesisRowWithTechnologies', () => {
       { area: 'ZoneA', technology: 'Biomass', trajectoryName: 'Trajectory2' },
     ] as DbTrajectory[];
 
-    const result = convertIntoHypothesisRowWithTechnologies(data, [], [{ name: 'ZoneA' }]);
+    const result = convertIntoHypothesisRowWithTechnologies(data, [], [{ name: 'ZoneA' }], ThermalOptions);
 
     expect(result).toHaveLength(1);
     expect(result[0]).toMatchObject({
@@ -848,8 +849,10 @@ describe('convertIntoHypothesisRowWithTechnologies', () => {
   });
 
   it('should return subRows as null if area is OTHER_AREAS', () => {
-    const data = [{ area: OTHER_AREAS, technology: '', trajectoryName: 'MainTrajectory' }] as DbTrajectory[];
-    const result = convertIntoHypothesisRowWithTechnologies(data, [], []);
+    const data = [
+      { area: OTHER_AREAS, technology: '', trajectoryName: 'MainTrajectory', type: TRAJECTORY_TYPE.THERMAL_CAPACITY },
+    ] as DbTrajectory[];
+    const result = convertIntoHypothesisRowWithTechnologies(data, [], [], ThermalOptions);
 
     expect(result[0].subRows).toBeNull();
     expect(result[0].isDefault).toBe(true);
@@ -857,7 +860,7 @@ describe('convertIntoHypothesisRowWithTechnologies', () => {
 
   it('should return status MISSING if trajectoryName is missing', () => {
     const data = [{ area: 'ZoneB', technology: '', trajectoryName: '' }] as DbTrajectory[];
-    const result = convertIntoHypothesisRowWithTechnologies(data, [], []);
+    const result = convertIntoHypothesisRowWithTechnologies(data, [], [], ThermalOptions);
 
     expect(result[0].status).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
     expect(result[0].trajectory).toBeNull();
@@ -865,7 +868,7 @@ describe('convertIntoHypothesisRowWithTechnologies', () => {
 
   it('should handle undefined defaultAreas', () => {
     const data = [{ area: 'ZoneC', technology: '', trajectoryName: 'TrajectoryX' }] as DbTrajectory[];
-    const result = convertIntoHypothesisRowWithTechnologies(data, [], undefined);
+    const result = convertIntoHypothesisRowWithTechnologies(data, [], undefined, ThermalOptions);
 
     expect(result[0].isDefault).toBe(false);
   });
@@ -875,7 +878,7 @@ describe('convertIntoHypothesisRowWithTechnologies', () => {
       { area: 'ZoneD', technology: '', trajectoryName: 'MainTrajectory' },
       { area: 'ZoneD', technology: 'Tech1', trajectoryName: 'Trajectory1' },
     ] as DbTrajectory[];
-    const result = convertIntoHypothesisRowWithTechnologies(data, ['ZoneD'], []);
+    const result = convertIntoHypothesisRowWithTechnologies(data, ['ZoneD'], [], ThermalOptions);
 
     expect(result[0].subRows).toBeNull();
   });
@@ -1037,5 +1040,43 @@ describe('isUniqueTrajectoryType', () => {
 
   it('returns false for LINK', () => {
     expect(isUniqueTrajectoryType(TRAJECTORY_TYPE.LINK)).toBe(false);
+  });
+});
+
+describe('shouldHaveSubRows', () => {
+  const excludedAreas = ['AREA_1', 'AREA_2'];
+
+  it('returns false for thermal capacity in OTHER_AREAS', () => {
+    const entry = { type: TRAJECTORY_TYPE.THERMAL_CAPACITY, area: OTHER_AREAS } as DbTrajectory;
+    expect(shouldHaveSubRows(excludedAreas, entry)).toBe(false);
+  });
+
+  it('returns false for thermal capacity in excluded area', () => {
+    const entry = { type: TRAJECTORY_TYPE.THERMAL_CAPACITY, area: 'AREA_1' } as DbTrajectory;
+    expect(shouldHaveSubRows(excludedAreas, entry)).toBe(false);
+  });
+
+  it('returns true for thermal capacity in non-excluded area', () => {
+    const entry = { type: TRAJECTORY_TYPE.THERMAL_CAPACITY, area: 'AREA_3' } as DbTrajectory;
+    expect(shouldHaveSubRows(excludedAreas, entry)).toBe(true);
+  });
+
+  it('returns true for non-thermal in OTHER_AREAS', () => {
+    const entry = { type: 'STS', area: OTHER_AREAS } as DbTrajectory;
+    expect(shouldHaveSubRows(excludedAreas, entry)).toBe(true);
+  });
+
+  it('returns true for non-thermal in non-excluded area', () => {
+    const entry = { type: 'LINK', area: 'AREA_3' } as DbTrajectory;
+    expect(shouldHaveSubRows(excludedAreas, entry)).toBe(true);
+  });
+
+  it('returns false for non-thermal in excluded area', () => {
+    const entry = { type: 'LOAD', area: 'AREA_1' } as DbTrajectory;
+    expect(shouldHaveSubRows(excludedAreas, entry)).toBe(false);
+  });
+
+  it('returns true when mainEntry is undefined', () => {
+    expect(shouldHaveSubRows(excludedAreas, undefined)).toBe(true);
   });
 });

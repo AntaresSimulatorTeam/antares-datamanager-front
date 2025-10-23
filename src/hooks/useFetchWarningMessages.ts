@@ -15,7 +15,9 @@ export const useFetchWarningMessages = (studyId: number, type: TRAJECTORY_TYPE) 
   useEffect(() => {
     const fetchWarningMessages = async (id: number, trajectoryType: TRAJECTORY_TYPE, state: Partial<StudyState>) => {
       const isNotGenerated = state.studyStatus !== StudyStatus.GENERATED;
-      const warningMessagesFromType: WarningMessage[] = await fetchWarningMessagesFromType(trajectoryType, id);
+      // TODO: remove this when STS api is implemented
+      const warningMessagesFromType: WarningMessage[] =
+        trajectoryType === TRAJECTORY_TYPE.STS ? [] : await fetchWarningMessagesFromType(trajectoryType, id);
       try {
         if (trajectoryType === TRAJECTORY_TYPE.AREA) {
           const dataWarningMessageArea = buildDataWarningMessage(

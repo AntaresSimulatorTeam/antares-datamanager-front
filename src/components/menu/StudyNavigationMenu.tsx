@@ -21,6 +21,7 @@ import { useFetchAreas } from '@/hooks/useFetchAreas.ts';
 import { countWarning } from '@/shared/utils/warningUtils.ts';
 import { getNbMessagesFromTrajectoryType } from '@/shared/services/trajectoryService.ts';
 import StdTabItem from '@common/layout/stdTabs/StdTabItem.tsx';
+import STSTab from '@/components/tab/STSTab.tsx';
 
 type StudyNavigationMenuProps = {
   onRenderActiveComponent?: (content: ReactNode | null) => void;
@@ -57,6 +58,8 @@ const StudyNavigationMenu = ({
         return <EnrTab />;
       case TRAJECTORY_TYPE.MISC:
         return <MiscTab />;
+      case TRAJECTORY_TYPE.STS:
+        return <STSTab defaultAreas={areaDefault} areas={trajectoryAreas} />;
       default:
         return null;
     }

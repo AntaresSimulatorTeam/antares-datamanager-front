@@ -24,6 +24,7 @@ export const useFetchHypothesisTrajectories = (
   trajectoryType?: TRAJECTORY_TYPE,
   defaultAreas?: { name: string }[],
   isStudyGenerated?: boolean,
+  options?: string[],
 ) => {
   const [hypothesisTrajectories, setHypothesisTrajectories] = useState<HypothesisRowData[]>([]);
   const [areasTrajectoryOptions, setAreasTrajectoryOptions] = useState<CheckBoxData[] | undefined>([]);
@@ -43,10 +44,11 @@ export const useFetchHypothesisTrajectories = (
     async (id?: number, trajType?: TRAJECTORY_TYPE) => {
       try {
         if (id != null && trajType) {
-          const result = await getStudyTrajectories(id, trajType);
+          // TODO: remove this when STS api is implemented
+          const result = trajType === TRAJECTORY_TYPE.STS ? [] : await getStudyTrajectories(id, trajType);
           // Build default empty areas (default area not linked to a trajectory)
           const defaultEmptyAreas = buildDefaultEmptyTrajectoryList(trajType, result, defaultAreas);
-          const allAreas = [...(result || []), ...emptyAreaSelected, ...defaultEmptyAreas];
+          const allAreas = [...(result || []), ...(emptyAreaSelected || []), ...(defaultEmptyAreas || [])];
 
           const arrayWithoutDuplicate =
             trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY
@@ -75,11 +77,12 @@ export const useFetchHypothesisTrajectories = (
 
           // Hypothesis table
           const areaData =
-            trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY
+            trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY || trajType === TRAJECTORY_TYPE.STS
               ? convertIntoHypothesisRowWithTechnologies(
                   arrayWithoutDuplicate,
                   defaultAreaListNotIncludedInList,
                   defaultAreas,
+                  options ?? [],
                 )
               : arrayWithoutDuplicate
                   .map((trajectory) =>

@@ -6,7 +6,7 @@ import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { generateId } from '@/shared/utils/defaultUtils.ts';
 import { Row } from '@tanstack/react-table';
-import { ThermalOptions } from '@/mocks/data/list/names.ts';
+import { Technologies, ThermalOptions } from '@/mocks/data/list/names.ts';
 
 /**
  * Get trajectory status from row status
@@ -248,9 +248,9 @@ export const isTrajectoryLinked = (area: { name: string }, trajectories: DbTraje
  * Checks if the given area corresponds to a valid technology option.
  *
  * @param {string} area - The name of the area to check.
- * @returns {boolean} - Returns true if the area matches any of the predefined technology options; otherwise, returns false.
+ * @returns {boolean} - Returns true if the area matches any of the predefined technology options; otherwise, returns false.s
  */
-export const isTechnology = (area: string): boolean => ThermalOptions.some((option) => option === area);
+export const isTechnology = (area: string): boolean => Technologies.some((option) => option === area);
 
 /**
  * Function to build a default list of empty trajectories based on the provided trajectory type,
@@ -279,6 +279,20 @@ export const buildDefaultEmptyTrajectoryList = (
 };
 
 /**
+ * Determines whether a given trajectory should have sub-rows based on specified conditions.
+ *
+ * @param {string[]} areasToExclude - A list of area identifiers to exclude from consideration.
+ * @param {DbTrajectory} [mainEntry] - An optional trajectory data object containing information about type and area.
+ * @returns {boolean} True if the trajectory should have sub-rows, otherwise false.
+ */
+export const shouldHaveSubRows = (areasToExclude: string[], mainEntry?: DbTrajectory): boolean => {
+  const isThermal = mainEntry?.type === TRAJECTORY_TYPE.THERMAL_CAPACITY;
+  const isOtherArea = mainEntry?.area === OTHER_AREAS;
+  const isInExcludedAreas = areasToExclude?.includes(mainEntry?.area ?? '');
+  return isThermal ? !isOtherArea && !isInExcludedAreas : isOtherArea || !isInExcludedAreas;
+};
+
+/**
  * Transforms data into a structured array of hypothesis rows, enriched with associated technologies.
  *
  * @param {DbTrajectory[]} data - An array of trajectory data objects, where each object contains detailed information
@@ -287,6 +301,7 @@ export const buildDefaultEmptyTrajectoryList = (
  * @param {{ name: string }[] | undefined} defaultAreas - An optional array of default area objects, where each object
  *                                                       contains a name field that specifies a default area.
  *
+ * @param {string[]} options - Thechnologies names array
  * @returns {HypothesisRowData[]} An array of hypothesis row objects, each containing trajectory details,
  *                                technology-specific sub-rows, and metadata like status and default indicators.
  */
@@ -294,6 +309,7 @@ export const convertIntoHypothesisRowWithTechnologies = (
   data: DbTrajectory[],
   areasNotInTrajectoryArea: string[],
   defaultAreas: { name: string }[] | undefined,
+  options: string[],
 ): HypothesisRowData[] => {
   const groupedByArea: Record<string, DbTrajectory[]> = data.reduce(
     (acc, item) => {
@@ -306,24 +322,20 @@ export const convertIntoHypothesisRowWithTechnologies = (
 
   return Object.entries(groupedByArea).map(([area, entries]) => {
     const mainEntry = entries.find((e) => e.technology === '');
-
-    const subRows: HypothesisRowData[] | null =
-      mainEntry?.area !== OTHER_AREAS && !areasNotInTrajectoryArea?.some((item) => item === mainEntry?.area)
-        ? ThermalOptions.map((option: string) => {
-            const trajectoryTechnology: DbTrajectory | undefined = entries.find(
-              (entry) => entry?.technology === option,
-            );
-            return {
-              hypothesis: option,
-              trajectory: trajectoryTechnology?.trajectoryName ? trajectoryTechnology : null,
-              status: trajectoryTechnology?.trajectoryName
-                ? TRAJECTORY_SELECTION_STATUS.OK
-                : TRAJECTORY_SELECTION_STATUS.MISSING,
-              isDefault: true,
-              subRows: null,
-            };
-          })
-        : null;
+    const subRows: HypothesisRowData[] | null = shouldHaveSubRows(areasNotInTrajectoryArea, mainEntry)
+      ? options.map((option: string) => {
+          const trajectoryTechnology: DbTrajectory | undefined = entries.find((entry) => entry?.technology === option);
+          return {
+            hypothesis: option,
+            trajectory: trajectoryTechnology?.trajectoryName ? trajectoryTechnology : null,
+            status: trajectoryTechnology?.trajectoryName
+              ? TRAJECTORY_SELECTION_STATUS.OK
+              : TRAJECTORY_SELECTION_STATUS.MISSING,
+            isDefault: true,
+            subRows: null,
+          };
+        })
+      : null;
 
     const isDefault = defaultAreas?.some((item: { name: string }) => item.name === mainEntry?.area) ?? false;
     return {
@@ -446,6 +458,7 @@ export const getStudyMenu = (t: (value: string) => string, isTrajectoryAreaLinke
     icon: StdIconId.LocalFireDepartment,
     isDisabled: isTrajectoryAreaLinked,
   },
+  { name: TRAJECTORY_TYPE.STS, label: t('studyDetails.@sts'), icon: StdIconId.BatteryChargingFull, isDisabled: true },
   { name: TRAJECTORY_TYPE.ENR, label: t('studyDetails.@enr'), icon: StdIconId.EnergySavingsLeaf, isDisabled: true },
   { name: TRAJECTORY_TYPE.MISC, label: t('studyDetails.@misc'), icon: StdIconId.Category, isDisabled: true },
 ];
