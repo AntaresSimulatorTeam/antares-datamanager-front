@@ -70,9 +70,12 @@ export const useHypothesisTableRemoveRow = (
                 await unlinkTrajectoryFromStudy(trajectoryIds[0], study.id);
               }
             }
+            const area =
+              trajectoryToDelete?.area ??
+              (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER ? value : row.hypothesis);
             dispatch?.({
               type: STUDY_ACTION.DELETE_TRAJECTORY,
-              payload: { area: trajectoryToDelete?.area ?? row.hypothesis, type },
+              payload: { area, type },
             });
           }
 
