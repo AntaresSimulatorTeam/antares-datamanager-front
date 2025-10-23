@@ -1,4 +1,4 @@
-import { DbTrajectory, HypothesisRowData, HypothesisTab, RowStatus, WarningMessage } from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, HypothesisTab, RowStatus } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { FileInputStatus } from 'rte-design-system-react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
@@ -105,21 +105,6 @@ export const removeDuplicate = (array: DbTrajectory[]): DbTrajectory[] => {
 export const removeDuplicateByTechnology = (array?: DbTrajectory[]): DbTrajectory[] =>
   (array || []).reduce((acc: DbTrajectory[], current: DbTrajectory) => {
     const x = acc.find((item) => item.area === current.area && item.technology === current.technology);
-    if (!x) {
-      acc.push(current);
-    }
-    return acc;
-  }, []);
-
-/**
- * Removes duplicate objects from an array of WarningMessage objects based on their 'id' property.
- *
- * @param {WarningMessage[]} [array] - Optional array of WarningMessage objects to process.
- * @returns {WarningMessage[]} A new array containing only unique WarningMessage objects by 'id'.
- */
-export const removeDuplicateById = (array?: WarningMessage[]): WarningMessage[] =>
-  (array || []).reduce((acc: WarningMessage[], current: WarningMessage) => {
-    const x = acc.find((item) => item.id === current.id);
     if (!x) {
       acc.push(current);
     }
