@@ -116,7 +116,9 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
           setCheckedValues,
           setTechnicalData,
         );
-      } else if (shouldOpenDeletionModal(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, 0, technicalData)) {
+      } else if (
+        shouldOpenDeletionModal(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, 0, technicalData, value)
+      ) {
         setRowToDelete({ index: 0, value });
         setIsDeletionModalOpen(true);
       } else {
@@ -216,7 +218,9 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
           }}
           isReadOnlyEnable={true}
           removeRow={(value: string, _rowId?: string) => {
-            if (shouldOpenDeletionModal(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, 0, technicalData)) {
+            if (
+              shouldOpenDeletionModal(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, 0, technicalData, value)
+            ) {
               setRowToDelete({ index: 0, value });
               setIsDeletionModalOpen(true);
             } else {

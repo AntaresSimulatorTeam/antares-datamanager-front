@@ -18,32 +18,33 @@ export const getReadOnlyForGeneratedStudy = (rows: HypothesisRowData[]): ReadOnl
 /**
  * Return boolean to indicate if the deletion modal should open
  * @param {TRAJECTORY_TYPE} type
- * @param {number} indexRow
+ * @param {number} indexRow - index of the paren row
  * @param {HypothesisRowData[]} data
+ * @param {string} value
  * @return {boolean} True if a trajectory is linked to an area for all trajectory type (expect THERMAL_CAPACITY) or at least two trajectories linked to one area and to one technology
  */
 export const shouldOpenDeletionModal = (
   type: TRAJECTORY_TYPE,
   indexRow: number,
   data: HypothesisRowData[],
+  value?: string,
 ): boolean => {
-  const subRowsWithTrajectory =
-    indexRow != null
-      ? (data[indexRow]?.subRows || [])?.filter(
-          (item: HypothesisRowData) => item.trajectory && item.status === TRAJECTORY_SELECTION_STATUS.OK,
-        )
-      : [];
+  const row = data[indexRow];
+  if (!row) return false;
 
-  const rowsWithTrajectory =
-    indexRow != null && data[indexRow]?.trajectory && data[indexRow]?.status === TRAJECTORY_SELECTION_STATUS.OK
-      ? data[indexRow]?.trajectory
-      : null;
+  const isRowTrajectoryValid = !!row.trajectory && row.status === TRAJECTORY_SELECTION_STATUS.OK;
 
-  if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
-    return subRowsWithTrajectory.length > 0;
-  } else if (type === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
-    return !!rowsWithTrajectory && subRowsWithTrajectory.length > 0;
-  } else {
-    return !!rowsWithTrajectory;
+  const subRowsWithTrajectory = (row.subRows || []).filter(
+    (item) =>
+      item.trajectory && item.status === TRAJECTORY_SELECTION_STATUS.OK && (!value || item.hypothesis === value),
+  );
+
+  switch (type) {
+    case TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER:
+      return subRowsWithTrajectory.length > 0;
+    case TRAJECTORY_TYPE.THERMAL_CAPACITY:
+      return isRowTrajectoryValid && subRowsWithTrajectory.length > 0;
+    default:
+      return isRowTrajectoryValid;
   }
 };

@@ -71,6 +71,9 @@ export const useFetchHypothesisParametersTrajectories = (
               specificAreas,
               defaultAreas,
             ) ?? [];
+          console.log('============== specificAreas', specificAreas);
+          console.log('============== emptyAreaSelected', emptyAreaSelected);
+          console.log('============== defaultEmptyAreas', defaultEmptyAreas);
 
           const allAreas = [...(specificAreas || []), ...emptyAreaSelected, ...defaultEmptyAreas];
           const arrayWithoutDuplicate =
