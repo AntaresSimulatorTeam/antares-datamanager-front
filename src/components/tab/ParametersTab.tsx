@@ -86,7 +86,7 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
       setReadOnly(readOnlyRow);
     };
     setHypothesis();
-  }, [areasTrajectoryOptions, dropDownListOptions, hypothesisTrajectories, t]);
+  }, [areasTrajectoryOptions, dropDownListOptions, hypothesisTrajectories, readOnlyRow]);
 
   useEffect(() => {
     const updateHypothesisTable = () => {
@@ -197,7 +197,9 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
                     [topIndex, subIndex].filter((n) => n !== undefined),
                     status,
                     current,
-                    shouldDeleteParamModulation(0, technicalData) ? technicalData[1].trajectory : null,
+                    topIndex === 0 && shouldDeleteParamModulation(0, technicalData)
+                      ? technicalData[1].trajectory
+                      : null,
                   );
                 }
               }
