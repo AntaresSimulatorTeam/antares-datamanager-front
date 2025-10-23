@@ -74,7 +74,7 @@ export const useFetchHypothesisParametersTrajectories = (
 
           const allAreas = [...(specificAreas || []), ...emptyAreaSelected, ...defaultEmptyAreas];
           const arrayWithoutDuplicate =
-            !!emptyAreaSelected.length && !!defaultEmptyAreas.length ? removeDuplicate(allAreas) : allAreas;
+            emptyAreaSelected.length > 0 || defaultEmptyAreas.length > 0 ? removeDuplicate(allAreas) : allAreas;
 
           dispatch?.({
             type: STUDY_ACTION.ADD_TRAJECTORIES,
