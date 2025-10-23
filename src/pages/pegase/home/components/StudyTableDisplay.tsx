@@ -75,10 +75,14 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
   };
 
   const handleDeleteClick = async () => {
-    const selectedStudyId = rows[Number.parseInt(selectedRowId || '-1')]?.id;
-    if (selectedStudyId) {
-      await deleteStudy(selectedStudyId);
-      setReloadStudies((prev) => prev + 1);
+    try {
+      const selectedStudyId = rows[Number.parseInt(selectedRowId || '-1')]?.id;
+      if (selectedStudyId) {
+        await deleteStudy(selectedStudyId);
+        setReloadStudies((prev) => prev + 1);
+      }
+    } catch {
+      // Silent handler
     }
   };
 
