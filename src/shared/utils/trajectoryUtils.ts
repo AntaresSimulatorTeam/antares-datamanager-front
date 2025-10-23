@@ -250,7 +250,7 @@ export const isTrajectoryLinked = (area: { name: string }, trajectories: DbTraje
  * @param {string} area - The name of the area to check.
  * @returns {boolean} - Returns true if the area matches any of the predefined technology options; otherwise, returns false.s
  */
-export const isTechnology = (area: string): boolean => Technologies.some((option) => option === area);
+export const isTechnology = (area: string): boolean => Technologies.some((option: string) => option === area);
 
 /**
  * Function to build a default list of empty trajectories based on the provided trajectory type,
@@ -659,7 +659,7 @@ export const getQueryParamAreaValue = (type: TRAJECTORY_TYPE, hypothesis: string
  * @param {HypothesisRowData[]} data - An array of hypothesis row data to be analyzed.
  * @returns {boolean} Whether the parameter modulation should be deleted.
  */
-export const shouldDeleteParamModulation = (index: number, data: HypothesisRowData[]) => {
+export const shouldDeleteParamModulation = (index: number, data: HypothesisRowData[]): boolean => {
   const hasOnlyOneSpecificTrajectory =
     index === 0 &&
     data[0]?.subRows?.filter((subRow) => subRow.trajectory != null && subRow.status === TRAJECTORY_SELECTION_STATUS.OK)
