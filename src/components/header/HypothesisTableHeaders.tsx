@@ -5,84 +5,63 @@
  */
 
 import { createColumnHelper } from '@tanstack/react-table';
-import { FileInputStatus } from 'rte-design-system-react';
-import { HypothesisRowData, RowStatus, SelectOption } from '@/shared/types';
+import { HypothesisRowData, SelectOption, TableHeadersGetterProps } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
-import { Dispatch, SetStateAction } from 'react';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
-import { ErrorMessageType } from '@/shared/types/Generic.type.ts';
 import { ProgressBar } from '@/components/forms/ProgressBar.tsx';
 import { CellWithStatus } from '@common/data/CellWithStatus.tsx';
 import { LabelWithDeleteButton } from '@common/data/LabelWithDeleteButton.tsx';
 import { SelectInputWithButton } from '@common/data/SelectInputWithButton.tsx';
-import StdButton from '@common/base/stdButton/StdButton.tsx';
+import { getAlignment } from '@/shared/utils/hypothesisTableUtils.ts';
+import { LabelWithButtonPreview } from '@common/data/LabelWithButtonPreview.tsx';
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
 
-const getHypothesisTableHeaders = (
-  t: (value: string) => string,
-  handleUpdate: (
-    index: number,
-    trajectoryId: number,
-    status: RowStatus,
-    trajectoryLabel?: string,
-    errorMessage?: string,
-  ) => Promise<void>,
-  handleImport: (index: number) => Promise<void>,
-  handlerSearch: (value?: string, index?: number) => Promise<SelectOption[] | undefined>,
-  handleView: (index: number) => Promise<void>,
-  error: ErrorMessageType,
-  setErrorInfo: Dispatch<SetStateAction<ErrorMessageType>>,
-  studyStatus: StudyStatus | undefined,
-  progress: number,
-  fileStatus: FileInputStatus,
-  rowIndexSelected: number,
-) => [
+const getHypothesisTableHeaders = ({
+  t,
+  errorInfo,
+  setErrorInfo,
+  studyState,
+  progress,
+  fileStatus,
+  idSelected,
+}: TableHeadersGetterProps) => [
   columnHelper.accessor('hypothesis', {
     header: t('studyDetails.@hypothesis'),
-    size: 50,
-    cell: ({ getValue, row }) => {
+    size: 300,
+    cell: ({ getValue, row, table: { options } }) => {
       const { trajectory, status } = row.original;
       return (
-        <div className="flex w-2/5 items-center gap-2">
-          <span
-            className={`${trajectory && status === TRAJECTORY_SELECTION_STATUS.OK ? 'text-primary-600' : 'text-gray-900'}`}
-          >
-            {getValue()}
-          </span>
-          {trajectory && status === TRAJECTORY_SELECTION_STATUS.OK && (
-            <StdButton
-              label={t('studyDetails.@preview')}
-              icon={StdIconId.Preview}
-              position={'left'}
-              disabled={row.getReadOnly()}
-              onClick={() => void handleView(row.index)}
-              variant="outlined"
-              size="small"
-            />
-          )}
+        <div className="w-1/5">
+          <LabelWithButtonPreview
+            value={getValue()}
+            status={status}
+            isReadOnly={row.getReadOnly()}
+            hasPreview={!!trajectory && status === TRAJECTORY_SELECTION_STATUS.OK}
+            alignment={getAlignment(row)}
+            onClick={() => void options?.meta?.viewData?.(row.id)}
+            disabled={row.getReadOnly()}
+          />
         </div>
       );
     },
   }),
   columnHelper.accessor('trajectory', {
     header: t('studyDetails.@trajectory'),
-    size: 300,
-    cell: ({ row: { original, index, getReadOnly } }) => {
-      const { trajectory, status } = original;
+    size: 900,
+    cell: ({ row, table: { options } }) => {
+      const { trajectory, status } = row.original;
       return trajectory && status !== TRAJECTORY_SELECTION_STATUS.MISSING ? (
-        <div className="flex w-full items-center gap-2">
+        <div className="flex w-full items-center gap-2 py-1">
           <LabelWithDeleteButton
             label={trajectory.trajectoryName}
-            isDeletable={studyStatus !== StudyStatus.GENERATED}
+            isDeletable={studyState !== StudyStatus.GENERATED}
             onClick={() => {
-              setErrorInfo({ index, message: '' });
-              void handleUpdate(
-                index,
-                trajectory.id,
+              setErrorInfo({ index: row.index, message: '' });
+              void options?.meta?.updateData?.(
+                row.id,
+                trajectory?.trajectoryName,
                 status === TRAJECTORY_SELECTION_STATUS.ERROR ? 'emptyError' : 'empty',
-                '',
               );
             }}
           />
@@ -91,22 +70,24 @@ const getHypothesisTableHeaders = (
         <div className="flex w-full items-center justify-start gap-2">
           <SelectInputWithButton
             onSelect={(value: SelectOption) => {
-              setErrorInfo({ index, message: '' });
-              void handleUpdate(index, value.id, 'success', value.label);
+              setErrorInfo({ index: row.index, message: '' });
+              void options?.meta?.updateData?.(row.id, value.label, 'success');
             }}
-            onSearch={async (value?: string) => await handlerSearch(value, index)}
+            onSearch={async (value?: string) => options?.meta?.search?.(value ?? '', row.id)}
             placeHolder={
-              getReadOnly() && index === 1 && studyStatus !== StudyStatus.GENERATED
+              row.getReadOnly() && row.index === 1 && studyState !== StudyStatus.GENERATED
                 ? t('studyDetails.@select_area')
                 : t('studyDetails.@select_trajectory')
             }
             onClickButton={() => {
-              setErrorInfo({ index, message: '' });
-              void handleImport(index);
+              setErrorInfo({ index: row.index, message: '' });
+              void options?.meta?.importData?.(row.id);
             }}
-            isDisabled={getReadOnly()}
+            isDisabled={row.getReadOnly()}
           />
-          {error.message && index === error.index && <div className="text-error-700">{error.message}</div>}
+          {errorInfo.message && row.index === errorInfo.index && (
+            <div className="text-error-700">{errorInfo.message}</div>
+          )}
         </div>
       );
     },
@@ -114,9 +95,10 @@ const getHypothesisTableHeaders = (
 
   columnHelper.accessor('status', {
     header: t('home.@status'),
+    size: 190,
     cell: ({ row }) => {
       const { status } = row.original;
-      return progress > 0 && fileStatus === 'loading' && rowIndexSelected === row.index ? (
+      return progress > 0 && fileStatus === 'loading' && idSelected === row.id ? (
         <ProgressBar statusFile={fileStatus} progressValue={progress} />
       ) : (
         <CellWithStatus status={status} isDeletable={false} />

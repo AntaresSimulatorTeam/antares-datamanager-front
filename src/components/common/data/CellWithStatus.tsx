@@ -18,7 +18,7 @@ export const CellWithStatus = ({ status, isDeletable, onClick }: CellWithStatusP
       case TRAJECTORY_SELECTION_STATUS.OK:
         return (
           <>
-            <StdIcon name={StdIconId.Done} color="text-acc1-600" />
+            <StdIcon name={StdIconId.Done} color="text-primary-600" />
             {t('studyDetails.@import_status_done')}
           </>
         );

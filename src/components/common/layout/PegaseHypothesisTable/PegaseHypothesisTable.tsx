@@ -1,45 +1,29 @@
 import StdSimpleTable from '@common/data/stdSimpleTable/StdSimpleTable.tsx';
-import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ErrorMessageType,
   ExpandedState,
-  FileInputStatus,
   HypothesisRowData,
   RowStatus,
   SelectOption,
+  TableHeadersGetterProps,
+  TableHeadersProps,
 } from '@/shared/types';
-import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { useTranslation } from 'react-i18next';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { TableOptions } from '@tanstack/react-table';
-import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 
-interface PegaseHypothesisTableProps {
+interface PegaseHypothesisTableProps extends TableHeadersProps {
   id: string;
   data: HypothesisRowData[];
-  getTableHeaders: (
-    t: (key: string) => string,
-    errorInfo: ErrorMessageType,
-    setErrorInfo: Dispatch<SetStateAction<ErrorMessageType>>,
-    studyState: StudyStatus,
-    progress: number,
-    fileStatus: FileInputStatus,
-    idSelected: string,
-    columnHeader?: string,
-    type?: TRAJECTORY_TYPE,
-  ) => TableOptions<HypothesisRowData>['columns'];
-  studyState: StudyStatus;
+  getTableHeaders: (context: TableHeadersGetterProps) => TableOptions<HypothesisRowData>['columns'];
   readOnly?: ReadOnlyObject;
-  progress: number;
-  fileStatus: FileInputStatus;
-  idSelected: string;
   handleSearch: (value: string, area: string) => Promise<SelectOption[] | undefined>;
   handleImport: (rowId: string) => Promise<void>;
   isReadOnlyEnable?: boolean;
   removeRow?: (value: string, rowId?: string) => void | Promise<void>;
   updateData?: (rowId: string, value: unknown, status: RowStatus) => void;
-  columnHeader?: string;
-  type?: TRAJECTORY_TYPE;
+  handleViewData?: (rowId: string) => void | Promise<void>;
 }
 
 export const PegaseHypothesisTable = ({
@@ -56,6 +40,7 @@ export const PegaseHypothesisTable = ({
   isReadOnlyEnable = false,
   removeRow,
   updateData,
+  handleViewData,
   columnHeader,
   type,
 }: PegaseHypothesisTableProps) => {
@@ -68,8 +53,9 @@ export const PegaseHypothesisTable = ({
   }, [data.length]);
 
   const columns: TableOptions<HypothesisRowData>['columns'] = useMemo(
-    () => getTableHeaders(t, errorInfo, setErrorInfo, studyState, progress, fileStatus, idSelected, columnHeader, type),
-    [getTableHeaders, t, errorInfo, studyState, progress, fileStatus, idSelected, columnHeader],
+    () =>
+      getTableHeaders({ t, errorInfo, setErrorInfo, studyState, progress, fileStatus, idSelected, columnHeader, type }),
+    [getTableHeaders, t, errorInfo, studyState, progress, fileStatus, idSelected, columnHeader, type],
   );
 
   const onHandleImport = useCallback(
@@ -89,6 +75,7 @@ export const PegaseHypothesisTable = ({
         id={id}
         data={data}
         columns={columns}
+        columnSize="rem"
         enableColumnResizing={false}
         enableReadOnly={isReadOnlyEnable}
         state={isReadOnlyEnable ? { readOnly, expanded } : { expanded }}
@@ -98,6 +85,7 @@ export const PegaseHypothesisTable = ({
         importData={async (rowId: string) => await onHandleImport(rowId)}
         removeRow={(value: string, rowId?: string) => void removeRow?.(value, rowId)}
         updateData={(rowId: string, value: unknown, status: RowStatus) => void updateData?.(rowId, value, status)}
+        viewData={(rowId: string) => void handleViewData?.(rowId)}
       />
     </div>
   );

@@ -33,7 +33,7 @@ export const getStatus = (status?: RowStatus) => {
 export const getBgColor = (status?: FileInputStatus) => {
   switch (status) {
     case 'loading':
-      return 'bg-acc1-600';
+      return 'bg-primary-600';
     case 'success':
     case 'error':
       return `bg-${status}-600`;

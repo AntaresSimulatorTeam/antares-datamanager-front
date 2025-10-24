@@ -96,10 +96,11 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
   const sortedHeaders = addSortColumn(headers, handleSort, sortBy, sortedColumn, handleHeaderHover, isHeaderHovered);
 
   return (
-    <div>
+    <div className={'flex w-fit grow-0 flex-col'}>
       <div className="flex-1">
         <StdSimpleTable
           columns={sortedHeaders}
+          columnSize="rem"
           data={rows}
           enableRowSelection={true}
           state={{

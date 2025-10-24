@@ -102,6 +102,8 @@
     "@bannerCreatedBy": "by {{createdBy}}",
     "@hypothesis": "Hypothesis",
     "@area": "Areas",
+    "@areas": "Areas",
+    "@links": "Links",
     "@link": "Link",
     "@areas_links": "Areas & Links",
     "@load": "Load",

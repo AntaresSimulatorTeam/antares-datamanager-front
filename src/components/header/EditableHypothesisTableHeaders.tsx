@@ -5,33 +5,31 @@
  */
 
 import { createColumnHelper } from '@tanstack/react-table';
-import { FileInputStatus, HypothesisRowData, SelectOption } from '@/shared/types';
+import { HypothesisRowData, SelectOption, TableHeadersGetterProps } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
-import { Dispatch, SetStateAction } from 'react';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { CellWithStatus } from '@common/data/CellWithStatus.tsx';
 import { LabelWithButtonPreview } from '@common/data/LabelWithButtonPreview.tsx';
 import { LabelWithDeleteButton } from '@common/data/LabelWithDeleteButton.tsx';
 import { SelectInputWithButton } from '@common/data/SelectInputWithButton.tsx';
-import { ErrorMessageType } from '@/shared/types/Generic.type.ts';
 import { ProgressBar } from '@/components/forms/ProgressBar.tsx';
 import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
 
-const getEditableHypothesisTableHeaders = (
-  t: (value: string) => string,
-  error: ErrorMessageType,
-  setErrorInfo: Dispatch<SetStateAction<ErrorMessageType>>,
-  studyStatus: StudyStatus | undefined,
-  progress: number,
-  fileStatus: FileInputStatus,
-  idSelected: string,
-  columnHeader?: string,
-) => [
+const getEditableHypothesisTableHeaders = ({
+  t,
+  errorInfo,
+  setErrorInfo,
+  studyState,
+  progress,
+  fileStatus,
+  idSelected,
+  columnHeader,
+}: TableHeadersGetterProps) => [
   columnHelper.accessor('hypothesis', {
-    header: columnHeader || t('studyDetails.@area'),
-    size: 130,
+    header: columnHeader || t('studyDetails.@areas'),
+    size: 233,
     cell: ({ getValue, row }) => {
       const { status, isDefault } = row.original;
       return (
@@ -47,7 +45,7 @@ const getEditableHypothesisTableHeaders = (
   }),
   columnHelper.accessor('trajectory', {
     header: t('studyDetails.@trajectory'),
-    size: 380,
+    size: 623,
     cell: ({ row, table: { options } }) => {
       const { trajectory, status } = row.original;
 
@@ -55,7 +53,7 @@ const getEditableHypothesisTableHeaders = (
         <div className="flex w-full items-center gap-2">
           <LabelWithDeleteButton
             label={trajectory.trajectoryName}
-            isDeletable={!(studyStatus === StudyStatus.GENERATED)}
+            isDeletable={!(studyState === StudyStatus.GENERATED)}
             onClick={() => {
               setErrorInfo({ index: row.index, message: '' });
               void options?.meta?.updateData?.(
@@ -80,7 +78,9 @@ const getEditableHypothesisTableHeaders = (
             }}
             isDisabled={row.getReadOnly()}
           />
-          {error.message && row.index === error.index && <div className="text-error-700">{error.message}</div>}
+          {errorInfo.message && row.index === errorInfo.index && (
+            <div className="text-error-700">{errorInfo.message}</div>
+          )}
         </div>
       );
     },
@@ -88,6 +88,7 @@ const getEditableHypothesisTableHeaders = (
 
   columnHelper.accessor('status', {
     header: t('home.@status'),
+    size: 233,
     cell: ({ row, table: { options } }) => {
       const { status, hypothesis, isDefault, isDeletable } = row.original;
       return progress > 0 && fileStatus === 'loading' && idSelected === row.id ? (
@@ -95,7 +96,7 @@ const getEditableHypothesisTableHeaders = (
       ) : (
         <CellWithStatus
           status={status}
-          isDeletable={!isDefault && studyStatus !== StudyStatus.GENERATED && (isDeletable ?? false)}
+          isDeletable={!isDefault && studyState !== StudyStatus.GENERATED && (isDeletable ?? false)}
           onClick={() => void options?.meta?.removeRow?.(hypothesis, row.id)}
         />
       );

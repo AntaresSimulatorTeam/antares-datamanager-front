@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "fix/ANT-4003_study_table_delete_last_study_behavior",
-  commit: "25402c4e",
-  commitTime: "2025-10-20T16:11:55.338Z"
+  branch: "feat/ANT-3935_design_use_rem_instaed_of_px",
+  commit: "2b539857",
+  commitTime: "2025-10-24T15:09:55.238Z"
 };

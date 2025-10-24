@@ -1,39 +1,45 @@
 import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
-import { ButtonPreview } from '@/components/button/ButtonPreview.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
+import StdButton from '@common/base/stdButton/StdButton.tsx';
+import { useTranslation } from 'react-i18next';
 
 interface LabelWithButtonPreviewProps {
   value: string;
   status: TRAJECTORY_SELECTION_STATUS;
   isReadOnly: boolean;
-  extraValue: string;
+  extraValue?: string;
   onClick?: () => void;
   hasPreview?: boolean;
   alignment?: string;
+  disabled?: boolean;
 }
 
 export const LabelWithButtonPreview = ({
   value,
   status,
-  isReadOnly,
   extraValue,
   onClick,
   hasPreview = true,
   alignment = '',
-}: LabelWithButtonPreviewProps) => (
-  <div className={`${alignment}`}>
-    <span className={`${status === TRAJECTORY_SELECTION_STATUS.OK ? 'text-primary-800' : 'text-gray-900'}`}>
-      {`${value} ${extraValue}`}
-    </span>
-    {hasPreview && (
-      <ButtonPreview
-        label={'View'}
-        icon={StdIconId.Preview}
-        position={'left'}
-        color={isReadOnly ? 'gray-700' : 'primary-800'}
-        borderColor={isReadOnly ? 'gray-700' : 'acc1-800'}
-        onClick={() => void onClick?.()}
-      />
-    )}
-  </div>
-);
+  disabled = false,
+}: LabelWithButtonPreviewProps) => {
+  const { t } = useTranslation();
+  return (
+    <div className={`${alignment} flex items-center justify-between gap-1`}>
+      <span className={`${status === TRAJECTORY_SELECTION_STATUS.OK ? 'text-primary-800' : 'text-gray-900'}`}>
+        {`${value} ${extraValue ?? ''}`}
+      </span>
+      {hasPreview && (
+        <StdButton
+          label={t('studyDetails.@preview')}
+          icon={StdIconId.Preview}
+          position="left"
+          onClick={() => void onClick?.()}
+          disabled={disabled}
+          variant="outlined"
+          size="small"
+        />
+      )}
+    </div>
+  );
+};

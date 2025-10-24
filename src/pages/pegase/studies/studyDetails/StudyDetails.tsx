@@ -84,19 +84,15 @@ const StudyDetails = () => {
       <StudyHeader study={studyData} />
       <div className="relative flex h-full w-full flex-col">
         <RdsDivider />
-        <div className="flex flex-col">
-          <DetailsContent content={studyData} onClickButton={toggleModal} />
-        </div>
-        <div className="flex px-3 pt-2">
-          <div className="flex items-end self-stretch">
-            <StudyNavigationMenu
-              onRenderActiveComponent={setActiveContent}
-              setActiveTab={setActiveTab}
-              activeTab={activeTab}
-              setErrorMessage={setErrorMessage}
-              studyId={study.id}
-            />
-          </div>
+        <DetailsContent content={studyData} onClickButton={toggleModal} />
+        <div className="flex items-end self-stretch px-3 pt-2">
+          <StudyNavigationMenu
+            onRenderActiveComponent={setActiveContent}
+            setActiveTab={setActiveTab}
+            activeTab={activeTab}
+            setErrorMessage={setErrorMessage}
+            studyId={study.id}
+          />
         </div>
         <div className="relative flex flex-1 flex-col overflow-y-auto px-4">
           <div className="flex h-full w-full flex-col gap-4">
