@@ -1,4 +1,4 @@
-import { DbTrajectory, HypothesisRowData, HypothesisTab, RowStatus, WarningMessage } from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, HypothesisTab, RowStatus } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { FileInputStatus } from 'rte-design-system-react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
@@ -105,21 +105,6 @@ export const removeDuplicate = (array: DbTrajectory[]): DbTrajectory[] => {
 export const removeDuplicateByTechnology = (array?: DbTrajectory[]): DbTrajectory[] =>
   (array || []).reduce((acc: DbTrajectory[], current: DbTrajectory) => {
     const x = acc.find((item) => item.area === current.area && item.technology === current.technology);
-    if (!x) {
-      acc.push(current);
-    }
-    return acc;
-  }, []);
-
-/**
- * Removes duplicate objects from an array of WarningMessage objects based on their 'id' property.
- *
- * @param {WarningMessage[]} [array] - Optional array of WarningMessage objects to process.
- * @returns {WarningMessage[]} A new array containing only unique WarningMessage objects by 'id'.
- */
-export const removeDuplicateById = (array?: WarningMessage[]): WarningMessage[] =>
-  (array || []).reduce((acc: WarningMessage[], current: WarningMessage) => {
-    const x = acc.find((item) => item.id === current.id);
     if (!x) {
       acc.push(current);
     }
@@ -250,7 +235,7 @@ export const isTrajectoryLinked = (area: { name: string }, trajectories: DbTraje
  * @param {string} area - The name of the area to check.
  * @returns {boolean} - Returns true if the area matches any of the predefined technology options; otherwise, returns false.s
  */
-export const isTechnology = (area: string): boolean => Technologies.some((option) => option === area);
+export const isTechnology = (area: string): boolean => Technologies.some((option: string) => option === area);
 
 /**
  * Function to build a default list of empty trajectories based on the provided trajectory type,
@@ -672,7 +657,7 @@ export const getQueryParamAreaValue = (type: TRAJECTORY_TYPE, hypothesis: string
  * @param {HypothesisRowData[]} data - An array of hypothesis row data to be analyzed.
  * @returns {boolean} Whether the parameter modulation should be deleted.
  */
-export const shouldDeleteParamModulation = (index: number, data: HypothesisRowData[]) => {
+export const shouldDeleteParamModulation = (index: number, data: HypothesisRowData[]): boolean => {
   const hasOnlyOneSpecificTrajectory =
     index === 0 &&
     data[0]?.subRows?.filter((subRow) => subRow.trajectory != null && subRow.status === TRAJECTORY_SELECTION_STATUS.OK)

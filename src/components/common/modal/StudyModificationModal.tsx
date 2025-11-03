@@ -80,6 +80,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
       const errorMessages = (error as Error)?.message;
       if (errorMessages?.includes('study')) {
         setStudyErrorMessage(errorMessages);
+        setIsFormValid(false);
       } else if (errorMessages?.includes('horizon')) {
         setHorizonErrorMessage(errorMessages);
       }
