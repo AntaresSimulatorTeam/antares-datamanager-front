@@ -70,6 +70,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
       const errorMessages = (error as Error)?.message;
       if (errorMessages?.includes('study')) {
         setStudyErrorMessage(errorMessages);
+        setIsFormValid(false);
       } else {
         notifyToast({
           type: 'error',
