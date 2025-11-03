@@ -22,6 +22,7 @@ import {
   generateReadOnlyIndexMap,
   getAreaTrajectoryName,
   getTrajectoryTypeByIndex,
+  iSTechnicalParametersType,
   shouldDeleteParamModulation,
 } from '@/shared/utils/trajectoryUtils.ts';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
@@ -71,6 +72,9 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
     studyState.studyStatus === StudyStatus.GENERATED || study.status === StudyStatus.GENERATED,
   );
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
+  const [selectedTrajectoryType, setSelectedTrajectoryType] = useState<TRAJECTORY_TYPE>(
+    TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+  );
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
     useFetchHypothesisParametersTrajectories(areas, study?.id, defaultAreas, isStudyGenerated);
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(study, studyState, dispatch, setTechnicalData);
@@ -167,15 +171,10 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
           }}
           handleImport={async (rowId: string) => {
             const indexArray = rowId.split('.').map(Number);
+            const type = getTrajectoryTypeByIndex(indexArray[0]);
+            setSelectedTrajectoryType(type);
             const area = technicalData[indexArray[0]]?.subRows?.[indexArray[1]]?.hypothesis;
-            await handleFetchTrajectoriesFS(
-              getTrajectoryTypeByIndex(indexArray[0]),
-              rowId,
-              setOptionsFS,
-              setRowIdSelected,
-              toggleModal,
-              area,
-            );
+            await handleFetchTrajectoriesFS(type, rowId, setOptionsFS, setRowIdSelected, toggleModal, area);
           }}
           updateData={(rowId: string, value: unknown, status: RowStatus) => {
             const [topIndex, subIndex] = rowId.split('.').map(Number);
@@ -241,7 +240,15 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
             idSelected={rowIdSelected}
             progress={0}
             handleSearch={async (_value: string, _rowId: string) => Promise.resolve(undefined)}
-            handleImport={() => Promise.resolve()}
+            handleImport={async (rowId: string) => {
+              const index = Number(rowId.split('.').map(Number)[0]);
+              const type =
+                index === 0
+                  ? TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER
+                  : TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER;
+              setSelectedTrajectoryType(type);
+              await handleFetchTrajectoriesFS(type, rowId, setOptionsFS, setRowIdSelected, toggleModal);
+            }}
           />
         </div>
       </div>
@@ -252,11 +259,21 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
             toggleModal();
             if (value != null) {
               const indexArray = rowIdSelected.split('.').map(Number);
-              await importTrajectory(getTrajectoryTypeByIndex(indexArray[0]), value, indexArray, technicalData);
+              if (
+                selectedTrajectoryType === TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER ||
+                selectedTrajectoryType === TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER
+              ) {
+                // TODO ATTACH TRAJECTORY FOR ECONOMIC PARAMETERS AND COSTS
+                return;
+              }
+              await importTrajectory(selectedTrajectoryType, value, indexArray, technicalData);
             }
           }}
-          trajectoryType={getTrajectoryTypeByIndex(Number(rowIdSelected))}
-          area={getAreaTrajectoryName(rowIdSelected, technicalData)}
+          trajectoryType={selectedTrajectoryType ?? getTrajectoryTypeByIndex(Number(rowIdSelected))}
+          area={getAreaTrajectoryName(
+            rowIdSelected,
+            iSTechnicalParametersType(selectedTrajectoryType) ? technicalData : data,
+          )}
         />
       )}
       {isDeletionModalOpen && (
