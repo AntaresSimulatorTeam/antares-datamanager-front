@@ -610,6 +610,19 @@ export const getTrajectoryTypeByIndex = (index: number): TRAJECTORY_TYPE => {
 };
 
 /**
+ * Determines if the provided type is classified as a technical parameter type
+ * within the thermal trajectory category.
+ *
+ * @param {TRAJECTORY_TYPE} type - The type to evaluate.
+ * @returns {boolean} Returns true if the type matches any of the defined
+ * thermal technical parameter categories; otherwise, returns false.
+ */
+export const iSTechnicalParametersType = (type: TRAJECTORY_TYPE): boolean =>
+  type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER ||
+  type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER ||
+  type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER;
+
+/**
  * Determines the file path based on the trajectory type.
  *
  * @param {TRAJECTORY_TYPE} type - The trajectory type used to select the corresponding file path.

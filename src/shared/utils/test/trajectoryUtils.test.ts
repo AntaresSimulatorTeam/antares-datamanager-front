@@ -20,6 +20,7 @@ import {
   getStudyMenu,
   getTrajectoryTypeByIndex,
   isMatchingTrajectoryType,
+  iSTechnicalParametersType,
   isTrajectoryLinked,
   isUniqueTrajectoryType,
   removeDuplicate,
@@ -1040,6 +1041,24 @@ describe('isUniqueTrajectoryType', () => {
 
   it('returns false for LINK', () => {
     expect(isUniqueTrajectoryType(TRAJECTORY_TYPE.LINK)).toBe(false);
+  });
+});
+
+describe('iSTechnicalParametersType', () => {
+  it('returns false for LOAD', () => {
+    expect(iSTechnicalParametersType(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER)).toBe(true);
+  });
+
+  it('returns true for THERMAL_TECHNICAL_MODULATION_PARAMETER', () => {
+    expect(iSTechnicalParametersType(TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER)).toBe(true);
+  });
+
+  it('returns true for THERMAL_ECONOMIC_PARAMETER', () => {
+    expect(iSTechnicalParametersType(TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER)).toBe(true);
+  });
+
+  it('returns false for LINK', () => {
+    expect(iSTechnicalParametersType(TRAJECTORY_TYPE.LINK)).toBe(false);
   });
 });
 

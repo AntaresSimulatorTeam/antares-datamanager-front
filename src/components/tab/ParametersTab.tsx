@@ -22,6 +22,7 @@ import {
   generateReadOnlyIndexMap,
   getAreaTrajectoryName,
   getTrajectoryTypeByIndex,
+  iSTechnicalParametersType,
   shouldDeleteParamModulation,
 } from '@/shared/utils/trajectoryUtils.ts';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
@@ -71,8 +72,9 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
     studyState.studyStatus === StudyStatus.GENERATED || study.status === StudyStatus.GENERATED,
   );
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
-  const [selectedTrajectoryType, setSelectedTrajectoryType] = useState<TRAJECTORY_TYPE | null>(null);
-  const [selectEconomicModalLabel, setSelectEconomicModalLabel] = useState<string | undefined>(undefined);
+  const [selectedTrajectoryType, setSelectedTrajectoryType] = useState<TRAJECTORY_TYPE>(
+    TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+  );
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
     useFetchHypothesisParametersTrajectories(areas, study?.id, defaultAreas, isStudyGenerated);
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(study, studyState, dispatch, setTechnicalData);
@@ -171,16 +173,8 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
             const indexArray = rowId.split('.').map(Number);
             const type = getTrajectoryTypeByIndex(indexArray[0]);
             setSelectedTrajectoryType(type);
-            setSelectEconomicModalLabel(getAreaTrajectoryName(rowId, technicalData));
             const area = technicalData[indexArray[0]]?.subRows?.[indexArray[1]]?.hypothesis;
-            await handleFetchTrajectoriesFS(
-              type,
-              rowId,
-              setOptionsFS,
-              setRowIdSelected,
-              toggleModal,
-              area,
-            );
+            await handleFetchTrajectoriesFS(type, rowId, setOptionsFS, setRowIdSelected, toggleModal, area);
           }}
           updateData={(rowId: string, value: unknown, status: RowStatus) => {
             const [topIndex, subIndex] = rowId.split('.').map(Number);
@@ -253,7 +247,6 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
                   ? TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER
                   : TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER;
               setSelectedTrajectoryType(type);
-              setSelectEconomicModalLabel(index === 0 ? t('thermal.@costs') : t('thermal.@economics'));
               await handleFetchTrajectoriesFS(type, rowId, setOptionsFS, setRowIdSelected, toggleModal);
             }}
           />
@@ -266,19 +259,21 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
             toggleModal();
             if (value != null) {
               const indexArray = rowIdSelected.split('.').map(Number);
-              const typeToImport = selectedTrajectoryType ?? getTrajectoryTypeByIndex(indexArray[0]);
               if (
-                typeToImport === TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER ||
-                typeToImport === TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER
+                selectedTrajectoryType === TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER ||
+                selectedTrajectoryType === TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER
               ) {
                 // TODO ATTACH TRAJECTORY FOR ECONOMIC PARAMETERS AND COSTS
                 return;
               }
-              await importTrajectory(typeToImport, value, indexArray, technicalData);
+              await importTrajectory(selectedTrajectoryType, value, indexArray, technicalData);
             }
           }}
           trajectoryType={selectedTrajectoryType ?? getTrajectoryTypeByIndex(Number(rowIdSelected))}
-          area={selectEconomicModalLabel ?? getAreaTrajectoryName(rowIdSelected, technicalData)}
+          area={getAreaTrajectoryName(
+            rowIdSelected,
+            iSTechnicalParametersType(selectedTrajectoryType) ? technicalData : data,
+          )}
         />
       )}
       {isDeletionModalOpen && (
