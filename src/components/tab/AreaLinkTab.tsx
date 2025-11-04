@@ -264,6 +264,7 @@ export const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
     <div className="flex h-fit w-full">
       <PegaseHypothesisTable
         id="area-link-table"
+        columnHeader={t('studyDetails.@hypothesis')}
         data={data}
         getTableHeaders={getEditableHypothesisTableHeaders}
         fileStatus={fileStatus}
