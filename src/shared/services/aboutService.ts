@@ -25,7 +25,6 @@ export const fetchBackendInfo = async (): Promise<AppInfo> => {
 
 export const fetchAppInfo = async () => {
   try {
-    console.log("=================== GIT_INFO", GIT_INFO)
     const frontInfos = {
       appName: packageJson.name,
       appDescription: packageJson.description,
