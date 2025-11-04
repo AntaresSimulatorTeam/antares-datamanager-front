@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "feat/ANT-4011_dropDownList_costs",
-  commit: "3a483e2b",
-  commitTime: "2025-11-03T12:50:02.439Z"
+  branch: "fix/ANT-4003_study_table_delete_last_study_behavior",
+  commit: "25402c4e",
+  commitTime: "2025-10-20T16:11:55.338Z"
 };
