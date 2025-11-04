@@ -11,34 +11,32 @@ export const fetchBackendInfo = async (): Promise<AppInfo> => {
   if (!response.ok) {
     throw new Error('Error fetching app info');
   }
-  const {
-    app,
-    git: { branch, commit },
-  } = (await response.json()) as AppBackendInfos;
+  const { app, git } = (await response.json()) as AppBackendInfos;
 
   return {
     appName: app.name,
     appDescription: app.description,
     appVersion: app.version,
-    appBranch: branch,
-    commitId: commit.id,
-    commitTime: formatDateToDDMMYYYY(commit.time, true),
+    appBranch: git?.branch,
+    commitId: git?.commit.id,
+    commitTime: git?.commit.time ? formatDateToDDMMYYYY(git?.commit.time, true) : new Date().toISOString(),
   };
 };
 
 export const fetchAppInfo = async () => {
   try {
+    console.log("=================== GIT_INFO", GIT_INFO)
     const frontInfos = {
       appName: packageJson.name,
       appDescription: packageJson.description,
       appVersion: packageJson.version,
-      appBranch: GIT_INFO.branch,
-      commitId: GIT_INFO.commit,
-      commitTime: formatDateToDDMMYYYY(GIT_INFO.commitTime, true),
+      appBranch: GIT_INFO?.branch,
+      commitId: GIT_INFO?.commit,
+      commitTime: GIT_INFO?.commitTime ? formatDateToDDMMYYYY(GIT_INFO?.commitTime, true) : new Date().toISOString(),
     };
 
     const data = await fetchBackendInfo();
-    return (Object.entries(data) as Entries<typeof data>).map(([key, value]) => ({
+    return (Object.entries(data) as Entries<typeof data>)?.map(([key, value]) => ({
       info: key,
       front: frontInfos[key],
       back: value,
