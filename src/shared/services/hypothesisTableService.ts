@@ -195,14 +195,21 @@ export const fetchMultipleTrajectoryType = async (
  * @param {TRAJECTORY_TYPE[]} types - An array of trajectory types to fetch trajectories for.
  * @returns {Promise<Partial<Record<TRAJECTORY_TYPE, DbTrajectory[]>>>} A promise resolving to an object that maps trajectory types to their respective array of database trajectories.
  */
-export const fetchTrajectoriesFromTypes = async (id: number, types: TRAJECTORY_TYPE[]) => {
-  const resultObject: Partial<Record<TRAJECTORY_TYPE, DbTrajectory[]>> = {};
-  await Promise.all(
-    types.map(async (thermalType: TRAJECTORY_TYPE) => {
-      resultObject[thermalType] = await getStudyTrajectories(id, thermalType);
-    }),
-  );
-  return resultObject;
+export const fetchTrajectoriesFromTypes = async (
+  id: number,
+  types: TRAJECTORY_TYPE[],
+): Promise<Partial<Record<TRAJECTORY_TYPE, DbTrajectory[]>> | undefined> => {
+  try {
+    const resultObject: Partial<Record<TRAJECTORY_TYPE, DbTrajectory[]>> = {};
+    await Promise.all(
+      types.map(async (thermalType: TRAJECTORY_TYPE) => {
+        resultObject[thermalType] = await getStudyTrajectories(id, thermalType);
+      }),
+    );
+    return resultObject;
+  } catch {
+    //Silent handler
+  }
 };
 
 /**
@@ -235,7 +242,7 @@ export const handleViewTrajectory = async (
       columns,
     });
     setIsViewModalOpen(true);
-  } catch (error) {
+  } catch {
     //Silent error
   }
 };
