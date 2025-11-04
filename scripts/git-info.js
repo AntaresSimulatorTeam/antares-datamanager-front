@@ -4,6 +4,7 @@ import { writeFileSync } from 'fs';
 try {
   const ref = process.env.GITHUB_REF || '';
   const branch = ref?.replace('refs/heads/', '');
+  console.log('process.env.GITHUB_REF', process.env.GITHUB_REF);
   console.log('branch', branch);
   const commit = execSync('git rev-parse --short HEAD').toString().trim();
   const commitTime = new Date().toISOString();
