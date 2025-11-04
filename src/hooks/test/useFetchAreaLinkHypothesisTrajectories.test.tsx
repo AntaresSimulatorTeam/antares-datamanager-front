@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useFetchAreaLinkHypothesisTrajectories } from '../useFetchAreaLinkHypothesisTrajectories';
-import { getStudyTrajectories } from '@/shared/services/studyService';
+import * as studyService from '@/shared/services/studyService';
 import { useStudyDispatch } from '@/store/contexts/StudyContext';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory';
 import { STUDY_ACTION } from '@/shared/enum/study';
@@ -9,15 +9,25 @@ import { DbTrajectory } from '@/shared/types';
 
 // Mocks
 vi.mock('@/shared/services/trajectoryService');
+vi.mock('@/shared/services/studyService');
 vi.mock('@/store/contexts/StudyContext');
-vi.mock('react-i18next');
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: Record<string, string> = {
+        'studyDetails.@areas': 'Areas',
+        'studyDetails.@links': 'Links',
+      };
+      return translations[key] || key;
+    },
+  }),
+}));
 
-const mockGetStudyTrajectories = vi.mocked(getStudyTrajectories);
+const mockGetStudyTrajectories = vi.mocked(studyService.getStudyTrajectories);
 const mockUseStudyDispatch = vi.mocked(useStudyDispatch);
 
 describe('useFetchAreaLinkHypothesisTrajectories', () => {
   const mockDispatch = vi.fn();
-  const mockT = vi.fn((key: string) => key);
 
   const mockAreaTrajectory = {
     id: 1,
@@ -26,7 +36,6 @@ describe('useFetchAreaLinkHypothesisTrajectories', () => {
     userName: 'user123',
     creationDate: '2024-01-01' as unknown as Date,
   } as DbTrajectory;
-
   const mockLinkTrajectory = {
     id: 2,
     trajectoryName: 'Link Trajectory 1',
@@ -38,11 +47,6 @@ describe('useFetchAreaLinkHypothesisTrajectories', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockUseStudyDispatch.mockReturnValue(mockDispatch);
-    mockT.mockImplementation((key: string) => {
-      if (key === 'studyDetails.@areas') return 'Areas';
-      if (key === 'studyDetails.@links') return 'Links';
-      return key;
-    });
   });
 
   describe('Initialisation', () => {

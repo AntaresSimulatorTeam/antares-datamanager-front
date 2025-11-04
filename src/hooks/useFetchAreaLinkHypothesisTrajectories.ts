@@ -22,8 +22,8 @@ export const useFetchAreaLinkHypothesisTrajectories = (isStudyGenerated: boolean
       dispatch?.({
         type: STUDY_ACTION.ADD_TRAJECTORIES,
         payload: {
-          ...(trajectoryAreaResult && { [TRAJECTORY_TYPE.AREA]: { trajectories: trajectoryAreaResult } }),
-          ...(trajectoryLinkResult && { [TRAJECTORY_TYPE.LINK]: { trajectories: trajectoryLinkResult } }),
+          ...(trajectoryAreaResult?.length > 0 && { [TRAJECTORY_TYPE.AREA]: { trajectories: trajectoryAreaResult } }),
+          ...(trajectoryLinkResult?.length > 0 && { [TRAJECTORY_TYPE.LINK]: { trajectories: trajectoryLinkResult } }),
         },
       });
       const trajectoryResult = [

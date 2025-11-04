@@ -6,7 +6,6 @@
 
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
-import getHypothesisTableHeaders from '@/components/header/HypothesisTableHeaders.tsx';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { useTranslation } from 'react-i18next';
 import {
@@ -46,6 +45,7 @@ import {
 } from '@/shared/services/hypothesisTableService.ts';
 import { useFetchAreaLinkHypothesisTrajectories } from '@/hooks/useFetchAreaLinkHypothesisTrajectories.ts';
 import { getReadOnlyForGeneratedStudy } from '@/shared/helpers/hypothesisTableHelper.ts';
+import getEditableHypothesisTableHeaders from '@/components/header/EditableHypothesisTableHeaders.tsx';
 
 interface AreaLinkTabProps {
   setErrorMessage: Dispatch<SetStateAction<string>>;
@@ -64,7 +64,7 @@ export const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
   const [trajectoryData, setTrajectoryData] = useState<TrajectoryViewData | undefined>();
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [data, setData] = useState<HypothesisRowData[]>([]);
-  const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
+  const [readOnly, setReadOnly] = useState<ReadOnlyObject>({ '0': false, '1': true });
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const [isAreaDeletionConfirmOpen, setIsAreaDeletionConfirmOpen] = useState(false);
   const [isStudyGenerated, setIsStudyGenerated] = useState(
@@ -76,8 +76,8 @@ export const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
 
   useEffect(() => {
     setErrorMessage('');
-    hypothesisTrajectories.length > 0 && setData(hypothesisTrajectories);
-    Object.keys(readOnlyRow).length > 0 && setReadOnly(readOnlyRow);
+    hypothesisTrajectories && setData(hypothesisTrajectories);
+    setReadOnly(readOnlyRow);
   }, [hypothesisTrajectories, readOnlyRow, setErrorMessage]);
 
   useEffect(() => {
@@ -86,14 +86,14 @@ export const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
       const rows = getReadOnlyForGeneratedStudy(data);
       setReadOnly(rows);
     }
-  }, [studyState.studyStatus, study?.status, data]);
+  }, [studyState.studyStatus, study?.status]);
 
   const handleTrajectoryError = async (
     rowIndex: number,
     trajectoryId: number,
     trajectoryLabel: string,
     errorMessage?: string,
-  ) => {
+  ): Promise<void> => {
     try {
       const newDbTrajectory = buildErrorTrajectory(
         rowIndex === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
@@ -265,10 +265,11 @@ export const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
       <PegaseHypothesisTable
         id="area-link-table"
         data={data}
-        getTableHeaders={getHypothesisTableHeaders}
+        getTableHeaders={getEditableHypothesisTableHeaders}
         fileStatus={fileStatus}
         studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
         readOnly={readOnly}
+        isReadOnlyEnable={true}
         progress={progress}
         idSelected={String(rowIdSelected)}
         updateData={(rowId: string, value: unknown, status: RowStatus) =>

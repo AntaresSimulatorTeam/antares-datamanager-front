@@ -105,7 +105,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: TabProps) => {
   );
 
   return (
-    <div className="flex h-fit w-full gap-6">
+    <div className="flex h-fit w-full gap-6 xl:gap-7 2xl:gap-8">
       <CheckBoxListWithSearchBar
         checkedValues={checkedValues}
         options={areasOptions}
