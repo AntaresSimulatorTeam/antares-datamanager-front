@@ -43,7 +43,7 @@ export const CardWithIconTitle = ({ data, size, transform }: CardWithIconTitlePr
   return (
     <div
       style={{ width: size, transform }}
-      className={`absolute left-0 flex h-full flex-col justify-start gap-1 rounded-lg border-b-4 bg-gray-100 shadow-2 ${!data.isAck || data.onClickItem == null ? 'border-transparent' : 'border-b-gray-600'} ${!data.isAck ? data.colorBorder : data.onClickItem == null ? 'border-transparent' : 'hover:border-b-gray-600'} p-2`}
+      className={`absolute left-0 flex h-fit flex-col justify-start gap-2 rounded-lg border-b-4 bg-gray-100 shadow-2 ${!data.isAck || data.onClickItem == null ? 'border-transparent' : 'border-b-gray-600'} ${!data.isAck ? data.colorBorder : data.onClickItem == null ? 'border-transparent' : 'hover:border-b-gray-600'} p-2`}
     >
       <div className="flex items-start justify-between gap-1">
         <RdsTextTooltip text={data.title} offset={5} placement="top">

@@ -39,7 +39,7 @@ export type TableCoreProps<TData> = {
 const TableCore = <TData,>({ table, id: propId, striped, trClassName, columnSize = 'meta' }: TableCoreProps<TData>) => {
   const id = useRdsId('table-', propId);
 
-  const handleToggleRow = (row: Row<unknown>) => () => {
+  const handleToggleRow = (row: Row<TData>) => () => {
     if (row.getCanSelect()) {
       row.toggleSelected();
     }

@@ -78,7 +78,7 @@ export const convertDataToItem = <T>(data: T, t: (value: string) => string): Car
     code: '',
     colorStatus: 'warning',
     color: 'text-warning-500',
-    colorBorder: 'hover:border-b-acc6-500',
+    colorBorder: 'hover:border-b-warning-500',
     icon: StdIconId.Warning,
     title: `${trajectoryName ?? ''} ${secondTrajectory ? '-' : ''} ${secondTrajectory ?? ''}`,
     buttonLabel: isAck ? t('studyDetails.@skipped') : t('studyDetails.@skip'),

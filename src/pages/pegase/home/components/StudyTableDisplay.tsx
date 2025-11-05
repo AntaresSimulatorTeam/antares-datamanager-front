@@ -96,8 +96,8 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
   const sortedHeaders = addSortColumn(headers, handleSort, sortBy, sortedColumn, handleHeaderHover, isHeaderHovered);
 
   return (
-    <div className={'flex w-fit grow-0 flex-col'}>
-      <div className="flex-1">
+    <div className="flex w-fit grow-0 flex-col">
+      <div style={{ maxHeight: '50vh', overflowY: 'auto' }}>
         <StdSimpleTable
           columns={sortedHeaders}
           columnSize="rem"
@@ -117,7 +117,7 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
           }}
         />
       </div>
-      <div className="flex h-8 items-center justify-between bg-gray-200 px-4">
+      <div className="sticky bottom-0 flex h-8 items-center justify-between bg-gray-200 px-4">
         <div className="flex gap-2">
           {selectedRowId !== undefined ? (
             <>

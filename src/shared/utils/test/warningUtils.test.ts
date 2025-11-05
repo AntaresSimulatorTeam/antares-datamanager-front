@@ -123,7 +123,7 @@ describe('convertDataToItem', () => {
       code: '',
       colorStatus: 'warning',
       color: 'text-warning-500',
-      colorBorder: 'hover:border-b-acc6-500',
+      colorBorder: 'hover:border-b-warning-500',
       icon: StdIconId.Warning,
       title: 'areas_BP23_A_ref - links_BP23_A_ref',
       buttonLabel: 'studyDetails.@skip',

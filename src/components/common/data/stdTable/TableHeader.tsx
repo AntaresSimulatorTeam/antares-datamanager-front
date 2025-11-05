@@ -17,11 +17,11 @@ export const TableHeader = <TData,>(props: TableHeaderProps<TData>) => {
     <th
       className={headerClassBuilder(props)}
       style={
-        header.getSize() != null && columnSize === 'rem'
-          ? { width: `${toRem(header.getSize())}` }
+        columnSize === 'rem'
+          ? { width: header.getSize() != null ? `${toRem(header.getSize())}` : '100vw' }
           : header.getSize() != null && columnSize === 'pixels'
             ? { width: header.getSize() }
-            : undefined
+            : { width: header.getSize() ?? '100%' }
       }
     >
       <span>{header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}</span>
