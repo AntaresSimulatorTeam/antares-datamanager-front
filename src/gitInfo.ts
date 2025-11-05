@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "feat/ANT-3935_design_use_rem_instaed_of_px",
+  branch: "fix/ANT-4040_remove_scrollbar_hub_study",
   commit: "db683742",
-  commitTime: "2025-11-06T08:42:52.540Z",
+  commitTime: "2025-11-05T17:39:38.321Z",
 };
