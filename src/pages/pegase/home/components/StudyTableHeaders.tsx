@@ -34,7 +34,7 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
 
   columnHelper.accessor('name', {
     header: t('home.@study_name'),
-    size: 250,
+    size: 300,
     cell: ({ getValue, row }) => {
       const status = row.original.status;
       const textClass = status === StudyStatus.GENERATED ? 'text-primary-600' : 'group-hover:text-green-500';
@@ -44,7 +44,7 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
 
   columnHelper.accessor('project', {
     header: t('home.@project'),
-    size: 200,
+    size: 300,
   }),
 
   columnHelper.accessor('horizon', {
@@ -54,6 +54,7 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
 
   columnHelper.accessor('creationDate', {
     header: t('home.@creation_date'),
+    size: 200,
     cell: ({ getValue }) => formatDateToDDMMYYYY(getValue(), true),
   }),
 
@@ -72,7 +73,7 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
 
   columnHelper.accessor('keywords', {
     header: t('home.@keywords'),
-    size: 300,
+    size: 350,
     cell: ({ getValue, row }) => (
       <div className="flex h-3">
         <RdsTagList id={`pegase-tags-${row.id}`} tags={getValue()} />

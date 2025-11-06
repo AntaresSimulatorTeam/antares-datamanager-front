@@ -1,6 +1,9 @@
 import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
 import { AccessorKeyColumnDefBase, DeepKeys, DeepValue, StringOrTemplateHeader } from '@tanstack/react-table';
 import { HypothesisRowData, TrajectoryAreaData } from '@/shared/types/Trajectory.type.ts';
+import { Dispatch, SetStateAction } from 'react';
+import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
+import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 
 export type Entries<T> = {
   [K in keyof T]: [K, T[K]];
@@ -60,4 +63,19 @@ export type ExpandedState = true | Record<string, boolean>;
 export interface TabProps {
   defaultAreas: { name: string }[];
   areas: TrajectoryAreaData[];
+}
+
+export type TableHeadersProps = {
+  studyState: StudyStatus;
+  progress: number;
+  fileStatus: FileInputStatus;
+  idSelected: string;
+  columnHeader?: string;
+  type?: TRAJECTORY_TYPE;
+};
+
+export interface TableHeadersGetterProps extends TableHeadersProps {
+  t: (key: string) => string;
+  errorInfo: ErrorMessageType;
+  setErrorInfo: Dispatch<SetStateAction<ErrorMessageType>>;
 }

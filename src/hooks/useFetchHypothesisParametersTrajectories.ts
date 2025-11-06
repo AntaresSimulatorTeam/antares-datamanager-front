@@ -47,7 +47,7 @@ export const useFetchHypothesisParametersTrajectories = (
 
   const fetchAreas = useCallback(
     async (id?: number) => {
-      let resultObject: Partial<Record<ThermalParamTrajectoryType, DbTrajectory[]>>;
+      let resultObject: Partial<Record<ThermalParamTrajectoryType, DbTrajectory[]>> | undefined;
       try {
         if (id != null) {
           const types: ThermalParamTrajectoryType[] = [
@@ -60,10 +60,10 @@ export const useFetchHypothesisParametersTrajectories = (
           const specificAreas: DbTrajectory[] =
             resultObject?.[TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER] ?? [];
           const paraModulationTrajectory =
-            resultObject[TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]?.[0] ??
+            resultObject?.[TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]?.[0] ??
             buildEmptyTrajectory('', TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER);
           const paraCommonTrajectory =
-            resultObject[TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER]?.[0] ??
+            resultObject?.[TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER]?.[0] ??
             buildEmptyTrajectory('', TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER);
           const defaultEmptyAreas =
             buildDefaultEmptyTrajectoryList(

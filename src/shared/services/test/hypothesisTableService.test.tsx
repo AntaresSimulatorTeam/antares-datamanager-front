@@ -3,9 +3,11 @@ import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/traj
 import {
   addRow,
   fetchMultipleTrajectoryType,
+  fetchTrajectoriesFromTypes,
   handleFetchTrajectoriesFS,
   handleTrajectoryError,
   handleTrajectorySearch,
+  handleViewTrajectory,
 } from '@/shared/services/hypothesisTableService.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import {
@@ -18,18 +20,29 @@ import {
 } from '@/shared/types';
 import { notifyAlert } from '@/shared/notification/notification.tsx';
 import * as trajectoryService from '@/shared/services/trajectoryService.ts';
-import { getStudyTrajectoriesWithWarnings } from '@/shared/services/trajectoryService.ts';
+import { getStudyTrajectoriesWithWarnings, getTrajectoryDataByTypeAndId } from '@/shared/services/trajectoryService.ts';
 import * as formFormatter from '@/shared/utils/formFormatter';
 import { ThermalOptions } from '@/mocks/data/list/names.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { Dispatch, SetStateAction } from 'react';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
+import { getStudyTrajectories } from '@/shared/services/studyService.ts';
+import { generateTrajectoryViewHeader } from '@/components/header/TrajectoryViewHeader.tsx';
+import { TFunction } from 'i18next';
 
 vi.mock('@/shared/notification/notification');
 
 vi.mock('@/shared/utils/defaultUtils.ts', () => ({
   generateId: vi.fn(() => 'DEMAND-NewHypothesis'),
 }));
+
+vi.mock('@/components/header/TrajectoryViewHeader.tsx', async (importOriginal) => {
+  const actual: Mock = await importOriginal();
+  return {
+    ...actual,
+    generateTrajectoryViewHeader: vi.fn(),
+  };
+});
 
 vi.mock('@/shared/services/trajectoryService', async (importOriginal) => {
   const actual: Mock = await importOriginal();
@@ -38,6 +51,15 @@ vi.mock('@/shared/services/trajectoryService', async (importOriginal) => {
     fetchTrajectoriesFromFS: vi.fn(),
     fetchTrajectoriesFromDB: vi.fn(),
     getStudyTrajectoriesWithWarnings: vi.fn(),
+    getTrajectoryDataByTypeAndId: vi.fn(),
+  };
+});
+
+vi.mock('@/shared/services/studyService', async (importOriginal) => {
+  const actual: Mock = await importOriginal();
+  return {
+    ...actual,
+    getStudyTrajectories: vi.fn(),
   };
 });
 
@@ -559,6 +581,10 @@ describe('addRow', () => {
 describe('fetchMultipleTrajectoryType', () => {
   const mockedGetStudyTrajectoriesWithWarnings = getStudyTrajectoriesWithWarnings as ReturnType<typeof vi.fn>;
 
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('should fetch trajectories for all types and return a mapped object', async () => {
     const studyId = 42;
     const types: ThermalParamTrajectoryType[] = [
@@ -593,5 +619,91 @@ describe('fetchMultipleTrajectoryType', () => {
     });
 
     await expect(fetchMultipleTrajectoryType(id, types)).rejects.toThrow('Failed to fetch');
+  });
+});
+
+describe('fetchTrajectoriesFromTypes', () => {
+  const mockedGetStudyTrajectories = getStudyTrajectories as unknown as ReturnType<typeof vi.fn>;
+
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should fetch trajectories for each type and return a result object', async () => {
+    const id = 42;
+    const types = [TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER, TRAJECTORY_TYPE.LOAD];
+
+    const mockData = [
+      { id: 1, trajectoryName: 'trajectory1' },
+      { id: 2, trajectoryName: 'trajectory2' },
+    ] as DbTrajectory[];
+    mockedGetStudyTrajectories.mockResolvedValue(mockData);
+
+    const result = await fetchTrajectoriesFromTypes(id, types);
+
+    expect(mockedGetStudyTrajectories).toHaveBeenCalledTimes(types.length);
+    expect(mockedGetStudyTrajectories).toHaveBeenCalledWith(id, TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER);
+    expect(mockedGetStudyTrajectories).toHaveBeenCalledWith(id, TRAJECTORY_TYPE.LOAD);
+    expect(result).toEqual({
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]: mockData,
+      [TRAJECTORY_TYPE.LOAD]: mockData,
+    });
+  });
+
+  it('should return undefined if an error occurs', async () => {
+    mockedGetStudyTrajectories.mockRejectedValueOnce(new Error('fail'));
+
+    const result = await fetchTrajectoriesFromTypes(1, [TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]);
+
+    expect(result).toBeUndefined();
+  });
+});
+
+describe('handleViewTrajectory', () => {
+  const mockedGetTrajectoryData = getTrajectoryDataByTypeAndId as unknown as ReturnType<typeof vi.fn>;
+  const mockedGenerateHeader = generateTrajectoryViewHeader as unknown as ReturnType<typeof vi.fn>;
+
+  const mockTrajectory = {
+    id: 1,
+    type: TRAJECTORY_TYPE.AREA,
+  } as DbTrajectory;
+
+  const mockResultsVien = [
+    { id: 'row1', type: TRAJECTORY_TYPE.AREA },
+    { id: 'row2', type: TRAJECTORY_TYPE.AREA },
+  ] as unknown as DbTrajectory[];
+  const mockColumns = [{ Header: 'Col1', accessor: 'col1' }];
+
+  const mockSetTrajectoryData = vi.fn();
+  const mockSetIsViewModalOpen = vi.fn();
+  const mockT = vi.fn((key: string) => key) as unknown as TFunction<'translation', undefined>;
+
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should fetch data and set trajectory view for AREA type', async () => {
+    mockedGetTrajectoryData.mockResolvedValue(mockResultsVien);
+    mockedGenerateHeader.mockReturnValue(mockColumns);
+
+    await handleViewTrajectory(mockTrajectory, mockSetTrajectoryData, mockSetIsViewModalOpen, mockT);
+
+    expect(mockedGetTrajectoryData).toHaveBeenCalledWith(mockTrajectory.type, mockTrajectory.id);
+    expect(mockedGenerateHeader).toHaveBeenCalledWith(expect.anything(), mockT, 350);
+    expect(mockSetTrajectoryData).toHaveBeenCalledWith({
+      trajectory: mockTrajectory,
+      data: mockResultsVien,
+      columns: mockColumns,
+    });
+    expect(mockSetIsViewModalOpen).toHaveBeenCalledWith(true);
+  });
+
+  it('should silently fail on error', async () => {
+    vi.mocked(trajectoryService.getTrajectoryDataByTypeAndId).mockRejectedValueOnce(new Error('fail'));
+
+    await handleViewTrajectory(mockTrajectory, mockSetTrajectoryData, mockSetIsViewModalOpen, mockT);
+
+    expect(mockSetTrajectoryData).not.toHaveBeenCalled();
+    expect(mockSetIsViewModalOpen).not.toHaveBeenCalled();
   });
 });

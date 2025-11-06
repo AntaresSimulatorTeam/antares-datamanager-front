@@ -4,12 +4,15 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { Cell, flexRender, Header, Row, RowData, Table } from '@tanstack/react-table';
-import { clsx } from 'clsx';
+import { Row, RowData, Table } from '@tanstack/react-table';
 import { tableCoreRowClassBuilder } from './tableCoreRowClassBuilder';
-import { useRdsId } from 'rte-design-system-react';
 import { RowStatus, SelectOption } from '@/shared/types';
 import { Fragment } from 'react';
+import { TableHeader } from '@common/data/stdTable/TableHeader.tsx';
+import { TableDataCell } from '@common/data/stdTable/TableDataCell.tsx';
+import { tableStyleBuilder } from '@common/data/stdTable/tableStyleBuilder.ts';
+import { useRdsId } from 'rte-design-system-react';
+import { tableClassBuilder } from '@common/data/stdTable/tableClassBuilder.ts';
 
 declare module '@tanstack/react-table' {
   interface TableMeta<TData extends RowData> {
@@ -17,81 +20,12 @@ declare module '@tanstack/react-table' {
     removeRow?: (value: string, rowId?: string) => void | Promise<void>;
     search?: (value: string, rowId: string) => Promise<SelectOption[] | undefined>;
     importData?: (rowId: string, index?: number) => Promise<void>;
+    viewData?: (rowId: string) => void | Promise<void>;
   }
 }
 
-export type ColumnSizeType = 'pixels' | 'meta';
 export type ColumnResizeMode = 'onChange' | 'onEnd';
-
-type TableHeaderProps<TData> = {
-  table: Table<TData>;
-  header: Header<TData, unknown>;
-  columnSize: ColumnSizeType;
-};
-
-const COMMON_HEADER_CLASSES = 'px-1 py-0.5 text-left font-semibold bg-primary-600 text-gray-w';
-const headerClassBuilder = <TData,>({ table, header, columnSize }: TableHeaderProps<TData>) =>
-  clsx(
-    COMMON_HEADER_CLASSES,
-    columnSize === 'meta' ? (header.column.columnDef.meta?.sizeClassNames ?? '') : `${header.column.columnDef.size}px`,
-    table.options.columnResizeMode ? 'group relative' : '',
-    header.index === 0
-      ? 'rounded-tl-lg'
-      : header.index === table.getHeaderGroups()[0]?.headers.length - 1
-        ? 'rounded-tr-lg'
-        : '',
-  );
-
-const RESIZER_CLASSES =
-  'absolute top-0 h-full w-0.5 cursor-col-resize touch-none select-none bg-gray-900 bg-opacity-50 opacity-0 group-hover:opacity-100';
-
-const headerDivClassBuilder = <TData,>({ table, header }: TableHeaderProps<TData>) =>
-  clsx(
-    RESIZER_CLASSES,
-    table.options.columnResizeDirection === 'ltr' ? 'right-0' : 'left-0',
-    header.column.getIsResizing() ? 'bg-gray-500 opacity-100' : '',
-  );
-
-const headerDivStyleBuilder = <TData,>({ table, header }: TableHeaderProps<TData>) => ({
-  transform:
-    table.options.columnResizeMode === 'onEnd' && header.column.getIsResizing()
-      ? `translateX(${
-          (table.options.columnResizeDirection === 'rtl' ? -1 : 1) *
-          (table.getState().columnSizingInfo.deltaOffset ?? 0)
-        }px)`
-      : '',
-});
-
-const TableHeader = <TData,>(props: TableHeaderProps<TData>) => {
-  const { table, header, columnSize } = props;
-  return (
-    <th
-      className={headerClassBuilder(props)}
-      style={columnSize === 'pixels' || header.getSize() != null ? { width: header.getSize() } : undefined}
-    >
-      <span>{header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}</span>
-      {table.options.columnResizeMode && (
-        <div
-          onDoubleClick={header.column.resetSize}
-          onMouseDown={header.getResizeHandler()}
-          onTouchStart={header.getResizeHandler()}
-          className={headerDivClassBuilder(props)}
-          style={headerDivStyleBuilder(props)}
-        />
-      )}
-    </th>
-  );
-};
-
-type TableDataCellProps<TData> = {
-  cell: Cell<TData, unknown>;
-};
-
-const TableDataCell = <TData,>({ cell }: TableDataCellProps<TData>) => (
-  <td className="text-left">
-    <div className="px-1">{flexRender(cell.column.columnDef.cell, cell.getContext())}</div>
-  </td>
-);
+export type ColumnSizeType = 'pixels' | 'meta' | 'rem';
 
 export type TableCoreProps<TData> = {
   id?: string;
@@ -102,21 +36,10 @@ export type TableCoreProps<TData> = {
   table: Table<TData>;
 };
 
-const ROW_CLASSES = '[&_tr]:border-b [&_tr]:border-b-gray-400 [&_tr]:text-body-s';
-const tableClassBuilder = <TData,>(table: Table<TData>) =>
-  clsx(table.options.columnResizeMode ? 'w-fit' : 'w-full', ROW_CLASSES);
-
-const tableStyleBuilder = <TData,>(table: Table<TData>, columnSize: ColumnSizeType) =>
-  columnSize === 'pixels'
-    ? {
-        width: table.getCenterTotalSize(),
-      }
-    : undefined;
-
 const TableCore = <TData,>({ table, id: propId, striped, trClassName, columnSize = 'meta' }: TableCoreProps<TData>) => {
   const id = useRdsId('table-', propId);
 
-  const handleToggleRow = (row: Row<unknown>) => () => {
+  const handleToggleRow = (row: Row<TData>) => () => {
     if (row.getCanSelect()) {
       row.toggleSelected();
     }

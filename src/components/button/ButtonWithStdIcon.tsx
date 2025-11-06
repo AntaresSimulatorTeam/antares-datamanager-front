@@ -32,27 +32,27 @@ export const ButtonWithStdIcon = ({
   const getColors = (mainColor: ButtonColor) => {
     switch (mainColor) {
       case 'secondary':
-        return 'acc1-600';
+        return 'primary-600';
       case 'danger':
         return 'text-error-700 border-error-700 hover:border-error-700 hover:bg-error-700 active:border-error-900 active:bg-error-900';
       case 'warning':
         return 'text-warning-500 border-warning-500 hover:border-warning-700 hover:bg-warning-700 active:border-warning-900 active:bg-warning-900';
       case 'primary':
       default:
-        return 'border-acc1-600 bg-acc1-600';
+        return 'border-primary-600 bg-primary-600';
     }
   };
   const getIconColor = (mainColor: ButtonColor) => {
     switch (mainColor) {
       case 'secondary':
-        return 'text-acc1-600';
+        return 'text-primary-600';
       case 'danger':
         return `${variant === 'outlined' ? 'text-error-700 hover:text-gray-w active:text-gray-w' : 'text-gray-w hover:text-error-700 active:text-error-700'}`;
       case 'warning':
         return `${variant === 'outlined' ? 'text-warning-500 hover:text-gray-w active:text-gray-w' : 'text-gray-w hover:text-warning-500 active:text-warning-500'}`;
       case 'primary':
       default:
-        return `${variant === 'outlined' ? 'text-acc1-600 hover:text-gray-w active:text-gray-w' : 'text-gray-w'}`;
+        return `${variant === 'outlined' ? 'text-primary-600 hover:text-gray-w active:text-gray-w' : 'text-gray-w'}`;
     }
   };
 

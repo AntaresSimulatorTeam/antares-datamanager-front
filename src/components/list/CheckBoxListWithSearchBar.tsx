@@ -26,7 +26,7 @@ export const CheckBoxListWithSearchBar = ({
   const { t } = useTranslation();
 
   return (
-    <div className="flex max-h-[45vh] w-28 flex-none flex-col self-start rounded border border-gray-400 p-2">
+    <div className="flex max-h-[45vh] flex-none shrink flex-col self-start rounded border border-gray-400 p-2">
       <div className="border-b border-gray-400 pb-2">
         <SearchBar
           onSearch={(value?: string) => void handleSearch?.(value)}

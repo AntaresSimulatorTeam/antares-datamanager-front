@@ -72,7 +72,7 @@ describe('getStatus', () => {
 describe('getBgColor', () => {
   it("should return the right color for 'loading' status", () => {
     const color = getBgColor('loading');
-    expect(color).toStrictEqual('bg-acc1-600');
+    expect(color).toStrictEqual('bg-primary-600');
   });
   it("should return the right color for 'success' status", () => {
     const color = getBgColor('success');

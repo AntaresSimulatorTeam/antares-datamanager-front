@@ -7,9 +7,9 @@ try {
   const commitTime = new Date().toISOString();
 
   const content = `export const GIT_INFO = {
-  branch: "${branch}",
+  branch: "${branch ?? ''}",
   commit: "${commit}",
-  commitTime: "${commitTime}"
+  commitTime: "${commitTime}",
 };`;
 
   writeFileSync('src/gitInfo.ts', content);

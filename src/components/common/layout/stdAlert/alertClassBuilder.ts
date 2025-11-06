@@ -19,7 +19,7 @@ export const STATUS_COLOR_CLASSES = {
   info: 'text-info-800',
 };
 export const STATUS_BG_COLOR_CLASSES = {
-  success: 'bg-acc1-600 text-gray-w',
+  success: 'bg-primary-600 text-gray-w',
   error: 'bg-error-800 text-gray-w',
   warning: 'bg-acc6-600 text-gray-w',
   info: 'bg-acc3-800 text-gray-w',

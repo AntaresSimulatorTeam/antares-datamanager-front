@@ -16,12 +16,11 @@ export const AVATAR_SIZE_CLASSES = {
 };
 
 export const COLOR_CLASSES = {
-  green: 'bg-acc1-300',
-  purple: 'bg-acc2-300',
-  blue: 'bg-acc3-300',
-  pink: 'bg-acc4-300',
-  gray: 'bg-acc5-300',
-  orange: 'bg-acc6-300',
+  green: 'bg-primary-300',
+  blue: 'bg-info-300',
+  pink: 'bg-error-300',
+  gray: 'bg-gray-300',
+  orange: 'bg-warning-300',
 };
 
 export const TEXT_CLASSES = {

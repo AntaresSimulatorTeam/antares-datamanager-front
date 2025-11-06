@@ -17,6 +17,9 @@ import {
   StudyActionType,
   StudyDTO,
   ThermalParamTrajectoryType,
+  TrajectoryAreaDataScheme,
+  TrajectoryLinkDataScheme,
+  TrajectoryViewData,
 } from '@/shared/types';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
@@ -24,9 +27,12 @@ import {
   fetchTrajectoriesFromDB,
   fetchTrajectoriesFromFS,
   getStudyTrajectoriesWithWarnings,
+  getTrajectoryDataByTypeAndId,
 } from '@/shared/services/trajectoryService.ts';
 import { convertToFSSelectionOptionType, convertToSelectionOptionType } from '@/shared/utils/formFormatter.ts';
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
+import { generateTrajectoryViewHeader } from '@/components/header/TrajectoryViewHeader.tsx';
+import { TFunction } from 'i18next';
 
 export const handleTrajectoryError = (
   type: TRAJECTORY_TYPE,
@@ -53,6 +59,20 @@ export const handleTrajectoryError = (
   });
 };
 
+/**
+ * Handles the process of fetching trajectories from a data source and updating related state.
+ *
+ * @async
+ * @function handleFetchTrajectoriesFS
+ * @param {TRAJECTORY_TYPE} type - The type of trajectory to fetch. Determines the context or criteria for the query.
+ * @param {string} rowId - The unique identifier for the row being processed or selected.
+ * @param {Dispatch<SetStateAction<SelectOption[] | undefined>>} setOptionsFS - State dispatcher for updating the options available after fetching trajectories.
+ * @param {Dispatch<SetStateAction<string>>} setRowIdSelected - State dispatcher for updating the selected row ID after processing.
+ * @param {Function} toggleModal - A function to toggle the visibility of a modal, typically used to display or hide UI elements during or after the process.
+ * @param {string} [hypothesis] - An optional parameter representing a hypothesis that determines additional query parameters.
+ * @returns {Promise<void>} Resolves to no value upon successful completion of the operation.
+ * @throws Will silently handle errors during data fetching or processing without throwing or exposing exceptions.
+ */
 export const handleFetchTrajectoriesFS = async (
   type: TRAJECTORY_TYPE,
   rowId: string,
@@ -72,6 +92,20 @@ export const handleFetchTrajectoriesFS = async (
   }
 };
 
+/**
+ * Asynchronously handles the search for trajectories based on the provided parameters.
+ *
+ * @param {TRAJECTORY_TYPE} type - The type of trajectory to be searched.
+ * @param {string} value - The value used as a search filter.
+ * @param {string} area - The area or region to scope the search.
+ * @param {Dispatch<SetStateAction<DbTrajectory[]>>} setDbTrajectories - A state updater function
+ * used to set the retrieved database trajectories.
+ * @param {StudyDTO} study - An object containing study-related details, including the horizon property.
+ * @param {string} [technology] - An optional parameter specifying the technology associated with the trajectory.
+ *
+ * @returns {Promise<SelectOption[] | undefined>} A Promise resolving to an array of selection options
+ * converted from the search results, or undefined in case of an error.
+ */
 export const handleTrajectorySearch = async (
   type: TRAJECTORY_TYPE,
   value: string,
@@ -161,12 +195,54 @@ export const fetchMultipleTrajectoryType = async (
  * @param {TRAJECTORY_TYPE[]} types - An array of trajectory types to fetch trajectories for.
  * @returns {Promise<Partial<Record<TRAJECTORY_TYPE, DbTrajectory[]>>>} A promise resolving to an object that maps trajectory types to their respective array of database trajectories.
  */
-export const fetchTrajectoriesFromTypes = async (id: number, types: TRAJECTORY_TYPE[]) => {
-  const resultObject: Partial<Record<TRAJECTORY_TYPE, DbTrajectory[]>> = {};
-  await Promise.all(
-    types.map(async (thermalType: TRAJECTORY_TYPE) => {
-      resultObject[thermalType] = await getStudyTrajectories(id, thermalType);
-    }),
-  );
-  return resultObject;
+export const fetchTrajectoriesFromTypes = async (
+  id: number,
+  types: TRAJECTORY_TYPE[],
+): Promise<Partial<Record<TRAJECTORY_TYPE, DbTrajectory[]>> | undefined> => {
+  try {
+    const resultObject: Partial<Record<TRAJECTORY_TYPE, DbTrajectory[]>> = {};
+    await Promise.all(
+      types.map(async (thermalType: TRAJECTORY_TYPE) => {
+        resultObject[thermalType] = await getStudyTrajectories(id, thermalType);
+      }),
+    );
+    return resultObject;
+  } catch {
+    //Silent handler
+  }
+};
+
+/**
+ * Handles fetching and preparing trajectory data for viewing.
+ *
+ * @async
+ * @function handleViewTrajectory
+ * @param {DbTrajectory} trajectory - The trajectory object containing type and ID information.
+ * @param {Dispatch<SetStateAction<TrajectoryViewData | undefined>>} setTrajectoryData - Function to update the state with trajectory data and related information.
+ * @param {Dispatch<SetStateAction<boolean>>} setIsViewModalOpen - Function to update the state controlling the visibility of the view modal.
+ * @param {TFunction<"translation", undefined>} t - Translation function for localizing column headers.
+ * @returns {Promise<void>} Resolves when the trajectory data has been successfully fetched and state updated, or does nothing on error.
+ * @description This function retrieves trajectory data by its type and ID and prepares it for display by generating localized column headers. It updates the necessary state to display the data in a view modal. Errors are silently ignored.
+ */
+export const handleViewTrajectory = async (
+  trajectory: DbTrajectory,
+  setTrajectoryData: Dispatch<SetStateAction<TrajectoryViewData | undefined>>,
+  setIsViewModalOpen: Dispatch<SetStateAction<boolean>>,
+  t: TFunction<'translation', undefined>,
+): Promise<void> => {
+  try {
+    const results = await getTrajectoryDataByTypeAndId(trajectory.type, trajectory.id);
+    const columns =
+      trajectory.type === TRAJECTORY_TYPE.AREA
+        ? generateTrajectoryViewHeader(TrajectoryAreaDataScheme, t, 350)
+        : generateTrajectoryViewHeader(TrajectoryLinkDataScheme, t, 128);
+    setTrajectoryData({
+      trajectory,
+      data: results,
+      columns,
+    });
+    setIsViewModalOpen(true);
+  } catch {
+    //Silent error
+  }
 };

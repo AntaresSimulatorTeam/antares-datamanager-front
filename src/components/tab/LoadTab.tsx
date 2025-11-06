@@ -101,7 +101,7 @@ const LoadTab = ({ defaultAreas, areas }: TabProps) => {
   );
 
   return (
-    <div className="flex min-h-0 w-full gap-6">
+    <div className="flex min-h-0 w-full gap-6 xl:gap-7 2xl:gap-8">
       <CheckBoxListWithSearchBar
         checkedValues={checkedValues}
         options={areasOptions}

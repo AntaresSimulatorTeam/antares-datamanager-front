@@ -15,3 +15,5 @@ export const hasArrayChanged = (original: string[], updated: string[]): boolean 
   }
   return original.some((item, index) => item !== updated[index]);
 };
+
+export const toRem = (px: number) => `${px / 16}rem`;

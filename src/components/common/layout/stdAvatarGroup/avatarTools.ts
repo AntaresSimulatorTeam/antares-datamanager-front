@@ -6,7 +6,7 @@
 
 import { UserInfo } from '@/shared/types/common/User.type';
 
-export const AVATAR_COLORS = ['green', 'purple', 'blue', 'pink', 'gray', 'orange'] as const;
+export const AVATAR_COLORS = ['green', 'blue', 'pink', 'gray', 'orange'] as const;
 const USER_SEPARATOR = ' - ';
 const MAX_USER_CHIP = 3;
 

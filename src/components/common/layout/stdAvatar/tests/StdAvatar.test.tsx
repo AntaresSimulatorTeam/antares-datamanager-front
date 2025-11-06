@@ -10,7 +10,7 @@ import StdAvatar from '../StdAvatar';
 
 const TEST_USER = 'CT';
 const TEST_SIZE = 'm';
-const TEST_COLOR = 'purple';
+const TEST_COLOR = 'blue';
 const TEST_FULLNAME = 'Thomas Candille';
 
 describe('StdAvatar', () => {

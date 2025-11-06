@@ -22,6 +22,7 @@ export type StdSimpleTableProps<TData> = {
   getSubRows?: (originalRow: TData) => TData[] | undefined;
   updateData?: (rowId: string, value: unknown, status: RowStatus) => void;
   removeRow?: (value: string, rowId?: string) => void | Promise<void>;
+  viewData?: (rowId: string) => void | Promise<void>;
   search?: (value: string, rowId: string) => Promise<SelectOption[] | undefined>;
   importData?: (rowId: string, index?: number) => Promise<void>;
 } & Omit<TableCoreProps<TData>, 'table'> &
@@ -46,6 +47,7 @@ const StdSimpleTable = <TData,>({
   updateData,
   removeRow,
   importData,
+  viewData,
   search,
   ...tableOptions
 }: StdSimpleTableProps<TData>) => {
@@ -59,7 +61,7 @@ const StdSimpleTable = <TData,>({
     enableRowSelection,
     enableMultiRowSelection,
     enableReadOnly,
-    meta: { removeRow, updateData, importData, search },
+    meta: { removeRow, updateData, importData, search, viewData },
     ...tableOptions,
   });
 

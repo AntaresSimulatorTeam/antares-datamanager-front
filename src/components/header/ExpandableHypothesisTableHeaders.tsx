@@ -5,15 +5,13 @@
  */
 
 import { createColumnHelper, TableOptions } from '@tanstack/react-table';
-import { FileInputStatus, HypothesisRowData, SelectOption } from '@/shared/types';
+import { HypothesisRowData, SelectOption, TableHeadersGetterProps } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { Dispatch, SetStateAction } from 'react';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { CellWithStatus } from '@common/data/CellWithStatus.tsx';
 import { LabelWithButtonPreview } from '@common/data/LabelWithButtonPreview.tsx';
 import { LabelWithDeleteButton } from '@common/data/LabelWithDeleteButton.tsx';
 import { SelectInputWithButton } from '@common/data/SelectInputWithButton.tsx';
-import { ErrorMessageType } from '@/shared/types/Generic.type.ts';
 import { ProgressBar } from '@/components/forms/ProgressBar.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
@@ -23,20 +21,20 @@ import { getAlignment, hasLabelDefault } from '@/shared/utils/hypothesisTableUti
 import StdButton from '@common/base/stdButton/StdButton.tsx';
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
-const getExpandableHypothesisTableHeaders = (
-  t: (value: string) => string,
-  error: ErrorMessageType,
-  setErrorInfo: Dispatch<SetStateAction<ErrorMessageType>>,
-  studyStatus: StudyStatus | undefined,
-  progress: number,
-  fileStatus: FileInputStatus,
-  idSelected: string,
-  columnHeader?: string,
-  type?: TRAJECTORY_TYPE,
-): TableOptions<HypothesisRowData>['columns'] => [
+const getExpandableHypothesisTableHeaders = ({
+  t,
+  errorInfo,
+  setErrorInfo,
+  studyState,
+  progress,
+  fileStatus,
+  idSelected,
+  columnHeader,
+  type,
+}: TableHeadersGetterProps): TableOptions<HypothesisRowData>['columns'] => [
   columnHelper.accessor('hypothesis', {
-    header: columnHeader || t('studyDetails.@area'),
-    size: 130,
+    header: columnHeader || t('studyDetails.@areas'),
+    size: type === TRAJECTORY_TYPE.STS ? 200 : 233,
     cell: ({ getValue, row }) => {
       const { status, isDefault, hypothesis } = row.original;
       const childrenArray: string[] = getChildrenList(row);
@@ -78,7 +76,7 @@ const getExpandableHypothesisTableHeaders = (
   }),
   columnHelper.accessor('trajectory', {
     header: t('studyDetails.@trajectory'),
-    size: 380,
+    size: type === TRAJECTORY_TYPE.STS ? 520 : 623,
     cell: ({ row, table: { options } }) => {
       const { trajectory, status, hypothesis } = row.original;
       if (hypothesis === t('thermal.@specific') || (type === TRAJECTORY_TYPE.STS && row.depth === 0)) return null;
@@ -86,7 +84,7 @@ const getExpandableHypothesisTableHeaders = (
         <div className="flex w-full items-center gap-2">
           <LabelWithDeleteButton
             label={trajectory.trajectoryName}
-            isDeletable={studyStatus !== StudyStatus.GENERATED}
+            isDeletable={studyState !== StudyStatus.GENERATED}
             onClick={() => {
               setErrorInfo({ index: row.index, message: '' });
               void options?.meta?.updateData?.(
@@ -111,7 +109,9 @@ const getExpandableHypothesisTableHeaders = (
             }}
             isDisabled={row.getReadOnly()}
           />
-          {error.message && row.index === error.index && <div className="text-error-700">{error.message}</div>}
+          {errorInfo.message && row.index === errorInfo.index && (
+            <div className="text-error-700">{errorInfo.message}</div>
+          )}
         </div>
       );
     },
@@ -120,6 +120,7 @@ const getExpandableHypothesisTableHeaders = (
     ? [
         columnHelper.accessor('timeSeries', {
           header: t('home.@time_series'),
+          size: 160,
           cell: ({ row }) => {
             if (row.depth === 0) return null;
             return (
@@ -140,6 +141,7 @@ const getExpandableHypothesisTableHeaders = (
 
   columnHelper.accessor('status', {
     header: t('home.@status'),
+    size: type === TRAJECTORY_TYPE.STS ? 200 : 233,
     cell: ({ row, table: { options } }) => {
       const { status, isDefault, hypothesis, isDeletable } = row.original;
       if (hypothesis === t('thermal.@specific') || (type === TRAJECTORY_TYPE.STS && row.depth === 0)) return null;
@@ -150,7 +152,7 @@ const getExpandableHypothesisTableHeaders = (
       ) : (
         <CellWithStatus
           status={status}
-          isDeletable={!isDefault && studyStatus !== StudyStatus.GENERATED && (isDeletable ?? false)}
+          isDeletable={!isDefault && studyState !== StudyStatus.GENERATED && (isDeletable ?? false)}
           onClick={() => {
             void options?.meta?.removeRow?.(hypothesis, row.id);
           }}
