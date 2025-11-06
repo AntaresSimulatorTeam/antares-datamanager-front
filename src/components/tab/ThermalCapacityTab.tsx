@@ -80,12 +80,12 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: TabProps) => {
   }, [areas, areasTrajectoryOptions, defaultAreas, dropDownListOptions, hypothesisTrajectories, readOnlyRow]);
 
   useEffect(() => {
-    if (studyState.studyStatus === StudyStatus.GENERATED || study?.status === StudyStatus.GENERATED) {
+    if (isStudyGenerated) {
       setIsStudyGenerated(true);
       const rows = generateReadOnlyIndexMap(data);
       setReadOnly(rows);
     }
-  }, [studyState.studyStatus, study?.status, data]);
+  }, [isStudyGenerated]);
 
   const handleSelectionChange = useCallback(
     async (value: string, isChecked?: boolean) => {
