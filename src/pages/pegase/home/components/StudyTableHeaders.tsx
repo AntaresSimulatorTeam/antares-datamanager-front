@@ -83,7 +83,7 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
 
   columnHelper.accessor('status', {
     header: t('home.@status'),
-    size: 200,
+    size: 230,
   }),
 ];
 

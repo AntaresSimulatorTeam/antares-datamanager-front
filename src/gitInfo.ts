@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "feat/ANT-3935_design_use_rem_instaed_of_px",
-  commit: "db683742",
-  commitTime: "2025-11-06T08:42:52.540Z",
+  branch: "fix/ANT-4040_checkboxlist_relative_to_remove_useless_scroll_bar",
+  commit: "7c69fb12",
+  commitTime: "2025-11-06T13:13:43.348Z",
 };

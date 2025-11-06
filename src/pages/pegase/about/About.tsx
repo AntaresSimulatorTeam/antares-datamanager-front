@@ -31,7 +31,13 @@ export const About = () => {
       <StdHeading title={t('about.@title')} />
       {info && !isLoadingInfo ? (
         <div className="w-3/4">
-          <StdSimpleTable id="app-data" data={info} columns={AboutHeaders(t)} enableColumnResizing={false} />
+          <StdSimpleTable
+            id="app-data"
+            columnSize="rem"
+            data={info}
+            columns={AboutHeaders(t)}
+            enableColumnResizing={false}
+          />
         </div>
       ) : (
         <p className="text-gray-500">{t('components.spinner.@label')}</p>
