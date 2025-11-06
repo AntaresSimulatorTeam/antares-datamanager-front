@@ -33,7 +33,7 @@ export const CheckBoxListWithSearchBar = ({
           placeholder={t('studyDetails.@search_area')}
         />
       </div>
-      <div className="min-h-0 overflow-y-auto">
+      <div className="relative min-h-0 overflow-y-auto">
         <StdCheckboxGroupWrapper
           label={''}
           name={''}
