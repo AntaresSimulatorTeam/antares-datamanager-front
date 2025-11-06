@@ -23,7 +23,7 @@ interface PegaseHypothesisTableProps extends TableHeadersProps {
   isReadOnlyEnable?: boolean;
   removeRow?: (value: string, rowId?: string) => void | Promise<void>;
   updateData?: (rowId: string, value: unknown, status: RowStatus) => void;
-  handleViewData?: (rowId: string) => void | Promise<void>;
+  handleViewData?: (rowId: string) => void | Promise<void> | undefined;
 }
 
 export const PegaseHypothesisTable = ({
@@ -85,7 +85,7 @@ export const PegaseHypothesisTable = ({
         importData={async (rowId: string) => await onHandleImport(rowId)}
         removeRow={(value: string, rowId?: string) => void removeRow?.(value, rowId)}
         updateData={(rowId: string, value: unknown, status: RowStatus) => void updateData?.(rowId, value, status)}
-        viewData={(rowId: string) => void handleViewData?.(rowId)}
+        viewData={handleViewData ? (rowId: string) => void handleViewData?.(rowId) : undefined}
       />
     </div>
   );
