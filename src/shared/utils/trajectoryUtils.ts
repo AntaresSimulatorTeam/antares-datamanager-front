@@ -7,6 +7,7 @@ import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { generateId } from '@/shared/utils/defaultUtils.ts';
 import { Row } from '@tanstack/react-table';
 import { Technologies, ThermalOptions } from '@/mocks/data/list/names.ts';
+import { TFunction } from 'i18next';
 
 /**
  * Get trajectory status from row status
@@ -564,17 +565,40 @@ export const setNestedData = (
 export const getChildrenList = (row: Row<HypothesisRowData>): string[] =>
   row.depth === 0
     ? (row.originalSubRows || []).reduce((acc: string[], current: HypothesisRowData) => {
-        if (current?.trajectory?.technology) {
+        if (current.status === TRAJECTORY_SELECTION_STATUS.OK && current?.trajectory?.technology) {
           acc.push(current.trajectory.technology);
           return acc;
-        } else if (current?.trajectory?.area) {
-          acc.push(current?.trajectory?.area === OTHER_AREAS ? OTHER_AREAS_LABEL : current?.trajectory?.area);
+        } else if (current.status === TRAJECTORY_SELECTION_STATUS.OK && current?.trajectory?.area) {
+          acc.push(current?.trajectory?.area);
           return acc;
         } else {
           return acc;
         }
       }, [])
     : [];
+
+export const getChildrenListWithArea = (
+  row: Row<HypothesisRowData>,
+  t: TFunction<'translation', undefined>,
+  type?: TRAJECTORY_TYPE,
+): { message: string; messageNb: number } => {
+  if (type === TRAJECTORY_TYPE.THERMAL_CAPACITY || type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
+    let prefix: string = '';
+    const childrenArray: string[] = getChildrenList(row);
+    if (type === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
+      prefix = t('thermal.@installedPowerInformation');
+    }
+    if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
+      prefix = t('thermal.@specificInformation');
+    }
+    return {
+      message: `${prefix}: ${childrenArray.join(', ')}`,
+      messageNb: childrenArray.length,
+    };
+  } else {
+    return { message: '', messageNb: 0 };
+  }
+};
 
 /**
  * Determines the trajectory type based on the provided index value.

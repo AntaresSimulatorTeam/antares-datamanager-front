@@ -4,6 +4,7 @@ import { HypothesisRowData, TrajectoryAreaData } from '@/shared/types/Trajectory
 import { Dispatch, SetStateAction } from 'react';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { TFunction } from 'i18next';
 
 export type Entries<T> = {
   [K in keyof T]: [K, T[K]];
@@ -75,7 +76,7 @@ export type TableHeadersProps = {
 };
 
 export interface TableHeadersGetterProps extends TableHeadersProps {
-  t: (key: string) => string;
+  t: TFunction<'translation', undefined>;
   errorInfo: ErrorMessageType;
   setErrorInfo: Dispatch<SetStateAction<ErrorMessageType>>;
 }
