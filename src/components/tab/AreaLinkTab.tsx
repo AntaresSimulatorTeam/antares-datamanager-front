@@ -81,12 +81,12 @@ export const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
   }, [hypothesisTrajectories, readOnlyRow, setErrorMessage]);
 
   useEffect(() => {
-    if (studyState.studyStatus === StudyStatus.GENERATED || study?.status === StudyStatus.GENERATED) {
+    if (isStudyGenerated) {
       setIsStudyGenerated(true);
       const rows = getReadOnlyForGeneratedStudy(data);
       setReadOnly(rows);
     }
-  }, [studyState.studyStatus, study?.status]);
+  }, [isStudyGenerated]);
 
   const handleTrajectoryError = async (
     rowIndex: number,

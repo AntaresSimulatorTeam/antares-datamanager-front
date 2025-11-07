@@ -67,23 +67,15 @@ const LoadTab = ({ defaultAreas, areas }: TabProps) => {
       setReadOnly(readOnlyRow);
     };
     setHypothesis();
-  }, [
-    hypothesisTrajectories,
-    areas,
-    defaultAreas,
-    isStudyGenerated,
-    areasTrajectoryOptions,
-    dropDownListOptions,
-    readOnlyRow,
-  ]);
+  }, [hypothesisTrajectories, areas, defaultAreas, areasTrajectoryOptions, dropDownListOptions, readOnlyRow]);
 
   useEffect(() => {
-    if (studyState.studyStatus === StudyStatus.GENERATED || study?.status === StudyStatus.GENERATED) {
+    if (isStudyGenerated) {
       setIsStudyGenerated(true);
       const rows = getReadOnlyForGeneratedStudy(data);
       setReadOnly(rows);
     }
-  }, [studyState.studyStatus, study?.status, data]);
+  }, [isStudyGenerated]);
 
   const handleSelectionChange = useCallback(
     async (value: string, isChecked?: boolean): Promise<void> => {

@@ -103,12 +103,12 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
   }, [detachTrajectory, technicalData]);
 
   useEffect(() => {
-    if (studyState.studyStatus === StudyStatus.GENERATED || study?.status === StudyStatus.GENERATED) {
+    if (isStudyGenerated) {
       setIsStudyGenerated(true);
       const rows = generateReadOnlyIndexMap(technicalData);
       setReadOnly(rows);
     }
-  }, [studyState.studyStatus, study?.status]);
+  }, [isStudyGenerated]);
 
   const handleSelectionChange = useCallback(
     async (value: string, isChecked: boolean) => {
