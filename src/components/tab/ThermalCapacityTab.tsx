@@ -122,6 +122,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: TabProps) => {
         readOnly={readOnly}
         progress={progress}
         idSelected={rowIdSelected}
+        type={TRAJECTORY_TYPE.THERMAL_CAPACITY}
         handleSearch={async (value: string, rowId: string) => {
           const indexArray = rowId.split('.').map(Number);
           const area =

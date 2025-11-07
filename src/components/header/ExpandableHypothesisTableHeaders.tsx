@@ -16,9 +16,9 @@ import { ProgressBar } from '@/components/forms/ProgressBar.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 import { RdsTextTooltip } from 'rte-design-system-react';
-import { getChildrenList } from '@/shared/utils/trajectoryUtils.ts';
 import { getAlignment, hasLabelDefault } from '@/shared/utils/hypothesisTableUtils.ts';
 import StdButton from '@common/base/stdButton/StdButton.tsx';
+import { getChildrenList } from '@/shared/utils/trajectoryUtils.ts';
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
 const getExpandableHypothesisTableHeaders = ({
@@ -37,7 +37,10 @@ const getExpandableHypothesisTableHeaders = ({
     size: type === TRAJECTORY_TYPE.STS ? 200 : 233,
     cell: ({ getValue, row }) => {
       const { status, isDefault, hypothesis } = row.original;
-      const childrenArray: string[] = getChildrenList(row);
+      const childrenArray: string[] =
+        type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER || type === TRAJECTORY_TYPE.THERMAL_CAPACITY
+          ? getChildrenList(row)
+          : [];
 
       return (
         <div className="flex gap-1 py-1">
@@ -61,11 +64,11 @@ const getExpandableHypothesisTableHeaders = ({
             }
           />
           {row.getCanExpand() && childrenArray.length > 0 && (
-            <RdsTextTooltip text={childrenArray.toString()} offset={5} placement="right">
-              <div className={'text-gray-600'}>{` | +${childrenArray.length}`}</div>
+            <RdsTextTooltip text={childrenArray.join(', ')} offset={5} placement="right">
+              <div className="text-gray-600">{` | +${childrenArray.length}`}</div>
             </RdsTextTooltip>
           )}
-          {row.index === 1 && hypothesis === t('thermal.@paramModulation') && (
+          {row.depth === 0 && row.index === 1 && type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER && (
             <RdsTextTooltip text={t('thermal.@paramModulationMessage')} offset={5} placement="right">
               <StdIcon name={StdIconId.Info} />
             </RdsTextTooltip>

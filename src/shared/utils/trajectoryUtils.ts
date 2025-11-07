@@ -564,8 +564,11 @@ export const setNestedData = (
 export const getChildrenList = (row: Row<HypothesisRowData>): string[] =>
   row.depth === 0
     ? (row.originalSubRows || []).reduce((acc: string[], current: HypothesisRowData) => {
-        if (!!current?.trajectory?.technology?.length && current?.trajectory?.technology?.length > 0) {
+        if (current?.trajectory?.technology) {
           acc.push(current.trajectory.technology);
+          return acc;
+        } else if (current?.trajectory?.area) {
+          acc.push(current?.trajectory?.area === OTHER_AREAS ? OTHER_AREAS_LABEL : current?.trajectory?.area);
           return acc;
         } else {
           return acc;

@@ -228,6 +228,7 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
               void removeRow(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, value, 0, technicalData);
             }
           }}
+          type={TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER}
         />
         <div className="flex h-fit w-full">
           <PegaseHypothesisTable
