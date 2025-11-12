@@ -629,7 +629,7 @@ export const getTrajectoryTypeByIndex = (index: number): TRAJECTORY_TYPE => {
  * @returns {boolean} Returns true if the type matches any of the defined
  * thermal technical parameter categories; otherwise, returns false.
  */
-export const iSTechnicalParametersType = (type: TRAJECTORY_TYPE): boolean =>
+export const isTechnicalParametersType = (type: TRAJECTORY_TYPE): boolean =>
   type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER ||
   type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER ||
   type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER;
