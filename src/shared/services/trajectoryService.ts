@@ -13,9 +13,11 @@ import {
   TRAJECTORY_FILE_SYSTEM_ENDPOINT,
   TRAJECTORY_LINK_TO_STUDY_ENDPOINT,
   TRAJECTORY_THERMAL_COMMON_PARAMETER_IMPORT,
+  TRAJECTORY_THERMAL_COSTS_PARAMETER_IMPORT,
+  TRAJECTORY_THERMAL_ECONOMIC_PARAMETER_IMPORT,
   TRAJECTORY_THERMAL_INSTALLED_POWER_IMPORT,
-  TRAJECTORY_THERMAL_SPECIFIC_PARAMETER_IMPORT,
   TRAJECTORY_THERMAL_MODULATION_PARAMETER_IMPORT,
+  TRAJECTORY_THERMAL_SPECIFIC_PARAMETER_IMPORT,
   TRAJECTORY_UNLINK_ALL_TO_STUDY_ENDPOINT,
   TRAJECTORY_UNLINK_MULTIPLE_TO_STUDY_ENDPOINT,
   TRAJECTORY_UNLINK_TO_STUDY_ENDPOINT,
@@ -130,9 +132,12 @@ export const uploadTrajectory = async (
   } else if (trajectoryType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
     urlApi = `${TRAJECTORY_THERMAL_SPECIFIC_PARAMETER_IMPORT}?area=${subArea ?? ''}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   } else if (trajectoryType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER) {
-  urlApi = `${TRAJECTORY_THERMAL_MODULATION_PARAMETER_IMPORT}?area=${subArea ?? ''}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
-  }
-    else {
+    urlApi = `${TRAJECTORY_THERMAL_MODULATION_PARAMETER_IMPORT}?area=${subArea ?? ''}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
+  } else if (trajectoryType === TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER) {
+    urlApi = `${TRAJECTORY_THERMAL_COSTS_PARAMETER_IMPORT}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
+  } else if (trajectoryType === TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER) {
+    urlApi = `${TRAJECTORY_THERMAL_ECONOMIC_PARAMETER_IMPORT}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
+  } else {
     urlApi = `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   }
 

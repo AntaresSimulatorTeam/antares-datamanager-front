@@ -22,7 +22,7 @@ import {
   generateReadOnlyIndexMap,
   getAreaTrajectoryName,
   getTrajectoryTypeByIndex,
-  iSTechnicalParametersType,
+  isTechnicalParametersType,
   shouldDeleteParamModulation,
 } from '@/shared/utils/trajectoryUtils.ts';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
@@ -36,6 +36,7 @@ import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow
 import { shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
 import { useFetchHypothesisParametersTrajectories } from '@/hooks/useFetchHypothesisParametersTrajectories.ts';
+import { useFetchEconomicHypothesisTrajectories } from '@/hooks/useFetchEconomicHypothesisTrajectories.ts';
 
 export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
   const { t } = useTranslation();
@@ -45,25 +46,10 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
   const dispatch = useStudyDispatch();
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
-  const data: HypothesisRowData[] = [
-    {
-      hypothesis: t('thermal.@costs'),
-      trajectory: null,
-      status: TRAJECTORY_SELECTION_STATUS.MISSING,
-      isDefault: false,
-      isDeletable: false,
-    },
-    {
-      hypothesis: t('thermal.@economics'),
-      trajectory: null,
-      status: TRAJECTORY_SELECTION_STATUS.MISSING,
-      isDefault: false,
-      isDeletable: false,
-    },
-  ];
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
   const [technicalData, setTechnicalData] = useState<HypothesisRowData[]>([]);
+  const [data, setData] = useState<HypothesisRowData[]>([]);
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
   const [rowIdSelected, setRowIdSelected] = useState<string>('0');
   const [rowToDelete, setRowToDelete] = useState<{ index: number | number[]; value?: string } | null>(null);
@@ -77,20 +63,42 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
   );
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
     useFetchHypothesisParametersTrajectories(areas, study?.id, defaultAreas, isStudyGenerated);
-  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(study, studyState, dispatch, setTechnicalData);
-  const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch, setTechnicalData);
-  const { removeRow } = useHypothesisTableRemoveRow(study, dispatch, setTechnicalData, setCheckedValues);
-  const { detachTrajectory } = useTrajectoryDetach(study, dispatch, setTechnicalData);
+  const { hypothesisTrajectories: economicData } = useFetchEconomicHypothesisTrajectories(isStudyGenerated, study?.id);
+
+  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(
+    study,
+    studyState,
+    dispatch,
+    isTechnicalParametersType(selectedTrajectoryType) ? setTechnicalData : setData,
+  );
+  const { attachTrajectory } = useTrajectoryAttach(
+    study,
+    studyState,
+    dispatch,
+    isTechnicalParametersType(selectedTrajectoryType) ? setTechnicalData : setData,
+  );
+  const { removeRow } = useHypothesisTableRemoveRow(
+    study,
+    dispatch,
+    isTechnicalParametersType(selectedTrajectoryType) ? setTechnicalData : setData,
+    setCheckedValues,
+  );
+  const { detachTrajectory } = useTrajectoryDetach(
+    study,
+    dispatch,
+    isTechnicalParametersType(selectedTrajectoryType) ? setTechnicalData : setData,
+  );
 
   useEffect(() => {
     const setHypothesis = () => {
       areasTrajectoryOptions && setAreasOptions(areasTrajectoryOptions);
       dropDownListOptions && setCheckedValues(dropDownListOptions);
       hypothesisTrajectories && setTechnicalData(hypothesisTrajectories);
+      economicData && setData(economicData);
       setReadOnly(readOnlyRow);
     };
     setHypothesis();
-  }, [areasTrajectoryOptions, dropDownListOptions, hypothesisTrajectories, readOnlyRow]);
+  }, [areasTrajectoryOptions, dropDownListOptions, hypothesisTrajectories, readOnlyRow, economicData]);
 
   useEffect(() => {
     const updateHypothesisTable = () => {
@@ -150,7 +158,7 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
           fileStatus={fileStatus}
           studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
           readOnly={readOnly}
-          progress={progress}
+          progress={isTechnicalParametersType(selectedTrajectoryType) ? progress : 0}
           idSelected={rowIdSelected}
           handleSearch={async (value: string, rowId: string) => {
             const indexArray = rowId.split('.').map(Number);
@@ -236,10 +244,10 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
             data={data}
             getTableHeaders={getEditableHypothesisTableHeaders}
             columnHeader={t('thermal.@parametersEconomic')}
-            fileStatus={'success'}
+            fileStatus={fileStatus}
             studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
             idSelected={rowIdSelected}
-            progress={0}
+            progress={isTechnicalParametersType(selectedTrajectoryType) ? 0 : progress}
             handleSearch={async (_value: string, _rowId: string) => Promise.resolve(undefined)}
             handleImport={async (rowId: string) => {
               const index = Number(rowId.split('.').map(Number)[0]);
@@ -249,6 +257,27 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
                   : TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER;
               setSelectedTrajectoryType(type);
               await handleFetchTrajectoriesFS(type, rowId, setOptionsFS, setRowIdSelected, toggleModal);
+            }}
+            updateData={(rowId: string, value: unknown, status: RowStatus) => {
+              const indexArray = rowId.split('.').map(Number);
+              const type =
+                indexArray[0] === 0
+                  ? TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER
+                  : TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER;
+              if (status === 'empty' || status === 'emptyError') {
+                const current = data[indexArray[0]]?.trajectory ?? null;
+                if (current) {
+                  void detachTrajectory(type, indexArray, status, current);
+                }
+              }
+
+              if (status === 'success') {
+                const dbTrajectory =
+                  dbTrajectories.find((traj) => traj.id === value || traj.trajectoryName === value) ?? null;
+                if (dbTrajectory) {
+                  void attachTrajectory(type, indexArray, status, dbTrajectory);
+                }
+              }
             }}
           />
         </div>
@@ -260,20 +289,14 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
             toggleModal();
             if (value != null) {
               const indexArray = rowIdSelected.split('.').map(Number);
-              if (
-                selectedTrajectoryType === TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER ||
-                selectedTrajectoryType === TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER
-              ) {
-                // TODO ATTACH TRAJECTORY FOR ECONOMIC PARAMETERS AND COSTS
-                return;
-              }
-              await importTrajectory(selectedTrajectoryType, value, indexArray, technicalData);
+              const dataTable = isTechnicalParametersType(selectedTrajectoryType) ? technicalData : data;
+              await importTrajectory(selectedTrajectoryType, value, indexArray, dataTable);
             }
           }}
           trajectoryType={selectedTrajectoryType ?? getTrajectoryTypeByIndex(Number(rowIdSelected))}
           area={getAreaTrajectoryName(
             rowIdSelected,
-            iSTechnicalParametersType(selectedTrajectoryType) ? technicalData : data,
+            isTechnicalParametersType(selectedTrajectoryType) ? technicalData : data,
           )}
         />
       )}
