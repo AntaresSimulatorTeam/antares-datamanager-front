@@ -581,6 +581,26 @@ describe('uploadTrajectory', () => {
     });
   });
 
+  it('should import THERMAL_ECONOMIC_COST_PARAMETER trajectory into data base', async () => {
+    await uploadTrajectory(
+      TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER,
+      'costs',
+      '2030-2031',
+      25,
+      undefined,
+      onProgress,
+    );
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        `https://mockapi.com/v1/trajectory/thermal-economic-costs?trajectoryToUse=costs&horizon=2030&studyId=25`,
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
+
   it('should handle fetch failure gracefully', async () => {
     vi.mocked(progressService.fetchWithProgress).mockRejectedValueOnce({
       message: 'Failed to import trajectory to data base',
