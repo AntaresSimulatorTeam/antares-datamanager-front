@@ -36,7 +36,7 @@ import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow
 import { shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
 import { useFetchHypothesisParametersTrajectories } from '@/hooks/useFetchHypothesisParametersTrajectories.ts';
-import { useFetchEconomicHypothesisTrajectories } from '@/hooks/useFetchEconomicHypothesisTrajectories.ts';
+import { useFetchFixHypothesisTrajectories } from '@/hooks/useFetchFixHypothesisTrajectories.ts';
 
 export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
   const { t } = useTranslation();
@@ -63,7 +63,13 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
   );
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
     useFetchHypothesisParametersTrajectories(areas, study?.id, defaultAreas, isStudyGenerated);
-  const { hypothesisTrajectories: economicData } = useFetchEconomicHypothesisTrajectories(isStudyGenerated, study?.id);
+
+  const configs = [
+    { type: TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER, labelKey: t('thermal.@costs') },
+    { type: TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER, labelKey: t('thermal.@economics') },
+  ];
+  const options = { withReadOnlyRow: false, isStudyGenerated };
+  const { hypothesisTrajectories: economicData } = useFetchFixHypothesisTrajectories(configs, options, study?.id);
 
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(
     study,
