@@ -269,31 +269,6 @@ describe('useFetchFixHypothesisTrajectories', () => {
         expect(mockGetStudyTrajectories).toHaveBeenCalledWith(2, TRAJECTORY_TYPE.LINK);
       });
     });
-
-    it.skip('devrait récupérer à nouveau les trajectoires quand isStudyGenerated change', async () => {
-      const impl = async (_id: number, type: TRAJECTORY_TYPE) => {
-        if (type === TRAJECTORY_TYPE.AREA) return Promise.resolve([mockAreaTrajectory]);
-        if (type === TRAJECTORY_TYPE.LINK) return Promise.resolve([]);
-        return Promise.resolve([]);
-      };
-      mockGetStudyTrajectories.mockImplementation(impl);
-
-      const { rerender, result } = renderHook(({ options }) => useFetchFixHypothesisTrajectories(configs, options, 1), {
-        initialProps: { options: { isStudyGenerated: false, withReadOnlyRow: true } },
-      });
-
-      await waitFor(() => {
-        expect(result.current.readOnlyRow?.['1']).toBe(false);
-      });
-
-      vi.clearAllMocks();
-      mockGetStudyTrajectories.mockImplementation(impl);
-      rerender({ options: { isStudyGenerated: true, withReadOnlyRow: true } });
-
-      await waitFor(() => {
-        expect(result.current.readOnlyRow?.['1']).toBe(true);
-      });
-    });
   });
 
   describe('Cas limites', () => {
