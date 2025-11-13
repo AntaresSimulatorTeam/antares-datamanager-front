@@ -77,7 +77,7 @@ export const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
   ];
   const options = { withReadOnlyRow: true, isStudyGenerated };
   const { hypothesisTrajectories, readOnlyRow } = useFetchFixHypothesisTrajectories(configs, options, study?.id);
-  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(study, studyState, dispatch, setData);
+  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(study, studyState, dispatch);
 
   useEffect(() => {
     setErrorMessage('');
@@ -315,6 +315,7 @@ export const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
                 value,
                 [Number(rowIdSelected)],
                 data,
+                setData,
               );
             }
           }}

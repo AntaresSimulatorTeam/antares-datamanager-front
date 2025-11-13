@@ -10,11 +10,7 @@ import { notifyAlert } from '@/shared/notification/notification.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 
-export const useTrajectoryDetach = (
-  study: StudyDTO,
-  dispatch: Dispatch<StudyActionType> | null,
-  setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
-) => {
+export const useTrajectoryDetach = (study: StudyDTO, dispatch: Dispatch<StudyActionType> | null) => {
   const { user } = useUser();
   const { t } = useTranslation();
 
@@ -24,6 +20,7 @@ export const useTrajectoryDetach = (
       indexArray: number[],
       status: RowStatus,
       trajectorySelected: DbTrajectory,
+      setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
       additionalTrajectory?: DbTrajectory | null,
     ): Promise<void> => {
       try {
@@ -90,7 +87,7 @@ export const useTrajectoryDetach = (
         }
       }
     },
-    [study, dispatch, setData, user?.profile?.sub, t],
+    [study, dispatch, user?.profile?.sub, t],
   );
 
   return { detachTrajectory };

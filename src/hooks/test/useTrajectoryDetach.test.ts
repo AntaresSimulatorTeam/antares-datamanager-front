@@ -70,9 +70,9 @@ describe('useTrajectoryDetach', () => {
   });
 
   it('should unlink trajectory when status is "empty" and update state', async () => {
-    const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch, mockSetData));
+    const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch));
 
-    await result.current.detachTrajectory(TRAJECTORY_TYPE.LOAD, [1], 'empty', trajectory);
+    await result.current.detachTrajectory(TRAJECTORY_TYPE.LOAD, [1], 'empty', trajectory, mockSetData);
 
     expect(unlinkTrajectoryFromStudy).toHaveBeenCalledWith(99, 'study-001');
     expect(mockDispatch).toHaveBeenCalledWith({
@@ -86,9 +86,9 @@ describe('useTrajectoryDetach', () => {
   });
 
   it('should skip unlink if status is not "empty" but still update trajectory', async () => {
-    const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch, mockSetData));
+    const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch));
 
-    await result.current.detachTrajectory(TRAJECTORY_TYPE.LOAD, [2], 'success', trajectory);
+    await result.current.detachTrajectory(TRAJECTORY_TYPE.LOAD, [2], 'success', trajectory, mockSetData);
 
     expect(unlinkTrajectoryFromStudy).not.toHaveBeenCalled();
     expect(mockDispatch).toHaveBeenCalledWith({
@@ -102,13 +102,14 @@ describe('useTrajectoryDetach', () => {
   });
 
   it('should handle multiple detach if additionalTrajectory is provided and trajectory type is THERMAL_TECHNICAL_SPECIFIC_PARAMETER', async () => {
-    const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch, mockSetData));
+    const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch));
 
     await result.current.detachTrajectory(
       TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
       [0],
       'empty' as RowStatus,
       trajectorySpecific,
+      mockSetData,
       trajectoryParam,
     );
 
@@ -124,13 +125,14 @@ describe('useTrajectoryDetach', () => {
   it('should notify error within notification alert for multiple deletion', async () => {
     (unlinkMultipleTrajectoriesFromStudy as Mock).mockRejectedValue(new Error('unlink failed'));
 
-    const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch, mockSetData));
+    const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch));
 
     await result.current.detachTrajectory(
       TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
       [0],
       'empty' as RowStatus,
       trajectorySpecific,
+      mockSetData,
       trajectoryParam,
     );
 
@@ -140,9 +142,9 @@ describe('useTrajectoryDetach', () => {
   it('should handle error and call handleTrajectoryError when error is a business one', async () => {
     (unlinkTrajectoryFromStudy as Mock).mockRejectedValue(new Error('unlink failed'));
 
-    const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch, mockSetData));
+    const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch));
 
-    await result.current.detachTrajectory(TRAJECTORY_TYPE.LOAD, [0], 'empty', trajectory);
+    await result.current.detachTrajectory(TRAJECTORY_TYPE.LOAD, [0], 'empty', trajectory, mockSetData);
 
     expect(handleTrajectoryError).toHaveBeenCalledWith(
       TRAJECTORY_TYPE.LOAD,
@@ -161,9 +163,9 @@ describe('useTrajectoryDetach', () => {
   it('should not handle error and not call handleTrajectoryError when error is a technical one', async () => {
     (unlinkTrajectoryFromStudy as Mock).mockRejectedValue(new Error('unlink failed'));
 
-    const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch, mockSetData));
+    const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch));
 
-    await result.current.detachTrajectory(TRAJECTORY_TYPE.LOAD, [0], 'empty', trajectory);
+    await result.current.detachTrajectory(TRAJECTORY_TYPE.LOAD, [0], 'empty', trajectory, mockSetData);
 
     expect(handleTrajectoryError).toHaveBeenCalled();
   });
@@ -171,9 +173,9 @@ describe('useTrajectoryDetach', () => {
   it('should not handle error and not call handleTrajectoryError when error is not a business one', async () => {
     (unlinkTrajectoryFromStudy as Mock).mockRejectedValue(new Error('unlink failed'));
 
-    const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch, mockSetData));
+    const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch));
 
-    await result.current.detachTrajectory(TRAJECTORY_TYPE.LOAD, [0], 'empty', trajectory);
+    await result.current.detachTrajectory(TRAJECTORY_TYPE.LOAD, [0], 'empty', trajectory, mockSetData);
 
     expect(handleTrajectoryError).toHaveBeenCalled();
   });
@@ -181,9 +183,9 @@ describe('useTrajectoryDetach', () => {
   it('should notify error with an alert when multiple unlink failed', async () => {
     (unlinkMultipleTrajectoriesFromStudy as Mock).mockRejectedValue(new Error('unlink failed'));
 
-    const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch, mockSetData));
+    const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch));
 
-    await result.current.detachTrajectory(TRAJECTORY_TYPE.LOAD, [0], 'empty', trajectory, trajectoryParam);
+    await result.current.detachTrajectory(TRAJECTORY_TYPE.LOAD, [0], 'empty', trajectory, mockSetData, trajectoryParam);
 
     expect(handleTrajectoryError).not.toHaveBeenCalled();
     expect(notifyAlert).toHaveBeenCalled();
@@ -194,9 +196,9 @@ describe('useTrajectoryDetach', () => {
     const mockUseUser = useUser as Mock<typeof useUser>;
     mockUseUser.mockImplementation(() => ({ user: { profile: {} } }) as UserState);
 
-    const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch, mockSetData));
+    const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch));
 
-    await result.current.detachTrajectory(TRAJECTORY_TYPE.LOAD, [0], 'empty', trajectory);
+    await result.current.detachTrajectory(TRAJECTORY_TYPE.LOAD, [0], 'empty', trajectory, mockSetData);
 
     expect(handleTrajectoryError).toHaveBeenCalledWith(
       TRAJECTORY_TYPE.LOAD,
@@ -213,9 +215,9 @@ describe('useTrajectoryDetach', () => {
   });
 
   it('should do nothing if trajectorySelected is null', async () => {
-    const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch, mockSetData));
+    const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch));
 
-    await result.current.detachTrajectory(TRAJECTORY_TYPE.LOAD, [0], '' as RowStatus, {} as DbTrajectory);
+    await result.current.detachTrajectory(TRAJECTORY_TYPE.LOAD, [0], '' as RowStatus, {} as DbTrajectory, mockSetData);
 
     expect(unlinkTrajectoryFromStudy).not.toHaveBeenCalled();
     expect(mockDispatch).not.toHaveBeenCalled();

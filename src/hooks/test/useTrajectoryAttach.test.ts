@@ -86,9 +86,9 @@ describe('useTrajectoryAttach', () => {
   it('should update existing trajectory', async () => {
     vi.mocked(studyService.getStudyTrajectories as ReturnType<typeof vi.fn>).mockResolvedValue([newTrajectory]);
 
-    const { result } = renderHook(() => useTrajectoryAttach(study, studyState, mockDispatch, mockSetData));
+    const { result } = renderHook(() => useTrajectoryAttach(study, studyState, mockDispatch));
 
-    await result.current.attachTrajectory(TRAJECTORY_TYPE.LOAD, [0], 'success', trajectory);
+    await result.current.attachTrajectory(TRAJECTORY_TYPE.LOAD, [0], 'success', trajectory, mockSetData);
 
     expect(trajectoryService.linkTrajectoryToStudy).toHaveBeenCalledWith(TRAJECTORY_TYPE.LOAD, 42, 'study-001');
     expect(mockDispatch).toHaveBeenCalledWith({
@@ -105,9 +105,9 @@ describe('useTrajectoryAttach', () => {
     const emptyState: Partial<StudyState> = {};
     vi.mocked(studyService.getStudyTrajectories).mockResolvedValue([newTrajectory]);
 
-    const { result } = renderHook(() => useTrajectoryAttach(study, emptyState, mockDispatch, mockSetData));
+    const { result } = renderHook(() => useTrajectoryAttach(study, emptyState, mockDispatch));
 
-    await result.current.attachTrajectory(TRAJECTORY_TYPE.LOAD, [1], 'success', trajectory);
+    await result.current.attachTrajectory(TRAJECTORY_TYPE.LOAD, [1], 'success', trajectory, mockSetData);
 
     expect(mockDispatch).toHaveBeenCalledWith({
       type: STUDY_ACTION.ADD_TRAJECTORIES,
@@ -138,13 +138,14 @@ describe('useTrajectoryAttach', () => {
     vi.mocked(studyService.getStudyTrajectories).mockResolvedValue([mockTrajectory] as unknown as DbTrajectory[]);
     vi.mocked(trajectoryUtils.isUniqueTrajectoryType).mockResolvedValue(true);
 
-    const { result } = renderHook(() => useTrajectoryAttach(study, studyState2, mockDispatch, mockSetData));
+    const { result } = renderHook(() => useTrajectoryAttach(study, studyState2, mockDispatch));
 
     await result.current.attachTrajectory(
       TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER,
       [0],
       'success',
       newTrajectory2,
+      mockSetData,
     );
 
     expect(mockDispatch).toHaveBeenCalledWith({
@@ -160,9 +161,9 @@ describe('useTrajectoryAttach', () => {
   it('should handle error and call handleTrajectoryError', async () => {
     vi.mocked(trajectoryService.linkTrajectoryToStudy).mockRejectedValue(new Error('link failed'));
 
-    const { result } = renderHook(() => useTrajectoryAttach(study, studyState, mockDispatch, mockSetData));
+    const { result } = renderHook(() => useTrajectoryAttach(study, studyState, mockDispatch));
 
-    await result.current.attachTrajectory(TRAJECTORY_TYPE.LOAD, [0], 'success', trajectory);
+    await result.current.attachTrajectory(TRAJECTORY_TYPE.LOAD, [0], 'success', trajectory, mockSetData);
 
     expect(handleTrajectoryError).toHaveBeenCalledWith(
       TRAJECTORY_TYPE.LOAD,
@@ -182,7 +183,7 @@ describe('useTrajectoryAttach', () => {
     vi.mocked(trajectoryService.linkTrajectoryToStudy).mockRejectedValue(new Error('link failed'));
     const mockUseUser = useUser as Mock<typeof useUser>;
     mockUseUser.mockImplementation(() => ({ user: { profile: {} } }) as UserState);
-    const { result } = renderHook(() => useTrajectoryAttach(study, studyState, mockDispatch, mockSetData));
+    const { result } = renderHook(() => useTrajectoryAttach(study, studyState, mockDispatch));
 
     const trajectoryArea = {
       id: 100,
@@ -194,7 +195,7 @@ describe('useTrajectoryAttach', () => {
       creationDate: '2025-08-07T14:17:09.895028' as unknown as Date,
     } as DbTrajectory;
 
-    await result.current.attachTrajectory(TRAJECTORY_TYPE.AREA, [0], 'success', trajectoryArea);
+    await result.current.attachTrajectory(TRAJECTORY_TYPE.AREA, [0], 'success', trajectoryArea, mockSetData);
 
     expect(handleTrajectoryError).toHaveBeenCalledWith(
       TRAJECTORY_TYPE.AREA,
