@@ -83,12 +83,7 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
     dispatch,
     isTechnicalParametersType(selectedTrajectoryType) ? setTechnicalData : setData,
   );
-  const { removeRow } = useHypothesisTableRemoveRow(
-    study,
-    dispatch,
-    isTechnicalParametersType(selectedTrajectoryType) ? setTechnicalData : setData,
-    setCheckedValues,
-  );
+  const { removeRow } = useHypothesisTableRemoveRow(study, dispatch, setTechnicalData, setCheckedValues);
   const { detachTrajectory } = useTrajectoryDetach(
     study,
     dispatch,
