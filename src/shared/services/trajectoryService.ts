@@ -134,8 +134,7 @@ export const uploadTrajectory = async (
   } else if (trajectoryType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER) {
     urlApi = `${TRAJECTORY_THERMAL_MODULATION_PARAMETER_IMPORT}?area=${subArea ?? ''}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   } else if (trajectoryType === TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER) {
-    const singleYear = horizon.split('-')[0];
-    urlApi = `${TRAJECTORY_THERMAL_COSTS_PARAMETER_IMPORT}?trajectoryToUse=${trajectoryName}&horizon=${singleYear}&studyId=${studyId}`;
+    urlApi = `${TRAJECTORY_THERMAL_COSTS_PARAMETER_IMPORT}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   } else if (trajectoryType === TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER) {
     urlApi = `${TRAJECTORY_THERMAL_ECONOMIC_PARAMETER_IMPORT}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   } else {
