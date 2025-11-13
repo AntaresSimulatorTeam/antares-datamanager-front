@@ -13,13 +13,18 @@ export const useTrajectoryAttach = (
   study: StudyDTO,
   studyState: Partial<StudyState>,
   dispatch: Dispatch<StudyActionType> | null,
-  setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
 ) => {
   const { user } = useUser();
   const { t } = useTranslation();
 
   const attachTrajectory = useCallback(
-    async (type: TRAJECTORY_TYPE, indexArray: number[], status: RowStatus, trajectory: DbTrajectory): Promise<void> => {
+    async (
+      type: TRAJECTORY_TYPE,
+      indexArray: number[],
+      status: RowStatus,
+      trajectory: DbTrajectory,
+      setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
+    ): Promise<void> => {
       try {
         await linkTrajectoryToStudy(type, trajectory.id, study.id);
         const result = await getStudyTrajectories(study.id, type);
@@ -88,7 +93,7 @@ export const useTrajectoryAttach = (
         }
       }
     },
-    [study.id, study?.name, setData, studyState, dispatch, t, user?.profile?.sub],
+    [study.id, study?.name, studyState, dispatch, t, user?.profile?.sub],
   );
 
   return { attachTrajectory };

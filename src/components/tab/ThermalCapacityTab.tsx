@@ -64,10 +64,10 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: TabProps) => {
       isStudyGenerated,
       ThermalOptions,
     );
-  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(study, studyState, dispatch, setData);
-  const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch, setData);
+  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(study, studyState, dispatch);
+  const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch);
   const { removeRow } = useHypothesisTableRemoveRow(study, dispatch, setData, setCheckedValues);
-  const { detachTrajectory } = useTrajectoryDetach(study, dispatch, setData);
+  const { detachTrajectory } = useTrajectoryDetach(study, dispatch);
 
   useEffect(() => {
     const setHypothesis = () => {
@@ -155,7 +155,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: TabProps) => {
           if (status === 'empty' || status === 'emptyError') {
             const trajectorySelected: DbTrajectory | null = getRowDataSelected(data, indexArray)?.trajectory ?? null;
             if (trajectorySelected) {
-              void detachTrajectory(TRAJECTORY_TYPE.THERMAL_CAPACITY, indexArray, status, trajectorySelected);
+              void detachTrajectory(TRAJECTORY_TYPE.THERMAL_CAPACITY, indexArray, status, trajectorySelected, setData);
             }
           } else if (status === 'success') {
             const dbTrajectory =
@@ -163,7 +163,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: TabProps) => {
                 ? dbTrajectories.find((item) => item.id === value)
                 : getRowDataSelected(data, indexArray)?.trajectory;
             if (dbTrajectory) {
-              void attachTrajectory(TRAJECTORY_TYPE.THERMAL_CAPACITY, indexArray, status, dbTrajectory);
+              void attachTrajectory(TRAJECTORY_TYPE.THERMAL_CAPACITY, indexArray, status, dbTrajectory, setData);
             }
           }
         }}
@@ -183,7 +183,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: TabProps) => {
             toggleModal();
             if (value != null) {
               const indexArray = rowIdSelected.split('.').map(Number);
-              await importTrajectory(TRAJECTORY_TYPE.THERMAL_CAPACITY, value, indexArray, data);
+              await importTrajectory(TRAJECTORY_TYPE.THERMAL_CAPACITY, value, indexArray, data, setData);
             }
           }}
           trajectoryType={TRAJECTORY_TYPE.THERMAL_CAPACITY}
