@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "feat/ANT-4010_thermal_parameters_costs_handle_import",
-  commit: "fbdd4cc7",
-  commitTime: "2025-11-12T15:58:39.377Z",
+  branch: "feat/ANT-4105_thermal_parameters_selct_trajectory_from_BDD",
+  commit: "f92bd73a",
+  commitTime: "2025-11-13T10:14:20.654Z",
 };
