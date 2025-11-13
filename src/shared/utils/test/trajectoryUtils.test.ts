@@ -11,6 +11,7 @@ import {
   getAreaTrajectoryName,
   getBgColor,
   getChildrenList,
+  getChildrenListWithArea,
   getDefaultLabel,
   getHypothesis,
   getPathFromTrajectoryType,
@@ -45,6 +46,7 @@ import { DbTrajectory, HypothesisRowData, HypothesisTab } from '@/shared/types';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { Row } from '@tanstack/react-table';
 import { ThermalOptions } from '@/mocks/data/list/names.ts';
+import { TFunction } from 'i18next';
 
 describe('getStatus', () => {
   it("should return an ERROR selection status for 'error' status", () => {
@@ -650,47 +652,6 @@ describe('setNestedData', () => {
   });
 });
 
-describe('getChildrenList', () => {
-  it('should return technologies when depth is 0 and subRows have technologies', () => {
-    const row = {
-      depth: 0,
-      originalSubRows: [{ trajectory: { technology: 'AI' } }, { trajectory: { technology: 'Blockchain' } }],
-    } as Row<HypothesisRowData>;
-
-    const result = getChildrenList(row);
-    expect(result).toEqual(['AI', 'Blockchain']);
-  });
-
-  it('should return empty array when depth is not 0', () => {
-    const row = {
-      depth: 1,
-      originalSubRows: [{ trajectory: { technology: 'AI' } }],
-    } as Row<HypothesisRowData>;
-
-    const result = getChildrenList(row);
-    expect(result).toEqual([]);
-  });
-
-  it('should skip subRows without technology', () => {
-    const row = {
-      depth: 0,
-      originalSubRows: [{ trajectory: { technology: '' } }, { trajectory: {} }, {}],
-    } as Row<HypothesisRowData>;
-
-    const result = getChildrenList(row);
-    expect(result).toEqual([]);
-  });
-
-  it('should handle undefined originalSubRows', () => {
-    const row = {
-      depth: 0,
-    } as Row<HypothesisRowData>;
-
-    const result = getChildrenList(row);
-    expect(result).toEqual([]);
-  });
-});
-
 describe('getAreaTrajectoryName', () => {
   const mockData = [
     {
@@ -1097,5 +1058,105 @@ describe('shouldHaveSubRows', () => {
 
   it('returns true when mainEntry is undefined', () => {
     expect(shouldHaveSubRows(excludedAreas, undefined)).toBe(true);
+  });
+});
+
+describe('getChildrenList', () => {
+  it('should return technologies when depth is 0 and subRows have technologies', () => {
+    const row = {
+      depth: 0,
+      originalSubRows: [
+        { trajectory: { technology: 'AI' }, status: TRAJECTORY_SELECTION_STATUS.OK },
+        { trajectory: { technology: 'Blockchain' }, status: TRAJECTORY_SELECTION_STATUS.OK },
+      ],
+    } as Row<HypothesisRowData>;
+
+    const result = getChildrenList(row);
+    expect(result).toEqual(['AI', 'Blockchain']);
+  });
+
+  it('should return empty array when depth is not 0', () => {
+    const row = {
+      depth: 1,
+      originalSubRows: [{ trajectory: { technology: 'AI' } }],
+    } as Row<HypothesisRowData>;
+
+    const result = getChildrenList(row);
+    expect(result).toEqual([]);
+  });
+
+  it('should skip subRows without technology', () => {
+    const row = {
+      depth: 0,
+      originalSubRows: [{ trajectory: { technology: '' } }, { trajectory: {} }, {}],
+    } as Row<HypothesisRowData>;
+
+    const result = getChildrenList(row);
+    expect(result).toEqual([]);
+  });
+
+  it('should handle undefined originalSubRows', () => {
+    const row = {
+      depth: 0,
+    } as Row<HypothesisRowData>;
+
+    const result = getChildrenList(row);
+    expect(result).toEqual([]);
+  });
+});
+
+describe('getChildrenListWithArea', () => {
+  const mockT = vi.fn((key: string) => {
+    if (key === 'thermal.@installedPowerInformation') return 'Installed Power';
+    if (key === 'thermal.@specificInformation') return 'Specific Info';
+    return key;
+  }) as unknown as TFunction<'translation', undefined>;
+
+  it('should return message and count for THERMAL_CAPACITY', () => {
+    const mockRow = {
+      depth: 0,
+      originalSubRows: [
+        { trajectory: { technology: 'Biomass', id: 7 }, status: TRAJECTORY_SELECTION_STATUS.OK },
+        { trajectory: { technology: 'DST', id: 9 }, status: TRAJECTORY_SELECTION_STATUS.OK },
+      ],
+    } as Row<HypothesisRowData>;
+    const result = getChildrenListWithArea(mockRow, mockT, TRAJECTORY_TYPE.THERMAL_CAPACITY);
+    expect(result).toEqual({
+      message: 'Installed Power: Biomass, DST',
+      messageNb: 2,
+    });
+  });
+
+  it('should return message and count for THERMAL_TECHNICAL_SPECIFIC_PARAMETER', () => {
+    const mockRow = {
+      depth: 0,
+      originalSubRows: [
+        { trajectory: { area: 'AT', id: 7 }, status: TRAJECTORY_SELECTION_STATUS.OK },
+        { trajectory: { area: 'FR', id: 9 }, status: TRAJECTORY_SELECTION_STATUS.OK },
+      ],
+    } as Row<HypothesisRowData>;
+    const result = getChildrenListWithArea(mockRow, mockT, TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER);
+    expect(result).toEqual({
+      message: 'Specific Info: AT, FR',
+      messageNb: 2,
+    });
+  });
+
+  it('should return empty message and 0 count for other types', () => {
+    const mockRow = {} as Row<HypothesisRowData>;
+    const result = getChildrenListWithArea(mockRow, mockT, TRAJECTORY_TYPE.LINK);
+    expect(result).toEqual({
+      message: '',
+      messageNb: 0,
+    });
+  });
+
+  it('should return empty message and 0 count if type is undefined', () => {
+    const mockRow = {} as Row<HypothesisRowData>;
+    const result = getChildrenListWithArea(mockRow, mockT);
+    expect(result).toEqual({
+      message: '',
+      messageNb: 0,
+    });
   });
 });

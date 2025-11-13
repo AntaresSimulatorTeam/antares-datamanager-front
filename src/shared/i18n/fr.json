@@ -103,9 +103,11 @@
   },
   "thermal": {
     "@installedPower": "Capacités installées",
+    "@installedPowerInformation": "Technology filled in",
     "@parameters": "Paramètres",
     "@parametersTechnical": "Paramètres techniques",
     "@specific": "Spécifique",
+    "@specificInformation": "Specific parameters filled in",
     "@parametersModulation": "Param modulation",
     "@parametersCommon": "Common",
     "@parametersEconomic": "Paramètres économiques",
