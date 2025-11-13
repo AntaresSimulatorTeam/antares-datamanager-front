@@ -209,7 +209,7 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
                   [topIndex, subIndex].filter((n) => n !== undefined),
                   status,
                   dbTrajectory,
-                  setData,
+                  setTechnicalData,
                 );
               }
             }
