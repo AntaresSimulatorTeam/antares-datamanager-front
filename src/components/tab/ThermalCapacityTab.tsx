@@ -70,13 +70,13 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: TabProps) => {
   const { detachTrajectory } = useTrajectoryDetach(study, dispatch);
 
   useEffect(() => {
-    const setHypothesis = () => {
+    const setThermalHypothesis = () => {
       areasTrajectoryOptions && setAreasOptions(areasTrajectoryOptions);
       dropDownListOptions && setCheckedValues(dropDownListOptions);
       hypothesisTrajectories && setData(hypothesisTrajectories);
       setReadOnly(readOnlyRow);
     };
-    setHypothesis();
+    setThermalHypothesis();
   }, [areas, areasTrajectoryOptions, defaultAreas, dropDownListOptions, hypothesisTrajectories, readOnlyRow]);
 
   useEffect(() => {

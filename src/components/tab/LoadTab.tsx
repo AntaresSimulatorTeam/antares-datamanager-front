@@ -60,13 +60,13 @@ const LoadTab = ({ defaultAreas, areas }: TabProps) => {
   const { detachTrajectory } = useTrajectoryDetach(study, dispatch);
 
   useEffect(() => {
-    const setHypothesis = () => {
+    const setLoadHypothesis = () => {
       areasTrajectoryOptions && setAreasOptions(areasTrajectoryOptions);
       dropDownListOptions && setCheckedValues(dropDownListOptions);
       hypothesisTrajectories && setData(hypothesisTrajectories);
       setReadOnly(readOnlyRow);
     };
-    setHypothesis();
+    setLoadHypothesis();
   }, [hypothesisTrajectories, areas, defaultAreas, areasTrajectoryOptions, dropDownListOptions, readOnlyRow]);
 
   useEffect(() => {
