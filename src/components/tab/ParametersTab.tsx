@@ -249,7 +249,18 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
             studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
             idSelected={rowIdSelected}
             progress={isTechnicalParametersType(selectedTrajectoryType) ? 0 : progress}
-            handleSearch={async (_value: string, _rowId: string) => Promise.resolve(undefined)}
+            handleSearch={async (value: string, rowId: string) => {
+              const index = Number(rowId.split('.').map(Number)[0]);
+              return await handleTrajectorySearch(
+                index === 0
+                  ? TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER
+                  : TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER,
+                value,
+                '',
+                setDbTrajectories,
+                study,
+              );
+            }}
             handleImport={async (rowId: string) => {
               const index = Number(rowId.split('.').map(Number)[0]);
               const type =
