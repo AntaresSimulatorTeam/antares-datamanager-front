@@ -43,9 +43,9 @@ import {
   handleTrajectorySearch,
   handleViewTrajectory,
 } from '@/shared/services/hypothesisTableService.ts';
-import { useFetchAreaLinkHypothesisTrajectories } from '@/hooks/useFetchAreaLinkHypothesisTrajectories.ts';
 import { getReadOnlyForGeneratedStudy } from '@/shared/helpers/hypothesisTableHelper.ts';
 import getEditableHypothesisTableHeaders from '@/components/header/EditableHypothesisTableHeaders.tsx';
+import { useFetchFixHypothesisTrajectories } from '@/hooks/useFetchFixHypothesisTrajectories.ts';
 
 interface AreaLinkTabProps {
   setErrorMessage: Dispatch<SetStateAction<string>>;
@@ -71,13 +71,18 @@ export const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
     studyState.studyStatus === StudyStatus.GENERATED || study.status === StudyStatus.GENERATED,
   );
 
-  const { hypothesisTrajectories, readOnlyRow } = useFetchAreaLinkHypothesisTrajectories(isStudyGenerated, study?.id);
+  const configs = [
+    { type: TRAJECTORY_TYPE.AREA, labelKey: t('studyDetails.@areas') },
+    { type: TRAJECTORY_TYPE.LINK, labelKey: t('studyDetails.@links') },
+  ];
+  const options = { withReadOnlyRow: true, isStudyGenerated };
+  const { hypothesisTrajectories, readOnlyRow } = useFetchFixHypothesisTrajectories(configs, options, study?.id);
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(study, studyState, dispatch, setData);
 
   useEffect(() => {
     setErrorMessage('');
     hypothesisTrajectories && setData(hypothesisTrajectories);
-    setReadOnly(readOnlyRow);
+    readOnlyRow && setReadOnly(readOnlyRow);
   }, [hypothesisTrajectories, readOnlyRow, setErrorMessage]);
 
   useEffect(() => {

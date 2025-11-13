@@ -38,6 +38,8 @@ export const TRAJECTORY_THERMAL_INSTALLED_POWER_IMPORT = `${BASE_URL}/v1/traject
 export const TRAJECTORY_THERMAL_COMMON_PARAMETER_IMPORT = `${BASE_URL}/v1/trajectory/thermal-common-parameter`;
 export const TRAJECTORY_THERMAL_SPECIFIC_PARAMETER_IMPORT = `${BASE_URL}/v1/trajectory/thermal-specific-parameter`;
 export const TRAJECTORY_THERMAL_MODULATION_PARAMETER_IMPORT = `${BASE_URL}/v1/trajectory/thermal-modulation-parameter`;
+export const TRAJECTORY_THERMAL_COSTS_PARAMETER_IMPORT = `${BASE_URL}/v1/trajectory/thermal-economic-costs`;
+export const TRAJECTORY_THERMAL_ECONOMIC_PARAMETER_IMPORT = `${BASE_URL}/v1/trajectory/thermal-economic-parameter`;
 
 //ABOUT
 export const ACTUATOR_ENDPOINT = `${BASE_URL}/actuator/info`;
