@@ -15,12 +15,14 @@ import { useTranslation } from 'react-i18next';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
 import { isBusinessError } from '@/shared/utils/errorUtils.ts';
+import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 
 export const useTrajectoryImport = (
   study: StudyDTO,
   studyState: Partial<StudyState>,
   dispatch: Dispatch<StudyActionType> | null,
   setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
+  setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
 ) => {
   const [fileStatus, setFileStatus] = useState<FileInputStatus>('empty');
   const [progress, setProgress] = useState<number>(0);
@@ -52,6 +54,7 @@ export const useTrajectoryImport = (
 
         if (newTrajectory.id != null) {
           await attachTrajectory(type, indexArray, 'success', newTrajectory);
+          type === TRAJECTORY_TYPE.AREA && setReadOnly?.({ '0': false, '1': false });
         }
       } catch (error) {
         setFileStatus('error');
