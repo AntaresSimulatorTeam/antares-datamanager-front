@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "feat/ANT-4010_thermal_parameters_costs_handle_import",
-  commit: "fbdd4cc7",
-  commitTime: "2025-11-12T15:58:39.377Z",
+  branch: "fix/ANT-4214_area_tab_link_line_should_be_enable",
+  commit: "906bbb20",
+  commitTime: "2025-11-24T10:38:21.331Z",
 };
