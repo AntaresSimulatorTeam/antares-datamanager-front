@@ -54,7 +54,7 @@ export const useTrajectoryImport = (
 
         if (newTrajectory.id != null) {
           await attachTrajectory(type, indexArray, 'success', newTrajectory);
-          setReadOnly?.({ '0': false, '1': false });
+          type === TRAJECTORY_TYPE.AREA && setReadOnly?.({ '0': false, '1': false });
         }
       } catch (error) {
         setFileStatus('error');

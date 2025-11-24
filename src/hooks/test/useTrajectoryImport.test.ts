@@ -61,7 +61,7 @@ describe('useTrajectoryImport', () => {
     vi.clearAllMocks();
   });
 
-  it('should import AREA trajectory and set readOnly properly', async () => {
+  it('should import AREA trajectory and call readOnly method', async () => {
     const mockTrajectory = { id: 101, trajectoryName: 'Trajectory A' };
     (uploadTrajectory as Mock).mockResolvedValue(mockTrajectory);
 
@@ -87,6 +87,32 @@ describe('useTrajectoryImport', () => {
     expect(result.current.fileStatus).toBe('success');
     expect(result.current.progress).toBeGreaterThanOrEqual(0);
     expect(mockSetReadOnly).toHaveBeenCalled();
+  });
+
+  it('should import LINK trajectory and not call setReadOnly', async () => {
+    const mockTrajectory = { id: 101, trajectoryName: 'Trajectory A' };
+    (uploadTrajectory as Mock).mockResolvedValue(mockTrajectory);
+
+    const { result } = renderHook(() =>
+      useTrajectoryImport(study, studyState, mockDispatch, mockSetData, mockSetReadOnly),
+    );
+
+    await act(async () => {
+      await result.current.importTrajectory(TRAJECTORY_TYPE.LINK, value, [0, 0], data);
+    });
+
+    expect(uploadTrajectory).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.LINK,
+      'Trajectory A',
+      2030,
+      'study-001',
+      'Solar',
+      expect.any(Function),
+      false,
+      'Tech A',
+    );
+
+    expect(mockSetReadOnly).not.toHaveBeenCalled();
   });
 
   it('should import trajectory and call attachTrajectory', async () => {
