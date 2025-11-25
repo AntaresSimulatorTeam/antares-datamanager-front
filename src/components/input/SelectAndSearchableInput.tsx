@@ -130,6 +130,7 @@ const SelectAndSearchableInput = ({
           ref={dropdownList}
           tabIndex={0}
           onBlur={() => setIsDropdownOpen(false)}
+          role="listbox"
         >
           {optionsSelection.map((trajectory: SelectOption, index) => (
             <div
