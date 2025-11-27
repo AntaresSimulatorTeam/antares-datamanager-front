@@ -71,24 +71,10 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
   const options = { withReadOnlyRow: false, isStudyGenerated };
   const { hypothesisTrajectories: economicData } = useFetchFixHypothesisTrajectories(configs, options, study?.id);
 
-  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(
-    study,
-    studyState,
-    dispatch,
-    isTechnicalParametersType(selectedTrajectoryType) ? setTechnicalData : setData,
-  );
-  const { attachTrajectory } = useTrajectoryAttach(
-    study,
-    studyState,
-    dispatch,
-    isTechnicalParametersType(selectedTrajectoryType) ? setTechnicalData : setData,
-  );
+  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(study, studyState, dispatch);
+  const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch);
   const { removeRow } = useHypothesisTableRemoveRow(study, dispatch, setTechnicalData, setCheckedValues);
-  const { detachTrajectory } = useTrajectoryDetach(
-    study,
-    dispatch,
-    isTechnicalParametersType(selectedTrajectoryType) ? setTechnicalData : setData,
-  );
+  const { detachTrajectory } = useTrajectoryDetach(study, dispatch);
 
   useEffect(() => {
     const setHypothesis = () => {
@@ -205,6 +191,7 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
                     [topIndex, subIndex].filter((n) => n !== undefined),
                     status,
                     current,
+                    setTechnicalData,
                     topIndex === 0 && shouldDeleteParamModulation(0, technicalData)
                       ? technicalData[1].trajectory
                       : null,
@@ -222,6 +209,7 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
                   [topIndex, subIndex].filter((n) => n !== undefined),
                   status,
                   dbTrajectory,
+                  setTechnicalData,
                 );
               }
             }
@@ -249,7 +237,15 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
             studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
             idSelected={rowIdSelected}
             progress={isTechnicalParametersType(selectedTrajectoryType) ? 0 : progress}
-            handleSearch={async (_value: string, _rowId: string) => Promise.resolve(undefined)}
+            handleSearch={async (value: string, rowId: string) => {
+              const index = Number(rowId.split('.').map(Number)[0]);
+              const type =
+                index === 0
+                  ? TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER
+                  : TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER;
+              setSelectedTrajectoryType(type);
+              return await handleTrajectorySearch(type, value, '', setDbTrajectories, study);
+            }}
             handleImport={async (rowId: string) => {
               const index = Number(rowId.split('.').map(Number)[0]);
               const type =
@@ -265,10 +261,11 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
                 indexArray[0] === 0
                   ? TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER
                   : TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER;
+              setSelectedTrajectoryType(type);
               if (status === 'empty' || status === 'emptyError') {
                 const current = data[indexArray[0]]?.trajectory ?? null;
                 if (current) {
-                  void detachTrajectory(type, indexArray, status, current);
+                  void detachTrajectory(type, indexArray, status, current, setData);
                 }
               }
 
@@ -276,7 +273,7 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
                 const dbTrajectory =
                   dbTrajectories.find((traj) => traj.id === value || traj.trajectoryName === value) ?? null;
                 if (dbTrajectory) {
-                  void attachTrajectory(type, indexArray, status, dbTrajectory);
+                  void attachTrajectory(type, indexArray, status, dbTrajectory, setData);
                 }
               }
             }}
@@ -290,8 +287,10 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
             toggleModal();
             if (value != null) {
               const indexArray = rowIdSelected.split('.').map(Number);
-              const dataTable = isTechnicalParametersType(selectedTrajectoryType) ? technicalData : data;
-              await importTrajectory(selectedTrajectoryType, value, indexArray, dataTable);
+              const isTechnicalParamType = isTechnicalParametersType(selectedTrajectoryType);
+              const dataTable = isTechnicalParamType ? technicalData : data;
+              const setDataTable = isTechnicalParamType ? setTechnicalData : setData;
+              await importTrajectory(selectedTrajectoryType, value, indexArray, dataTable, setDataTable);
             }
           }}
           trajectoryType={selectedTrajectoryType ?? getTrajectoryTypeByIndex(Number(rowIdSelected))}
@@ -322,6 +321,7 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
                     rowToDelete?.index,
                     'empty',
                     current,
+                    setTechnicalData,
                     shouldDeleteParamModulation(0, technicalData) ? technicalData[1].trajectory : null,
                   );
                 }

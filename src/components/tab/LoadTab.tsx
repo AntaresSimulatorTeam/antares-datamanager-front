@@ -54,19 +54,19 @@ const LoadTab = ({ defaultAreas, areas }: TabProps) => {
   );
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
     useFetchHypothesisTrajectories(areas, study?.id, TRAJECTORY_TYPE.LOAD, defaultAreas, isStudyGenerated);
-  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(study, studyState, dispatch, setData);
-  const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch, setData);
+  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(study, studyState, dispatch);
+  const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch);
   const { removeRow } = useHypothesisTableRemoveRow(study, dispatch, setData, setCheckedValues);
-  const { detachTrajectory } = useTrajectoryDetach(study, dispatch, setData);
+  const { detachTrajectory } = useTrajectoryDetach(study, dispatch);
 
   useEffect(() => {
-    const setHypothesis = () => {
+    const setLoadHypothesis = () => {
       areasTrajectoryOptions && setAreasOptions(areasTrajectoryOptions);
       dropDownListOptions && setCheckedValues(dropDownListOptions);
       hypothesisTrajectories && setData(hypothesisTrajectories);
       setReadOnly(readOnlyRow);
     };
-    setHypothesis();
+    setLoadHypothesis();
   }, [hypothesisTrajectories, areas, defaultAreas, areasTrajectoryOptions, dropDownListOptions, readOnlyRow]);
 
   useEffect(() => {
@@ -137,10 +137,11 @@ const LoadTab = ({ defaultAreas, areas }: TabProps) => {
           const index = Number(rowId);
           const trajectory = data[index]?.trajectory;
           if ((status === 'empty' && trajectory) || (status === 'emptyError' && trajectory)) {
-            void detachTrajectory(TRAJECTORY_TYPE.LOAD, [index], status, trajectory);
+            void detachTrajectory(TRAJECTORY_TYPE.LOAD, [index], status, trajectory, setData);
           } else if (status === 'success') {
             const dbTrajectory = dbTrajectories.find((item) => item.trajectoryName === value) ?? trajectory;
-            if (dbTrajectory) void attachTrajectory(TRAJECTORY_TYPE.LOAD, [Number(rowId)], status, dbTrajectory);
+            if (dbTrajectory)
+              void attachTrajectory(TRAJECTORY_TYPE.LOAD, [Number(rowId)], status, dbTrajectory, setData);
           }
         }}
         isReadOnlyEnable={true}
@@ -151,7 +152,7 @@ const LoadTab = ({ defaultAreas, areas }: TabProps) => {
           onClose={async (value?: SelectOption) => {
             toggleModal();
             if (value != null) {
-              await importTrajectory(TRAJECTORY_TYPE.LOAD, value, [Number(rowIdSelected)], data);
+              await importTrajectory(TRAJECTORY_TYPE.LOAD, value, [Number(rowIdSelected)], data, setData);
             }
           }}
           trajectoryType={TRAJECTORY_TYPE.LOAD}
