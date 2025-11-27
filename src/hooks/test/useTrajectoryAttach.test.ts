@@ -84,7 +84,7 @@ describe('useTrajectoryAttach', () => {
   });
 
   it('should update existing trajectory', async () => {
-    vi.mocked(studyService.getStudyTrajectories as ReturnType<typeof vi.fn>).mockResolvedValue([newTrajectory]);
+    vi.mocked(trajectoryService.linkTrajectoryToStudy as ReturnType<typeof vi.fn>).mockResolvedValue(newTrajectory);
 
     const { result } = renderHook(() => useTrajectoryAttach(study, studyState, mockDispatch));
 
@@ -135,7 +135,7 @@ describe('useTrajectoryAttach', () => {
         ],
       },
     };
-    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue([mockTrajectory] as unknown as DbTrajectory[]);
+    vi.mocked(trajectoryService.linkTrajectoryToStudy).mockResolvedValue(mockTrajectory as unknown as DbTrajectory);
     vi.mocked(trajectoryUtils.isUniqueTrajectoryType).mockResolvedValue(true);
 
     const { result } = renderHook(() => useTrajectoryAttach(study, studyState2, mockDispatch));

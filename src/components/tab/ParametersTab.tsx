@@ -94,7 +94,7 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
       const newReadOnlyRow = { ...readOnlyRow, ['1']: !hasSpecificTrajectory };
       setReadOnly(newReadOnlyRow);
     };
-    void updateHypothesisTable();
+    updateHypothesisTable();
   }, [detachTrajectory, technicalData]);
 
   useEffect(() => {

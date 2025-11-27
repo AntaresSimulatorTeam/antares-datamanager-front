@@ -89,16 +89,14 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: TabProps) => {
 
   const handleSelectionChange = useCallback(
     async (value: string, isChecked?: boolean) => {
-      {
-        const indexRow = data.findIndex((row) => row.hypothesis === value);
-        if (isChecked) {
-          addRow(TRAJECTORY_TYPE.THERMAL_CAPACITY, value, dispatch, setCheckedValues, setData);
-        } else if (shouldOpenDeletionModal(TRAJECTORY_TYPE.THERMAL_CAPACITY, indexRow, data)) {
-          setRowToDelete({ index: indexRow, value });
-          setIsDeletionModalOpen(true);
-        } else {
-          await removeRow(TRAJECTORY_TYPE.THERMAL_CAPACITY, value, indexRow, data);
-        }
+      const indexRow = data.findIndex((row) => row.hypothesis === value);
+      if (isChecked) {
+        addRow(TRAJECTORY_TYPE.THERMAL_CAPACITY, value, dispatch, setCheckedValues, setData);
+      } else if (shouldOpenDeletionModal(TRAJECTORY_TYPE.THERMAL_CAPACITY, indexRow, data)) {
+        setRowToDelete({ index: indexRow, value });
+        setIsDeletionModalOpen(true);
+      } else {
+        await removeRow(TRAJECTORY_TYPE.THERMAL_CAPACITY, value, indexRow, data);
       }
     },
     [data, dispatch, removeRow, setCheckedValues, setData],

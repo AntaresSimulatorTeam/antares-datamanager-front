@@ -7,7 +7,6 @@ import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.
 import { isUniqueTrajectoryType, normalize, setNestedData } from '@/shared/utils/trajectoryUtils.ts';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { useTranslation } from 'react-i18next';
-import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 
 export const useTrajectoryAttach = (
   study: StudyDTO,
@@ -26,9 +25,7 @@ export const useTrajectoryAttach = (
       setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
     ): Promise<void> => {
       try {
-        await linkTrajectoryToStudy(type, trajectory.id, study.id);
-        const result = await getStudyTrajectories(study.id, type);
-        const newDbTrajectory = result?.find((dbTrajectory) => dbTrajectory.id === trajectory.id);
+        const newDbTrajectory = await linkTrajectoryToStudy(type, trajectory.id, study.id);
 
         if (newDbTrajectory) {
           let alreadyExists = false;
