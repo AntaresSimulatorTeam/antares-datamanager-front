@@ -32,6 +32,7 @@ import { mockWarningMessagesWithTwo } from '@/mocks/data/tests/warning.mock.ts';
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { fetchWarningMessagesFromType } from '@/shared/services/warningService.ts';
 import * as progressService from '@/shared/services/progressService.ts';
+import * as utils from '@/shared/utils/errorUtils.ts';
 
 vi.mock('@/envVariables', () => ({
   getEnvVariables: vi.fn(() => 'https://mockapi.com'),
@@ -629,5 +630,32 @@ describe('uploadTrajectory', () => {
     await expect(async () =>
       uploadTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026', 2, 'FR', onProgress),
     ).rejects.toThrowError('Failed to upload trajectory area_BP_23_v6');
+  });
+
+  it('should handle response when ok is false and error is not a business one', async () => {
+    vi.mocked(progressService.fetchWithProgress).mockRejectedValueOnce({
+      ok: false,
+    });
+
+    await expect(async () =>
+      uploadTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026', 2, 'FR', onProgress),
+    ).rejects.toThrowError('Failed to upload trajectory area_BP_23_v6');
+  });
+
+  it('should handle response when ok is false and error is type of business ', async () => {
+    vi.spyOn(utils, 'isBusinessError').mockReturnValue(true);
+    const businessError = {
+      message: 'Failed to import trajectory into data base',
+    } as unknown as Error;
+
+    const mockResponse = {
+      ok: false,
+      json: vi.fn().mockResolvedValueOnce(businessError),
+    } as unknown as Response;
+    vi.mocked(progressService.fetchWithProgress).mockResolvedValueOnce(mockResponse);
+
+    await expect(async () =>
+      uploadTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026', 2, 'FR', onProgress),
+    ).rejects.toThrow('Failed to import trajectory into data base');
   });
 });

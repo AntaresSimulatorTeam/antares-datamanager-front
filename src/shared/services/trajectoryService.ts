@@ -111,7 +111,7 @@ export const fetchTrajectoriesFromFS = async (
  * @param {(progress: number) => void} onProgress - A callback function invoked to report progress updates. Receives a numeric progress value.
  * @param {string | undefined} subArea - The subarea associated with the trajectory, may be undefined.
  * @returns {Promise<DbTrajectory>} A promise that resolves to the uploaded trajectory object.
- * @throws {TrajectoryBackendError | ERROR_MESSAGE_TYPE.BUSINESS} If the upload process fails or an invalid response is encountered.
+ * @throws {TrajectoryBackendError | Error} If the upload process fails or an invalid response is encountered.
  */
 export const uploadTrajectory = async (
   trajectoryType: TRAJECTORY_TYPE,

@@ -724,7 +724,7 @@ export const normalize = (value: string | null): string => (value === null || va
  * Throw error according to its type
  * @param error
  * @param trajectoryName
- * @throws{TrajectoryBackendError | ERROR_MESSAGE_TYPE.BUSINESS}
+ * @throws{TrajectoryBackendError | Error}
  */
 export const importError = (error: Error, trajectoryName: string): Error => {
   if (isBusinessError(error)) {

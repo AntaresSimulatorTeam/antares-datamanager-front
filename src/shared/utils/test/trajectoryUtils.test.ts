@@ -20,6 +20,7 @@ import {
   getStatus,
   getStudyMenu,
   getTrajectoryTypeByIndex,
+  importError,
   isMatchingTrajectoryType,
   isTechnicalParametersType,
   isTrajectoryLinked,
@@ -42,11 +43,12 @@ import {
   mockRowDataTrajectoryC,
 } from '@/mocks/data/tests/trajectory.mock.ts';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
-import { DbTrajectory, HypothesisRowData, HypothesisTab } from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, HypothesisTab, TrajectoryBackendError } from '@/shared/types';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { Row } from '@tanstack/react-table';
 import { ThermalOptions } from '@/mocks/data/list/names.ts';
 import { TFunction } from 'i18next';
+import * as utils from '@/shared/utils/errorUtils.ts';
 
 describe('getStatus', () => {
   it("should return an ERROR selection status for 'error' status", () => {
@@ -1158,5 +1160,29 @@ describe('getChildrenListWithArea', () => {
       message: '',
       messageNb: 0,
     });
+  });
+});
+
+describe('importError', () => {
+  it('should rethrow the error if it is a business error', () => {
+    const error = new Error('Business error');
+    // mock de isBusinessError pour retourner true
+    vi.spyOn(utils, 'isBusinessError').mockReturnValue(true);
+
+    expect(() => importError(error, 'traj1')).toThrow(error);
+  });
+
+  it('should throw a TrajectoryBackendError if not a business error', () => {
+    const error = new Error('Generic error');
+    vi.spyOn(utils, 'isBusinessError').mockReturnValue(false);
+
+    expect(() => importError(error, 'traj2')).toThrow(TrajectoryBackendError);
+
+    try {
+      importError(error, 'traj2');
+    } catch (e) {
+      expect(e).toBeInstanceOf(TrajectoryBackendError);
+      expect((e as TrajectoryBackendError).message).toContain('Failed to upload trajectory traj2');
+    }
   });
 });
