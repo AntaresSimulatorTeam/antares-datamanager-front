@@ -38,6 +38,7 @@ import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { fetchWarningMessagesFromType } from './warningService';
 import { isBusinessError } from '@/shared/utils/errorUtils.ts';
+import { importError } from '@/shared/utils/trajectoryUtils.ts';
 
 /**
  * Retrieve a list of trajectories by type and horizon from database
@@ -110,7 +111,7 @@ export const fetchTrajectoriesFromFS = async (
  * @param {(progress: number) => void} onProgress - A callback function invoked to report progress updates. Receives a numeric progress value.
  * @param {string | undefined} subArea - The subarea associated with the trajectory, may be undefined.
  * @returns {Promise<DbTrajectory>} A promise that resolves to the uploaded trajectory object.
- * @throws {Error} If the upload process fails or an invalid response is encountered.
+ * @throws {TrajectoryBackendError | ERROR_MESSAGE_TYPE.BUSINESS} If the upload process fails or an invalid response is encountered.
  */
 export const uploadTrajectory = async (
   trajectoryType: TRAJECTORY_TYPE,
@@ -121,7 +122,7 @@ export const uploadTrajectory = async (
   onProgress: (progress: number) => void,
   isCivilYear?: boolean,
   subArea?: string,
-): Promise<DbTrajectory> => {
+): Promise<DbTrajectory | Error> => {
   let urlApi;
   if (trajectoryType === TRAJECTORY_TYPE.LOAD) {
     urlApi = `${TRAJECTORY_ENDPOINT}/load?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
@@ -153,13 +154,14 @@ export const uploadTrajectory = async (
       onProgress,
     );
 
+    if (!response.ok) {
+      const error = (await response.json()) as unknown as Error;
+      return importError(error, trajectoryName);
+    }
+
     return (await response.json()) as DbTrajectory;
   } catch (error) {
-    if (isBusinessError(error)) {
-      throw error;
-    } else {
-      throw new TrajectoryBackendError(`Failed to upload trajectory ${trajectoryName}`, error);
-    }
+    return importError(error as Error, trajectoryName);
   }
 };
 

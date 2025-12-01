@@ -1,4 +1,4 @@
-import { DbTrajectory, HypothesisRowData, HypothesisTab, RowStatus } from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, HypothesisTab, RowStatus, TrajectoryBackendError } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { FileInputStatus } from 'rte-design-system-react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
@@ -8,6 +8,7 @@ import { generateId } from '@/shared/utils/defaultUtils.ts';
 import { Row } from '@tanstack/react-table';
 import { Technologies, ThermalOptions } from '@/mocks/data/list/names.ts';
 import { TFunction } from 'i18next';
+import { isBusinessError } from '@/shared/utils/errorUtils.ts';
 
 /**
  * Get trajectory status from row status
@@ -718,3 +719,17 @@ export const isUniqueTrajectoryType = (type: TRAJECTORY_TYPE): boolean =>
  * @returns {string} The normalized string.
  */
 export const normalize = (value: string | null): string => (value === null || value === '' ? '' : value);
+
+/**
+ * Throw error according to its type
+ * @param error
+ * @param trajectoryName
+ * @throws{TrajectoryBackendError | ERROR_MESSAGE_TYPE.BUSINESS}
+ */
+export const importError = (error: Error, trajectoryName: string): Error => {
+  if (isBusinessError(error)) {
+    throw error;
+  } else {
+    throw new TrajectoryBackendError(`Failed to upload trajectory ${trajectoryName}`, error);
+  }
+};
