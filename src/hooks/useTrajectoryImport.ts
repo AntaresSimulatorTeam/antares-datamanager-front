@@ -4,6 +4,7 @@ import { uploadTrajectory } from '@/shared/services/trajectoryService.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import {
+  DbTrajectory,
   FileInputStatus,
   HypothesisRowData,
   SelectOption,
@@ -21,7 +22,7 @@ export const useTrajectoryImport = (
   study: StudyDTO,
   studyState: Partial<StudyState>,
   dispatch: Dispatch<StudyActionType> | null,
-  setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>
+  setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
 ) => {
   const [fileStatus, setFileStatus] = useState<FileInputStatus>('empty');
   const [progress, setProgress] = useState<number>(0);
@@ -57,8 +58,8 @@ export const useTrajectoryImport = (
 
         setFileStatus('success');
 
-        if (newTrajectory.id != null) {
-          await attachTrajectory(type, indexArray, 'success', newTrajectory, setData);
+        if ((newTrajectory as DbTrajectory).id != null) {
+          await attachTrajectory(type, indexArray, 'success', newTrajectory as DbTrajectory, setData);
           type === TRAJECTORY_TYPE.AREA && setReadOnly?.({ '0': false, '1': false });
         }
       } catch (error) {

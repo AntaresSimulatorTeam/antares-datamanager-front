@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "feat/ANT-4231_attach_hook_remove_useless_request",
-  commit: "61e33125",
-  commitTime: "2025-11-27T09:29:50.728Z",
+  branch: "fix/handle_api_import_response_false",
+  commit: "75e4832b",
+  commitTime: "2025-12-01T13:50:30.411Z",
 };
