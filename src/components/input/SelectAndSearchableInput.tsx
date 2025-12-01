@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { MouseEvent, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { SelectOption } from '@/shared/types';
 import StdInputText from '@/components/forms/stdInputText/StdInputText.tsx';
 import StdButton from '@common/base/stdButton/StdButton';
@@ -75,20 +75,16 @@ const SelectAndSearchableInput = ({
     setIsDropdownOpen(false);
   };
 
-  const handleClickOnKeyboard = async (event: MouseEvent<HTMLButtonElement>) => {
+  const handleClickOnKeyboard = async () => {
+    let results;
     try {
-      const results = await setSearchTerm?.();
+      results = await setSearchTerm?.();
+    } finally {
       if (results && results.length > 0) {
         setOptionsSelection(results);
       } else {
         setOptionsSelection([]);
       }
-    } finally {
-      setIsDropdownOpen((prev) => !prev);
-      setTimeout(() => {
-        dropdownList.current?.focus();
-      }, 0);
-      event.stopPropagation();
     }
   };
 
@@ -100,7 +96,13 @@ const SelectAndSearchableInput = ({
             icon={isDropdownOpen ? StdIconId.KeyboardArrowDown : StdIconId.KeyboardArrowRight}
             size="extraSmall"
             variant="text"
-            onClick={(e) => void handleClickOnKeyboard(e)}
+            onClick={(e) => {
+              if (!optionsSelection?.length) {
+                void handleClickOnKeyboard();
+              }
+              setIsDropdownOpen((prev) => !prev);
+              e.stopPropagation();
+            }}
             color="secondary"
             disabled={!isSelectEnable}
           />
