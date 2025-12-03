@@ -6,17 +6,10 @@
 
 import { afterEach, beforeEach, describe, expectTypeOf, it, Mock, vi } from 'vitest';
 import { Queries, renderHook, RenderHookOptions, waitFor } from '@testing-library/react';
-import { Router, useNavigate } from 'react-router-dom';
+import { MemoryRouter, useNavigate } from 'react-router-dom';
 import { useProjectNavigation } from '@/hooks/useProjectNavigation';
 import { ReactNode } from 'react';
 import { notifyToast } from '@/shared/notification/notification.tsx';
-
-const mockNavigator = {
-  createHref: vi.fn(),
-  go: vi.fn(),
-  push: vi.fn(),
-  replace: vi.fn(),
-};
 
 vi.mock('react-router-dom', async (importOriginal) => {
   const actual: Mock = await importOriginal();
@@ -44,9 +37,7 @@ describe('useProjectNavigation', () => {
     mockUseNavigation.mockImplementationOnce(() => mockNavigate);
 
     const wrapper = ({ children }: { children: ReactNode }) => (
-      <Router location={'/'} navigator={mockNavigator}>
-        {children}
-      </Router>
+      <MemoryRouter initialEntries={['/']}>{children}</MemoryRouter>
     );
     const { result } = renderHook(() => useProjectNavigation(), {
       wrapper,
@@ -68,9 +59,7 @@ describe('useProjectNavigation', () => {
     mockUseNavigation.mockImplementationOnce(() => mockNavigate);
 
     const wrapper = ({ children }: { children: ReactNode }) => (
-      <Router location={{ pathname: '/', state: { studyId: '123' } }} navigator={mockNavigator}>
-        {children}
-      </Router>
+      <MemoryRouter initialEntries={[{ pathname: '/', state: { studyId: '123' } }]}>{children}</MemoryRouter>
     );
     const { result } = renderHook(() => useProjectNavigation(), {
       wrapper,
