@@ -5,14 +5,13 @@
  */
 
 import { useLocation, useNavigate } from 'react-router-dom';
-import { StudyDTO } from '@/shared/types';
+import { StudyDTO, StudyState } from '@/shared/types';
 import { useCallback } from 'react';
 import { notifyToast } from '@/shared/notification/notification.tsx';
 
 export const useStudyNavigation = () => {
   const navigate = useNavigate();
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const { pathname, state } = useLocation();
+  const location = useLocation();
 
   const navigateToStudy = useCallback(
     async (study: StudyDTO) => {
@@ -25,13 +24,12 @@ export const useStudyNavigation = () => {
           type: 'error',
           message: (error as Error)?.message ?? 'Error during navigation',
         });
-        await navigate(pathname, {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          state,
+        await navigate(location.pathname, {
+          state: location.state as StudyState,
         });
       }
     },
-    [navigate, pathname, state],
+    [navigate, location.pathname, location.state],
   );
 
   return { navigateToStudy };
