@@ -12,6 +12,7 @@ import { Dispatch, SetStateAction } from 'react';
 import {
   DbTrajectory,
   HypothesisRowData,
+  isTrajectorySubrowsType,
   ParamTrajectoryState,
   SelectOption,
   StudyActionType,
@@ -20,6 +21,7 @@ import {
   TrajectoryAreaDataScheme,
   TrajectoryLinkDataScheme,
   TrajectoryViewData,
+  TrajectoryWithSubRowsOptions,
 } from '@/shared/types';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
@@ -150,8 +152,12 @@ export const addRow = (
       },
     },
   });
-  const subRows =
-    type === TRAJECTORY_TYPE.THERMAL_CAPACITY ? ThermalOptions : type === TRAJECTORY_TYPE.STS ? STSTechnology : [];
+  const subRowsMap: TrajectoryWithSubRowsOptions = {
+    [TRAJECTORY_TYPE.THERMAL_CAPACITY]: ThermalOptions,
+    [TRAJECTORY_TYPE.STS]: STSTechnology,
+  };
+
+  const subRows = isTrajectorySubrowsType(type) ? subRowsMap[type] : [];
   const newRow: HypothesisRowData = buildEmptyRowWithSubRowsData(value, subRows);
   setCheckedValues((prev) => [...prev, value]);
 

@@ -1,6 +1,6 @@
 import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
 import { AccessorKeyColumnDefBase, DeepKeys, DeepValue, StringOrTemplateHeader } from '@tanstack/react-table';
-import { HypothesisRowData, TrajectoryAreaData } from '@/shared/types/Trajectory.type.ts';
+import { HypothesisRowData, TrajectoryAreaData, TrajectoryWithSubRowsType } from '@/shared/types/Trajectory.type.ts';
 import { Dispatch, SetStateAction } from 'react';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
@@ -80,3 +80,6 @@ export interface TableHeadersGetterProps extends TableHeadersProps {
   errorInfo: ErrorMessageType;
   setErrorInfo: Dispatch<SetStateAction<ErrorMessageType>>;
 }
+
+export const isTrajectorySubrowsType = (value: unknown): value is TrajectoryWithSubRowsType =>
+  [TRAJECTORY_TYPE.THERMAL_CAPACITY, TRAJECTORY_TYPE.STS].includes(value as TrajectoryWithSubRowsType);

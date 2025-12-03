@@ -15,10 +15,11 @@ import { SelectInputWithButton } from '@common/data/SelectInputWithButton.tsx';
 import { ProgressBar } from '@/components/forms/ProgressBar.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
-import { RdsIconButton, RdsIconId, RdsTextTooltip } from 'rte-design-system-react';
+import { RdsTextTooltip } from 'rte-design-system-react';
 import { getAlignment, hasLabelDefault } from '@/shared/utils/hypothesisTableUtils.ts';
 import StdButton from '@common/base/stdButton/StdButton.tsx';
 import { getChildrenListWithArea } from '@/shared/utils/trajectoryUtils.ts';
+import StdIconButton from '@common/base/stdIconButton/StdIconButton.tsx';
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
 const getExpandableHypothesisTableHeaders = ({
@@ -154,8 +155,8 @@ const getExpandableHypothesisTableHeaders = ({
           {type !== TRAJECTORY_TYPE.STS && <CellWithStatus status={status} />}
           {options?.meta?.removeRow && !isDefault && studyState !== StudyStatus.GENERATED && (
             <div className={`${isDeletable ? 'pointer-events-auto visible' : 'pointer-events-none invisible'}`}>
-              <RdsIconButton
-                icon={RdsIconId.Delete}
+              <StdIconButton
+                icon={StdIconId.Delete}
                 size="small"
                 onClick={() => void options?.meta?.removeRow?.(hypothesis, row.id)}
               />
