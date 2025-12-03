@@ -22,7 +22,7 @@ import { notifyAlert } from '@/shared/notification/notification.tsx';
 import * as trajectoryService from '@/shared/services/trajectoryService.ts';
 import { getStudyTrajectoriesWithWarnings, getTrajectoryDataByTypeAndId } from '@/shared/services/trajectoryService.ts';
 import * as formFormatter from '@/shared/utils/formFormatter';
-import { ThermalOptions } from '@/mocks/data/list/names.ts';
+import { STSTechnology, ThermalOptions } from '@/mocks/data/list/names.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { Dispatch, SetStateAction } from 'react';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
@@ -567,6 +567,61 @@ describe('addRow', () => {
     });
   });
 
+  it('should not include subRows for THERMAL_TECHNICAL_SPECIFIC_PARAMETER type', () => {
+    const mockDispatch = vi.fn();
+    const mockSetCheckedValues = vi.fn<Dispatch<SetStateAction<string[]>>>();
+    const mockSetData = vi.fn<Dispatch<SetStateAction<HypothesisRowData[]>>>();
+    const prevData = [
+      {
+        hypothesis: 'specific',
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+        isDefault: false,
+        isDeletable: false,
+        subRows: null,
+      },
+      {
+        hypothesis: 'paramModulation',
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+        isDefault: false,
+        isDeletable: false,
+      },
+      {
+        hypothesis: 'common',
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+        isDefault: false,
+        isDeletable: false,
+      },
+    ] as unknown as HypothesisRowData[];
+
+    addRow(TRAJECTORY_TYPE.LOAD, 'ThermalHypothesis', mockDispatch, mockSetCheckedValues, mockSetData);
+
+    const updater = mockSetData.mock.calls[0][0] as (prev: HypothesisRowData[]) => HypothesisRowData[];
+    const newRow = updater(prevData);
+    expect(newRow[0].subRows).toBeUndefined();
+  });
+
+  it('should include subRows for STS type', () => {
+    const mockDispatch = vi.fn();
+    const mockSetCheckedValues = vi.fn<Dispatch<SetStateAction<string[]>>>();
+    const mockSetData = vi.fn<Dispatch<SetStateAction<HypothesisRowData[]>>>();
+
+    addRow(TRAJECTORY_TYPE.STS, 'STSHypothesis', mockDispatch, mockSetCheckedValues, mockSetData);
+
+    const updater = mockSetData.mock.calls[0][0] as (prev: HypothesisRowData[]) => HypothesisRowData[];
+    const newRow = updater([]);
+    expect(newRow[0]?.subRows).toHaveLength(STSTechnology.length);
+    expect(newRow[0].subRows?.[0]).toMatchObject({
+      hypothesis: STSTechnology[0],
+      trajectory: null,
+      status: TRAJECTORY_SELECTION_STATUS.MISSING,
+      isDefault: true,
+      subRows: null,
+    });
+  });
+
   it('should not crash if dispatch is null', () => {
     const mockSetCheckedValues = vi.fn<Dispatch<SetStateAction<string[]>>>();
     const mockSetData = vi.fn<Dispatch<SetStateAction<HypothesisRowData[]>>>();
@@ -693,6 +748,31 @@ describe('handleViewTrajectory', () => {
     expect(mockSetTrajectoryData).toHaveBeenCalledWith({
       trajectory: mockTrajectory,
       data: mockResultsVien,
+      columns: mockColumns,
+    });
+    expect(mockSetIsViewModalOpen).toHaveBeenCalledWith(true);
+  });
+
+  it('should fetch data and set trajectory view for LINK type', async () => {
+    const mockTrajectoryLink = {
+      id: 1,
+      type: TRAJECTORY_TYPE.LINK,
+    } as DbTrajectory;
+
+    const mockResultsLinkVien = [
+      { id: 'row1', type: TRAJECTORY_TYPE.LINK },
+      { id: 'row2', type: TRAJECTORY_TYPE.LINK },
+    ];
+    mockedGetTrajectoryData.mockResolvedValue(mockResultsLinkVien);
+    mockedGenerateHeader.mockReturnValue(mockColumns);
+
+    await handleViewTrajectory(mockTrajectoryLink, mockSetTrajectoryData, mockSetIsViewModalOpen, mockT);
+
+    expect(mockedGetTrajectoryData).toHaveBeenCalledWith(mockTrajectoryLink.type, mockTrajectoryLink.id);
+    expect(mockedGenerateHeader).toHaveBeenCalledWith(expect.anything(), mockT, 128);
+    expect(mockSetTrajectoryData).toHaveBeenCalledWith({
+      trajectory: mockTrajectoryLink,
+      data: mockResultsLinkVien,
       columns: mockColumns,
     });
     expect(mockSetIsViewModalOpen).toHaveBeenCalledWith(true);
