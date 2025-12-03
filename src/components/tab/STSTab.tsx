@@ -10,17 +10,20 @@ import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajec
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useLocation } from 'react-router-dom';
 import { CheckBoxData, HypothesisRowData, LocationStudy, TabProps } from '@/shared/types';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
-import { useStudy } from '@/store/contexts/StudyContext.tsx';
+import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { CheckBoxListWithSearchBar } from '@/components/list/CheckBoxListWithSearchBar.tsx';
 import { STSTechnology } from '@/mocks/data/list/names.ts';
 import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
+import { addRow } from '@/shared/services/hypothesisTableService.ts';
+import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow.ts';
 
 const STSTab = ({ defaultAreas, areas }: TabProps) => {
   const studyState = useStudy();
   const location = useLocation();
   const study = (location.state as LocationStudy)?.study;
+  const dispatch = useStudyDispatch();
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
   const [data, setData] = useState<HypothesisRowData[]>([]);
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
@@ -37,6 +40,7 @@ const STSTab = ({ defaultAreas, areas }: TabProps) => {
       isStudyGenerated,
       STSTechnology,
     );
+  const { removeRow } = useHypothesisTableRemoveRow(study, dispatch, setData, setCheckedValues);
 
   useEffect(() => {
     const setHypothesis = () => {
@@ -46,22 +50,26 @@ const STSTab = ({ defaultAreas, areas }: TabProps) => {
       setReadOnly(readOnlyRow);
     };
     setHypothesis();
-  }, [
-    hypothesisTrajectories,
-    areas,
-    defaultAreas,
-    isStudyGenerated,
-    areasTrajectoryOptions,
-    dropDownListOptions,
-    readOnlyRow,
-  ]);
+  }, [hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow]);
+
+  const handleSelectionChange = useCallback(
+    async (value: string, isChecked: boolean) => {
+      const indexRow = data.findIndex((row) => row.hypothesis === value);
+      if (isChecked) {
+        addRow(TRAJECTORY_TYPE.STS, value, dispatch, setCheckedValues, setData);
+      } else if (indexRow >= 0) {
+        await removeRow(TRAJECTORY_TYPE.STS, value, indexRow, data);
+      }
+    },
+    [data, dispatch, removeRow],
+  );
 
   return (
     <div className="flex min-h-0 w-full gap-6">
       <CheckBoxListWithSearchBar
         checkedValues={checkedValues}
         options={areasOptions}
-        handleSelectionChange={() => {}}
+        handleSelectionChange={handleSelectionChange}
         dividerPosition={defaultAreas.length}
         disabled={isStudyGenerated}
       />
@@ -77,6 +85,7 @@ const STSTab = ({ defaultAreas, areas }: TabProps) => {
         isReadOnlyEnable={true}
         handleSearch={() => Promise.resolve(undefined)}
         handleImport={() => Promise.resolve()}
+        removeRow={(value: string, rowId?: string) => void removeRow(TRAJECTORY_TYPE.STS, value, Number(rowId), data)}
         type={TRAJECTORY_TYPE.STS}
       />
     </div>

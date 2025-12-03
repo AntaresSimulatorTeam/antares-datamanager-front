@@ -6,7 +6,7 @@ import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { generateId } from '@/shared/utils/defaultUtils.ts';
 import { Row } from '@tanstack/react-table';
-import { Technologies, ThermalOptions } from '@/mocks/data/list/names.ts';
+import { Technologies } from '@/mocks/data/list/names.ts';
 import { TFunction } from 'i18next';
 
 /**
@@ -197,17 +197,17 @@ export const buildRowWithSubRowsData = (
  * Constructs an object representing a row with optional sub-rows data.
  *
  * @param {string} value - The hypothesis value for the main row.
- * @param {boolean} hasSubRows - Indicates whether the row should include sub-rows.
+ * @param {string[]} subRows - Array of options for sub-rows.
  * @returns {HypothesisRowData} An object representing the row, containing details such as hypothesis, trajectory, status, isDefault, isDeletable, and optionally subRows if hasSubRows is true.
  */
-export const buildEmptyRowWithSubRowsData = (value: string, hasSubRows: boolean): HypothesisRowData => ({
+export const buildEmptyRowWithSubRowsData = (value: string, subRows: string[]): HypothesisRowData => ({
   hypothesis: value,
   trajectory: null,
   status: TRAJECTORY_SELECTION_STATUS.MISSING,
   isDefault: false,
   isDeletable: true,
-  subRows: hasSubRows
-    ? ThermalOptions.map((option) => ({
+  subRows: subRows?.length
+    ? subRows.map((option) => ({
         hypothesis: option,
         trajectory: null,
         status: TRAJECTORY_SELECTION_STATUS.MISSING,

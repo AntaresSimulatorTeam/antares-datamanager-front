@@ -33,6 +33,7 @@ import { convertToFSSelectionOptionType, convertToSelectionOptionType } from '@/
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { generateTrajectoryViewHeader } from '@/components/header/TrajectoryViewHeader.tsx';
 import { TFunction } from 'i18next';
+import { STSTechnology, ThermalOptions } from '@/mocks/data/list/names.ts';
 
 export const handleTrajectoryError = (
   type: TRAJECTORY_TYPE,
@@ -149,8 +150,9 @@ export const addRow = (
       },
     },
   });
-  const hasSubRows = type === TRAJECTORY_TYPE.THERMAL_CAPACITY;
-  const newRow: HypothesisRowData = buildEmptyRowWithSubRowsData(value, hasSubRows);
+  const subRows =
+    type === TRAJECTORY_TYPE.THERMAL_CAPACITY ? ThermalOptions : type === TRAJECTORY_TYPE.STS ? STSTechnology : [];
+  const newRow: HypothesisRowData = buildEmptyRowWithSubRowsData(value, subRows);
   setCheckedValues((prev) => [...prev, value]);
 
   setData((prev) => {

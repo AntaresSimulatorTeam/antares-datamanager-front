@@ -1,4 +1,3 @@
-import { RdsIconButton, RdsIconId } from 'rte-design-system-react';
 import { useTranslation } from 'react-i18next';
 import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
@@ -6,11 +5,9 @@ import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 
 interface CellWithStatusProps {
   status: TRAJECTORY_SELECTION_STATUS;
-  isDeletable: boolean;
-  onClick?: () => void;
 }
 
-export const CellWithStatus = ({ status, isDeletable, onClick }: CellWithStatusProps) => {
+export const CellWithStatus = ({ status }: CellWithStatusProps) => {
   const { t } = useTranslation();
 
   const getIcon = (rowStatus: TRAJECTORY_SELECTION_STATUS) => {
@@ -40,12 +37,5 @@ export const CellWithStatus = ({ status, isDeletable, onClick }: CellWithStatusP
     }
   };
 
-  return (
-    <div className="flex items-center justify-start gap-1">
-      {getIcon(status)}
-      <div className={`${isDeletable ? 'pointer-events-auto visible' : 'pointer-events-none invisible'}`}>
-        <RdsIconButton icon={RdsIconId.Delete} size="small" onClick={() => onClick?.()} />
-      </div>
-    </div>
-  );
+  return <div className="flex items-center justify-start gap-1">{getIcon(status)}</div>;
 };
