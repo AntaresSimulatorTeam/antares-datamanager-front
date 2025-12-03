@@ -19,6 +19,7 @@ import { RdsTextTooltip } from 'rte-design-system-react';
 import { getAlignment, hasLabelDefault } from '@/shared/utils/hypothesisTableUtils.ts';
 import StdButton from '@common/base/stdButton/StdButton.tsx';
 import { getChildrenListWithArea } from '@/shared/utils/trajectoryUtils.ts';
+import StdIconButton from '@common/base/stdIconButton/StdIconButton.tsx';
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
 const getExpandableHypothesisTableHeaders = ({
@@ -144,19 +145,24 @@ const getExpandableHypothesisTableHeaders = ({
     size: type === TRAJECTORY_TYPE.STS ? 200 : 233,
     cell: ({ row, table: { options } }) => {
       const { status, isDefault, hypothesis, isDeletable } = row.original;
-      if (hypothesis === t('thermal.@specific') || (type === TRAJECTORY_TYPE.STS && row.depth === 0)) return null;
+      if (hypothesis === t('thermal.@specific')) return null;
       const shouldShowProgressBar = progress > 0 && fileStatus === 'loading' && idSelected === row.id;
 
       return shouldShowProgressBar ? (
         <ProgressBar statusFile={fileStatus} progressValue={progress} />
       ) : (
-        <CellWithStatus
-          status={status}
-          isDeletable={!isDefault && studyState !== StudyStatus.GENERATED && (isDeletable ?? false)}
-          onClick={() => {
-            void options?.meta?.removeRow?.(hypothesis, row.id);
-          }}
-        />
+        <div className="flex items-center gap-1">
+          {type !== TRAJECTORY_TYPE.STS && <CellWithStatus status={status} />}
+          {options?.meta?.removeRow && !isDefault && studyState !== StudyStatus.GENERATED && (
+            <div className={`${isDeletable ? 'pointer-events-auto visible' : 'pointer-events-none invisible'}`}>
+              <StdIconButton
+                icon={StdIconId.Delete}
+                size="small"
+                onClick={() => void options?.meta?.removeRow?.(hypothesis, row.id)}
+              />
+            </div>
+          )}
+        </div>
       );
     },
   }),

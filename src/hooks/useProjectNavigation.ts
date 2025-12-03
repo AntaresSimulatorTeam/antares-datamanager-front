@@ -4,16 +4,14 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { Location, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useCallback } from 'react';
 import { notifyToast } from '@/shared/notification/notification.tsx';
 import { StudyState } from '@/shared/types';
 
 export const useProjectNavigation = () => {
   const navigate = useNavigate();
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const location: Location<StudyState> = useLocation();
-  const { pathname, state } = location || {};
+  const location = useLocation();
 
   const navigateToProject = useCallback(
     async (id: string) => {
@@ -26,12 +24,12 @@ export const useProjectNavigation = () => {
           type: 'error',
           message: (error as Error)?.message ?? 'Error during navigation',
         });
-        await navigate(pathname, {
-          state,
+        await navigate(location.pathname, {
+          state: location.state as StudyState,
         });
       }
     },
-    [navigate, pathname, state],
+    [navigate, location.pathname, location.state],
   );
 
   return { navigateToProject };

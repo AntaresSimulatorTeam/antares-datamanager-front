@@ -118,3 +118,7 @@ export type ThermalParamTrajectoryType =
   | TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER;
 
 export type ParamTrajectoryState = Record<ThermalParamTrajectoryType, TrajectoryState>;
+
+export type TrajectoryWithSubRowsType = TRAJECTORY_TYPE.THERMAL_CAPACITY | TRAJECTORY_TYPE.STS;
+
+export type TrajectoryWithSubRowsOptions = Record<TrajectoryWithSubRowsType, string[]>;

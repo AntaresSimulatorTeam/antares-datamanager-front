@@ -14,6 +14,7 @@ import { LabelWithDeleteButton } from '@common/data/LabelWithDeleteButton.tsx';
 import { SelectInputWithButton } from '@common/data/SelectInputWithButton.tsx';
 import { ProgressBar } from '@/components/forms/ProgressBar.tsx';
 import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
+import { RdsIconButton, RdsIconId } from 'rte-design-system-react';
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
 
@@ -105,11 +106,18 @@ const getEditableHypothesisTableHeaders = ({
       return progress > 0 && fileStatus === 'loading' && idSelected === row.id ? (
         <ProgressBar statusFile={fileStatus} progressValue={progress} />
       ) : (
-        <CellWithStatus
-          status={status}
-          isDeletable={!isDefault && studyState !== StudyStatus.GENERATED && (isDeletable ?? false)}
-          onClick={() => void options?.meta?.removeRow?.(hypothesis, row.id)}
-        />
+        <div className="flex items-center gap-1">
+          <CellWithStatus status={status} />
+          {options?.meta?.removeRow && !isDefault && studyState !== StudyStatus.GENERATED && (
+            <div className={`${isDeletable ? 'pointer-events-auto visible' : 'pointer-events-none invisible'}`}>
+              <RdsIconButton
+                icon={RdsIconId.Delete}
+                size="small"
+                onClick={() => void options?.meta?.removeRow?.(hypothesis, row.id)}
+              />
+            </div>
+          )}
+        </div>
       );
     },
   }),

@@ -12,6 +12,7 @@ import { Dispatch, SetStateAction } from 'react';
 import {
   DbTrajectory,
   HypothesisRowData,
+  isTrajectorySubrowsType,
   ParamTrajectoryState,
   SelectOption,
   StudyActionType,
@@ -20,6 +21,7 @@ import {
   TrajectoryAreaDataScheme,
   TrajectoryLinkDataScheme,
   TrajectoryViewData,
+  TrajectoryWithSubRowsOptions,
 } from '@/shared/types';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
@@ -33,6 +35,7 @@ import { convertToFSSelectionOptionType, convertToSelectionOptionType } from '@/
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { generateTrajectoryViewHeader } from '@/components/header/TrajectoryViewHeader.tsx';
 import { TFunction } from 'i18next';
+import { STSTechnology, ThermalOptions } from '@/mocks/data/list/names.ts';
 
 export const handleTrajectoryError = (
   type: TRAJECTORY_TYPE,
@@ -149,8 +152,13 @@ export const addRow = (
       },
     },
   });
-  const hasSubRows = type === TRAJECTORY_TYPE.THERMAL_CAPACITY;
-  const newRow: HypothesisRowData = buildEmptyRowWithSubRowsData(value, hasSubRows);
+  const subRowsMap: TrajectoryWithSubRowsOptions = {
+    [TRAJECTORY_TYPE.THERMAL_CAPACITY]: ThermalOptions,
+    [TRAJECTORY_TYPE.STS]: STSTechnology,
+  };
+
+  const subRows = isTrajectorySubrowsType(type) ? subRowsMap[type] : [];
+  const newRow: HypothesisRowData = buildEmptyRowWithSubRowsData(value, subRows);
   setCheckedValues((prev) => [...prev, value]);
 
   setData((prev) => {

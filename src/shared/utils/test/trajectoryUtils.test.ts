@@ -1,6 +1,7 @@
 import {
   addNestedRow,
   buildDefaultEmptyTrajectoryList,
+  buildEmptyRowWithSubRowsData,
   buildEmptyTrajectory,
   buildErrorTrajectory,
   buildReadOnlyRow,
@@ -315,6 +316,56 @@ describe('buildRowWithSubRowsData', () => {
     const result = buildRowWithSubRowsData(trajectory, defaultAreas, [], subRowOptions);
 
     expect(result.isDefault).toBe(false);
+  });
+});
+
+describe('buildEmptyRowWithSubRowsData', () => {
+  it('crée une ligne sans sous-lignes quand subRows est vide', () => {
+    const result = buildEmptyRowWithSubRowsData('Main hypothesis', []);
+    expect(result).toEqual({
+      hypothesis: 'Main hypothesis',
+      trajectory: null,
+      status: TRAJECTORY_SELECTION_STATUS.MISSING,
+      isDefault: false,
+      isDeletable: true,
+      subRows: null,
+    });
+  });
+
+  it('crée une ligne avec des sous-lignes quand subRows est fourni', () => {
+    const result = buildEmptyRowWithSubRowsData('Main hypothesis', ['Sub A', 'Sub B']);
+    expect(result.hypothesis).toBe('Main hypothesis');
+    expect(result.subRows).toHaveLength(2);
+
+    expect(result.subRows?.[0]).toEqual({
+      hypothesis: 'Sub A',
+      trajectory: null,
+      status: TRAJECTORY_SELECTION_STATUS.MISSING,
+      isDefault: true,
+      isDeletable: false,
+      subRows: null,
+    });
+
+    expect(result.subRows?.[1]).toEqual({
+      hypothesis: 'Sub B',
+      trajectory: null,
+      status: TRAJECTORY_SELECTION_STATUS.MISSING,
+      isDefault: true,
+      isDeletable: false,
+      subRows: null,
+    });
+  });
+
+  it('assure que la ligne principale est toujours deletable et non default', () => {
+    const result = buildEmptyRowWithSubRowsData('Main hypothesis', ['Sub']);
+    expect(result.isDeletable).toBe(true);
+    expect(result.isDefault).toBe(false);
+  });
+
+  it('assure que les sous-lignes sont toujours default et non deletable', () => {
+    const result = buildEmptyRowWithSubRowsData('Main hypothesis', ['Sub']);
+    expect(result.subRows?.[0].isDefault).toBe(true);
+    expect(result.subRows?.[0].isDeletable).toBe(false);
   });
 });
 
