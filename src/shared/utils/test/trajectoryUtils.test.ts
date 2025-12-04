@@ -520,7 +520,7 @@ describe('getStudyMenu', () => {
   it('should return correct tab structure when area is not linked', () => {
     const result: HypothesisTab[] = getStudyMenu(mockTranslate, false);
 
-    expect(result.length).toBe(6);
+    expect(result.length).toBe(4);
 
     expect(result[0]).toEqual({
       name: TRAJECTORY_TYPE.AREA,
@@ -532,7 +532,6 @@ describe('getStudyMenu', () => {
     expect(result[1].isDisabled).toBe(false);
     expect(result[2].isDisabled).toBe(false);
     expect(result[3].isDisabled).toBe(true);
-    expect(result[4].isDisabled).toBe(true);
   });
 
   it('should disable LOAD and THERMAL_CAPACITY when area is linked', () => {

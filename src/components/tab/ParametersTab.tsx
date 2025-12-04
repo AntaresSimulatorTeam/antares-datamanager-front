@@ -95,6 +95,16 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
 
   useEffect(() => {
     if (isStudyGenerated) {
+      const newData = technicalData[0]?.subRows?.filter(
+        (area) => area.isDefault || (area.trajectory && area.status === TRAJECTORY_SELECTION_STATUS.OK),
+      );
+      setTechnicalData((prev) => [
+        {
+          ...prev[0],
+          subRows: newData,
+        },
+        ...prev.slice(1),
+      ]);
       setIsStudyGenerated(true);
       const rows = generateReadOnlyIndexMap(technicalData);
       setReadOnly(rows);

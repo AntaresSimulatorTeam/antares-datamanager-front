@@ -17,6 +17,7 @@ import { CheckBoxListWithSearchBar } from '@/components/list/CheckBoxListWithSea
 import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
 import { addRow } from '@/shared/services/hypothesisTableService.ts';
 import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow.ts';
+import { filterNestedRow, generateReadOnlyIndexMap } from '@/shared/utils/trajectoryUtils.ts';
 
 const STSTab = ({ defaultAreas, areas }: TabProps) => {
   const studyState = useStudy();
@@ -28,7 +29,7 @@ const STSTab = ({ defaultAreas, areas }: TabProps) => {
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
   const [stsTechnologies, setStsTechnologies] = useState<string[]>([]);
-  const [isStudyGenerated] = useState(
+  const [isStudyGenerated, setIsStudyGenerated] = useState(
     studyState.studyStatus === StudyStatus.GENERATED || study.status === StudyStatus.GENERATED,
   );
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow, technologyList } =
@@ -45,6 +46,16 @@ const STSTab = ({ defaultAreas, areas }: TabProps) => {
     };
     setHypothesis();
   }, [hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow, technologyList]);
+
+  useEffect(() => {
+    if (isStudyGenerated) {
+      setIsStudyGenerated(true);
+      const newData = filterNestedRow(data);
+      setData(newData);
+      const rows = generateReadOnlyIndexMap(data);
+      setReadOnly(rows);
+    }
+  }, [isStudyGenerated]);
 
   const handleSelectionChange = useCallback(
     async (value: string, isChecked: boolean) => {

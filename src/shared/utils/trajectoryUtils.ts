@@ -416,6 +416,32 @@ export const addNestedRow = (
     }
   });
 
+/**
+ * Filter sub rows of each row provided by an array of HypothesisRowData
+ * @param {HypothesisRowData[]} data
+ * @return {HypothesisRowData[]}
+ */
+export const filterNestedRow = (data: HypothesisRowData[]): HypothesisRowData[] =>
+  data.map((trajectory) => {
+    if (trajectory?.subRows) {
+      return {
+        ...trajectory,
+        subRows:
+          trajectory?.subRows?.filter(
+            (subRow) => subRow.trajectory && subRow.status === TRAJECTORY_SELECTION_STATUS.OK,
+          ) ?? null,
+      };
+    } else {
+      return trajectory;
+    }
+  });
+
+/**
+ * Return all tabs available for a study configuration
+ * @param {TFunction<'translation', undefined>} t - Translation function
+ * @param {boolean} isTrajectoryAreaLinked - Flag to indicate if an AREA trajectory is linked to the study
+ * @return {HypothesisTab[]} - Array of tab data model
+ */
 export const getStudyMenu = (t: (value: string) => string, isTrajectoryAreaLinked: boolean): HypothesisTab[] => [
   {
     name: TRAJECTORY_TYPE.AREA,
@@ -436,8 +462,6 @@ export const getStudyMenu = (t: (value: string) => string, isTrajectoryAreaLinke
     isDisabled: isTrajectoryAreaLinked,
   },
   { name: TRAJECTORY_TYPE.STS, label: t('studyDetails.@sts'), icon: StdIconId.BatteryChargingFull, isDisabled: true },
-  { name: TRAJECTORY_TYPE.ENR, label: t('studyDetails.@enr'), icon: StdIconId.EnergySavingsLeaf, isDisabled: true },
-  { name: TRAJECTORY_TYPE.MISC, label: t('studyDetails.@misc'), icon: StdIconId.Category, isDisabled: true },
 ];
 
 /**
