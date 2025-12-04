@@ -48,6 +48,7 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
+  const [readOnlyParam, setReadOnlyParam] = useState<ReadOnlyObject>({});
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
   const [technicalData, setTechnicalData] = useState<HypothesisRowData[]>([]);
   const [data, setData] = useState<HypothesisRowData[]>([]);
@@ -108,6 +109,7 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
       setIsStudyGenerated(true);
       const rows = generateReadOnlyIndexMap(technicalData);
       setReadOnly(rows);
+      setReadOnlyParam({ '0': true, '1': true });
     }
   }, [isStudyGenerated]);
 
@@ -250,6 +252,8 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
             fileStatus={fileStatus}
             studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
             idSelected={rowIdSelected}
+            isReadOnlyEnable={true}
+            readOnly={readOnlyParam}
             progress={isTechnicalParametersType(selectedTrajectoryType) ? 0 : progress}
             handleSearch={async (value: string, rowId: string) => {
               const index = Number(rowId.split('.').map(Number)[0]);
