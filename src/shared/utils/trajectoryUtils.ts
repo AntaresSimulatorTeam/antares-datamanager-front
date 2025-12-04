@@ -426,10 +426,9 @@ export const filterNestedRow = (data: HypothesisRowData[]): HypothesisRowData[] 
     if (trajectory?.subRows) {
       return {
         ...trajectory,
-        subRows:
-          trajectory?.subRows?.filter(
-            (subRow) => subRow.trajectory && subRow.status === TRAJECTORY_SELECTION_STATUS.OK,
-          ) ?? null,
+        subRows: trajectory?.subRows?.filter(
+          (subRow) => subRow.trajectory && subRow.status === TRAJECTORY_SELECTION_STATUS.OK,
+        ),
       };
     } else {
       return trajectory;
