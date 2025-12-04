@@ -516,7 +516,7 @@ describe('filterNestedRow', () => {
     expect(result[0].subRows).toEqual([{ trajectory: 'sub1', status: TRAJECTORY_SELECTION_STATUS.OK }]);
   });
 
-  it('should return null if no subRows match', () => {
+  it('should return an empty array if no subRows match', () => {
     const input = [
       {
         trajectory: 'main2',
@@ -529,7 +529,7 @@ describe('filterNestedRow', () => {
 
     const result = filterNestedRow(input);
 
-    expect(result[0].subRows).toEqual(null);
+    expect(result[0].subRows).toEqual([]);
   });
 
   it('should leave rows without subRows unchanged', () => {
