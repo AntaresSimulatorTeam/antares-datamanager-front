@@ -8,6 +8,7 @@ import {
   buildRowData,
   buildRowWithSubRowsData,
   convertIntoHypothesisRowWithTechnologies,
+  filterNestedRow,
   generateReadOnlyIndexMap,
   getAreaTrajectoryName,
   getBgColor,
@@ -494,6 +495,49 @@ describe('addNestedRow', () => {
     const result = addNestedRow(data, newRow);
 
     expect(result).toEqual(data);
+  });
+});
+
+describe('filterNestedRow', () => {
+  it('should keep only subRows with trajectory and status OK', () => {
+    const input = [
+      {
+        trajectory: 'main1',
+        subRows: [
+          { trajectory: 'sub1', status: TRAJECTORY_SELECTION_STATUS.OK },
+          { trajectory: 'sub2', status: TRAJECTORY_SELECTION_STATUS.MISSING },
+          { trajectory: undefined, status: TRAJECTORY_SELECTION_STATUS.OK },
+        ],
+      },
+    ] as unknown as HypothesisRowData[];
+
+    const result = filterNestedRow(input);
+
+    expect(result[0].subRows).toEqual([{ trajectory: 'sub1', status: TRAJECTORY_SELECTION_STATUS.OK }]);
+  });
+
+  it('should return null if no subRows match', () => {
+    const input = [
+      {
+        trajectory: 'main2',
+        subRows: [
+          { trajectory: 'sub3', status: TRAJECTORY_SELECTION_STATUS.MISSING },
+          { trajectory: undefined, status: TRAJECTORY_SELECTION_STATUS.OK },
+        ],
+      },
+    ] as unknown as HypothesisRowData[];
+
+    const result = filterNestedRow(input);
+
+    expect(result[0].subRows).toEqual(null);
+  });
+
+  it('should leave rows without subRows unchanged', () => {
+    const input = [{ trajectory: 'main3' }] as unknown as HypothesisRowData[];
+
+    const result = filterNestedRow(input);
+
+    expect(result).toEqual([{ trajectory: 'main3' }]);
   });
 });
 
