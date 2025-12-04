@@ -57,26 +57,6 @@ const STSTab = ({ defaultAreas, areas }: TabProps) => {
     }
   }, [isStudyGenerated]);
 
-  useEffect(() => {
-    if (isStudyGenerated) {
-      setIsStudyGenerated(true);
-      const newData = filterNestedRow(data);
-      setData(newData);
-      const rows = generateReadOnlyIndexMap(data);
-      setReadOnly(rows);
-    }
-  }, [isStudyGenerated]);
-
-  useEffect(() => {
-    if (isStudyGenerated) {
-      setIsStudyGenerated(true);
-      const newData = filterNestedRow(data);
-      setData(newData);
-      const rows = generateReadOnlyIndexMap(data);
-      setReadOnly(rows);
-    }
-  }, [isStudyGenerated]);
-
   const handleSelectionChange = useCallback(
     async (value: string, isChecked: boolean) => {
       const indexRow = data.findIndex((row) => row.hypothesis === value);
