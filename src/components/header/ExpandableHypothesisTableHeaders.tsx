@@ -152,7 +152,7 @@ const getExpandableHypothesisTableHeaders = ({
         <ProgressBar statusFile={fileStatus} progressValue={progress} />
       ) : (
         <div className="flex items-center gap-1">
-          {type !== TRAJECTORY_TYPE.STS && <CellWithStatus status={status} />}
+          <CellWithStatus status={status} />
           {options?.meta?.removeRow && !isDefault && studyState !== StudyStatus.GENERATED && (
             <div className={`${isDeletable ? 'pointer-events-auto visible' : 'pointer-events-none invisible'}`}>
               <StdIconButton
