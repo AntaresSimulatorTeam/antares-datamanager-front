@@ -145,7 +145,19 @@ const getExpandableHypothesisTableHeaders = ({
     size: type === TRAJECTORY_TYPE.STS ? 200 : 233,
     cell: ({ row, table: { options } }) => {
       const { status, isDefault, hypothesis, isDeletable } = row.original;
-      if (hypothesis === t('thermal.@specific') || (type === TRAJECTORY_TYPE.STS && row.depth === 0)) return null;
+      if (hypothesis === t('thermal.@specific') || (type === TRAJECTORY_TYPE.STS && row.depth === 0 && isDefault))
+        return null;
+      if (type === TRAJECTORY_TYPE.STS && row.depth === 0 && !isDefault) {
+        return (
+          <div className={`${isDeletable ? 'pointer-events-auto visible' : 'pointer-events-none invisible'}`}>
+            <StdIconButton
+              icon={StdIconId.Delete}
+              size="small"
+              onClick={() => void options?.meta?.removeRow?.(hypothesis, row.id)}
+            />
+          </div>
+        );
+      }
       const shouldShowProgressBar = progress > 0 && fileStatus === 'loading' && idSelected === row.id;
 
       return shouldShowProgressBar ? (
