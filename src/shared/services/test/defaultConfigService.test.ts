@@ -56,7 +56,9 @@ describe('getThermalTechnologyList', () => {
 
     await waitFor(() => {
       expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
-      expect(AuthService.authFetch).toHaveBeenCalledWith('https://mockapi.com/v1/default_config/load');
+      expect(AuthService.authFetch).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/default_config/thermal-technology-display',
+      );
       expect(result).toEqual(ThermalOptions);
     });
   });
