@@ -41,7 +41,6 @@ const getExpandableHypothesisTableHeaders = ({
       const { status, isDefault, hypothesis } = row.original;
       const subRowListName = getSubRowsList(row);
       const subRowListWithArea = getSubRowListWithArea(subRowListName, t, type);
-      console.log('========================= list', list);
       const isTechnology = list?.length ? list?.some((subRow: string) => subRow === hypothesis) : false;
 
       return (
