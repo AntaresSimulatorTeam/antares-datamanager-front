@@ -3,6 +3,7 @@ import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { StudyState, TrajectoryAreaData } from '@/shared/types';
 import { renderHook, waitFor } from '@testing-library/react';
 import * as studyService from '@/shared/services/studyService.ts';
+import * as defaultConfigService from '@/shared/services/defaultConfigService.ts';
 import {
   mockDbTrajectory,
   mockDbTrajectoryArrayLoad,
@@ -16,7 +17,7 @@ import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
 import * as trajectoryUtils from '@/shared/utils/trajectoryUtils.ts';
 import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
-import { STSTechnology, ThermalOptions } from '@/mocks/data/list/names.ts';
+import { ThermalOptions } from '@/mocks/data/list/names.ts';
 
 vi.mock('@/shared/services/trajectoryService');
 vi.mock('@/shared/services/hypothesisTableService');
@@ -44,6 +45,13 @@ vi.mock('@/shared/services/warningService', async (importOriginal) => {
   return {
     ...actual,
     fetchWarningMessages: vi.fn(),
+  };
+});
+vi.mock('@/shared/services/defaultConfigService', async (importOriginal) => {
+  const actual: Mock = await importOriginal();
+  return {
+    ...actual,
+    getThermalTechnologyList: vi.fn(),
   };
 });
 
@@ -475,6 +483,9 @@ describe('useFetchHypothesisTrajectories', () => {
 
   it('should include ThermalOptions when trajectoryType is THERMAL_CAPACITY', async () => {
     vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArrayThermal);
+    vi.mocked(defaultConfigService.getThermalTechnologyList).mockResolvedValue(
+      ThermalOptions.map((option) => ({ name: option })),
+    );
     const technologiesHypothesis = ThermalOptions.map((option) => ({
       hypothesis: option,
       isDefault: true,
@@ -484,24 +495,7 @@ describe('useFetchHypothesisTrajectories', () => {
     }));
 
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories([], 5, TRAJECTORY_TYPE.THERMAL_CAPACITY, [], false, ThermalOptions),
-    );
-
-    await waitFor(() => expect(result.current.hypothesisTrajectories[0].subRows).toEqual(technologiesHypothesis));
-  });
-
-  it('should include STS options when trajectoryType is STS type', async () => {
-    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArrayThermal);
-    const technologiesHypothesis = STSTechnology.map((option) => ({
-      hypothesis: option,
-      isDefault: true,
-      status: TRAJECTORY_SELECTION_STATUS.MISSING,
-      subRows: null,
-      trajectory: null,
-    }));
-
-    const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories([], 5, TRAJECTORY_TYPE.STS, [], false, STSTechnology),
+      useFetchHypothesisTrajectories([], 5, TRAJECTORY_TYPE.THERMAL_CAPACITY, [], false),
     );
 
     await waitFor(() => expect(result.current.hypothesisTrajectories[0].subRows).toEqual(technologiesHypothesis));

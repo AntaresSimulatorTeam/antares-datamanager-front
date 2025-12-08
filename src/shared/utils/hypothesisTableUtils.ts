@@ -1,6 +1,5 @@
 import { CheckBoxData, DbTrajectory, HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
 import { Row } from '@tanstack/react-table';
-import { isTechnology } from '@/shared/utils/trajectoryUtils.ts';
 import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 
 /**
@@ -17,9 +16,15 @@ export const getAlignment = (row: Row<HypothesisRowData>) => {
  * @param {number} rowDepth
  * @param {boolean} isDefault
  * @param {string} hypothesis
+ * @param {boolean} isTechnology
+ * @return {boolean}
  */
-export const hasLabelDefault = (rowDepth: number, isDefault: boolean, hypothesis: string) =>
-  isDefault && hypothesis !== OTHER_AREAS_LABEL && (rowDepth === 0 || (rowDepth === 1 && !isTechnology(hypothesis)));
+export const hasLabelDefault = (
+  rowDepth: number,
+  isDefault: boolean,
+  hypothesis: string,
+  isTechnology: boolean,
+): boolean => isDefault && hypothesis !== OTHER_AREAS_LABEL && (rowDepth === 0 || (rowDepth === 1 && !isTechnology));
 
 /**
  *

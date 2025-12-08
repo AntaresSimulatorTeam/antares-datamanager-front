@@ -21,7 +21,6 @@ import {
   TrajectoryAreaDataScheme,
   TrajectoryLinkDataScheme,
   TrajectoryViewData,
-  TrajectoryWithSubRowsOptions,
 } from '@/shared/types';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
@@ -35,7 +34,6 @@ import { convertToFSSelectionOptionType, convertToSelectionOptionType } from '@/
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { generateTrajectoryViewHeader } from '@/components/header/TrajectoryViewHeader.tsx';
 import { TFunction } from 'i18next';
-import { STSTechnology, ThermalOptions } from '@/mocks/data/list/names.ts';
 
 export const handleTrajectoryError = (
   type: TRAJECTORY_TYPE,
@@ -134,7 +132,7 @@ export const handleTrajectorySearch = async (
  * @param {Dispatch<StudyActionType> | null} dispatch - Dispatch function to update the study state. If null, the dispatch operation is skipped.
  * @param {Dispatch<SetStateAction<string[]>>} setCheckedValues - State update function for maintaining the checked values in the UI.
  * @param {Dispatch<SetStateAction<HypothesisRowData[]>>} setData - State update function for maintaining the overall row data structure.
- *
+ * @param {string[]} options - Options list for TRAJECTORY_TYPE.THERMAL_CAPACITY or TRAJECTORY_TYPE.STS type
  * @returns {void}
  */
 export const addRow = (
@@ -143,6 +141,7 @@ export const addRow = (
   dispatch: Dispatch<StudyActionType> | null,
   setCheckedValues: Dispatch<SetStateAction<string[]>>,
   setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
+  options?: string[],
 ): void => {
   dispatch?.({
     type: STUDY_ACTION.ADD_TRAJECTORIES,
@@ -152,12 +151,8 @@ export const addRow = (
       },
     },
   });
-  const subRowsMap: TrajectoryWithSubRowsOptions = {
-    [TRAJECTORY_TYPE.THERMAL_CAPACITY]: ThermalOptions,
-    [TRAJECTORY_TYPE.STS]: STSTechnology,
-  };
 
-  const subRows = isTrajectorySubrowsType(type) ? subRowsMap[type] : [];
+  const subRows = isTrajectorySubrowsType(type) && options ? options : [];
   const newRow: HypothesisRowData = buildEmptyRowWithSubRowsData(value, subRows);
   setCheckedValues((prev) => [...prev, value]);
 

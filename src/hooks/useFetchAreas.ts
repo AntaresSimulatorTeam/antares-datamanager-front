@@ -1,7 +1,8 @@
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useCallback, useEffect, useState } from 'react';
-import { getDefaultLoadHypothesis, getTrajectoryDataByTypeAndId } from '@/shared/services/trajectoryService.ts';
+import { getTrajectoryDataByTypeAndId } from '@/shared/services/trajectoryService.ts';
 import { DbTrajectory, TrajectoryAreaData } from '@/shared/types';
+import { getDefaultAreas } from '@/shared/services/defaultConfigService.ts';
 
 export const useFetchAreas = (trajectoryArea?: DbTrajectory | null) => {
   const [areaDefault, setAreaDefault] = useState<{ name: string }[]>([]);
@@ -9,7 +10,7 @@ export const useFetchAreas = (trajectoryArea?: DbTrajectory | null) => {
 
   const fetchAreas = useCallback(async () => {
     try {
-      const defaultAreas: { name: string }[] = await getDefaultLoadHypothesis();
+      const defaultAreas: { name: string }[] = await getDefaultAreas();
       setAreaDefault(defaultAreas);
       if (trajectoryArea?.id != null) {
         const areas = (await getTrajectoryDataByTypeAndId(

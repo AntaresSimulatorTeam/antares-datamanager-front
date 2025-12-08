@@ -44,8 +44,9 @@ export const TRAJECTORY_THERMAL_ECONOMIC_PARAMETER_IMPORT = `${BASE_URL}/v1/traj
 //ABOUT
 export const ACTUATOR_ENDPOINT = `${BASE_URL}/actuator/info`;
 
-// HYPOTHESIS
-export const HYPOTHESIS_LOAD_DEFAULT = `${BASE_URL}/v1/default_config/load`;
+// DEFAULT CONFIG
+export const DEFAULT_CONFIG_AREAS = `${BASE_URL}/v1/default_config/load`;
+export const DEFAULT_CONFIG_INSTALLED_POWER_TECHNOLOGY = `${BASE_URL}/v1/default_config/thermal-technology-display`;
 
 // WARNING
 export const WARNING_MESSAGES = `${BASE_URL}/v1/warnings`;

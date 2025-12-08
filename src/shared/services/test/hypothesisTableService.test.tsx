@@ -494,7 +494,14 @@ describe('addRow', () => {
     const mockSetCheckedValues = vi.fn<Dispatch<SetStateAction<string[]>>>();
     const mockSetData = vi.fn<Dispatch<SetStateAction<HypothesisRowData[]>>>();
 
-    addRow(TRAJECTORY_TYPE.THERMAL_CAPACITY, 'ThermalHypothesis', mockDispatch, mockSetCheckedValues, mockSetData);
+    addRow(
+      TRAJECTORY_TYPE.THERMAL_CAPACITY,
+      'ThermalHypothesis',
+      mockDispatch,
+      mockSetCheckedValues,
+      mockSetData,
+      ThermalOptions,
+    );
 
     const updater = mockSetData.mock.calls[0][0] as (prev: HypothesisRowData[]) => HypothesisRowData[];
     const newRow = updater([]);
@@ -608,7 +615,7 @@ describe('addRow', () => {
     const mockSetCheckedValues = vi.fn<Dispatch<SetStateAction<string[]>>>();
     const mockSetData = vi.fn<Dispatch<SetStateAction<HypothesisRowData[]>>>();
 
-    addRow(TRAJECTORY_TYPE.STS, 'STSHypothesis', mockDispatch, mockSetCheckedValues, mockSetData);
+    addRow(TRAJECTORY_TYPE.STS, 'STSHypothesis', mockDispatch, mockSetCheckedValues, mockSetData, STSTechnology);
 
     const updater = mockSetData.mock.calls[0][0] as (prev: HypothesisRowData[]) => HypothesisRowData[];
     const newRow = updater([]);

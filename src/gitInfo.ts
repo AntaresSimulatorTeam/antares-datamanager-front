@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "fix/close_icon",
-  commit: "c315dc4b",
-  commitTime: "2025-12-05T12:54:51.543Z",
+  branch: "feat/ANT-3651_thermal_installed_power_use_api_for_technology_list",
+  commit: "8ce59271",
+  commitTime: "2025-12-08T09:08:39.881Z",
 };

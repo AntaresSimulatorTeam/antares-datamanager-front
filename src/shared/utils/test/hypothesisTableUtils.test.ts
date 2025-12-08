@@ -11,7 +11,6 @@ import {
 } from '@/shared/utils/hypothesisTableUtils.ts';
 import { DbTrajectory, HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
 import { Row } from '@tanstack/react-table';
-import { isTechnology } from '@/shared/utils/trajectoryUtils.ts';
 import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 
 describe('getAlignment', () => {
@@ -49,34 +48,31 @@ vi.mock('@/shared/utils/trajectoryUtils', () => ({
 
 describe('hasLabelDefault', () => {
   it('returns true for depth 1, isDefault true, not technology, not OTHER_AREAS_LABEL', () => {
-    (isTechnology as Mock).mockReturnValue(false);
-    expect(hasLabelDefault(1, true, 'AI')).toBe(true);
+    expect(hasLabelDefault(1, true, 'AI', false)).toBe(true);
   });
 
   it('returns false for depth 1 if hypothesis is technology', () => {
-    (isTechnology as Mock).mockReturnValue(true);
-    expect(hasLabelDefault(1, true, 'Tech')).toBe(false);
+    expect(hasLabelDefault(1, true, 'Tech', true)).toBe(false);
   });
 
   it('returns false for depth 1 if hypothesis is OTHER_AREAS_LABEL', () => {
-    (isTechnology as Mock).mockReturnValue(false);
-    expect(hasLabelDefault(1, true, OTHER_AREAS_LABEL)).toBe(false);
+    expect(hasLabelDefault(1, true, OTHER_AREAS_LABEL, false)).toBe(false);
   });
 
   it('returns true for depth 0, isDefault true, not OTHER_AREAS_LABEL', () => {
-    expect(hasLabelDefault(0, true, 'AI')).toBe(true);
+    expect(hasLabelDefault(0, true, 'AI', true)).toBe(true);
   });
 
   it('returns false for depth 0 if isDefault is false', () => {
-    expect(hasLabelDefault(0, false, 'AI')).toBe(false);
+    expect(hasLabelDefault(0, false, 'AI', false)).toBe(false);
   });
 
   it('returns false for depth 0 if hypothesis is OTHER_AREAS_LABEL', () => {
-    expect(hasLabelDefault(0, true, OTHER_AREAS_LABEL)).toBe(false);
+    expect(hasLabelDefault(0, true, OTHER_AREAS_LABEL, true)).toBe(false);
   });
 
   it('returns false for other depths', () => {
-    expect(hasLabelDefault(2, true, 'AI')).toBe(false);
+    expect(hasLabelDefault(2, true, 'AI', false)).toBe(false);
   });
 });
 

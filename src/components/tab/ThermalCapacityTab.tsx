@@ -35,7 +35,6 @@ import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig';
 import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
 import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
 import { CheckBoxListWithSearchBar } from '@/components/list/CheckBoxListWithSearchBar.tsx';
-import { ThermalOptions } from '@/mocks/data/list/names.ts';
 
 const ThermalCapacityTab = ({ defaultAreas, areas }: TabProps) => {
   const studyState = useStudy();
@@ -47,6 +46,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: TabProps) => {
   const [data, setData] = useState<HypothesisRowData[]>([]);
   const [rowIdSelected, setRowIdSelected] = useState<string>('0');
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
+  const [installedPowerTechnologies, setInstalledPowerTechnologies] = useState<string[]>([]);
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
@@ -55,15 +55,8 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: TabProps) => {
   const [isStudyGenerated, setIsStudyGenerated] = useState(
     studyState.studyStatus === StudyStatus.GENERATED || study.status === StudyStatus.GENERATED,
   );
-  const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
-    useFetchHypothesisTrajectories(
-      areas,
-      study?.id,
-      TRAJECTORY_TYPE.THERMAL_CAPACITY,
-      defaultAreas,
-      isStudyGenerated,
-      ThermalOptions,
-    );
+  const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow, technologyList } =
+    useFetchHypothesisTrajectories(areas, study?.id, TRAJECTORY_TYPE.THERMAL_CAPACITY, defaultAreas, isStudyGenerated);
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(study, studyState, dispatch);
   const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch);
   const { removeRow } = useHypothesisTableRemoveRow(study, dispatch, setData, setCheckedValues);
@@ -74,10 +67,11 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: TabProps) => {
       areasTrajectoryOptions && setAreasOptions(areasTrajectoryOptions);
       dropDownListOptions && setCheckedValues(dropDownListOptions);
       hypothesisTrajectories && setData(hypothesisTrajectories);
+      technologyList && setInstalledPowerTechnologies(technologyList);
       setReadOnly(readOnlyRow);
     };
     setThermalHypothesis();
-  }, [areas, areasTrajectoryOptions, defaultAreas, dropDownListOptions, hypothesisTrajectories, readOnlyRow]);
+  }, [areasTrajectoryOptions, technologyList, dropDownListOptions, hypothesisTrajectories, readOnlyRow]);
 
   useEffect(() => {
     if (isStudyGenerated) {
@@ -91,7 +85,14 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: TabProps) => {
     async (value: string, isChecked?: boolean) => {
       const indexRow = data.findIndex((row) => row.hypothesis === value);
       if (isChecked) {
-        addRow(TRAJECTORY_TYPE.THERMAL_CAPACITY, value, dispatch, setCheckedValues, setData);
+        addRow(
+          TRAJECTORY_TYPE.THERMAL_CAPACITY,
+          value,
+          dispatch,
+          setCheckedValues,
+          setData,
+          installedPowerTechnologies,
+        );
       } else if (shouldOpenDeletionModal(TRAJECTORY_TYPE.THERMAL_CAPACITY, indexRow, data)) {
         setRowToDelete({ index: indexRow, value });
         setIsDeletionModalOpen(true);
@@ -121,6 +122,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: TabProps) => {
         progress={progress}
         idSelected={rowIdSelected}
         type={TRAJECTORY_TYPE.THERMAL_CAPACITY}
+        list={installedPowerTechnologies}
         handleSearch={async (value: string, rowId: string) => {
           const indexArray = rowId.split('.').map(Number);
           const area =
