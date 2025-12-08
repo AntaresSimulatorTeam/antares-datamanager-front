@@ -1,4 +1,4 @@
-import { getDefaultAreas } from '@/shared/services/defaultConfigService.ts';
+import { getDefaultAreas, getThermalTechnologyList } from '@/shared/services/defaultConfigService.ts';
 import { AuthService } from '@/shared/services/authService.ts';
 import { waitFor } from '@testing-library/react';
 import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
@@ -52,7 +52,7 @@ describe('getThermalTechnologyList', () => {
       json: async () => Promise.resolve(ThermalOptions),
     });
 
-    const result = await getDefaultAreas();
+    const result = await getThermalTechnologyList();
 
     await waitFor(() => {
       expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
@@ -68,6 +68,8 @@ describe('getThermalTechnologyList', () => {
       type: ERROR_MESSAGE_TYPE.BUSINESS,
     });
 
-    await expect(async () => getDefaultAreas()).rejects.toThrowError('Failed to fetch thermal technology list');
+    await expect(async () => getThermalTechnologyList()).rejects.toThrowError(
+      'Failed to fetch thermal technology list',
+    );
   });
 });
