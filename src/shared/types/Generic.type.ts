@@ -5,6 +5,7 @@ import { Dispatch, SetStateAction } from 'react';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { TFunction } from 'i18next';
+import { StudyDTO } from '@/shared/types/Study.type.ts';
 
 export type Entries<T> = {
   [K in keyof T]: [K, T[K]];
@@ -64,6 +65,7 @@ export type ExpandedState = true | Record<string, boolean>;
 export interface TabProps {
   defaultAreas: { name: string }[];
   areas: TrajectoryAreaData[];
+  studyData: StudyDTO;
 }
 
 export type TableHeadersProps = {

@@ -40,14 +40,14 @@ const MainContent = () => {
           <Suspense>
             <Routes>
               <Route
-                path="/study/:studyName"
+                path="/study/:id"
                 element={
                   <StudyProvider>
                     <StudyDetails />
                   </StudyProvider>
                 }
               />
-              <Route path="/project/:projectName" element={<ProjectDetails />} />
+              <Route path="/project/:id" element={<ProjectDetails />} />
               {Object.entries([...menuBottomData, ...menuTopData]).map(([key, route]) => (
                 <Route key={key} path={route.path} Component={route.component} />
               ))}

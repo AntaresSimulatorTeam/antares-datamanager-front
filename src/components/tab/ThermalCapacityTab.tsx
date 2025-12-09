@@ -4,15 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import {
-  CheckBoxData,
-  DbTrajectory,
-  HypothesisRowData,
-  LocationStudy,
-  RowStatus,
-  SelectOption,
-  TabProps,
-} from '@/shared/types';
+import { CheckBoxData, DbTrajectory, HypothesisRowData, RowStatus, SelectOption, TabProps } from '@/shared/types';
 import { useCallback, useEffect, useState } from 'react';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
@@ -28,7 +20,6 @@ import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/Pega
 import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
-import { useLocation } from 'react-router-dom';
 import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
 import { addRow, handleFetchTrajectoriesFS, handleTrajectorySearch } from '@/shared/services/hypothesisTableService.ts';
 import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
@@ -41,10 +32,8 @@ import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
 import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
 import { CheckBoxListWithSearchBar } from '@/components/list/CheckBoxListWithSearchBar.tsx';
 
-const ThermalCapacityTab = ({ defaultAreas, areas }: TabProps) => {
+const ThermalCapacityTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const studyState = useStudy();
-  const location = useLocation();
-  const study = (location.state as LocationStudy)?.study;
   const dispatch = useStudyDispatch();
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
@@ -58,14 +47,14 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: TabProps) => {
   const [rowToDelete, setRowToDelete] = useState<{ index: number; value?: string } | null>(null);
   const [isDeletionModalOpen, setIsDeletionModalOpen] = useState(false);
   const [isStudyGenerated, setIsStudyGenerated] = useState(
-    studyState.studyStatus === StudyStatus.GENERATED || study.status === StudyStatus.GENERATED,
+    studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED,
   );
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow, technologyList } =
-    useFetchHypothesisTrajectories(areas, study?.id, TRAJECTORY_TYPE.THERMAL_CAPACITY, defaultAreas, isStudyGenerated);
+    useFetchHypothesisTrajectories(areas, studyData?.id, TRAJECTORY_TYPE.THERMAL_CAPACITY, defaultAreas, isStudyGenerated);
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(study, studyState, dispatch);
-  const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch);
-  const { removeRow } = useHypothesisTableRemoveRow(study, dispatch, setData, setCheckedValues);
-  const { detachTrajectory } = useTrajectoryDetach(study, dispatch);
+  const { attachTrajectory } = useTrajectoryAttach(studyData, studyState, dispatch);
+  const { removeRow } = useHypothesisTableRemoveRow(studyData, dispatch, setData, setCheckedValues);
+  const { detachTrajectory } = useTrajectoryDetach(studyData, dispatch);
 
   useEffect(() => {
     const setThermalHypothesis = () => {
@@ -140,7 +129,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: TabProps) => {
             value,
             area,
             setDbTrajectories,
-            study,
+            studyData,
             technology,
           );
         }}

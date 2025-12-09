@@ -25,7 +25,7 @@ export const useTrajectoryAttach = (
       setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
     ) => {
       try {
-        const newDbTrajectory = await linkTrajectoryToStudy(type, trajectory.id, study.id);
+        const newDbTrajectory = await linkTrajectoryToStudy(type, trajectory.id, study?.id);
 
         if (newDbTrajectory) {
           let alreadyExists = false;
@@ -71,7 +71,7 @@ export const useTrajectoryAttach = (
       } catch (error) {
         if (indexArray.length) {
           const message = t('studyDetails.@notificationAlert', {
-            studyName: study.name,
+            studyName: study?.name,
             trajectoryName: trajectory.trajectoryName,
             trajectoryType: trajectory.area,
           });
@@ -90,7 +90,7 @@ export const useTrajectoryAttach = (
         }
       }
     },
-    [study.id, study.name, studyState, dispatch, t, user?.profile?.sub],
+    [study?.id, study?.name, studyState, dispatch, t, user?.profile?.sub],
   );
 
   return { attachTrajectory };

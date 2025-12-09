@@ -5,7 +5,7 @@
  */
 
 import { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import ProjectDetailsHeader from './ProjectDetailsHeader';
 import StudyTableDisplay from '@/pages/pegase/home/components/StudyTableDisplay';
 import SearchBar from '@/pages/pegase/home/components/SearchBar';
@@ -13,7 +13,6 @@ import { useTranslation } from 'react-i18next';
 import { RdsChip, RdsDivider } from 'rte-design-system-react';
 import DetailsContent from '@/components/banner/DetailsContent.tsx';
 import { useUser } from '@/store/contexts/UserContext.tsx';
-import { LocationProject } from '@/shared/types';
 import { ProjectCreationModal } from '@common/modal/ProjectCreationModal.tsx';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { useGetProjectDetails } from '@/hooks/useGetProjectDetails.ts';
@@ -25,9 +24,8 @@ const ProjectDetails = () => {
   const [reFetchProject, setReFetchProject] = useState(0);
   const { user } = useUser();
   const { isModalOpen, toggleModal } = useNewStudyModal();
-  const location = useLocation();
-  const projectId = (location.state as LocationProject)?.projectId as string | null;
-  const { projectDetails } = useGetProjectDetails(projectId, reFetchProject);
+  const { id } = useParams();
+  const { projectDetails } = useGetProjectDetails(id ?? null, reFetchProject);
 
   const handleChipClick = () => {
     if (activeChip) {

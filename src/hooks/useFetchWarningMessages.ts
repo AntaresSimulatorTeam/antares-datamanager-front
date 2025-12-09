@@ -7,7 +7,7 @@ import { buildDataWarningMessage } from '@/shared/utils/warningUtils.ts';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 
-export const useFetchWarningMessages = (studyId: number, type: TRAJECTORY_TYPE) => {
+export const useFetchWarningMessages = (studyId: number | null, type: TRAJECTORY_TYPE) => {
   const [warningMessages, setWarningMessages] = useState<WarningMessage[]>([]);
   const studyState = useStudy();
   const dispatch = useStudyDispatch();
