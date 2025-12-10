@@ -7,6 +7,7 @@ import * as defaultConfigService from '@/shared/services/defaultConfigService.ts
 import {
   mockDbTrajectory,
   mockDbTrajectoryArrayLoad,
+  mockDbTrajectoryArraySTSThermal,
   mockDbTrajectoryArrayThermal,
   mockEmptyDbTrajectoryArrayLoad,
   mockEmptyDbTrajectoryLoadFR,
@@ -17,7 +18,7 @@ import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
 import * as trajectoryUtils from '@/shared/utils/trajectoryUtils.ts';
 import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
-import { ThermalOptions } from '@/mocks/data/list/names.ts';
+import { STSTechnology, ThermalOptions } from '@/mocks/data/list/names.ts';
 
 vi.mock('@/shared/services/trajectoryService');
 vi.mock('@/shared/services/hypothesisTableService');
@@ -499,6 +500,36 @@ describe('useFetchHypothesisTrajectories', () => {
     );
 
     await waitFor(() => expect(result.current.hypothesisTrajectories[0].subRows).toEqual(technologiesHypothesis));
+  });
+
+  it('should include STSTechnology when trajectoryType is STS', async () => {
+    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArraySTSThermal);
+    vi.mocked(defaultConfigService.getThermalTechnologyList).mockResolvedValue(
+      STSTechnology.map((option) => ({ name: option })),
+    );
+    const technologiesHypothesis = STSTechnology.map((option) => ({
+      hypothesis: option,
+      isDefault: true,
+      status: TRAJECTORY_SELECTION_STATUS.MISSING,
+      subRows: null,
+      trajectory: null,
+    }));
+
+    const { result } = renderHook(() => useFetchHypothesisTrajectories([], 5, TRAJECTORY_TYPE.STS, [], false));
+
+    await waitFor(() => {
+      expect(defaultConfigService.getThermalTechnologyList).not.toHaveBeenCalled();
+      expect(result.current.hypothesisTrajectories).toEqual([
+        {
+          hypothesis: 'Other areas',
+          isDefault: true,
+          isDeletable: true,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          subRows: technologiesHypothesis,
+          trajectory: null,
+        },
+      ]);
+    });
   });
 
   it('should not call api if only study id is provided', async () => {
