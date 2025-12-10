@@ -7,9 +7,9 @@ import * as defaultConfigService from '@/shared/services/defaultConfigService.ts
 import {
   mockDbTrajectory,
   mockDbTrajectoryArrayLoad,
-  mockDbTrajectoryArraySTSThermal,
   mockDbTrajectoryArrayThermal,
   mockEmptyDbTrajectoryArrayLoad,
+  mockEmptyDbTrajectoryArrayLoadSTS,
   mockEmptyDbTrajectoryLoadFR,
   mockEmptyDbTrajectoryLoadOthers,
 } from '@/mocks/data/tests/trajectory.mock.ts';
@@ -503,7 +503,15 @@ describe('useFetchHypothesisTrajectories', () => {
   });
 
   it('should include STSTechnology when trajectoryType is STS', async () => {
-    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArraySTSThermal);
+    const defaultAreas = [{ name: 'FR' }];
+    const areas = [{ areaName: 'AT' }, { areaName: 'BE' }] as TrajectoryAreaData[];
+    mockUseStudy.mockImplementation(
+      () =>
+        ({
+          ['STS']: { trajectories: mockEmptyDbTrajectoryArrayLoadSTS, warningMessages: [] },
+        }) as Partial<StudyState>,
+    );
+    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue([]);
     vi.mocked(defaultConfigService.getThermalTechnologyList).mockResolvedValue(
       STSTechnology.map((option) => ({ name: option })),
     );
@@ -515,15 +523,33 @@ describe('useFetchHypothesisTrajectories', () => {
       trajectory: null,
     }));
 
-    const { result } = renderHook(() => useFetchHypothesisTrajectories([], 5, TRAJECTORY_TYPE.STS, [], false));
+    const { result } = renderHook(() =>
+      useFetchHypothesisTrajectories(areas, 5, TRAJECTORY_TYPE.STS, defaultAreas, false),
+    );
 
     await waitFor(() => {
       expect(defaultConfigService.getThermalTechnologyList).not.toHaveBeenCalled();
       expect(result.current.hypothesisTrajectories).toEqual([
         {
+          hypothesis: 'AT',
+          isDefault: false,
+          isDeletable: true,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          subRows: technologiesHypothesis,
+          trajectory: null,
+        },
+        {
+          hypothesis: 'BE',
+          isDefault: false,
+          isDeletable: true,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          subRows: technologiesHypothesis,
+          trajectory: null,
+        },
+        {
           hypothesis: 'Other areas',
           isDefault: true,
-          isDeletable: true,
+          isDeletable: false,
           status: TRAJECTORY_SELECTION_STATUS.MISSING,
           subRows: technologiesHypothesis,
           trajectory: null,

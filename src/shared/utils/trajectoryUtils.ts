@@ -322,9 +322,9 @@ export const convertIntoHypothesisRowWithTechnologies = (
         mainEntry?.trajectoryName && !mainEntry?.technology
           ? TRAJECTORY_SELECTION_STATUS.OK
           : TRAJECTORY_SELECTION_STATUS.MISSING,
-      isDefault: isDefault || OTHER_AREAS === mainEntry?.area,
+      isDefault: isDefault || mainEntry?.area === OTHER_AREAS,
       subRows: subRows?.length ? subRows : null,
-      isDeletable: true,
+      isDeletable: isDefault || !(mainEntry?.area === OTHER_AREAS),
     };
   });
 };

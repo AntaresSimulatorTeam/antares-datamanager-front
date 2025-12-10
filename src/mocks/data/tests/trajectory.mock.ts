@@ -171,10 +171,10 @@ export const mockDbTrajectoryArrayThermal: DbTrajectory[] = [
   },
 ];
 
-export const mockDbTrajectoryArraySTSThermal: DbTrajectory[] = [
+export const mockEmptyDbTrajectoryArrayLoadSTS: DbTrajectory[] = [
   {
     id: 1,
-    trajectoryName: 'area_PB_2024',
+    trajectoryName: '',
     type: TRAJECTORY_TYPE.STS,
     version: 3,
     userName: 'mouad',
@@ -184,7 +184,7 @@ export const mockDbTrajectoryArraySTSThermal: DbTrajectory[] = [
   },
   {
     id: 2,
-    trajectoryName: 'area_PB_2026',
+    trajectoryName: '',
     type: TRAJECTORY_TYPE.STS,
     version: 3,
     userName: 'mouad',
