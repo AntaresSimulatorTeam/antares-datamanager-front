@@ -41,75 +41,73 @@ export const useFetchHypothesisTrajectories = (
   }, [trajectoryType]);
 
   const fetchAreas = useCallback(
-    async (id?: number, trajType?: TRAJECTORY_TYPE) => {
+    async (id: number, trajType: TRAJECTORY_TYPE) => {
       try {
-        if (id != null && trajType) {
-          // TODO: remove this when STS api is implemented
-          let technologies;
-          const result = trajType === TRAJECTORY_TYPE.STS ? [] : await getStudyTrajectories(id, trajType);
-          if (trajectoryType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
-            const thermalOptions = await getThermalTechnologyList();
-            technologies = thermalOptions?.map((thermalOption) => thermalOption.name);
-            setTechnologyList(technologies);
-          }
-          if (trajectoryType === TRAJECTORY_TYPE.STS) {
-            // TODO : To implement when thermal sts technologies api is implemented
-            technologies = STSTechnology;
-            setTechnologyList(STSTechnology);
-          }
-          // Build default empty areas (default area not linked to a trajectory)
-          const defaultEmptyAreas = buildDefaultEmptyTrajectoryList(trajType, result, defaultAreas);
-          const allAreas = [...(result || []), ...(emptyAreaSelected || []), ...(defaultEmptyAreas || [])];
+        // TODO: remove this when STS api is implemented
+        let technologies;
+        const result = trajType === TRAJECTORY_TYPE.STS ? [] : await getStudyTrajectories(id, trajType);
+        if (trajectoryType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
+          const thermalOptions = await getThermalTechnologyList();
+          technologies = thermalOptions?.map((thermalOption) => thermalOption.name);
+          setTechnologyList(technologies);
+        }
+        if (trajectoryType === TRAJECTORY_TYPE.STS) {
+          // TODO : To implement when thermal sts technologies api is implemented
+          technologies = STSTechnology;
+          setTechnologyList(STSTechnology);
+        }
+        // Build default empty areas (default area not linked to a trajectory)
+        const defaultEmptyAreas = buildDefaultEmptyTrajectoryList(trajType, result, defaultAreas);
+        const allAreas = [...(result || []), ...(emptyAreaSelected || []), ...(defaultEmptyAreas || [])];
 
-          const arrayWithoutDuplicate =
-            trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY
-              ? removeDuplicateByTechnology(allAreas)
-              : removeDuplicate(allAreas);
-          dispatch?.({
-            type: STUDY_ACTION.ADD_TRAJECTORIES,
-            payload: {
-              [trajType]: {
-                trajectories: arrayWithoutDuplicate,
-              },
+        const arrayWithoutDuplicate =
+          trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY
+            ? removeDuplicateByTechnology(allAreas)
+            : removeDuplicate(allAreas);
+        dispatch?.({
+          type: STUDY_ACTION.ADD_TRAJECTORIES,
+          payload: {
+            [trajType]: {
+              trajectories: arrayWithoutDuplicate,
             },
-          });
+          },
+        });
 
-          // Build checklist for dropdown list
-          const resultList = buildCheckListBox(arrayWithoutDuplicate, areas, defaultAreas);
-          resultList?.areaOptions && setAreasTrajectoryOptions(resultList?.areaOptions);
-          setDropDownListOptions(resultList?.checkedValues);
+        // Build checklist for dropdown list
+        const resultList = buildCheckListBox(arrayWithoutDuplicate, areas, defaultAreas);
+        resultList?.areaOptions && setAreasTrajectoryOptions(resultList?.areaOptions);
+        setDropDownListOptions(resultList?.checkedValues);
 
-          // Build row data for hypothesis table
-          // Find default area not included in areas trajectory list
-          const defaultAreaListNotIncludedInList: string[] = getDefaultAreaNotIncludedInAreaList(
-            defaultAreas ?? [],
-            areas,
-          );
+        // Build row data for hypothesis table
+        // Find default area not included in areas trajectory list
+        const defaultAreaListNotIncludedInList: string[] = getDefaultAreaNotIncludedInAreaList(
+          defaultAreas ?? [],
+          areas,
+        );
 
-          // Hypothesis table
-          const areaData =
-            trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY || trajType === TRAJECTORY_TYPE.STS
-              ? convertIntoHypothesisRowWithTechnologies(
-                  arrayWithoutDuplicate,
-                  defaultAreaListNotIncludedInList,
-                  defaultAreas,
-                  technologies ?? [],
+        // Hypothesis table
+        const areaData =
+          trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY || trajType === TRAJECTORY_TYPE.STS
+            ? convertIntoHypothesisRowWithTechnologies(
+                arrayWithoutDuplicate,
+                defaultAreaListNotIncludedInList,
+                defaultAreas,
+                technologies ?? [],
+              )
+            : arrayWithoutDuplicate
+                .map((trajectory) =>
+                  buildRowWithSubRowsData(trajectory, defaultAreas, defaultAreaListNotIncludedInList, null),
                 )
-              : arrayWithoutDuplicate
-                  .map((trajectory) =>
-                    buildRowWithSubRowsData(trajectory, defaultAreas, defaultAreaListNotIncludedInList, null),
-                  )
-                  .filter(Boolean);
-          const dataTrajectories = sortWithFixedPosition(areaData);
-          setHypothesisTrajectories(dataTrajectories);
+                .filter(Boolean);
+        const dataTrajectories = sortWithFixedPosition(areaData);
+        setHypothesisTrajectories(dataTrajectories);
 
-          if (isStudyGenerated) {
-            const rows = generateReadOnlyIndexMap(dataTrajectories);
-            setReadOnlyRow(rows);
-          } else {
-            const readOnlyRows = retrieveReadOnlyArea(dataTrajectories, defaultAreaListNotIncludedInList);
-            setReadOnlyRow(readOnlyRows);
-          }
+        if (isStudyGenerated) {
+          const rows = generateReadOnlyIndexMap(dataTrajectories);
+          setReadOnlyRow(rows);
+        } else {
+          const readOnlyRows = retrieveReadOnlyArea(dataTrajectories, defaultAreaListNotIncludedInList);
+          setReadOnlyRow(readOnlyRows);
         }
       } catch (error) {
         console.error('============= error', error);
@@ -119,7 +117,9 @@ export const useFetchHypothesisTrajectories = (
   );
 
   useEffect(() => {
-    void fetchAreas(studyId, trajectoryType);
+    if (studyId != null && trajectoryType) {
+      void fetchAreas(studyId, trajectoryType);
+    }
   }, [studyId, trajectoryType]);
 
   return { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow, technologyList };

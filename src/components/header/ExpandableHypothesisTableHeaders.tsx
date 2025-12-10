@@ -41,7 +41,7 @@ const getExpandableHypothesisTableHeaders = ({
       const { status, isDefault, hypothesis } = row.original;
       const subRowListName = getSubRowsList(row);
       const subRowListWithArea = getSubRowListWithArea(subRowListName, t, type);
-      const isTechnology = list?.length ? list?.some((subRow: string) => subRow === hypothesis) : false;
+      const isTechnology = list?.length ? list?.includes(hypothesis) : false;
 
       return (
         <div className="flex gap-1 py-1">
