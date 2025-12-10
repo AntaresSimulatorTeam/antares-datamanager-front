@@ -73,13 +73,8 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
   const options = { withReadOnlyRow: false, isStudyGenerated };
   const { hypothesisTrajectories: economicData } = useFetchFixHypothesisTrajectories(configs, options, study?.id);
 
-  const {
-    fileStatus,
-    progress,
-    importTrajectory,
-    newDbTrajectoryAttached: newDbTrajectoryImported,
-  } = useTrajectoryImport(study, studyState, dispatch);
-  const { attachTrajectory, newDbTrajectoryAttached } = useTrajectoryAttach(study, studyState, dispatch);
+  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(study, studyState, dispatch);
+  const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch);
   const { removeRow } = useHypothesisTableRemoveRow(study, dispatch, setTechnicalData, setCheckedValues);
   const { detachTrajectory } = useTrajectoryDetach(study, dispatch);
 
