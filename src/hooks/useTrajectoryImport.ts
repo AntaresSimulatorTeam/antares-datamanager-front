@@ -28,7 +28,7 @@ export const useTrajectoryImport = (
   const { t } = useTranslation();
   const { user } = useUser();
 
-  const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch);
+  const { attachTrajectory, newDbTrajectoryAttached } = useTrajectoryAttach(study, studyState, dispatch);
 
   const importTrajectory = useCallback(
     async (
@@ -88,5 +88,6 @@ export const useTrajectoryImport = (
     fileStatus,
     progress,
     importTrajectory,
+    newDbTrajectoryAttached,
   };
 };
