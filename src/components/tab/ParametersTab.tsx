@@ -73,13 +73,8 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
   const options = { withReadOnlyRow: false, isStudyGenerated };
   const { hypothesisTrajectories: economicData } = useFetchFixHypothesisTrajectories(configs, options, study?.id);
 
-  const {
-    fileStatus,
-    progress,
-    importTrajectory,
-    newDbTrajectoryAttached: newDbTrajectoryImported,
-  } = useTrajectoryImport(study, studyState, dispatch);
-  const { attachTrajectory, newDbTrajectoryAttached } = useTrajectoryAttach(study, studyState, dispatch);
+  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(study, studyState, dispatch);
+  const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch);
   const { removeRow } = useHypothesisTableRemoveRow(study, dispatch, setTechnicalData, setCheckedValues);
   const { detachTrajectory } = useTrajectoryDetach(study, dispatch);
 
@@ -209,19 +204,21 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
               const dbTrajectory =
                 dbTrajectories.find((traj) => traj.id === value || traj.trajectoryName === value) ?? null;
               if (dbTrajectory) {
-                await attachTrajectory(
+                const newDbTrajectoryAttached = await attachTrajectory(
                   getTrajectoryTypeByIndex(topIndex),
                   [topIndex, subIndex].filter((n) => n !== undefined),
                   status,
                   dbTrajectory,
                   setTechnicalData,
                 );
-                const isRequired = await isParamModulationRequired(
-                  study.id,
-                  study?.horizon,
-                  newDbTrajectoryAttached?.id,
-                );
-                setShouldEnableParamModulation(isRequired);
+                if (newDbTrajectoryAttached) {
+                  const isRequired = await isParamModulationRequired(
+                    study.id,
+                    study?.horizon,
+                    newDbTrajectoryAttached?.id,
+                  );
+                  setShouldEnableParamModulation(isRequired);
+                }
               }
             }
           }}
@@ -288,13 +285,21 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
                 const dbTrajectory =
                   dbTrajectories.find((traj) => traj.id === value || traj.trajectoryName === value) ?? null;
                 if (dbTrajectory) {
-                  void attachTrajectory(type, indexArray, status, dbTrajectory, setData);
-                  const isRequired = await isParamModulationRequired(
-                    study.id,
-                    study?.horizon,
-                    newDbTrajectoryAttached?.id,
+                  const newDbTrajectoryAttached = await attachTrajectory(
+                    type,
+                    indexArray,
+                    status,
+                    dbTrajectory,
+                    setData,
                   );
-                  setShouldEnableParamModulation(isRequired);
+                  if (newDbTrajectoryAttached) {
+                    const isRequired = await isParamModulationRequired(
+                      study.id,
+                      study?.horizon,
+                      newDbTrajectoryAttached?.id,
+                    );
+                    setShouldEnableParamModulation(isRequired);
+                  }
                 }
               }
             }}
@@ -311,12 +316,22 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
               const isTechnicalParamType = isTechnicalParametersType(selectedTrajectoryType);
               const dataTable = isTechnicalParamType ? technicalData : data;
               const setDataTable = isTechnicalParamType ? setTechnicalData : setData;
-              await importTrajectory(selectedTrajectoryType, value, indexArray, dataTable, setDataTable);
+              const newDbTrajectoryImported = await importTrajectory(
+                selectedTrajectoryType,
+                value,
+                indexArray,
+                dataTable,
+                setDataTable,
+              );
               if (
                 newDbTrajectoryImported &&
                 selectedTrajectoryType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER
               ) {
-                const isRequired = await isParamModulationRequired(study.id, study?.horizon);
+                const isRequired = await isParamModulationRequired(
+                  study.id,
+                  study?.horizon,
+                  newDbTrajectoryImported?.id,
+                );
                 setShouldEnableParamModulation(isRequired);
               }
             }
