@@ -324,7 +324,7 @@ export const convertIntoHypothesisRowWithTechnologies = (
           : TRAJECTORY_SELECTION_STATUS.MISSING,
       isDefault: isDefault || mainEntry?.area === OTHER_AREAS,
       subRows: subRows?.length ? subRows : null,
-      isDeletable: isDefault || !(mainEntry?.area === OTHER_AREAS),
+      isDeletable: isDefault || mainEntry?.area !== OTHER_AREAS,
     };
   });
 };
