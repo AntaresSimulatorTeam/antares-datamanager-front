@@ -73,6 +73,7 @@ export type TableHeadersProps = {
   idSelected: string;
   columnHeader?: string;
   type?: TRAJECTORY_TYPE;
+  list?: string[];
 };
 
 export interface TableHeadersGetterProps extends TableHeadersProps {

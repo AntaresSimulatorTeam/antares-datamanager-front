@@ -5,7 +5,6 @@
  */
 
 import {
-  HYPOTHESIS_LOAD_DEFAULT,
   TRAJECTORY_COUNT_WARNING_ENDPOINT,
   TRAJECTORY_DATA_BASE_ENDPOINT,
   TRAJECTORY_DATA_FILE_ENDPOINT,
@@ -275,20 +274,6 @@ export const getTrajectoryDataByTypeAndId = async (
   try {
     const response = await AuthService.authFetch(urlApi);
     return (await (response as Response).json()) as Types<TRAJECTORY_DATA_TYPE>[];
-  } catch (error) {
-    throw new Error((error as BackendError).antaresErrorMessage);
-  }
-};
-
-/**
- * Fetch load default hypothesis (LOAD_OTHERS, LOAD_FR...)
- * @return {Promise<{ name: string }[]>}
- * @throws {Error}
- */
-export const getDefaultLoadHypothesis = async (): Promise<{ name: string }[]> => {
-  try {
-    const response = await AuthService.authFetch(HYPOTHESIS_LOAD_DEFAULT);
-    return (await (response as Response).json()) as { name: string }[];
   } catch (error) {
     throw new Error((error as BackendError).antaresErrorMessage);
   }

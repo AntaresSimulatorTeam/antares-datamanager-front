@@ -10,7 +10,6 @@ import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import {
   fetchTrajectoriesFromDB,
   fetchTrajectoriesFromFS,
-  getDefaultLoadHypothesis,
   getNbMessagesFromTrajectoryType,
   getStudyTrajectoriesWithWarnings,
   getTrajectoryDataByTypeAndId,
@@ -405,37 +404,6 @@ describe('getStudyTrajectoriesWithWarnings', () => {
     await expect(async () => getStudyTrajectoriesWithWarnings(5, TRAJECTORY_TYPE.LINK)).rejects.toThrowError(
       'Failed to fetch warning message',
     );
-  });
-});
-
-describe('getDefaultLoadHypothesis', () => {
-  afterEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('should fetch default hypothesis', async () => {
-    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
-      ok: true,
-      json: async () => Promise.resolve({ name: 'FR' }),
-    });
-
-    const result = await getDefaultLoadHypothesis();
-
-    await waitFor(() => {
-      expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
-      expect(AuthService.authFetch).toHaveBeenCalledWith('https://mockapi.com/v1/default_config/load');
-      expect(result).toEqual({ name: 'FR' });
-    });
-  });
-
-  it('should throw error when data fetching failed', async () => {
-    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
-      antaresErrorMessage: 'Failed to fetch default hypothesis',
-      date: new Date(),
-      type: ERROR_MESSAGE_TYPE.BUSINESS,
-    });
-
-    await expect(async () => getDefaultLoadHypothesis()).rejects.toThrowError('Failed to fetch default hypothesis');
   });
 });
 

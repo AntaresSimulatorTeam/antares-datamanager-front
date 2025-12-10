@@ -4,6 +4,7 @@ import { useStudy } from '@/store/contexts/StudyContext.tsx';
 import { StudyState, TrajectoryLinkData } from '@/shared/types';
 import { renderHook, waitFor } from '@testing-library/react';
 import * as trajectoryService from '@/shared/services/trajectoryService.ts';
+import * as defaultConfigService from '@/shared/services/defaultConfigService.ts';
 import {
   mockDbTrajectory,
   mockDbTrajectoryArray,
@@ -13,6 +14,7 @@ import {
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 
 vi.mock('@/shared/services/trajectoryService');
+vi.mock('@/shared/services/defaultConfigService');
 vi.mock('@/shared/services/studyService');
 vi.mock('@/store/contexts/StudyContext', async (importOriginal) => {
   const actual: Mock = await importOriginal();
@@ -24,7 +26,7 @@ vi.mock('@/store/contexts/StudyContext', async (importOriginal) => {
 
 describe('useFetchAreas', () => {
   const mockUseStudy = useStudy as Mock<typeof useStudy>;
-  vi.mocked(trajectoryService.getDefaultLoadHypothesis).mockResolvedValueOnce(mockDefaultArea);
+  vi.mocked(defaultConfigService.getDefaultAreas).mockResolvedValueOnce(mockDefaultArea);
   vi.mocked(trajectoryService.getTrajectoryDataByTypeAndId).mockResolvedValueOnce(
     mockTrajectoryAreaData as unknown as TrajectoryLinkData[],
   );
@@ -47,7 +49,7 @@ describe('useFetchAreas', () => {
     const { result } = renderHook(() => useFetchAreas(mockDbTrajectory));
 
     await waitFor(() => {
-      expect(trajectoryService.getDefaultLoadHypothesis).toHaveBeenCalledTimes(1);
+      expect(defaultConfigService.getDefaultAreas).toHaveBeenCalledTimes(1);
       expect(trajectoryService.getTrajectoryDataByTypeAndId).toHaveBeenCalledTimes(1);
       expect(trajectoryService.getTrajectoryDataByTypeAndId).toHaveBeenCalledWith(TRAJECTORY_TYPE.AREA, 1);
       expect(result.current.areaDefault).toEqual([

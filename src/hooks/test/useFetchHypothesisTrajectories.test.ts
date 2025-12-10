@@ -3,11 +3,13 @@ import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { StudyState, TrajectoryAreaData } from '@/shared/types';
 import { renderHook, waitFor } from '@testing-library/react';
 import * as studyService from '@/shared/services/studyService.ts';
+import * as defaultConfigService from '@/shared/services/defaultConfigService.ts';
 import {
   mockDbTrajectory,
   mockDbTrajectoryArrayLoad,
   mockDbTrajectoryArrayThermal,
   mockEmptyDbTrajectoryArrayLoad,
+  mockEmptyDbTrajectoryArrayLoadSTS,
   mockEmptyDbTrajectoryLoadFR,
   mockEmptyDbTrajectoryLoadOthers,
 } from '@/mocks/data/tests/trajectory.mock.ts';
@@ -44,6 +46,13 @@ vi.mock('@/shared/services/warningService', async (importOriginal) => {
   return {
     ...actual,
     fetchWarningMessages: vi.fn(),
+  };
+});
+vi.mock('@/shared/services/defaultConfigService', async (importOriginal) => {
+  const actual: Mock = await importOriginal();
+  return {
+    ...actual,
+    getThermalTechnologyList: vi.fn(),
   };
 });
 
@@ -475,6 +484,9 @@ describe('useFetchHypothesisTrajectories', () => {
 
   it('should include ThermalOptions when trajectoryType is THERMAL_CAPACITY', async () => {
     vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArrayThermal);
+    vi.mocked(defaultConfigService.getThermalTechnologyList).mockResolvedValue(
+      ThermalOptions.map((option) => ({ name: option })),
+    );
     const technologiesHypothesis = ThermalOptions.map((option) => ({
       hypothesis: option,
       isDefault: true,
@@ -484,14 +496,25 @@ describe('useFetchHypothesisTrajectories', () => {
     }));
 
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories([], 5, TRAJECTORY_TYPE.THERMAL_CAPACITY, [], false, ThermalOptions),
+      useFetchHypothesisTrajectories([], 5, TRAJECTORY_TYPE.THERMAL_CAPACITY, [], false),
     );
 
     await waitFor(() => expect(result.current.hypothesisTrajectories[0].subRows).toEqual(technologiesHypothesis));
   });
 
-  it('should include STS options when trajectoryType is STS type', async () => {
-    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArrayThermal);
+  it('should include STSTechnology when trajectoryType is STS', async () => {
+    const defaultAreas = [{ name: 'FR' }];
+    const areas = [{ areaName: 'AT' }, { areaName: 'BE' }] as TrajectoryAreaData[];
+    mockUseStudy.mockImplementation(
+      () =>
+        ({
+          ['STS']: { trajectories: mockEmptyDbTrajectoryArrayLoadSTS, warningMessages: [] },
+        }) as Partial<StudyState>,
+    );
+    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue([]);
+    vi.mocked(defaultConfigService.getThermalTechnologyList).mockResolvedValue(
+      STSTechnology.map((option) => ({ name: option })),
+    );
     const technologiesHypothesis = STSTechnology.map((option) => ({
       hypothesis: option,
       isDefault: true,
@@ -501,10 +524,38 @@ describe('useFetchHypothesisTrajectories', () => {
     }));
 
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories([], 5, TRAJECTORY_TYPE.STS, [], false, STSTechnology),
+      useFetchHypothesisTrajectories(areas, 5, TRAJECTORY_TYPE.STS, defaultAreas, false),
     );
 
-    await waitFor(() => expect(result.current.hypothesisTrajectories[0].subRows).toEqual(technologiesHypothesis));
+    await waitFor(() => {
+      expect(defaultConfigService.getThermalTechnologyList).not.toHaveBeenCalled();
+      expect(result.current.hypothesisTrajectories).toEqual([
+        {
+          hypothesis: 'AT',
+          isDefault: false,
+          isDeletable: true,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          subRows: technologiesHypothesis,
+          trajectory: null,
+        },
+        {
+          hypothesis: 'BE',
+          isDefault: false,
+          isDeletable: true,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          subRows: technologiesHypothesis,
+          trajectory: null,
+        },
+        {
+          hypothesis: 'Other areas',
+          isDefault: true,
+          isDeletable: false,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          subRows: technologiesHypothesis,
+          trajectory: null,
+        },
+      ]);
+    });
   });
 
   it('should not call api if only study id is provided', async () => {

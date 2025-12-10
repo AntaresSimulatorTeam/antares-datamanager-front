@@ -24,6 +24,7 @@ interface PegaseHypothesisTableProps extends TableHeadersProps {
   removeRow?: (value: string, rowId?: string) => void | Promise<void>;
   updateData?: (rowId: string, value: unknown, status: RowStatus) => void;
   handleViewData?: (rowId: string) => void | Promise<void> | undefined;
+  list?: string[];
 }
 
 export const PegaseHypothesisTable = ({
@@ -43,6 +44,7 @@ export const PegaseHypothesisTable = ({
   handleViewData,
   columnHeader,
   type,
+  list,
 }: PegaseHypothesisTableProps) => {
   const { t } = useTranslation();
   const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
@@ -54,8 +56,19 @@ export const PegaseHypothesisTable = ({
 
   const columns: TableOptions<HypothesisRowData>['columns'] = useMemo(
     () =>
-      getTableHeaders({ t, errorInfo, setErrorInfo, studyState, progress, fileStatus, idSelected, columnHeader, type }),
-    [getTableHeaders, t, errorInfo, studyState, progress, fileStatus, idSelected, columnHeader, type],
+      getTableHeaders({
+        t,
+        errorInfo,
+        setErrorInfo,
+        studyState,
+        progress,
+        fileStatus,
+        idSelected,
+        columnHeader,
+        type,
+        list,
+      }),
+    [getTableHeaders, t, errorInfo, studyState, progress, fileStatus, idSelected, columnHeader, type, list],
   );
 
   const onHandleImport = useCallback(

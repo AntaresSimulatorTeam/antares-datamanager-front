@@ -14,7 +14,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { CheckBoxListWithSearchBar } from '@/components/list/CheckBoxListWithSearchBar.tsx';
-import { STSTechnology } from '@/mocks/data/list/names.ts';
 import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
 import { addRow } from '@/shared/services/hypothesisTableService.ts';
 import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow.ts';
@@ -28,18 +27,12 @@ const STSTab = ({ defaultAreas, areas }: TabProps) => {
   const [data, setData] = useState<HypothesisRowData[]>([]);
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
+  const [stsTechnologies, setStsTechnologies] = useState<string[]>([]);
   const [isStudyGenerated] = useState(
     studyState.studyStatus === StudyStatus.GENERATED || study.status === StudyStatus.GENERATED,
   );
-  const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
-    useFetchHypothesisTrajectories(
-      areas,
-      study?.id,
-      TRAJECTORY_TYPE.STS,
-      defaultAreas,
-      isStudyGenerated,
-      STSTechnology,
-    );
+  const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow, technologyList } =
+    useFetchHypothesisTrajectories(areas, study?.id, TRAJECTORY_TYPE.STS, defaultAreas, isStudyGenerated);
   const { removeRow } = useHypothesisTableRemoveRow(study, dispatch, setData, setCheckedValues);
 
   useEffect(() => {
@@ -47,21 +40,22 @@ const STSTab = ({ defaultAreas, areas }: TabProps) => {
       areasTrajectoryOptions && setAreasOptions(areasTrajectoryOptions);
       dropDownListOptions && setCheckedValues(dropDownListOptions);
       hypothesisTrajectories && setData(hypothesisTrajectories);
+      technologyList && setStsTechnologies(technologyList);
       setReadOnly(readOnlyRow);
     };
     setHypothesis();
-  }, [hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow]);
+  }, [hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow, technologyList]);
 
   const handleSelectionChange = useCallback(
     async (value: string, isChecked: boolean) => {
       const indexRow = data.findIndex((row) => row.hypothesis === value);
       if (isChecked) {
-        addRow(TRAJECTORY_TYPE.STS, value, dispatch, setCheckedValues, setData);
+        addRow(TRAJECTORY_TYPE.STS, value, dispatch, setCheckedValues, setData, stsTechnologies);
       } else if (indexRow >= 0) {
         await removeRow(TRAJECTORY_TYPE.STS, value, indexRow, data);
       }
     },
-    [data, dispatch, removeRow],
+    [data, dispatch, removeRow, stsTechnologies],
   );
 
   return (
@@ -87,6 +81,7 @@ const STSTab = ({ defaultAreas, areas }: TabProps) => {
         handleImport={() => Promise.resolve()}
         removeRow={(value: string, rowId?: string) => void removeRow(TRAJECTORY_TYPE.STS, value, Number(rowId), data)}
         type={TRAJECTORY_TYPE.STS}
+        list={technologyList}
       />
     </div>
   );

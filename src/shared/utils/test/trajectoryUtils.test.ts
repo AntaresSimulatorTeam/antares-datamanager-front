@@ -11,8 +11,6 @@ import {
   generateReadOnlyIndexMap,
   getAreaTrajectoryName,
   getBgColor,
-  getChildrenList,
-  getChildrenListWithArea,
   getDefaultLabel,
   getHypothesis,
   getPathFromTrajectoryType,
@@ -20,6 +18,8 @@ import {
   getRowDataSelected,
   getStatus,
   getStudyMenu,
+  getSubRowListWithArea,
+  getSubRowsList,
   getTrajectoryTypeByIndex,
   isMatchingTrajectoryType,
   isTechnicalParametersType,
@@ -1112,7 +1112,7 @@ describe('shouldHaveSubRows', () => {
   });
 });
 
-describe('getChildrenList', () => {
+describe('getSubRowsList', () => {
   it('should return technologies when depth is 0 and subRows have technologies', () => {
     const row = {
       depth: 0,
@@ -1122,7 +1122,7 @@ describe('getChildrenList', () => {
       ],
     } as Row<HypothesisRowData>;
 
-    const result = getChildrenList(row);
+    const result = getSubRowsList(row);
     expect(result).toEqual(['AI', 'Blockchain']);
   });
 
@@ -1132,7 +1132,7 @@ describe('getChildrenList', () => {
       originalSubRows: [{ trajectory: { technology: 'AI' } }],
     } as Row<HypothesisRowData>;
 
-    const result = getChildrenList(row);
+    const result = getSubRowsList(row);
     expect(result).toEqual([]);
   });
 
@@ -1142,7 +1142,7 @@ describe('getChildrenList', () => {
       originalSubRows: [{ trajectory: { technology: '' } }, { trajectory: {} }, {}],
     } as Row<HypothesisRowData>;
 
-    const result = getChildrenList(row);
+    const result = getSubRowsList(row);
     expect(result).toEqual([]);
   });
 
@@ -1151,12 +1151,12 @@ describe('getChildrenList', () => {
       depth: 0,
     } as Row<HypothesisRowData>;
 
-    const result = getChildrenList(row);
+    const result = getSubRowsList(row);
     expect(result).toEqual([]);
   });
 });
 
-describe('getChildrenListWithArea', () => {
+describe('getSubRowListWithArea', () => {
   const mockT = vi.fn((key: string) => {
     if (key === 'thermal.@installedPowerInformation') return 'Installed Power';
     if (key === 'thermal.@specificInformation') return 'Specific Info';
@@ -1164,14 +1164,8 @@ describe('getChildrenListWithArea', () => {
   }) as unknown as TFunction<'translation', undefined>;
 
   it('should return message and count for THERMAL_CAPACITY', () => {
-    const mockRow = {
-      depth: 0,
-      originalSubRows: [
-        { trajectory: { technology: 'Biomass', id: 7 }, status: TRAJECTORY_SELECTION_STATUS.OK },
-        { trajectory: { technology: 'DST', id: 9 }, status: TRAJECTORY_SELECTION_STATUS.OK },
-      ],
-    } as Row<HypothesisRowData>;
-    const result = getChildrenListWithArea(mockRow, mockT, TRAJECTORY_TYPE.THERMAL_CAPACITY);
+    const mockRow = ['Biomass', 'DST'];
+    const result = getSubRowListWithArea(mockRow, mockT, TRAJECTORY_TYPE.THERMAL_CAPACITY);
     expect(result).toEqual({
       message: 'Installed Power: Biomass, DST',
       messageNb: 2,
@@ -1179,14 +1173,8 @@ describe('getChildrenListWithArea', () => {
   });
 
   it('should return message and count for THERMAL_TECHNICAL_SPECIFIC_PARAMETER', () => {
-    const mockRow = {
-      depth: 0,
-      originalSubRows: [
-        { trajectory: { area: 'AT', id: 7 }, status: TRAJECTORY_SELECTION_STATUS.OK },
-        { trajectory: { area: 'FR', id: 9 }, status: TRAJECTORY_SELECTION_STATUS.OK },
-      ],
-    } as Row<HypothesisRowData>;
-    const result = getChildrenListWithArea(mockRow, mockT, TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER);
+    const mockRow = ['AT', 'FR'];
+    const result = getSubRowListWithArea(mockRow, mockT, TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER);
     expect(result).toEqual({
       message: 'Specific Info: AT, FR',
       messageNb: 2,
@@ -1194,8 +1182,8 @@ describe('getChildrenListWithArea', () => {
   });
 
   it('should return empty message and 0 count for other types', () => {
-    const mockRow = {} as Row<HypothesisRowData>;
-    const result = getChildrenListWithArea(mockRow, mockT, TRAJECTORY_TYPE.LINK);
+    const mockRow = [] as string[];
+    const result = getSubRowListWithArea(mockRow, mockT, TRAJECTORY_TYPE.LINK);
     expect(result).toEqual({
       message: '',
       messageNb: 0,
@@ -1203,8 +1191,8 @@ describe('getChildrenListWithArea', () => {
   });
 
   it('should return empty message and 0 count if type is undefined', () => {
-    const mockRow = {} as Row<HypothesisRowData>;
-    const result = getChildrenListWithArea(mockRow, mockT);
+    const mockRow = [] as string[];
+    const result = getSubRowListWithArea(mockRow, mockT);
     expect(result).toEqual({
       message: '',
       messageNb: 0,

@@ -6,7 +6,6 @@ import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { generateId } from '@/shared/utils/defaultUtils.ts';
 import { Row } from '@tanstack/react-table';
-import { Technologies } from '@/mocks/data/list/names.ts';
 import { TFunction } from 'i18next';
 
 /**
@@ -231,14 +230,6 @@ export const isTrajectoryLinked = (area: { name: string }, trajectories: DbTraje
   trajectories.some((trajectory) => area.name === trajectory.area && trajectory.technology === '');
 
 /**
- * Checks if the given area corresponds to a valid technology option.
- *
- * @param {string} area - The name of the area to check.
- * @returns {boolean} - Returns true if the area matches any of the predefined technology options; otherwise, returns false.s
- */
-export const isTechnology = (area: string): boolean => Technologies.some((option: string) => option === area);
-
-/**
  * Function to build a default list of empty trajectories based on the provided trajectory type,
  * existing trajectories, and optionally specified default areas.
  *
@@ -331,9 +322,9 @@ export const convertIntoHypothesisRowWithTechnologies = (
         mainEntry?.trajectoryName && !mainEntry?.technology
           ? TRAJECTORY_SELECTION_STATUS.OK
           : TRAJECTORY_SELECTION_STATUS.MISSING,
-      isDefault: isDefault || OTHER_AREAS === mainEntry?.area,
+      isDefault: isDefault || mainEntry?.area === OTHER_AREAS,
       subRows: subRows?.length ? subRows : null,
-      isDeletable: true,
+      isDeletable: isDefault || mainEntry?.area !== OTHER_AREAS,
     };
   });
 };
@@ -562,7 +553,7 @@ export const setNestedData = (
  * @param {Row<HypothesisRowData>} row - The input row containing child data and associated information.
  * @returns {string[]} An array of technology strings from the child rows, or an empty array if none are found.
  */
-export const getChildrenList = (row: Row<HypothesisRowData>): string[] =>
+export const getSubRowsList = (row: Row<HypothesisRowData>): string[] =>
   row.depth === 0
     ? (row.originalSubRows || []).reduce((acc: string[], current: HypothesisRowData) => {
         if (current.status === TRAJECTORY_SELECTION_STATUS.OK && current?.trajectory?.technology) {
@@ -577,14 +568,19 @@ export const getChildrenList = (row: Row<HypothesisRowData>): string[] =>
       }, [])
     : [];
 
-export const getChildrenListWithArea = (
-  row: Row<HypothesisRowData>,
+/**
+ * Provide information message about number and subrow name linked to a trajectory
+ * @param subRowsList
+ * @param t
+ * @param type
+ */
+export const getSubRowListWithArea = (
+  subRowsList: string[],
   t: TFunction<'translation', undefined>,
   type?: TRAJECTORY_TYPE,
 ): { message: string; messageNb: number } => {
   if (type === TRAJECTORY_TYPE.THERMAL_CAPACITY || type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
     let prefix: string = '';
-    const childrenArray: string[] = getChildrenList(row);
     if (type === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
       prefix = t('thermal.@installedPowerInformation');
     }
@@ -592,8 +588,8 @@ export const getChildrenListWithArea = (
       prefix = t('thermal.@specificInformation');
     }
     return {
-      message: `${prefix}: ${childrenArray.join(', ')}`,
-      messageNb: childrenArray.length,
+      message: `${prefix}: ${subRowsList.join(', ')}`,
+      messageNb: subRowsList.length,
     };
   } else {
     return { message: '', messageNb: 0 };

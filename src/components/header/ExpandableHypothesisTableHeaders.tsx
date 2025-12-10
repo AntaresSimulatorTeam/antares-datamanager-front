@@ -18,7 +18,7 @@ import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 import { RdsTextTooltip } from 'rte-design-system-react';
 import { getAlignment, hasLabelDefault } from '@/shared/utils/hypothesisTableUtils.ts';
 import StdButton from '@common/base/stdButton/StdButton.tsx';
-import { getChildrenListWithArea } from '@/shared/utils/trajectoryUtils.ts';
+import { getSubRowListWithArea, getSubRowsList } from '@/shared/utils/trajectoryUtils.ts';
 import StdIconButton from '@common/base/stdIconButton/StdIconButton.tsx';
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
@@ -32,13 +32,16 @@ const getExpandableHypothesisTableHeaders = ({
   idSelected,
   columnHeader,
   type,
+  list,
 }: TableHeadersGetterProps): TableOptions<HypothesisRowData>['columns'] => [
   columnHelper.accessor('hypothesis', {
     header: columnHeader || t('studyDetails.@areas'),
     size: type === TRAJECTORY_TYPE.STS ? 200 : 233,
     cell: ({ getValue, row }) => {
       const { status, isDefault, hypothesis } = row.original;
-      const children = getChildrenListWithArea(row, t, type);
+      const subRowListName = getSubRowsList(row);
+      const subRowListWithArea = getSubRowListWithArea(subRowListName, t, type);
+      const isTechnology = list?.length ? list?.includes(hypothesis) : false;
 
       return (
         <div className="flex gap-1 py-1">
@@ -58,12 +61,14 @@ const getExpandableHypothesisTableHeaders = ({
             hasPreview={false}
             alignment={getAlignment(row)}
             extraValue={
-              hasLabelDefault(row.depth, isDefault ?? false, hypothesis) ? `(${t('studyDetails.@default')})` : ''
+              hasLabelDefault(row.depth, isDefault ?? false, hypothesis, isTechnology)
+                ? `(${t('studyDetails.@default')})`
+                : ''
             }
           />
-          {row.getCanExpand() && children && children?.messageNb > 0 && (
-            <RdsTextTooltip text={children?.message} offset={5} placement="right">
-              <div className="text-gray-600">{` | +${children?.messageNb}`}</div>
+          {row.getCanExpand() && subRowListWithArea && subRowListWithArea?.messageNb > 0 && (
+            <RdsTextTooltip text={subRowListWithArea?.message} offset={5} placement="right">
+              <div className="text-gray-600">{` | +${subRowListWithArea?.messageNb}`}</div>
             </RdsTextTooltip>
           )}
           {row.depth === 0 && row.index === 1 && type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER && (
