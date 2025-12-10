@@ -23,7 +23,7 @@ export const useTrajectoryAttach = (
       status: RowStatus,
       trajectory: DbTrajectory,
       setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
-    ): Promise<DbTrajectory | undefined> => {
+    ) => {
       try {
         const newDbTrajectory = await linkTrajectoryToStudy(type, trajectory.id, study.id);
 
@@ -67,7 +67,6 @@ export const useTrajectoryAttach = (
           };
 
           setData((prev) => setNestedData(prev, indexArray, newTrajectory));
-          return newDbTrajectory;
         }
       } catch (error) {
         if (indexArray.length) {

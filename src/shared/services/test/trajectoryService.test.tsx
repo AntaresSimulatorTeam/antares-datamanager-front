@@ -605,7 +605,6 @@ describe('uploadTrajectory', () => {
 describe('isParamModulationRequired', () => {
   const studyId = 123;
   const horizon = '2025';
-  const trajectoryId = 456;
 
   it('should return true when API responds with true', async () => {
     // Mock de la réponse
@@ -615,11 +614,11 @@ describe('isParamModulationRequired', () => {
 
     vi.spyOn(AuthService, 'authFetch').mockResolvedValue(mockResponse);
 
-    const result = await isParamModulationRequired(studyId, horizon, trajectoryId);
+    const result = await isParamModulationRequired(studyId, horizon);
 
     expect(result).toBe(true);
     expect(AuthService.authFetch).toHaveBeenCalledWith(
-      `${TRAJECTORY_THERMAL_PARAM_MODULATION}?horizon=${horizon}&studyId=${studyId}&trajectoryId=${trajectoryId}`,
+      `${TRAJECTORY_THERMAL_PARAM_MODULATION}?horizon=${horizon}&studyId=${studyId}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

@@ -204,21 +204,15 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
               const dbTrajectory =
                 dbTrajectories.find((traj) => traj.id === value || traj.trajectoryName === value) ?? null;
               if (dbTrajectory) {
-                const newDbTrajectoryAttached = await attachTrajectory(
+                await attachTrajectory(
                   getTrajectoryTypeByIndex(topIndex),
                   [topIndex, subIndex].filter((n) => n !== undefined),
                   status,
                   dbTrajectory,
                   setTechnicalData,
                 );
-                if (newDbTrajectoryAttached) {
-                  const isRequired = await isParamModulationRequired(
-                    study.id,
-                    study?.horizon,
-                    newDbTrajectoryAttached?.id,
-                  );
-                  setShouldEnableParamModulation(isRequired);
-                }
+                const isRequired = await isParamModulationRequired(study.id, study?.horizon);
+                setShouldEnableParamModulation(isRequired);
               }
             }
           }}
@@ -285,21 +279,9 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
                 const dbTrajectory =
                   dbTrajectories.find((traj) => traj.id === value || traj.trajectoryName === value) ?? null;
                 if (dbTrajectory) {
-                  const newDbTrajectoryAttached = await attachTrajectory(
-                    type,
-                    indexArray,
-                    status,
-                    dbTrajectory,
-                    setData,
-                  );
-                  if (newDbTrajectoryAttached) {
-                    const isRequired = await isParamModulationRequired(
-                      study.id,
-                      study?.horizon,
-                      newDbTrajectoryAttached?.id,
-                    );
-                    setShouldEnableParamModulation(isRequired);
-                  }
+                  await attachTrajectory(type, indexArray, status, dbTrajectory, setData);
+                  const isRequired = await isParamModulationRequired(study.id, study?.horizon);
+                  setShouldEnableParamModulation(isRequired);
                 }
               }
             }}
@@ -316,22 +298,9 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
               const isTechnicalParamType = isTechnicalParametersType(selectedTrajectoryType);
               const dataTable = isTechnicalParamType ? technicalData : data;
               const setDataTable = isTechnicalParamType ? setTechnicalData : setData;
-              const newDbTrajectoryImported = await importTrajectory(
-                selectedTrajectoryType,
-                value,
-                indexArray,
-                dataTable,
-                setDataTable,
-              );
-              if (
-                newDbTrajectoryImported &&
-                selectedTrajectoryType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER
-              ) {
-                const isRequired = await isParamModulationRequired(
-                  study.id,
-                  study?.horizon,
-                  newDbTrajectoryImported?.id,
-                );
+              await importTrajectory(selectedTrajectoryType, value, indexArray, dataTable, setDataTable);
+              if (selectedTrajectoryType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
+                const isRequired = await isParamModulationRequired(study.id, study?.horizon);
                 setShouldEnableParamModulation(isRequired);
               }
             }
