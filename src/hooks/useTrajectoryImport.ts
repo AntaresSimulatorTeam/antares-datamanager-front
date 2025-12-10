@@ -4,6 +4,7 @@ import { uploadTrajectory } from '@/shared/services/trajectoryService.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import {
+  DbTrajectory,
   FileInputStatus,
   HypothesisRowData,
   SelectOption,
@@ -28,7 +29,7 @@ export const useTrajectoryImport = (
   const { t } = useTranslation();
   const { user } = useUser();
 
-  const { attachTrajectory, newDbTrajectoryAttached } = useTrajectoryAttach(study, studyState, dispatch);
+  const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch);
 
   const importTrajectory = useCallback(
     async (
@@ -37,7 +38,7 @@ export const useTrajectoryImport = (
       indexArray: number[],
       data: HypothesisRowData[],
       setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
-    ) => {
+    ): Promise<DbTrajectory | undefined> => {
       const hypothesis = data[indexArray[0]]?.hypothesis;
       const subArea = indexArray?.length > 1 ? data[indexArray[0]]?.subRows?.[indexArray[1]]?.hypothesis : undefined;
       setFileStatus('loading');
@@ -58,8 +59,9 @@ export const useTrajectoryImport = (
         setFileStatus('success');
 
         if (newTrajectory.id != null) {
-          await attachTrajectory(type, indexArray, 'success', newTrajectory, setData);
+          const newDbTrajectory = await attachTrajectory(type, indexArray, 'success', newTrajectory, setData);
           type === TRAJECTORY_TYPE.AREA && setReadOnly?.({ '0': false, '1': false });
+          return newDbTrajectory;
         }
       } catch (error) {
         setFileStatus('error');
@@ -88,6 +90,5 @@ export const useTrajectoryImport = (
     fileStatus,
     progress,
     importTrajectory,
-    newDbTrajectoryAttached,
   };
 };
