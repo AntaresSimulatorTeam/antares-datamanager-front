@@ -13,7 +13,6 @@ import { STUDY_ACTION } from '@/shared/enum/study.ts';
 export const useTrajectoryDetach = (study: StudyDTO, dispatch: Dispatch<StudyActionType> | null) => {
   const { user } = useUser();
   const { t } = useTranslation();
-  //const [shouldEnableParamModulation, setShouldEnableParamModulation] = useState<boolean>(false);
 
   const detachTrajectory = useCallback(
     async (
@@ -45,8 +44,6 @@ export const useTrajectoryDetach = (study: StudyDTO, dispatch: Dispatch<StudyAct
           status: TRAJECTORY_SELECTION_STATUS.MISSING,
         };
         if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
-          //const isParamModulation = await isParamModulationRequired(study.id, trajectorySelected.id, study?.horizon);
-          //setShouldEnableParamModulation(isParamModulation);
           setData((prev: HypothesisRowData[]): HypothesisRowData[] => {
             if (additionalTrajectory?.type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER) {
               const newData = [
