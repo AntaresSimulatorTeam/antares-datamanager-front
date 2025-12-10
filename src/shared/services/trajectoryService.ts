@@ -340,16 +340,11 @@ export const getStudyTrajectoriesWithWarnings = async (
 /**
  * Check if the cluster of a trajectory (THERMAL_TECHNICAL_SPECIFIC_PARAMETER) requires a parameter modulation (CM or MR value is 1)
  * @param {number} studyId
- * @param {number} trajectoryId
  * @param {string} horizon
  */
-export const isParamModulationRequired = async (
-  studyId: number,
-  horizon: string,
-  trajectoryId?: number,
-): Promise<boolean> => {
+export const isParamModulationRequired = async (studyId: number, horizon: string): Promise<boolean> => {
   try {
-    const urlApi = `${TRAJECTORY_THERMAL_PARAM_MODULATION}?horizon=${horizon}&studyId=${studyId}&trajectoryId=${trajectoryId ?? ''}`;
+    const urlApi = `${TRAJECTORY_THERMAL_PARAM_MODULATION}?horizon=${horizon}&studyId=${studyId}`;
     const response = await AuthService.authFetch(urlApi, {
       method: 'POST',
       headers: {
