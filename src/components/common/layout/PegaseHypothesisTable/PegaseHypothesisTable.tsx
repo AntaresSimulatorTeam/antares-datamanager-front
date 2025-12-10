@@ -22,7 +22,7 @@ interface PegaseHypothesisTableProps extends TableHeadersProps {
   handleImport: (rowId: string) => Promise<void>;
   isReadOnlyEnable?: boolean;
   removeRow?: (value: string, rowId?: string) => void | Promise<void>;
-  updateData?: (rowId: string, value: unknown, status: RowStatus) => void;
+  updateData?: (rowId: string, value: unknown, status: RowStatus) => void | Promise<void>;
   handleViewData?: (rowId: string) => void | Promise<void> | undefined;
 }
 

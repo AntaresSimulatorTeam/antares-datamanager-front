@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useCallback } from 'react';
+import { Dispatch, SetStateAction, useCallback, useState } from 'react';
 import { DbTrajectory, HypothesisRowData, RowStatus, StudyActionType, StudyDTO, StudyState } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { linkTrajectoryToStudy } from '@/shared/services/trajectoryService.ts';
@@ -15,6 +15,7 @@ export const useTrajectoryAttach = (
 ) => {
   const { user } = useUser();
   const { t } = useTranslation();
+  const [newDbTrajectoryAttached, setNewDbTrajectoryAttached] = useState<DbTrajectory | null>(null);
 
   const attachTrajectory = useCallback(
     async (
@@ -26,6 +27,7 @@ export const useTrajectoryAttach = (
     ): Promise<void> => {
       try {
         const newDbTrajectory = await linkTrajectoryToStudy(type, trajectory.id, study.id);
+        setNewDbTrajectoryAttached(newDbTrajectory);
 
         if (newDbTrajectory) {
           let alreadyExists = false;
@@ -90,8 +92,8 @@ export const useTrajectoryAttach = (
         }
       }
     },
-    [study.id, study?.name, studyState, dispatch, t, user?.profile?.sub],
+    [study.id, study.name, newDbTrajectoryAttached, studyState, dispatch, t, user?.profile?.sub],
   );
 
-  return { attachTrajectory };
+  return { attachTrajectory, newDbTrajectoryAttached };
 };

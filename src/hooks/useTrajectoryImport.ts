@@ -21,14 +21,14 @@ export const useTrajectoryImport = (
   study: StudyDTO,
   studyState: Partial<StudyState>,
   dispatch: Dispatch<StudyActionType> | null,
-  setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>
+  setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
 ) => {
   const [fileStatus, setFileStatus] = useState<FileInputStatus>('empty');
   const [progress, setProgress] = useState<number>(0);
   const { t } = useTranslation();
   const { user } = useUser();
 
-  const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch);
+  const { attachTrajectory, newDbTrajectoryAttached } = useTrajectoryAttach(study, studyState, dispatch);
 
   const importTrajectory = useCallback(
     async (
@@ -88,5 +88,6 @@ export const useTrajectoryImport = (
     fileStatus,
     progress,
     importTrajectory,
+    newDbTrajectoryAttached,
   };
 };
