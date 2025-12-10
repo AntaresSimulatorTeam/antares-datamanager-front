@@ -16,6 +16,7 @@ import {
   TRAJECTORY_THERMAL_ECONOMIC_PARAMETER_IMPORT,
   TRAJECTORY_THERMAL_INSTALLED_POWER_IMPORT,
   TRAJECTORY_THERMAL_MODULATION_PARAMETER_IMPORT,
+  TRAJECTORY_THERMAL_PARAM_MODULATION,
   TRAJECTORY_THERMAL_SPECIFIC_PARAMETER_IMPORT,
   TRAJECTORY_UNLINK_ALL_TO_STUDY_ENDPOINT,
   TRAJECTORY_UNLINK_MULTIPLE_TO_STUDY_ENDPOINT,
@@ -316,6 +317,31 @@ export const getStudyTrajectoriesWithWarnings = async (
       warningMessages = await fetchWarningMessagesFromType(trajectoryType, studyId);
     }
     return { trajectories, warningMessages };
+  } catch (error) {
+    throw new Error((error as BackendError).antaresErrorMessage);
+  }
+};
+
+/**
+ * Check if the cluster of a trajectory (THERMAL_TECHNICAL_SPECIFIC_PARAMETER) requires a parameter modulation (CM or MR value is 1)
+ * @param {number} studyId
+ * @param {number} trajectoryId
+ * @param {string} horizon
+ */
+export const isParamModulationRequired = async (
+  studyId: number,
+  horizon: string,
+  trajectoryId?: number,
+): Promise<boolean> => {
+  try {
+    const urlApi = `${TRAJECTORY_THERMAL_PARAM_MODULATION}?horizon=${horizon}&studyId=${studyId}&trajectoryId=${trajectoryId ?? ''}`;
+    const response = await AuthService.authFetch(urlApi, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return (await (response as Response).json()) as boolean;
   } catch (error) {
     throw new Error((error as BackendError).antaresErrorMessage);
   }
