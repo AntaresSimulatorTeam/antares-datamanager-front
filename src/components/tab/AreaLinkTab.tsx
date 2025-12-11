@@ -80,7 +80,6 @@ export const AreaLinkTab = ({ setErrorMessage, studyData }: AreaLinkTabProps) =>
 
   useEffect(() => {
     setErrorMessage('');
-    console.log('================== hypothesisTrajectories', hypothesisTrajectories);
     hypothesisTrajectories && setData(hypothesisTrajectories);
     readOnlyRow && setReadOnly(readOnlyRow);
   }, [hypothesisTrajectories, readOnlyRow, setErrorMessage, studyData?.id]);
