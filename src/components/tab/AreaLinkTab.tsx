@@ -9,7 +9,6 @@ import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { useTranslation } from 'react-i18next';
 import {
-  getStudyTrajectoriesWithWarnings,
   linkTrajectoryToStudy,
   unlinkAllTrajectoriesFromStudy,
   unlinkTrajectoryFromStudy,
@@ -81,7 +80,6 @@ export const AreaLinkTab = ({ setErrorMessage, studyData }: AreaLinkTabProps) =>
 
   useEffect(() => {
     setErrorMessage('');
-    console.log('================== hypothesisTrajectories', hypothesisTrajectories);
     hypothesisTrajectories && setData(hypothesisTrajectories);
     readOnlyRow && setReadOnly(readOnlyRow);
   }, [hypothesisTrajectories, readOnlyRow, setErrorMessage, studyData?.id]);
@@ -228,13 +226,15 @@ export const AreaLinkTab = ({ setErrorMessage, studyData }: AreaLinkTabProps) =>
       if (dbTrajectory?.id != null && status === 'success') {
         setErrorMessage('');
         const trajectoryType = rowIndex === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK;
-        await linkTrajectoryToStudy(trajectoryType, dbTrajectory?.id, studyData.id);
-        const result = await getStudyTrajectoriesWithWarnings(studyData.id, trajectoryType);
-        const newTrajectory = result?.trajectories?.[0];
+        const newTrajectory = await linkTrajectoryToStudy(trajectoryType, dbTrajectory?.id, studyData.id);
         if (newTrajectory) {
           dispatch?.({
             type: STUDY_ACTION.ADD_TRAJECTORIES,
-            payload: { [trajectoryType]: result },
+            payload: {
+              [trajectoryType]: {
+                trajectories: [newTrajectory],
+              },
+            },
           });
         }
         setData((prev) =>
