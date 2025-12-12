@@ -111,7 +111,7 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         setIsDeletionModalOpen(true);
       } else {
         await removeRow(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, value, 0, technicalData);
-        const isRequired = await isParamModulationRequired(study.id, study?.horizon);
+        const isRequired = await isParamModulationRequired(studyData.id, studyData?.horizon);
         setShouldEnableParamModulation(isRequired);
       }
     },
@@ -187,7 +187,7 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
                       ? technicalData[1].trajectory
                       : null,
                   );
-                  const isRequired = await isParamModulationRequired(study.id, study?.horizon);
+                  const isRequired = await isParamModulationRequired(studyData.id, studyData?.horizon);
                   setShouldEnableParamModulation(isRequired);
                 }
               }
@@ -204,7 +204,7 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
                   dbTrajectory,
                   setTechnicalData,
                 );
-                const isRequired = await isParamModulationRequired(study.id, study?.horizon);
+                const isRequired = await isParamModulationRequired(studyData.id, studyData?.horizon);
                 setShouldEnableParamModulation(isRequired);
               }
             }
@@ -218,7 +218,7 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
               setIsDeletionModalOpen(true);
             } else {
               await removeRow(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, value, 0, technicalData);
-              const isRequired = await isParamModulationRequired(study.id, study?.horizon);
+              const isRequired = await isParamModulationRequired(studyData.id, studyData?.horizon);
               setShouldEnableParamModulation(isRequired);
             }
           }}
@@ -265,7 +265,7 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
                 const current = data[indexArray[0]]?.trajectory ?? null;
                 if (current) {
                   void detachTrajectory(type, indexArray, status, current, setData);
-                  const isRequired = await isParamModulationRequired(study.id, study?.horizon);
+                  const isRequired = await isParamModulationRequired(studyData.id, studyData?.horizon);
                   setShouldEnableParamModulation(isRequired);
                 }
               }
@@ -275,7 +275,7 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
                   dbTrajectories.find((traj) => traj.id === value || traj.trajectoryName === value) ?? null;
                 if (dbTrajectory) {
                   await attachTrajectory(type, indexArray, status, dbTrajectory, setData);
-                  const isRequired = await isParamModulationRequired(study.id, study?.horizon);
+                  const isRequired = await isParamModulationRequired(studyData.id, studyData?.horizon);
                   setShouldEnableParamModulation(isRequired);
                 }
               }
@@ -295,7 +295,7 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
               const setDataTable = isTechnicalParamType ? setTechnicalData : setData;
               await importTrajectory(selectedTrajectoryType, value, indexArray, dataTable, setDataTable);
               if (selectedTrajectoryType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
-                const isRequired = await isParamModulationRequired(study.id, study?.horizon);
+                const isRequired = await isParamModulationRequired(studyData.id, studyData?.horizon);
                 setShouldEnableParamModulation(isRequired);
               }
             }
@@ -331,7 +331,7 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
                     setTechnicalData,
                     shouldDeleteParamModulation(0, technicalData) ? technicalData[1].trajectory : null,
                   );
-                  const isRequired = await isParamModulationRequired(study.id, study?.horizon);
+                  const isRequired = await isParamModulationRequired(studyData.id, studyData?.horizon);
                   setShouldEnableParamModulation(isRequired);
                 }
               } else {
@@ -341,7 +341,7 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
                   0,
                   technicalData,
                 );
-                const isRequired = await isParamModulationRequired(study.id, study?.horizon);
+                const isRequired = await isParamModulationRequired(studyData.id, studyData?.horizon);
                 setShouldEnableParamModulation(isRequired);
               }
               setIsDeletionModalOpen(false);

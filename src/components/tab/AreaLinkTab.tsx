@@ -52,8 +52,6 @@ interface AreaLinkTabProps {
 
 export const AreaLinkTab = ({ setErrorMessage, studyData }: AreaLinkTabProps) => {
   const studyState = useStudy();
-  //const location = useLocation();
-  //const study = (location.state as LocationStudy)?.study;
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const dispatch = useStudyDispatch();
   const { t } = useTranslation();
