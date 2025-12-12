@@ -21,7 +21,7 @@ export const useTrajectoryImport = (
   study: StudyDTO,
   studyState: Partial<StudyState>,
   dispatch: Dispatch<StudyActionType> | null,
-  setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>
+  setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
 ) => {
   const [fileStatus, setFileStatus] = useState<FileInputStatus>('empty');
   const [progress, setProgress] = useState<number>(0);

@@ -13,6 +13,7 @@ import {
   getNbMessagesFromTrajectoryType,
   getStudyTrajectoriesWithWarnings,
   getTrajectoryDataByTypeAndId,
+  isParamModulationRequired,
   linkTrajectoryToStudy,
   unlinkAllTrajectoriesFromStudy,
   unlinkMultipleTrajectoriesFromStudy,
@@ -31,6 +32,7 @@ import { mockWarningMessagesWithTwo } from '@/mocks/data/tests/warning.mock.ts';
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { fetchWarningMessagesFromType } from '@/shared/services/warningService.ts';
 import * as progressService from '@/shared/services/progressService.ts';
+import { TRAJECTORY_THERMAL_PARAM_MODULATION } from '@/shared/const/apiEndPoint.ts';
 
 vi.mock('@/envVariables', () => ({
   getEnvVariables: vi.fn(() => 'https://mockapi.com'),
@@ -597,5 +599,49 @@ describe('uploadTrajectory', () => {
     await expect(async () =>
       uploadTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026', 2, 'FR', onProgress),
     ).rejects.toThrowError('Failed to upload trajectory area_BP_23_v6');
+  });
+});
+
+describe('isParamModulationRequired', () => {
+  const studyId = 123;
+  const horizon = '2025';
+
+  it('should return true when API responds with true', async () => {
+    // Mock de la réponse
+    const mockResponse = {
+      json: vi.fn().mockResolvedValue(true),
+    } as unknown as Response;
+
+    vi.spyOn(AuthService, 'authFetch').mockResolvedValue(mockResponse);
+
+    const result = await isParamModulationRequired(studyId, horizon);
+
+    expect(result).toBe(true);
+    expect(AuthService.authFetch).toHaveBeenCalledWith(
+      `${TRAJECTORY_THERMAL_PARAM_MODULATION}?horizon=${horizon}&studyId=${studyId}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      },
+    );
+  });
+
+  it('should return false when API responds with false', async () => {
+    const mockResponse = {
+      json: vi.fn().mockResolvedValue(false),
+    } as unknown as Response;
+
+    vi.spyOn(AuthService, 'authFetch').mockResolvedValue(mockResponse);
+
+    const result = await isParamModulationRequired(studyId, horizon);
+
+    expect(result).toBe(false);
+  });
+
+  it('should throw an error when API fails', async () => {
+    const backendError = { antaresErrorMessage: 'API failed' };
+    vi.spyOn(AuthService, 'authFetch').mockRejectedValue(backendError);
+
+    await expect(isParamModulationRequired(studyId, horizon)).rejects.toThrow('API failed');
   });
 });

@@ -23,7 +23,7 @@ export const useTrajectoryAttach = (
       status: RowStatus,
       trajectory: DbTrajectory,
       setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
-    ): Promise<void> => {
+    ) => {
       try {
         const newDbTrajectory = await linkTrajectoryToStudy(type, trajectory.id, study.id);
 
@@ -90,7 +90,7 @@ export const useTrajectoryAttach = (
         }
       }
     },
-    [study.id, study?.name, studyState, dispatch, t, user?.profile?.sub],
+    [study.id, study.name, studyState, dispatch, t, user?.profile?.sub],
   );
 
   return { attachTrajectory };
