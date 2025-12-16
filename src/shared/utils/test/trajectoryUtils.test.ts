@@ -1247,11 +1247,13 @@ describe('getSubRowListWithArea', () => {
 describe('filterRow', () => {
   it('garde toujours les rows avec isDefault', () => {
     const data: HypothesisRowData[] = [
-      { status: TRAJECTORY_SELECTION_STATUS.ERROR, isDefault: true },
+      { status: TRAJECTORY_SELECTION_STATUS.ERROR, isDefault: true, isDeletable: false },
+      { status: TRAJECTORY_SELECTION_STATUS.ERROR, isDefault: false, isDeletable: true },
     ] as unknown as HypothesisRowData[];
     const result = filterRow(data);
-    expect(result).toHaveLength(1);
+    expect(result).toHaveLength(2);
     expect(result[0].status).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
+    expect(result[1].status).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
   });
 
   it('filtre les subRows avec trajectory et status OK', () => {
