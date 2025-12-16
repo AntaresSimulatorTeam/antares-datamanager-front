@@ -468,28 +468,6 @@ export const addNestedRow = (
   });
 
 /**
- * Filter sub rows of each row provided by an array of HypothesisRowData
- * @param {HypothesisRowData[]} data
- * @return {HypothesisRowData[]}
- */
-export const filterNestedRow = (data: HypothesisRowData[]): HypothesisRowData[] =>
-  data.map((trajectory) => {
-    if (trajectory?.subRows) {
-      return {
-        ...trajectory,
-        subRows:
-          filterNestedRow(
-            trajectory.subRows.filter(
-              (subRow) => subRow.trajectory && subRow.status === TRAJECTORY_SELECTION_STATUS.OK,
-            ),
-          ) ?? null,
-      };
-    } else {
-      return trajectory;
-    }
-  });
-
-/**
  * Return all tabs available for a study configuration
  * @param {TFunction<'translation', undefined>} t - Translation function
  * @param {boolean} isTrajectoryAreaLinked - Flag to indicate if an AREA trajectory is linked to the study

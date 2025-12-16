@@ -8,7 +8,6 @@ import {
   buildRowData,
   buildRowWithSubRowsData,
   convertIntoHypothesisRowWithTechnologies,
-  filterNestedRow,
   filterRow,
   generateReadOnlyIndexMap,
   getAreaTrajectoryName,
@@ -496,49 +495,6 @@ describe('addNestedRow', () => {
     const result = addNestedRow(data, newRow);
 
     expect(result).toEqual(data);
-  });
-});
-
-describe('filterNestedRow', () => {
-  it('should keep only subRows with trajectory and status OK', () => {
-    const input = [
-      {
-        trajectory: 'main1',
-        subRows: [
-          { trajectory: 'sub1', status: TRAJECTORY_SELECTION_STATUS.OK },
-          { trajectory: 'sub2', status: TRAJECTORY_SELECTION_STATUS.MISSING },
-          { trajectory: undefined, status: TRAJECTORY_SELECTION_STATUS.OK },
-        ],
-      },
-    ] as unknown as HypothesisRowData[];
-
-    const result = filterNestedRow(input);
-
-    expect(result[0].subRows).toEqual([{ trajectory: 'sub1', status: TRAJECTORY_SELECTION_STATUS.OK }]);
-  });
-
-  it('should return an empty array if no subRows match', () => {
-    const input = [
-      {
-        trajectory: 'main2',
-        subRows: [
-          { trajectory: 'sub3', status: TRAJECTORY_SELECTION_STATUS.MISSING },
-          { trajectory: undefined, status: TRAJECTORY_SELECTION_STATUS.OK },
-        ],
-      },
-    ] as unknown as HypothesisRowData[];
-
-    const result = filterNestedRow(input);
-
-    expect(result[0].subRows).toEqual([]);
-  });
-
-  it('should leave rows without subRows unchanged', () => {
-    const input = [{ trajectory: 'main3' }] as unknown as HypothesisRowData[];
-
-    const result = filterNestedRow(input);
-
-    expect(result).toEqual([{ trajectory: 'main3' }]);
   });
 });
 
@@ -1245,7 +1201,7 @@ describe('getSubRowListWithArea', () => {
 });
 
 describe('filterRow', () => {
-  it('garde toujours les rows avec isDefault', () => {
+  it('garde toujours les rows avec isDefault et isDeletable', () => {
     const data: HypothesisRowData[] = [
       { status: TRAJECTORY_SELECTION_STATUS.ERROR, isDefault: true, isDeletable: false },
       { status: TRAJECTORY_SELECTION_STATUS.ERROR, isDefault: false, isDeletable: true },
@@ -1269,6 +1225,7 @@ describe('filterRow', () => {
     const result = filterRow(data);
     expect(result[0].subRows).toHaveLength(1);
     expect(result[0].subRows?.[0].status).toBe(TRAJECTORY_SELECTION_STATUS.OK);
+    expect(result[0].status).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
   });
 
   it('transforme ERROR en MISSING si subRows OK existent', () => {
