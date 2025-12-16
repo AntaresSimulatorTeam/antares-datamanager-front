@@ -70,12 +70,12 @@ const LoadTab = ({ defaultAreas, areas }: TabProps) => {
   }, [hypothesisTrajectories, areas, defaultAreas, areasTrajectoryOptions, dropDownListOptions, readOnlyRow]);
 
   useEffect(() => {
-    if (isStudyGenerated) {
+    if (studyState.studyStatus === StudyStatus.GENERATED || isStudyGenerated) {
       setIsStudyGenerated(true);
       const rows = getReadOnlyForGeneratedStudy(data);
       setReadOnly(rows);
     }
-  }, [isStudyGenerated]);
+  }, [studyState.studyStatus, isStudyGenerated]);
 
   const handleSelectionChange = useCallback(
     async (value: string, isChecked?: boolean): Promise<void> => {

@@ -95,7 +95,7 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
   }, [detachTrajectory, shouldEnableParamModulation]);
 
   useEffect(() => {
-    if (isStudyGenerated) {
+    if (studyState.studyStatus === StudyStatus.GENERATED || isStudyGenerated) {
       const newData = technicalData[0]?.subRows?.filter(
         (area) => area.isDefault || (area.trajectory && area.status === TRAJECTORY_SELECTION_STATUS.OK),
       );
@@ -111,7 +111,7 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
       setReadOnly(rows);
       setReadOnlyParam({ '0': true, '1': true });
     }
-  }, [isStudyGenerated]);
+  }, [studyState.studyStatus, isStudyGenerated]);
 
   const handleSelectionChange = useCallback(
     async (value: string, isChecked: boolean) => {

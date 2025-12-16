@@ -48,14 +48,14 @@ const STSTab = ({ defaultAreas, areas }: TabProps) => {
   }, [hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow, technologyList]);
 
   useEffect(() => {
-    if (isStudyGenerated) {
+    if (studyState.studyStatus === StudyStatus.GENERATED || isStudyGenerated) {
       setIsStudyGenerated(true);
       const newData = filterNestedRow(data);
       setData(newData);
       const rows = generateReadOnlyIndexMap(data);
       setReadOnly(rows);
     }
-  }, [isStudyGenerated]);
+  }, [studyState.studyStatus, isStudyGenerated]);
 
   const handleSelectionChange = useCallback(
     async (value: string, isChecked: boolean) => {
