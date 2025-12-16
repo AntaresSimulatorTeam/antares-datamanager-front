@@ -116,7 +116,7 @@ export const useFetchHypothesisParametersTrajectories = (
               hypothesis: t('thermal.@specific'),
               trajectory: null,
               status: TRAJECTORY_SELECTION_STATUS.MISSING,
-              isDefault: false,
+              isDefault: true,
               isDeletable: false,
               subRows: sortWithFixedPosition(specificAreaSelected),
             },
@@ -126,7 +126,7 @@ export const useFetchHypothesisParametersTrajectories = (
               status: paraModulationTrajectory?.trajectoryName
                 ? TRAJECTORY_SELECTION_STATUS.OK
                 : TRAJECTORY_SELECTION_STATUS.MISSING,
-              isDefault: false,
+              isDefault: true,
               isDeletable: false,
               subRows: null,
             },
@@ -136,7 +136,7 @@ export const useFetchHypothesisParametersTrajectories = (
               status: paraCommonTrajectory?.trajectoryName
                 ? TRAJECTORY_SELECTION_STATUS.OK
                 : TRAJECTORY_SELECTION_STATUS.MISSING,
-              isDefault: false,
+              isDefault: true,
               isDeletable: false,
               subRows: null,
             },
