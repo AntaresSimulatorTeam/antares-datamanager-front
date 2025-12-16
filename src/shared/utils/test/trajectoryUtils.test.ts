@@ -1203,8 +1203,8 @@ describe('getSubRowListWithArea', () => {
 describe('filterRow', () => {
   it('garde toujours les rows avec isDefault et isDeletable', () => {
     const data: HypothesisRowData[] = [
-      { status: TRAJECTORY_SELECTION_STATUS.ERROR, isDefault: true, isDeletable: false },
-      { status: TRAJECTORY_SELECTION_STATUS.ERROR, isDefault: false, isDeletable: true },
+      { status: TRAJECTORY_SELECTION_STATUS.ERROR, isDefault: true, isDeletable: true },
+      { status: TRAJECTORY_SELECTION_STATUS.ERROR, isDefault: false, isDeletable: false },
     ] as unknown as HypothesisRowData[];
     const result = filterRow(data);
     expect(result).toHaveLength(2);
@@ -1228,7 +1228,7 @@ describe('filterRow', () => {
 
   it('supprime une row en ERROR si subRows est vide', () => {
     const data: HypothesisRowData[] = [
-      { status: TRAJECTORY_SELECTION_STATUS.ERROR, subRows: [] },
+      { status: TRAJECTORY_SELECTION_STATUS.ERROR, isDeletable: true, subRows: [] },
     ] as unknown as HypothesisRowData[];
     const result = filterRow(data);
     expect(result).toHaveLength(0);
@@ -1263,15 +1263,17 @@ describe('filterRow', () => {
     expect(result[0].status).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
   });
 
-  it('supprime les rows inutiles (ni default, ni deletable, ni OK/MISSING)', () => {
-    const data: HypothesisRowData[] = [{ status: TRAJECTORY_SELECTION_STATUS.ERROR }] as unknown as HypothesisRowData[];
+  it('supprime les rows inutiles (ni default, deletable, ni OK/MISSING)', () => {
+    const data: HypothesisRowData[] = [
+      { status: TRAJECTORY_SELECTION_STATUS.ERROR, isDeletable: true },
+    ] as unknown as HypothesisRowData[];
     const result = filterRow(data);
     expect(result).toHaveLength(0);
   });
 
-  it('garde les rows isDeletable même si status ERROR', () => {
+  it('garde les rows non isDeletable même si status ERROR', () => {
     const data: HypothesisRowData[] = [
-      { status: TRAJECTORY_SELECTION_STATUS.ERROR, isDeletable: true },
+      { status: TRAJECTORY_SELECTION_STATUS.ERROR, isDeletable: false },
     ] as unknown as HypothesisRowData[];
     const result = filterRow(data);
     expect(result).toHaveLength(1);

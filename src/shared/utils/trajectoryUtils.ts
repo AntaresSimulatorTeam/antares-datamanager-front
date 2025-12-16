@@ -412,18 +412,11 @@ export const filterRow = (data: HypothesisRowData[]): HypothesisRowData[] =>
       };
 
       // 🔹 Cas 1 : row.isDefault === true
-      if (row.isDefault) {
+      if (row.isDefault || !row.isDeletable) {
         if (row.status === TRAJECTORY_SELECTION_STATUS.ERROR) {
           updatedRow.status = TRAJECTORY_SELECTION_STATUS.MISSING;
         }
         return updatedRow; // on garde toujours les lignes en default
-      }
-
-      if (row.isDeletable) {
-        if (row.status === TRAJECTORY_SELECTION_STATUS.ERROR) {
-          updatedRow.status = TRAJECTORY_SELECTION_STATUS.MISSING;
-        }
-        return updatedRow; // on garde toujours les lignes qui ne sont pas supprimables
       }
 
       // 🔹 Cas 2 : row en ERROR mais avec des subRows OK → devient MISSING
@@ -436,7 +429,7 @@ export const filterRow = (data: HypothesisRowData[]): HypothesisRowData[] =>
     .filter(
       (row) =>
         row.isDefault || // 🔹 garde toujours les isDefault
-        row.isDeletable ||
+        !row.isDeletable ||
         row.status === TRAJECTORY_SELECTION_STATUS.OK ||
         row.status === TRAJECTORY_SELECTION_STATUS.MISSING ||
         (row.status === TRAJECTORY_SELECTION_STATUS.ERROR && row.subRows && row.subRows.length > 0),
