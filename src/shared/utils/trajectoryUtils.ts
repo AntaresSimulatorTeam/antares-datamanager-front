@@ -429,6 +429,7 @@ export const filterRow = (data: HypothesisRowData[]): HypothesisRowData[] =>
     .filter(
       (row) =>
         row.isDefault || // 🔹 garde toujours les isDefault
+        row.isDeletable ||
         row.status === TRAJECTORY_SELECTION_STATUS.OK ||
         row.status === TRAJECTORY_SELECTION_STATUS.MISSING ||
         (row.status === TRAJECTORY_SELECTION_STATUS.ERROR && row.subRows && row.subRows.length > 0),
