@@ -71,7 +71,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: TabProps) => {
       setReadOnly(readOnlyRow);
     };
     setThermalHypothesis();
-  }, [areasTrajectoryOptions, dropDownListOptions, hypothesisTrajectories, readOnlyRow]);
+  }, [areasTrajectoryOptions, dropDownListOptions, hypothesisTrajectories, technologyList, readOnlyRow]);
 
   useEffect(() => {
     if (isStudyGenerated) {
