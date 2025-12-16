@@ -19,6 +19,7 @@ import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableH
 import { useLocation } from 'react-router-dom';
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import {
+  filterRow,
   generateReadOnlyIndexMap,
   getAreaTrajectoryName,
   getTrajectoryTypeByIndex,
@@ -95,23 +96,24 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
   }, [detachTrajectory, shouldEnableParamModulation]);
 
   useEffect(() => {
-    if (studyState.studyStatus === StudyStatus.GENERATED || isStudyGenerated) {
-      const newData = technicalData[0]?.subRows?.filter(
-        (area) => area.isDefault || (area.trajectory && area.status === TRAJECTORY_SELECTION_STATUS.OK),
-      );
-      setTechnicalData((prev) => [
-        {
-          ...prev[0],
-          subRows: newData,
-        },
-        ...prev.slice(1),
-      ]);
+    if (studyState.studyStatus === StudyStatus.GENERATED) {
+      // const newData = technicalData[0]?.subRows?.filter(
+      //   (area) => area.isDefault || (area.trajectory && area.status === TRAJECTORY_SELECTION_STATUS.OK),
+      // );
+      // setTechnicalData((prev) => [
+      //   {
+      //     ...prev[0],
+      //     subRows: newData,
+      //   },
+      //   ...prev.slice(1),
+      // ]);
       setIsStudyGenerated(true);
+      setTechnicalData((rows) => filterRow(rows));
       const rows = generateReadOnlyIndexMap(technicalData);
       setReadOnly(rows);
       setReadOnlyParam({ '0': true, '1': true });
     }
-  }, [studyState.studyStatus, isStudyGenerated]);
+  }, [studyState.studyStatus]);
 
   const handleSelectionChange = useCallback(
     async (value: string, isChecked: boolean) => {

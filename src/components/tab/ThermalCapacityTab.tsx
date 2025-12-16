@@ -17,7 +17,12 @@ import { useCallback, useEffect, useState } from 'react';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
-import { generateReadOnlyIndexMap, getAreaTrajectoryName, getRowDataSelected } from '@/shared/utils/trajectoryUtils.ts';
+import {
+  filterRow,
+  generateReadOnlyIndexMap,
+  getAreaTrajectoryName,
+  getRowDataSelected,
+} from '@/shared/utils/trajectoryUtils.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
@@ -74,12 +79,13 @@ const ThermalCapacityTab = ({ defaultAreas, areas }: TabProps) => {
   }, [areasTrajectoryOptions, dropDownListOptions, hypothesisTrajectories, technologyList, readOnlyRow]);
 
   useEffect(() => {
-    if (studyState.studyStatus === StudyStatus.GENERATED || isStudyGenerated) {
+    if (studyState.studyStatus === StudyStatus.GENERATED) {
       setIsStudyGenerated(true);
+      setData((rows) => filterRow(rows));
       const rows = generateReadOnlyIndexMap(data);
       setReadOnly(rows);
     }
-  }, [studyState.studyStatus, isStudyGenerated]);
+  }, [studyState.studyStatus]);
 
   const handleSelectionChange = useCallback(
     async (value: string, isChecked?: boolean) => {

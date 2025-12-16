@@ -392,6 +392,49 @@ export const generateReadOnlyIndexMap = (data: HypothesisRowData[]): ReadOnlyObj
 };
 
 /**
+ * Recursive updater to reset data (error status) into data in missing status
+ * @param {HypothesisRowData[]} data
+ * @return {HypothesisRowData[]}
+ */
+export const filterRow = (data: HypothesisRowData[]): HypothesisRowData[] =>
+  data
+    .map((row) => {
+      // Filtrer récursivement les subRows
+      const filteredSubRows = row.subRows
+        ? filterRow(
+            row.subRows.filter((subRow) => subRow.trajectory && subRow.status === TRAJECTORY_SELECTION_STATUS.OK),
+          )
+        : [];
+
+      const updatedRow: HypothesisRowData = {
+        ...row,
+        subRows: filteredSubRows.length > 0 ? filteredSubRows : null,
+      };
+
+      // 🔹 Cas 1 : row.isDefault === true
+      if (row.isDefault) {
+        if (row.status === TRAJECTORY_SELECTION_STATUS.ERROR) {
+          updatedRow.status = TRAJECTORY_SELECTION_STATUS.MISSING;
+        }
+        return updatedRow; // on garde toujours
+      }
+
+      // 🔹 Cas 2 : row en ERROR mais avec des subRows OK → devient MISSING
+      if (row.status === TRAJECTORY_SELECTION_STATUS.ERROR && filteredSubRows.length > 0) {
+        updatedRow.status = TRAJECTORY_SELECTION_STATUS.MISSING;
+      }
+
+      return updatedRow;
+    })
+    .filter(
+      (row) =>
+        row.isDefault || // 🔹 garde toujours les isDefault
+        row.status === TRAJECTORY_SELECTION_STATUS.OK ||
+        row.status === TRAJECTORY_SELECTION_STATUS.MISSING ||
+        (row.status === TRAJECTORY_SELECTION_STATUS.ERROR && row.subRows && row.subRows.length > 0),
+    );
+
+/**
  * Add data to nested row
  * @param data
  * @param newRow
@@ -427,8 +470,10 @@ export const filterNestedRow = (data: HypothesisRowData[]): HypothesisRowData[] 
       return {
         ...trajectory,
         subRows:
-          trajectory?.subRows?.filter(
-            (subRow) => subRow.trajectory && subRow.status === TRAJECTORY_SELECTION_STATUS.OK,
+          filterNestedRow(
+            trajectory.subRows.filter(
+              (subRow) => subRow.trajectory && subRow.status === TRAJECTORY_SELECTION_STATUS.OK,
+            ),
           ) ?? null,
       };
     } else {

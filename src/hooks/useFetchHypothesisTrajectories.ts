@@ -6,7 +6,7 @@ import {
   buildDefaultEmptyTrajectoryList,
   buildRowWithSubRowsData,
   convertIntoHypothesisRowWithTechnologies,
-  filterNestedRow,
+  filterRow,
   generateReadOnlyIndexMap,
   removeDuplicate,
   removeDuplicateByTechnology,
@@ -86,32 +86,32 @@ export const useFetchHypothesisTrajectories = (
           areas,
         );
 
-          // Hypothesis table
-          const areaData =
-            trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY || trajType === TRAJECTORY_TYPE.STS
-              ? convertIntoHypothesisRowWithTechnologies(
-                  arrayWithoutDuplicate,
-                  defaultAreaListNotIncludedInList,
-                  defaultAreas,
-                  technologies ?? [],
+        // Hypothesis table
+        const areaData =
+          trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY || trajType === TRAJECTORY_TYPE.STS
+            ? convertIntoHypothesisRowWithTechnologies(
+                arrayWithoutDuplicate,
+                defaultAreaListNotIncludedInList,
+                defaultAreas,
+                technologies ?? [],
+              )
+            : arrayWithoutDuplicate
+                .map((trajectory) =>
+                  buildRowWithSubRowsData(trajectory, defaultAreas, defaultAreaListNotIncludedInList, null),
                 )
-              : arrayWithoutDuplicate
-                  .map((trajectory) =>
-                    buildRowWithSubRowsData(trajectory, defaultAreas, defaultAreaListNotIncludedInList, null),
-                  )
-                  .filter(Boolean);
-          let dataTrajectories = [];
-          let readOnlyAreas = {};
+                .filter(Boolean);
+        let dataTrajectories = [];
+        let readOnlyAreas = {};
 
-          if (isStudyGenerated) {
-            dataTrajectories = sortWithFixedPosition(filterNestedRow(areaData));
-            readOnlyAreas = generateReadOnlyIndexMap(dataTrajectories);
-          } else {
-            dataTrajectories = sortWithFixedPosition(areaData);
-            readOnlyAreas = retrieveReadOnlyArea(dataTrajectories, defaultAreaListNotIncludedInList);
-          }
-          setHypothesisTrajectories(dataTrajectories);
-          setReadOnlyRow(readOnlyAreas);
+        if (isStudyGenerated) {
+          dataTrajectories = sortWithFixedPosition(filterRow(areaData));
+          readOnlyAreas = generateReadOnlyIndexMap(dataTrajectories);
+        } else {
+          dataTrajectories = sortWithFixedPosition(areaData);
+          readOnlyAreas = retrieveReadOnlyArea(dataTrajectories, defaultAreaListNotIncludedInList);
+        }
+        setHypothesisTrajectories(dataTrajectories);
+        setReadOnlyRow(readOnlyAreas);
       } catch (error) {
         console.error('============= error', error);
       }

@@ -28,7 +28,7 @@ import {
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
-import { buildErrorTrajectory, getStatus } from '@/shared/utils/trajectoryUtils.ts';
+import { buildErrorTrajectory, filterRow, getStatus } from '@/shared/utils/trajectoryUtils.ts';
 import { TrajectoryDataVisualisation } from '@common/modal/TrajectoryDataVisualisation.tsx';
 import { useLocation } from 'react-router-dom';
 import { useUser } from '@/store/contexts/UserContext.tsx';
@@ -86,12 +86,13 @@ export const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
   }, [hypothesisTrajectories, readOnlyRow, setErrorMessage]);
 
   useEffect(() => {
-    if (studyState.studyStatus === StudyStatus.GENERATED || isStudyGenerated) {
+    if (studyState.studyStatus === StudyStatus.GENERATED) {
       setIsStudyGenerated(true);
+      setData((rows) => filterRow(rows));
       const rows = getReadOnlyForGeneratedStudy(data);
       setReadOnly(rows);
     }
-  }, [studyState.studyStatus, isStudyGenerated]);
+  }, [studyState.studyStatus]);
 
   const handleTrajectoryError = async (
     rowIndex: number,
