@@ -9,6 +9,7 @@ import {
   buildRowWithSubRowsData,
   convertIntoHypothesisRowWithTechnologies,
   filterNestedRow,
+  filterRow,
   generateReadOnlyIndexMap,
   getAreaTrajectoryName,
   getBgColor,
@@ -1240,5 +1241,56 @@ describe('getSubRowListWithArea', () => {
       message: '',
       messageNb: 0,
     });
+  });
+});
+
+describe('filterRow', () => {
+  it('garde toujours les rows avec isDefault', () => {
+    const data: HypothesisRowData[] = [
+      { status: TRAJECTORY_SELECTION_STATUS.ERROR, isDefault: true },
+    ] as unknown as HypothesisRowData[];
+    const result = filterRow(data);
+    expect(result).toHaveLength(1);
+    expect(result[0].status).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
+  });
+
+  it('filtre les subRows avec trajectory et status OK', () => {
+    const data: HypothesisRowData[] = [
+      {
+        status: TRAJECTORY_SELECTION_STATUS.ERROR,
+        subRows: [
+          { status: TRAJECTORY_SELECTION_STATUS.OK, trajectory: true },
+          { status: TRAJECTORY_SELECTION_STATUS.ERROR, trajectory: true },
+        ] as unknown as HypothesisRowData[],
+      },
+    ] as unknown as HypothesisRowData[];
+    const result = filterRow(data);
+    expect(result[0].subRows).toHaveLength(1);
+    expect(result[0].subRows?.[0].status).toBe(TRAJECTORY_SELECTION_STATUS.OK);
+  });
+
+  it('transforme ERROR en MISSING si subRows OK existent', () => {
+    const data: HypothesisRowData[] = [
+      {
+        status: TRAJECTORY_SELECTION_STATUS.ERROR,
+        subRows: [{ status: TRAJECTORY_SELECTION_STATUS.OK, trajectory: true }],
+      },
+    ];
+    const result = filterRow(data);
+    expect(result[0].status).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
+  });
+
+  it('supprime les rows inutiles (ni default, ni deletable, ni OK/MISSING)', () => {
+    const data: HypothesisRowData[] = [{ status: TRAJECTORY_SELECTION_STATUS.ERROR }] as unknown as HypothesisRowData[];
+    const result = filterRow(data);
+    expect(result).toHaveLength(0);
+  });
+
+  it('garde les rows isDeletable même si status ERROR', () => {
+    const data: HypothesisRowData[] = [
+      { status: TRAJECTORY_SELECTION_STATUS.ERROR, isDeletable: true },
+    ] as unknown as HypothesisRowData[];
+    const result = filterRow(data);
+    expect(result).toHaveLength(1);
   });
 });
