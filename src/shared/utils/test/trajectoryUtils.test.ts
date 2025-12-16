@@ -1259,8 +1259,8 @@ describe('filterRow', () => {
       {
         status: TRAJECTORY_SELECTION_STATUS.ERROR,
         subRows: [
-          { status: TRAJECTORY_SELECTION_STATUS.OK, trajectory: true },
-          { status: TRAJECTORY_SELECTION_STATUS.ERROR, trajectory: true },
+          { status: TRAJECTORY_SELECTION_STATUS.OK, trajectory: { trajectoryName: 'name' } as DbTrajectory },
+          { status: TRAJECTORY_SELECTION_STATUS.ERROR, trajectory: { trajectoryName: 'name' } as DbTrajectory },
         ] as unknown as HypothesisRowData[],
       },
     ] as unknown as HypothesisRowData[];
@@ -1273,9 +1273,11 @@ describe('filterRow', () => {
     const data: HypothesisRowData[] = [
       {
         status: TRAJECTORY_SELECTION_STATUS.ERROR,
-        subRows: [{ status: TRAJECTORY_SELECTION_STATUS.OK, trajectory: true }],
+        subRows: [
+          { status: TRAJECTORY_SELECTION_STATUS.OK, trajectory: { trajectoryName: 'name' } as DbTrajectory },
+        ] as unknown as HypothesisRowData[],
       },
-    ];
+    ] as unknown as HypothesisRowData[];
     const result = filterRow(data);
     expect(result[0].status).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
   });
