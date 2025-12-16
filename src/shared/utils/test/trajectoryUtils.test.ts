@@ -1212,6 +1212,28 @@ describe('filterRow', () => {
     expect(result[1].status).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
   });
 
+  it('garde une row en ERROR si elle a des subRows non vides', () => {
+    const data: HypothesisRowData[] = [
+      {
+        status: TRAJECTORY_SELECTION_STATUS.ERROR,
+        subRows: [{ status: TRAJECTORY_SELECTION_STATUS.OK, trajectory: { trajectoryName: 'name' } as DbTrajectory }],
+      },
+    ] as unknown as HypothesisRowData[];
+    const result = filterRow(data);
+    expect(result).toHaveLength(1);
+    expect(result[0].status).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
+    expect(result[0].subRows).not.toBeNull();
+    expect(result[0].subRows?.length).toBe(1);
+  });
+
+  it('supprime une row en ERROR si subRows est vide', () => {
+    const data: HypothesisRowData[] = [
+      { status: TRAJECTORY_SELECTION_STATUS.ERROR, subRows: [] },
+    ] as unknown as HypothesisRowData[];
+    const result = filterRow(data);
+    expect(result).toHaveLength(0);
+  });
+
   it('filtre les subRows avec trajectory et status OK', () => {
     const data: HypothesisRowData[] = [
       {
