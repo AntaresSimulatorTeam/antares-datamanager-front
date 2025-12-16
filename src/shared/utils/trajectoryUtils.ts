@@ -392,6 +392,50 @@ export const generateReadOnlyIndexMap = (data: HypothesisRowData[]): ReadOnlyObj
 };
 
 /**
+ * Recursive updater to reset data (error status) into data in missing status
+ * @param {HypothesisRowData[]} data
+ * @return {HypothesisRowData[]}
+ */
+export const filterRow = (data: HypothesisRowData[]): HypothesisRowData[] =>
+  data
+    .map((row) => {
+      // Filtrer récursivement les subRows
+      const filteredSubRows = row.subRows
+        ? filterRow(
+            row.subRows.filter((subRow) => subRow.trajectory && subRow.status === TRAJECTORY_SELECTION_STATUS.OK),
+          )
+        : [];
+
+      const updatedRow: HypothesisRowData = {
+        ...row,
+        subRows: filteredSubRows.length > 0 ? filteredSubRows : null,
+      };
+
+      // 🔹 Cas 1 : row.isDefault === true
+      if (row.isDefault || !row.isDeletable) {
+        if (row.status === TRAJECTORY_SELECTION_STATUS.ERROR) {
+          updatedRow.status = TRAJECTORY_SELECTION_STATUS.MISSING;
+        }
+        return updatedRow; // on garde toujours les lignes en default
+      }
+
+      // 🔹 Cas 2 : row en ERROR mais avec des subRows OK → devient MISSING
+      if (row.status === TRAJECTORY_SELECTION_STATUS.ERROR && filteredSubRows.length > 0) {
+        updatedRow.status = TRAJECTORY_SELECTION_STATUS.MISSING;
+      }
+
+      return updatedRow;
+    })
+    .filter(
+      (row) =>
+        row.isDefault || // 🔹 garde toujours les isDefault
+        !row.isDeletable ||
+        row.status === TRAJECTORY_SELECTION_STATUS.OK ||
+        row.status === TRAJECTORY_SELECTION_STATUS.MISSING ||
+        (row.status === TRAJECTORY_SELECTION_STATUS.ERROR && row.subRows && row.subRows.length > 0),
+    );
+
+/**
  * Add data to nested row
  * @param data
  * @param newRow
@@ -416,6 +460,12 @@ export const addNestedRow = (
     }
   });
 
+/**
+ * Return all tabs available for a study configuration
+ * @param {TFunction<'translation', undefined>} t - Translation function
+ * @param {boolean} isTrajectoryAreaLinked - Flag to indicate if an AREA trajectory is linked to the study
+ * @return {HypothesisTab[]} - Array of tab data model
+ */
 export const getStudyMenu = (t: (value: string) => string, isTrajectoryAreaLinked: boolean): HypothesisTab[] => [
   {
     name: TRAJECTORY_TYPE.AREA,
@@ -436,8 +486,6 @@ export const getStudyMenu = (t: (value: string) => string, isTrajectoryAreaLinke
     isDisabled: isTrajectoryAreaLinked,
   },
   { name: TRAJECTORY_TYPE.STS, label: t('studyDetails.@sts'), icon: StdIconId.BatteryChargingFull, isDisabled: true },
-  { name: TRAJECTORY_TYPE.ENR, label: t('studyDetails.@enr'), icon: StdIconId.EnergySavingsLeaf, isDisabled: true },
-  { name: TRAJECTORY_TYPE.MISC, label: t('studyDetails.@misc'), icon: StdIconId.Category, isDisabled: true },
 ];
 
 /**

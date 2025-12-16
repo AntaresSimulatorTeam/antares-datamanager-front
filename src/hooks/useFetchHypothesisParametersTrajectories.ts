@@ -105,6 +105,12 @@ export const useFetchHypothesisParametersTrajectories = (
               buildRowWithSubRowsData(trajectory, defaultAreas, defaultAreaListNotIncludedInList, null),
             )
             .filter(Boolean);
+
+          const specificAreaSelected = isStudyGenerated
+            ? specificAreaData.filter(
+                (area) => area.isDefault || (area.trajectory && area.status === TRAJECTORY_SELECTION_STATUS.OK),
+              )
+            : specificAreaData;
           const dataTrajectories = [
             {
               hypothesis: t('thermal.@specific'),
@@ -112,7 +118,7 @@ export const useFetchHypothesisParametersTrajectories = (
               status: TRAJECTORY_SELECTION_STATUS.MISSING,
               isDefault: false,
               isDeletable: false,
-              subRows: sortWithFixedPosition(specificAreaData),
+              subRows: sortWithFixedPosition(specificAreaSelected),
             },
             {
               hypothesis: t('thermal.@paramModulation'),
@@ -136,7 +142,6 @@ export const useFetchHypothesisParametersTrajectories = (
             },
           ];
           setHypothesisTrajectories(dataTrajectories);
-
           if (isStudyGenerated) {
             const rows = generateReadOnlyIndexMap(dataTrajectories);
             setReadOnlyRow(rows);

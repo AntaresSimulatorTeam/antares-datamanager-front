@@ -34,10 +34,8 @@ export const checkboxClassBuilder = (disabled: boolean, error: boolean) => {
 
   return {
     containerClasses: clsx(
-      'flex items-center gap-1 group w-full hover:bg-gray-200 focus:bg-primary-300 active:bg-gray-300',
-      {
-        'cursor-pointer': !disabled,
-      },
+      `flex items-center gap-1 group w-full`,
+      disabled ? '' : 'hover:bg-gray-200 focus:bg-primary-300 active:bg-gray-300 cursor-pointer',
     ),
     inputClasses: clsx(
       COMMON_CHECKBOX_CLASSES,

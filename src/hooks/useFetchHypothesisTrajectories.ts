@@ -6,6 +6,7 @@ import {
   buildDefaultEmptyTrajectoryList,
   buildRowWithSubRowsData,
   convertIntoHypothesisRowWithTechnologies,
+  filterRow,
   generateReadOnlyIndexMap,
   removeDuplicate,
   removeDuplicateByTechnology,
@@ -99,16 +100,18 @@ export const useFetchHypothesisTrajectories = (
                   buildRowWithSubRowsData(trajectory, defaultAreas, defaultAreaListNotIncludedInList, null),
                 )
                 .filter(Boolean);
-        const dataTrajectories = sortWithFixedPosition(areaData);
-        setHypothesisTrajectories(dataTrajectories);
+        let dataTrajectories = [];
+        let readOnlyAreas = {};
 
         if (isStudyGenerated) {
-          const rows = generateReadOnlyIndexMap(dataTrajectories);
-          setReadOnlyRow(rows);
+          dataTrajectories = sortWithFixedPosition(filterRow(areaData));
+          readOnlyAreas = generateReadOnlyIndexMap(dataTrajectories);
         } else {
-          const readOnlyRows = retrieveReadOnlyArea(dataTrajectories, defaultAreaListNotIncludedInList);
-          setReadOnlyRow(readOnlyRows);
+          dataTrajectories = sortWithFixedPosition(areaData);
+          readOnlyAreas = retrieveReadOnlyArea(dataTrajectories, defaultAreaListNotIncludedInList);
         }
+        setHypothesisTrajectories(dataTrajectories);
+        setReadOnlyRow(readOnlyAreas);
       } catch (error) {
         console.error('============= error', error);
       }

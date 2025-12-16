@@ -6,8 +6,6 @@
 
 import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from 'react';
 import LoadTab from '@/components/tab/LoadTab.tsx';
-import EnrTab from '@/components/tab/EnrTab.tsx';
-import MiscTab from '@/components/tab/MiscLinkTab.tsx';
 import { AreaLinkTab } from '@/components/tab/AreaLinkTab.tsx';
 import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
@@ -54,10 +52,6 @@ const StudyNavigationMenu = ({
         return <LoadTab defaultAreas={areaDefault} areas={trajectoryAreas} />;
       case TRAJECTORY_TYPE.THERMAL_CAPACITY:
         return <ThermalMenu defaultAreas={areaDefault} areas={trajectoryAreas} />;
-      case TRAJECTORY_TYPE.ENR:
-        return <EnrTab />;
-      case TRAJECTORY_TYPE.MISC:
-        return <MiscTab />;
       case TRAJECTORY_TYPE.STS:
         return <STSTab defaultAreas={areaDefault} areas={trajectoryAreas} />;
       default:

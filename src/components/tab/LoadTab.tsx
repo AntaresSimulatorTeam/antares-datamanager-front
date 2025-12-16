@@ -33,6 +33,7 @@ import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
 import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow.ts';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { CheckBoxListWithSearchBar } from '@/components/list/CheckBoxListWithSearchBar.tsx';
+import { filterRow } from '@/shared/utils/trajectoryUtils.ts';
 
 const LoadTab = ({ defaultAreas, areas }: TabProps) => {
   const studyState = useStudy();
@@ -70,12 +71,13 @@ const LoadTab = ({ defaultAreas, areas }: TabProps) => {
   }, [hypothesisTrajectories, areas, defaultAreas, areasTrajectoryOptions, dropDownListOptions, readOnlyRow]);
 
   useEffect(() => {
-    if (isStudyGenerated) {
+    if (studyState.studyStatus === StudyStatus.GENERATED) {
       setIsStudyGenerated(true);
+      setData((rows) => filterRow(rows));
       const rows = getReadOnlyForGeneratedStudy(data);
       setReadOnly(rows);
     }
-  }, [isStudyGenerated]);
+  }, [studyState.studyStatus]);
 
   const handleSelectionChange = useCallback(
     async (value: string, isChecked?: boolean): Promise<void> => {

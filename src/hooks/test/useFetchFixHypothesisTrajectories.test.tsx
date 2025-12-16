@@ -1,16 +1,25 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import * as studyService from '@/shared/services/studyService';
+import * as trajectoryUtils from '@/shared/utils/trajectoryUtils';
 import { useStudyDispatch } from '@/store/contexts/StudyContext';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory';
 import { STUDY_ACTION } from '@/shared/enum/study';
 import { DbTrajectory } from '@/shared/types';
 import { useFetchFixHypothesisTrajectories } from '@/hooks/useFetchFixHypothesisTrajectories.ts';
+import { HypothesisConfig, HypothesisTableOptions } from '@/shared/types/HypothesisTable.ts';
 
 // Mocks
 vi.mock('@/shared/services/trajectoryService');
 vi.mock('@/shared/services/studyService');
 vi.mock('@/store/contexts/StudyContext');
+vi.mock('@/shared/utils/trajectoryUtils', async (importOriginal) => {
+  const actual: Mock = await importOriginal();
+  return {
+    ...actual,
+    buildReadOnlyRow: vi.fn(),
+  };
+});
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => {
@@ -206,6 +215,26 @@ describe('useFetchFixHypothesisTrajectories', () => {
           '0': false,
           '1': false,
         });
+      });
+    });
+
+    it.skip('should call buildReadOnlyRow when options.isStudyGenerated = true and withReadOnlyRow = false', async () => {
+      const configsOk = [
+        { type: 'A', labelKey: 'label.a' },
+        { type: 'B', labelKey: 'label.b' },
+      ] as unknown as HypothesisConfig[];
+      mockGetStudyTrajectories.mockImplementation(async (_id: number, type: TRAJECTORY_TYPE) => {
+        if (type === TRAJECTORY_TYPE.AREA) return Promise.resolve([mockAreaTrajectory]);
+        if (type === TRAJECTORY_TYPE.LINK) return Promise.resolve([]);
+        return Promise.resolve([]);
+      });
+      const optionsOk = { isStudyGenerated: true, withReadOnlyRow: false } as unknown as HypothesisTableOptions;
+      const { result } = renderHook(() => useFetchFixHypothesisTrajectories(configsOk, optionsOk, 123));
+      await waitFor(() => {
+        expect(trajectoryUtils.buildReadOnlyRow).toHaveBeenCalledWith([0, 1]);
+        expect(result.current).toHaveProperty('hypothesisTrajectories');
+        expect(result.current).toHaveProperty('readOnlyRow');
+        expect(result.current.readOnlyRow).toEqual({ mockRow: ['0', '1'] });
       });
     });
   });

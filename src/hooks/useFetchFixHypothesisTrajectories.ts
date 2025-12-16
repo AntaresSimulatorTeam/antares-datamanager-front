@@ -7,6 +7,7 @@ import { useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
 import { HypothesisConfig, HypothesisTableOptions } from '@/shared/types/HypothesisTable.ts';
+import { buildReadOnlyRow } from '@/shared/utils/trajectoryUtils.ts';
 
 export const useFetchFixHypothesisTrajectories = (
   configs: HypothesisConfig[],
@@ -43,19 +44,20 @@ export const useFetchFixHypothesisTrajectories = (
         result: results[idx],
       }));
 
-      setHypothesisTrajectories(
-        trajectoryResult.map(({ label, result }) => ({
-          hypothesis: label,
-          trajectory: result?.[0],
-          status: result.length > 0 ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
-        })),
-      );
+      const dataTrajectories = trajectoryResult.map(({ label, result }) => ({
+        hypothesis: label,
+        trajectory: result?.[0],
+        status: result.length > 0 ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+      }));
+      setHypothesisTrajectories(dataTrajectories);
 
       if (options.withReadOnlyRow) {
         setReadOnlyRow({
           '0': false,
           '1': !results[0]?.length || (!results[1]?.length && options.isStudyGenerated),
         });
+      } else if (options.isStudyGenerated) {
+        setReadOnlyRow(buildReadOnlyRow([...dataTrajectories.keys()]));
       }
     } catch {
       // Silent handler

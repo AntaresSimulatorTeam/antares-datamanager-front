@@ -129,12 +129,14 @@ const getExpandableHypothesisTableHeaders = ({
           size: 160,
           cell: ({ row }) => {
             if (row.depth === 0) return null;
+            const { trajectory, status } = row.original;
+            const hasTrajectory = trajectory?.trajectoryName && status === TRAJECTORY_SELECTION_STATUS.OK;
             return (
               <StdButton
                 label={t('studyDetails.@preview')}
                 icon={StdIconId.Preview}
                 position="left"
-                disabled={row.getReadOnly() || true} // TODO: to implement later
+                disabled={row.getReadOnly() || (studyState !== StudyStatus.GENERATED && !hasTrajectory)}
                 onClick={() => {}}
                 variant="outlined"
                 size="small"

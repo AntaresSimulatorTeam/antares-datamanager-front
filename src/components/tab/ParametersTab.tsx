@@ -19,6 +19,7 @@ import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableH
 import { useLocation } from 'react-router-dom';
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import {
+  filterRow,
   generateReadOnlyIndexMap,
   getAreaTrajectoryName,
   getTrajectoryTypeByIndex,
@@ -48,6 +49,7 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
+  const [readOnlyParam, setReadOnlyParam] = useState<ReadOnlyObject>({});
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
   const [technicalData, setTechnicalData] = useState<HypothesisRowData[]>([]);
   const [data, setData] = useState<HypothesisRowData[]>([]);
@@ -94,12 +96,14 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
   }, [detachTrajectory, shouldEnableParamModulation]);
 
   useEffect(() => {
-    if (isStudyGenerated) {
+    if (studyState.studyStatus === StudyStatus.GENERATED) {
       setIsStudyGenerated(true);
+      setTechnicalData((rows) => filterRow(rows));
       const rows = generateReadOnlyIndexMap(technicalData);
       setReadOnly(rows);
+      setReadOnlyParam({ '0': true, '1': true });
     }
-  }, [isStudyGenerated]);
+  }, [studyState.studyStatus]);
 
   const handleSelectionChange = useCallback(
     async (value: string, isChecked: boolean) => {
@@ -240,6 +244,8 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
             fileStatus={fileStatus}
             studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
             idSelected={rowIdSelected}
+            isReadOnlyEnable={true}
+            readOnly={readOnlyParam}
             progress={isTechnicalParametersType(selectedTrajectoryType) ? 0 : progress}
             handleSearch={async (value: string, rowId: string) => {
               const index = Number(rowId.split('.').map(Number)[0]);
