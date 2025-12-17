@@ -134,7 +134,7 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
           getTableHeaders={getExpandableHypothesisTableHeaders}
           columnHeader={t('thermal.@parametersTechnical')}
           fileStatus={fileStatus}
-          studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
+          isStudyGenerated={isStudyGenerated}
           readOnly={readOnly}
           progress={isTechnicalParametersType(selectedTrajectoryType) ? progress : 0}
           idSelected={rowIdSelected}
@@ -231,7 +231,7 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
             getTableHeaders={getEditableHypothesisTableHeaders}
             columnHeader={t('thermal.@parametersEconomic')}
             fileStatus={fileStatus}
-            studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
+            isStudyGenerated={isStudyGenerated}
             idSelected={rowIdSelected}
             isReadOnlyEnable={true}
             readOnly={readOnlyParam}

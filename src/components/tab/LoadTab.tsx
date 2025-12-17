@@ -97,7 +97,7 @@ const LoadTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         data={data}
         getTableHeaders={getEditableHypothesisTableHeaders}
         fileStatus={fileStatus}
-        studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
+        isStudyGenerated={isStudyGenerated}
         readOnly={readOnly}
         progress={progress}
         idSelected={String(rowIdSelected)}

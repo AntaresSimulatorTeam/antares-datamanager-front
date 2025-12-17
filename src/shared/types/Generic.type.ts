@@ -2,7 +2,6 @@ import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
 import { AccessorKeyColumnDefBase, DeepKeys, DeepValue, StringOrTemplateHeader } from '@tanstack/react-table';
 import { HypothesisRowData, TrajectoryAreaData, TrajectoryWithSubRowsType } from '@/shared/types/Trajectory.type.ts';
 import { Dispatch, SetStateAction } from 'react';
-import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { TFunction } from 'i18next';
 import { StudyDTO } from '@/shared/types/Study.type.ts';
@@ -69,7 +68,7 @@ export interface TabProps {
 }
 
 export type TableHeadersProps = {
-  studyState: StudyStatus;
+  isStudyGenerated: boolean;
   progress: number;
   fileStatus: FileInputStatus;
   idSelected: string;

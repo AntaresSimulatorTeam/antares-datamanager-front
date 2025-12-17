@@ -33,7 +33,7 @@ export const PegaseHypothesisTable = ({
   getTableHeaders,
   readOnly,
   progress,
-  studyState,
+  isStudyGenerated,
   fileStatus,
   idSelected,
   handleSearch,
@@ -60,7 +60,7 @@ export const PegaseHypothesisTable = ({
         t,
         errorInfo,
         setErrorInfo,
-        studyState,
+        isStudyGenerated,
         progress,
         fileStatus,
         idSelected,
@@ -68,7 +68,7 @@ export const PegaseHypothesisTable = ({
         type,
         list,
       }),
-    [getTableHeaders, t, errorInfo, studyState, progress, fileStatus, idSelected, columnHeader, type, list],
+    [getTableHeaders, t, errorInfo, isStudyGenerated, progress, fileStatus, idSelected, columnHeader, type, list],
   );
 
   const onHandleImport = useCallback(

@@ -273,7 +273,7 @@ export const AreaLinkTab = ({ setErrorMessage, studyData }: AreaLinkTabProps) =>
         data={data}
         getTableHeaders={getEditableHypothesisTableHeaders}
         fileStatus={fileStatus}
-        studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
+        isStudyGenerated={isStudyGenerated}
         readOnly={readOnly}
         isReadOnlyEnable={true}
         progress={progress}

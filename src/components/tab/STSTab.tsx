@@ -30,13 +30,7 @@ const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
     studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED,
   );
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow, technologyList } =
-    useFetchHypothesisTrajectories(
-      areas,
-      studyData?.id,
-      TRAJECTORY_TYPE.STS,
-      defaultAreas,
-      isStudyGenerated
-    );
+    useFetchHypothesisTrajectories(areas, studyData?.id, TRAJECTORY_TYPE.STS, defaultAreas, isStudyGenerated);
   const { removeRow } = useHypothesisTableRemoveRow(studyData, dispatch, setData, setCheckedValues);
 
   useEffect(() => {
@@ -85,7 +79,7 @@ const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         data={data}
         getTableHeaders={getExpandableHypothesisTableHeaders}
         fileStatus={'empty'}
-        studyState={StudyStatus.IN_PROGRESS}
+        isStudyGenerated={isStudyGenerated}
         readOnly={readOnly}
         progress={0}
         idSelected={'0'}

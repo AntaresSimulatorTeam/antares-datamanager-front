@@ -118,7 +118,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         data={data}
         getTableHeaders={getExpandableHypothesisTableHeaders}
         fileStatus={fileStatus}
-        studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
+        isStudyGenerated={isStudyGenerated}
         readOnly={readOnly}
         progress={progress}
         idSelected={rowIdSelected}
