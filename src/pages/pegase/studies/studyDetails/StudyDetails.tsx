@@ -5,7 +5,7 @@
  */
 
 import { ReactNode, useEffect, useState } from 'react';
-import { Location, useLocation } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import StudyHeader from './StudyHeader.tsx';
 import { RdsDivider } from 'rte-design-system-react';
 import StudyNavigationMenu from '@/components/menu/StudyNavigationMenu.tsx';
@@ -24,15 +24,9 @@ import { useFetchWarningMessages } from '@/hooks/useFetchWarningMessages.ts';
 import StudyModificationModal from '@common/modal/StudyModificationModal.tsx';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 
-interface StudyState {
-  study: StudyDTO;
-}
-
 const StudyDetails = () => {
   const [activeContent, setActiveContent] = useState<ReactNode>(null);
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const location: Location<StudyState> = useLocation();
-  const { study } = location.state || {};
+  const { id } = useParams();
   const { t } = useTranslation();
   const studyState = useStudy();
   const dispatch = useStudyDispatch();
@@ -45,14 +39,14 @@ const StudyDetails = () => {
     isDisabled: false,
   });
   const [errorMessage, setErrorMessage] = useState<string>('');
-  const { warningMessages } = useFetchWarningMessages(study.id, activeTab.name);
+  const { warningMessages } = useFetchWarningMessages(id ? Number(id) : null, activeTab.name);
   const [reloadStudy, setReloadStudy] = useState(0);
-  const [studyData, setStudyData] = useState<StudyDTO>(study);
+  const [studyData, setStudyData] = useState<StudyDTO | null>(null);
 
-  const handleGenerateStudy = async () => {
+  const handleGenerateStudy = async (studyId: number) => {
     try {
       setIsGenerating(true);
-      await generateStudy(study.id);
+      await generateStudy(studyId);
       setIsGenerating(false);
       dispatch?.({ type: STUDY_ACTION.SET_STUDY_STATUS, payload: StudyStatus.GENERATED });
     } catch {
@@ -66,16 +60,16 @@ const StudyDetails = () => {
   };
 
   useEffect(() => {
-    const fetchStudyData = async (id: number) => {
-      const studyUpdated = await getStudyById(id);
+    const fetchStudyData = async (studyId: number) => {
+      const studyUpdated = await getStudyById(studyId);
       setStudyData(studyUpdated);
     };
-    if (study.id != null) {
-      void fetchStudyData(study.id);
+    if (id != null) {
+      void fetchStudyData(Number(id));
     }
-  }, [reloadStudy, study.id]);
+  }, [reloadStudy, id]);
 
-  return !study.id ? (
+  return !studyData ? (
     <div className="flex h-screen items-center justify-center">
       <p>{t('studyDetails.@loading')}</p>
     </div>
@@ -91,7 +85,7 @@ const StudyDetails = () => {
             setActiveTab={setActiveTab}
             activeTab={activeTab}
             setErrorMessage={setErrorMessage}
-            studyId={study.id}
+            studyData={studyData}
           />
         </div>
         <div className="relative flex flex-1 flex-col overflow-y-auto px-4">
@@ -107,7 +101,7 @@ const StudyDetails = () => {
               {errorMessage && <div className="mr-1 text-error-600">{errorMessage}</div>}
               <ButtonWithStdIcon
                 label={t('studyDetails.@generate')}
-                onClick={() => void handleGenerateStudy()}
+                onClick={() => studyData?.id && void handleGenerateStudy(studyData?.id)}
                 disabled={!studyState.AREA?.trajectories?.length || studyState.studyStatus === StudyStatus.GENERATED}
                 icon={StdIconId.CheckCircle}
                 position="right"

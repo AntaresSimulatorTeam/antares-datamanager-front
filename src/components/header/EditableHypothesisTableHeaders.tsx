@@ -7,7 +7,6 @@
 import { createColumnHelper } from '@tanstack/react-table';
 import { HypothesisRowData, SelectOption, TableHeadersGetterProps } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { CellWithStatus } from '@common/data/CellWithStatus.tsx';
 import { LabelWithButtonPreview } from '@common/data/LabelWithButtonPreview.tsx';
 import { LabelWithDeleteButton } from '@common/data/LabelWithDeleteButton.tsx';
@@ -22,7 +21,7 @@ const getEditableHypothesisTableHeaders = ({
   t,
   errorInfo,
   setErrorInfo,
-  studyState,
+  isStudyGenerated,
   progress,
   fileStatus,
   idSelected,
@@ -57,7 +56,7 @@ const getEditableHypothesisTableHeaders = ({
         <div className="flex w-full items-center gap-2 py-1">
           <LabelWithDeleteButton
             label={trajectory.trajectoryName}
-            isDeletable={!(studyState === StudyStatus.GENERATED)}
+            isDeletable={!isStudyGenerated}
             onClick={() => {
               setErrorInfo({ index: row.index, message: '' });
               void table.options?.meta?.updateData?.(
@@ -85,7 +84,7 @@ const getEditableHypothesisTableHeaders = ({
               table.getSortedRowModel().rows?.[0]?.original?.status === TRAJECTORY_SELECTION_STATUS.MISSING &&
               table.getSortedRowModel().rows?.[0]?.original?.trajectory?.type === TRAJECTORY_TYPE.AREA &&
               row.index === 1 &&
-              studyState !== StudyStatus.GENERATED
+              !isStudyGenerated
                 ? t('studyDetails.@select_area')
                 : t('studyDetails.@select_trajectory')
             }
@@ -108,7 +107,7 @@ const getEditableHypothesisTableHeaders = ({
       ) : (
         <div className="flex items-center gap-1">
           <CellWithStatus status={status} />
-          {options?.meta?.removeRow && !isDefault && studyState !== StudyStatus.GENERATED && (
+          {options?.meta?.removeRow && !isDefault && !isStudyGenerated && (
             <div className={`${isDeletable ? 'pointer-events-auto visible' : 'pointer-events-none invisible'}`}>
               <RdsIconButton
                 icon={RdsIconId.Delete}

@@ -11,7 +11,7 @@ import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useTranslation } from 'react-i18next';
 import { useStudy } from '@/store/contexts/StudyContext.tsx';
-import { HypothesisTab, WarningTrajectoryType } from '@/shared/types';
+import { HypothesisTab, StudyDTO, WarningTrajectoryType } from '@/shared/types';
 import StdAvatar from '@common/layout/stdAvatar/StdAvatar.tsx';
 import { ThermalMenu } from '@/components/menu/ThermalMenu.tsx';
 import { getStudyMenu } from '@/shared/utils/trajectoryUtils.ts';
@@ -26,7 +26,7 @@ type StudyNavigationMenuProps = {
   setActiveTab: Dispatch<SetStateAction<HypothesisTab>>;
   activeTab: HypothesisTab;
   setErrorMessage: Dispatch<SetStateAction<string>>;
-  studyId: number;
+  studyData: StudyDTO;
 };
 
 const StudyNavigationMenu = ({
@@ -34,7 +34,7 @@ const StudyNavigationMenu = ({
   setActiveTab,
   activeTab,
   setErrorMessage,
-  studyId,
+  studyData,
 }: StudyNavigationMenuProps) => {
   const { t } = useTranslation();
   const studyState = useStudy();
@@ -47,13 +47,13 @@ const StudyNavigationMenu = ({
   const renderActiveComponent = (): ReactNode | null => {
     switch (activeTab.name) {
       case TRAJECTORY_TYPE.AREA:
-        return <AreaLinkTab setErrorMessage={setErrorMessage} />;
+        return <AreaLinkTab setErrorMessage={setErrorMessage} studyData={studyData} />;
       case TRAJECTORY_TYPE.LOAD:
-        return <LoadTab defaultAreas={areaDefault} areas={trajectoryAreas} />;
+        return <LoadTab defaultAreas={areaDefault} areas={trajectoryAreas} studyData={studyData} />;
       case TRAJECTORY_TYPE.THERMAL_CAPACITY:
-        return <ThermalMenu defaultAreas={areaDefault} areas={trajectoryAreas} />;
+        return <ThermalMenu defaultAreas={areaDefault} areas={trajectoryAreas} studyData={studyData} />;
       case TRAJECTORY_TYPE.STS:
-        return <STSTab defaultAreas={areaDefault} areas={trajectoryAreas} />;
+        return <STSTab defaultAreas={areaDefault} areas={trajectoryAreas} studyData={studyData} />;
       default:
         return null;
     }
@@ -83,8 +83,8 @@ const StudyNavigationMenu = ({
         onRenderActiveComponent(renderActiveComponent());
       }
     }
-    void countNbWarningMessages(studyId);
-  }, [activeTab, onRenderActiveComponent, studyId, studyState]);
+    void countNbWarningMessages(studyData?.id);
+  }, [activeTab, onRenderActiveComponent, studyData?.id, studyState]);
 
   return (
     <div className="flex space-x-4 p-4">

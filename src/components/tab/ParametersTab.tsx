@@ -1,14 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useCallback, useEffect, useState } from 'react';
-import {
-  CheckBoxData,
-  DbTrajectory,
-  HypothesisRowData,
-  LocationStudy,
-  RowStatus,
-  SelectOption,
-  TabProps,
-} from '@/shared/types';
+import { CheckBoxData, DbTrajectory, HypothesisRowData, RowStatus, SelectOption, TabProps } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import getEditableHypothesisTableHeaders from '@/components/header/EditableHypothesisTableHeaders.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
@@ -16,7 +8,6 @@ import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/Pega
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
-import { useLocation } from 'react-router-dom';
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import {
   filterRow,
@@ -40,11 +31,9 @@ import { useFetchHypothesisParametersTrajectories } from '@/hooks/useFetchHypoth
 import { useFetchFixHypothesisTrajectories } from '@/hooks/useFetchFixHypothesisTrajectories.ts';
 import { isParamModulationRequired } from '@/shared/services/trajectoryService.ts';
 
-export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
+export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const { t } = useTranslation();
   const studyState = useStudy();
-  const location = useLocation();
-  const study = (location.state as LocationStudy)?.study;
   const dispatch = useStudyDispatch();
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
@@ -59,26 +48,26 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
   const [isDeletionModalOpen, setIsDeletionModalOpen] = useState(false);
   const [shouldEnableParamModulation, setShouldEnableParamModulation] = useState(false);
   const [isStudyGenerated, setIsStudyGenerated] = useState(
-    studyState.studyStatus === StudyStatus.GENERATED || study.status === StudyStatus.GENERATED,
+    studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED,
   );
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const [selectedTrajectoryType, setSelectedTrajectoryType] = useState<TRAJECTORY_TYPE>(
     TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
   );
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
-    useFetchHypothesisParametersTrajectories(areas, study?.id, defaultAreas, isStudyGenerated);
+    useFetchHypothesisParametersTrajectories(areas, studyData?.id, defaultAreas, isStudyGenerated);
 
   const configs = [
     { type: TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER, labelKey: t('thermal.@costs') },
     { type: TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER, labelKey: t('thermal.@economics') },
   ];
   const options = { withReadOnlyRow: false, isStudyGenerated };
-  const { hypothesisTrajectories: economicData } = useFetchFixHypothesisTrajectories(configs, options, study?.id);
+  const { hypothesisTrajectories: economicData } = useFetchFixHypothesisTrajectories(configs, options, studyData?.id);
 
-  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(study, studyState, dispatch);
-  const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch);
-  const { removeRow } = useHypothesisTableRemoveRow(study, dispatch, setTechnicalData, setCheckedValues);
-  const { detachTrajectory } = useTrajectoryDetach(study, dispatch);
+  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch);
+  const { attachTrajectory } = useTrajectoryAttach(studyData, studyState, dispatch);
+  const { removeRow } = useHypothesisTableRemoveRow(studyData, dispatch, setTechnicalData, setCheckedValues);
+  const { detachTrajectory } = useTrajectoryDetach(studyData, dispatch);
 
   useEffect(() => {
     const setHypothesis = () => {
@@ -122,7 +111,7 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
         setIsDeletionModalOpen(true);
       } else {
         await removeRow(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, value, 0, technicalData);
-        const isRequired = await isParamModulationRequired(study.id, study?.horizon);
+        const isRequired = await isParamModulationRequired(studyData.id, studyData?.horizon);
         setShouldEnableParamModulation(isRequired);
       }
     },
@@ -145,7 +134,7 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
           getTableHeaders={getExpandableHypothesisTableHeaders}
           columnHeader={t('thermal.@parametersTechnical')}
           fileStatus={fileStatus}
-          studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
+          isStudyGenerated={isStudyGenerated}
           readOnly={readOnly}
           progress={isTechnicalParametersType(selectedTrajectoryType) ? progress : 0}
           idSelected={rowIdSelected}
@@ -163,7 +152,7 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
               value,
               area,
               setDbTrajectories,
-              study,
+              studyData,
             );
           }}
           handleImport={async (rowId: string) => {
@@ -198,7 +187,7 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
                       ? technicalData[1].trajectory
                       : null,
                   );
-                  const isRequired = await isParamModulationRequired(study.id, study?.horizon);
+                  const isRequired = await isParamModulationRequired(studyData.id, studyData?.horizon);
                   setShouldEnableParamModulation(isRequired);
                 }
               }
@@ -215,7 +204,7 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
                   dbTrajectory,
                   setTechnicalData,
                 );
-                const isRequired = await isParamModulationRequired(study.id, study?.horizon);
+                const isRequired = await isParamModulationRequired(studyData.id, studyData?.horizon);
                 setShouldEnableParamModulation(isRequired);
               }
             }
@@ -229,7 +218,7 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
               setIsDeletionModalOpen(true);
             } else {
               await removeRow(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, value, 0, technicalData);
-              const isRequired = await isParamModulationRequired(study.id, study?.horizon);
+              const isRequired = await isParamModulationRequired(studyData.id, studyData?.horizon);
               setShouldEnableParamModulation(isRequired);
             }
           }}
@@ -242,7 +231,7 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
             getTableHeaders={getEditableHypothesisTableHeaders}
             columnHeader={t('thermal.@parametersEconomic')}
             fileStatus={fileStatus}
-            studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
+            isStudyGenerated={isStudyGenerated}
             idSelected={rowIdSelected}
             isReadOnlyEnable={true}
             readOnly={readOnlyParam}
@@ -254,7 +243,7 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
                   ? TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER
                   : TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER;
               setSelectedTrajectoryType(type);
-              return await handleTrajectorySearch(type, value, '', setDbTrajectories, study);
+              return await handleTrajectorySearch(type, value, '', setDbTrajectories, studyData);
             }}
             handleImport={async (rowId: string) => {
               const index = Number(rowId.split('.').map(Number)[0]);
@@ -276,7 +265,7 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
                 const current = data[indexArray[0]]?.trajectory ?? null;
                 if (current) {
                   void detachTrajectory(type, indexArray, status, current, setData);
-                  const isRequired = await isParamModulationRequired(study.id, study?.horizon);
+                  const isRequired = await isParamModulationRequired(studyData.id, studyData?.horizon);
                   setShouldEnableParamModulation(isRequired);
                 }
               }
@@ -286,7 +275,7 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
                   dbTrajectories.find((traj) => traj.id === value || traj.trajectoryName === value) ?? null;
                 if (dbTrajectory) {
                   await attachTrajectory(type, indexArray, status, dbTrajectory, setData);
-                  const isRequired = await isParamModulationRequired(study.id, study?.horizon);
+                  const isRequired = await isParamModulationRequired(studyData.id, studyData?.horizon);
                   setShouldEnableParamModulation(isRequired);
                 }
               }
@@ -306,7 +295,7 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
               const setDataTable = isTechnicalParamType ? setTechnicalData : setData;
               await importTrajectory(selectedTrajectoryType, value, indexArray, dataTable, setDataTable);
               if (selectedTrajectoryType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
-                const isRequired = await isParamModulationRequired(study.id, study?.horizon);
+                const isRequired = await isParamModulationRequired(studyData.id, studyData?.horizon);
                 setShouldEnableParamModulation(isRequired);
               }
             }
@@ -342,7 +331,7 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
                     setTechnicalData,
                     shouldDeleteParamModulation(0, technicalData) ? technicalData[1].trajectory : null,
                   );
-                  const isRequired = await isParamModulationRequired(study.id, study?.horizon);
+                  const isRequired = await isParamModulationRequired(studyData.id, studyData?.horizon);
                   setShouldEnableParamModulation(isRequired);
                 }
               } else {
@@ -352,7 +341,7 @@ export const ParametersTab = ({ defaultAreas, areas }: TabProps) => {
                   0,
                   technicalData,
                 );
-                const isRequired = await isParamModulationRequired(study.id, study?.horizon);
+                const isRequired = await isParamModulationRequired(studyData.id, studyData?.horizon);
                 setShouldEnableParamModulation(isRequired);
               }
               setIsDeletionModalOpen(false);

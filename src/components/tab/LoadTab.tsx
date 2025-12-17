@@ -5,18 +5,9 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
-import {
-  CheckBoxData,
-  DbTrajectory,
-  HypothesisRowData,
-  LocationStudy,
-  RowStatus,
-  SelectOption,
-  TabProps,
-} from '@/shared/types';
+import { CheckBoxData, DbTrajectory, HypothesisRowData, RowStatus, SelectOption, TabProps } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
-import { useLocation } from 'react-router-dom';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import getEditableHypothesisTableHeaders from '@/components/header/EditableHypothesisTableHeaders.tsx';
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
@@ -35,10 +26,8 @@ import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { CheckBoxListWithSearchBar } from '@/components/list/CheckBoxListWithSearchBar.tsx';
 import { filterRow } from '@/shared/utils/trajectoryUtils.ts';
 
-const LoadTab = ({ defaultAreas, areas }: TabProps) => {
+const LoadTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const studyState = useStudy();
-  const location = useLocation();
-  const study = (location.state as LocationStudy)?.study;
   const dispatch = useStudyDispatch();
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
   const [data, setData] = useState<HypothesisRowData[]>([]);
@@ -51,14 +40,14 @@ const LoadTab = ({ defaultAreas, areas }: TabProps) => {
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const [rowToDelete, setRowToDelete] = useState<{ index: number; value?: string } | null>(null);
   const [isStudyGenerated, setIsStudyGenerated] = useState(
-    studyState.studyStatus === StudyStatus.GENERATED || study.status === StudyStatus.GENERATED,
+    studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED,
   );
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
-    useFetchHypothesisTrajectories(areas, study?.id, TRAJECTORY_TYPE.LOAD, defaultAreas, isStudyGenerated);
-  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(study, studyState, dispatch);
-  const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch);
-  const { removeRow } = useHypothesisTableRemoveRow(study, dispatch, setData, setCheckedValues);
-  const { detachTrajectory } = useTrajectoryDetach(study, dispatch);
+    useFetchHypothesisTrajectories(areas, studyData?.id, TRAJECTORY_TYPE.LOAD, defaultAreas, isStudyGenerated);
+  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch);
+  const { attachTrajectory } = useTrajectoryAttach(studyData, studyState, dispatch);
+  const { removeRow } = useHypothesisTableRemoveRow(studyData, dispatch, setData, setCheckedValues);
+  const { detachTrajectory } = useTrajectoryDetach(studyData, dispatch);
 
   useEffect(() => {
     const setLoadHypothesis = () => {
@@ -108,14 +97,14 @@ const LoadTab = ({ defaultAreas, areas }: TabProps) => {
         data={data}
         getTableHeaders={getEditableHypothesisTableHeaders}
         fileStatus={fileStatus}
-        studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
+        isStudyGenerated={isStudyGenerated}
         readOnly={readOnly}
         progress={progress}
         idSelected={String(rowIdSelected)}
         handleSearch={async (value: string, rowId: string) => {
           const area =
             data[Number(rowId)]?.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : data[Number(rowId)]?.hypothesis;
-          return await handleTrajectorySearch(TRAJECTORY_TYPE.LOAD, value, area, setDbTrajectories, study);
+          return await handleTrajectorySearch(TRAJECTORY_TYPE.LOAD, value, area, setDbTrajectories, studyData);
         }}
         handleImport={async (rowId: string) => {
           await handleFetchTrajectoriesFS(

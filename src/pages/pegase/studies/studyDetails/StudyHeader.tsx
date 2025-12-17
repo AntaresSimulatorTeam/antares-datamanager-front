@@ -18,13 +18,13 @@ const StudyHeader = ({ study }: StudyDetailsHeaderProps) => {
   const itemsStudyHeader: PegaseBreadcrumbItemType[] = [
     {
       key: 'item-0',
-      label: study.project,
-      data: { id: study.projectId, name: study.project },
+      label: study?.project,
+      data: { id: study?.projectId, name: study?.project },
       onClickItem: navigateToProject,
     },
     {
       key: 'item-1',
-      label: study.name,
+      label: study?.name,
       data: null,
       onClickItem: navigateToProject,
     },

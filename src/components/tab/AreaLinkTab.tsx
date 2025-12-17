@@ -9,7 +9,6 @@ import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { useTranslation } from 'react-i18next';
 import {
-  getStudyTrajectoriesWithWarnings,
   linkTrajectoryToStudy,
   unlinkAllTrajectoriesFromStudy,
   unlinkTrajectoryFromStudy,
@@ -18,10 +17,10 @@ import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/traj
 import {
   DbTrajectory,
   HypothesisRowData,
-  LocationStudy,
   RowStatus,
   SelectOption,
   StudyActionType,
+  StudyDTO,
   TrajectoryBackendError,
   TrajectoryViewData,
 } from '@/shared/types';
@@ -30,7 +29,6 @@ import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { buildErrorTrajectory, filterRow, getStatus } from '@/shared/utils/trajectoryUtils.ts';
 import { TrajectoryDataVisualisation } from '@common/modal/TrajectoryDataVisualisation.tsx';
-import { useLocation } from 'react-router-dom';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { notifyAlert } from '@/shared/notification/notification.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
@@ -49,12 +47,11 @@ import { useFetchFixHypothesisTrajectories } from '@/hooks/useFetchFixHypothesis
 
 interface AreaLinkTabProps {
   setErrorMessage: Dispatch<SetStateAction<string>>;
+  studyData: StudyDTO;
 }
 
-export const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
+export const AreaLinkTab = ({ setErrorMessage, studyData }: AreaLinkTabProps) => {
   const studyState = useStudy();
-  const location = useLocation();
-  const study = (location.state as LocationStudy)?.study;
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const dispatch = useStudyDispatch();
   const { t } = useTranslation();
@@ -68,7 +65,7 @@ export const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const [isAreaDeletionConfirmOpen, setIsAreaDeletionConfirmOpen] = useState(false);
   const [isStudyGenerated, setIsStudyGenerated] = useState(
-    studyState.studyStatus === StudyStatus.GENERATED || study.status === StudyStatus.GENERATED,
+    studyState.studyStatus === StudyStatus.GENERATED || studyData?.status === StudyStatus.GENERATED,
   );
 
   const configs = [
@@ -76,14 +73,14 @@ export const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
     { type: TRAJECTORY_TYPE.LINK, labelKey: t('studyDetails.@links') },
   ];
   const options = { withReadOnlyRow: true, isStudyGenerated };
-  const { hypothesisTrajectories, readOnlyRow } = useFetchFixHypothesisTrajectories(configs, options, study?.id);
-  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(study, studyState, dispatch, setReadOnly);
+  const { hypothesisTrajectories, readOnlyRow } = useFetchFixHypothesisTrajectories(configs, options, studyData?.id);
+  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch, setReadOnly);
 
   useEffect(() => {
     setErrorMessage('');
     hypothesisTrajectories && setData(hypothesisTrajectories);
     readOnlyRow && setReadOnly(readOnlyRow);
-  }, [hypothesisTrajectories, readOnlyRow, setErrorMessage]);
+  }, [hypothesisTrajectories, readOnlyRow, setErrorMessage, studyData?.id]);
 
   useEffect(() => {
     if (studyState.studyStatus === StudyStatus.GENERATED) {
@@ -113,7 +110,7 @@ export const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
       const shouldUnlink =
         rowIndex === 0 && data[1]?.trajectory && data[1]?.status !== TRAJECTORY_SELECTION_STATUS.ERROR;
       if (shouldUnlink && data[1]?.trajectory?.id) {
-        await unlinkTrajectoryFromStudy(data[1]?.trajectory?.id, study.id);
+        await unlinkTrajectoryFromStudy(data[1]?.trajectory?.id, studyData.id);
         dispatch?.({
           type: STUDY_ACTION.CLEAR_TRAJECTORY_BY_TYPE,
           payload: [TRAJECTORY_TYPE.LINK],
@@ -143,7 +140,7 @@ export const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
       notifyAlert({
         icon: StdIconId.Close,
         message: t('studyDetails.@notificationAlert', {
-          studyName: study?.name ?? '',
+          studyName: studyData?.name ?? '',
           trajectoryName: trajectoryLabel,
           trajectoryType: rowIndex === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
         }),
@@ -159,7 +156,7 @@ export const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
   const unlinkWithConfirmationCheck = async (trajectoryId: number, rowId: string): Promise<void> => {
     const rowIndex = Number(rowId);
     try {
-      await unlinkTrajectoryFromStudy(trajectoryId, study.id);
+      await unlinkTrajectoryFromStudy(trajectoryId, studyData.id);
       setErrorMessage(t('studyDetails.@add_trajectories_message'));
       dispatch?.({
         type: STUDY_ACTION.CLEAR_TRAJECTORY_BY_TYPE,
@@ -206,7 +203,7 @@ export const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
   };
 
   const handleConfirmedAreaDeletion = async () => {
-    await unlinkAllTrajectoriesFromStudy(study.id);
+    await unlinkAllTrajectoriesFromStudy(studyData.id);
 
     dispatch?.({ type: STUDY_ACTION.RESET_STUDY_STATE });
     setData([
@@ -227,13 +224,15 @@ export const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
       if (dbTrajectory?.id != null && status === 'success') {
         setErrorMessage('');
         const trajectoryType = rowIndex === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK;
-        await linkTrajectoryToStudy(trajectoryType, dbTrajectory?.id, study.id);
-        const result = await getStudyTrajectoriesWithWarnings(study.id, trajectoryType);
-        const newTrajectory = result?.trajectories?.[0];
+        const newTrajectory = await linkTrajectoryToStudy(trajectoryType, dbTrajectory?.id, studyData.id);
         if (newTrajectory) {
           dispatch?.({
             type: STUDY_ACTION.ADD_TRAJECTORIES,
-            payload: { [trajectoryType]: result },
+            payload: {
+              [trajectoryType]: {
+                trajectories: [newTrajectory],
+              },
+            },
           });
         }
         setData((prev) =>
@@ -274,7 +273,7 @@ export const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
         data={data}
         getTableHeaders={getEditableHypothesisTableHeaders}
         fileStatus={fileStatus}
-        studyState={studyState?.studyStatus ?? StudyStatus.IN_PROGRESS}
+        isStudyGenerated={isStudyGenerated}
         readOnly={readOnly}
         isReadOnlyEnable={true}
         progress={progress}
@@ -285,7 +284,7 @@ export const AreaLinkTab = ({ setErrorMessage }: AreaLinkTabProps) => {
         handleSearch={async (value: string, rowId: string) => {
           const index = Number(rowId);
           const type = index === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK;
-          return await handleTrajectorySearch(type, value, '', setDbTrajectories, study);
+          return await handleTrajectorySearch(type, value, '', setDbTrajectories, studyData);
         }}
         handleImport={async (rowId: string) =>
           await handleFetchTrajectoriesFS(

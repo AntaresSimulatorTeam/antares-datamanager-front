@@ -45,8 +45,8 @@ export const useTrajectoryImport = (
         const newTrajectory = await uploadTrajectory(
           type,
           value.label,
-          study.horizon,
-          study.id,
+          study?.horizon,
+          study?.id,
           hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : hypothesis,
           (progressValue: number) => {
             setProgress(+progressValue.toFixed(0));
@@ -65,7 +65,7 @@ export const useTrajectoryImport = (
         setFileStatus('error');
         if (isBusinessError(error)) {
           const message = t('studyDetails.@notificationAlert', {
-            studyName: study.name,
+            studyName: study?.name,
             trajectoryName: value.label,
             trajectoryType: subArea ?? hypothesis,
           });
@@ -81,7 +81,7 @@ export const useTrajectoryImport = (
         }
       }
     },
-    [study.horizon, study.id, study?.name, attachTrajectory, t, user?.profile?.sub],
+    [study?.horizon, study?.id, study?.name, attachTrajectory, t, user?.profile?.sub],
   );
 
   return {

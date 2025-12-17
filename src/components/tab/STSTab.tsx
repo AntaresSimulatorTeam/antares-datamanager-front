@@ -8,8 +8,7 @@ import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { useLocation } from 'react-router-dom';
-import { CheckBoxData, HypothesisRowData, LocationStudy, TabProps } from '@/shared/types';
+import { CheckBoxData, HypothesisRowData, TabProps } from '@/shared/types';
 import { useCallback, useEffect, useState } from 'react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
@@ -19,10 +18,8 @@ import { addRow } from '@/shared/services/hypothesisTableService.ts';
 import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow.ts';
 import { filterRow, generateReadOnlyIndexMap } from '@/shared/utils/trajectoryUtils.ts';
 
-const STSTab = ({ defaultAreas, areas }: TabProps) => {
+const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const studyState = useStudy();
-  const location = useLocation();
-  const study = (location.state as LocationStudy)?.study;
   const dispatch = useStudyDispatch();
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
   const [data, setData] = useState<HypothesisRowData[]>([]);
@@ -30,11 +27,11 @@ const STSTab = ({ defaultAreas, areas }: TabProps) => {
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
   const [stsTechnologies, setStsTechnologies] = useState<string[]>([]);
   const [isStudyGenerated, setIsStudyGenerated] = useState(
-    studyState.studyStatus === StudyStatus.GENERATED || study.status === StudyStatus.GENERATED,
+    studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED,
   );
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow, technologyList } =
-    useFetchHypothesisTrajectories(areas, study?.id, TRAJECTORY_TYPE.STS, defaultAreas, isStudyGenerated);
-  const { removeRow } = useHypothesisTableRemoveRow(study, dispatch, setData, setCheckedValues);
+    useFetchHypothesisTrajectories(areas, studyData?.id, TRAJECTORY_TYPE.STS, defaultAreas, isStudyGenerated);
+  const { removeRow } = useHypothesisTableRemoveRow(studyData, dispatch, setData, setCheckedValues);
 
   useEffect(() => {
     const setHypothesis = () => {
@@ -82,7 +79,7 @@ const STSTab = ({ defaultAreas, areas }: TabProps) => {
         data={data}
         getTableHeaders={getExpandableHypothesisTableHeaders}
         fileStatus={'empty'}
-        studyState={StudyStatus.IN_PROGRESS}
+        isStudyGenerated={isStudyGenerated}
         readOnly={readOnly}
         progress={0}
         idSelected={'0'}
