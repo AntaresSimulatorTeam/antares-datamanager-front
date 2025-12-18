@@ -14,7 +14,7 @@ vi.mock('@/shared/utils/trajectoryUtils.ts', async (importOriginal) => {
   };
 });
 
-describe('setReadOnlyForGeneratedStudy', () => {
+describe('getReadOnlyForGeneratedStudy', () => {
   const mockReadOnlyResult: ReadOnlyObject = { H1: true, H3: true };
 
   it('should call setReadOnly with the result of retrieveReadOnlyArea for rows without trajectory', () => {

@@ -17,14 +17,14 @@ import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
 import { addRow, handleFetchTrajectoriesFS, handleTrajectorySearch } from '@/shared/services/hypothesisTableService.ts';
-import { shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
+import { getReadOnlyForGeneratedStudy, shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
 import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow.ts';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { CheckBoxListWithSearchBar } from '@/components/list/CheckBoxListWithSearchBar.tsx';
-import { buildReadOnlyRow, filterRow } from '@/shared/utils/trajectoryUtils.ts';
+import { filterRow } from '@/shared/utils/trajectoryUtils.ts';
 
 const LoadTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const studyState = useStudy();
@@ -77,7 +77,7 @@ const LoadTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         .filter(Boolean) as string[];
       console.log('================== newCheckedValues', newCheckedValues);
       setCheckedValues(newCheckedValues);
-      const rows = buildReadOnlyRow(newCheckedValues.map((_, index) => index));
+      const rows = getReadOnlyForGeneratedStudy(newData);
       console.log('================== rows', rows);
       setReadOnly(rows);
     }
