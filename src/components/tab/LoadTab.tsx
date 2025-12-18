@@ -62,6 +62,7 @@ const LoadTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   useEffect(() => {
     if (studyState.studyStatus === StudyStatus.GENERATED) {
       setIsStudyGenerated(true);
+      console.log('============== filterRow data', filterRow(data));
       setData((rows) => filterRow(rows));
       const rows = getReadOnlyForGeneratedStudy(data);
       setReadOnly(rows);
