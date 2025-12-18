@@ -89,7 +89,7 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
       setIsStudyGenerated(true);
       const newTechnicalData = filterRow(technicalData);
       setTechnicalData(newTechnicalData);
-      const newCheckedValues = newTechnicalData
+      const newCheckedValues = newTechnicalData[0]?.subRows
         ?.map((trajectory) => {
           if (
             areas.some((area) => area.areaName === trajectory.hypothesis) ||
