@@ -1,9 +1,13 @@
 import { Mock, vi } from 'vitest';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
-import { DbTrajectory, HypothesisRowData } from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { mockDbTrajectory } from '@/mocks/data/tests/trajectory.mock.ts';
-import { getReadOnlyForGeneratedStudy, shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
+import {
+  getCheckedValues,
+  getReadOnlyForGeneratedStudy,
+  shouldOpenDeletionModal,
+} from '@/shared/helpers/hypothesisTableHelper.ts';
 import { retrieveReadOnlyArea } from '@/shared/utils/trajectoryUtils.ts';
 
 vi.mock('@/shared/utils/trajectoryUtils.ts', async (importOriginal) => {
@@ -127,5 +131,57 @@ describe('shouldOpenDeletionModal', () => {
     data[3] = baseRow;
     const result = shouldOpenDeletionModal(TRAJECTORY_TYPE.LOAD, 1, data);
     expect(result).toBe(false);
+  });
+});
+
+describe('getCheckedValues', () => {
+  it('retourne les hypothèses présentes dans areas', () => {
+    const data = [{ hypothesis: 'A' }, { hypothesis: 'B' }, { hypothesis: 'C' }] as HypothesisRowData[];
+    const areas = [{ areaName: 'A' }, { areaName: 'C' }] as TrajectoryAreaData[];
+    const defaultAreas: { name: string }[] = [];
+
+    const result = getCheckedValues(data, areas, defaultAreas);
+
+    expect(result).toEqual(['A', 'C']);
+  });
+
+  it('retourne les hypothèses présentes dans defaultAreas', () => {
+    const data = [{ hypothesis: 'X' }, { hypothesis: 'Y' }] as HypothesisRowData[];
+    const areas = [] as TrajectoryAreaData[];
+    const defaultAreas = [{ name: 'Y' }];
+
+    const result = getCheckedValues(data, areas, defaultAreas);
+
+    expect(result).toEqual(['Y']);
+  });
+
+  it('retourne un tableau vide si aucune correspondance', () => {
+    const data = [{ hypothesis: 'A' }, { hypothesis: 'B' }] as HypothesisRowData[];
+    const areas = [{ areaName: 'Z' }] as TrajectoryAreaData[];
+    const defaultAreas = [{ name: 'W' }];
+
+    const result = getCheckedValues(data, areas, defaultAreas);
+
+    expect(result).toEqual([]);
+  });
+
+  it('gère le cas où data est vide', () => {
+    const data = [] as HypothesisRowData[];
+    const areas = [{ areaName: 'A' }] as TrajectoryAreaData[];
+    const defaultAreas = [{ name: 'B' }];
+
+    const result = getCheckedValues(data, areas, defaultAreas);
+
+    expect(result).toEqual([]);
+  });
+
+  it('gère le cas où areas et defaultAreas sont vides', () => {
+    const data = [{ hypothesis: 'A' }, { hypothesis: 'B' }] as HypothesisRowData[];
+    const areas = [] as TrajectoryAreaData[];
+    const defaultAreas: { name: string }[] = [];
+
+    const result = getCheckedValues(data, areas, defaultAreas);
+
+    expect(result).toEqual([]);
   });
 });
