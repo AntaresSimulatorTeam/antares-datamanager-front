@@ -77,7 +77,7 @@ const LoadTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         .filter(Boolean) as string[];
       console.log('================== newCheckedValues', newCheckedValues);
       setCheckedValues(newCheckedValues);
-      const rows = getReadOnlyForGeneratedStudy(data);
+      const rows = getReadOnlyForGeneratedStudy(newData);
       setReadOnly(rows);
     }
   }, [studyState.studyStatus]);
