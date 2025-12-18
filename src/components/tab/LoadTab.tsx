@@ -62,8 +62,17 @@ const LoadTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   useEffect(() => {
     if (studyState.studyStatus === StudyStatus.GENERATED) {
       setIsStudyGenerated(true);
-      console.log('============== filterRow data', filterRow(data));
-      setData((rows) => filterRow(rows));
+      const newData = filterRow(data);
+      setData(newData);
+      const newCheckedValues = newData
+        ?.map((trajectory) => {
+          if (areas.some((area) => area.areaName === trajectory.hypothesis)) {
+            return trajectory.hypothesis;
+          }
+        })
+        .filter(Boolean) as string[];
+      console.log('================== newCheckedValues', newCheckedValues);
+      setCheckedValues(newCheckedValues);
       const rows = getReadOnlyForGeneratedStudy(data);
       setReadOnly(rows);
     }

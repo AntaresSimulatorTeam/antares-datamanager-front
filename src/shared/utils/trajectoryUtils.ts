@@ -432,7 +432,6 @@ export const filterRow = (data: HypothesisRowData[]): HypothesisRowData[] =>
         !row.isDeletable ||
         row.status === TRAJECTORY_SELECTION_STATUS.OK ||
         (row.status === TRAJECTORY_SELECTION_STATUS.MISSING && row.subRows && row.subRows.length > 0),
-      //(row.status === TRAJECTORY_SELECTION_STATUS.ERROR && row.subRows && row.subRows.length > 0),
     );
 
 /**
