@@ -75,7 +75,7 @@ const LoadTab = ({ defaultAreas, areas, studyData }: TabProps) => {
                 : defaultArea.name === trajectory.hypothesis,
             )
           ) {
-            return trajectory.hypothesis;
+            return trajectory.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : trajectory.hypothesis;
           }
         })
         .filter(Boolean) as string[];

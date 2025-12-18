@@ -415,6 +415,7 @@ export const filterRow = (data: HypothesisRowData[]): HypothesisRowData[] =>
       if (row.isDefault || !row.isDeletable) {
         if (row.status === TRAJECTORY_SELECTION_STATUS.ERROR) {
           updatedRow.status = TRAJECTORY_SELECTION_STATUS.MISSING;
+          updatedRow.trajectory = null;
         }
         return updatedRow; // on garde toujours les lignes en default
       }
@@ -422,6 +423,7 @@ export const filterRow = (data: HypothesisRowData[]): HypothesisRowData[] =>
       // 🔹 Cas 2 : row en ERROR mais avec des subRows OK → devient MISSING
       if (row.status === TRAJECTORY_SELECTION_STATUS.ERROR && filteredSubRows.length > 0) {
         updatedRow.status = TRAJECTORY_SELECTION_STATUS.MISSING;
+        updatedRow.trajectory = null;
       }
 
       return updatedRow;
