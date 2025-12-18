@@ -17,7 +17,11 @@ import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
 import { addRow, handleFetchTrajectoriesFS, handleTrajectorySearch } from '@/shared/services/hypothesisTableService.ts';
-import { getReadOnlyForGeneratedStudy, shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
+import {
+  getCheckedValues,
+  getReadOnlyForGeneratedStudy,
+  shouldOpenDeletionModal,
+} from '@/shared/helpers/hypothesisTableHelper.ts';
 import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
@@ -64,16 +68,7 @@ const LoadTab = ({ defaultAreas, areas, studyData }: TabProps) => {
       setIsStudyGenerated(true);
       const newData = filterRow(data);
       setData(newData);
-      const newCheckedValues = newData
-        ?.map((trajectory) => {
-          if (
-            areas.some((area) => area.areaName === trajectory.hypothesis) ||
-            defaultAreas.some((defaultArea) => defaultArea.name === trajectory.hypothesis)
-          ) {
-            return trajectory.hypothesis;
-          }
-        })
-        .filter(Boolean) as string[];
+      const newCheckedValues = getCheckedValues(newData, areas, defaultAreas);
       setCheckedValues(newCheckedValues);
       const rows = getReadOnlyForGeneratedStudy(newData);
       setReadOnly(rows);

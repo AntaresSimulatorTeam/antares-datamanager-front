@@ -25,7 +25,7 @@ import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach';
 import { CheckBoxListWithSearchBar } from '@/components/list/CheckBoxListWithSearchBar.tsx';
 import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow.ts';
-import { shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
+import { getCheckedValues, shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
 import { useFetchHypothesisParametersTrajectories } from '@/hooks/useFetchHypothesisParametersTrajectories.ts';
 import { useFetchFixHypothesisTrajectories } from '@/hooks/useFetchFixHypothesisTrajectories.ts';
@@ -89,16 +89,7 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
       setIsStudyGenerated(true);
       const newTechnicalData = filterRow(technicalData);
       setTechnicalData(newTechnicalData);
-      const newCheckedValues = newTechnicalData[0]?.subRows
-        ?.map((trajectory) => {
-          if (
-            areas.some((area) => area.areaName === trajectory.hypothesis) ||
-            defaultAreas.some((defaultArea) => defaultArea.name === trajectory.hypothesis)
-          ) {
-            return trajectory.hypothesis;
-          }
-        })
-        .filter(Boolean) as string[];
+      const newCheckedValues = getCheckedValues(newTechnicalData[0]?.subRows ?? [], areas, defaultAreas);
       setCheckedValues(newCheckedValues);
       const rows = generateReadOnlyIndexMap(technicalData);
       setReadOnly(rows);
