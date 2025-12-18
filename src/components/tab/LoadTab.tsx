@@ -64,9 +64,13 @@ const LoadTab = ({ defaultAreas, areas, studyData }: TabProps) => {
       setIsStudyGenerated(true);
       const newData = filterRow(data);
       setData(newData);
+      console.log('================== newData', newData);
       const newCheckedValues = newData
         ?.map((trajectory) => {
-          if (areas.some((area) => area.areaName === trajectory.hypothesis)) {
+          if (
+            areas.some((area) => area.areaName === trajectory.hypothesis) ||
+            defaultAreas.some((defaultArea) => defaultArea.name === trajectory.hypothesis)
+          ) {
             return trajectory.hypothesis;
           }
         })
