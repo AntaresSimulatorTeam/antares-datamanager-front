@@ -1222,6 +1222,7 @@ describe('filterRow', () => {
     const result = filterRow(data);
     expect(result).toHaveLength(1);
     expect(result[0].status).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
+    expect(result[0].trajectory).toBeNull();
     expect(result[0].subRows).not.toBeNull();
     expect(result[0].subRows?.length).toBe(1);
   });
@@ -1248,6 +1249,7 @@ describe('filterRow', () => {
     expect(result[0].subRows).toHaveLength(1);
     expect(result[0].subRows?.[0].status).toBe(TRAJECTORY_SELECTION_STATUS.OK);
     expect(result[0].status).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
+    expect(result[0].trajectory).toBeNull();
   });
 
   it('transforme ERROR en MISSING si subRows OK existent', () => {
@@ -1261,6 +1263,7 @@ describe('filterRow', () => {
     ] as unknown as HypothesisRowData[];
     const result = filterRow(data);
     expect(result[0].status).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
+    expect(result[0].trajectory).toBeNull();
   });
 
   it('supprime les rows inutiles (ni default, deletable, ni OK/MISSING)', () => {
