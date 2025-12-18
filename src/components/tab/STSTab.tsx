@@ -47,7 +47,19 @@ const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   useEffect(() => {
     if (studyState.studyStatus === StudyStatus.GENERATED) {
       setIsStudyGenerated(true);
-      setData((rows) => filterRow(rows));
+      const newData = filterRow(data);
+      setData(newData);
+      const newCheckedValues = newData
+        ?.map((trajectory) => {
+          if (
+            areas.some((area) => area.areaName === trajectory.hypothesis) ||
+            defaultAreas.some((defaultArea) => defaultArea.name === trajectory.hypothesis)
+          ) {
+            return trajectory.hypothesis;
+          }
+        })
+        .filter(Boolean) as string[];
+      setCheckedValues(newCheckedValues);
       const rows = generateReadOnlyIndexMap(data);
       setReadOnly(rows);
     }

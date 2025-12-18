@@ -87,7 +87,19 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   useEffect(() => {
     if (studyState.studyStatus === StudyStatus.GENERATED) {
       setIsStudyGenerated(true);
-      setTechnicalData((rows) => filterRow(rows));
+      const newTechnicalData = filterRow(technicalData);
+      setTechnicalData(newTechnicalData);
+      const newCheckedValues = newTechnicalData
+        ?.map((trajectory) => {
+          if (
+            areas.some((area) => area.areaName === trajectory.hypothesis) ||
+            defaultAreas.some((defaultArea) => defaultArea.name === trajectory.hypothesis)
+          ) {
+            return trajectory.hypothesis;
+          }
+        })
+        .filter(Boolean) as string[];
+      setCheckedValues(newCheckedValues);
       const rows = generateReadOnlyIndexMap(technicalData);
       setReadOnly(rows);
       setReadOnlyParam({ '0': true, '1': true });

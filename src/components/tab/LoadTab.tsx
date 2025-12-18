@@ -64,7 +64,6 @@ const LoadTab = ({ defaultAreas, areas, studyData }: TabProps) => {
       setIsStudyGenerated(true);
       const newData = filterRow(data);
       setData(newData);
-      console.log('================== newData', newData);
       const newCheckedValues = newData
         ?.map((trajectory) => {
           if (
@@ -75,10 +74,8 @@ const LoadTab = ({ defaultAreas, areas, studyData }: TabProps) => {
           }
         })
         .filter(Boolean) as string[];
-      console.log('================== newCheckedValues', newCheckedValues);
       setCheckedValues(newCheckedValues);
       const rows = getReadOnlyForGeneratedStudy(newData);
-      console.log('================== rows', rows);
       setReadOnly(rows);
     }
   }, [studyState.studyStatus]);
