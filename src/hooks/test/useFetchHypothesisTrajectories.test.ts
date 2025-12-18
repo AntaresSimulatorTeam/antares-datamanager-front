@@ -478,7 +478,7 @@ describe('useFetchHypothesisTrajectories', () => {
     );
 
     await waitFor(() => {
-      expect(result.current.readOnlyRow).toEqual({ '0': true, '1': true, '2': true, '3': true, '4': true });
+      expect(result.current.readOnlyRow).toEqual({ '0': true, '1': true, '2': true });
     });
   });
 
