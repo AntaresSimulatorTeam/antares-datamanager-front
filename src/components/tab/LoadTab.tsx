@@ -69,7 +69,11 @@ const LoadTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         ?.map((trajectory) => {
           if (
             areas.some((area) => area.areaName === trajectory.hypothesis) ||
-            defaultAreas.some((defaultArea) => defaultArea.name === trajectory.hypothesis)
+            defaultAreas.some((defaultArea) =>
+              trajectory.hypothesis === OTHER_AREAS_LABEL
+                ? defaultArea.name === OTHER_AREAS
+                : defaultArea.name === trajectory.hypothesis,
+            )
           ) {
             return trajectory.hypothesis;
           }
@@ -78,6 +82,7 @@ const LoadTab = ({ defaultAreas, areas, studyData }: TabProps) => {
       console.log('================== newCheckedValues', newCheckedValues);
       setCheckedValues(newCheckedValues);
       const rows = getReadOnlyForGeneratedStudy(newData);
+      console.log('================== rows', rows);
       setReadOnly(rows);
     }
   }, [studyState.studyStatus]);
