@@ -308,7 +308,8 @@ export const convertIntoHypothesisRowWithTechnologies = (
             status: trajectoryTechnology?.trajectoryName
               ? TRAJECTORY_SELECTION_STATUS.OK
               : TRAJECTORY_SELECTION_STATUS.MISSING,
-            isDefault: true,
+            isDefault: false,
+            isDeletable: false,
             subRows: null,
           };
         })

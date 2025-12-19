@@ -489,7 +489,8 @@ describe('useFetchHypothesisTrajectories', () => {
     );
     const technologiesHypothesis = ThermalOptions.map((option) => ({
       hypothesis: option,
-      isDefault: true,
+      isDefault: false,
+      isDeletable: false,
       status: TRAJECTORY_SELECTION_STATUS.MISSING,
       subRows: null,
       trajectory: null,
@@ -517,7 +518,8 @@ describe('useFetchHypothesisTrajectories', () => {
     );
     const technologiesHypothesis = STSTechnology.map((option) => ({
       hypothesis: option,
-      isDefault: true,
+      isDefault: false,
+      isDeletable: false,
       status: TRAJECTORY_SELECTION_STATUS.MISSING,
       subRows: null,
       trajectory: null,
