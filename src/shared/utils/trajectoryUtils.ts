@@ -399,38 +399,52 @@ export const generateReadOnlyIndexMap = (data: HypothesisRowData[]): ReadOnlyObj
 export const filterRow = (data: HypothesisRowData[]): HypothesisRowData[] =>
   data
     .map((row) => {
-      // Filtrer récursivement les subRows
+      // 🔹 Filtrer et transformer récursivement les subRows
       const filteredSubRows = row.subRows
         ? filterRow(
-            row.subRows.filter((subRow) => subRow.trajectory && subRow.status === TRAJECTORY_SELECTION_STATUS.OK),
+            row.subRows
+              .map((subRow) =>
+                subRow.isDefault && subRow.status === TRAJECTORY_SELECTION_STATUS.ERROR
+                  ? { ...subRow, status: TRAJECTORY_SELECTION_STATUS.MISSING }
+                  : subRow,
+              )
+              .filter(
+                (subRow) => subRow.isDefault || (subRow.trajectory && subRow.status === TRAJECTORY_SELECTION_STATUS.OK),
+              ),
           )
         : [];
 
-      const updatedRow: HypothesisRowData = {
+      let updatedRow: HypothesisRowData = {
         ...row,
         subRows: filteredSubRows.length > 0 ? filteredSubRows : null,
       };
 
-      // 🔹 Cas 1 : row.isDefault === true
+      // 🔹 Cas 1 : row.isDefault ou non supprimable
       if (row.isDefault || !row.isDeletable) {
         if (row.status === TRAJECTORY_SELECTION_STATUS.ERROR) {
-          updatedRow.status = TRAJECTORY_SELECTION_STATUS.MISSING;
-          updatedRow.trajectory = null;
+          updatedRow = {
+            ...updatedRow,
+            status: TRAJECTORY_SELECTION_STATUS.MISSING,
+            trajectory: null,
+          };
         }
-        return updatedRow; // on garde toujours les lignes en default
+        return updatedRow;
       }
 
-      // 🔹 Cas 2 : row en ERROR mais avec des subRows OK → devient MISSING
+      // 🔹 Cas 2 : row en ERROR mais avec des subRows valides
       if (row.status === TRAJECTORY_SELECTION_STATUS.ERROR && filteredSubRows.length > 0) {
-        updatedRow.status = TRAJECTORY_SELECTION_STATUS.MISSING;
-        updatedRow.trajectory = null;
+        updatedRow = {
+          ...updatedRow,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          trajectory: null,
+        };
       }
 
       return updatedRow;
     })
     .filter(
       (row) =>
-        row.isDefault || // 🔹 garde toujours les isDefault
+        row.isDefault ||
         !row.isDeletable ||
         row.status === TRAJECTORY_SELECTION_STATUS.OK ||
         (row.status === TRAJECTORY_SELECTION_STATUS.MISSING && row.subRows && row.subRows.length > 0),

@@ -41,8 +41,11 @@ export const useFetchHypothesisParametersTrajectories = (
   const dispatch = useStudyDispatch();
   const { t } = useTranslation();
   const emptyAreaSelected: DbTrajectory[] = useMemo(
-    () => studyState?.[TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]?.trajectories ?? [],
-    [],
+    () =>
+      studyState?.[TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]?.trajectories?.filter(
+        (trajectory) => trajectory?.trajectoryName?.length < 1,
+      ) ?? [],
+    [isStudyGenerated],
   );
 
   const fetchAreas = useCallback(
