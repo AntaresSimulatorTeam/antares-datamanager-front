@@ -76,7 +76,6 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
       hypothesisTrajectories && setTechnicalData(hypothesisTrajectories);
       economicData && setData(economicData);
       setReadOnly(readOnlyRow);
-      console.log('================= useEffect setHypothesis');
     };
     setHypothesis();
   }, [areasTrajectoryOptions, dropDownListOptions, hypothesisTrajectories, readOnlyRow, economicData]);
@@ -89,7 +88,6 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
     if (studyState.studyStatus === StudyStatus.GENERATED) {
       setIsStudyGenerated(true);
       const newTechnicalData = filterRow(technicalData);
-      console.log('================ newTechnicalData', newTechnicalData);
       setTechnicalData(newTechnicalData);
       const newCheckedValues = getCheckedValues(newTechnicalData[0]?.subRows ?? [], areas, defaultAreas);
       setCheckedValues(newCheckedValues);

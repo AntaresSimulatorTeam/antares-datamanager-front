@@ -35,11 +35,13 @@ export const useFetchHypothesisTrajectories = (
   const studyState = useStudy();
   const dispatch = useStudyDispatch();
   const emptyAreaSelected: DbTrajectory[] = useMemo(() => {
-    if (trajectoryType) {
-      return studyState?.[trajectoryType]?.trajectories ?? [];
+    if (trajectoryType && !isStudyGenerated) {
+      return (
+        studyState?.[trajectoryType]?.trajectories?.filter((trajectory) => trajectory?.trajectoryName?.length < 1) ?? []
+      );
     }
     return [];
-  }, [trajectoryType]);
+  }, [isStudyGenerated, trajectoryType]);
 
   const fetchAreas = useCallback(
     async (id: number, trajType: TRAJECTORY_TYPE) => {
