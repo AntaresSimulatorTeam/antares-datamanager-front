@@ -70,15 +70,15 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const { detachTrajectory } = useTrajectoryDetach(studyData, dispatch);
 
   useEffect(() => {
-      const setHypothesis = () => {
-        areasTrajectoryOptions && setAreasOptions(areasTrajectoryOptions);
-        dropDownListOptions && setCheckedValues(dropDownListOptions);
-        hypothesisTrajectories && setTechnicalData(hypothesisTrajectories);
-        economicData && setData(economicData);
-        setReadOnly(readOnlyRow);
-        console.log("================= useEffect setHypothesis")
-      };
-      setHypothesis();
+    const setHypothesis = () => {
+      areasTrajectoryOptions && setAreasOptions(areasTrajectoryOptions);
+      dropDownListOptions && setCheckedValues(dropDownListOptions);
+      hypothesisTrajectories && setTechnicalData(hypothesisTrajectories);
+      economicData && setData(economicData);
+      setReadOnly(readOnlyRow);
+      console.log('================= useEffect setHypothesis');
+    };
+    setHypothesis();
   }, [areasTrajectoryOptions, dropDownListOptions, hypothesisTrajectories, readOnlyRow, economicData]);
 
   useEffect(() => {
