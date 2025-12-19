@@ -43,7 +43,9 @@ export const useFetchHypothesisParametersTrajectories = (
   const emptyAreaSelected: DbTrajectory[] = useMemo(() => {
     if (!isStudyGenerated) {
       return (
-        studyState?.[TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]?.trajectories?.filter((trajectory) => trajectory?.trajectoryName?.length < 1) ?? []
+        studyState?.[TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]?.trajectories?.filter(
+          (trajectory) => trajectory?.trajectoryName?.length < 1,
+        ) ?? []
       );
     }
     return [];
