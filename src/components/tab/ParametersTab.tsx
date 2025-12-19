@@ -70,14 +70,15 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const { detachTrajectory } = useTrajectoryDetach(studyData, dispatch);
 
   useEffect(() => {
-    const setHypothesis = () => {
-      areasTrajectoryOptions && setAreasOptions(areasTrajectoryOptions);
-      dropDownListOptions && setCheckedValues(dropDownListOptions);
-      hypothesisTrajectories && setTechnicalData(hypothesisTrajectories);
-      economicData && setData(economicData);
-      setReadOnly(readOnlyRow);
-    };
-    setHypothesis();
+      const setHypothesis = () => {
+        areasTrajectoryOptions && setAreasOptions(areasTrajectoryOptions);
+        dropDownListOptions && setCheckedValues(dropDownListOptions);
+        hypothesisTrajectories && setTechnicalData(hypothesisTrajectories);
+        economicData && setData(economicData);
+        setReadOnly(readOnlyRow);
+        console.log("================= useEffect setHypothesis")
+      };
+      setHypothesis();
   }, [areasTrajectoryOptions, dropDownListOptions, hypothesisTrajectories, readOnlyRow, economicData]);
 
   useEffect(() => {
@@ -88,6 +89,7 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
     if (studyState.studyStatus === StudyStatus.GENERATED) {
       setIsStudyGenerated(true);
       const newTechnicalData = filterRow(technicalData);
+      console.log('================ newTechnicalData', newTechnicalData);
       setTechnicalData(newTechnicalData);
       const newCheckedValues = getCheckedValues(newTechnicalData[0]?.subRows ?? [], areas, defaultAreas);
       setCheckedValues(newCheckedValues);
