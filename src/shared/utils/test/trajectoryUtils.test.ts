@@ -855,7 +855,7 @@ describe('convertIntoHypothesisRowWithTechnologies', () => {
       trajectory: { trajectoryName: 'MainTrajectory' },
       status: TRAJECTORY_SELECTION_STATUS.OK,
       isDefault: true,
-      isDeletable: true,
+      isDeletable: false,
     });
     expect(result[0].subRows).toHaveLength(ThermalOptions.length);
     expect(result[0].subRows?.[0].status).toBe(TRAJECTORY_SELECTION_STATUS.OK);

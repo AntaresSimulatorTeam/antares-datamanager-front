@@ -325,7 +325,7 @@ export const convertIntoHypothesisRowWithTechnologies = (
           : TRAJECTORY_SELECTION_STATUS.MISSING,
       isDefault: isDefault || mainEntry?.area === OTHER_AREAS,
       subRows: subRows?.length ? subRows : null,
-      isDeletable: isDefault || mainEntry?.area !== OTHER_AREAS,
+      isDeletable: !isDefault && mainEntry?.area !== OTHER_AREAS,
     };
   });
 };
@@ -405,7 +405,7 @@ export const filterRow = (data: HypothesisRowData[]): HypothesisRowData[] =>
         ? filterRow(
             row.subRows
               .map((subRow) =>
-                subRow.isDefault && subRow.status === TRAJECTORY_SELECTION_STATUS.ERROR
+                subRow.status === TRAJECTORY_SELECTION_STATUS.ERROR
                   ? { ...subRow, status: TRAJECTORY_SELECTION_STATUS.MISSING }
                   : subRow,
               )
