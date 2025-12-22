@@ -197,21 +197,31 @@ export const buildRowWithSubRowsData = (
  *
  * @param {string} value - The hypothesis value for the main row.
  * @param {string[]} subRows - Array of options for sub-rows.
+ * @param type
+ * @param defaultAreas
  * @returns {HypothesisRowData} An object representing the row, containing details such as hypothesis, trajectory, status, isDefault, isDeletable, and optionally subRows if hasSubRows is true.
  */
-export const buildEmptyRowWithSubRowsData = (value: string, subRows: string[]): HypothesisRowData => ({
+export const buildEmptyRowWithSubRowsData = (
+  value: string,
+  subRows: string[],
+  type: TRAJECTORY_TYPE,
+  defaultAreas?: { name: string }[],
+): HypothesisRowData => ({
   hypothesis: value,
   trajectory: null,
   status: TRAJECTORY_SELECTION_STATUS.MISSING,
-  isDefault: false,
-  isDeletable: true,
+  isDefault: defaultAreas?.some((area) => area.name === value) ?? false,
+  isDeletable: !defaultAreas?.some((area) => area.name === value),
   subRows: subRows?.length
     ? subRows.map((option) => ({
         hypothesis: option,
         trajectory: null,
         status: TRAJECTORY_SELECTION_STATUS.MISSING,
-        isDefault: true,
-        isDeletable: false,
+        isDefault: !!(
+          type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER &&
+          defaultAreas?.some((area) => area.name === option)
+        ),
+        isDeletable: defaultAreas ? !defaultAreas?.some((area) => area.name === value) : false,
         subRows: null,
       }))
     : null,

@@ -106,6 +106,8 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
           dispatch,
           setCheckedValues,
           setTechnicalData,
+          [],
+          defaultAreas,
         );
       } else if (
         shouldOpenDeletionModal(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, 0, technicalData, value)
