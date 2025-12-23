@@ -66,7 +66,6 @@ const ThermalCapacityTab = ({ defaultAreas, areas, studyData }: TabProps) => {
     const setThermalHypothesis = () => {
       areasTrajectoryOptions && setAreasOptions(areasTrajectoryOptions);
       dropDownListOptions && setCheckedValues(dropDownListOptions);
-      console.log('============ hypothesisTrajectories', hypothesisTrajectories);
       hypothesisTrajectories && setData(hypothesisTrajectories);
       technologyList && setInstalledPowerTechnologies(technologyList);
       setReadOnly(readOnlyRow);
