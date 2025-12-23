@@ -57,15 +57,7 @@ const LoadTab = ({ defaultAreas, areas, studyData }: TabProps) => {
       setReadOnly(readOnlyRow);
     };
     setLoadHypothesis();
-  }, [
-    hypothesisTrajectories,
-    areas,
-    defaultAreas,
-    areasTrajectoryOptions,
-    dropDownListOptions,
-    readOnlyRow,
-    isStudyGenerated,
-  ]);
+  }, [hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow]);
 
   useEffect(() => {
     if (studyState.studyStatus === StudyStatus.GENERATED) {
