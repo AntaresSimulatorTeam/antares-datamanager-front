@@ -66,9 +66,7 @@ const LoadTab = ({ defaultAreas, areas, studyData }: TabProps) => {
       setData(newData);
       const newCheckedValues = getCheckedValues(newData, areas, defaultAreas);
       setCheckedValues(newCheckedValues);
-      console.log('================ LOAD newData', newData);
       const rows = generateReadOnlyIndexMap(newData);
-      console.log('================ LOAD rows', rows);
       setReadOnly(rows);
     }
   }, [studyState.studyStatus]);
