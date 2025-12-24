@@ -322,7 +322,7 @@ describe('buildRowWithSubRowsData', () => {
 
 describe('buildEmptyRowWithSubRowsData', () => {
   it('crée une ligne sans sous-lignes quand subRows est vide', () => {
-    const result = buildEmptyRowWithSubRowsData('Main hypothesis', []);
+    const result = buildEmptyRowWithSubRowsData('Main hypothesis', [], TRAJECTORY_TYPE.STS);
     expect(result).toEqual({
       hypothesis: 'Main hypothesis',
       trajectory: null,
@@ -334,7 +334,7 @@ describe('buildEmptyRowWithSubRowsData', () => {
   });
 
   it('crée une ligne avec des sous-lignes quand subRows est fourni', () => {
-    const result = buildEmptyRowWithSubRowsData('Main hypothesis', ['Sub A', 'Sub B']);
+    const result = buildEmptyRowWithSubRowsData('Main hypothesis', ['Sub A', 'Sub B'], TRAJECTORY_TYPE.STS);
     expect(result.hypothesis).toBe('Main hypothesis');
     expect(result.subRows).toHaveLength(2);
 
@@ -342,7 +342,7 @@ describe('buildEmptyRowWithSubRowsData', () => {
       hypothesis: 'Sub A',
       trajectory: null,
       status: TRAJECTORY_SELECTION_STATUS.MISSING,
-      isDefault: true,
+      isDefault: false,
       isDeletable: false,
       subRows: null,
     });
@@ -351,21 +351,35 @@ describe('buildEmptyRowWithSubRowsData', () => {
       hypothesis: 'Sub B',
       trajectory: null,
       status: TRAJECTORY_SELECTION_STATUS.MISSING,
-      isDefault: true,
+      isDefault: false,
       isDeletable: false,
       subRows: null,
     });
   });
 
-  it('assure que la ligne principale est toujours deletable et non default', () => {
-    const result = buildEmptyRowWithSubRowsData('Main hypothesis', ['Sub']);
+  it("assure que la ligne principale est toujours deletable si l'area est non default", () => {
+    const result = buildEmptyRowWithSubRowsData('Main hypothesis', ['Sub'], TRAJECTORY_TYPE.STS, [{ name: 'FR' }]);
     expect(result.isDeletable).toBe(true);
     expect(result.isDefault).toBe(false);
   });
 
-  it('assure que les sous-lignes sont toujours default et non deletable', () => {
-    const result = buildEmptyRowWithSubRowsData('Main hypothesis', ['Sub']);
-    expect(result.subRows?.[0].isDefault).toBe(true);
+  it("assure que la ligne principale est toujours deletable si l'area est non default", () => {
+    const result = buildEmptyRowWithSubRowsData('Main hypothesis', ['Sub'], TRAJECTORY_TYPE.STS);
+    expect(result.isDeletable).toBe(true);
+    expect(result.isDefault).toBe(false);
+  });
+
+  it("assure que la ligne principale est non deletable si l'area est default", () => {
+    const result = buildEmptyRowWithSubRowsData('Main hypothesis', ['Sub'], TRAJECTORY_TYPE.STS, [
+      { name: 'Main hypothesis' },
+    ]);
+    expect(result.isDeletable).toBe(false);
+    expect(result.isDefault).toBe(true);
+  });
+
+  it('assure que les sous-lignes sont non default (si pas SPECIFIC PARAM et pas dans la liste des default areas) et non deletable', () => {
+    const result = buildEmptyRowWithSubRowsData('Main hypothesis', ['Sub'], TRAJECTORY_TYPE.STS);
+    expect(result.subRows?.[0].isDefault).toBe(false);
     expect(result.subRows?.[0].isDeletable).toBe(false);
   });
 });
@@ -855,7 +869,7 @@ describe('convertIntoHypothesisRowWithTechnologies', () => {
       trajectory: { trajectoryName: 'MainTrajectory' },
       status: TRAJECTORY_SELECTION_STATUS.OK,
       isDefault: true,
-      isDeletable: true,
+      isDeletable: false,
     });
     expect(result[0].subRows).toHaveLength(ThermalOptions.length);
     expect(result[0].subRows?.[0].status).toBe(TRAJECTORY_SELECTION_STATUS.OK);
@@ -1222,6 +1236,7 @@ describe('filterRow', () => {
     const result = filterRow(data);
     expect(result).toHaveLength(1);
     expect(result[0].status).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
+    expect(result[0].trajectory).toBeNull();
     expect(result[0].subRows).not.toBeNull();
     expect(result[0].subRows?.length).toBe(1);
   });
@@ -1248,6 +1263,7 @@ describe('filterRow', () => {
     expect(result[0].subRows).toHaveLength(1);
     expect(result[0].subRows?.[0].status).toBe(TRAJECTORY_SELECTION_STATUS.OK);
     expect(result[0].status).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
+    expect(result[0].trajectory).toBeNull();
   });
 
   it('transforme ERROR en MISSING si subRows OK existent', () => {
@@ -1261,6 +1277,7 @@ describe('filterRow', () => {
     ] as unknown as HypothesisRowData[];
     const result = filterRow(data);
     expect(result[0].status).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
+    expect(result[0].trajectory).toBeNull();
   });
 
   it('supprime les rows inutiles (ni default, deletable, ni OK/MISSING)', () => {

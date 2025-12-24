@@ -26,7 +26,7 @@ import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
 import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow.ts';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
-import { shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
+import { getCheckedValues, shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig';
 import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
 import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
@@ -76,7 +76,10 @@ const ThermalCapacityTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   useEffect(() => {
     if (studyState.studyStatus === StudyStatus.GENERATED) {
       setIsStudyGenerated(true);
-      setData((rows) => filterRow(rows));
+      const newData = filterRow(data);
+      setData(newData);
+      const newCheckedValues = getCheckedValues(newData, areas, defaultAreas);
+      setCheckedValues(newCheckedValues);
       const rows = generateReadOnlyIndexMap(data);
       setReadOnly(rows);
     }

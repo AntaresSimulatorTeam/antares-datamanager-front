@@ -510,7 +510,8 @@ describe('addRow', () => {
       hypothesis: ThermalOptions[0],
       trajectory: null,
       status: TRAJECTORY_SELECTION_STATUS.MISSING,
-      isDefault: true,
+      isDefault: false,
+      isDeletable: false,
       subRows: null,
     });
   });
@@ -624,7 +625,8 @@ describe('addRow', () => {
       hypothesis: STSTechnology[0],
       trajectory: null,
       status: TRAJECTORY_SELECTION_STATUS.MISSING,
-      isDefault: true,
+      isDefault: false,
+      isDeletable: false,
       subRows: null,
     });
   });

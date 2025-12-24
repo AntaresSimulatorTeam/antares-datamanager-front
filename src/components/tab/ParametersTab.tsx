@@ -25,7 +25,7 @@ import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach';
 import { CheckBoxListWithSearchBar } from '@/components/list/CheckBoxListWithSearchBar.tsx';
 import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow.ts';
-import { shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
+import { getCheckedValues, shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
 import { useFetchHypothesisParametersTrajectories } from '@/hooks/useFetchHypothesisParametersTrajectories.ts';
 import { useFetchFixHypothesisTrajectories } from '@/hooks/useFetchFixHypothesisTrajectories.ts';
@@ -87,7 +87,10 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   useEffect(() => {
     if (studyState.studyStatus === StudyStatus.GENERATED) {
       setIsStudyGenerated(true);
-      setTechnicalData((rows) => filterRow(rows));
+      const newTechnicalData = filterRow(technicalData);
+      setTechnicalData(newTechnicalData);
+      const newCheckedValues = getCheckedValues(newTechnicalData[0]?.subRows ?? [], areas, defaultAreas);
+      setCheckedValues(newCheckedValues);
       const rows = generateReadOnlyIndexMap(technicalData);
       setReadOnly(rows);
       setReadOnlyParam({ '0': true, '1': true });
@@ -103,6 +106,8 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
           dispatch,
           setCheckedValues,
           setTechnicalData,
+          [],
+          defaultAreas,
         );
       } else if (
         shouldOpenDeletionModal(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, 0, technicalData, value)

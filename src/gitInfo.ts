@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "fix/routes_modify_routes_declaration",
-  commit: "4ecd23df",
-  commitTime: "2025-12-11T15:03:53.435Z",
+  branch: "fix/ANT-4169_study_generation",
+  commit: "2f9cf867",
+  commitTime: "2025-12-22T14:37:52.886Z",
 };

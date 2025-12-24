@@ -478,7 +478,7 @@ describe('useFetchHypothesisTrajectories', () => {
     );
 
     await waitFor(() => {
-      expect(result.current.readOnlyRow).toEqual({ '0': true, '1': true, '2': true, '3': true, '4': true });
+      expect(result.current.readOnlyRow).toEqual({ '0': true, '1': true, '2': true });
     });
   });
 
@@ -489,7 +489,8 @@ describe('useFetchHypothesisTrajectories', () => {
     );
     const technologiesHypothesis = ThermalOptions.map((option) => ({
       hypothesis: option,
-      isDefault: true,
+      isDefault: false,
+      isDeletable: false,
       status: TRAJECTORY_SELECTION_STATUS.MISSING,
       subRows: null,
       trajectory: null,
@@ -517,7 +518,8 @@ describe('useFetchHypothesisTrajectories', () => {
     );
     const technologiesHypothesis = STSTechnology.map((option) => ({
       hypothesis: option,
-      isDefault: true,
+      isDefault: false,
+      isDeletable: false,
       status: TRAJECTORY_SELECTION_STATUS.MISSING,
       subRows: null,
       trajectory: null,

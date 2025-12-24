@@ -17,6 +17,7 @@ import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableH
 import { addRow } from '@/shared/services/hypothesisTableService.ts';
 import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow.ts';
 import { filterRow, generateReadOnlyIndexMap } from '@/shared/utils/trajectoryUtils.ts';
+import { getCheckedValues } from '@/shared/helpers/hypothesisTableHelper.ts';
 
 const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const studyState = useStudy();
@@ -47,7 +48,10 @@ const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   useEffect(() => {
     if (studyState.studyStatus === StudyStatus.GENERATED) {
       setIsStudyGenerated(true);
-      setData((rows) => filterRow(rows));
+      const newData = filterRow(data);
+      setData(newData);
+      const newCheckedValues = getCheckedValues(newData, areas, defaultAreas);
+      setCheckedValues(newCheckedValues);
       const rows = generateReadOnlyIndexMap(data);
       setReadOnly(rows);
     }

@@ -17,14 +17,14 @@ import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
 import { addRow, handleFetchTrajectoriesFS, handleTrajectorySearch } from '@/shared/services/hypothesisTableService.ts';
-import { getReadOnlyForGeneratedStudy, shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
+import { getCheckedValues, shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
 import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow.ts';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { CheckBoxListWithSearchBar } from '@/components/list/CheckBoxListWithSearchBar.tsx';
-import { filterRow } from '@/shared/utils/trajectoryUtils.ts';
+import { filterRow, generateReadOnlyIndexMap } from '@/shared/utils/trajectoryUtils.ts';
 
 const LoadTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const studyState = useStudy();
@@ -57,13 +57,16 @@ const LoadTab = ({ defaultAreas, areas, studyData }: TabProps) => {
       setReadOnly(readOnlyRow);
     };
     setLoadHypothesis();
-  }, [hypothesisTrajectories, areas, defaultAreas, areasTrajectoryOptions, dropDownListOptions, readOnlyRow]);
+  }, [hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow]);
 
   useEffect(() => {
     if (studyState.studyStatus === StudyStatus.GENERATED) {
       setIsStudyGenerated(true);
-      setData((rows) => filterRow(rows));
-      const rows = getReadOnlyForGeneratedStudy(data);
+      const newData = filterRow(data);
+      setData(newData);
+      const newCheckedValues = getCheckedValues(newData, areas, defaultAreas);
+      setCheckedValues(newCheckedValues);
+      const rows = generateReadOnlyIndexMap(newData);
       setReadOnly(rows);
     }
   }, [studyState.studyStatus]);

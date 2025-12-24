@@ -1,4 +1,4 @@
-import { HypothesisRowData } from '@/shared/types';
+import { HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
 import { retrieveReadOnlyArea } from '@/shared/utils/trajectoryUtils.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
@@ -48,3 +48,25 @@ export const shouldOpenDeletionModal = (
       return isRowTrajectoryValid;
   }
 };
+
+/**
+ *
+ * @param {HypothesisRowData[]} data
+ * @param {TrajectoryAreaData[]} areas
+ * @param {{name: string}[]} defaultAreas
+ */
+export const getCheckedValues = (
+  data: HypothesisRowData[],
+  areas: TrajectoryAreaData[],
+  defaultAreas: { name: string }[],
+) =>
+  data
+    ?.map((trajectory) => {
+      if (
+        areas.some((area) => area.areaName === trajectory.hypothesis) ||
+        defaultAreas.some((defaultArea) => defaultArea.name === trajectory.hypothesis)
+      ) {
+        return trajectory.hypothesis;
+      }
+    })
+    .filter(Boolean) as string[];
