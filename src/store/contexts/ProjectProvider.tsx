@@ -17,8 +17,11 @@ export interface ProjectProviderProps {
 export const ProjectProvider = ({ children, initialValue }: ProjectProviderProps) => {
   const [state, dispatch] = useReducer<Reducer<ProjectState, ProjectActionType>>(projectReducer, initialValue);
 
+  const filteredProjects = state.projects.filter((project) => !state.pinnedProjects.some((p) => p.id === project.id));
+  // value={{ projects: filteredProjects, pinnedProjects: state.pinnedProjects }}
+
   return (
-    <ProjectContext.Provider value={state}>
+    <ProjectContext.Provider value={{ projects: filteredProjects, pinnedProjects: state.pinnedProjects }}>
       <ProjectDispatchContext.Provider value={dispatch}>{children}</ProjectDispatchContext.Provider>
     </ProjectContext.Provider>
   );
