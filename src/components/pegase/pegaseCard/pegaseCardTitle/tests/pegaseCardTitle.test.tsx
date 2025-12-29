@@ -8,7 +8,8 @@ import { render, screen, within } from '@testing-library/react';
 
 import { noop } from '@/shared/utils/common/defaultUtils';
 import PegaseCardTitle from '../pegaseCardTitle';
-import { RdsDropdownOption, RdsIconButton, RdsIconId, RdsTagProps } from 'rte-design-system-react';
+import { RdsIconButton, RdsIconId, RdsTagProps } from 'rte-design-system-react';
+import { StdDropdownOption } from '@common/layout/stdDropdown/StdDropdown.tsx';
 
 const TEST_TITLE = 'Card Title';
 const TEST_LEFT_ICON = RdsIconId.StarFilled;
@@ -17,7 +18,7 @@ const TEST_ID = 'card-title-id';
 const TEST_TAG: Omit<RdsTagProps, 'onClose'> = {
   label: TEST_LABEL,
 };
-const TEST_DROPDOWN_ITEMS: RdsDropdownOption[] = [
+const TEST_DROPDOWN_ITEMS: StdDropdownOption[] = [
   { key: 'op1', label: 'Option 1', value: 'op1', onItemClick: noop },
   { key: 'op2', label: 'Option 2', value: 'op2', onItemClick: noop },
   { key: 'op3', label: 'Option 3', value: 'op3', onItemClick: noop },
