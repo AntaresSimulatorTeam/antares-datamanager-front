@@ -50,7 +50,7 @@ export const useDropdownOptions = () => {
         label: pinned ? t('project.@unpin') : t('project.@pin'),
         value: 'pin',
         icon: pinned ? StdIconId.KeepOff : StdIconId.PushPin,
-        onItemClick: onClick,
+        onItemClick: disabled ? undefined : onClick,
         extraClasses: NO_WRAP_CLASS,
         disabled,
       }) as StdDropdownOption,
