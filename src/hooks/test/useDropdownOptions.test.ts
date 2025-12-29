@@ -7,7 +7,9 @@
 import { renderHook } from '@testing-library/react';
 import { NO_WRAP_CLASS, useDropdownOptions } from '@/hooks/useDropdownOptions';
 import { describe, expectTypeOf, it } from 'vitest';
-import { RdsDropdownOption, RdsIconId } from 'rte-design-system-react';
+import { RdsDropdownOption } from 'rte-design-system-react';
+import { StdDropdownOption } from '@common/layout/stdDropdown/StdDropdown.tsx';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 describe('useDropdownOptions', () => {
   const mockOnClick = vi.fn();
@@ -16,11 +18,11 @@ describe('useDropdownOptions', () => {
     const { result } = renderHook(() => useDropdownOptions());
 
     expectTypeOf(result.current.editOption).toBeFunction();
-    expectTypeOf(result.current.editOption).returns.toEqualTypeOf<RdsDropdownOption>();
+    expectTypeOf(result.current.editOption).returns.toEqualTypeOf<StdDropdownOption>();
     expectTypeOf(result.current.deleteOption).toBeFunction();
-    expectTypeOf(result.current.deleteOption).returns.toEqualTypeOf<RdsDropdownOption>();
+    expectTypeOf(result.current.deleteOption).returns.toEqualTypeOf<StdDropdownOption>();
     expectTypeOf(result.current.pinOption).toBeFunction();
-    expectTypeOf(result.current.pinOption).returns.toEqualTypeOf<RdsDropdownOption>();
+    expectTypeOf(result.current.pinOption).returns.toEqualTypeOf<StdDropdownOption>();
   });
 
   it('should call editOption and return the right set of options', () => {
@@ -31,7 +33,7 @@ describe('useDropdownOptions', () => {
       value: 'edit',
       onItemClick: mockOnClick,
       disabled: undefined,
-      icon: RdsIconId.Edit,
+      icon: StdIconId.Edit,
       extraClasses: NO_WRAP_CLASS,
     } as RdsDropdownOption;
 
@@ -42,7 +44,7 @@ describe('useDropdownOptions', () => {
       value: 'edit',
       onItemClick: mockOnClick,
       disabled: undefined,
-      icon: RdsIconId.Edit,
+      icon: StdIconId.Edit,
       extraClasses: NO_WRAP_CLASS,
     });
     expect(result.current.editOption(mockOnClick)).toEqual({
@@ -51,7 +53,7 @@ describe('useDropdownOptions', () => {
       value: 'edit',
       onItemClick: mockOnClick,
       disabled: undefined,
-      icon: RdsIconId.Edit,
+      icon: StdIconId.Edit,
       extraClasses: NO_WRAP_CLASS,
     });
     expect(result.current.editOption(mockOnClick, 'Edit', true)).toEqual({
@@ -60,7 +62,7 @@ describe('useDropdownOptions', () => {
       value: 'edit',
       onItemClick: mockOnClick,
       disabled: true,
-      icon: RdsIconId.Edit,
+      icon: StdIconId.Edit,
       extraClasses: NO_WRAP_CLASS,
     });
   });
@@ -75,7 +77,7 @@ describe('useDropdownOptions', () => {
       value: 'delete',
       onItemClick: mockOnClick,
       disabled: undefined,
-      icon: RdsIconId.Delete,
+      icon: StdIconId.Delete,
       extraClasses: classes,
     } as RdsDropdownOption;
 
@@ -86,7 +88,7 @@ describe('useDropdownOptions', () => {
       value: 'delete',
       onItemClick: mockOnClick,
       disabled: undefined,
-      icon: RdsIconId.Delete,
+      icon: StdIconId.Delete,
       extraClasses: classes,
     } as RdsDropdownOption);
     expect(result.current.deleteOption(mockOnClick, undefined, false)).toEqual({
@@ -95,7 +97,7 @@ describe('useDropdownOptions', () => {
       value: 'delete',
       onItemClick: mockOnClick,
       disabled: false,
-      icon: RdsIconId.Delete,
+      icon: StdIconId.Delete,
       extraClasses: classes,
     } as RdsDropdownOption);
   });
@@ -107,7 +109,7 @@ describe('useDropdownOptions', () => {
       label: 'Unpin',
       value: 'pin',
       onItemClick: mockOnClick,
-      icon: RdsIconId.KeepOff,
+      icon: StdIconId.KeepOff,
       extraClasses: NO_WRAP_CLASS,
     } as RdsDropdownOption;
 
@@ -117,7 +119,7 @@ describe('useDropdownOptions', () => {
       label: 'Pin',
       value: 'pin',
       onItemClick: mockOnClick,
-      icon: RdsIconId.PushPin,
+      icon: StdIconId.PushPin,
       extraClasses: NO_WRAP_CLASS,
     } as RdsDropdownOption);
   });

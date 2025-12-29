@@ -6,21 +6,15 @@
 
 import { ReactElement } from 'react';
 import cardTitleClassBuilder from './cardTitleClassBuilder';
-import {
-  RdsDropdown,
-  RdsDropdownOption,
-  RdsFloatingWrapper,
-  RdsIconButtonProps,
-  RdsTag,
-  RdsTagProps,
-} from 'rte-design-system-react';
+import { RdsFloatingWrapper, RdsIconButtonProps, RdsTag, RdsTagProps } from 'rte-design-system-react';
 import StdButton from '@common/base/stdButton/StdButton';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
+import StdDropdown, { StdDropdownOption } from '@common/layout/stdDropdown/StdDropdown.tsx';
 
 export type PegaseCardTitleProps = {
   id: string;
   title: string;
-  dropdownOptions: RdsDropdownOption[];
+  dropdownOptions: StdDropdownOption[];
   icons?: ReactElement<RdsIconButtonProps>;
   tag?: Omit<RdsTagProps, 'onClose'>;
   lineClamp?: number;
@@ -63,7 +57,7 @@ const PegaseCardTitle = ({ title, dropdownOptions, icons, tag, lineClamp, onClic
           </Trigger>
           <Element>
             <div className="whitespace-nowrap">
-              <RdsDropdown items={dropdownOptions} />
+              <StdDropdown items={dropdownOptions} />
             </div>
           </Element>
         </RdsFloatingWrapper>
