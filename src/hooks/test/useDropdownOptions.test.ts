@@ -7,7 +7,6 @@
 import { renderHook } from '@testing-library/react';
 import { NO_WRAP_CLASS, useDropdownOptions } from '@/hooks/useDropdownOptions';
 import { describe, expectTypeOf, it } from 'vitest';
-import { RdsDropdownOption } from 'rte-design-system-react';
 import { StdDropdownOption } from '@common/layout/stdDropdown/StdDropdown.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
@@ -35,7 +34,7 @@ describe('useDropdownOptions', () => {
       disabled: undefined,
       icon: StdIconId.Edit,
       extraClasses: NO_WRAP_CLASS,
-    } as RdsDropdownOption;
+    } as StdDropdownOption;
 
     expect(result.current.editOption(mockOnClick)).toEqual(settingOptions);
     expect(result.current.editOption(mockOnClick, 'noSettings')).toEqual({
@@ -79,7 +78,7 @@ describe('useDropdownOptions', () => {
       disabled: undefined,
       icon: StdIconId.Delete,
       extraClasses: classes,
-    } as RdsDropdownOption;
+    } as StdDropdownOption;
 
     expect(result.current.deleteOption(mockOnClick)).toEqual(deleteOptions);
     expect(result.current.deleteOption(mockOnClick, 'deleteLabel')).toEqual({
@@ -90,7 +89,7 @@ describe('useDropdownOptions', () => {
       disabled: undefined,
       icon: StdIconId.Delete,
       extraClasses: classes,
-    } as RdsDropdownOption);
+    } as StdDropdownOption);
     expect(result.current.deleteOption(mockOnClick, undefined, false)).toEqual({
       key: 'delete',
       label: 'Delete',
@@ -99,7 +98,42 @@ describe('useDropdownOptions', () => {
       disabled: false,
       icon: StdIconId.Delete,
       extraClasses: classes,
-    } as RdsDropdownOption);
+    } as StdDropdownOption);
+  });
+
+  it('should call deleteOption and onClickItem is undefined if option is disabled', () => {
+    const { result } = renderHook(() => useDropdownOptions());
+    const classes = 'whitespace-nowrap [&]:text-error-600 [&]:hover:text-error-600';
+
+    const deleteOptions = {
+      key: 'delete',
+      label: 'Delete',
+      value: 'delete',
+      onItemClick: undefined,
+      disabled: true,
+      icon: StdIconId.Delete,
+      extraClasses: classes,
+    } as StdDropdownOption;
+
+    expect(result.current.deleteOption(mockOnClick, 'Delete', true)).toEqual(deleteOptions);
+    expect(result.current.deleteOption(mockOnClick, 'deleteLabel', true)).toEqual({
+      key: 'delete',
+      label: 'deleteLabel',
+      value: 'delete',
+      onItemClick: undefined,
+      disabled: true,
+      icon: StdIconId.Delete,
+      extraClasses: classes,
+    } as StdDropdownOption);
+    expect(result.current.deleteOption(mockOnClick, undefined, true)).toEqual({
+      key: 'delete',
+      label: 'Delete',
+      value: 'delete',
+      onItemClick: undefined,
+      disabled: true,
+      icon: StdIconId.Delete,
+      extraClasses: classes,
+    } as StdDropdownOption);
   });
 
   it('should call pinOption and return the right set of options', () => {
@@ -111,7 +145,7 @@ describe('useDropdownOptions', () => {
       onItemClick: mockOnClick,
       icon: StdIconId.KeepOff,
       extraClasses: NO_WRAP_CLASS,
-    } as RdsDropdownOption;
+    } as StdDropdownOption;
 
     expect(result.current.pinOption(true, mockOnClick)).toEqual(pinOptions);
     expect(result.current.pinOption(false, mockOnClick)).toEqual({
@@ -121,6 +155,30 @@ describe('useDropdownOptions', () => {
       onItemClick: mockOnClick,
       icon: StdIconId.PushPin,
       extraClasses: NO_WRAP_CLASS,
-    } as RdsDropdownOption);
+    } as StdDropdownOption);
+  });
+
+  it('should call pinOption and onClickItem is undefined if option is disabled', () => {
+    const { result } = renderHook(() => useDropdownOptions());
+    const pinOptions = {
+      key: 'pin',
+      label: 'Unpin',
+      value: 'pin',
+      onItemClick: undefined,
+      disabled: true,
+      icon: StdIconId.KeepOff,
+      extraClasses: NO_WRAP_CLASS,
+    } as StdDropdownOption;
+
+    expect(result.current.pinOption(true, mockOnClick, true)).toEqual(pinOptions);
+    expect(result.current.pinOption(false, mockOnClick, true)).toEqual({
+      key: 'pin',
+      label: 'Pin',
+      value: 'pin',
+      disabled: true,
+      onItemClick: undefined,
+      icon: StdIconId.PushPin,
+      extraClasses: NO_WRAP_CLASS,
+    } as StdDropdownOption);
   });
 });
