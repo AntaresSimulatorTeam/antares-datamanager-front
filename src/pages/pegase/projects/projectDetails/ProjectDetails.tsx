@@ -5,8 +5,7 @@
  */
 
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
-import ProjectDetailsHeader from './ProjectDetailsHeader';
+import { useNavigate, useParams } from 'react-router-dom';
 import StudyTableDisplay from '@/pages/pegase/home/components/StudyTableDisplay';
 import SearchBar from '@/pages/pegase/home/components/SearchBar';
 import { useTranslation } from 'react-i18next';
@@ -16,6 +15,8 @@ import { useUser } from '@/store/contexts/UserContext.tsx';
 import { ProjectCreationModal } from '@common/modal/ProjectCreationModal.tsx';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { useGetProjectDetails } from '@/hooks/useGetProjectDetails.ts';
+import { PegaseBreadcrumbItemType } from '@/shared/types';
+import { PegaseBreadcrumb } from '@common/layout/PegaseBreadcrumb/PegaseBreadcrumb.tsx';
 
 const ProjectDetails = () => {
   const { t } = useTranslation();
@@ -26,6 +27,21 @@ const ProjectDetails = () => {
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const { id } = useParams();
   const { projectDetails } = useGetProjectDetails(id ?? null, reFetchProject);
+  const navigate = useNavigate();
+
+  const headerItems: PegaseBreadcrumbItemType[] = [
+    {
+      key: 'item-0',
+      label: 'Projects',
+      data: { id: '/projects' },
+      onClickItem: navigate,
+    },
+    {
+      key: 'item-1',
+      label: projectDetails?.name ?? '',
+      data: { id: projectDetails?.id ?? '', name: projectDetails?.name ?? '' },
+    },
+  ];
 
   const handleChipClick = () => {
     if (activeChip) {
@@ -47,13 +63,11 @@ const ProjectDetails = () => {
       <p>{t('projectDetails.@loading')}</p>
     </div>
   ) : (
-    <div className="flex flex-col">
-      <ProjectDetailsHeader projectName={projectDetails.name} />
+    <div className="flex flex-col gap-4 p-3">
+      <PegaseBreadcrumb items={headerItems}></PegaseBreadcrumb>
       <RdsDivider />
-      <div className="flex flex-col">
-        <DetailsContent content={projectDetails} onClickButton={toggleModal} />
-      </div>
-      <div className="flex flex-col gap-4 p-3">
+      <DetailsContent content={projectDetails} onClickButton={toggleModal} />
+      <div className="flex flex-col gap-4">
         <div className="flex items-center gap-4">
           <SearchBar onSearch={(value?: string) => setSearchTerm(value)} />
           <RdsChip
