@@ -59,7 +59,8 @@
     "@unpin": "Unpin",
     "@close": "Close",
     "@created": "Created",
-    "@by": "By"
+    "@by": "By",
+    "@new_study": "Create a study"
   },
   "pinnedProject": {
     "@pinSuccess": "Project pinned successfully",

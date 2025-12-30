@@ -13,6 +13,12 @@
     "quickAccess": {
       "confirmUnpin": "Projet détaché avec succes",
       "@cancel": "Annuler"
+    },
+    "selectAnsSearchInput": {
+      "@emptyList": "Aucun résultat"
+    },
+    "spinner": {
+      "label": "En chargement ..."
     }
   },
   "Pegase": {
@@ -39,6 +45,10 @@
     "@project": "Projet",
     "@my_studies": "Mes études",
     "@my_projects": "Mes projets",
+    "@new_project": "Create a project",
+    "@update_project": "Update a project",
+    "@duplicate_study": "Duplicate a study",
+    "@study_table_title": "Last studies",
     "@time_series": "Time Series"
   },
   "project": {
@@ -50,17 +60,30 @@
     "@close": "Fermer",
     "@created": "Crée le",
     "@by": "Par",
-    "@new_study": "Creer une étude"
+    "@new_study": "Créer une étude"
+  },
+  "pinnedProject": {
+    "@pinSuccess": "Project pinned successfully",
+    "@unpinSuccess": "Project unpinned successfully"
   },
   "projectDetails": {
-    "@buttonEdit": "Editer"
+    "@buttonEdit": "Editer",
+    "@bannerProjectName": "Projet",
+    "@loading": "Chargement de détails du projet..."
+  },
+  "modal": {
+    "@number_characters_exceeds": "Le nombre de caractères maximum a été atteint"
   },
   "projectModal": {
+    "@placeholder_name_input": "Nommer votre projet...",
+    "@placeholder_description_input": "Ajouter quelques lignes pour décrire votre projet...",
+    "@placeholder_keyword": "Ajouter un mot-clé",
     "@keyword_already_exists": "Le mot-clé existe déjà",
     "@keyword_length_error": "Le mot-clé doit avoir entre {{min}} et {{max}} lettres",
     "@keyword_minimum_error": "Le mot-clé doit avoir à minimum {{min}} lettres",
     "@keyword_maximum_error": "Le mot-clé ne doit pas dépasser {{max}} lettres",
-    "@keyword_max_keys_errors": "Il n'est pas possible d'ajouter plus que {{maxNbKey}} mot-clés"
+    "@keyword_max_keys_errors": "Il n'est pas possible d'ajouter plus que {{maxNbKey}} mot-clés",
+    "@keyword_button_clear": "Supprimer tout"
   },
   "studyModal": {
     "@new_study": "Créer une étude",
@@ -77,8 +100,16 @@
     "@delete": "Effacer"
   },
   "studyDetails": {
+    "@loading": "Loading study details...",
+    "@warnings": "Warnings",
+    "@noWarnings": "No warning message at this time",
+    "@bannerStudyName": "Study",
+    "@bannerHorizon": "Horizon: {{horizon}}",
+    "@bannerCreatedBy": "by {{createdBy}}",
     "@hypothesis": "Hypothèse",
     "@area": "Zone",
+    "@areas": "Zones",
+    "@links": "Liens",
     "@link": "Lien",
     "@areas_links": "Zones & Liens",
     "@load": "Consommation",
@@ -90,14 +121,24 @@
     "@select_trajectory": "Selectionner une trajectoire",
     "@select_project": "Selectionner un nom de projet",
     "@select_file": "Selectionner un fichier",
+    "@select_file_fs_error": "Aucun fichier au niveau du système fichier",
     "@import_from_file_system": "Importer une trajectoire pour {{area}}",
     "@select_from": "Select from {{path}}",
     "@import": "Importer",
-    "@preview": "Prévisualisation",
     "@import_status_done": "OK",
     "@import_status_missing": "Missing",
     "@import_status_error": "Error",
+    "@import_status_warning": "Warning",
+    "@skip": "Skip",
+    "@skipped": "Skipped",
+    "@warningButtonTooltip": "You cannot reset this warning",
+    "@preview": "Prévisualisation",
     "@generate": "Générer",
+    "@add_trajectories_message": "Ajouter une trajectoire avec des zones",
+    "@error_link_trajectory_message": "Please select another LINK trajectory or delete it",
+    "@search_area": "Search area",
+    "@or": "or",
+    "@viewLog": "View Log",
     "@notificationAlert": "Erreur: {{studyName}} - {{trajectoryName}} aucun paramètre n'a pas être enregistré pour {{trajectoryType}}",
     "@default": "Par défaut"
   },
@@ -109,7 +150,7 @@
     "@specific": "Spécifique",
     "@specificInformation": "Specific parameters filled in",
     "@parametersModulation": "Param modulation",
-    "@parametersCommon": "Common",
+    "@common": "Common",
     "@parametersEconomic": "Paramètres économiques",
     "@costs": "Coûts",
     "@economics": "Économique",
@@ -156,10 +197,13 @@
     "@frontend": "Frontend",
     "@backend": "Backend"
   },
-  "horizonInput":{
+  "horizonInput": {
     "@validYearError": "Horizon doit être un numéro entre 2000 et 99999",
     "@horizon_placeholder": "Horizon",
     "@requiredHorizon": "Reinsegner un horizon est obligatoire"
-
+  },
+  "deletionModal": {
+    "@title": "Are you sure you want to delete this area ?",
+    "@content": "This action will delete the associated trajectory. Please confirm you wish to proceed."
   }
 }

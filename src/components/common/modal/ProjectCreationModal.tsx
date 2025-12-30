@@ -72,8 +72,8 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
           type: 'error',
           message: `${errorMessages ?? 'An error occurred'}`,
         });
+        onClose();
       }
-      onClose();
     }
   };
 
