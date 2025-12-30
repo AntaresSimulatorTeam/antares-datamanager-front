@@ -22,6 +22,7 @@ import { useProject } from '@/store/contexts/ProjectContext.tsx';
 import { ProjectInfo, ProjectResponse } from '@/shared/types';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { ProjectCreationModal } from '@common/modal/ProjectCreationModal.tsx';
+import { StdDropdownOption } from '@common/layout/stdDropdown/StdDropdown.tsx';
 
 const ProjectContent = () => {
   const { t } = useTranslation();
@@ -30,7 +31,7 @@ const ProjectContent = () => {
   const [searchTerm, setSearchTerm] = useState<string | undefined>();
   const [activeChip, setActiveChip] = useState<boolean | null>(false);
   const [current, setCurrent] = useState(0);
-  const { projects } = useProject();
+  const { projects, pinnedProjects } = useProject();
   const { count, refetch } = useFetchProjectList(current, intervalSize, searchTerm, projects.length);
   const { navigateToProject } = useProjectNavigation();
   const { handlePinProject } = useHandlePinnedProjectList();
@@ -75,8 +76,8 @@ const ProjectContent = () => {
       </div>
       <div className="grid w-full grid-cols-3 gap-3">
         {(projects.length > intervalSize ? projects.splice(0, 9) : projects || []).map((project) => {
-          const dropdownItems = [
-            pinOption(false, () => void handlePinProject(project.id)),
+          const dropdownItems: StdDropdownOption[] = [
+            pinOption(false, () => void handlePinProject(project.id), pinnedProjects?.length >= 3),
             editOption(() => void openModalProject(project), t('project.@edit')),
             deleteOption(() => void handleDeleteProject(project.id), t('project.@delete'), project.studies?.length > 0),
           ];

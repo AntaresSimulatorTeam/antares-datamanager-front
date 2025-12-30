@@ -8,7 +8,7 @@ type OptionsActiveKeyboard = {
 };
 
 const useActiveKeyboard = <T extends HTMLElement>(
-  handlerKeyup: (e: KeyboardEvent<T>) => void,
+  handlerKeyup?: (e: KeyboardEvent<T>) => void,
   options: OptionsActiveKeyboard = {},
 ) => {
   const { id, interactiveKeyCodes } = options;
@@ -24,7 +24,7 @@ const useActiveKeyboard = <T extends HTMLElement>(
 
   const onKeyUp = (e: React.KeyboardEvent<T>) => {
     if (interactiveKeys.includes(e.code) && (!id || (e.target as T).id === id)) {
-      handlerKeyup(e);
+      handlerKeyup?.(e);
       setIsActiveKeyboard(false);
     }
   };

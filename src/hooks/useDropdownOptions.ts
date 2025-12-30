@@ -7,7 +7,8 @@
 import { clsx } from 'clsx';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RdsDropdownOption, RdsIconId } from 'rte-design-system-react';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
+import { StdDropdownOption } from '@/components/common/layout/stdDropdown/StdDropdown';
 
 export const NO_WRAP_CLASS = 'whitespace-nowrap';
 
@@ -15,43 +16,44 @@ export const useDropdownOptions = () => {
   const { t } = useTranslation();
 
   const editOption = useCallback(
-    (onClick: () => void, label?: string, disabled?: boolean): RdsDropdownOption =>
+    (onClick: () => void, label?: string, disabled?: boolean): StdDropdownOption =>
       ({
         key: 'edit',
         label: label ?? t('project.@edit'),
         value: 'edit',
         onItemClick: onClick,
         disabled,
-        icon: RdsIconId.Edit,
+        icon: StdIconId.Edit,
         extraClasses: NO_WRAP_CLASS,
-      }) as RdsDropdownOption,
+      }) as StdDropdownOption,
     [t],
   );
 
   const deleteOption = useCallback(
-    (onClick: () => void, label?: string, disabled?: boolean): RdsDropdownOption =>
+    (onClick: () => void, label?: string, disabled?: boolean): StdDropdownOption =>
       ({
         key: 'delete',
         label: label ?? t('project.@delete'),
         value: 'delete',
-        icon: RdsIconId.Delete,
-        onItemClick: onClick,
+        icon: StdIconId.Delete,
+        onItemClick: disabled ? undefined : onClick,
         extraClasses: clsx(NO_WRAP_CLASS, '[&]:text-error-600 [&]:hover:text-error-600'),
         disabled,
-      }) as RdsDropdownOption,
+      }) as StdDropdownOption,
     [t],
   );
 
   const pinOption = useCallback(
-    (pinned: boolean, onClick: () => void): RdsDropdownOption =>
+    (pinned: boolean, onClick: () => void, disabled?: boolean): StdDropdownOption =>
       ({
         key: 'pin',
         label: pinned ? t('project.@unpin') : t('project.@pin'),
         value: 'pin',
-        icon: pinned ? RdsIconId.KeepOff : RdsIconId.PushPin,
-        onItemClick: onClick,
+        icon: pinned ? StdIconId.KeepOff : StdIconId.PushPin,
+        onItemClick: disabled ? undefined : onClick,
         extraClasses: NO_WRAP_CLASS,
-      }) as RdsDropdownOption,
+        disabled,
+      }) as StdDropdownOption,
     [t],
   );
 
