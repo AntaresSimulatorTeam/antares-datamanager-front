@@ -82,6 +82,7 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
         });
         onClose();
       }
+      onClose();
     }
   };
 
