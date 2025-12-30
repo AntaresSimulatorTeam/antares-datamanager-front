@@ -1,7 +1,7 @@
 {
   "components": {
     "navbar": {
-      "@expand": "Maximize",
+      "@expand": "Expand",
       "@minimize": "Minimize"
     },
     "popover": {
@@ -70,14 +70,19 @@
     "@bannerProjectName": "Project",
     "@loading": "Loading project details..."
   },
+  "modal": {
+    "@number_characters_exceeds": "You have exceeded the maximum number of characters allowed"
+  },
   "projectModal": {
     "@placeholder_name_input": "Name your project...",
     "@placeholder_description_input": "Add a few lines to describe your project...",
-    "@keyword_already_exists": "Keyword already exists",
+    "@placeholder_keyword": "Add a keyword",
+    "@keyword_already_exists": "Keyword already exists. Please choose another one",
     "@keyword_length_error": "Keyword must be between {{min}} and {{max}} characters",
     "@keyword_minimum_error": "Keyword must be at least {{min}} characters",
     "@keyword_maximum_error": "Keyword must not exceed {{max}} characters",
-    "@keyword_max_keys_errors": "Cannot add more than {{maxNbKey}} keywords"
+    "@keyword_max_keys_errors": "Cannot add more than {{maxNbKey}} keywords",
+    "@keyword_button_clear": "Clear all"
   },
   "studyModal": {
     "@new_study": "Create a study",
