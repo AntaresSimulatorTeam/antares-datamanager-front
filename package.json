@@ -2,7 +2,7 @@
   "name": "antares-datamanager-front",
   "private": true,
   "version": "1.4.3",
-  "description": "Pegase app",
+  "description": "Pegase web app",
   "type": "module",
   "scripts": {
     "dev": "node scripts/git-info.js && vite",
