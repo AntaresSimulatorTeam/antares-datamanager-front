@@ -112,7 +112,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
         <div className="flex w-full flex-col gap-4 self-stretch">
           <div className="flex w-1/2 flex-col items-start">
             <StdInputText
-              label={t('studyModal.@input_name')}
+              label={t('modal.@input_name')}
               value={studyName}
               onChange={handleStudyNameChange}
               variant="outlined"
@@ -142,7 +142,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
         <StdButton label={t('components.quickAccess.@cancel')} onClick={onClose} color="secondary" />
         <StdButton
           icon={StdIconId.Add}
-          label={t('studyModal.@button_create')}
+          label={t('modal.@button_create')}
           onClick={() => void saveStudyHandler()}
           variant="contained"
           color="primary"

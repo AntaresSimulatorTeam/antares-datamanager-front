@@ -72,7 +72,11 @@
     "@loading": "Chargement de détails du projet..."
   },
   "modal": {
-    "@number_characters_exceeds": "Le nombre de caractères maximum a été atteint"
+    "@number_characters_exceeds": "Le nombre de caractères maximum a été atteint",
+    "@input_name": "Nom",
+    "@input_description": "Description",
+    "@button_create": "Créer",
+    "@button_update": "Modifier"
   },
   "projectModal": {
     "@placeholder_name_input": "Nommer votre projet...",
@@ -88,11 +92,7 @@
   "studyModal": {
     "@new_study": "Créer une étude",
     "@update_study": "Modifier l'étude",
-    "@study_creation_placeholder": "Saisissez un nom d'étude...",
-    "@button_create": "Créer",
-    "@button_update": "Modifier",
-    "@button_edit": "Editer",
-    "@input_name": "Nom"
+    "@study_creation_placeholder": "Saisissez un nom d'étude..."
   },
   "study": {
     "@open": "Ouvrir",
