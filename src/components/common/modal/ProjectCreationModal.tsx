@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { RdsInputTextArea, RdsModal } from 'rte-design-system-react';
+import { RdsModal } from 'rte-design-system-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import KeywordsInput from '@/components/input/KeywordsInput.tsx';
@@ -16,6 +16,7 @@ import { useProjectDispatch } from '@/store/contexts/ProjectContext.tsx';
 import StdButton from '@common/base/stdButton/StdButton';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import StdInputText from '@/components/forms/stdInputText/StdInputText.tsx';
+import StdInputTextArea from '@common/forms/stdInputTextArea/StdInputTextArea.tsx';
 
 interface ProjectCreationModalProps {
   onClose: () => void;
@@ -85,14 +86,14 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
       <RdsModal.Content>
         <div className="flex w-8/12 flex-col items-start gap-3">
           <StdInputText
-            label="Name"
+            label={t('modal.@input_name')}
             value={name}
             onChange={(text: string) => {
               if (text.length <= 40) {
                 setName(text || '');
                 setNameError(null);
               }
-              if (text.length > 40) {
+              if (text.length >= 40) {
                 setNameError(t('modal.@number_characters_exceeds'));
                 setIsFormValid(false);
               }
@@ -106,21 +107,21 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
             helperText={nameError ?? ''}
           />
           <div className="flex w-full [&_textarea]:min-h-[300px] [&_textarea]:resize-none">
-            <RdsInputTextArea
-              label="Description"
+            <StdInputTextArea
+              label={t('modal.@input_description')}
               value={description}
               onChange={(text) => {
                 if (text.length <= 500) {
                   setDescription(text || '');
                   setDescriptionError(null);
                 }
-                if (text.length > 500) {
+                if (text.length >= 500) {
                   setDescriptionError(t('modal.@number_characters_exceeds'));
                   setIsFormValid(false);
                 }
               }}
               maxLength={500}
-              placeHolder={t('projectModal.@placeholder_description_input')}
+              placeholder={t('projectModal.@placeholder_description_input')}
               error={!!descriptionError}
               helperText={descriptionError ?? ''}
             />
@@ -138,7 +139,7 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
         <StdButton label={t('components.quickAccess.@cancel')} onClick={onClose} color="secondary" />
         <StdButton
           icon={projectInfo ? StdIconId.Edit : StdIconId.Add}
-          label={projectInfo ? t('studyModal.@button_update') : t('studyModal.@button_create')}
+          label={projectInfo ? t('modal.@button_update') : t('modal.@button_create')}
           onClick={() => void handleCreateProject()}
           variant="contained"
           color="primary"

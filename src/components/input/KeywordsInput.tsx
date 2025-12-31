@@ -43,7 +43,8 @@ const KeywordsInput = ({
     const isKeywordExist = keywords?.some((keyword) => keyword == keywordInput);
     if (
       (!value && errorMessage && maxNbKeywords != null && keywords?.length === maxNbKeywords) ||
-      (!value && errorMessage && isKeywordExist)
+      (!value && errorMessage && isKeywordExist) ||
+      (value && errorMessage && !isKeywordExist)
     ) {
       setErrorMessage('');
     }
