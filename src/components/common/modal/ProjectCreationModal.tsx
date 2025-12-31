@@ -41,8 +41,8 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
   const dispatch = useProjectDispatch();
 
   useEffect(() => {
-    setIsFormValid(name.length > 0);
-  }, [name]);
+    setIsFormValid(name.length > 0 && !nameError && !descriptionError);
+  }, [name, nameError, descriptionError]);
 
   const handleCreateProject = async () => {
     try {
