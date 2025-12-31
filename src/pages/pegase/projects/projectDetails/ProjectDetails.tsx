@@ -32,7 +32,7 @@ const ProjectDetails = () => {
   const headerItems: PegaseBreadcrumbItemType[] = [
     {
       key: 'item-0',
-      label: 'Projects',
+      label: 'Project',
       data: { id: '/projects' },
       onClickItem: navigate,
     },

@@ -89,12 +89,12 @@ const StudyDetails = () => {
       <p>{t('studyDetails.@loading')}</p>
     </div>
   ) : (
-    <div className="flex h-full w-screen flex-col overflow-x-hidden pb-16">
+    <div className="flex h-full flex-col gap-4 px-3 pb-16 pt-3">
       <PegaseBreadcrumb items={headerItems}></PegaseBreadcrumb>
+      <RdsDivider />
+      <DetailsContent content={studyData} onClickButton={toggleModal} />
       <div className="relative flex h-full w-full flex-col">
-        <RdsDivider />
-        <DetailsContent content={studyData} onClickButton={toggleModal} />
-        <div className="flex items-end self-stretch px-3 pt-2">
+        <div className="flex items-end self-stretch">
           <StudyNavigationMenu
             onRenderActiveComponent={setActiveContent}
             setActiveTab={setActiveTab}
@@ -103,7 +103,7 @@ const StudyDetails = () => {
             studyData={studyData}
           />
         </div>
-        <div className="relative flex flex-1 flex-col overflow-y-auto px-4">
+        <div className="relative flex flex-1 flex-col overflow-y-auto">
           <div className="flex h-full w-full flex-col gap-4">
             <ContainerWithExpander content={warningMessages} placeholder={t('studyDetails.@noWarnings')} />
             <div className="flex h-screen w-full pb-2">{activeContent}</div>
