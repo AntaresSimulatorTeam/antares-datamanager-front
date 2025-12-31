@@ -36,25 +36,25 @@ const KeywordsInput = ({
   const [suggestedKeywords, setSuggestedKeywords] = useState<string[]>([]);
 
   const handleKeywordChange = async (value: string) => {
-    if (maxNbCharacters != null && value?.length > maxNbCharacters) {
-      return;
-    }
-    // Remove error message when input keyword is deleted and error message (max nb or already keyword is displayed)
-    const isKeywordExist = keywords?.some((keyword) => keyword == keywordInput);
-    if (
-      (!value && errorMessage && maxNbKeywords != null && keywords?.length === maxNbKeywords) ||
-      (!value && errorMessage && isKeywordExist) ||
-      (value && errorMessage && !isKeywordExist)
-    ) {
-      setErrorMessage('');
-    }
-    setKeywordInput(value);
-
-    try {
-      const tags = await fetchSuggestedKeywords(value);
-      setSuggestedKeywords(tags);
-    } catch {
-      setErrorMessage('Failed to fetch suggested keywords');
+    if (!value) {
+      errorMessage && setErrorMessage('');
+      setKeywordInput(value);
+    } else if (value) {
+      if (maxNbCharacters != null && value?.length > maxNbCharacters) {
+        if (value?.length <= maxNbCharacters + 1) {
+          setErrorMessage(t('modal.@number_characters_exceeds'));
+        } else {
+          return;
+        }
+      } else {
+        setKeywordInput(value);
+        try {
+          const tags = await fetchSuggestedKeywords(value);
+          setSuggestedKeywords(tags);
+        } catch {
+          setErrorMessage('Failed to fetch suggested keywords');
+        }
+      }
     }
   };
 
@@ -111,8 +111,8 @@ const KeywordsInput = ({
 
   return (
     <div className={clsx(width ?? 'w-full', 'flex min-h-22 flex-col items-start justify-start gap-1')}>
-      <div className="relative">
-        <div className="max-w-3/4 flex items-end justify-start gap-2">
+      <div className="relative flex w-full flex-col items-start">
+        <div className="flex shrink-0 grow-0 items-end justify-start gap-2">
           <StdInputText
             label={t('home.@keywords')}
             value={keywordInput}
