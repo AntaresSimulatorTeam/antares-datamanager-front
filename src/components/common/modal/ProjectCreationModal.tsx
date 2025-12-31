@@ -17,6 +17,13 @@ import StdButton from '@common/base/stdButton/StdButton';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import StdInputText from '@/components/forms/stdInputText/StdInputText.tsx';
 import StdInputTextArea from '@common/forms/stdInputTextArea/StdInputTextArea.tsx';
+import { validateMaxLength } from '@/shared/utils/validateMaxTextLength.ts';
+import {
+  MAX_KEYWORD_LENGTH,
+  MAX_KEYWORD_NUMBER,
+  MAX_PROJECT_DESCRIPTION_LENGTH,
+  MAX_PROJECT_NAME_LENGTH,
+} from '@/shared/const/studyConfig.ts';
 
 interface ProjectCreationModalProps {
   onClose: () => void;
@@ -89,11 +96,11 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
             label={t('modal.@input_name')}
             value={name}
             onChange={(text: string) => {
-              if (text.length <= 40) {
+              if (validateMaxLength(text, MAX_PROJECT_NAME_LENGTH)) {
                 setName(text || '');
                 setNameError(null);
-              }
-              if (text.length >= 40) {
+              } else if (text?.length === MAX_PROJECT_NAME_LENGTH + 1) {
+                setName(text || '');
                 setNameError(t('modal.@number_characters_exceeds'));
                 setIsFormValid(false);
               }
@@ -101,7 +108,7 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
             variant="outlined"
             placeHolder={t('projectModal.@placeholder_name_input')}
             required
-            maxLength={40}
+            maxLength={MAX_PROJECT_NAME_LENGTH}
             autoFocus={true}
             error={!!nameError}
             helperText={nameError ?? ''}
@@ -111,16 +118,16 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
               label={t('modal.@input_description')}
               value={description}
               onChange={(text) => {
-                if (text.length <= 500) {
+                if (validateMaxLength(text, MAX_PROJECT_DESCRIPTION_LENGTH)) {
                   setDescription(text || '');
                   setDescriptionError(null);
-                }
-                if (text.length >= 500) {
+                } else if (text?.length === MAX_PROJECT_DESCRIPTION_LENGTH + 1) {
+                  setDescription(text || '');
                   setDescriptionError(t('modal.@number_characters_exceeds'));
                   setIsFormValid(false);
                 }
               }}
-              maxLength={500}
+              maxLength={MAX_PROJECT_DESCRIPTION_LENGTH}
               placeholder={t('projectModal.@placeholder_description_input')}
               error={!!descriptionError}
               helperText={descriptionError ?? ''}
@@ -129,8 +136,8 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
           <KeywordsInput
             keywords={keywords}
             setKeywords={setKeywords}
-            maxNbKeywords={6}
-            maxNbCharacters={15}
+            maxNbKeywords={MAX_KEYWORD_NUMBER}
+            maxNbCharacters={MAX_KEYWORD_LENGTH}
             minNbCharacters={1}
           />
         </div>

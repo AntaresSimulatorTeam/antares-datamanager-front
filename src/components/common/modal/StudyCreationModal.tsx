@@ -14,7 +14,7 @@ import { StudyDTO } from '@/shared/types';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { notifyToast } from '@/shared/notification/notification';
 import { validateMaxLength } from '@/shared/utils/validateMaxTextLength';
-import { MAX_STUDY_NAME_LENGTH } from '@/shared/const/studyConfig';
+import { MAX_KEYWORD_LENGTH, MAX_KEYWORD_NUMBER, MAX_STUDY_NAME_LENGTH } from '@/shared/const/studyConfig';
 import StdButton from '@common/base/stdButton/StdButton';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import StdInputText from '@/components/forms/stdInputText/StdInputText.tsx';
@@ -90,8 +90,10 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
     if (validateMaxLength(value, MAX_STUDY_NAME_LENGTH)) {
       setStudyName(value || '');
       setStudyErrorMessage('');
-    } else {
+    } else if (value?.length === MAX_STUDY_NAME_LENGTH + 1) {
+      setStudyName(value || '');
       setStudyErrorMessage(t('modal.@number_characters_exceeds'));
+      setIsFormValid(false);
     }
   };
 
@@ -110,7 +112,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
       <RdsModal.Title onClose={onClose}>{t('studyModal.@new_study')}</RdsModal.Title>
       <RdsModal.Content>
         <div className="flex w-full flex-col gap-4 self-stretch">
-          <div className="flex w-1/2 flex-col items-start">
+          <div className="flex w-1/2 flex-col items-start justify-start">
             <StdInputText
               label={t('modal.@input_name')}
               value={studyName}
@@ -118,7 +120,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
               variant="outlined"
               placeHolder={t('studyModal.@study_creation_placeholder')}
               required
-              maxLength={75}
+              maxLength={MAX_STUDY_NAME_LENGTH}
               error={!!studyErrorMessage}
               helperText={studyErrorMessage}
             />
@@ -132,8 +134,8 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
           <KeywordsInput
             keywords={keywords}
             setKeywords={setKeywords}
-            maxNbKeywords={6}
-            maxNbCharacters={15}
+            maxNbKeywords={MAX_KEYWORD_NUMBER}
+            maxNbCharacters={MAX_KEYWORD_LENGTH}
             minNbCharacters={1}
           />
         </div>

@@ -12,6 +12,7 @@ import StdButton from '@common/base/stdButton/StdButton';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import StdInputText from '@/components/forms/stdInputText/StdInputText.tsx';
 import { ERROR_CLASSES, HELPER_CLASSES } from '@/components/forms/stdInputText/textClassBuilder.ts';
+import { validateMaxLength } from '@/shared/utils/validateMaxTextLength.ts';
 
 interface KeywordsInputProps {
   keywords: string[];
@@ -41,12 +42,14 @@ const KeywordsInput = ({
       setKeywordInput(value);
     } else if (value) {
       if (maxNbCharacters != null && value?.length > maxNbCharacters) {
-        if (value?.length <= maxNbCharacters + 1) {
+        if (validateMaxLength(value, maxNbCharacters + 1)) {
           setErrorMessage(t('modal.@number_characters_exceeds'));
+          setKeywordInput(value);
         } else {
           return;
         }
       } else {
+        errorMessage && setErrorMessage('');
         setKeywordInput(value);
         try {
           const tags = await fetchSuggestedKeywords(value);
