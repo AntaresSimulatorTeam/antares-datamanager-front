@@ -154,8 +154,8 @@ const KeywordsInput = ({
             />
           )}
         </div>
-        <span className={clsx(HELPER_CLASSES, !!errorMessage && ERROR_CLASSES.text)}>{errorMessage}</span>
       </div>
+      <span className={clsx(HELPER_CLASSES, !!errorMessage && ERROR_CLASSES.text)}>{errorMessage}</span>
 
       {/* Keywords Display and Clear All Button */}
       <div className="flex flex-wrap gap-2">
