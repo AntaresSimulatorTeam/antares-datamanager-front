@@ -6,10 +6,9 @@
 
 import { ReactNode, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import StudyHeader from './StudyHeader.tsx';
 import { RdsDivider } from 'rte-design-system-react';
 import StudyNavigationMenu from '@/components/menu/StudyNavigationMenu.tsx';
-import { HypothesisTab, StudyDTO } from '@/shared/types';
+import { HypothesisTab, PegaseBreadcrumbItemType, StudyDTO } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { generateStudy, getStudyById } from '@/shared/services/studyService.ts';
@@ -23,6 +22,8 @@ import { ContainerWithExpander } from '@/components/banner/ContainerWithExpander
 import { useFetchWarningMessages } from '@/hooks/useFetchWarningMessages.ts';
 import StudyModificationModal from '@common/modal/StudyModificationModal.tsx';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
+import { useProjectNavigation } from '@/hooks/useProjectNavigation.ts';
+import { PegaseBreadcrumb } from '@common/layout/PegaseBreadcrumb/PegaseBreadcrumb.tsx';
 
 const StudyDetails = () => {
   const [activeContent, setActiveContent] = useState<ReactNode>(null);
@@ -42,6 +43,20 @@ const StudyDetails = () => {
   const { warningMessages } = useFetchWarningMessages(id ? Number(id) : null, activeTab.name);
   const [reloadStudy, setReloadStudy] = useState(0);
   const [studyData, setStudyData] = useState<StudyDTO | null>(null);
+  const { navigateToProject } = useProjectNavigation();
+  const headerItems: PegaseBreadcrumbItemType[] = [
+    {
+      key: 'item-0',
+      label: studyData?.project ?? '',
+      data: { id: studyData?.projectId ?? '', name: studyData?.project ?? '' },
+      onClickItem: navigateToProject,
+    },
+    {
+      key: 'item-1',
+      label: studyData?.name ?? '',
+      data: null,
+    },
+  ];
 
   const handleGenerateStudy = async (studyId: number) => {
     try {
@@ -74,12 +89,12 @@ const StudyDetails = () => {
       <p>{t('studyDetails.@loading')}</p>
     </div>
   ) : (
-    <div className="flex h-full w-full flex-col pb-16">
-      <StudyHeader study={studyData} />
+    <div className="flex h-full flex-col gap-4 px-3 pb-16 pt-3">
+      <PegaseBreadcrumb items={headerItems}></PegaseBreadcrumb>
+      <RdsDivider />
+      <DetailsContent content={studyData} onClickButton={toggleModal} />
       <div className="relative flex h-full w-full flex-col">
-        <RdsDivider />
-        <DetailsContent content={studyData} onClickButton={toggleModal} />
-        <div className="flex items-end self-stretch px-3 pt-2">
+        <div className="flex items-end self-stretch">
           <StudyNavigationMenu
             onRenderActiveComponent={setActiveContent}
             setActiveTab={setActiveTab}
@@ -88,7 +103,7 @@ const StudyDetails = () => {
             studyData={studyData}
           />
         </div>
-        <div className="relative flex flex-1 flex-col overflow-y-auto px-4">
+        <div className="relative flex flex-1 flex-col overflow-y-auto">
           <div className="flex h-full w-full flex-col gap-4">
             <ContainerWithExpander content={warningMessages} placeholder={t('studyDetails.@noWarnings')} />
             <div className="flex h-screen w-full pb-2">{activeContent}</div>

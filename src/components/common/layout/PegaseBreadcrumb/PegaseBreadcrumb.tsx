@@ -4,24 +4,14 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import {
-  RdsBreadcrumbSeparator,
-  RdsDropdown,
-  RdsDropdownOption,
-  RdsFloatingWrapper,
-  useRdsId,
-} from 'rte-design-system-react';
+import { RdsBreadcrumbSeparator, useRdsId } from 'rte-design-system-react';
 import { PegaseBreadcrumbItemType } from '@/shared/types';
 import { PegaseLinearBreadcrumb } from '@common/layout/PegaseBreadcrumb/PegaseLinearBreadcrumb.tsx';
-import StdButton from '@common/base/stdButton/StdButton';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 type RdsBreadcrumbProps = {
   items: PegaseBreadcrumbItemType[];
   id?: string;
 };
-
-const { Trigger, Element } = RdsFloatingWrapper;
 
 export const PegaseBreadcrumb = ({ items, id: propsId }: RdsBreadcrumbProps) => {
   const id = useRdsId('breadcrumb', propsId);
@@ -34,26 +24,8 @@ export const PegaseBreadcrumb = ({ items, id: propsId }: RdsBreadcrumbProps) => 
     );
   }
 
-  const extraItems: RdsDropdownOption[] = items.slice(0, -2).map((item) => ({
-    id: item.id,
-    key: item.key,
-    label: item.label,
-    value: item.label,
-    onItemClick: () => {},
-  }));
-
   return (
     <div id={id} className="rds-flex rds-items-center rds-align-middle">
-      <RdsFloatingWrapper placement="bottom-start" autoClose offset={3}>
-        <Trigger>
-          <div className="rds-flex rds-items-center">
-            <StdButton variant="transparent" size="small" color="secondary" icon={StdIconId.MoreHoriz} />
-          </div>
-        </Trigger>
-        <Element>
-          <RdsDropdown items={extraItems} />
-        </Element>
-      </RdsFloatingWrapper>
       <RdsBreadcrumbSeparator />
       <PegaseLinearBreadcrumb items={items.slice(-2)} />
     </div>

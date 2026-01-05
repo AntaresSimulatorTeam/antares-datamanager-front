@@ -42,7 +42,7 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
 
   useEffect(() => {
     setIsFormValid(name.length > 0 && !nameError && !descriptionError);
-  }, [name, nameError, descriptionError]);
+  }, [name.length, nameError, descriptionError]);
 
   const handleCreateProject = async () => {
     try {
@@ -102,7 +102,6 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
               } else if (text?.length === MAX_PROJECT_NAME_LENGTH + 1) {
                 setName(text || '');
                 setNameError(t('modal.@number_characters_exceeds'));
-                setIsFormValid(false);
               }
             }}
             variant="outlined"
@@ -124,7 +123,6 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
                 } else if (text?.length === MAX_PROJECT_DESCRIPTION_LENGTH + 1) {
                   setDescription(text || '');
                   setDescriptionError(t('modal.@number_characters_exceeds'));
-                  setIsFormValid(false);
                 }
               }}
               maxLength={MAX_PROJECT_DESCRIPTION_LENGTH}
@@ -150,7 +148,7 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
           onClick={() => void handleCreateProject()}
           variant="contained"
           color="primary"
-          disabled={!projectInfo && !isFormValid}
+          disabled={!isFormValid}
         />
       </RdsModal.Footer>
     </RdsModal>
