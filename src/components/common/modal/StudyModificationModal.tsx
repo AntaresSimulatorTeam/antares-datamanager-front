@@ -117,7 +117,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
           <div className="flex justify-between gap-2">
             <div className="w-1/2">
               <RdsInputText
-                label={t('studyModal.@input_name')}
+                label={t('modal.@input_name')}
                 value={studyName}
                 onChange={handleStudyNameChange}
                 variant="outlined"
@@ -156,7 +156,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
         <StdButton label={t('components.quickAccess.@cancel')} onClick={onClose} color="secondary" />
         <StdButton
           icon={isDuplicateMode ? StdIconId.ContentCopy : StdIconId.Edit}
-          label={isDuplicateMode ? t('study.@duplicate') : t('studyModal.@button_update')}
+          label={isDuplicateMode ? t('study.@duplicate') : t('modal.@button_update')}
           onClick={() => void updateStudyHandler()}
           variant="contained"
           color="primary"

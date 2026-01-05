@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { RdsInputText, RdsInputTextArea, RdsModal } from 'rte-design-system-react';
+import { RdsModal } from 'rte-design-system-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import KeywordsInput from '@/components/input/KeywordsInput.tsx';
@@ -15,6 +15,15 @@ import { ProjectActionType, ProjectResponse } from '@/shared/types/Project.type.
 import { useProjectDispatch } from '@/store/contexts/ProjectContext.tsx';
 import StdButton from '@common/base/stdButton/StdButton';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
+import StdInputText from '@/components/forms/stdInputText/StdInputText.tsx';
+import StdInputTextArea from '@common/forms/stdInputTextArea/StdInputTextArea.tsx';
+import { validateMaxLength } from '@/shared/utils/validateMaxTextLength.ts';
+import {
+  MAX_KEYWORD_LENGTH,
+  MAX_KEYWORD_NUMBER,
+  MAX_PROJECT_DESCRIPTION_LENGTH,
+  MAX_PROJECT_NAME_LENGTH,
+} from '@/shared/const/studyConfig.ts';
 
 interface ProjectCreationModalProps {
   onClose: () => void;
@@ -27,11 +36,13 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
   const [description, setDescription] = useState<string>(projectInfo?.description ?? '');
   const [keywords, setKeywords] = useState<string[]>(projectInfo?.tags ?? []);
   const [isFormValid, setIsFormValid] = useState(false);
+  const [nameError, setNameError] = useState<string | null>(null);
+  const [descriptionError, setDescriptionError] = useState<string | null>(null);
   const dispatch = useProjectDispatch();
 
   useEffect(() => {
-    setIsFormValid(name.length > 0);
-  }, [name]);
+    setIsFormValid(name.length > 0 && !nameError && !descriptionError);
+  }, [name, nameError, descriptionError]);
 
   const handleCreateProject = async () => {
     try {
@@ -60,11 +71,16 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
       setKeywords([]);
       onClose();
     } catch (error: unknown) {
-      if (error instanceof Error) {
+      const errorMessages = (error as Error)?.message;
+      if (errorMessages?.includes('already exists')) {
+        setNameError(errorMessages);
+        setIsFormValid(false);
+      } else {
         notifyToast({
           type: 'error',
-          message: `${error.message}`,
+          message: `${errorMessages ?? 'An error occurred'}`,
         });
+        onClose();
       }
     }
   };
@@ -75,46 +91,62 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
         {projectInfo ? t('home.@update_project') : t('home.@new_project')}
       </RdsModal.Title>
       <RdsModal.Content>
-        <div className="flex flex-col items-start gap-2">
-          <div className="flex w-8/12 flex-col items-start gap-2">
-            <RdsInputText
-              label="Name"
-              value={name}
-              onChange={(text: string) => {
-                if (text.length <= 40) setName(text || '');
+        <div className="flex w-8/12 flex-col items-start gap-3">
+          <StdInputText
+            label={t('modal.@input_name')}
+            value={name}
+            onChange={(text: string) => {
+              if (validateMaxLength(text, MAX_PROJECT_NAME_LENGTH)) {
+                setName(text || '');
+                setNameError(null);
+              } else if (text?.length === MAX_PROJECT_NAME_LENGTH + 1) {
+                setName(text || '');
+                setNameError(t('modal.@number_characters_exceeds'));
+                setIsFormValid(false);
+              }
+            }}
+            variant="outlined"
+            placeHolder={t('projectModal.@placeholder_name_input')}
+            required
+            maxLength={MAX_PROJECT_NAME_LENGTH}
+            autoFocus={true}
+            error={!!nameError}
+            helperText={nameError ?? ''}
+          />
+          <div className="flex w-full [&_textarea]:min-h-[300px] [&_textarea]:resize-none">
+            <StdInputTextArea
+              label={t('modal.@input_description')}
+              value={description}
+              onChange={(text) => {
+                if (validateMaxLength(text, MAX_PROJECT_DESCRIPTION_LENGTH)) {
+                  setDescription(text || '');
+                  setDescriptionError(null);
+                } else if (text?.length === MAX_PROJECT_DESCRIPTION_LENGTH + 1) {
+                  setDescription(text || '');
+                  setDescriptionError(t('modal.@number_characters_exceeds'));
+                  setIsFormValid(false);
+                }
               }}
-              variant="outlined"
-              placeHolder={t('projectModal.@placeholder_name_input')}
-              required
-              maxLength={40}
-              autoFocus={true}
+              maxLength={MAX_PROJECT_DESCRIPTION_LENGTH}
+              placeholder={t('projectModal.@placeholder_description_input')}
+              error={!!descriptionError}
+              helperText={descriptionError ?? ''}
             />
-            <div className="flex w-full [&_textarea]:min-h-[300px] [&_textarea]:resize-none">
-              <RdsInputTextArea
-                label="Description"
-                value={description}
-                onChange={(text) => {
-                  if (text.length <= 500) setDescription(text || '');
-                }}
-                maxLength={500}
-                placeHolder={t('projectModal.@placeholder_description_input')}
-              />
-            </div>
           </div>
           <KeywordsInput
             keywords={keywords}
             setKeywords={setKeywords}
-            maxNbKeywords={6}
-            maxNbCharacters={15}
+            maxNbKeywords={MAX_KEYWORD_NUMBER}
+            maxNbCharacters={MAX_KEYWORD_LENGTH}
             minNbCharacters={1}
           />
         </div>
       </RdsModal.Content>
       <RdsModal.Footer>
-        <StdButton label="Cancel" onClick={onClose} color="secondary" />
+        <StdButton label={t('components.quickAccess.@cancel')} onClick={onClose} color="secondary" />
         <StdButton
           icon={projectInfo ? StdIconId.Edit : StdIconId.Add}
-          label={projectInfo ? t('studyModal.@button_update') : t('studyModal.@button_create')}
+          label={projectInfo ? t('modal.@button_update') : t('modal.@button_create')}
           onClick={() => void handleCreateProject()}
           variant="contained"
           color="primary"

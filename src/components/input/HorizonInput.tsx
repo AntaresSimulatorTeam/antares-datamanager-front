@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RdsInputText } from 'rte-design-system-react';
+import StdInputText from '@/components/forms/stdInputText/StdInputText.tsx';
 
 interface YearInputProps {
   horizon: string;
@@ -76,7 +76,7 @@ const HorizonInput: React.FC<YearInputProps> = ({
   return (
     <div className="flex items-center gap-2">
       <div className="flex w-1/2 flex-col">
-        <RdsInputText
+        <StdInputText
           label={t('home.@horizon')}
           value={horizon}
           onChange={handleInputChange}
@@ -86,12 +86,9 @@ const HorizonInput: React.FC<YearInputProps> = ({
           required={required}
           maxLength={4}
           disabled={disabled}
+          error={!!customErrorMessage || !!errorMessage}
+          helperText={customErrorMessage || errorMessage}
         />
-        <div
-          className={`text-error-500 ${customErrorMessage || errorMessage ? 'opacity-100' : 'opacity-0'} h-2 text-left text-body-s leading-4`}
-        >
-          {customErrorMessage || errorMessage || t('horizonInput.@errorMessage')}
-        </div>
       </div>
     </div>
   );

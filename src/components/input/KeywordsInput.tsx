@@ -5,12 +5,14 @@
  */
 
 import { Dispatch, SetStateAction, useState } from 'react';
-import { RdsIcon, RdsIconId, RdsInputText } from 'rte-design-system-react';
 import { fetchSuggestedKeywords } from '@/shared/services/studyService.ts';
 import { clsx } from 'clsx';
 import { useTranslation } from 'react-i18next';
 import StdButton from '@common/base/stdButton/StdButton';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
+import StdInputText from '@/components/forms/stdInputText/StdInputText.tsx';
+import { ERROR_CLASSES, HELPER_CLASSES } from '@/components/forms/stdInputText/textClassBuilder.ts';
+import { validateMaxLength } from '@/shared/utils/validateMaxTextLength.ts';
 
 interface KeywordsInputProps {
   keywords: string[];
@@ -35,24 +37,27 @@ const KeywordsInput = ({
   const [suggestedKeywords, setSuggestedKeywords] = useState<string[]>([]);
 
   const handleKeywordChange = async (value: string) => {
-    if (maxNbCharacters != null && value?.length > maxNbCharacters) {
-      return;
-    }
-    // Remove error message when input keyword is deleted and error message (max nb or already keyword is displayed)
-    const isKeywordExist = keywords?.some((keyword) => keyword == keywordInput);
-    if (
-      (!value && errorMessage && maxNbKeywords != null && keywords?.length === maxNbKeywords) ||
-      (!value && errorMessage && isKeywordExist)
-    ) {
-      setErrorMessage('');
-    }
-    setKeywordInput(value);
-
-    try {
-      const tags = await fetchSuggestedKeywords(value);
-      setSuggestedKeywords(tags);
-    } catch {
-      setErrorMessage('Failed to fetch suggested keywords');
+    if (!value) {
+      errorMessage && setErrorMessage('');
+      setKeywordInput(value);
+    } else if (value) {
+      if (maxNbCharacters != null && value?.length > maxNbCharacters) {
+        if (validateMaxLength(value, maxNbCharacters + 1)) {
+          setErrorMessage(t('modal.@number_characters_exceeds'));
+          setKeywordInput(value);
+        } else {
+          return;
+        }
+      } else {
+        errorMessage && setErrorMessage('');
+        setKeywordInput(value);
+        try {
+          const tags = await fetchSuggestedKeywords(value);
+          setSuggestedKeywords(tags);
+        } catch {
+          setErrorMessage('Failed to fetch suggested keywords');
+        }
+      }
     }
   };
 
@@ -95,7 +100,7 @@ const KeywordsInput = ({
   };
 
   const shouldAddKeywordButton = (input: string): boolean => {
-    if (!input) {
+    if (!input || errorMessage) {
       return false;
     } else {
       if (minNbCharacters && !maxNbCharacters) {
@@ -108,31 +113,31 @@ const KeywordsInput = ({
   };
 
   return (
-    <div className={clsx(width ?? 'w-full', 'flex min-h-22 flex-col items-start justify-start')}>
-      <div className="relative">
-        <div className="flex w-full items-center gap-2">
-          <div className="max-w-3/4 flex">
-            <RdsInputText
-              label={t('home.@keywords')}
-              value={keywordInput}
-              onChange={handleKeywordChange}
-              placeHolder="Add a keyword"
-              variant="outlined"
-              maxLength={maxNbCharacters}
-            />
+    <div className={clsx(width ?? 'w-full', 'flex min-h-22 flex-col items-start justify-start gap-1')}>
+      <div className="relative flex w-full flex-col items-start">
+        <div className="flex shrink-0 grow-0 items-end justify-start gap-2">
+          <StdInputText
+            label={t('home.@keywords')}
+            value={keywordInput}
+            onChange={handleKeywordChange}
+            placeHolder={t('')}
+            variant="outlined"
+            maxLength={maxNbCharacters}
+            error={!!errorMessage}
+          />
+          <div className="mb-0.5">
+            {shouldAddKeywordButton(keywordInput) && (
+              <StdButton
+                onClick={() => handleAddKeyword()}
+                icon={StdIconId.Add}
+                color="secondary"
+                size="extraSmall"
+                variant="transparent"
+              />
+            )}
           </div>
-          {shouldAddKeywordButton(keywordInput) && (
-            <StdButton
-              onClick={() => handleAddKeyword()}
-              icon={StdIconId.Add}
-              color="secondary"
-              size="extraSmall"
-              variant="transparent"
-            />
-          )}
-          {/* Error Message */}
-          {errorMessage && <div className="text-left text-body-s leading-4 text-error-500">{errorMessage}</div>}
         </div>
+        <span className={clsx(HELPER_CLASSES, !!errorMessage && ERROR_CLASSES.text)}>{errorMessage}</span>
 
         {/* Suggested Keywords Dropdown */}
         {keywordInput && !errorMessage && suggestedKeywords.length > 0 && (
@@ -156,7 +161,7 @@ const KeywordsInput = ({
       {/* Keywords Display and Clear All Button */}
       <div className="flex flex-wrap gap-2">
         {keywords.map((keyword, index) => (
-          <div key={index} className="py-0.3 flex items-center gap-2 rounded bg-gray-200 px-1">
+          <div key={index} className="flex items-center gap-2 rounded bg-gray-200 px-1">
             <span>{keyword}</span>
             <StdButton
               icon={StdIconId.Close}
@@ -171,10 +176,13 @@ const KeywordsInput = ({
 
       {/* Clear All Keywords Button */}
       {keywords?.length > 0 && (
-        <div className="text-sm text-secondary mt-1 flex cursor-pointer items-center gap-1" onClick={clearAllKeywords}>
-          <RdsIcon name={RdsIconId.InkEraser} color="secondary" />
-          <span>Clear all</span>
-        </div>
+        <StdButton
+          label={t('projectModal.@keyword_button_clear')}
+          icon={StdIconId.InkEraser}
+          onClick={clearAllKeywords}
+          variant="text"
+          color="secondary"
+        />
       )}
     </div>
   );

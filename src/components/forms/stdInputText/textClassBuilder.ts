@@ -31,7 +31,12 @@ export const ERROR_CLASSES = {
 export const textClassBuilder = (variant: TextVariant, disabled: boolean, error: boolean, hideButton: boolean) => ({
   labelClasses: clsx(TEXT_CLASSES, error && ERROR_CLASSES.text),
   countClasses: clsx(TEXT_CLASSES, error && ERROR_CLASSES.text),
-  wrapperInputClasses: clsx(COMMON_VARIANT_CLASSES, VARIANT_CLASSES[variant], disabled && VARIANT_DISABLED_CLASSES),
+  wrapperInputClasses: clsx(
+    COMMON_VARIANT_CLASSES,
+    VARIANT_CLASSES[variant],
+    disabled && VARIANT_DISABLED_CLASSES,
+    error && ERROR_CLASSES.input[variant],
+  ),
   inputClasses: clsx(INPUT_CLASSES, disabled && VARIANT_DISABLED_CLASSES, error && ERROR_CLASSES.input[variant]),
   helperClasses: clsx(HELPER_CLASSES, error && ERROR_CLASSES.text),
   clearClasses: clsx(CLEAR_CLASSES, disabled && VARIANT_DISABLED_CLASSES),

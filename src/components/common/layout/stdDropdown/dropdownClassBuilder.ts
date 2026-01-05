@@ -1,7 +1,6 @@
 import { clsx } from 'clsx';
 
-export const COMMON_ELEMENT_CLASSES =
-  'flex gap-1 text-body-s text-gray-700 items-center p-1 mx-0.25 rounded bg-gray-w focus:z-50';
+export const COMMON_ELEMENT_CLASSES = 'flex gap-1 text-body-s items-center p-1 mx-0.25 rounded bg-gray-w focus:z-50';
 export const COMMON_ELEMENT_STATUS_CLASSES =
   'focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-0 focus-visible:outline-gray-900';
 export const DISABLED_CLASSES = 'text-gray-500 outline-none';
@@ -19,7 +18,7 @@ export const dropdownElementClassBuilder = (
   additionnalClasses?: string,
 ) => {
   if (disabled) {
-    const pointer = disabled ? 'cursor-not-allowed disabled' : 'cursor-pointer';
+    const pointer = disabled ? 'cursor-not-allowed disabled text-gray-400' : 'cursor-pointer text-gray-700';
     return clsx(COMMON_ELEMENT_CLASSES, DISABLED_CLASSES, pointer);
   } else {
     const activeKey = active ? 'active' : 'inactive';

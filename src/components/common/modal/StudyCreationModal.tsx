@@ -5,7 +5,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { RdsInputText, RdsModal } from 'rte-design-system-react';
+import { RdsModal } from 'rte-design-system-react';
 import { useTranslation } from 'react-i18next';
 import KeywordsInput from '@/components/input/KeywordsInput.tsx';
 import HorizonInput from '@/components/input/HorizonInput';
@@ -14,9 +14,10 @@ import { StudyDTO } from '@/shared/types';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { notifyToast } from '@/shared/notification/notification';
 import { validateMaxLength } from '@/shared/utils/validateMaxTextLength';
-import { MAX_STUDY_NAME_LENGTH } from '@/shared/const/studyConfig';
+import { MAX_KEYWORD_LENGTH, MAX_KEYWORD_NUMBER, MAX_STUDY_NAME_LENGTH } from '@/shared/const/studyConfig';
 import StdButton from '@common/base/stdButton/StdButton';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
+import StdInputText from '@/components/forms/stdInputText/StdInputText.tsx';
 
 interface StudyCreationModalProps {
   isOpen?: boolean;
@@ -89,6 +90,10 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
     if (validateMaxLength(value, MAX_STUDY_NAME_LENGTH)) {
       setStudyName(value || '');
       setStudyErrorMessage('');
+    } else if (value?.length === MAX_STUDY_NAME_LENGTH + 1) {
+      setStudyName(value || '');
+      setStudyErrorMessage(t('modal.@number_characters_exceeds'));
+      setIsFormValid(false);
     }
   };
 
@@ -106,24 +111,19 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
     <RdsModal size="small">
       <RdsModal.Title onClose={onClose}>{t('studyModal.@new_study')}</RdsModal.Title>
       <RdsModal.Content>
-        <div className="flex flex-col gap-4 self-stretch">
-          <div className="flex justify-between gap-2">
-            <div className="w-1/2">
-              <RdsInputText
-                label={t('studyModal.@input_name')}
-                value={studyName}
-                onChange={handleStudyNameChange}
-                variant="outlined"
-                placeHolder={t('studyModal.@study_creation_placeholder')}
-                required
-                maxLength={75}
-              />
-              <div
-                className={`text-error-500 ${studyErrorMessage ? 'opacity-100' : 'opacity-0'} flex h-2 justify-start text-left text-body-s leading-4`}
-              >
-                {studyErrorMessage ?? ''}
-              </div>
-            </div>
+        <div className="flex w-full flex-col gap-4 self-stretch">
+          <div className="flex w-1/2 flex-col items-start justify-start">
+            <StdInputText
+              label={t('modal.@input_name')}
+              value={studyName}
+              onChange={handleStudyNameChange}
+              variant="outlined"
+              placeHolder={t('studyModal.@study_creation_placeholder')}
+              required
+              maxLength={MAX_STUDY_NAME_LENGTH}
+              error={!!studyErrorMessage}
+              helperText={studyErrorMessage}
+            />
           </div>
           <HorizonInput
             horizon={horizon}
@@ -134,8 +134,8 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
           <KeywordsInput
             keywords={keywords}
             setKeywords={setKeywords}
-            maxNbKeywords={6}
-            maxNbCharacters={15}
+            maxNbKeywords={MAX_KEYWORD_NUMBER}
+            maxNbCharacters={MAX_KEYWORD_LENGTH}
             minNbCharacters={1}
           />
         </div>
@@ -144,7 +144,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
         <StdButton label={t('components.quickAccess.@cancel')} onClick={onClose} color="secondary" />
         <StdButton
           icon={StdIconId.Add}
-          label={t('studyModal.@button_create')}
+          label={t('modal.@button_create')}
           onClick={() => void saveStudyHandler()}
           variant="contained"
           color="primary"
