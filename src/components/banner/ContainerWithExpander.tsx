@@ -22,15 +22,15 @@ export const ContainerWithExpander = <T,>({ content, placeholder }: Props<T>) =>
 
   return (
     <div
-      className={`flex ${isOpen && content?.length > 0 ? 'aspect-medium:h-1/3 aspect-wide:h-[220px]' : 'h-fit'} w-full shrink-0 rounded border-gray-600 bg-gray-200 px-2 py-1 shadow-2`}
+      className={`flex ${isOpen && content?.length > 0 ? 'aspect-medium:h-1/5 aspect-wide:h-[210px]' : 'h-fit'} w-full shrink-0 rounded border-gray-600 bg-gray-200 px-2 pb-1 pt-0.5 shadow-2`}
     >
-      <div className="flex w-full max-w-fit flex-col pt-3 sm:pt-1.5">
+      <div className="flex w-full max-w-fit flex-col pt-2 sm:pt-1.5">
         <button onClick={() => setIsOpen((prev) => !prev)}>
           <StdIcon name={isOpen ? StdIconId.KeyboardArrowUp : StdIconId.KeyboardArrowDown} />
         </button>
       </div>
       <div className="flex h-full w-full flex-col items-center">
-        <div className="flex w-full items-center gap-4 p-2 sm:gap-2 sm:p-1">
+        <div className="flex w-full items-center gap-4 px-2 sm:gap-2 sm:p-1">
           {content?.length > 0 && (
             <StdAvatar
               initials={`${content?.length ?? '0'}`}
