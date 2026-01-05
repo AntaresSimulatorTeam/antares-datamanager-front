@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "feat/ANT-4321_project_modal_error_display",
-  commit: "9e569b38",
-  commitTime: "2025-12-31T13:44:54.079Z",
+  branch: "feat/ANT-4331_navbar_and_study_table",
+  commit: "8abd7653",
+  commitTime: "2026-01-05T15:26:04.431Z",
 };

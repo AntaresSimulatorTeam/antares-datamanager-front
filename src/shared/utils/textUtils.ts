@@ -8,3 +8,8 @@ import { MenuNavItem } from '@/shared/types';
 
 export const translateMenuItemLabel = (menuItems: MenuNavItem[], t: (key: string) => string): MenuNavItem[] =>
   menuItems.map((data: MenuNavItem) => ({ ...data, label: t(data.label) }));
+
+export const sentenceCase = (str: string) => {
+  const s = str.replace(/_/g, ' ').toLowerCase();
+  return s.charAt(0).toUpperCase() + s.slice(1);
+};
