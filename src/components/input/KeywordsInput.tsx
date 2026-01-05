@@ -115,7 +115,7 @@ const KeywordsInput = ({
   return (
     <div className={clsx(width ?? 'w-full', 'flex min-h-22 flex-col items-start justify-start gap-1')}>
       <div className="relative flex w-full flex-col items-start">
-        <div className="flex shrink-0 grow-0 items-end justify-start gap-2">
+        <div className="inline-flex items-end justify-start gap-2">
           <StdInputText
             label={t('home.@keywords')}
             value={keywordInput}
@@ -142,7 +142,7 @@ const KeywordsInput = ({
         {/* Suggested Keywords Dropdown */}
         {keywordInput && !errorMessage && suggestedKeywords.length > 0 && (
           <div
-            className="absolute left-0 top-8 z-50 max-h-14 w-full overflow-y-auto rounded border border-gray-300 bg-gray-w shadow-2 outline-none"
+            className={`absolute left-0 top-7 z-50 max-h-14 w-3/5 overflow-y-auto rounded border border-gray-300 bg-gray-w shadow-2 outline-none`}
             onMouseDown={(e) => e.preventDefault()} // Prevent closing when interacting with dropdown
           >
             {suggestedKeywords.map((suggestedKeyword, index) => (
