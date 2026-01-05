@@ -114,8 +114,8 @@ const KeywordsInput = ({
 
   return (
     <div className={clsx(width ?? 'w-full', 'flex min-h-22 flex-col items-start justify-start gap-1')}>
-      <div className="relative flex w-full flex-col items-start">
-        <div className="inline-flex items-end justify-start gap-2">
+      <div className="inline-flex items-end justify-start gap-2">
+        <div className="relative flex w-full flex-col items-start">
           <StdInputText
             label={t('home.@keywords')}
             value={keywordInput}
@@ -125,37 +125,36 @@ const KeywordsInput = ({
             maxLength={maxNbCharacters}
             error={!!errorMessage}
           />
-          <div className="mb-0.5">
-            {shouldAddKeywordButton(keywordInput) && (
-              <StdButton
-                onClick={() => handleAddKeyword()}
-                icon={StdIconId.Add}
-                color="secondary"
-                size="extraSmall"
-                variant="transparent"
-              />
-            )}
-          </div>
+          {/* Suggested Keywords Dropdown */}
+          {keywordInput && !errorMessage && suggestedKeywords.length > 0 && (
+            <div
+              className="absolute left-0 top-7 z-50 max-h-14 w-full overflow-y-auto rounded border border-gray-300 bg-gray-w shadow-2 outline-none"
+              onMouseDown={(e) => e.preventDefault()} // Prevent closing when interacting with dropdown
+            >
+              {suggestedKeywords.map((suggestedKeyword, index) => (
+                <div
+                  key={index}
+                  className="cursor-pointer px-2 py-1 hover:bg-gray-200"
+                  onClick={() => handleAddKeyword(suggestedKeyword)}
+                >
+                  {suggestedKeyword}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="mb-0.5">
+          {shouldAddKeywordButton(keywordInput) && (
+            <StdButton
+              onClick={() => handleAddKeyword()}
+              icon={StdIconId.Add}
+              color="secondary"
+              size="extraSmall"
+              variant="transparent"
+            />
+          )}
         </div>
         <span className={clsx(HELPER_CLASSES, !!errorMessage && ERROR_CLASSES.text)}>{errorMessage}</span>
-
-        {/* Suggested Keywords Dropdown */}
-        {keywordInput && !errorMessage && suggestedKeywords.length > 0 && (
-          <div
-            className={`absolute left-0 top-7 z-50 max-h-14 w-3/5 overflow-y-auto rounded border border-gray-300 bg-gray-w shadow-2 outline-none`}
-            onMouseDown={(e) => e.preventDefault()} // Prevent closing when interacting with dropdown
-          >
-            {suggestedKeywords.map((suggestedKeyword, index) => (
-              <div
-                key={index}
-                className="cursor-pointer px-2 py-1 hover:bg-gray-200"
-                onClick={() => handleAddKeyword(suggestedKeyword)}
-              >
-                {suggestedKeyword}
-              </div>
-            ))}
-          </div>
-        )}
       </div>
 
       {/* Keywords Display and Clear All Button */}
