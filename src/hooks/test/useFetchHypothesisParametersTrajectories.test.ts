@@ -3,7 +3,7 @@ import { useFetchHypothesisParametersTrajectories } from '@/hooks/useFetchHypoth
 import * as hypothesisTableService from '@/shared/services/hypothesisTableService.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
-import { DbTrajectory, HypothesisRowData } from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, StudyDTO } from '@/shared/types';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import * as sortUtils from '@/shared/utils/sortUtils.ts';
@@ -46,6 +46,7 @@ describe('useFetchHypothesisParametersTrajectories', () => {
   });
 
   it('should fetch and populate hypothesis trajectories when one specific trajectories', async () => {
+    const study = { id: 123, horizon: '2025' } as StudyDTO;
     const trajectoryData = [
       {
         areaName: 'B',
@@ -60,7 +61,9 @@ describe('useFetchHypothesisParametersTrajectories', () => {
       [TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER]: mockCommon,
     });
 
-    const { result } = renderHook(() => useFetchHypothesisParametersTrajectories(trajectoryData, 123, [{ name: 'B' }]));
+    const { result } = renderHook(() =>
+      useFetchHypothesisParametersTrajectories(trajectoryData, study, [{ name: 'B' }]),
+    );
 
     await waitFor(() => {
       expect(mockDispatch).toHaveBeenCalledWith({
@@ -86,6 +89,7 @@ describe('useFetchHypothesisParametersTrajectories', () => {
   });
 
   it('should handle missing modulation trajectory', async () => {
+    const study = { id: 123, horizon: '2025' } as StudyDTO;
     const mockTrajectories = {
       [TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]: [{ trajectoryName: 'A' }],
       [TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER]: [{ trajectoryName: 'C' }],
@@ -93,7 +97,7 @@ describe('useFetchHypothesisParametersTrajectories', () => {
 
     vi.mocked(hypothesisTableService.fetchTrajectoriesFromTypes).mockResolvedValue(mockTrajectories);
 
-    const { result } = renderHook(() => useFetchHypothesisParametersTrajectories([], 1, [{ name: 'A' }], false));
+    const { result } = renderHook(() => useFetchHypothesisParametersTrajectories([], study, [{ name: 'A' }], false));
 
     await waitFor(() => {
       expect(result.current.hypothesisTrajectories[1].status).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
@@ -101,6 +105,7 @@ describe('useFetchHypothesisParametersTrajectories', () => {
   });
 
   it("should not set readonly state to param modulation row when there's at least more than one specific trajectories", async () => {
+    const study = { id: 123, horizon: '2025' } as StudyDTO;
     const trajectoryData = [
       {
         areaName: 'B',
@@ -137,15 +142,16 @@ describe('useFetchHypothesisParametersTrajectories', () => {
     ] as HypothesisRowData[]);
 
     const { result } = renderHook(() =>
-      useFetchHypothesisParametersTrajectories(trajectoryData, 1, [{ name: 'A' }], false),
+      useFetchHypothesisParametersTrajectories(trajectoryData, study, [{ name: 'A' }], false),
     );
 
     await waitFor(() => {
-      expect(result.current.readOnlyRow).toEqual({ '0.0': true });
+      expect(result.current.readOnlyRow).toEqual({ '0.0': true, '1': true });
     });
   });
 
   it('should handle readonly rows when no specific trajectories', async () => {
+    const study = { id: 123, horizon: '2025' } as StudyDTO;
     const mockTrajectories = {
       [TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER]: [{ trajectoryName: 'C' }],
     } as Partial<Record<TRAJECTORY_TYPE, DbTrajectory[]>>;
@@ -165,15 +171,16 @@ describe('useFetchHypothesisParametersTrajectories', () => {
     vi.mocked(hypothesisTableService.fetchTrajectoriesFromTypes).mockResolvedValue(mockTrajectories);
 
     const { result } = renderHook(() =>
-      useFetchHypothesisParametersTrajectories(trajectoryData, 1, [{ name: 'A' }], false),
+      useFetchHypothesisParametersTrajectories(trajectoryData, study, [{ name: 'A' }], false),
     );
 
     await waitFor(() => {
-      expect(result.current.readOnlyRow).toEqual({ '0.0': true });
+      expect(result.current.readOnlyRow).toEqual({ '0.0': true, '1': true });
     });
   });
 
   it('should handle readonly rows when study is generated', async () => {
+    const study = { id: 123, horizon: '2025' } as StudyDTO;
     const trajectoryData = [
       {
         areaName: 'A',
@@ -198,7 +205,7 @@ describe('useFetchHypothesisParametersTrajectories', () => {
     });
 
     const { result } = renderHook(() =>
-      useFetchHypothesisParametersTrajectories(trajectoryData, 1, [{ name: 'A' }], true),
+      useFetchHypothesisParametersTrajectories(trajectoryData, study, [{ name: 'A' }], true),
     );
 
     await waitFor(() => {
@@ -219,13 +226,14 @@ describe('useFetchHypothesisParametersTrajectories', () => {
   });
 
   it('should handle missing common and param modulation trajectories', async () => {
+    const study = { id: 123, horizon: '2025' } as StudyDTO;
     const mockTrajectories = {
       [TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]: [{ trajectoryName: 'A', area: 'specific' }],
     } as Partial<Record<TRAJECTORY_TYPE, DbTrajectory[]>>;
 
     vi.mocked(hypothesisTableService.fetchTrajectoriesFromTypes).mockResolvedValue(mockTrajectories);
 
-    const { result } = renderHook(() => useFetchHypothesisParametersTrajectories([], 1, [{ name: 'A' }], false));
+    const { result } = renderHook(() => useFetchHypothesisParametersTrajectories([], study, [{ name: 'A' }], false));
 
     await waitFor(() => {
       expect(result.current.hypothesisTrajectories).toHaveLength(3);
@@ -236,8 +244,8 @@ describe('useFetchHypothesisParametersTrajectories', () => {
 
   it('should handle empty trajectory response', async () => {
     vi.mocked(hypothesisTableService.fetchTrajectoriesFromTypes).mockResolvedValue({});
-
-    const { result } = renderHook(() => useFetchHypothesisParametersTrajectories([], 1, [{ name: 'A' }], false));
+    const study = { id: 123, horizon: '2025' } as StudyDTO;
+    const { result } = renderHook(() => useFetchHypothesisParametersTrajectories([], study, [{ name: 'A' }], false));
 
     await waitFor(() => {
       expect(result.current.hypothesisTrajectories.every((h) => h.status === TRAJECTORY_SELECTION_STATUS.MISSING)).toBe(
