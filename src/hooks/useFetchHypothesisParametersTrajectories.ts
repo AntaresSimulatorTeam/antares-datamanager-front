@@ -5,6 +5,7 @@ import {
   CheckBoxData,
   DbTrajectory,
   HypothesisRowData,
+  StudyDTO,
   ThermalParamTrajectoryType,
   TrajectoryAreaData,
 } from '@/shared/types';
@@ -26,10 +27,11 @@ import {
 } from '@/shared/utils/hypothesisTableUtils.ts';
 import { useTranslation } from 'react-i18next';
 import { fetchTrajectoriesFromTypes } from '@/shared/services/hypothesisTableService.ts';
+import { isParamModulationRequired } from '@/shared/services/trajectoryService.ts';
 
 export const useFetchHypothesisParametersTrajectories = (
   areas: TrajectoryAreaData[],
-  studyId?: number,
+  studyData?: StudyDTO,
   defaultAreas?: { name: string }[],
   isStudyGenerated?: boolean,
 ) => {
@@ -52,7 +54,7 @@ export const useFetchHypothesisParametersTrajectories = (
   }, [isStudyGenerated]);
 
   const fetchAreas = useCallback(
-    async (id: number) => {
+    async (id: number, horizon: string) => {
       let resultObject: Partial<Record<ThermalParamTrajectoryType, DbTrajectory[]>> | undefined;
       try {
         const types: ThermalParamTrajectoryType[] = [
@@ -159,12 +161,12 @@ export const useFetchHypothesisParametersTrajectories = (
             (row) => row.status === TRAJECTORY_SELECTION_STATUS.OK,
           );
           const readOnlySubRows = transformToSubRowKeys(readOnlyRows);
+          let isRequired = false;
           if (hasSpecificTrajectory) {
-            setReadOnlyRow(readOnlySubRows);
-          } else {
-            const next = { ...readOnlySubRows, ['1']: true };
-            setReadOnlyRow(next);
+            isRequired = await isParamModulationRequired(id, horizon);
           }
+          const next = { ...readOnlySubRows, ['1']: !isRequired };
+          setReadOnlyRow(next);
         }
       } catch (error) {
         console.error('============= error', error);
@@ -174,10 +176,10 @@ export const useFetchHypothesisParametersTrajectories = (
   );
 
   useEffect(() => {
-    if (studyId != null) {
-      void fetchAreas(studyId);
+    if (studyData?.id != null && studyData?.horizon) {
+      void fetchAreas(studyData.id, studyData?.horizon);
     }
-  }, [studyId]);
+  }, [studyData?.id, studyData?.horizon]);
 
   return { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow };
 };

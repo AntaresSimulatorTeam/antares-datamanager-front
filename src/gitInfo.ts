@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "feat/ANT-4329_project_page_breadcrumb_and_banner",
-  commit: "1a9df6e5",
-  commitTime: "2026-01-05T14:56:32.049Z",
+  branch: "fix/ANT-4350_thermal_param_modulation",
+  commit: "d0156b68",
+  commitTime: "2026-01-06T09:10:06.242Z",
 };
