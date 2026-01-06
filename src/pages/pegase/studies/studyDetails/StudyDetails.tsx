@@ -89,39 +89,43 @@ const StudyDetails = () => {
       <p>{t('studyDetails.@loading')}</p>
     </div>
   ) : (
-    <div className="flex h-full flex-col gap-4 px-3 pb-16 pt-3">
-      <PegaseBreadcrumb items={headerItems}></PegaseBreadcrumb>
+    <div className="flex h-full flex-col gap-4">
+      <div className="px-3 pt-3">
+        <PegaseBreadcrumb items={headerItems}></PegaseBreadcrumb>
+      </div>
       <RdsDivider />
-      <DetailsContent content={studyData} onClickButton={toggleModal} />
-      <div className="relative flex h-full w-full flex-col">
-        <div className="flex items-end self-stretch">
-          <StudyNavigationMenu
-            onRenderActiveComponent={setActiveContent}
-            setActiveTab={setActiveTab}
-            activeTab={activeTab}
-            setErrorMessage={setErrorMessage}
-            studyData={studyData}
-          />
-        </div>
-        <div className="relative flex flex-1 flex-col overflow-y-auto">
-          <div className="flex h-full w-full flex-col gap-4">
-            <ContainerWithExpander content={warningMessages} placeholder={t('studyDetails.@noWarnings')} />
-            <div className="flex h-screen w-full pb-2">{activeContent}</div>
+      <div className="flex flex-col gap-4 px-3 pb-3">
+        <DetailsContent content={studyData} onClickButton={toggleModal} />
+        <div className="relative flex h-full w-full flex-col">
+          <div className="flex items-end self-stretch">
+            <StudyNavigationMenu
+              onRenderActiveComponent={setActiveContent}
+              setActiveTab={setActiveTab}
+              activeTab={activeTab}
+              setErrorMessage={setErrorMessage}
+              studyData={studyData}
+            />
           </div>
-          <div className="fixed bottom-0 right-0 w-full border-t bg-gray-w px-1 py-1.5">
-            <div className="flex h-fit w-full items-center justify-end">
-              {!studyState.AREA?.trajectories?.length && !errorMessage && (
-                <div className="mr-1 text-error-600">{t('studyDetails.@add_trajectories_message')}</div>
-              )}
-              {errorMessage && <div className="mr-1 text-error-600">{errorMessage}</div>}
-              <ButtonWithStdIcon
-                label={t('studyDetails.@generate')}
-                onClick={() => studyData?.id && void handleGenerateStudy(studyData?.id)}
-                disabled={!studyState.AREA?.trajectories?.length || studyState.studyStatus === StudyStatus.GENERATED}
-                icon={StdIconId.CheckCircle}
-                position="right"
-                isLoading={isGenerating}
-              />
+          <div className="relative flex flex-1 flex-col overflow-y-auto">
+            <div className="flex h-full w-full flex-col gap-4">
+              <ContainerWithExpander content={warningMessages} placeholder={t('studyDetails.@noWarnings')} />
+              <div className="flex h-screen w-full pb-2">{activeContent}</div>
+            </div>
+            <div className="fixed bottom-0 right-0 w-full border-t bg-gray-w px-1 py-1.5">
+              <div className="flex h-fit w-full items-center justify-end">
+                {!studyState.AREA?.trajectories?.length && !errorMessage && (
+                  <div className="mr-1 text-error-600">{t('studyDetails.@add_trajectories_message')}</div>
+                )}
+                {errorMessage && <div className="mr-1 text-error-600">{errorMessage}</div>}
+                <ButtonWithStdIcon
+                  label={t('studyDetails.@generate')}
+                  onClick={() => studyData?.id && void handleGenerateStudy(studyData?.id)}
+                  disabled={!studyState.AREA?.trajectories?.length || studyState.studyStatus === StudyStatus.GENERATED}
+                  icon={StdIconId.CheckCircle}
+                  position="right"
+                  isLoading={isGenerating}
+                />
+              </div>
             </div>
           </div>
         </div>

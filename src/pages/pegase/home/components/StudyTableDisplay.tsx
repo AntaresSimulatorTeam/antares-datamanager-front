@@ -71,7 +71,7 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
     setSelectedStudy(rows[Number.parseInt(selectedRowId || '-1')]);
     setIsDuplicateMode(true);
     toggleModal();
-    setReloadStudies((prev) => prev + 1); // Trigger reload after deleting
+    setReloadStudies((prev) => prev + 1);
   };
 
   const handleDeleteClick = async () => {

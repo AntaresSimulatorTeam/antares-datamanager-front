@@ -63,20 +63,24 @@ const ProjectDetails = () => {
       <p>{t('projectDetails.@loading')}</p>
     </div>
   ) : (
-    <div className="flex flex-col gap-4 p-3">
-      <PegaseBreadcrumb items={headerItems}></PegaseBreadcrumb>
+    <div className="flex flex-col gap-4">
+      <div className="px-3 pt-3">
+        <PegaseBreadcrumb items={headerItems}></PegaseBreadcrumb>
+      </div>
       <RdsDivider />
-      <DetailsContent content={projectDetails} onClickButton={toggleModal} />
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center gap-4">
-          <SearchBar onSearch={(value?: string) => setSearchTerm(value)} />
-          <RdsChip
-            label={t('home.@my_studies')}
-            onClick={handleChipClick}
-            status={activeChip ? 'secondary' : 'primary'}
-          />
+      <div className="flex flex-col gap-4 px-3 pb-3">
+        <DetailsContent content={projectDetails} onClickButton={toggleModal} />
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-4">
+            <SearchBar onSearch={(value?: string) => setSearchTerm(value)} />
+            <RdsChip
+              label={t('home.@my_studies')}
+              onClick={handleChipClick}
+              status={activeChip ? 'secondary' : 'primary'}
+            />
+          </div>
+          <StudyTableDisplay searchStudy={searchTerm} projectInfo={projectDetails} />
         </div>
-        <StudyTableDisplay searchStudy={searchTerm} projectInfo={projectDetails} />
       </div>
       {isModalOpen && <ProjectCreationModal onClose={onCloseModal} projectInfo={projectDetails} />}
     </div>

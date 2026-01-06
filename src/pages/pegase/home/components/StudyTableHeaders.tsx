@@ -11,6 +11,9 @@ import { createColumnHelper } from '@tanstack/react-table';
 import { RdsTagList } from 'rte-design-system-react';
 import StdRadioButton from '@/components/forms/stdRadioButton/StdRadioButton.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
+import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
+import { getStatusIcon } from '@/shared/utils/iconUtils.ts';
+import { sentenceCase } from '@/shared/utils/textUtils.ts';
 
 const columnHelper = createColumnHelper<StudyDTO>();
 
@@ -84,6 +87,16 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
   columnHelper.accessor('status', {
     header: t('home.@status'),
     size: 230,
+    cell: ({ getValue }) => {
+      const status = getValue();
+      const { icon, color } = getStatusIcon(status);
+      return (
+        <div className="flex gap-1">
+          <StdIcon name={icon} color={`text-${color}`} />
+          <div>{sentenceCase(status)}</div>
+        </div>
+      );
+    },
   }),
 ];
 
