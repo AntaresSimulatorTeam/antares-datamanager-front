@@ -4,8 +4,11 @@ import { DbTrajectory, HypothesisRowData, TrajectoryAreaData } from '@/shared/ty
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { mockDbTrajectory } from '@/mocks/data/tests/trajectory.mock.ts';
 import {
+  collectTrajectoriesRecursively,
+  findSpecificTrajectoryToDelete,
   getCheckedValues,
   getReadOnlyForGeneratedStudy,
+  getSpecificTrajectories,
   shouldOpenDeletionModal,
 } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { retrieveReadOnlyArea } from '@/shared/utils/trajectoryUtils.ts';
@@ -183,5 +186,299 @@ describe('getCheckedValues', () => {
     const result = getCheckedValues(data, areas, defaultAreas);
 
     expect(result).toEqual([]);
+  });
+});
+
+const makeTrajectory = (id: number): DbTrajectory =>
+  ({
+    id,
+    area: `area-${id}`,
+  }) as DbTrajectory;
+
+describe('collectTrajectoriesRecursively', () => {
+  it('retourne la trajectoire de la ligne si status OK', () => {
+    const row: HypothesisRowData = {
+      hypothesis: 'H1',
+      trajectory: makeTrajectory(1),
+      status: TRAJECTORY_SELECTION_STATUS.OK,
+      subRows: null,
+    };
+
+    const result = collectTrajectoriesRecursively(row);
+    expect(result).toEqual([makeTrajectory(1)]);
+  });
+
+  it('ignore la trajectoire si status != OK', () => {
+    const row: HypothesisRowData = {
+      hypothesis: 'H1',
+      trajectory: makeTrajectory(1),
+      status: TRAJECTORY_SELECTION_STATUS.MISSING,
+      subRows: null,
+    };
+
+    const result = collectTrajectoriesRecursively(row);
+    expect(result).toEqual([]);
+  });
+
+  it('récupère les trajectoires dans les subRows', () => {
+    const row: HypothesisRowData = {
+      hypothesis: 'H1',
+      trajectory: makeTrajectory(1),
+      status: TRAJECTORY_SELECTION_STATUS.OK,
+      subRows: [
+        {
+          hypothesis: 'H1-1',
+          trajectory: makeTrajectory(2),
+          status: TRAJECTORY_SELECTION_STATUS.OK,
+          subRows: null,
+        },
+      ],
+    };
+
+    const result = collectTrajectoriesRecursively(row);
+    expect(result).toEqual([makeTrajectory(1), makeTrajectory(2)]);
+  });
+
+  it('récupère les trajectoires dans les subRows imbriqués (récursion)', () => {
+    const row: HypothesisRowData = {
+      hypothesis: 'H1',
+      trajectory: makeTrajectory(1),
+      status: TRAJECTORY_SELECTION_STATUS.OK,
+      subRows: [
+        {
+          hypothesis: 'H1-1',
+          trajectory: makeTrajectory(2),
+          status: TRAJECTORY_SELECTION_STATUS.OK,
+          subRows: [
+            {
+              hypothesis: 'H1-1-1',
+              trajectory: makeTrajectory(3),
+              status: TRAJECTORY_SELECTION_STATUS.OK,
+              subRows: null,
+            },
+          ],
+        },
+      ],
+    };
+
+    const result = collectTrajectoriesRecursively(row);
+    expect(result).toEqual([makeTrajectory(1), makeTrajectory(2), makeTrajectory(3)]);
+  });
+
+  it('ignore les subRows sans trajectoire ou status != OK', () => {
+    const row: HypothesisRowData = {
+      hypothesis: 'H1',
+      trajectory: makeTrajectory(1),
+      status: TRAJECTORY_SELECTION_STATUS.OK,
+      subRows: [
+        {
+          hypothesis: 'H1-1',
+          trajectory: null,
+          status: TRAJECTORY_SELECTION_STATUS.OK,
+          subRows: null,
+        },
+        {
+          hypothesis: 'H1-2',
+          trajectory: makeTrajectory(2),
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          subRows: null,
+        },
+      ],
+    };
+
+    const result = collectTrajectoriesRecursively(row);
+    expect(result).toEqual([makeTrajectory(1)]);
+  });
+
+  it('retourne un tableau vide si aucune trajectoire', () => {
+    const row: HypothesisRowData = {
+      hypothesis: 'H1',
+      trajectory: null,
+      status: TRAJECTORY_SELECTION_STATUS.OK,
+      subRows: null,
+    };
+
+    const result = collectTrajectoriesRecursively(row);
+    expect(result).toEqual([]);
+  });
+});
+
+describe('getSpecificTrajectories', () => {
+  it('retourne un tableau vide si subRows est undefined', () => {
+    const result = getSpecificTrajectories(undefined);
+    expect(result).toEqual([]);
+  });
+
+  it('retourne un tableau vide si subRows est null', () => {
+    const result = getSpecificTrajectories(null);
+    expect(result).toEqual([]);
+  });
+
+  it('retourne un tableau vide si subRows est vide', () => {
+    const result = getSpecificTrajectories([]);
+    expect(result).toEqual([]);
+  });
+
+  it('retourne uniquement les trajectoires avec status OK', () => {
+    const subRows: HypothesisRowData[] = [
+      {
+        hypothesis: 'H1',
+        trajectory: makeTrajectory(1),
+        status: TRAJECTORY_SELECTION_STATUS.OK,
+        subRows: null,
+      },
+      {
+        hypothesis: 'H2',
+        trajectory: makeTrajectory(2),
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+        subRows: null,
+      },
+    ];
+
+    const result = getSpecificTrajectories(subRows);
+    expect(result).toEqual([makeTrajectory(1)]);
+  });
+
+  it('ignore les subRows sans trajectory', () => {
+    const subRows: HypothesisRowData[] = [
+      {
+        hypothesis: 'H1',
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.OK,
+        subRows: null,
+      },
+      {
+        hypothesis: 'H2',
+        trajectory: makeTrajectory(2),
+        status: TRAJECTORY_SELECTION_STATUS.OK,
+        subRows: null,
+      },
+    ];
+
+    const result = getSpecificTrajectories(subRows);
+    expect(result).toEqual([makeTrajectory(2)]);
+  });
+
+  it('retourne toutes les trajectoires valides', () => {
+    const subRows: HypothesisRowData[] = [
+      {
+        hypothesis: 'H1',
+        trajectory: makeTrajectory(1),
+        status: TRAJECTORY_SELECTION_STATUS.OK,
+        subRows: null,
+      },
+      {
+        hypothesis: 'H2',
+        trajectory: makeTrajectory(2),
+        status: TRAJECTORY_SELECTION_STATUS.OK,
+        subRows: null,
+      },
+    ];
+
+    const result = getSpecificTrajectories(subRows);
+    expect(result).toEqual([makeTrajectory(1), makeTrajectory(2)]);
+  });
+});
+
+describe('findSpecificTrajectoryToDelete', () => {
+  it('retourne null si subRows est undefined', () => {
+    const result = findSpecificTrajectoryToDelete(undefined, 'H1');
+    expect(result).toBeNull();
+  });
+
+  it('retourne null si subRows est null', () => {
+    const result = findSpecificTrajectoryToDelete(null, 'H1');
+    expect(result).toBeNull();
+  });
+
+  it('retourne null si subRows est vide', () => {
+    const result = findSpecificTrajectoryToDelete([], 'H1');
+    expect(result).toBeNull();
+  });
+
+  it('retourne null si aucune subRow ne correspond à la valeur', () => {
+    const subRows: HypothesisRowData[] = [
+      {
+        hypothesis: 'H2',
+        trajectory: makeTrajectory(1),
+        status: TRAJECTORY_SELECTION_STATUS.OK,
+        subRows: null,
+      },
+    ];
+
+    const result = findSpecificTrajectoryToDelete(subRows, 'H1');
+    expect(result).toBeNull();
+  });
+
+  it('retourne null si la subRow correspondante n’a pas de trajectory', () => {
+    const subRows: HypothesisRowData[] = [
+      {
+        hypothesis: 'H1',
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.OK,
+        subRows: null,
+      },
+    ];
+
+    const result = findSpecificTrajectoryToDelete(subRows, 'H1');
+    expect(result).toBeNull();
+  });
+
+  it('retourne null si la subRow correspondante a un status != OK', () => {
+    const subRows: HypothesisRowData[] = [
+      {
+        hypothesis: 'H1',
+        trajectory: makeTrajectory(1),
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+        subRows: null,
+      },
+    ];
+
+    const result = findSpecificTrajectoryToDelete(subRows, 'H1');
+    expect(result).toBeNull();
+  });
+
+  it('retourne la trajectoire si la subRow correspondante est valide', () => {
+    const traj = makeTrajectory(1);
+
+    const subRows: HypothesisRowData[] = [
+      {
+        hypothesis: 'H1',
+        trajectory: traj,
+        status: TRAJECTORY_SELECTION_STATUS.OK,
+        subRows: null,
+      },
+    ];
+
+    const result = findSpecificTrajectoryToDelete(subRows, 'H1');
+    expect(result).toEqual(traj);
+  });
+
+  it('retourne la première trajectoire valide si plusieurs subRows existent', () => {
+    const traj2 = makeTrajectory(2);
+
+    const subRows: HypothesisRowData[] = [
+      {
+        hypothesis: 'H1',
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.OK,
+        subRows: null,
+      },
+      {
+        hypothesis: 'H1',
+        trajectory: traj2,
+        status: TRAJECTORY_SELECTION_STATUS.OK,
+        subRows: null,
+      },
+      {
+        hypothesis: 'H1',
+        trajectory: makeTrajectory(3),
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+        subRows: null,
+      },
+    ];
+
+    const result = findSpecificTrajectoryToDelete(subRows, 'H1');
+    expect(result).toEqual(traj2);
   });
 });
