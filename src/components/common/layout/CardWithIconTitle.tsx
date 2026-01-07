@@ -52,9 +52,9 @@ export const CardWithIconTitle = ({ data, size, transform }: CardWithIconTitlePr
         {data.onClickItem != null && getButton()}
       </div>
       {data?.content && (
-        <div className="flex h-full text-ellipsis text-gray-600">
+        <div className="h-[calc(theme(lineHeight.4)*2)] overflow-hidden text-gray-600 aspect-medium:h-[calc(theme(lineHeight.4)*2.2)] aspect-wide:h-[calc(theme(lineHeight.4)*2.4)]">
           <RdsTextTooltip text={data?.content} offset={5} placement="top">
-            <div className="line-clamp-2 text-ellipsis text-start text-body-xs">{data.content}</div>
+            <div className="leading-2 line-clamp-2 text-ellipsis text-start text-body-xs">{data.content}</div>
           </RdsTextTooltip>
         </div>
       )}

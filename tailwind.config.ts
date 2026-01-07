@@ -27,8 +27,12 @@ export default {
       lg: '1440px',
       xl: '1680px',
       '2xl': '1920px',
+      'aspect-narrow': { raw: '(max-aspect-ratio: 16/10)' },
       'aspect-medium': { raw: '(min-aspect-ratio: 16/10) and (max-aspect-ratio: 16/9)' },
       'aspect-wide': { raw: '(min-aspect-ratio: 16/9)' },
+    },
+    lineHeight: {
+      4: '1rem',
     },
     colors: {
       primary: {
