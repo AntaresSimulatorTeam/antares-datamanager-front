@@ -110,6 +110,7 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         setRowToDelete({ index: 0, value });
         setIsDeletionModalOpen(true);
       } else {
+        console.log('====================== value', value);
         await removeRow(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, value, 0, technicalData);
         const isRequired = await isParamModulationRequired(studyData.id, studyData?.horizon);
         setReadOnly({ ...readOnlyRow, ['1']: !isRequired });
