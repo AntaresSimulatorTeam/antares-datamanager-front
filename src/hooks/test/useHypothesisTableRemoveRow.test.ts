@@ -110,7 +110,7 @@ describe('useHypothesisTableRemoveRow', () => {
   ] as HypothesisRowData[];
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
   });
 
   it('should unlink single main trajectory and update state', async () => {
@@ -258,5 +258,54 @@ describe('useHypothesisTableRemoveRow', () => {
     await result.current.removeRow(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, 'SubHypo', 0, rowData);
 
     expect(notifyAlert).toHaveBeenCalled();
+  });
+
+  it('met à jour le tableau (THERMAL) en supprimant une specific + modulation', async () => {
+    const rowDataMock = [
+      {
+        hypothesis: 'Specific',
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+        subRows: [
+          {
+            hypothesis: 'Tech B',
+            trajectory: { id: 20, trajectoryName: 'Traj B', area: 'Tech B' } as DbTrajectory,
+            status: TRAJECTORY_SELECTION_STATUS.OK,
+            subRows: [],
+          },
+        ],
+      },
+      {
+        hypothesis: 'Modulation',
+        trajectory: modulationTrajectory,
+        status: TRAJECTORY_SELECTION_STATUS.OK,
+        subRows: [],
+      },
+    ] as HypothesisRowData[];
+
+    const { result } = renderHook(() =>
+      useHypothesisTableRemoveRow(study, mockDispatch, mockSetData, mockSetCheckedValues),
+    );
+
+    await result.current.removeRow(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, 'Tech B', 0, rowDataMock);
+
+    expect(mockSetData).toHaveBeenCalledTimes(1);
+    const updater = mockSetData.mock.calls[0][0] as (prev: HypothesisRowData[]) => HypothesisRowData[];
+    const newData = updater(rowDataMock);
+
+    expect(newData).toEqual([
+      {
+        hypothesis: 'Specific',
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+        subRows: [],
+      },
+      {
+        hypothesis: 'Modulation',
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+        subRows: [],
+      },
+    ]);
   });
 });
