@@ -7,7 +7,7 @@ import { useProjectDispatch } from '@/store/contexts/ProjectContext.tsx';
 export const useDeleteProject = () => {
   const dispatch = useProjectDispatch();
 
-  const deleteProject = async (projectId: string) => {
+  const deleteProject = async (projectId: number) => {
     try {
       await deleteProjectById(projectId);
       // Update pinned project list

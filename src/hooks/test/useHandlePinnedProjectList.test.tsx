@@ -101,10 +101,10 @@ describe('useHandlePinnedProjectList', () => {
       initialProps: { initialValue: { pinnedProject: [] } },
     } as RenderHookOptions<{ initialValue: { pinnedProject: never[]; projects: [] } }, Queries>);
 
-    await act(async () => result.current.handlePinProject('projectId'));
+    await act(async () => result.current.handlePinProject(6));
 
     await waitFor(() => {
-      expect(pinProject).toHaveBeenCalledWith('projectId', 'testUser');
+      expect(pinProject).toHaveBeenCalledWith(6, 'testUser');
       expect(mockDispatch).toHaveBeenCalledTimes(1);
       expect(mockDispatch).toHaveBeenCalledWith({
         type: PROJECT_ACTION.ADD_PINNED_PROJECT,
@@ -133,10 +133,10 @@ describe('useHandlePinnedProjectList', () => {
       initialProps: { initialValue: { pinnedProject: [] } },
     } as RenderHookOptions<{ initialValue: { pinnedProject: never[] } }, Queries>);
 
-    await act(async () => result.current.handlePinProject('projectId'));
+    await act(async () => result.current.handlePinProject(8));
 
     await waitFor(() => {
-      expect(pinProject).toHaveBeenCalledWith('projectId', 'testUser');
+      expect(pinProject).toHaveBeenCalledWith(8, 'testUser');
       expect(mockDispatch).toHaveBeenCalledTimes(0);
       expect(notifyToast).toHaveBeenCalledWith({
         id,
@@ -159,14 +159,14 @@ describe('useHandlePinnedProjectList', () => {
       initialProps: { initialValue: { pinnedProject: mockProjectsApiResponse } },
     } as RenderHookOptions<{ initialValue: { pinnedProject: never[]; projects: [] } }, Queries>);
 
-    await act(async () => result.current.handleUnpinProject('2'));
+    await act(async () => result.current.handleUnpinProject(2));
 
     await waitFor(() => {
-      expect(unpinProject).toHaveBeenCalledWith('2', 'testUser');
+      expect(unpinProject).toHaveBeenCalledWith(2, 'testUser');
       expect(mockDispatch).toHaveBeenCalledTimes(1);
       expect(mockDispatch).toHaveBeenCalledWith({
         type: PROJECT_ACTION.UNPIN_PINNED_PROJECT,
-        payload: '2',
+        payload: 2,
       });
       expect(notifyToast).toHaveBeenCalledWith({
         id,
@@ -191,10 +191,10 @@ describe('useHandlePinnedProjectList', () => {
       initialProps: { initialValue: { pinnedProject: [] } },
     } as RenderHookOptions<{ initialValue: { pinnedProject: never[] } }, Queries>);
 
-    await act(async () => result.current.handleUnpinProject('2'));
+    await act(async () => result.current.handleUnpinProject(2));
 
     await waitFor(() => {
-      expect(unpinProject).toHaveBeenCalledWith('2', 'testUser');
+      expect(unpinProject).toHaveBeenCalledWith(2, 'testUser');
       expect(mockDispatch).toHaveBeenCalledTimes(0);
       expect(notifyToast).toHaveBeenCalledWith({
         id,

@@ -35,13 +35,13 @@ export const fetchPinnedProjects = async (userId: string | undefined): Promise<P
  * The API call to the /unpin endpoint is made only if the "Cancel" button
  * on the toast is not clicked.
  *
- * @param {string} projectId - Project id
+ * @param {number} projectId - Project id
  * @param {string | undefined} userId
  *
  * @return {Promise<ProjectInfo>} - Object that describes a project
  */
 
-export const pinProject = async (projectId: string, userId: string | undefined): Promise<ProjectInfo> => {
+export const pinProject = async (projectId: number, userId: string | undefined): Promise<ProjectInfo> => {
   const apiUrl = `${PROJECT_PIN_ENDPOINT}?userId=${userId ?? DEFAULT_USER}&projectId=${projectId}`;
   try {
     const response = await AuthService.authFetch(apiUrl, {
@@ -62,7 +62,7 @@ export const pinProject = async (projectId: string, userId: string | undefined):
  * @param {string} projectId
  * @param {string | undefined} userId
  */
-export const unpinProject = async (projectId: string, userId: string | undefined): Promise<void> => {
+export const unpinProject = async (projectId: number, userId: string | undefined): Promise<void> => {
   const apiUrl = `${PROJECT_UNPIN_ENDPOINT}?userId=${userId ?? DEFAULT_USER}&projectId=${projectId}`;
 
   try {

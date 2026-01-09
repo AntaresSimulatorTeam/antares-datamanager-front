@@ -10,7 +10,6 @@ import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter';
 import { useTranslation } from 'react-i18next';
 import { useDropdownOptions } from '@/hooks/useDropdownOptions';
 import { useProjectNavigation } from '@/hooks/useProjectNavigation';
-import { RdsIcon, RdsIconId, RdsTagList } from 'rte-design-system-react';
 import { useHandlePinnedProjectList } from '@/hooks/useHandlePinnedProjectList.ts';
 import { useProject } from '@/store/contexts/ProjectContext.tsx';
 import { useDeleteProject } from '@/hooks/useDeleteProject.ts';
@@ -18,6 +17,9 @@ import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { ProjectCreationModal } from '@common/modal/ProjectCreationModal.tsx';
 import { useState } from 'react';
 import { ProjectInfo, ProjectResponse } from '@/shared/types';
+import StdTagList from '@common/base/StdTagList/StdTagList.tsx';
+import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 const PinnedProjectCards = () => {
   const { t } = useTranslation();
@@ -45,19 +47,15 @@ const PinnedProjectCards = () => {
               editOption(() => void openModalProject(project), t('project.@edit')),
               deleteOption(() => void deleteProject(project.id), t('project.@delete'), project.studies?.length > 0),
             ]}
-            id={project.id}
+            id={String(project.id)}
             onClick={() => void navigateToProject(project.id)}
-            icons={
-              <div className="text-primary-600">
-                <RdsIcon name={RdsIconId.PushPin} />{' '}
-              </div>
-            }
+            icons={<StdIcon name={StdIconId.PushPin} color="text-primary-600" />}
           >
             <div className="flex flex-col items-start justify-between">
               <div className="flex items-center gap-1">
                 {project.tags && (
-                  <div className="flex h-3 w-32">
-                    <RdsTagList id={`${project.id}-tag-list`} tags={project.tags} />
+                  <div className="flex w-32">
+                    <StdTagList id={`${project.id}-tag-list`} tags={project.tags} maxVisibleTags={3} />
                   </div>
                 )}
               </div>

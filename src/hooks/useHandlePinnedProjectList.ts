@@ -42,7 +42,7 @@ export const useHandlePinnedProjectList = () => {
    *
    * @param {string} projectId - Project id
    */
-  const handlePinProject = useCallback(async (projectId: string) => {
+  const handlePinProject = useCallback(async (projectId: number) => {
     const toastId = uuidv4();
     try {
       const newProject = await pinProject(projectId, user?.profile.sub);
@@ -74,7 +74,7 @@ export const useHandlePinnedProjectList = () => {
    *
    * @param {string} projectId - Project id
    */
-  const handleUnpinProject = useCallback(async (projectId: string) => {
+  const handleUnpinProject = useCallback(async (projectId: number) => {
     const toastId = uuidv4();
 
     try {
