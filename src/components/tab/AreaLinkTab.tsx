@@ -219,9 +219,7 @@ export const AreaLinkTab = ({ setErrorMessage, studyData }: AreaLinkTabProps) =>
   const handleTrajectoryUpdate = async (rowId: string, value: string, status: RowStatus) => {
     const rowIndex = Number(rowId);
     const trajectory = data[rowIndex]?.trajectory;
-    const type = rowIndex === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK;
-    const dbTrajectory =
-      dbTrajectories.find((item: DbTrajectory) => item.trajectoryName === value && item.type === type) ?? trajectory;
+    const dbTrajectory = dbTrajectories.find((item: DbTrajectory) => item.trajectoryName === value) ?? trajectory;
     try {
       if (dbTrajectory?.id != null && status === 'success') {
         setErrorMessage('');
@@ -252,8 +250,12 @@ export const AreaLinkTab = ({ setErrorMessage, studyData }: AreaLinkTabProps) =>
       }
 
       // Handle deletion case for areas
-      if (rowIndex != null && dbTrajectory?.id != null && (status === 'empty' || status === 'emptyError')) {
-        await handleTrajectoryDeletion(rowId, status, dbTrajectory?.id);
+      if (
+        rowIndex != null &&
+        data[rowIndex]?.trajectory?.id != null &&
+        (status === 'empty' || status === 'emptyError')
+      ) {
+        await handleTrajectoryDeletion(rowId, status, data[rowIndex]?.trajectory?.id);
       }
     } catch (error) {
       if (rowIndex != null && dbTrajectory?.id != null) {
