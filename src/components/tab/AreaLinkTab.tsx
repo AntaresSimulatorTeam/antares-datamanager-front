@@ -219,7 +219,9 @@ export const AreaLinkTab = ({ setErrorMessage, studyData }: AreaLinkTabProps) =>
   const handleTrajectoryUpdate = async (rowId: string, value: string, status: RowStatus) => {
     const rowIndex = Number(rowId);
     const trajectory = data[rowIndex]?.trajectory;
-    const dbTrajectory = dbTrajectories.find((item: DbTrajectory) => item.trajectoryName === value) ?? trajectory;
+    const type = rowIndex === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK;
+    const dbTrajectory =
+      dbTrajectories.find((item: DbTrajectory) => item.trajectoryName === value && item.type === type) ?? trajectory;
     try {
       if (dbTrajectory?.id != null && status === 'success') {
         setErrorMessage('');
