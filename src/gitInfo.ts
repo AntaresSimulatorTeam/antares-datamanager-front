@@ -1,5 +1,6 @@
 export const GIT_INFO = {
-  branch: "",
-  commit: "72cc57e9",
-  commitTime: "2026-01-09T09:57:19.749Z",
-};
+      branch: "fix/AREA_deletino",
+      commit: "d02e5e9e",
+      commitTime: "2026-01-09T16:15:44.402Z",
+    };
+  
