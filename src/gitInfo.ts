@@ -1,5 +1,5 @@
 export const GIT_INFO = {
-  branch: "fix/ANT-4360_thermal_parameters_specific_delete_row",
-  commit: "880f457e",
-  commitTime: "2026-01-07T16:38:54.888Z",
+  branch: "fix/ANT-4269_about_retrieve_branch_name",
+  commit: "238cb38a",
+  commitTime: "2026-01-09T09:45:58.827Z",
 };

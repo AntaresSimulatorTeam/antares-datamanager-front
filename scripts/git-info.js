@@ -1,8 +1,10 @@
 import { execSync } from 'child_process';
-import { writeFileSync } from 'fs';
+import { writeFileSync, readFileSync } from 'fs';
 
 try {
-  const branch = execSync('git rev-parse --abbrev-ref HEAD').toString().trim();
+  const head = readFileSync('.git/HEAD', 'utf8').trim(); // HEAD peut contenir : "ref: refs/heads/develop"
+  const branch = head.startsWith('ref:') ? head.replace('ref: refs/heads/', '') : head;
+  //const branch = execSync('git rev-parse --abbrev-ref HEAD').toString().trim();
   const commit = execSync('git rev-parse --short HEAD').toString().trim();
   const commitTime = new Date().toISOString();
 
