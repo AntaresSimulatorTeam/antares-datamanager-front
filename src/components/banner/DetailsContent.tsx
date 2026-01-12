@@ -60,7 +60,7 @@ export const DetailsContent = ({ content, onClickButton }: DetailsContentProps) 
                 <StdTagList
                   id={`${content.id}-tag-list`}
                   tags={(content as StudyDTO).keywords}
-                  maxVisibleTags={(content as StudyDTO)?.keywords?.length}
+                  maxVisibleTags={(content as StudyDTO).keywords.length}
                 />
               </div>
             </>
