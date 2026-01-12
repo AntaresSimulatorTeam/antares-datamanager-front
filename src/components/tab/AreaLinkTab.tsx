@@ -219,7 +219,7 @@ export const AreaLinkTab = ({ setErrorMessage, studyData }: AreaLinkTabProps) =>
   const handleTrajectoryUpdate = async (rowId: string, value: string, status: RowStatus) => {
     const rowIndex = Number(rowId);
     const trajectory = data[rowIndex]?.trajectory;
-    const dbTrajectory = dbTrajectories.find((item) => item.trajectoryName === value) ?? trajectory;
+    const dbTrajectory = dbTrajectories.find((item: DbTrajectory) => item.trajectoryName === value) ?? trajectory;
     try {
       if (dbTrajectory?.id != null && status === 'success') {
         setErrorMessage('');
@@ -250,8 +250,12 @@ export const AreaLinkTab = ({ setErrorMessage, studyData }: AreaLinkTabProps) =>
       }
 
       // Handle deletion case for areas
-      if (rowIndex != null && dbTrajectory?.id != null && (status === 'empty' || status === 'emptyError')) {
-        await handleTrajectoryDeletion(rowId, status, dbTrajectory?.id);
+      if (
+        rowIndex != null &&
+        data[rowIndex]?.trajectory?.id != null &&
+        (status === 'empty' || status === 'emptyError')
+      ) {
+        await handleTrajectoryDeletion(rowId, status, data[rowIndex]?.trajectory?.id);
       }
     } catch (error) {
       if (rowIndex != null && dbTrajectory?.id != null) {
@@ -278,9 +282,9 @@ export const AreaLinkTab = ({ setErrorMessage, studyData }: AreaLinkTabProps) =>
         isReadOnlyEnable={true}
         progress={progress}
         idSelected={String(rowIdSelected)}
-        updateData={(rowId: string, value: unknown, status: RowStatus) =>
-          void handleTrajectoryUpdate(rowId, value as string, status)
-        }
+        updateData={(rowId: string, value: unknown, status: RowStatus) => {
+          void handleTrajectoryUpdate(rowId, value as string, status);
+        }}
         handleSearch={async (value: string, rowId: string) => {
           const index = Number(rowId);
           const type = index === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK;
