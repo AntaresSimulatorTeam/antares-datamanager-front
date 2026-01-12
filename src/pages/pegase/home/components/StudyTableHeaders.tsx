@@ -13,7 +13,7 @@ import StdRadioButton from '@/components/forms/stdRadioButton/StdRadioButton.tsx
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 import { getStatusIcon } from '@/shared/utils/iconUtils.ts';
-import { sentenceCase } from '@/shared/utils/textUtils.ts';
+import { avatarCase, sentenceCase } from '@/shared/utils/textUtils.ts';
 
 const columnHelper = createColumnHelper<StudyDTO>();
 
@@ -65,12 +65,7 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
     header: t('home.@user_name'),
     size: 50,
     cell: ({ getValue }) => (
-      <StdAvatar
-        size="es"
-        backgroundColor="gray"
-        fullname={getValue() ?? ''}
-        initials={getValue()?.substring(0, 2) ?? ''}
-      />
+      <StdAvatar size="es" backgroundColor="gray" fullname={getValue() ?? ''} initials={avatarCase(getValue() ?? '')} />
     ),
   }),
 
