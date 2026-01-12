@@ -40,12 +40,12 @@ const PegaseCardTitle = ({ title, dropdownOptions, icons, tag, lineClamp, onClic
           </span>
         )}
         {tag && (
-          <span role="list" className="flex items-center">
+          <menu className="flex items-center">
             <StdTag {...tag} id={`${id}-tag`} />
-          </span>
+          </menu>
         )}
       </div>
-      <div className="interactive" onClick={(e) => e.stopPropagation()}>
+      <div className="button" onMouseOver={() => {}} onClick={(e) => e.stopPropagation()}>
         <RdsFloatingWrapper placement={'bottom-start'} fallbackPlacements={['bottom-end']} autoClose>
           <Trigger>
             <StdButton
