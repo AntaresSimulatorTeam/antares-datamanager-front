@@ -14,6 +14,6 @@ export const titleCase = (str: string, shouldLower = false) => {
   return s.charAt(0).toUpperCase() + s.slice(1);
 };
 
-export const sentenceCase = (str: string) => titleCase(str.replaceAll(/_/g, ' '), true);
+export const sentenceCase = (str: string) => titleCase(str.replace(/_/g, ' '), true);
 
 export const avatarCase = (str: string) => titleCase(str.substring(0, 2));
