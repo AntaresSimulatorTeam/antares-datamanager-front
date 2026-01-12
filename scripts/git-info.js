@@ -27,8 +27,7 @@ try {
       branch: "${branch}",
       commit: "${commit}",
       commitTime: "${commitTime}",
-    };
-  `;
+    };`;
   writeFileSync('src/gitInfo.ts', content);
 
   console.log('✅ Git info updated in src/gitInfo.ts');
