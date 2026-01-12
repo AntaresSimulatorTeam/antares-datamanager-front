@@ -45,7 +45,7 @@ const PegaseCardTitle = ({ title, dropdownOptions, icons, tag, lineClamp, onClic
           </menu>
         )}
       </div>
-      <div role="button" onMouseOver={() => {}} onFocus={() => {}} onClick={(e) => e.stopPropagation()}>
+      <button tabIndex={0} onMouseOver={() => {}} onFocus={() => {}} onClick={(e) => e.stopPropagation()}>
         <RdsFloatingWrapper placement={'bottom-start'} fallbackPlacements={['bottom-end']} autoClose>
           <Trigger>
             <StdButton
@@ -62,7 +62,7 @@ const PegaseCardTitle = ({ title, dropdownOptions, icons, tag, lineClamp, onClic
             </div>
           </Element>
         </RdsFloatingWrapper>
-      </div>
+      </button>
     </header>
   );
 };
