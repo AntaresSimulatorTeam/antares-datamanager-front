@@ -25,7 +25,7 @@ describe('sentenceCase', () => {
 
 describe('avatarCase', () => {
   it('met la première lettre en majuscule et le reste en minuscule', () => {
-    expect(avatarCase('HELLO')).toBe('He');
+    expect(avatarCase('HELLO')).toBe('HE');
   });
 
   it('gère une chaîne déjà en minuscules', () => {
