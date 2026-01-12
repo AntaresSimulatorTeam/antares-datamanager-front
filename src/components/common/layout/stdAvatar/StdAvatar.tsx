@@ -10,7 +10,7 @@ import { RdsTextTooltip, useRdsId } from 'rte-design-system-react';
 
 export type AvatarSize = 'es' | 's' | 'm';
 export type AvatarColor = (typeof AVATAR_COLORS)[number];
-export type AvatarTextColor = 'black' | 'white' | 'gray';
+export type AvatarTextColor = 'black' | 'white' | 'primary';
 
 type StdAvatarProps = {
   initials: string;

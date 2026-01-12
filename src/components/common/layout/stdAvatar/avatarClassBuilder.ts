@@ -26,6 +26,7 @@ export const COLOR_CLASSES = {
 export const TEXT_CLASSES = {
   white: 'text-gray-w',
   black: 'text-gray-900',
+  primary: 'text-primary-900',
 };
 
 export const avatarClassBuilder = (size: AvatarSize, color: AvatarColor, textColor?: AvatarTextColor) =>

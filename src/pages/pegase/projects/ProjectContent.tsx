@@ -109,7 +109,7 @@ const ProjectContent = () => {
                     backgroundColor="green"
                     fullname={project.createdBy}
                     initials={project.createdBy.substring(0, 2)}
-                    textColor="gray"
+                    textColor="primary"
                   />
                   <span className="text-body-xs font-light text-gray-600">{project.createdBy}</span>
                 </div>
