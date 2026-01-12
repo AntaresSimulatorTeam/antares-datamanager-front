@@ -94,7 +94,7 @@ const ProjectContent = () => {
                 <div className="flex items-center gap-1">
                   {project.tags && (
                     <div className="flex h-3 w-32">
-                      <StdTagList id={`${project.id}-tag-list`} tags={project.tags} maxVisibleTags={3} />
+                      <StdTagList id={`${project.id}-tag-list`} tags={project.tags} maxVisibleTags={12} />
                     </div>
                   )}
                 </div>
