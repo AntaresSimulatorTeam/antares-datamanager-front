@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { sentenceCase } from '@/shared/utils/textUtils.ts';
+import { avatarCase, sentenceCase } from '@/shared/utils/textUtils.ts';
 
 describe('sentenceCase', () => {
   it('met la première lettre en majuscule et le reste en minuscule', () => {
@@ -20,5 +20,23 @@ describe('sentenceCase', () => {
 
   it('gère une chaîne avec plusieurs underscores consécutifs', () => {
     expect(sentenceCase('hello__world')).toBe('Hello  world');
+  });
+});
+
+describe('avatarCase', () => {
+  it('met la première lettre en majuscule et le reste en minuscule', () => {
+    expect(avatarCase('HELLO')).toBe('HE');
+  });
+
+  it('gère une chaîne déjà en minuscules', () => {
+    expect(avatarCase('hello')).toBe('He');
+  });
+
+  it('gère une chaîne avec 1 seul caractère', () => {
+    expect(avatarCase('u')).toBe('U');
+  });
+
+  it('gère une chaîne vide', () => {
+    expect(avatarCase('')).toBe('');
   });
 });

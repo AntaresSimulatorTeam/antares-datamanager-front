@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { PegaseCardSecondaryButtonPosition } from './pegaseCard';
+import { PegaseCardSecondaryButtonPosition } from './PegaseCard';
 
 export const BUTTON_CONTAINER_CLASSES = {
   default: 'flex justify-end gap-3',

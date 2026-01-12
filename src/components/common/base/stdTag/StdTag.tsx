@@ -15,7 +15,7 @@ const StdTag = ({ id: propsId, label, onDelete }: StdTagProps) => {
 
   return (
     <span className={tagClasses} id={id} role="listitem">
-      <label className="overflow-hidden text-ellipsis whitespace-pre text-overnote text-gray-w">{label}</label>
+      <label className="overflow-hidden text-ellipsis whitespace-pre text-overnote text-gray-700">{label}</label>
       {onDelete && (
         <span className="px-0.25">
           <StdIconButton icon={StdIconId.Close} onClick={onDelete} size="extraSmall" variant="danger" />

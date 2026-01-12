@@ -6,10 +6,11 @@
 
 import { ReactElement } from 'react';
 import cardTitleClassBuilder from './cardTitleClassBuilder';
-import { RdsFloatingWrapper, RdsIconButtonProps, RdsTag, RdsTagProps } from 'rte-design-system-react';
+import { RdsFloatingWrapper, RdsIconButtonProps, RdsTagProps } from 'rte-design-system-react';
 import StdButton from '@common/base/stdButton/StdButton';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import StdDropdown, { StdDropdownOption } from '@common/layout/stdDropdown/StdDropdown.tsx';
+import StdTag from '@common/base/stdTag/StdTag.tsx';
 
 export type PegaseCardTitleProps = {
   id: string;
@@ -39,17 +40,17 @@ const PegaseCardTitle = ({ title, dropdownOptions, icons, tag, lineClamp, onClic
           </span>
         )}
         {tag && (
-          <span role="list" className="flex items-center">
-            <RdsTag {...tag} id={`${id}-tag`} />
-          </span>
+          <menu className="flex items-center">
+            <StdTag {...tag} id={`${id}-tag`} />
+          </menu>
         )}
       </div>
-      <div className="interactive" onClick={(e) => e.stopPropagation()}>
+      <button tabIndex={0} onMouseOver={() => {}} onFocus={() => {}} onClick={(e) => e.stopPropagation()}>
         <RdsFloatingWrapper placement={'bottom-start'} fallbackPlacements={['bottom-end']} autoClose>
           <Trigger>
             <StdButton
               id={`${id}-button`}
-              variant="text"
+              variant="transparent"
               size="small"
               icon={StdIconId.MoreVert}
               disabled={dropdownOptions.length === 0}
@@ -61,7 +62,7 @@ const PegaseCardTitle = ({ title, dropdownOptions, icons, tag, lineClamp, onClic
             </div>
           </Element>
         </RdsFloatingWrapper>
-      </div>
+      </button>
     </header>
   );
 };

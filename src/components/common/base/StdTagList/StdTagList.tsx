@@ -96,7 +96,7 @@ const StdTagList = ({
             >
               <StdPopover.Trigger>
                 <StdButton
-                  color="secondary"
+                  color="primary"
                   variant="outlined"
                   size="extraSmall"
                   label={`+ ${isReady ? tags.length - (tagsNumber ?? 0) : '00'}`}
