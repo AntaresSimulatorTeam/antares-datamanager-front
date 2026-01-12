@@ -56,8 +56,12 @@ export const DetailsContent = ({ content, onClickButton }: DetailsContentProps) 
           {(content as StudyDTO)?.keywords?.length > 0 && (
             <>
               <div>|</div>
-              <div className="flex h-3 w-32">
-                <StdTagList id={`${content.id}-tag-list`} tags={(content as StudyDTO).keywords} />
+              <div className="w-72 flex h-3">
+                <StdTagList
+                  id={`${content.id}-tag-list`}
+                  tags={(content as StudyDTO).keywords}
+                  maxVisibleTags={(content as StudyDTO)?.keywords?.length}
+                />
               </div>
             </>
           )}

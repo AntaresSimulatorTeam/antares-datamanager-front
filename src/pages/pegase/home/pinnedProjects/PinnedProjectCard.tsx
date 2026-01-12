@@ -49,11 +49,7 @@ const PinnedProjectCards = () => {
             ]}
             id={project.id}
             onClick={() => void navigateToProject(project.id)}
-            icons={
-              <div className="text-primary-600">
-                <StdIcon name={StdIconId.PushPin} />{' '}
-              </div>
-            }
+            icons={<StdIcon name={StdIconId.PushPin} color="text-primary-600" />}
           >
             <div className="flex flex-col items-start justify-between">
               <div className="flex items-center gap-1">
