@@ -7,7 +7,7 @@
 import { render, screen, within } from '@testing-library/react';
 
 import { noop } from '@/shared/utils/common/defaultUtils';
-import PegaseCardTitle from '../pegaseCardTitle';
+import PegaseCardTitle from '../PegaseCardTitle';
 import { RdsIconButton, RdsIconId, RdsTagProps } from 'rte-design-system-react';
 import { StdDropdownOption } from '@common/layout/stdDropdown/StdDropdown.tsx';
 

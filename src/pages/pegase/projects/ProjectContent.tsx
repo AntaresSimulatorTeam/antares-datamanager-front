@@ -7,7 +7,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import SearchBar from '@/pages/pegase/home/components/SearchBar';
-import PegaseCard from '@/components/pegase/pegaseCard/pegaseCard';
+import PegaseCard from '@/components/pegase/pegaseCard/PegaseCard';
 import StudiesPagination from '@/pages/pegase/home/components/StudiesPagination';
 import { useDropdownOptions } from '@/hooks/useDropdownOptions';
 import { useProjectNavigation } from '@/hooks/useProjectNavigation';

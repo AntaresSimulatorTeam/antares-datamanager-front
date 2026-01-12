@@ -6,7 +6,7 @@
 
 import { PropsWithChildren } from 'react';
 import cardClassBuilder from './cardClassBuilder';
-import PegaseCardTitle, { PegaseCardTitleProps } from './pegaseCardTitle/pegaseCardTitle';
+import PegaseCardTitle, { PegaseCardTitleProps } from './pegaseCardTitle/PegaseCardTitle';
 import { RdsButton, RdsButtonProps, RdsCard, RdsCardProps } from 'rte-design-system-react';
 
 export type PegaseCardSecondaryButtonPosition = 'default' | 'center';

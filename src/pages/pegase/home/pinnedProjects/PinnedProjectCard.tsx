@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import PegaseCard from '@/components/pegase/pegaseCard/pegaseCard';
+import PegaseCard from '@/components/pegase/pegaseCard/PegaseCard';
 import { useTranslation } from 'react-i18next';
 import { useDropdownOptions } from '@/hooks/useDropdownOptions';
 import { useProjectNavigation } from '@/hooks/useProjectNavigation';
