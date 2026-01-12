@@ -20,6 +20,7 @@ import { ProjectInfo, ProjectResponse } from '@/shared/types';
 import StdTagList from '@common/base/StdTagList/StdTagList.tsx';
 import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
+import { avatarCase } from '@/shared/utils/textUtils.ts';
 
 const PinnedProjectCards = () => {
   const { t } = useTranslation();
@@ -55,25 +56,24 @@ const PinnedProjectCards = () => {
               <div className="flex items-center gap-1">
                 {project.tags && (
                   <div className="flex h-3 w-32">
-                    <StdTagList id={`${project.id}-tag-list`} tags={project.tags} />
+                    <StdTagList id={`${project.id}-tag-list`} tags={project.tags} maxVisibleTags={12} />
                   </div>
                 )}
               </div>
-
               <div className="flex items-center gap-x-0.5 pt-2.5">
-                <div className="font-sans text-body-xs font-light">
-                  {t('project.@created')} :{' '}
-                  <span className="text-body-xs font-bold">{formatDateToDDMMYYYY(project.creationDate, false)} </span>{' '}
-                  <span className="ml-2">{t('project.@by')}</span> :
+                <div className="text-body-xs font-light text-gray-600">
+                  {`${t('project.@created')}: `}
+                  <span className="text-body-xs font-medium">{formatDateToDDMMYYYY(project.creationDate)} </span>
+                  <span className="ml-2">{`${t('project.@by')}: `}</span>
                 </div>
-
                 <StdAvatar
                   size="es"
-                  backgroundColor="gray"
+                  backgroundColor="green"
                   fullname={project.createdBy}
-                  initials={project.createdBy.substring(0, 2)}
+                  initials={avatarCase(project.createdBy)}
+                  textColor="primary"
                 />
-                <span className="font-sans text-body-xs font-light">{project.createdBy}</span>
+                <span className="text-body-xs font-light text-gray-600">{project.createdBy}</span>
               </div>
             </div>
           </PegaseCard>

@@ -24,6 +24,7 @@ import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { ProjectCreationModal } from '@common/modal/ProjectCreationModal.tsx';
 import { StdDropdownOption } from '@common/layout/stdDropdown/StdDropdown.tsx';
 import StdTagList from '@common/base/StdTagList/StdTagList.tsx';
+import { avatarCase } from '@/shared/utils/textUtils.ts';
 
 const ProjectContent = () => {
   const { t } = useTranslation();
@@ -100,15 +101,15 @@ const ProjectContent = () => {
                 </div>
                 <div className="flex items-center gap-x-0.5 pt-2.5">
                   <div className="text-body-xs font-light text-gray-600">
-                    {t('project.@created')} :{' '}
-                    <span className="text-body-xs font-bold">{formatDateToDDMMYYYY(project.creationDate)} </span>{' '}
-                    <span className="ml-2">{t('project.@by')}</span> :
+                    {`${t('project.@created')}: `}
+                    <span className="text-body-xs font-medium">{formatDateToDDMMYYYY(project.creationDate)} </span>
+                    <span className="ml-2">{`${t('project.@by')}: `}</span>
                   </div>
                   <StdAvatar
                     size="es"
                     backgroundColor="green"
                     fullname={project.createdBy}
-                    initials={project.createdBy.substring(0, 2)}
+                    initials={avatarCase(project.createdBy)}
                     textColor="primary"
                   />
                   <span className="text-body-xs font-light text-gray-600">{project.createdBy}</span>
