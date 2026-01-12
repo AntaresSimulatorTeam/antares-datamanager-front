@@ -5,8 +5,6 @@
  */
 
 import PegaseCard from '@/components/pegase/pegaseCard/pegaseCard';
-import StdAvatar from '@common/layout/stdAvatar/StdAvatar';
-import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter';
 import { useTranslation } from 'react-i18next';
 import { useDropdownOptions } from '@/hooks/useDropdownOptions';
 import { useProjectNavigation } from '@/hooks/useProjectNavigation';
@@ -17,10 +15,9 @@ import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { ProjectCreationModal } from '@common/modal/ProjectCreationModal.tsx';
 import { useState } from 'react';
 import { ProjectInfo, ProjectResponse } from '@/shared/types';
-import StdTagList from '@common/base/StdTagList/StdTagList.tsx';
 import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
-import { avatarCase } from '@/shared/utils/textUtils.ts';
+import { PegaseCardContent } from '@/components/pegase/pegaseCard/pegaseCardContent/PegaseCardContent.tsx';
 
 const PinnedProjectCards = () => {
   const { t } = useTranslation();
@@ -52,30 +49,7 @@ const PinnedProjectCards = () => {
             onClick={() => void navigateToProject(project.id)}
             icons={<StdIcon name={StdIconId.PushPin} color="text-primary-600" />}
           >
-            <div className="flex flex-col items-start justify-between">
-              <div className="flex items-center gap-1">
-                {project.tags && (
-                  <div className="flex h-3 w-32">
-                    <StdTagList id={`${project.id}-tag-list`} tags={project.tags} maxVisibleTags={12} />
-                  </div>
-                )}
-              </div>
-              <div className="flex items-center gap-x-0.5 pt-2.5">
-                <div className="text-body-xs font-light text-gray-600">
-                  {`${t('project.@created')}: `}
-                  <span className="text-body-xs font-medium">{formatDateToDDMMYYYY(project.creationDate)} </span>
-                  <span className="ml-2">{`${t('project.@by')}: `}</span>
-                </div>
-                <StdAvatar
-                  size="es"
-                  backgroundColor="green"
-                  fullname={project.createdBy}
-                  initials={avatarCase(project.createdBy)}
-                  textColor="primary"
-                />
-                <span className="text-body-xs font-light text-gray-600">{project.createdBy}</span>
-              </div>
-            </div>
+            <PegaseCardContent project={project} />
           </PegaseCard>
         </div>
       ))}
