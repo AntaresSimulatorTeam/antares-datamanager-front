@@ -6,7 +6,7 @@
 
 import { clsx } from 'clsx';
 
-export const COMMON_TITLE_CLASSES = 'text-heading-xs font-semibold text-left ';
+export const COMMON_TITLE_CLASSES = 'text-heading-xs font-semibold text-left text-gray-800';
 
 export const COMMON_TEXT_CLASS = 'text-ellipsis';
 

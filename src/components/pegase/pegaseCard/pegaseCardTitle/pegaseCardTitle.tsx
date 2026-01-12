@@ -6,10 +6,11 @@
 
 import { ReactElement } from 'react';
 import cardTitleClassBuilder from './cardTitleClassBuilder';
-import { RdsFloatingWrapper, RdsIconButtonProps, RdsTag, RdsTagProps } from 'rte-design-system-react';
+import { RdsFloatingWrapper, RdsIconButtonProps, RdsTagProps } from 'rte-design-system-react';
 import StdButton from '@common/base/stdButton/StdButton';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import StdDropdown, { StdDropdownOption } from '@common/layout/stdDropdown/StdDropdown.tsx';
+import StdTag from '@common/base/stdTag/StdTag.tsx';
 
 export type PegaseCardTitleProps = {
   id: string;
@@ -40,7 +41,7 @@ const PegaseCardTitle = ({ title, dropdownOptions, icons, tag, lineClamp, onClic
         )}
         {tag && (
           <span role="list" className="flex items-center">
-            <RdsTag {...tag} id={`${id}-tag`} />
+            <StdTag {...tag} id={`${id}-tag`} />
           </span>
         )}
       </div>
@@ -49,7 +50,7 @@ const PegaseCardTitle = ({ title, dropdownOptions, icons, tag, lineClamp, onClic
           <Trigger>
             <StdButton
               id={`${id}-button`}
-              variant="text"
+              variant="transparent"
               size="small"
               icon={StdIconId.MoreVert}
               disabled={dropdownOptions.length === 0}
