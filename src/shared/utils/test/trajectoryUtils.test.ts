@@ -730,8 +730,8 @@ describe('getAreaTrajectoryName', () => {
   ] as HypothesisRowData[];
 
   it('should return combined hypothesis for valid rowIdSelected', () => {
-    expect(getAreaTrajectoryName('0.1', mockData)).toBe('Energy - Wind');
-    expect(getAreaTrajectoryName('1.0', mockData)).toBe('Transport - Electric');
+    expect(getAreaTrajectoryName('0.1', mockData)).toStrictEqual({ area: 'Energy', technology: 'Wind' });
+    expect(getAreaTrajectoryName('1.0', mockData)).toStrictEqual({ area: 'Transport', technology: 'Electric' });
   });
 
   it('should return only main hypothesis if subRow hypothesis is missing', () => {
@@ -741,16 +741,22 @@ describe('getAreaTrajectoryName', () => {
         subRows: [{}],
       },
     ] as HypothesisRowData[];
-    expect(getAreaTrajectoryName('0.0', dataWithMissingSubHypothesis)).toBe('Agriculture');
+    expect(getAreaTrajectoryName('0.0', dataWithMissingSubHypothesis)).toStrictEqual({
+      area: 'Agriculture',
+      technology: '',
+    });
   });
 
-  it('should return empty string if mainRow is missing', () => {
-    expect(getAreaTrajectoryName('5.0', mockData)).toBe('');
+  it('should return undefined if mainRow is missing', () => {
+    expect(getAreaTrajectoryName('5.0', mockData)).toBeUndefined();
   });
 
   it('should return empty string if both hypotheses are missing', () => {
     const emptyData: HypothesisRowData[] = [{}, {}] as HypothesisRowData[];
-    expect(getAreaTrajectoryName('0.0', emptyData)).toBe('');
+    expect(getAreaTrajectoryName('0.0', emptyData)).toStrictEqual({
+      area: '',
+      technology: '',
+    });
   });
 });
 

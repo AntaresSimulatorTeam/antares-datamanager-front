@@ -193,7 +193,7 @@ describe('handleFetchTrajectoriesFS', () => {
 
     const type = TRAJECTORY_TYPE.THERMAL_CAPACITY;
     const rowId = 'row-123';
-    const hypothesis = 'FR Default';
+    const hypothesis = 'FR';
 
     await handleFetchTrajectoriesFS(type, rowId, setOptionsFS, setRowIdSelected, toggleModal, hypothesis);
 

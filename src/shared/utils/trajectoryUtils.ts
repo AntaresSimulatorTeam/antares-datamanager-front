@@ -552,7 +552,7 @@ export const getAreaTrajectoryName = (
 
   const subRow = mainRow.subRows?.[subIndex];
 
-  return { area: mainRow.hypothesis, technology: subRow?.hypothesis ?? '' };
+  return { area: mainRow.hypothesis ?? '', technology: subRow?.hypothesis ?? '' };
 };
 
 /**
