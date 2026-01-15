@@ -14,7 +14,7 @@ interface ImportTrajectoryModalProps {
   options: SelectOption[] | undefined;
   onClose: (value?: SelectOption) => Promise<void>;
   trajectoryType: TRAJECTORY_TYPE;
-  hypothesis?: { area: string; technology: string };
+  hypothesis?: { area?: string; technology?: string };
 }
 
 export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, hypothesis }: ImportTrajectoryModalProps) => {

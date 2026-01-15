@@ -539,20 +539,23 @@ export const getRowDataSelected = (data: HypothesisRowData[], indexArray: number
  * Get a name composed of an area name and a technology name
  * @param {string} rowIdSelected
  * @param {HypothesisRowData[]} data
- * @return {{area: string, technology: string} | undefined}
+ * @return {{area: string, technology?: string} | undefined}
  */
 export const getAreaTrajectoryName = (
   rowIdSelected: string,
   data: HypothesisRowData[],
-): { area: string; technology: string } | undefined => {
+): { area?: string; technology?: string } | undefined => {
   const [mainIndex, subIndex] = rowIdSelected.split('.').map(Number);
+  const hypothesisInfo = {} as { area: string; technology?: string };
 
   const mainRow = data[mainIndex];
-  if (!mainRow) return;
+  if (!mainRow?.hypothesis) return;
+  if (mainRow.hypothesis) hypothesisInfo.area = mainRow.hypothesis;
 
   const subRow = mainRow.subRows?.[subIndex];
 
-  return { area: mainRow.hypothesis ?? '', technology: subRow?.hypothesis ?? '' };
+  if (subRow?.hypothesis) hypothesisInfo.technology = subRow.hypothesis;
+  return hypothesisInfo;
 };
 
 /**

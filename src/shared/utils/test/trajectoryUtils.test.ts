@@ -743,7 +743,6 @@ describe('getAreaTrajectoryName', () => {
     ] as HypothesisRowData[];
     expect(getAreaTrajectoryName('0.0', dataWithMissingSubHypothesis)).toStrictEqual({
       area: 'Agriculture',
-      technology: '',
     });
   });
 
@@ -753,10 +752,7 @@ describe('getAreaTrajectoryName', () => {
 
   it('should return empty string if both hypotheses are missing', () => {
     const emptyData: HypothesisRowData[] = [{}, {}] as HypothesisRowData[];
-    expect(getAreaTrajectoryName('0.0', emptyData)).toStrictEqual({
-      area: '',
-      technology: '',
-    });
+    expect(getAreaTrajectoryName('0.0', emptyData)).toBeUndefined();
   });
 });
 
