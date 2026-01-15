@@ -97,10 +97,6 @@ const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         handleImport={async (rowId: string) => {
           const indexArray = rowId.split('.').map(Number);
           const technology = data[indexArray[0]]?.subRows?.[indexArray[1]]?.hypothesis;
-          console.log(
-            '=================== data[indexArray[0]]?.subRows',
-            data[indexArray[0]]?.subRows?.[indexArray[1]]?.hypothesis,
-          );
           await handleFetchTrajectoriesFS(
             TRAJECTORY_TYPE.STS,
             rowId,
@@ -120,10 +116,6 @@ const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
           onClose={async (_value?: SelectOption) => {
             toggleModal();
             return Promise.resolve();
-            // if (value != null) {
-            //   const indexArray = rowIdSelected.split('.').map(Number);
-            //   await importTrajectory(TRAJECTORY_TYPE.STS, value, indexArray, data, setData);
-            // }
           }}
           trajectoryType={TRAJECTORY_TYPE.STS}
           hypothesis={getAreaTrajectoryName(rowIdSelected, data)}
