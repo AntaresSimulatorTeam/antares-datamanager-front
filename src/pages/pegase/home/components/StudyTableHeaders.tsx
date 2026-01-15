@@ -8,12 +8,12 @@ import StdAvatar from '@/components/common/layout/stdAvatar/StdAvatar';
 import { StudyDTO } from '@/shared/types/Study.type.ts';
 import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter';
 import { createColumnHelper } from '@tanstack/react-table';
-import { RdsTagList } from 'rte-design-system-react';
 import StdRadioButton from '@/components/forms/stdRadioButton/StdRadioButton.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 import { getStatusIcon } from '@/shared/utils/iconUtils.ts';
 import { avatarCase, sentenceCase } from '@/shared/utils/textUtils.ts';
+import StdTagList from '@common/base/StdTagList/StdTagList.tsx';
 
 const columnHelper = createColumnHelper<StudyDTO>();
 
@@ -72,11 +72,7 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
   columnHelper.accessor('keywords', {
     header: t('home.@keywords'),
     size: 350,
-    cell: ({ getValue, row }) => (
-      <div className="flex h-3">
-        <RdsTagList id={`pegase-tags-${row.id}`} tags={getValue()} />
-      </div>
-    ),
+    cell: ({ getValue, row }) => <StdTagList id={`pegase-tags-${row.id}`} tags={getValue()} />,
   }),
 
   columnHelper.accessor('status', {

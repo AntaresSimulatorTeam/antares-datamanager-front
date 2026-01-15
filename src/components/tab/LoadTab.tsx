@@ -24,7 +24,7 @@ import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
 import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow.ts';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { CheckBoxListWithSearchBar } from '@/components/list/CheckBoxListWithSearchBar.tsx';
-import { filterRow, generateReadOnlyIndexMap } from '@/shared/utils/trajectoryUtils.ts';
+import { filterRow, generateReadOnlyIndexMap, getAreaTrajectoryName } from '@/shared/utils/trajectoryUtils.ts';
 
 const LoadTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const studyState = useStudy();
@@ -150,7 +150,7 @@ const LoadTab = ({ defaultAreas, areas, studyData }: TabProps) => {
             }
           }}
           trajectoryType={TRAJECTORY_TYPE.LOAD}
-          area={data[Number(rowIdSelected)]?.hypothesis}
+          hypothesis={getAreaTrajectoryName(rowIdSelected, data)}
         />
       )}
       {isDeletionModalOpen && (

@@ -297,7 +297,7 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
             }
           }}
           trajectoryType={selectedTrajectoryType ?? getTrajectoryTypeByIndex(Number(rowIdSelected))}
-          area={getAreaTrajectoryName(
+          hypothesis={getAreaTrajectoryName(
             rowIdSelected,
             isTechnicalParametersType(selectedTrajectoryType) ? technicalData : data,
           )}
