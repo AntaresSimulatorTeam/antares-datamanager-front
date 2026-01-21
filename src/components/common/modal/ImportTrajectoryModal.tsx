@@ -54,7 +54,7 @@ export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, hypoth
   return (
     <RdsModal size="small">
       <RdsModal.Title onClose={() => void onClose()} icon="Upload">
-        {`${t('studyDetails.@import_from_file_system')} ${hypothesis?.area ?? ''} ${hypothesis?.technology ? ' - ' : ''} ${hypothesis?.technology ?? ''}`}
+        {`${t('studyDetails.@import_from_file_system')} ${hypothesis?.area ?? trajectoryType} ${hypothesis?.technology ? ' - ' : ''} ${hypothesis?.technology ?? ''}`}
       </RdsModal.Title>
       <RdsModal.Content>
         {path && (
