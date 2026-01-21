@@ -222,6 +222,6 @@ export const ThermalOptions = [
   'TAC',
 ];
 
-export const STSTechnology = ['Battery', 'DSR', 'EV', 'PSP'];
+export const STSTechnology = ['battery', 'DSR', 'EV', 'PSP'];
 
 export const Technologies = ThermalOptions.concat(STSTechnology);
