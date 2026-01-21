@@ -297,7 +297,6 @@ export const AreaLinkTab = ({ setErrorMessage, studyData }: AreaLinkTabProps) =>
             setOptionsFS,
             setRowIdSelected,
             toggleModal,
-            data[Number(rowId)]?.hypothesis,
           )
         }
         handleViewData={(rowId: string) => {
@@ -324,7 +323,6 @@ export const AreaLinkTab = ({ setErrorMessage, studyData }: AreaLinkTabProps) =>
             }
           }}
           trajectoryType={rowIdSelected === '0' ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK}
-          hypothesis={{ area: rowIdSelected === '0' ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK }}
         />
       )}
       {isViewModalOpen && trajectoryData && (

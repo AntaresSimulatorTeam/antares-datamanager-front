@@ -600,6 +600,28 @@ describe('uploadTrajectory', () => {
       uploadTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026', 2, 'FR', onProgress),
     ).rejects.toThrowError('Failed to upload trajectory area_BP_23_v6');
   });
+
+  it('should import STS trajectory into data base', async () => {
+    await uploadTrajectory(
+      TRAJECTORY_TYPE.STS,
+      'cluster_battery_PEMMEDB25',
+      '2030-2031',
+      87,
+      'AT',
+      onProgress,
+      false,
+      'battery',
+    );
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/trajectory/st-storage?area=AT&technology=battery&trajectoryToUse=cluster_battery_PEMMEDB25&horizon=2030-2031&studyId=87&isCivilYear=false',
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
 });
 
 describe('isParamModulationRequired', () => {

@@ -8,7 +8,7 @@ import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { CheckBoxData, HypothesisRowData, SelectOption, TabProps } from '@/shared/types';
+import { CheckBoxData, HypothesisRowData, RowStatus, SelectOption, TabProps } from '@/shared/types';
 import { useCallback, useEffect, useState } from 'react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
@@ -17,9 +17,12 @@ import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableH
 import { addRow, handleFetchTrajectoriesFS } from '@/shared/services/hypothesisTableService.ts';
 import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow.ts';
 import { filterRow, generateReadOnlyIndexMap, getAreaTrajectoryName } from '@/shared/utils/trajectoryUtils.ts';
-import { getCheckedValues } from '@/shared/helpers/hypothesisTableHelper.ts';
+import { getCheckedValues, shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
+import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
+import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
+import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
 
 const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const studyState = useStudy();
@@ -32,12 +35,16 @@ const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
   const [stsTechnologies, setStsTechnologies] = useState<string[]>([]);
+  const [isDeletionModalOpen, setIsDeletionModalOpen] = useState(false);
+  const [rowToDelete, setRowToDelete] = useState<{ index: number; value?: string } | null>(null);
   const [isStudyGenerated, setIsStudyGenerated] = useState(
     studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED,
   );
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow, technologyList } =
     useFetchHypothesisTrajectories(areas, studyData?.id, TRAJECTORY_TYPE.STS, defaultAreas, isStudyGenerated);
   const { removeRow } = useHypothesisTableRemoveRow(studyData, dispatch, setData, setCheckedValues);
+  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch);
+  const { detachTrajectory } = useTrajectoryDetach(studyData, dispatch);
 
   useEffect(() => {
     const setHypothesis = () => {
@@ -67,6 +74,9 @@ const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
       const indexRow = data.findIndex((row) => row.hypothesis === value);
       if (isChecked) {
         addRow(TRAJECTORY_TYPE.STS, value, dispatch, setCheckedValues, setData, stsTechnologies);
+      } else if (shouldOpenDeletionModal(TRAJECTORY_TYPE.STS, indexRow, data)) {
+        setRowToDelete({ index: indexRow, value });
+        setIsDeletionModalOpen(true);
       } else if (indexRow >= 0) {
         await removeRow(TRAJECTORY_TYPE.STS, value, indexRow, data);
       }
@@ -87,11 +97,11 @@ const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         id="sts-table"
         data={data}
         getTableHeaders={getExpandableHypothesisTableHeaders}
-        fileStatus={'empty'}
+        fileStatus={fileStatus}
         isStudyGenerated={isStudyGenerated}
         readOnly={readOnly}
-        progress={0}
-        idSelected={'0'}
+        progress={progress}
+        idSelected={String(rowIdSelected)}
         isReadOnlyEnable={true}
         handleSearch={() => Promise.resolve(undefined)}
         handleImport={async (rowId: string) => {
@@ -106,19 +116,50 @@ const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
             technology,
           );
         }}
-        removeRow={(value: string, rowId?: string) => void removeRow(TRAJECTORY_TYPE.STS, value, Number(rowId), data)}
+        updateData={async (rowId: string, _value: unknown, status: RowStatus) => {
+          const indexArray = rowId.split('.').map(Number);
+          if (status === 'empty' || status === 'emptyError') {
+            const current = data[indexArray[0]]?.subRows?.[indexArray[1]]?.trajectory ?? null;
+            if (current) {
+              await detachTrajectory(TRAJECTORY_TYPE.STS, indexArray, status, current, setData);
+            }
+          }
+        }}
+        removeRow={(value: string, rowId?: string) => {
+          if (shouldOpenDeletionModal(TRAJECTORY_TYPE.STS, Number(rowId), data)) {
+            setRowToDelete({ index: Number(rowId), value });
+            setIsDeletionModalOpen(true);
+          } else {
+            void removeRow(TRAJECTORY_TYPE.STS, value, Number(rowId), data);
+          }
+        }}
         type={TRAJECTORY_TYPE.STS}
         list={technologyList}
       />
       {isModalOpen && (
         <ImportTrajectoryModal
           options={optionsFS}
-          onClose={async (_value?: SelectOption) => {
+          onClose={async (value?: SelectOption) => {
             toggleModal();
-            return Promise.resolve();
+            if (value != null) {
+              const indexArray = rowIdSelected.split('.').map(Number);
+              await importTrajectory(TRAJECTORY_TYPE.STS, value, indexArray, data, setData);
+            }
           }}
           trajectoryType={TRAJECTORY_TYPE.STS}
           hypothesis={getAreaTrajectoryName(rowIdSelected, data)}
+        />
+      )}
+      {isDeletionModalOpen && (
+        <AreaDeletionConfirmationModal
+          isOpen={isDeletionModalOpen}
+          onClose={() => setIsDeletionModalOpen(false)}
+          onConfirm={async () => {
+            if (rowToDelete?.value) {
+              await removeRow(TRAJECTORY_TYPE.STS, rowToDelete?.value, rowToDelete.index, data);
+              setIsDeletionModalOpen(false);
+            }
+          }}
         />
       )}
     </div>

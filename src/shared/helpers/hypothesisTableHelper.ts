@@ -41,6 +41,7 @@ export const shouldOpenDeletionModal = (
 
   switch (type) {
     case TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER:
+    case TRAJECTORY_TYPE.STS:
       return subRowsWithTrajectory.length > 0;
     case TRAJECTORY_TYPE.THERMAL_CAPACITY:
       return isRowTrajectoryValid && subRowsWithTrajectory.length > 0;

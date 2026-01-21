@@ -40,6 +40,8 @@ export const TRAJECTORY_THERMAL_SPECIFIC_PARAMETER_IMPORT = `${BASE_URL}/v1/traj
 export const TRAJECTORY_THERMAL_MODULATION_PARAMETER_IMPORT = `${BASE_URL}/v1/trajectory/thermal-modulation-parameter`;
 export const TRAJECTORY_THERMAL_COSTS_PARAMETER_IMPORT = `${BASE_URL}/v1/trajectory/thermal-economic-costs`;
 export const TRAJECTORY_THERMAL_ECONOMIC_PARAMETER_IMPORT = `${BASE_URL}/v1/trajectory/thermal-economic-parameter`;
+export const TRAJECTORY_STS = `${BASE_URL}/v1/trajectory/st-storage`;
+
 export const TRAJECTORY_THERMAL_PARAM_MODULATION = `${BASE_URL}/v1/trajectory/param-modulation/check`;
 
 //ABOUT
