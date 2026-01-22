@@ -841,7 +841,7 @@ describe('getQueryParamAreaValue', () => {
 
   it('should handle undefined hypothesis gracefully', () => {
     const result = getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD, undefined as unknown as string);
-    expect(result).toBe('');
+    expect(result).toBeUndefined();
   });
 
   it('should remove defaultLabel from hypothesis if type is not THERMAL_CAPACITY', () => {
@@ -851,7 +851,7 @@ describe('getQueryParamAreaValue', () => {
 
   it('should handle undefined hypothesis gracefully', () => {
     const result = getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD, undefined as unknown as string);
-    expect(result).toBe('');
+    expect(result).toBeUndefined();
   });
 });
 

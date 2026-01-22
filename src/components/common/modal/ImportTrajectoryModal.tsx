@@ -42,7 +42,7 @@ export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, hypoth
             ? hypothesis?.technology
             : hypothesis?.area;
         const searchArea = searchHypothesis ? getQueryParamAreaValue(trajectoryType, searchHypothesis) : '';
-        const results = await fetchTrajectoriesFromFS(trajectoryType, searchTerm, searchArea);
+        const results = await fetchTrajectoriesFromFS(trajectoryType, searchArea, searchTerm);
         return convertToFSSelectionOptionType(results);
       } catch (error) {
         // silent handler

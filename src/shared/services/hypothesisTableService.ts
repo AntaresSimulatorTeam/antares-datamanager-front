@@ -83,8 +83,8 @@ export const handleFetchTrajectoriesFS = async (
   hypothesis?: string,
 ): Promise<void> => {
   try {
-    const area = hypothesis ? getQueryParamAreaValue(type, hypothesis) : '';
-    const results = await fetchTrajectoriesFromFS(type, '', area);
+    const area = hypothesis ? getQueryParamAreaValue(type, hypothesis) : undefined;
+    const results = area ? await fetchTrajectoriesFromFS(type, area) : await fetchTrajectoriesFromFS(type);
     setOptionsFS(convertToFSSelectionOptionType(results));
     setRowIdSelected(rowId);
     toggleModal();

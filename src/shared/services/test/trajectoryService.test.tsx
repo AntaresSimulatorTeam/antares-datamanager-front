@@ -23,6 +23,7 @@ import {
 import {
   mockDbTrajectory,
   mockFsTrajectoryAreaArray,
+  mockFsTrajectorySTSArray,
   mockTrajectoryAreaData,
   mockTrajectoryTwo,
 } from '@/mocks/data/tests/trajectory.mock.ts';
@@ -138,10 +139,24 @@ describe('fetchTrajectoriesFromFS', () => {
 
     await waitFor(() => {
       expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
-      expect(AuthService.authFetch).toHaveBeenCalledWith(
-        `https://mockapi.com/v1/trajectory/fs?trajectoryType=AREA&area=&fileNameContains=`,
-      );
+      expect(AuthService.authFetch).toHaveBeenCalledWith(`https://mockapi.com/v1/trajectory/fs?trajectoryType=AREA`);
       expect(result).toEqual(mockFsTrajectoryAreaArray);
+    });
+  });
+
+  it('should fetch trajectories with STS type from file system', async () => {
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
+      ok: true,
+      json: async () => Promise.resolve(mockFsTrajectorySTSArray),
+    });
+
+    await fetchTrajectoriesFromFS(TRAJECTORY_TYPE.STS, 'battery');
+
+    await waitFor(() => {
+      expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
+      expect(AuthService.authFetch).toHaveBeenCalledWith(
+        `https://mockapi.com/v1/trajectory/fs?trajectoryType=STS&technology=battery`,
+      );
     });
   });
 

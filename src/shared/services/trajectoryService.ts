@@ -81,14 +81,14 @@ export const fetchTrajectoriesFromDB = async (
  */
 export const fetchTrajectoriesFromFS = async (
   trajectoryType: TRAJECTORY_TYPE,
-  searchTerm?: string,
   hypothesis?: string,
+  searchTerm?: string,
 ): Promise<FsTrajectory[]> => {
   const queryString = new URLSearchParams({
     trajectoryType,
-    fileNameContains: searchTerm ?? '',
-    ...(trajectoryType !== TRAJECTORY_TYPE.STS && { area: hypothesis }),
-    ...(trajectoryType === TRAJECTORY_TYPE.STS && { technology: hypothesis }),
+    ...(trajectoryType !== TRAJECTORY_TYPE.STS && hypothesis && { area: hypothesis }),
+    ...(trajectoryType === TRAJECTORY_TYPE.STS && hypothesis && { technology: hypothesis }),
+    ...(searchTerm && { fileNameContains: searchTerm }),
   }).toString();
 
   const urlApi = `${TRAJECTORY_FILE_SYSTEM_ENDPOINT}?${queryString}`;
