@@ -58,14 +58,14 @@ export type Types<T extends TRAJECTORY_DATA_TYPE> = T extends TrajectoryAreaData
 
 export interface TrajectoryAreaData {
   areaName: string;
-  powerToGas: string | null;
-  shortTermStorage: string | null;
+  spilledEnergyCost: string | null;
+  unsuppliedEnergyCost: string | null;
 }
 
 export const TrajectoryAreaDataScheme = {
   areaName: 'string',
-  powerToGas: 'string',
-  shortTermStorage: 'string',
+  spilledEnergyCost: 'string',
+  unsuppliedEnergyCost: 'string',
 } as const;
 
 export interface TrajectoryLinkData {
