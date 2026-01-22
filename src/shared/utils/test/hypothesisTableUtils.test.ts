@@ -88,8 +88,8 @@ describe('getDefaultAreaNotIncludedInAreaList', () => {
     const areas: TrajectoryAreaData[] = [
       {
         areaName: 'Zone B',
-        powerToGas: null,
-        shortTermStorage: null,
+        spilledEnergyCost: null,
+        unsuppliedEnergyCost: null,
       },
     ];
     const result = getDefaultAreaNotIncludedInAreaList(defaultAreas, areas);
@@ -101,13 +101,13 @@ describe('getDefaultAreaNotIncludedInAreaList', () => {
     const areas: TrajectoryAreaData[] = [
       {
         areaName: 'Zone A',
-        powerToGas: null,
-        shortTermStorage: null,
+        spilledEnergyCost: null,
+        unsuppliedEnergyCost: null,
       },
       {
         areaName: 'Zone B',
-        powerToGas: null,
-        shortTermStorage: null,
+        spilledEnergyCost: null,
+        unsuppliedEnergyCost: null,
       },
     ];
     const result = getDefaultAreaNotIncludedInAreaList(defaultAreas, areas);
@@ -119,8 +119,8 @@ describe('getDefaultAreaNotIncludedInAreaList', () => {
     const areas: TrajectoryAreaData[] = [
       {
         areaName: 'Zone A',
-        powerToGas: null,
-        shortTermStorage: null,
+        spilledEnergyCost: null,
+        unsuppliedEnergyCost: null,
       },
     ];
     const result = getDefaultAreaNotIncludedInAreaList(defaultAreas, areas);
@@ -132,8 +132,8 @@ describe('getDefaultAreaNotIncludedInAreaList', () => {
     const areas: TrajectoryAreaData[] = [
       {
         areaName: 'Zone A',
-        powerToGas: null,
-        shortTermStorage: null,
+        spilledEnergyCost: null,
+        unsuppliedEnergyCost: null,
       },
     ];
     const result = getDefaultAreaNotIncludedInAreaList(defaultAreas, areas);
