@@ -379,28 +379,28 @@ export const mockFsTrajectoryParaModulationArray: FsTrajectory[] = [
 export const mockTrajectoryAreaData: TrajectoryAreaData[] = [
   {
     areaName: 'CH',
-    powerToGas: 'false',
-    shortTermStorage: 'false',
+    spilledEnergyCost: '2.356',
+    unsuppliedEnergyCost: '15.5',
   },
   {
     areaName: 'BR',
-    powerToGas: 'false',
-    shortTermStorage: 'false',
+    spilledEnergyCost: '2.356',
+    unsuppliedEnergyCost: '32.5',
   },
   {
     areaName: 'ES',
-    powerToGas: 'true',
-    shortTermStorage: 'false',
+    spilledEnergyCost: '2.356',
+    unsuppliedEnergyCost: '32.5',
   },
   {
     areaName: 'IE',
-    powerToGas: 'false',
-    shortTermStorage: 'true',
+    spilledEnergyCost: '2.356',
+    unsuppliedEnergyCost: '32.5',
   },
   {
     areaName: 'ITcs',
-    powerToGas: 'false',
-    shortTermStorage: 'false',
+    spilledEnergyCost: '2.356',
+    unsuppliedEnergyCost: '32.5',
   },
 ];
 

@@ -50,8 +50,8 @@ describe('useFetchHypothesisParametersTrajectories', () => {
     const trajectoryData = [
       {
         areaName: 'B',
-        powerToGas: '',
-        shortTermStorage: null,
+        spilledEnergyCost: '',
+        unsuppliedEnergyCost: '300.256',
       },
     ];
 
@@ -109,13 +109,13 @@ describe('useFetchHypothesisParametersTrajectories', () => {
     const trajectoryData = [
       {
         areaName: 'B',
-        powerToGas: '',
-        shortTermStorage: null,
+                                                                                                                                                                                                                                                                                        spilledEnergyCost: '200.32',
+        unsuppliedEnergyCost: '300.256',
       },
       {
         areaName: 'F',
-        powerToGas: '',
-        shortTermStorage: null,
+        spilledEnergyCost: '200.32',
+        unsuppliedEnergyCost: '300.256',
       },
     ];
     const mockTwoSpecific = [
@@ -158,13 +158,13 @@ describe('useFetchHypothesisParametersTrajectories', () => {
     const trajectoryData = [
       {
         areaName: 'B',
-        powerToGas: '',
-        shortTermStorage: null,
+        spilledEnergyCost: '200.32',
+        unsuppliedEnergyCost: '300.256',
       },
       {
         areaName: 'C',
-        powerToGas: '',
-        shortTermStorage: null,
+        spilledEnergyCost: '200.32',
+        unsuppliedEnergyCost: '300.256',
       },
     ];
 
@@ -184,18 +184,18 @@ describe('useFetchHypothesisParametersTrajectories', () => {
     const trajectoryData = [
       {
         areaName: 'A',
-        powerToGas: '',
-        shortTermStorage: null,
+        spilledEnergyCost: '200.32',
+        unsuppliedEnergyCost: '300.256',
       },
       {
         areaName: 'B',
-        powerToGas: '',
-        shortTermStorage: null,
+        spilledEnergyCost: '200.32',
+        unsuppliedEnergyCost: '300.256',
       },
       {
         areaName: 'C',
-        powerToGas: '',
-        shortTermStorage: null,
+        spilledEnergyCost: '200.32',
+        unsuppliedEnergyCost: '300.256',
       },
     ];
     vi.mocked(hypothesisTableService.fetchTrajectoriesFromTypes).mockResolvedValue({
