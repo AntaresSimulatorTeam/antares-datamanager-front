@@ -74,20 +74,21 @@ export const fetchTrajectoriesFromDB = async (
  * Retrieve a list of trajectories by type and thermal capacity area from file system
  *
  * @param {TRAJECTORY_TYPE} trajectoryType - Partial name of a study
- * @param {string | undefined} area - To use just in thermal capacity case
+ * @param {string | undefined} hypothesis - For STS or thermal capacity trajectory type
  * @param {string | undefined} searchTerm - Autocompletion - filter trajectories by file name
  * @returns {Promise<FsTrajectory[]>} - Promise object that represents a list of trajectories
  * @throws {Error}
  */
 export const fetchTrajectoriesFromFS = async (
   trajectoryType: TRAJECTORY_TYPE,
-  searchTerm?: string | undefined,
-  area?: string | undefined,
+  searchTerm?: string,
+  hypothesis?: string,
 ): Promise<FsTrajectory[]> => {
   const queryString = new URLSearchParams({
     trajectoryType,
-    area: area ?? '',
     fileNameContains: searchTerm ?? '',
+    ...(trajectoryType !== TRAJECTORY_TYPE.STS && { area: hypothesis }),
+    ...(trajectoryType === TRAJECTORY_TYPE.STS && { technology: hypothesis }),
   }).toString();
 
   const urlApi = `${TRAJECTORY_FILE_SYSTEM_ENDPOINT}?${queryString}`;
