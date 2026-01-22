@@ -829,28 +829,73 @@ describe('getDefaultLabel', () => {
 });
 
 describe('getQueryParamAreaValue', () => {
-  it('should return OTHER_AREAS when hypothesis equals OTHER_AREAS_LABEL', () => {
+  it('retourne undefined si hypothesis est undefined', () => {
+    expect(getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD)).toBeUndefined();
+  });
+
+  it('retourne area si hypothesis.area est défini et différent de OTHER_AREAS_LABEL', () => {
+    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD, 'FR');
+    expect(result).toBe('FR');
+  });
+
+  it('remplace OTHER_AREAS_LABEL par OTHER_AREAS', () => {
     const result = getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD, OTHER_AREAS_LABEL);
     expect(result).toBe(OTHER_AREAS);
   });
 
-  it('should remove defaultLabel from hypothesis if type is not THERMAL_CAPACITY', () => {
-    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD, 'Paris');
-    expect(result).toBe('Paris');
+  // --- THERMAL_CAPACITY ---
+  it('THERMAL_CAPACITY : retourne FR si hypothesis.area = FR', () => {
+    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.THERMAL_CAPACITY, 'FR');
+    expect(result).toBe('FR');
   });
 
-  it('should handle undefined hypothesis gracefully', () => {
-    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD, undefined as unknown as string);
+  it('THERMAL_CAPACITY : retourne OTHER_AREAS si hypothesis.area != FR', () => {
+    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.THERMAL_CAPACITY, 'DE');
+    expect(result).toBe(OTHER_AREAS);
+  });
+
+  it('THERMAL_CAPACITY : retourne OTHER_AREAS si hypothesis.area est undefined', () => {
+    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.THERMAL_CAPACITY);
+    expect(result).toBe(OTHER_AREAS);
+  });
+
+  // --- STS & THERMAL_TECHNICAL_SPECIFIC_PARAMETER ---
+  it('STS : retourne hypothesis.technology', () => {
+    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.STS, 'HP');
+    expect(result).toBe('HP');
+  });
+
+  it('THERMAL_TECHNICAL_SPECIFIC_PARAMETER : retourne hypothesis.technology', () => {
+    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, 'BOILER');
+    expect(result).toBe('BOILER');
+  });
+
+  it('STS : retourne undefined si technology est undefined', () => {
+    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.STS);
     expect(result).toBeUndefined();
   });
 
-  it('should remove defaultLabel from hypothesis if type is not THERMAL_CAPACITY', () => {
-    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD, 'Paris');
-    expect(result).toBe('Paris');
+  // --- THERMAL_TECHNICAL_MODULATION_PARAMETER ---
+  it('THERMAL_TECHNICAL_MODULATION_PARAMETER : retourne toujours undefined', () => {
+    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER, 'param');
+    expect(result).toBeUndefined();
   });
 
-  it('should handle undefined hypothesis gracefully', () => {
-    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD, undefined as unknown as string);
+  // --- THERMAL_TECHNICAL_COMMON_PARAMETER ---
+  it('THERMAL_TECHNICAL_COMMON_PARAMETER : retourne toujours undefined', () => {
+    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER, 'common');
+    expect(result).toBeUndefined();
+  });
+
+  // --- THERMAL_ECONOMIC_COST_PARAMETER ---
+  it('THERMAL_ECONOMIC_COST_PARAMETER : retourne toujours undefined', () => {
+    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER, 'cost');
+    expect(result).toBeUndefined();
+  });
+
+  // --- THERMAL_ECONOMIC_PARAMETER ---
+  it('THERMAL_ECONOMIC_PARAMETER : retourne toujours undefined', () => {
+    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER, 'economic');
     expect(result).toBeUndefined();
   });
 });

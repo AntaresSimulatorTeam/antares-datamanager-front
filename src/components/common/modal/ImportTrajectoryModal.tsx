@@ -41,8 +41,11 @@ export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, hypoth
           trajectoryType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER
             ? hypothesis?.technology
             : hypothesis?.area;
-        const searchArea = searchHypothesis ? getQueryParamAreaValue(trajectoryType, searchHypothesis) : '';
-        const results = await fetchTrajectoriesFromFS(trajectoryType, searchArea, searchTerm);
+        const results = await fetchTrajectoriesFromFS(
+          trajectoryType,
+          getQueryParamAreaValue(trajectoryType, searchHypothesis),
+          searchTerm,
+        );
         return convertToFSSelectionOptionType(results);
       } catch (error) {
         // silent handler

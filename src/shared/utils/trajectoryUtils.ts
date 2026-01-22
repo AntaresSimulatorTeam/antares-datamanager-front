@@ -735,14 +735,23 @@ export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE): string | null 
 
 /**
  * Determines the area name according to the trajectory type and the hypothesis
- * @param {TRAJECTORY_TYPE} type
- * @param {string} hypothesis
+ * @param {TRAJECTORY_TYPE} trajectoryType
+ * @param {string | undefined } hypothesis
  * @return {string | undefined}
  */
-export const getQueryParamAreaValue = (type: TRAJECTORY_TYPE, hypothesis?: string): string | undefined => {
+
+export const getQueryParamAreaValue = (trajectoryType: TRAJECTORY_TYPE, hypothesis?: string): string | undefined => {
   let area = hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : hypothesis;
-  if (type === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
+  if (trajectoryType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
     area = hypothesis === 'FR' ? 'FR' : OTHER_AREAS;
+  }
+  if (
+    trajectoryType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER ||
+    trajectoryType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER ||
+    trajectoryType === TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER ||
+    trajectoryType === TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER
+  ) {
+    area = undefined;
   }
   return area;
 };
