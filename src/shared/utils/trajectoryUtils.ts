@@ -539,18 +539,23 @@ export const getRowDataSelected = (data: HypothesisRowData[], indexArray: number
  * Get a name composed of an area name and a technology name
  * @param {string} rowIdSelected
  * @param {HypothesisRowData[]} data
- * @return {{area: string, technology: string}}
+ * @return {{area: string, technology?: string} | undefined}
  */
-export const getAreaTrajectoryName = (rowIdSelected: string, data: HypothesisRowData[]): string => {
+export const getAreaTrajectoryName = (
+  rowIdSelected: string,
+  data: HypothesisRowData[],
+): { area?: string; technology?: string } | undefined => {
   const [mainIndex, subIndex] = rowIdSelected.split('.').map(Number);
+  const hypothesisInfo = {} as { area: string; technology?: string };
 
   const mainRow = data[mainIndex];
-  if (!mainRow) return '';
+  if (!mainRow?.hypothesis) return;
+  if (mainRow.hypothesis) hypothesisInfo.area = mainRow.hypothesis;
 
   const subRow = mainRow.subRows?.[subIndex];
-  const technologyName = subRow?.hypothesis ? ` - ${subRow.hypothesis}` : '';
 
-  return `${mainRow.hypothesis ?? ''}${technologyName}`;
+  if (subRow?.hypothesis) hypothesisInfo.technology = subRow.hypothesis;
+  return hypothesisInfo;
 };
 
 /**
@@ -721,6 +726,8 @@ export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE): string | null 
     case TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER:
     case TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER:
       return '\\\\thermal\\technical parameters';
+    case TRAJECTORY_TYPE.STS:
+      return '\\\\STS\\clusters';
     default:
       return null;
   }
@@ -728,16 +735,25 @@ export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE): string | null 
 
 /**
  * Determines the area name according to the trajectory type and the hypothesis
- * @param {TRAJECTORY_TYPE} type
- * @param {string} hypothesis
- * @return {string}
+ * @param {TRAJECTORY_TYPE} trajectoryType
+ * @param {string | undefined } hypothesis
+ * @return {string | undefined}
  */
-export const getQueryParamAreaValue = (type: TRAJECTORY_TYPE, hypothesis: string): string => {
-  let area = hypothesis?.includes(OTHER_AREAS_LABEL) ? OTHER_AREAS : hypothesis;
-  if (type === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
-    area = hypothesis?.includes('FR') ? 'FR' : OTHER_AREAS;
+
+export const getQueryParamAreaValue = (trajectoryType: TRAJECTORY_TYPE, hypothesis?: string): string | undefined => {
+  let area = hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : hypothesis;
+  if (trajectoryType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
+    area = hypothesis === 'FR' ? 'FR' : OTHER_AREAS;
   }
-  return area ?? '';
+  if (
+    trajectoryType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER ||
+    trajectoryType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER ||
+    trajectoryType === TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER ||
+    trajectoryType === TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER
+  ) {
+    area = undefined;
+  }
+  return area;
 };
 
 /**

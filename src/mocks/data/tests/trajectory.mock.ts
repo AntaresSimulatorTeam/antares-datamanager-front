@@ -335,25 +335,25 @@ export const mockFsTrajectoryLoadArray: FsTrajectory[] = [
   },
 ];
 
-export const mockFsTrajectoryThermalCapacityArray: FsTrajectory[] = [
+export const mockFsTrajectorySTSArray: FsTrajectory[] = [
   {
     trajectoryName: 'FR_BP23_A-ref_FR',
-    type: TRAJECTORY_TYPE.THERMAL_CAPACITY,
+    type: TRAJECTORY_TYPE.STS,
     lastModifiedDate: '2025-07-02T11:57:48.493018687' as unknown as Date,
   },
   {
     trajectoryName: 'FR_BP23_A-ref_FR_nuc',
-    type: TRAJECTORY_TYPE.THERMAL_CAPACITY,
+    type: TRAJECTORY_TYPE.STS,
     lastModifiedDate: '2025-07-02T11:57:48.493018687' as unknown as Date,
   },
   {
     trajectoryName: 'FR_DSR',
-    type: TRAJECTORY_TYPE.THERMAL_CAPACITY,
+    type: TRAJECTORY_TYPE.STS,
     lastModifiedDate: '2025-06-27T10:40:47.410233' as unknown as Date,
   },
   {
     trajectoryName: 'BE_PEMMDB23_26avril',
-    type: TRAJECTORY_TYPE.THERMAL_CAPACITY,
+    type: TRAJECTORY_TYPE.STS,
     lastModifiedDate: '2025-06-27T10:40:07.150247' as unknown as Date,
   },
 ];
@@ -425,60 +425,5 @@ export const mockEmptyDbTrajectoryLoadFR: DbTrajectory = {
   userName: 'mouad',
   creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
   area: 'FR',
-  technology: '',
-};
-
-export const mockEmptyDbTrajectorySPECIFICFR: DbTrajectory = {
-  id: 1,
-  trajectoryName: '',
-  type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
-  version: 0,
-  userName: 'mouad',
-  creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-  area: 'FR',
-  technology: '',
-};
-
-export const mockEmptyDbTrajectorySPECIFICAT: DbTrajectory = {
-  id: 1,
-  trajectoryName: 'area_PB_2024',
-  type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
-  version: 3,
-  userName: 'mouad',
-  creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-  area: 'AT',
-  technology: '',
-};
-
-export const mockEmptyDbTrajectorySPECIFICBE: DbTrajectory = {
-  id: 1,
-  trajectoryName: 'area_PB_2024',
-  type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
-  version: 3,
-  userName: 'mouad',
-  creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-  area: 'BE',
-  technology: '',
-};
-
-export const mockEmptyDbTrajectorySPECIFICCZ: DbTrajectory = {
-  id: 1,
-  trajectoryName: '',
-  type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
-  version: 0,
-  userName: 'mouad',
-  creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-  area: 'CZ',
-  technology: '',
-};
-
-export const mockEmptyDbTrajectorySpecificOthers: DbTrajectory = {
-  id: 1,
-  trajectoryName: '',
-  type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
-  version: 0,
-  userName: 'mouad',
-  creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-  area: 'OTHERS',
   technology: '',
 };

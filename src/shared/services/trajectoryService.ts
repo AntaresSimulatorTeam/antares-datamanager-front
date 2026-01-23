@@ -11,6 +11,7 @@ import {
   TRAJECTORY_ENDPOINT,
   TRAJECTORY_FILE_SYSTEM_ENDPOINT,
   TRAJECTORY_LINK_TO_STUDY_ENDPOINT,
+  TRAJECTORY_STS,
   TRAJECTORY_THERMAL_COMMON_PARAMETER_IMPORT,
   TRAJECTORY_THERMAL_COSTS_PARAMETER_IMPORT,
   TRAJECTORY_THERMAL_ECONOMIC_PARAMETER_IMPORT,
@@ -73,20 +74,21 @@ export const fetchTrajectoriesFromDB = async (
  * Retrieve a list of trajectories by type and thermal capacity area from file system
  *
  * @param {TRAJECTORY_TYPE} trajectoryType - Partial name of a study
- * @param {string | undefined} area - To use just in thermal capacity case
+ * @param {string | undefined} hypothesis - For STS or thermal capacity trajectory type
  * @param {string | undefined} searchTerm - Autocompletion - filter trajectories by file name
  * @returns {Promise<FsTrajectory[]>} - Promise object that represents a list of trajectories
  * @throws {Error}
  */
 export const fetchTrajectoriesFromFS = async (
   trajectoryType: TRAJECTORY_TYPE,
-  searchTerm?: string | undefined,
-  area?: string | undefined,
+  hypothesis?: string,
+  searchTerm?: string,
 ): Promise<FsTrajectory[]> => {
   const queryString = new URLSearchParams({
     trajectoryType,
-    area: area ?? '',
-    fileNameContains: searchTerm ?? '',
+    ...(trajectoryType !== TRAJECTORY_TYPE.STS && hypothesis && { area: hypothesis }),
+    ...(trajectoryType === TRAJECTORY_TYPE.STS && hypothesis && { technology: hypothesis }),
+    ...(searchTerm && { fileNameContains: searchTerm }),
   }).toString();
 
   const urlApi = `${TRAJECTORY_FILE_SYSTEM_ENDPOINT}?${queryString}`;
@@ -109,6 +111,7 @@ export const fetchTrajectoriesFromFS = async (
  * @param {boolean} isCivilYear - Indicates whether the horizon is based on the civil or a different calendar year.
  * @param {(progress: number) => void} onProgress - A callback function invoked to report progress updates. Receives a numeric progress value.
  * @param {string | undefined} subArea - The subarea associated with the trajectory, may be undefined.
+ * @param {string} subArea - Hypothesis from sub row (ex: Technology for STS trajectory type : Battery, DSR, EV PSP)
  * @returns {Promise<DbTrajectory>} A promise that resolves to the uploaded trajectory object.
  * @throws {Error} If the upload process fails or an invalid response is encountered.
  */
@@ -137,6 +140,8 @@ export const uploadTrajectory = async (
     urlApi = `${TRAJECTORY_THERMAL_COSTS_PARAMETER_IMPORT}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   } else if (trajectoryType === TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER) {
     urlApi = `${TRAJECTORY_THERMAL_ECONOMIC_PARAMETER_IMPORT}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
+  } else if (trajectoryType === TRAJECTORY_TYPE.STS) {
+    urlApi = `${TRAJECTORY_STS}?area=${area}&technology=${subArea}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
   } else {
     urlApi = `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   }

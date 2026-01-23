@@ -191,7 +191,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas, studyData }: TabProps) => {
             }
           }}
           trajectoryType={TRAJECTORY_TYPE.THERMAL_CAPACITY}
-          area={getAreaTrajectoryName(rowIdSelected, data)}
+          hypothesis={getAreaTrajectoryName(rowIdSelected, data)}
         />
       )}
       {isDeletionModalOpen && (

@@ -14,10 +14,10 @@ interface ImportTrajectoryModalProps {
   options: SelectOption[] | undefined;
   onClose: (value?: SelectOption) => Promise<void>;
   trajectoryType: TRAJECTORY_TYPE;
-  area?: string;
+  hypothesis?: { area?: string; technology?: string };
 }
 
-export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, area }: ImportTrajectoryModalProps) => {
+export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, hypothesis }: ImportTrajectoryModalProps) => {
   const { t } = useTranslation();
   const [trajectorySelected, setTrajectorySelected] = useState<SelectOption | null>(null);
   const path = getPathFromTrajectoryType(trajectoryType);
@@ -36,22 +36,27 @@ export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, area }
     async (searchTerm?: string) => {
       if (!searchTerm && !options?.length) return;
       try {
-        const searchArea = area ? getQueryParamAreaValue(trajectoryType, area) : '';
-        const results = await fetchTrajectoriesFromFS(trajectoryType, searchTerm, searchArea);
+        const isTechnologyTrajectory =
+          trajectoryType === TRAJECTORY_TYPE.STS ||
+          trajectoryType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER;
+        const searchHypothesis = isTechnologyTrajectory ? hypothesis?.technology : hypothesis?.area;
+        const results = await fetchTrajectoriesFromFS(
+          trajectoryType,
+          getQueryParamAreaValue(trajectoryType, searchHypothesis),
+          searchTerm,
+        );
         return convertToFSSelectionOptionType(results);
       } catch (error) {
         // silent handler
       }
     },
-    [options, area, trajectoryType],
+    [options, hypothesis, trajectoryType],
   );
 
   return (
     <RdsModal size="small">
       <RdsModal.Title onClose={() => void onClose()} icon="Upload">
-        {t('studyDetails.@import_from_file_system', {
-          area,
-        })}
+        {`${t('studyDetails.@import_from_file_system')} ${hypothesis?.area ?? trajectoryType} ${hypothesis?.technology ? ' - ' : ''} ${hypothesis?.technology ?? ''}`}
       </RdsModal.Title>
       <RdsModal.Content>
         {path && (

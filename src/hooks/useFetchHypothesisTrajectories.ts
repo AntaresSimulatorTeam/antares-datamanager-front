@@ -46,16 +46,14 @@ export const useFetchHypothesisTrajectories = (
   const fetchAreas = useCallback(
     async (id: number, trajType: TRAJECTORY_TYPE) => {
       try {
-        // TODO: remove this when STS api is implemented
         let technologies;
-        const result = trajType === TRAJECTORY_TYPE.STS ? [] : await getStudyTrajectories(id, trajType);
+        const result = await getStudyTrajectories(id, trajType);
         if (trajectoryType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
           const thermalOptions = await getThermalTechnologyList();
           technologies = thermalOptions?.map((thermalOption) => thermalOption.name);
           setTechnologyList(technologies);
         }
         if (trajectoryType === TRAJECTORY_TYPE.STS) {
-          // TODO : To implement when thermal sts technologies api is implemented
           technologies = STSTechnology;
           setTechnologyList(STSTechnology);
         }
