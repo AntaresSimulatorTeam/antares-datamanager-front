@@ -36,11 +36,10 @@ export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, hypoth
     async (searchTerm?: string) => {
       if (!searchTerm && !options?.length) return;
       try {
-        const searchHypothesis =
+        const isTechnologyTrajectory =
           trajectoryType === TRAJECTORY_TYPE.STS ||
-          trajectoryType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER
-            ? hypothesis?.technology
-            : hypothesis?.area;
+          trajectoryType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER;
+        const searchHypothesis = isTechnologyTrajectory ? hypothesis?.technology : hypothesis?.area;
         const results = await fetchTrajectoriesFromFS(
           trajectoryType,
           getQueryParamAreaValue(trajectoryType, searchHypothesis),
