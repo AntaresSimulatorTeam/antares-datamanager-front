@@ -414,16 +414,15 @@ describe('handleFetchTrajectoriesFS', () => {
 });
 
 describe('handleTrajectorySearch', () => {
+  const mockResultsArraySearch = [
+    { id: 1, label: 'Trajectory A' },
+    { id: 2, label: 'Trajectory B' },
+  ] as unknown as DbTrajectory[];
+  const mockConvertedOptionsArraySearch = [
+    { value: '1', label: 'Trajectory A' },
+    { value: '2', label: 'Trajectory B' },
+  ] as unknown as SelectOption[];
   it('should fetch trajectories and return converted options', async () => {
-    const mockResultsArraySearch = [
-      { id: 1, label: 'Trajectory A' },
-      { id: 2, label: 'Trajectory B' },
-    ] as unknown as DbTrajectory[];
-    const mockConvertedOptionsArraySearch = [
-      { value: '1', label: 'Trajectory A' },
-      { value: '2', label: 'Trajectory B' },
-    ] as unknown as SelectOption[];
-
     vi.mocked(trajectoryService.fetchTrajectoriesFromDB).mockResolvedValue(mockResultsArraySearch);
     vi.mocked(formFormatter.convertToSelectionOptionType).mockReturnValue(mockConvertedOptionsArraySearch);
     const setDbTrajectories = vi.fn();
@@ -448,6 +447,27 @@ describe('handleTrajectorySearch', () => {
     expect(setDbTrajectories).toHaveBeenCalledWith(mockResultsArraySearch);
     expect(formFormatter.convertToSelectionOptionType).toHaveBeenCalledWith(mockResultsArraySearch);
     expect(result).toEqual(mockConvertedOptionsArraySearch);
+  });
+
+  it('should fetch trajectories for OTHERS area when hypothesis is Other areas', async () => {
+    vi.mocked(trajectoryService.fetchTrajectoriesFromDB).mockResolvedValue(mockResultsArraySearch);
+    vi.mocked(formFormatter.convertToSelectionOptionType).mockReturnValue(mockConvertedOptionsArraySearch);
+    const setDbTrajectories = vi.fn();
+
+    const type = TRAJECTORY_TYPE.STS;
+    const value = 'valueToSearch';
+    const area = OTHER_AREAS_LABEL;
+    const study = { horizon: '2031' } as StudyDTO;
+
+    await handleTrajectorySearch(type, setDbTrajectories, study.horizon, {
+      area,
+      fileNameContains: value,
+    });
+
+    expect(trajectoryService.fetchTrajectoriesFromDB).toHaveBeenCalledWith(type, study.horizon, {
+      area: OTHER_AREAS,
+      fileNameContains: value,
+    });
   });
 
   it('should handle errors silently and return undefined', async () => {
