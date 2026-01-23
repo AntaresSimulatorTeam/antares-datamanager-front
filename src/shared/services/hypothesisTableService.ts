@@ -16,7 +16,6 @@ import {
   ParamTrajectoryState,
   SelectOption,
   StudyActionType,
-  StudyDTO,
   ThermalParamTrajectoryType,
   TrajectoryAreaDataScheme,
   TrajectoryLinkDataScheme,
@@ -97,26 +96,25 @@ export const handleFetchTrajectoriesFS = async (
  * Asynchronously handles the search for trajectories based on the provided parameters.
  *
  * @param {TRAJECTORY_TYPE} type - The type of trajectory to be searched.
- * @param {string} value - The value used as a search filter.
- * @param {string} area - The area or region to scope the search.
  * @param {Dispatch<SetStateAction<DbTrajectory[]>>} setDbTrajectories - A state updater function
  * used to set the retrieved database trajectories.
- * @param {StudyDTO} study - An object containing study-related details, including the horizon property.
- * @param {string} [technology] - An optional parameter specifying the technology associated with the trajectory.
+ * @param {string} studyHorizon - Study horizon
+ * @param {{ area?: string; technology?: string; fileNameContains?: string }} options - options for searching area in BDD (area, technology or search term)
+ * @param {string | undefined} options.area - The area or region to scope the search.
+ * @param {string | undefined} options.technology - An optional parameter specifying the technology associated with the trajectory.
+ * @param {string | undefined} options.fileNameContains - The value used as a search filter.
  *
  * @returns {Promise<SelectOption[] | undefined>} A Promise resolving to an array of selection options
  * converted from the search results, or undefined in case of an error.
  */
 export const handleTrajectorySearch = async (
   type: TRAJECTORY_TYPE,
-  value: string,
-  area: string,
   setDbTrajectories: Dispatch<SetStateAction<DbTrajectory[]>>,
-  study: StudyDTO,
-  technology?: string,
+  studyHorizon: string,
+  options: { area?: string; technology?: string; fileNameContains?: string },
 ): Promise<SelectOption[] | undefined> => {
   try {
-    const results = await fetchTrajectoriesFromDB(type, study.horizon, value, area, technology);
+    const results = await fetchTrajectoriesFromDB(type, studyHorizon, options);
     setDbTrajectories(results);
     return convertToSelectionOptionType(results);
   } catch {

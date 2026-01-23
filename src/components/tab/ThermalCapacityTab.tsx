@@ -127,20 +127,17 @@ const ThermalCapacityTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         idSelected={rowIdSelected}
         type={TRAJECTORY_TYPE.THERMAL_CAPACITY}
         list={installedPowerTechnologies}
-        handleSearch={async (value: string, rowId: string) => {
+        handleSearch={async (fileNameContains: string, rowId: string) => {
           const indexArray = rowId.split('.').map(Number);
           const area =
             data[indexArray[0]]?.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : data[indexArray[0]]?.hypothesis;
           const technology =
             indexArray?.length > 1 ? data[indexArray[0]]?.subRows?.[indexArray[1]]?.hypothesis : undefined;
-          return await handleTrajectorySearch(
-            TRAJECTORY_TYPE.THERMAL_CAPACITY,
-            value,
+          return await handleTrajectorySearch(TRAJECTORY_TYPE.THERMAL_CAPACITY, setDbTrajectories, studyData?.horizon, {
             area,
-            setDbTrajectories,
-            studyData,
             technology,
-          );
+            fileNameContains,
+          });
         }}
         handleImport={async (rowId: string) => {
           const indexArray = rowId.split('.').map(Number);

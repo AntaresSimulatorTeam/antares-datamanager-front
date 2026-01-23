@@ -104,10 +104,13 @@ const LoadTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         readOnly={readOnly}
         progress={progress}
         idSelected={String(rowIdSelected)}
-        handleSearch={async (value: string, rowId: string) => {
+        handleSearch={async (fileNameContains: string, rowId: string) => {
           const area =
             data[Number(rowId)]?.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : data[Number(rowId)]?.hypothesis;
-          return await handleTrajectorySearch(TRAJECTORY_TYPE.LOAD, value, area, setDbTrajectories, studyData);
+          return await handleTrajectorySearch(TRAJECTORY_TYPE.LOAD, setDbTrajectories, studyData?.horizon, {
+            area,
+            fileNameContains,
+          });
         }}
         handleImport={async (rowId: string) => {
           await handleFetchTrajectoriesFS(

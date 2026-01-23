@@ -8,21 +8,28 @@ import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { CheckBoxData, HypothesisRowData, RowStatus, SelectOption, TabProps } from '@/shared/types';
+import { CheckBoxData, DbTrajectory, HypothesisRowData, RowStatus, SelectOption, TabProps } from '@/shared/types';
 import { useCallback, useEffect, useState } from 'react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { CheckBoxListWithSearchBar } from '@/components/list/CheckBoxListWithSearchBar.tsx';
 import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
-import { addRow, handleFetchTrajectoriesFS } from '@/shared/services/hypothesisTableService.ts';
+import { addRow, handleFetchTrajectoriesFS, handleTrajectorySearch } from '@/shared/services/hypothesisTableService.ts';
 import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow.ts';
-import { filterRow, generateReadOnlyIndexMap, getAreaTrajectoryName } from '@/shared/utils/trajectoryUtils.ts';
+import {
+  filterRow,
+  generateReadOnlyIndexMap,
+  getAreaTrajectoryName,
+  getRowDataSelected,
+} from '@/shared/utils/trajectoryUtils.ts';
 import { getCheckedValues, shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
 import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
+import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
+import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 
 const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const studyState = useStudy();
@@ -37,6 +44,7 @@ const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const [stsTechnologies, setStsTechnologies] = useState<string[]>([]);
   const [isDeletionModalOpen, setIsDeletionModalOpen] = useState(false);
   const [rowToDelete, setRowToDelete] = useState<{ index: number; value?: string } | null>(null);
+  const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const [isStudyGenerated, setIsStudyGenerated] = useState(
     studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED,
   );
@@ -45,6 +53,7 @@ const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const { removeRow } = useHypothesisTableRemoveRow(studyData, dispatch, setData, setCheckedValues);
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch);
   const { detachTrajectory } = useTrajectoryDetach(studyData, dispatch);
+  const { attachTrajectory } = useTrajectoryAttach(studyData, studyState, dispatch);
 
   useEffect(() => {
     const setHypothesis = () => {
@@ -103,7 +112,17 @@ const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         progress={progress}
         idSelected={String(rowIdSelected)}
         isReadOnlyEnable={true}
-        handleSearch={() => Promise.resolve(undefined)}
+        handleSearch={async (fileNameContains: string, rowId: string) => {
+          const indexArray = rowId.split('.').map(Number);
+          const area =
+            data[indexArray[0]]?.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : data[indexArray[0]]?.hypothesis;
+          const technology = data[indexArray[0]].subRows?.[indexArray[1]].hypothesis;
+          return await handleTrajectorySearch(TRAJECTORY_TYPE.STS, setDbTrajectories, studyData?.horizon, {
+            area,
+            technology,
+            fileNameContains,
+          });
+        }}
         handleImport={async (rowId: string) => {
           const indexArray = rowId.split('.').map(Number);
           const technology = data[indexArray[0]]?.subRows?.[indexArray[1]]?.hypothesis;
@@ -116,12 +135,20 @@ const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
             technology,
           );
         }}
-        updateData={async (rowId: string, _value: unknown, status: RowStatus) => {
+        updateData={async (rowId: string, value: unknown, status: RowStatus) => {
           const indexArray = rowId.split('.').map(Number);
           if (status === 'empty' || status === 'emptyError') {
             const current = data[indexArray[0]]?.subRows?.[indexArray[1]]?.trajectory ?? null;
             if (current) {
               await detachTrajectory(TRAJECTORY_TYPE.STS, indexArray, status, current, setData);
+            }
+          } else if (status === 'success') {
+            const dbTrajectory =
+              dbTrajectories.length > 0
+                ? dbTrajectories.find((item) => item.id === value)
+                : getRowDataSelected(data, indexArray)?.trajectory;
+            if (dbTrajectory) {
+              void attachTrajectory(TRAJECTORY_TYPE.STS, indexArray, status, dbTrajectory, setData);
             }
           }
         }}

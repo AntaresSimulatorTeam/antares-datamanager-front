@@ -62,7 +62,7 @@ export const useFetchHypothesisTrajectories = (
         const allAreas = [...(result || []), ...(emptyAreaSelected || []), ...(defaultEmptyAreas || [])];
 
         const arrayWithoutDuplicate =
-          trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY
+          trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY || trajectoryType === TRAJECTORY_TYPE.STS
             ? removeDuplicateByTechnology(allAreas)
             : removeDuplicate(allAreas);
         dispatch?.({
@@ -81,24 +81,19 @@ export const useFetchHypothesisTrajectories = (
 
         // Build row data for hypothesis table
         // Find default area not included in areas trajectory list
-        const defaultAreaListNotIncludedInList: string[] = getDefaultAreaNotIncludedInAreaList(
-          defaultAreas ?? [],
-          areas,
-        );
+        const defaultAreaListNotInList: string[] = getDefaultAreaNotIncludedInAreaList(defaultAreas ?? [], areas);
 
         // Hypothesis table
         const areaData =
           trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY || trajType === TRAJECTORY_TYPE.STS
             ? convertIntoHypothesisRowWithTechnologies(
                 arrayWithoutDuplicate,
-                defaultAreaListNotIncludedInList,
+                defaultAreaListNotInList,
                 defaultAreas,
                 technologies ?? [],
               )
             : arrayWithoutDuplicate
-                .map((trajectory) =>
-                  buildRowWithSubRowsData(trajectory, defaultAreas, defaultAreaListNotIncludedInList, null),
-                )
+                .map((trajectory) => buildRowWithSubRowsData(trajectory, defaultAreas, defaultAreaListNotInList, null))
                 .filter(Boolean);
         let dataTrajectories = [];
         let readOnlyAreas = {};
@@ -108,7 +103,7 @@ export const useFetchHypothesisTrajectories = (
           readOnlyAreas = generateReadOnlyIndexMap(dataTrajectories);
         } else {
           dataTrajectories = sortWithFixedPosition(areaData);
-          readOnlyAreas = retrieveReadOnlyArea(dataTrajectories, defaultAreaListNotIncludedInList);
+          readOnlyAreas = retrieveReadOnlyArea(dataTrajectories, defaultAreaListNotInList);
         }
         setHypothesisTrajectories(dataTrajectories);
         setReadOnlyRow(readOnlyAreas);

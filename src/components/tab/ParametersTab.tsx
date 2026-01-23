@@ -138,7 +138,7 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
           readOnly={readOnly}
           progress={isTechnicalParametersType(selectedTrajectoryType) ? progress : 0}
           idSelected={rowIdSelected}
-          handleSearch={async (value: string, rowId: string) => {
+          handleSearch={async (fileNameContains: string, rowId: string) => {
             const indexArray = rowId.split('.').map(Number);
             let area: string = '';
             if (indexArray.length === 2) {
@@ -149,10 +149,9 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
             }
             return await handleTrajectorySearch(
               getTrajectoryTypeByIndex(indexArray[0]),
-              value,
-              area,
               setDbTrajectories,
-              studyData,
+              studyData?.horizon,
+              { area, fileNameContains },
             );
           }}
           handleImport={async (rowId: string) => {
@@ -236,14 +235,16 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
             isReadOnlyEnable={true}
             readOnly={readOnlyParam}
             progress={isTechnicalParametersType(selectedTrajectoryType) ? 0 : progress}
-            handleSearch={async (value: string, rowId: string) => {
+            handleSearch={async (fileNameContains: string, rowId: string) => {
               const index = Number(rowId.split('.').map(Number)[0]);
               const type =
                 index === 0
                   ? TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER
                   : TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER;
               setSelectedTrajectoryType(type);
-              return await handleTrajectorySearch(type, value, '', setDbTrajectories, studyData);
+              return await handleTrajectorySearch(type, setDbTrajectories, studyData?.horizon, {
+                fileNameContains,
+              });
             }}
             handleImport={async (rowId: string) => {
               const index = Number(rowId.split('.').map(Number)[0]);

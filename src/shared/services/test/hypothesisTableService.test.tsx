@@ -428,14 +428,23 @@ describe('handleTrajectorySearch', () => {
     vi.mocked(formFormatter.convertToSelectionOptionType).mockReturnValue(mockConvertedOptionsArraySearch);
     const setDbTrajectories = vi.fn();
 
-    const type = 'TYPE_A' as TRAJECTORY_TYPE;
+    const type = TRAJECTORY_TYPE.STS;
     const value = 'searchValue';
     const area = 'Area51';
+    const technology = 'biomass';
     const study = { horizon: '2025' } as StudyDTO;
 
-    const result = await handleTrajectorySearch(type, value, area, setDbTrajectories, study);
+    const result = await handleTrajectorySearch(type, setDbTrajectories, study.horizon, {
+      area,
+      technology,
+      fileNameContains: value,
+    });
 
-    expect(trajectoryService.fetchTrajectoriesFromDB).toHaveBeenCalledWith(type, study.horizon, value, area, undefined);
+    expect(trajectoryService.fetchTrajectoriesFromDB).toHaveBeenCalledWith(type, study.horizon, {
+      area,
+      technology,
+      fileNameContains: value,
+    });
     expect(setDbTrajectories).toHaveBeenCalledWith(mockResultsArraySearch);
     expect(formFormatter.convertToSelectionOptionType).toHaveBeenCalledWith(mockResultsArraySearch);
     expect(result).toEqual(mockConvertedOptionsArraySearch);
@@ -445,9 +454,10 @@ describe('handleTrajectorySearch', () => {
     vi.mocked(trajectoryService.fetchTrajectoriesFromDB).mockRejectedValue(new Error('DB error'));
     const setDbTrajectories = vi.fn();
 
-    const result = await handleTrajectorySearch('TYPE_B' as TRAJECTORY_TYPE, 'value', 'area', setDbTrajectories, {
-      horizon: '2030',
-    } as StudyDTO);
+    const result = await handleTrajectorySearch('TYPE_B' as TRAJECTORY_TYPE, setDbTrajectories, '2030', {
+      fileNameContains: 'value',
+      area: 'area',
+    });
 
     expect(result).toBeUndefined();
     expect(setDbTrajectories).not.toHaveBeenCalled();
