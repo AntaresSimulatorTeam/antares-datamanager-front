@@ -285,10 +285,10 @@ export const AreaLinkTab = ({ setErrorMessage, studyData }: AreaLinkTabProps) =>
         updateData={(rowId: string, value: unknown, status: RowStatus) => {
           void handleTrajectoryUpdate(rowId, value as string, status);
         }}
-        handleSearch={async (value: string, rowId: string) => {
+        handleSearch={async (fileNameContains: string, rowId: string) => {
           const index = Number(rowId);
           const type = index === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK;
-          return await handleTrajectorySearch(type, value, '', setDbTrajectories, studyData);
+          return await handleTrajectorySearch(type, setDbTrajectories, studyData?.horizon, { fileNameContains });
         }}
         handleImport={async (rowId: string) =>
           await handleFetchTrajectoriesFS(

@@ -101,16 +101,11 @@ export const useFetchHypothesisParametersTrajectories = (
 
         // Build row data for hypothesis table
         // Find default area not included in areas trajectory list
-        const defaultAreaListNotIncludedInList: string[] = getDefaultAreaNotIncludedInAreaList(
-          defaultAreas ?? [],
-          areas,
-        );
+        const defaultAreaListNotInList: string[] = getDefaultAreaNotIncludedInAreaList(defaultAreas ?? [], areas);
 
         // Hypothesis table
         const specificAreaData = arrayWithoutDuplicate
-          ?.map((trajectory) =>
-            buildRowWithSubRowsData(trajectory, defaultAreas, defaultAreaListNotIncludedInList, null),
-          )
+          ?.map((trajectory) => buildRowWithSubRowsData(trajectory, defaultAreas, defaultAreaListNotInList, null))
           .filter(Boolean);
 
         const specificAreaSelected = isStudyGenerated
@@ -153,10 +148,7 @@ export const useFetchHypothesisParametersTrajectories = (
           const rows = generateReadOnlyIndexMap(dataTrajectories);
           setReadOnlyRow(rows);
         } else {
-          const readOnlyRows = retrieveReadOnlyArea(
-            dataTrajectories[0].subRows ?? [],
-            defaultAreaListNotIncludedInList,
-          );
+          const readOnlyRows = retrieveReadOnlyArea(dataTrajectories[0].subRows ?? [], defaultAreaListNotInList);
           const hasSpecificTrajectory = dataTrajectories[0].subRows?.some(
             (row) => row.status === TRAJECTORY_SELECTION_STATUS.OK,
           );

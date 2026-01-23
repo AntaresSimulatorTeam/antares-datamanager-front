@@ -45,22 +45,23 @@ import { isBusinessError } from '@/shared/utils/errorUtils.ts';
  *
  * @param {TRAJECTORY_TYPE} trajectoryType - Partial name of a study
  * @param {string} horizon - Horizon value (ex: 2020-2021)
- * @param {string | undefined} fileName - Autocompletion - filter trajectories by file name
- * @param {string | undefined} area - To use just in thermal capacity case
- * @param {string | undefined} technology - Technology
+ * @param {{ area?: string; technology?: string; fileNameContains?: string }} options - options for searching area in BDD (area, technology or search term)
  * @returns {Promise<DbTrajectory[]>} - Promise object that represents a list of trajectories
  * @throws {Error}
  */
 export const fetchTrajectoriesFromDB = async (
   trajectoryType: TRAJECTORY_TYPE,
   horizon: string,
-  fileName?: string,
-  area?: string,
-  technology?: string,
+  options?: { area?: string; technology?: string; fileNameContains?: string },
 ): Promise<DbTrajectory[]> => {
-  const baseParams = `trajectoryType=${trajectoryType}&horizon=${horizon}&fileNameContains=${fileName ?? ''}&area=${area ?? ''}`;
-  const techParam = trajectoryType === TRAJECTORY_TYPE.THERMAL_CAPACITY ? `&technology=${technology ?? ''}` : '';
-  const urlApi = `${TRAJECTORY_DATA_BASE_ENDPOINT}?${baseParams}${techParam}`;
+  const queryParams = new URLSearchParams({
+    trajectoryType,
+    horizon,
+    ...(options?.area && { area: options.area }),
+    ...(options?.technology && { technology: options.technology }),
+    ...(options?.fileNameContains && { fileNameContains: options.fileNameContains }),
+  }).toString();
+  const urlApi = `${TRAJECTORY_DATA_BASE_ENDPOINT}?${queryParams}`;
 
   try {
     const response = await AuthService.authFetch(urlApi);

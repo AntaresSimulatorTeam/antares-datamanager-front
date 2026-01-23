@@ -414,40 +414,70 @@ describe('handleFetchTrajectoriesFS', () => {
 });
 
 describe('handleTrajectorySearch', () => {
+  const mockResultsArraySearch = [
+    { id: 1, label: 'Trajectory A' },
+    { id: 2, label: 'Trajectory B' },
+  ] as unknown as DbTrajectory[];
+  const mockConvertedOptionsArraySearch = [
+    { value: '1', label: 'Trajectory A' },
+    { value: '2', label: 'Trajectory B' },
+  ] as unknown as SelectOption[];
   it('should fetch trajectories and return converted options', async () => {
-    const mockResultsArraySearch = [
-      { id: 1, label: 'Trajectory A' },
-      { id: 2, label: 'Trajectory B' },
-    ] as unknown as DbTrajectory[];
-    const mockConvertedOptionsArraySearch = [
-      { value: '1', label: 'Trajectory A' },
-      { value: '2', label: 'Trajectory B' },
-    ] as unknown as SelectOption[];
-
     vi.mocked(trajectoryService.fetchTrajectoriesFromDB).mockResolvedValue(mockResultsArraySearch);
     vi.mocked(formFormatter.convertToSelectionOptionType).mockReturnValue(mockConvertedOptionsArraySearch);
     const setDbTrajectories = vi.fn();
 
-    const type = 'TYPE_A' as TRAJECTORY_TYPE;
+    const type = TRAJECTORY_TYPE.STS;
     const value = 'searchValue';
     const area = 'Area51';
+    const technology = 'biomass';
     const study = { horizon: '2025' } as StudyDTO;
 
-    const result = await handleTrajectorySearch(type, value, area, setDbTrajectories, study);
+    const result = await handleTrajectorySearch(type, setDbTrajectories, study.horizon, {
+      area,
+      technology,
+      fileNameContains: value,
+    });
 
-    expect(trajectoryService.fetchTrajectoriesFromDB).toHaveBeenCalledWith(type, study.horizon, value, area, undefined);
+    expect(trajectoryService.fetchTrajectoriesFromDB).toHaveBeenCalledWith(type, study.horizon, {
+      area,
+      technology,
+      fileNameContains: value,
+    });
     expect(setDbTrajectories).toHaveBeenCalledWith(mockResultsArraySearch);
     expect(formFormatter.convertToSelectionOptionType).toHaveBeenCalledWith(mockResultsArraySearch);
     expect(result).toEqual(mockConvertedOptionsArraySearch);
+  });
+
+  it('should fetch trajectories for OTHERS area when hypothesis is Other areas', async () => {
+    vi.mocked(trajectoryService.fetchTrajectoriesFromDB).mockResolvedValue(mockResultsArraySearch);
+    vi.mocked(formFormatter.convertToSelectionOptionType).mockReturnValue(mockConvertedOptionsArraySearch);
+    const setDbTrajectories = vi.fn();
+
+    const type = TRAJECTORY_TYPE.STS;
+    const value = 'valueToSearch';
+    const area = OTHER_AREAS_LABEL;
+    const study = { horizon: '2031' } as StudyDTO;
+
+    await handleTrajectorySearch(type, setDbTrajectories, study.horizon, {
+      area,
+      fileNameContains: value,
+    });
+
+    expect(trajectoryService.fetchTrajectoriesFromDB).toHaveBeenCalledWith(type, study.horizon, {
+      area: OTHER_AREAS,
+      fileNameContains: value,
+    });
   });
 
   it('should handle errors silently and return undefined', async () => {
     vi.mocked(trajectoryService.fetchTrajectoriesFromDB).mockRejectedValue(new Error('DB error'));
     const setDbTrajectories = vi.fn();
 
-    const result = await handleTrajectorySearch('TYPE_B' as TRAJECTORY_TYPE, 'value', 'area', setDbTrajectories, {
-      horizon: '2030',
-    } as StudyDTO);
+    const result = await handleTrajectorySearch('TYPE_B' as TRAJECTORY_TYPE, setDbTrajectories, '2030', {
+      fileNameContains: 'value',
+      area: 'area',
+    });
 
     expect(result).toBeUndefined();
     expect(setDbTrajectories).not.toHaveBeenCalled();
