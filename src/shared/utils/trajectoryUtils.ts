@@ -658,9 +658,13 @@ export const getSubRowListWithArea = (
   t: TFunction<'translation', undefined>,
   type?: TRAJECTORY_TYPE,
 ): { message: string; messageNb: number } => {
-  if (type === TRAJECTORY_TYPE.THERMAL_CAPACITY || type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
+  if (
+    type === TRAJECTORY_TYPE.THERMAL_CAPACITY ||
+    type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER ||
+    type === TRAJECTORY_TYPE.STS
+  ) {
     let prefix: string = '';
-    if (type === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
+    if (type === TRAJECTORY_TYPE.THERMAL_CAPACITY || type === TRAJECTORY_TYPE.STS) {
       prefix = t('thermal.@installedPowerInformation');
     }
     if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
