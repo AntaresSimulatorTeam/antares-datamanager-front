@@ -29,7 +29,6 @@ import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
 import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
-import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 
 const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const studyState = useStudy();
@@ -114,11 +113,9 @@ const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         isReadOnlyEnable={true}
         handleSearch={async (fileNameContains: string, rowId: string) => {
           const indexArray = rowId.split('.').map(Number);
-          const area =
-            data[indexArray[0]]?.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : data[indexArray[0]]?.hypothesis;
           const technology = data[indexArray[0]].subRows?.[indexArray[1]].hypothesis;
           return await handleTrajectorySearch(TRAJECTORY_TYPE.STS, setDbTrajectories, studyData?.horizon, {
-            area,
+            area: data[indexArray[0]]?.hypothesis,
             technology,
             fileNameContains,
           });

@@ -33,6 +33,7 @@ import { convertToFSSelectionOptionType, convertToSelectionOptionType } from '@/
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { generateTrajectoryViewHeader } from '@/components/header/TrajectoryViewHeader.tsx';
 import { TFunction } from 'i18next';
+import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 
 export const handleTrajectoryError = (
   type: TRAJECTORY_TYPE,
@@ -114,6 +115,9 @@ export const handleTrajectorySearch = async (
   options: { area?: string; technology?: string; fileNameContains?: string },
 ): Promise<SelectOption[] | undefined> => {
   try {
+    if (options?.area && options.area === OTHER_AREAS_LABEL) {
+      options.area = OTHER_AREAS;
+    }
     const results = await fetchTrajectoriesFromDB(type, studyHorizon, options);
     setDbTrajectories(results);
     return convertToSelectionOptionType(results);

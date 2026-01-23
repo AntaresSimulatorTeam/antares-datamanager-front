@@ -22,7 +22,6 @@ import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
 import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow.ts';
-import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { CheckBoxListWithSearchBar } from '@/components/list/CheckBoxListWithSearchBar.tsx';
 import { filterRow, generateReadOnlyIndexMap, getAreaTrajectoryName } from '@/shared/utils/trajectoryUtils.ts';
 
@@ -104,14 +103,12 @@ const LoadTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         readOnly={readOnly}
         progress={progress}
         idSelected={String(rowIdSelected)}
-        handleSearch={async (fileNameContains: string, rowId: string) => {
-          const area =
-            data[Number(rowId)]?.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : data[Number(rowId)]?.hypothesis;
-          return await handleTrajectorySearch(TRAJECTORY_TYPE.LOAD, setDbTrajectories, studyData?.horizon, {
-            area,
+        handleSearch={async (fileNameContains: string, rowId: string) =>
+          await handleTrajectorySearch(TRAJECTORY_TYPE.LOAD, setDbTrajectories, studyData?.horizon, {
+            area: data[Number(rowId)]?.hypothesis,
             fileNameContains,
-          });
-        }}
+          })
+        }
         handleImport={async (rowId: string) => {
           await handleFetchTrajectoriesFS(
             TRAJECTORY_TYPE.LOAD,

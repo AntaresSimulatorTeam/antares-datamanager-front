@@ -19,7 +19,6 @@ import {
 } from '@/shared/utils/trajectoryUtils.ts';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { addRow, handleFetchTrajectoriesFS, handleTrajectorySearch } from '@/shared/services/hypothesisTableService.ts';
-import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach';
@@ -140,18 +139,16 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
           idSelected={rowIdSelected}
           handleSearch={async (fileNameContains: string, rowId: string) => {
             const indexArray = rowId.split('.').map(Number);
-            let area: string = '';
-            if (indexArray.length === 2) {
-              area =
-                technicalData[indexArray[0]]?.subRows?.[indexArray[1]]?.hypothesis === OTHER_AREAS_LABEL
-                  ? OTHER_AREAS
-                  : (technicalData[indexArray[0]]?.subRows?.[indexArray[1]]?.hypothesis ?? '');
-            }
             return await handleTrajectorySearch(
               getTrajectoryTypeByIndex(indexArray[0]),
               setDbTrajectories,
               studyData?.horizon,
-              { area, fileNameContains },
+              {
+                ...(indexArray.length === 2 && {
+                  area: technicalData[indexArray[0]]?.subRows?.[indexArray[1]]?.hypothesis,
+                }),
+                fileNameContains,
+              },
             );
           }}
           handleImport={async (rowId: string) => {
