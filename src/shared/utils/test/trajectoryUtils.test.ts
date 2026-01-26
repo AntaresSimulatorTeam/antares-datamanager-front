@@ -1219,7 +1219,7 @@ describe('getSubRowsList', () => {
 
 describe('getSubRowListWithArea', () => {
   const mockT = vi.fn((key: string) => {
-    if (key === 'thermal.@installedPowerInformation') return 'Installed Power';
+    if (key === 'thermal.@installedPowerInformation') return 'Technology filled in';
     if (key === 'thermal.@specificInformation') return 'Specific Info';
     return key;
   }) as unknown as TFunction<'translation', undefined>;
@@ -1228,8 +1228,17 @@ describe('getSubRowListWithArea', () => {
     const mockRow = ['Biomass', 'DST'];
     const result = getSubRowListWithArea(mockRow, mockT, TRAJECTORY_TYPE.THERMAL_CAPACITY);
     expect(result).toEqual({
-      message: 'Installed Power: Biomass, DST',
+      message: 'Technology filled in: Biomass, DST',
       messageNb: 2,
+    });
+  });
+
+  it('should return message and count for STS', () => {
+    const mockRow = ['DSR'];
+    const result = getSubRowListWithArea(mockRow, mockT, TRAJECTORY_TYPE.STS);
+    expect(result).toEqual({
+      message: 'Technology filled in: DSR',
+      messageNb: 1,
     });
   });
 
