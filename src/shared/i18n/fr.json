@@ -185,6 +185,9 @@
     "@confirm": "Confirm",
     "@cancel": "Cancel"
   },
+  "trajectoryImportModal": {
+    "@timeSeries": "Des séries temporelles seront importées"
+  },
   "about": {
     "@title": "About",
     "@appName": "App Name",

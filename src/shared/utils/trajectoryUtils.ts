@@ -731,9 +731,10 @@ export const isTechnicalParametersType = (type: TRAJECTORY_TYPE): boolean =>
  * Determines the file path based on the trajectory type.
  *
  * @param {TRAJECTORY_TYPE} type - The trajectory type used to select the corresponding file path.
+ * @param {string} technology
  * @returns {string | null} The file path associated with the given trajectory type.
  */
-export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE): string | null => {
+export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE, technology?: string): string | null => {
   switch (type) {
     case TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER:
       return '\\\\thermal\\economic parameters\\economic';
@@ -745,7 +746,7 @@ export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE): string | null 
     case TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER:
       return '\\\\thermal\\technical parameters';
     case TRAJECTORY_TYPE.STS:
-      return '\\\\STS\\clusters';
+      return `\\\\STS\\${technology}\\clusters`;
     default:
       return null;
   }

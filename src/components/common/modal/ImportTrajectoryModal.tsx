@@ -9,6 +9,7 @@ import { convertToFSSelectionOptionType } from '@/shared/utils/formFormatter.ts'
 import StdButton from '@common/base/stdButton/StdButton';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { getPathFromTrajectoryType, getQueryParamAreaValue } from '@/shared/utils/trajectoryUtils.ts';
+import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 
 interface ImportTrajectoryModalProps {
   options: SelectOption[] | undefined;
@@ -20,7 +21,7 @@ interface ImportTrajectoryModalProps {
 export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, hypothesis }: ImportTrajectoryModalProps) => {
   const { t } = useTranslation();
   const [trajectorySelected, setTrajectorySelected] = useState<SelectOption | null>(null);
-  const path = getPathFromTrajectoryType(trajectoryType);
+  const path = getPathFromTrajectoryType(trajectoryType, hypothesis?.technology);
 
   const handleSelectOption = (value: SelectOption | null) => {
     if (value) {
@@ -74,6 +75,12 @@ export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, hypoth
                 resetField={resetField}
               />
             </div>
+            {trajectoryType === TRAJECTORY_TYPE.STS && (
+              <div className="mt-1 flex items-center gap-1 text-body-s text-gray-600">
+                <StdIcon name={StdIconId.Info} width={15} height={15} />
+                <span>{t('trajectoryImportModal.@timeSeries')}</span>
+              </div>
+            )}
           </div>
           <div className="relative flex w-full justify-end gap-1 pb-2 pt-8">
             <StdButton label="Cancel" onClick={() => void onClose()} color="secondary" />
