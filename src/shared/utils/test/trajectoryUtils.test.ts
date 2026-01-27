@@ -807,7 +807,7 @@ describe('getPathFromTrajectoryType', () => {
   });
 
   it('should return technical path for STS', () => {
-    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.STS, 'DSR')).toBe('\\\\STS\\DSR\\technical parameters');
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.STS, 'DSR')).toBe('\\\\STS\\DSR\\clusters');
   });
 
   it('should return technical path for unknown type', () => {
