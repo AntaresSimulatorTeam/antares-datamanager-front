@@ -274,19 +274,16 @@ export const buildDefaultEmptyTrajectoryList = (
  */
 export const shouldHaveSubRows = (areasToExclude: string[], mainEntry?: DbTrajectory): boolean => {
   if (!mainEntry) return true;
-
-  const { type, area } = mainEntry;
-  const isInExcludedAreas = areasToExclude.includes(area);
-
-  if (type === TRAJECTORY_TYPE.STS) {
-    return true;
+  const isInExcluded = areasToExclude.includes(mainEntry.area);
+  const isOther = mainEntry.area === OTHER_AREAS;
+  switch (mainEntry.type) {
+    case TRAJECTORY_TYPE.STS:
+      return true;
+    case TRAJECTORY_TYPE.THERMAL_CAPACITY:
+      return !isOther && !isInExcluded;
+    default:
+      return isOther || !isInExcluded;
   }
-
-  if (type === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
-    return area !== OTHER_AREAS && !isInExcludedAreas;
-  }
-
-  return area === OTHER_AREAS || !isInExcludedAreas;
 };
 
 const normalizeTechnology = (s: string | undefined | null) => s?.trim().toLowerCase();
