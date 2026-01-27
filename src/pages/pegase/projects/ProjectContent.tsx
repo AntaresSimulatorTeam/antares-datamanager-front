@@ -74,7 +74,7 @@ const ProjectContent = () => {
         />
       </div>
       <div className="grid w-full grid-cols-3 gap-3">
-        {(projects.length > intervalSize ? projects.splice(0, 9) : projects || []).map((project) => {
+        {(projects.length > intervalSize ? projects.slice(0, 9) : projects || []).map((project) => {
           const dropdownItems: StdDropdownOption[] = [
             pinOption(false, () => void handlePinProject(project.id), pinnedProjects?.length >= 3),
             editOption(() => void openModalProject(project), t('project.@edit')),
