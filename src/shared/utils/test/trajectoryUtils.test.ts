@@ -806,6 +806,10 @@ describe('getPathFromTrajectoryType', () => {
     );
   });
 
+  it('should return technical path for STS', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.STS, 'DSR')).toBe('\\\\STS\\DSR\\technical parameters');
+  });
+
   it('should return technical path for unknown type', () => {
     expect(getPathFromTrajectoryType('UNKNOWN_TYPE' as TRAJECTORY_TYPE)).toBeNull();
   });
@@ -1154,7 +1158,17 @@ describe('shouldHaveSubRows', () => {
   });
 
   it('returns true for non-thermal in OTHER_AREAS', () => {
+    const entry = { type: 'THERMAL_ECONOMIC_COST_PARAMETER', area: OTHER_AREAS } as DbTrajectory;
+    expect(shouldHaveSubRows(excludedAreas, entry)).toBe(true);
+  });
+
+  it('returns true for STS and area OTHER_AREAS', () => {
     const entry = { type: 'STS', area: OTHER_AREAS } as DbTrajectory;
+    expect(shouldHaveSubRows(excludedAreas, entry)).toBe(true);
+  });
+
+  it('returns true for STS and specific area', () => {
+    const entry = { type: 'STS', area: 'AREA_3' } as DbTrajectory;
     expect(shouldHaveSubRows(excludedAreas, entry)).toBe(true);
   });
 
@@ -1185,6 +1199,19 @@ describe('getSubRowsList', () => {
 
     const result = getSubRowsList(row);
     expect(result).toEqual(['AI', 'Blockchain']);
+  });
+
+  it('should return area when depth is 0 and subRows have area', () => {
+    const row = {
+      depth: 0,
+      originalSubRows: [
+        { trajectory: { area: 'AT' }, status: TRAJECTORY_SELECTION_STATUS.OK },
+        { trajectory: { area: 'BE' }, status: TRAJECTORY_SELECTION_STATUS.OK },
+      ],
+    } as Row<HypothesisRowData>;
+
+    const result = getSubRowsList(row);
+    expect(result).toEqual(['AT', 'BE']);
   });
 
   it('should return empty array when depth is not 0', () => {
