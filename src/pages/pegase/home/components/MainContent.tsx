@@ -35,7 +35,7 @@ const MainContent = () => {
           bottomItems={translateMenuItemLabel(menuBottomData, t)}
           config={navBarConfig}
         />
-        <div className="flex h-full w-full min-w-0 flex-col">
+        <div className="flex h-full w-full flex-col">
           <PegaseStar />
           <Suspense>
             <Routes>
