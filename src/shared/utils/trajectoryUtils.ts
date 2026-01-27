@@ -273,11 +273,23 @@ export const buildDefaultEmptyTrajectoryList = (
  * @returns {boolean} True if the trajectory should have sub-rows, otherwise false.
  */
 export const shouldHaveSubRows = (areasToExclude: string[], mainEntry?: DbTrajectory): boolean => {
-  const isThermal = mainEntry?.type === TRAJECTORY_TYPE.THERMAL_CAPACITY;
-  const isOtherArea = mainEntry?.area === OTHER_AREAS;
-  const isInExcludedAreas = areasToExclude?.includes(mainEntry?.area ?? '');
-  return isThermal ? !isOtherArea && !isInExcludedAreas : isOtherArea || !isInExcludedAreas;
+  if (!mainEntry) return true;
+
+  const { type, area } = mainEntry;
+  const isInExcludedAreas = areasToExclude.includes(area);
+
+  if (type === TRAJECTORY_TYPE.STS) {
+    return true;
+  }
+
+  if (type === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
+    return area !== OTHER_AREAS && !isInExcludedAreas;
+  }
+
+  return area === OTHER_AREAS || !isInExcludedAreas;
 };
+
+const normalizeTechnology = (s: string | undefined | null) => s?.trim().toLowerCase();
 
 /**
  * Transforms data into a structured array of hypothesis rows, enriched with associated technologies.
@@ -311,7 +323,9 @@ export const convertIntoHypothesisRowWithTechnologies = (
     const mainEntry = entries.find((e) => e.technology === '');
     const subRows: HypothesisRowData[] | null = shouldHaveSubRows(areasNotInTrajectoryArea, mainEntry)
       ? options.map((option: string) => {
-          const trajectoryTechnology: DbTrajectory | undefined = entries.find((entry) => entry?.technology === option);
+          const trajectoryTechnology: DbTrajectory | undefined = entries.find(
+            (entry) => normalizeTechnology(entry?.technology) == normalizeTechnology(option),
+          );
           return {
             hypothesis: option,
             trajectory: trajectoryTechnology?.trajectoryName ? trajectoryTechnology : null,
