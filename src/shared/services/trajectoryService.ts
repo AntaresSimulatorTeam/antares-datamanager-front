@@ -57,8 +57,8 @@ export const fetchTrajectoriesFromDB = async (
   const queryParams = new URLSearchParams({
     trajectoryType,
     horizon,
-    ...(options?.area && { area: options.area }),
-    ...(options?.technology && { technology: options.technology }),
+    area: options?.area ?? '',
+    technology: options?.technology ?? '',
     ...(options?.fileNameContains && { fileNameContains: options.fileNameContains }),
   }).toString();
   const urlApi = `${TRAJECTORY_DATA_BASE_ENDPOINT}?${queryParams}`;
@@ -87,8 +87,8 @@ export const fetchTrajectoriesFromFS = async (
 ): Promise<FsTrajectory[]> => {
   const queryString = new URLSearchParams({
     trajectoryType,
-    ...(trajectoryType !== TRAJECTORY_TYPE.STS && { area: hypothesis }),
-    ...(trajectoryType === TRAJECTORY_TYPE.STS && { technology: hypothesis }),
+    ...(trajectoryType !== TRAJECTORY_TYPE.STS && hypothesis && { area: hypothesis }),
+    ...(trajectoryType === TRAJECTORY_TYPE.STS && hypothesis && { technology: hypothesis }),
     ...(searchTerm && { fileNameContains: searchTerm }),
   }).toString();
 
