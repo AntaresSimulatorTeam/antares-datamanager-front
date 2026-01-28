@@ -87,8 +87,8 @@ export const fetchTrajectoriesFromFS = async (
 ): Promise<FsTrajectory[]> => {
   const queryString = new URLSearchParams({
     trajectoryType,
-    ...(trajectoryType !== TRAJECTORY_TYPE.STS && hypothesis && { area: hypothesis }),
-    ...(trajectoryType === TRAJECTORY_TYPE.STS && hypothesis && { technology: hypothesis }),
+    ...(trajectoryType !== TRAJECTORY_TYPE.STS && { area: hypothesis }),
+    ...(trajectoryType === TRAJECTORY_TYPE.STS && { technology: hypothesis }),
     ...(searchTerm && { fileNameContains: searchTerm }),
   }).toString();
 
