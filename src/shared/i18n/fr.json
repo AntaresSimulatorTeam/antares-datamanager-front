@@ -159,6 +159,7 @@
   "trajectoryViewModal": {
     "@title_area": "Zones",
     "@title_link": "Liens",
+    "@title_sts": "STS - Série temporelle",
     "@areaName": "Nom",
     "@spilledEnergyCost": "spilled energy cost",
     "@unsuppliedEnergyCost": "unsupplied energy cost",
@@ -175,7 +176,9 @@
     "@hvdc": "HVDC",
     "@specificTs": "Specific TS",
     "@forcedOutageHvac": "Forced Outage HVAC",
-    "@hurdleCost": "Hurdle cost"
+    "@hurdleCost": "Hurdle cost",
+    "@cluster": "Hypothèse - Technologie - Clusters",
+    "@series": "Série temporelle"
   },
   "trajectoryDeletionModal": {
     "@confirmDeleteTitle": "Confirm you want to delete this area.",

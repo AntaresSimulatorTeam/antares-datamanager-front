@@ -19,6 +19,7 @@ import {
   ThermalParamTrajectoryType,
   TrajectoryAreaDataScheme,
   TrajectoryLinkDataScheme,
+  TrajectorySTSDataScheme,
   TrajectoryViewData,
 } from '@/shared/types';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
@@ -219,6 +220,18 @@ export const fetchTrajectoriesFromTypes = async (
   }
 };
 
+export const getSchemeData = (type: TRAJECTORY_TYPE) => {
+  switch (type) {
+    case TRAJECTORY_TYPE.STS:
+      return TrajectorySTSDataScheme;
+    case TRAJECTORY_TYPE.LINK:
+      return TrajectoryLinkDataScheme;
+    case TRAJECTORY_TYPE.AREA:
+    default:
+      return TrajectoryAreaDataScheme;
+  }
+};
+
 /**
  * Handles fetching and preparing trajectory data for viewing.
  *
@@ -239,10 +252,9 @@ export const handleViewTrajectory = async (
 ): Promise<void> => {
   try {
     const results = await getTrajectoryDataByTypeAndId(trajectory.type, trajectory.id);
-    const columns =
-      trajectory.type === TRAJECTORY_TYPE.AREA
-        ? generateTrajectoryViewHeader(TrajectoryAreaDataScheme, t, 350)
-        : generateTrajectoryViewHeader(TrajectoryLinkDataScheme, t, 128);
+    const scheme = getSchemeData(trajectory.type);
+    const size = trajectory.type === TRAJECTORY_TYPE.AREA ? 350 : 128;
+    const columns = generateTrajectoryViewHeader(scheme, t, size);
     setTrajectoryData({
       trajectory,
       data: results,

@@ -49,12 +49,15 @@ export interface TrajectoryViewData {
 
 export enum TRAJECTORY_DATA_TYPE {
   TrajectoryAreaData = 'TrajectoryAreaData',
-  TrajectoryLinkData = 'BTrajectoryLinkData',
+  TrajectoryLinkData = 'TrajectoryLinkData',
+  TrajectorySTSData = 'TrajectorySTSData',
 }
 
 export type Types<T extends TRAJECTORY_DATA_TYPE> = T extends TrajectoryAreaData
   ? TrajectoryAreaData
-  : TrajectoryLinkData;
+  : T extends TrajectoryLinkData
+    ? TrajectoryLinkData
+    : TrajectorySTSData;
 
 export interface TrajectoryAreaData {
   areaName: string;
@@ -100,6 +103,16 @@ export const TrajectoryLinkDataScheme = {
   specificTs: 'string',
   forcedOutageHvac: 'string',
   hurdleCost: 'number',
+} as const;
+
+export interface TrajectorySTSData {
+  name: string;
+  series: string;
+}
+
+export const TrajectorySTSDataScheme = {
+  cluster: 'string',
+  series: 'string',
 } as const;
 
 export interface HypothesisTab extends Tab {

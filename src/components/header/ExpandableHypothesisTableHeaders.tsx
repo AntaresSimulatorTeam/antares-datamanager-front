@@ -126,7 +126,7 @@ const getExpandableHypothesisTableHeaders = ({
         columnHelper.accessor('timeSeries', {
           header: t('home.@time_series'),
           size: 160,
-          cell: ({ row }) => {
+          cell: ({ row, table: { options } }) => {
             if (row.depth === 0) return null;
             const { trajectory, status } = row.original;
             const hasTrajectory = trajectory?.trajectoryName && status === TRAJECTORY_SELECTION_STATUS.OK;
@@ -136,7 +136,7 @@ const getExpandableHypothesisTableHeaders = ({
                 icon={StdIconId.Preview}
                 position="left"
                 disabled={row.getReadOnly() || (!isStudyGenerated && !hasTrajectory)}
-                onClick={() => {}}
+                onClick={() => void options?.meta?.viewData?.(row.id)}
                 variant="outlined"
                 size="small"
               />
