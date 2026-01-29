@@ -57,8 +57,8 @@ export const fetchTrajectoriesFromDB = async (
   const queryParams = new URLSearchParams({
     trajectoryType,
     horizon,
-    area: options?.area ?? '',
-    technology: options?.technology ?? '',
+    ...(options?.area && { area: options.area }),
+    ...(options?.technology && { technology: options.technology }),
     ...(options?.fileNameContains && { fileNameContains: options.fileNameContains }),
   }).toString();
   const urlApi = `${TRAJECTORY_DATA_BASE_ENDPOINT}?${queryParams}`;

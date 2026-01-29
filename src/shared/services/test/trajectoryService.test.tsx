@@ -71,7 +71,7 @@ describe('fetchTrajectoriesFromDB', () => {
     await waitFor(() => {
       expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
       expect(AuthService.authFetch).toHaveBeenCalledWith(
-        'https://mockapi.com/v1/trajectory/db?trajectoryType=AREA&horizon=2023-2024&area=&technology=',
+        'https://mockapi.com/v1/trajectory/db?trajectoryType=AREA&horizon=2023-2024',
       );
       expect(result).toEqual(mockDbTrajectory);
     });
@@ -88,7 +88,7 @@ describe('fetchTrajectoriesFromDB', () => {
     await waitFor(() => {
       expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
       expect(AuthService.authFetch).toHaveBeenCalledWith(
-        'https://mockapi.com/v1/trajectory/db?trajectoryType=THERMAL_CAPACITY&horizon=2023-2024&area=&technology=',
+        'https://mockapi.com/v1/trajectory/db?trajectoryType=THERMAL_CAPACITY&horizon=2023-2024',
       );
       expect(result).toEqual(mockDbTrajectory);
     });
