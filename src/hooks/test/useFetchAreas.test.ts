@@ -1,7 +1,7 @@
 import { beforeEach, describe, Mock, vi } from 'vitest';
 import { useFetchAreas } from '@/hooks/useFetchAreas.ts';
 import { useStudy } from '@/store/contexts/StudyContext.tsx';
-import { StudyState, TrajectoryLinkData } from '@/shared/types';
+import { StudyState, TrajectoryAreaData } from '@/shared/types';
 import { renderHook, waitFor } from '@testing-library/react';
 import * as trajectoryService from '@/shared/services/trajectoryService.ts';
 import * as defaultConfigService from '@/shared/services/defaultConfigService.ts';
@@ -28,7 +28,7 @@ describe('useFetchAreas', () => {
   const mockUseStudy = useStudy as Mock<typeof useStudy>;
   vi.mocked(defaultConfigService.getDefaultAreas).mockResolvedValueOnce(mockDefaultArea);
   vi.mocked(trajectoryService.getTrajectoryDataByTypeAndId).mockResolvedValueOnce(
-    mockTrajectoryAreaData as unknown as TrajectoryLinkData[],
+    mockTrajectoryAreaData as unknown as TrajectoryAreaData[],
   );
 
   beforeEach(() => {

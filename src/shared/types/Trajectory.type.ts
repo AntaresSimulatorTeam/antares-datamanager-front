@@ -53,11 +53,11 @@ export enum TRAJECTORY_DATA_TYPE {
   TrajectorySTSData = 'TrajectorySTSData',
 }
 
-export type Types<T extends TRAJECTORY_DATA_TYPE> = T extends TrajectoryAreaData
-  ? TrajectoryAreaData
+export type Types<T extends TRAJECTORY_DATA_TYPE> = T extends TrajectorySTSData
+  ? TrajectorySTSData
   : T extends TrajectoryLinkData
     ? TrajectoryLinkData
-    : TrajectorySTSData;
+    : TrajectoryAreaData;
 
 export interface TrajectoryAreaData {
   areaName: string;
