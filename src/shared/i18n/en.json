@@ -178,7 +178,7 @@
     "@specificTs": "Specific TS",
     "@forcedOutageHvac": "Forced Outage HVAC",
     "@hurdleCost": "Hurdle cost",
-    "@cluster": "Hypothesis - Technology - Clusters",
+    "@cluster": "Area - Technology - Clusters",
     "@series": "Time Series"
   },
   "trajectoryDeletionModal": {
