@@ -1,6 +1,15 @@
-import { CheckBoxData, DbTrajectory, HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
+import {
+  CheckBoxData,
+  DbTrajectory,
+  HypothesisRowData,
+  TrajectoryAreaData,
+  TrajectoryAreaDataScheme,
+  TrajectoryLinkDataScheme,
+  TrajectorySTSDataScheme,
+} from '@/shared/types';
 import { Row } from '@tanstack/react-table';
 import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
+import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 
 /**
  * Return the left padding value for hypothesis table with subRows
@@ -166,4 +175,16 @@ export const buildCheckListBox = (
   const areaOptions: CheckBoxData[] = buildAreaOptions(trajectoryAreas, defaultAreas);
   const checkedValues: string[] = buildCheckValuesList(areaWithTrajectory, defaultAreas);
   return { areaOptions, checkedValues };
+};
+
+export const getSchemeData = (type: TRAJECTORY_TYPE) => {
+  switch (type) {
+    case TRAJECTORY_TYPE.STS:
+      return TrajectorySTSDataScheme;
+    case TRAJECTORY_TYPE.LINK:
+      return TrajectoryLinkDataScheme;
+    case TRAJECTORY_TYPE.AREA:
+    default:
+      return TrajectoryAreaDataScheme;
+  }
 };
