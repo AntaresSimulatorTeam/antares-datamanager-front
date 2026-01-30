@@ -516,6 +516,7 @@ describe('addRow', () => {
               area: 'NewHypothesis',
               technology: '',
               state: TRAJECTORY_SELECTION_STATUS.MISSING,
+              hasTimeSeries: false,
             },
           ],
         },

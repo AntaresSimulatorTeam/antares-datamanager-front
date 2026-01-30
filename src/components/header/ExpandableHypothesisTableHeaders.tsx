@@ -129,7 +129,8 @@ const getExpandableHypothesisTableHeaders = ({
           cell: ({ row, table: { options } }) => {
             if (row.depth === 0) return null;
             const { trajectory, status } = row.original;
-            const hasTrajectory = trajectory?.trajectoryName && status === TRAJECTORY_SELECTION_STATUS.OK;
+            const hasTrajectory =
+              trajectory?.hasTimeSeries && trajectory?.trajectoryName && status === TRAJECTORY_SELECTION_STATUS.OK;
             return (
               <StdButton
                 label={t('studyDetails.@preview')}
