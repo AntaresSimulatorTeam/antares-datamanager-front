@@ -17,8 +17,6 @@ import {
   SelectOption,
   StudyActionType,
   ThermalParamTrajectoryType,
-  TrajectoryAreaDataScheme,
-  TrajectoryLinkDataScheme,
   TrajectoryViewData,
 } from '@/shared/types';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
@@ -34,6 +32,7 @@ import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { generateTrajectoryViewHeader } from '@/components/header/TrajectoryViewHeader.tsx';
 import { TFunction } from 'i18next';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
+import { getSchemeData } from '@/shared/utils/hypothesisTableUtils.ts';
 
 export const handleTrajectoryError = (
   type: TRAJECTORY_TYPE,
@@ -239,10 +238,9 @@ export const handleViewTrajectory = async (
 ): Promise<void> => {
   try {
     const results = await getTrajectoryDataByTypeAndId(trajectory.type, trajectory.id);
-    const columns =
-      trajectory.type === TRAJECTORY_TYPE.AREA
-        ? generateTrajectoryViewHeader(TrajectoryAreaDataScheme, t, 350)
-        : generateTrajectoryViewHeader(TrajectoryLinkDataScheme, t, 128);
+    const scheme = getSchemeData(trajectory.type);
+    const size = trajectory.type === TRAJECTORY_TYPE.AREA ? 350 : 128;
+    const columns = generateTrajectoryViewHeader(scheme, t, size);
     setTrajectoryData({
       trajectory,
       data: results,

@@ -5,13 +5,22 @@ import {
   buildCheckValuesList,
   getAlignment,
   getDefaultAreaNotIncludedInAreaList,
+  getSchemeData,
   hasLabelDefault,
   simulateProgress,
   transformToSubRowKeys,
 } from '@/shared/utils/hypothesisTableUtils.ts';
-import { DbTrajectory, HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
+import {
+  DbTrajectory,
+  HypothesisRowData,
+  TrajectoryAreaData,
+  TrajectoryAreaDataScheme,
+  TrajectoryLinkDataScheme,
+  TrajectorySTSDataScheme,
+} from '@/shared/types';
 import { Row } from '@tanstack/react-table';
 import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
+import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 
 describe('getAlignment', () => {
   it('should return "pl-0" when depth is 0 and row can expand', () => {
@@ -332,5 +341,19 @@ describe('buildCheckValuesList', () => {
     const result = buildCheckValuesList(areaWithTrajectory, defaultAreas);
 
     expect(result).toEqual(['Zone A', 'Zone B']);
+  });
+});
+
+describe('getSchemeData', () => {
+  it('return area scheme for AREA type', () => {
+    expect(getSchemeData(TRAJECTORY_TYPE.AREA)).toBe(TrajectoryAreaDataScheme);
+  });
+
+  it('return area scheme for LINK type', () => {
+    expect(getSchemeData(TRAJECTORY_TYPE.LINK)).toBe(TrajectoryLinkDataScheme);
+  });
+
+  it('return area scheme for STS type', () => {
+    expect(getSchemeData(TRAJECTORY_TYPE.STS)).toBe(TrajectorySTSDataScheme);
   });
 });

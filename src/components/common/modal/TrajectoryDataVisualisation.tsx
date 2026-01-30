@@ -19,11 +19,17 @@ export const TrajectoryDataVisualisation = ({ trajectoryData, onClose }: Traject
   const title =
     trajectory.type === TRAJECTORY_TYPE.AREA
       ? t('trajectoryViewModal.@title_area')
-      : t('trajectoryViewModal.@title_link');
+      : trajectory.type === TRAJECTORY_TYPE.LINK
+        ? t('trajectoryViewModal.@title_link')
+        : t('trajectoryViewModal.@title_sts');
+  const icon =
+    trajectory.type === TRAJECTORY_TYPE.AREA || trajectory.type === TRAJECTORY_TYPE.LINK
+      ? StdIconId.LinkedServices
+      : StdIconId.BatteryChargingFull;
 
   return (
     <RdsModal size="medium">
-      <RdsModal.Title onClose={onClose} customIcon={<StdIcon name={StdIconId.LinkedServices} color="secondary" />}>
+      <RdsModal.Title onClose={onClose} customIcon={<StdIcon name={icon} color="primary" />}>
         {`${title}: ${trajectory.trajectoryName}`}
       </RdsModal.Title>
       <RdsModal.Content>

@@ -8,13 +8,26 @@ import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { CheckBoxData, DbTrajectory, HypothesisRowData, RowStatus, SelectOption, TabProps } from '@/shared/types';
+import {
+  CheckBoxData,
+  DbTrajectory,
+  HypothesisRowData,
+  RowStatus,
+  SelectOption,
+  TabProps,
+  TrajectoryViewData,
+} from '@/shared/types';
 import { useCallback, useEffect, useState } from 'react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { CheckBoxListWithSearchBar } from '@/components/list/CheckBoxListWithSearchBar.tsx';
 import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
-import { addRow, handleFetchTrajectoriesFS, handleTrajectorySearch } from '@/shared/services/hypothesisTableService.ts';
+import {
+  addRow,
+  handleFetchTrajectoriesFS,
+  handleTrajectorySearch,
+  handleViewTrajectory,
+} from '@/shared/services/hypothesisTableService.ts';
 import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow.ts';
 import {
   filterRow,
@@ -29,10 +42,13 @@ import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
 import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
+import { TrajectoryDataVisualisation } from '@common/modal/TrajectoryDataVisualisation.tsx';
+import { useTranslation } from 'react-i18next';
 
 const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const studyState = useStudy();
   const dispatch = useStudyDispatch();
+  const { t } = useTranslation();
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
   const [rowIdSelected, setRowIdSelected] = useState<string>('0.0');
@@ -42,6 +58,8 @@ const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
   const [stsTechnologies, setStsTechnologies] = useState<string[]>([]);
   const [isDeletionModalOpen, setIsDeletionModalOpen] = useState(false);
+  const [trajectoryData, setTrajectoryData] = useState<TrajectoryViewData | undefined>();
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [rowToDelete, setRowToDelete] = useState<{ index: number; value?: string } | null>(null);
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const [isStudyGenerated, setIsStudyGenerated] = useState(
@@ -159,6 +177,13 @@ const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         }}
         type={TRAJECTORY_TYPE.STS}
         list={technologyList}
+        handleViewData={(rowId: string) => {
+          const indexArray = rowId.split('.').map(Number);
+          const trajectory = data[indexArray[0]]?.subRows?.[indexArray[1]]?.trajectory;
+          if (trajectory) {
+            void handleViewTrajectory(trajectory, setTrajectoryData, setIsViewModalOpen, t);
+          }
+        }}
       />
       {isModalOpen && (
         <ImportTrajectoryModal
@@ -173,6 +198,9 @@ const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
           trajectoryType={TRAJECTORY_TYPE.STS}
           hypothesis={getAreaTrajectoryName(rowIdSelected, data)}
         />
+      )}
+      {isViewModalOpen && trajectoryData && (
+        <TrajectoryDataVisualisation trajectoryData={trajectoryData} onClose={() => setIsViewModalOpen(false)} />
       )}
       {isDeletionModalOpen && (
         <AreaDeletionConfirmationModal
