@@ -77,7 +77,7 @@ const ProjectContent = () => {
         />
       </div>
 
-      <div className="grid w-full grid-cols-3 gap-3">
+      <div data-testid="projects-grid" className="grid w-full grid-cols-3 gap-3">
         {(projects.length > intervalSize ? projects.slice(0, intervalSize) : projects || []).map((project) => {
           const dropdownItems: StdDropdownOption[] = [
             pinOption(false, () => void handlePinProject(project.id), (pinnedProjects?.length ?? 0) >= 3),
