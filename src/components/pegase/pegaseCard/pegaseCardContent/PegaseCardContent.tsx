@@ -2,11 +2,11 @@ import StdTagList from '@common/base/StdTagList/StdTagList.tsx';
 import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter.ts';
 import StdAvatar from '@common/layout/stdAvatar/StdAvatar.tsx';
 import { avatarCase } from '@/shared/utils/textUtils.ts';
-import { ProjectInfo } from '@/shared/types';
+import { ProjectResponse } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 
 export type PegaseCardContentProps = {
-  project: ProjectInfo;
+  project: ProjectResponse;
 };
 
 export const PegaseCardContent = ({ project }: PegaseCardContentProps) => {

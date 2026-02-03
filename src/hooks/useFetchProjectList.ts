@@ -1,41 +1,49 @@
-/*
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
-
 import { useCallback, useEffect, useState } from 'react';
-import { ProjectActionType, ProjectResponse } from '@/shared/types/Project.type.ts';
-import { fetchProjectFromSearchTerm } from '@/shared/services/projectService.ts';
-import { PROJECT_ACTION } from '@/shared/enum/project.ts';
-import { useProjectDispatch } from '@/store/contexts/ProjectContext.tsx';
+import { fetchProjectFromSearchTerm } from '@/shared/services/projectService';
+import { useProjectDispatch } from '@/store/contexts/ProjectContext';
+import { PROJECT_ACTION } from '@/shared/enum/project';
+import { ProjectActionType, ProjectResponse } from '@/shared/types';
 
-export const useFetchProjectList = (current: number, intervalSize: number, searchTerm?: string, reload?: number) => {
+export const useFetchProjectList = (current: number, intervalSize: number, searchTerm?: string) => {
   const [projects, setProjects] = useState<ProjectResponse[]>([]);
   const [count, setCount] = useState(0);
+  const [error, setError] = useState<unknown>(null);
   const dispatch = useProjectDispatch();
 
   const fetchProjects = useCallback(
     async (currentPage: number, size: number, term: string) => {
-      try {
-        const response = await fetchProjectFromSearchTerm(currentPage, size, term);
+      setError(null);
 
-        dispatch?.({
-          type: PROJECT_ACTION.INIT_PROJECT_LIST,
-          payload: response?.content,
-        } as ProjectActionType);
-        setProjects(response?.content);
-        setCount(response?.totalElements);
-      } catch (error) {
-        console.error(error);
-      }
+      const response = await fetchProjectFromSearchTerm(currentPage, size, term);
+
+      dispatch?.({
+        type: PROJECT_ACTION.INIT_PROJECT_LIST,
+        payload: response?.content,
+      } as ProjectActionType);
+
+      setProjects(response?.content ?? []);
+      setCount(response?.totalElements ?? 0);
     },
     [dispatch],
   );
 
   useEffect(() => {
-    void fetchProjects(current, intervalSize, searchTerm ?? '');
-  }, [current, searchTerm, intervalSize, reload]);
+    let cancelled = false;
 
-  return { projects, count, refetch: fetchProjects, reload };
+    const run = async () => {
+      try {
+        await fetchProjects(current, intervalSize, searchTerm ?? '');
+      } catch (e) {
+        if (!cancelled) setError(e);
+      }
+    };
+
+    void run();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [current, intervalSize, searchTerm, fetchProjects]);
+
+  return { projects, count, refetch: fetchProjects, error };
 };

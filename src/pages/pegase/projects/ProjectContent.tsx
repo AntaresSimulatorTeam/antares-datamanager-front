@@ -1,9 +1,3 @@
-/*
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
-
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import SearchBar from '@/pages/pegase/home/components/SearchBar';
@@ -17,7 +11,7 @@ import { useHandlePinnedProjectList } from '@/hooks/useHandlePinnedProjectList.t
 import { useDeleteProject } from '@/hooks/useDeleteProject.ts';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { useProject } from '@/store/contexts/ProjectContext.tsx';
-import { ProjectInfo, ProjectResponse } from '@/shared/types';
+import { ProjectResponse } from '@/shared/types';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { ProjectCreationModal } from '@common/modal/ProjectCreationModal.tsx';
 import { StdDropdownOption } from '@common/layout/stdDropdown/StdDropdown.tsx';
@@ -27,11 +21,15 @@ const ProjectContent = () => {
   const { t } = useTranslation();
   const intervalSize = 9;
   const { user } = useUser();
+
   const [searchTerm, setSearchTerm] = useState<string | undefined>();
-  const [activeChip, setActiveChip] = useState<boolean | null>(false);
+  const [activeChip, setActiveChip] = useState(false);
   const [current, setCurrent] = useState(0);
+
   const { projects, pinnedProjects } = useProject();
-  const { count, refetch } = useFetchProjectList(current, intervalSize, searchTerm, projects.length);
+
+  const { count, refetch } = useFetchProjectList(current, intervalSize, searchTerm);
+
   const { navigateToProject } = useProjectNavigation();
   const { handlePinProject } = useHandlePinnedProjectList();
   const { deleteProject } = useDeleteProject();
@@ -40,25 +38,24 @@ const ProjectContent = () => {
   const [selectedProject, setSelectedProject] = useState<ProjectResponse | null>(null);
 
   const handleChipClick = () => {
-    if (activeChip) {
-      setActiveChip(false);
-      setSearchTerm('');
-    } else {
-      setActiveChip(true);
-      setSearchTerm(user?.profile.sub);
-    }
+    setActiveChip((prev) => {
+      const next = !prev;
+      setSearchTerm(next ? user?.profile.sub : undefined);
+      setCurrent(0);
+      return next;
+    });
   };
 
   const handleDeleteProject = async (projectId: string) => {
-    await deleteProject(projectId);
     try {
+      await deleteProject(projectId);
       await refetch(current, intervalSize, searchTerm ?? '');
-    } catch (error) {
+    } catch {
       // silent handler
     }
   };
 
-  const openModalProject = (project: ProjectInfo) => {
+  const openModalProject = (project: ProjectResponse) => {
     setSelectedProject(project);
     toggleModal();
   };
@@ -66,20 +63,32 @@ const ProjectContent = () => {
   return (
     <div className="flex w-full flex-1 flex-col gap-3">
       <div className="flex gap-4 py-2">
-        <SearchBar onSearch={(value?: string) => setSearchTerm(value)} />
+        <SearchBar
+          onSearch={(value?: string) => {
+            setSearchTerm(value);
+            setActiveChip(false);
+            setCurrent(0);
+          }}
+        />
         <RdsChip
           label={t('home.@my_projects')}
           onClick={handleChipClick}
           status={activeChip ? 'secondary' : 'primary'}
         />
       </div>
+
       <div className="grid w-full grid-cols-3 gap-3">
-        {(projects.length > intervalSize ? projects.splice(0, 9) : projects || []).map((project) => {
+        {(projects.length > intervalSize ? projects.slice(0, intervalSize) : projects || []).map((project) => {
           const dropdownItems: StdDropdownOption[] = [
-            pinOption(false, () => void handlePinProject(project.id), pinnedProjects?.length >= 3),
+            pinOption(false, () => void handlePinProject(project.id), (pinnedProjects?.length ?? 0) >= 3),
             editOption(() => void openModalProject(project), t('project.@edit')),
-            deleteOption(() => void handleDeleteProject(project.id), t('project.@delete'), project.studies?.length > 0),
+            deleteOption(
+              () => void handleDeleteProject(project.id),
+              t('project.@delete'),
+              (project.studies?.length ?? 0) > 0,
+            ),
           ];
+
           return (
             <PegaseCard
               key={project.id}
@@ -92,8 +101,10 @@ const ProjectContent = () => {
             </PegaseCard>
           );
         })}
+
         {isModalOpen && <ProjectCreationModal onClose={toggleModal} projectInfo={selectedProject} />}
       </div>
+
       <div className="flex h-[60px] items-center justify-between bg-gray-200 px-[32px]">
         <StudiesPagination count={count} intervalSize={intervalSize} current={current} onChange={setCurrent} />
       </div>
