@@ -50,6 +50,8 @@ const PegaseCardTitle = ({ title, dropdownOptions, icons, tag, lineClamp, onClic
           <Trigger>
             <StdButton
               id={`${id}-button`}
+              data-testid="project-card-menu"
+              aria-label="more-vert"
               variant="transparent"
               size="small"
               icon={StdIconId.MoreVert}
