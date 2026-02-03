@@ -26,7 +26,9 @@ export const LabelWithButtonPreview = ({
   const { t } = useTranslation();
   return (
     <div className={`${alignment ?? undefined} flex items-center justify-between gap-2`}>
-      <span className={`${status === TRAJECTORY_SELECTION_STATUS.OK ? 'text-primary-800' : 'text-gray-900'}`}>
+      <span
+        className={`${status === TRAJECTORY_SELECTION_STATUS.OK ? 'text-primary-800' : status === TRAJECTORY_SELECTION_STATUS.ERROR ? 'text-error-800' : 'text-gray-900'}`}
+      >
         {`${value} ${extraValue ?? ''}`}
       </span>
       {hasPreview && (
