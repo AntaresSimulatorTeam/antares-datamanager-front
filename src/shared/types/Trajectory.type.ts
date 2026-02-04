@@ -26,6 +26,7 @@ export interface DbTrajectory {
   creationDate: Date;
   area: string;
   technology: string;
+  hasTimeSeries: boolean;
   state?: TRAJECTORY_SELECTION_STATUS;
 }
 

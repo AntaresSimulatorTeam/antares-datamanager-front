@@ -120,6 +120,7 @@ describe('buildErrorTrajectory', () => {
       creationDate: date,
       area: 'FR',
       state: TRAJECTORY_SELECTION_STATUS.ERROR,
+      hasTimeSeries: false,
     });
   });
 });
@@ -137,6 +138,7 @@ describe('removeDuplicate', () => {
         creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
         area: 'AT',
         technology: '',
+        hasTimeSeries: false,
       },
       {
         id: 2,
@@ -147,6 +149,7 @@ describe('removeDuplicate', () => {
         creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
         area: 'BE',
         technology: '',
+        hasTimeSeries: false,
       },
     ]);
   });

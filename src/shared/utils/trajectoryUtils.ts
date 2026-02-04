@@ -77,6 +77,7 @@ export const buildErrorTrajectory = (
   creationDate: new Date(),
   area,
   state: TRAJECTORY_SELECTION_STATUS.ERROR,
+  hasTimeSeries: false,
 });
 
 /**
@@ -141,6 +142,7 @@ export const buildEmptyTrajectory = (area: string, type: TRAJECTORY_TYPE, techno
   creationDate: new Date(),
   area,
   technology: technology ?? '',
+  hasTimeSeries: false,
   state: TRAJECTORY_SELECTION_STATUS.MISSING,
 });
 

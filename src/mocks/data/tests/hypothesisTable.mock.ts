@@ -15,6 +15,7 @@ const buildRowDataMock = (
   version: number,
   userName: string,
   creationDate: Date,
+  hasTimeSeries: boolean,
 ): HypothesisRowData => ({
   hypothesis,
   status,
@@ -29,6 +30,7 @@ const buildRowDataMock = (
     creationDate,
     area: hypothesis === OTHER_AREAS_LABEL ? 'OTHERS' : hypothesis,
     technology: '',
+    hasTimeSeries,
   },
 });
 
@@ -43,6 +45,7 @@ export const rowData = [
     1,
     'unknown',
     '2024-07-22 15:13:56.860045' as unknown as Date,
+    false,
   ),
   buildRowDataMock(
     'CH',
@@ -54,6 +57,7 @@ export const rowData = [
     0,
     'unknown',
     '2026-00-15 14:17:40' as unknown as Date,
+    false,
   ),
   buildRowDataMock(
     'DEkf',
@@ -65,6 +69,7 @@ export const rowData = [
     0,
     'unknown',
     '2027-04-06 08:56:34' as unknown as Date,
+    false,
   ),
   buildRowDataMock(
     'AT',
@@ -76,6 +81,7 @@ export const rowData = [
     0,
     'unknown',
     '2024-07-22 15:13:56.860045' as unknown as Date,
+    false,
   ),
 ];
 
@@ -90,6 +96,7 @@ export const rowDataTwo: HypothesisRowData[] = [
     0,
     'unknown',
     '2026-08-34 18:45:89' as unknown as Date,
+    false,
   ),
   buildRowDataMock(
     OTHER_AREAS_LABEL,
@@ -101,6 +108,7 @@ export const rowDataTwo: HypothesisRowData[] = [
     0,
     'robert',
     '2025-08-34 10:40:30' as unknown as Date,
+    false,
   ),
   buildRowDataMock(
     'Dkkef',
@@ -112,6 +120,7 @@ export const rowDataTwo: HypothesisRowData[] = [
     0,
     'unknown',
     '2023-06-12 09:08:45' as unknown as Date,
+    false,
   ),
   buildRowDataMock(
     'TR',
@@ -123,6 +132,7 @@ export const rowDataTwo: HypothesisRowData[] = [
     0,
     'comes',
     '2024-09-21 15:13:63' as unknown as Date,
+    false,
   ),
   buildRowDataMock(
     'GH',
@@ -134,6 +144,7 @@ export const rowDataTwo: HypothesisRowData[] = [
     0,
     'unknown',
     '2023-05-18 15:13:56' as unknown as Date,
+    false,
   ),
 ];
 
@@ -148,6 +159,7 @@ export const rowNotDefaultData = [
     1,
     'unknown',
     '2024-07-22 15:13:56.860045' as unknown as Date,
+    false,
   ),
   buildRowDataMock(
     'OTHER areas',
@@ -159,5 +171,6 @@ export const rowNotDefaultData = [
     0,
     'unknown',
     '2024-07-22 15:13:56.860045' as unknown as Date,
+    false,
   ),
 ];

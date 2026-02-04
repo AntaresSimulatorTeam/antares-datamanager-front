@@ -127,6 +127,7 @@ describe('useFetchHypothesisTrajectories', () => {
             creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
             area: 'AT',
             technology: '',
+            hasTimeSeries: false,
           },
         },
         {
@@ -144,6 +145,7 @@ describe('useFetchHypothesisTrajectories', () => {
             creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
             area: 'BE',
             technology: '',
+            hasTimeSeries: false,
           },
         },
         {
@@ -230,6 +232,7 @@ describe('useFetchHypothesisTrajectories', () => {
             creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
             area: 'AT',
             technology: '',
+            hasTimeSeries: false,
           },
         },
         {
@@ -247,6 +250,7 @@ describe('useFetchHypothesisTrajectories', () => {
             creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
             area: 'BE',
             technology: '',
+            hasTimeSeries: false,
           },
         },
         {
@@ -327,6 +331,7 @@ describe('useFetchHypothesisTrajectories', () => {
             creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
             area: 'AT',
             technology: '',
+            hasTimeSeries: false,
           },
         },
         {
@@ -344,6 +349,7 @@ describe('useFetchHypothesisTrajectories', () => {
             creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
             area: 'BE',
             technology: '',
+            hasTimeSeries: false,
           },
         },
         {
@@ -395,6 +401,7 @@ describe('useFetchHypothesisTrajectories', () => {
             creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
             area: 'BE',
             technology: '',
+            hasTimeSeries: false,
           },
         },
         {
@@ -420,6 +427,7 @@ describe('useFetchHypothesisTrajectories', () => {
             creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
             area: 'AT',
             technology: '',
+            hasTimeSeries: false,
           },
         },
         {

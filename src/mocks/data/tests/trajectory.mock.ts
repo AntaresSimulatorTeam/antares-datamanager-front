@@ -11,6 +11,7 @@ export const mockDataBaseTrajectory = (type: TRAJECTORY_TYPE, id: number, area: 
   creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
   area,
   technology: '',
+  hasTimeSeries: false,
 });
 
 export const mockDbTrajectory: DbTrajectory = {
@@ -22,6 +23,7 @@ export const mockDbTrajectory: DbTrajectory = {
   creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
   area: 'AT',
   technology: '',
+  hasTimeSeries: false,
 };
 
 export const mockTrajectoryTwo: DbTrajectory[] = [
@@ -34,6 +36,7 @@ export const mockTrajectoryTwo: DbTrajectory[] = [
     creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
     area: 'AT',
     technology: '',
+    hasTimeSeries: false,
   },
   {
     id: 2,
@@ -44,6 +47,7 @@ export const mockTrajectoryTwo: DbTrajectory[] = [
     creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
     area: 'BE',
     technology: '',
+    hasTimeSeries: false,
   },
 ];
 
@@ -56,17 +60,8 @@ export const mockDbTrajectoryAREA: DbTrajectory = {
   creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
   area: 'AT',
   technology: '',
+  hasTimeSeries: false,
 };
-
-// export const mockDbTrajectoryLINK: DbTrajectory = {
-//   id: 1,
-//   trajectoryName: 'link_BP_23_v6',
-//   type: TRAJECTORY_TYPE.LINK,
-//   version: 6,
-//   userName: 'mouad',
-//   creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-//   area: 'AT',
-// };
 
 export const mockPrevStateArea = () => ({
   studyStatus: StudyStatus.IN_PROGRESS,
@@ -112,6 +107,7 @@ export const mockDbTrajectoryArray: DbTrajectory[] = [
     creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
     area: 'AT',
     technology: '',
+    hasTimeSeries: false,
   },
   {
     id: 2,
@@ -122,6 +118,7 @@ export const mockDbTrajectoryArray: DbTrajectory[] = [
     creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
     area: 'BE',
     technology: '',
+    hasTimeSeries: false,
   },
 ];
 
@@ -135,6 +132,7 @@ export const mockDbTrajectoryArrayLoad: DbTrajectory[] = [
     creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
     area: 'AT',
     technology: '',
+    hasTimeSeries: false,
   },
   {
     id: 2,
@@ -145,6 +143,7 @@ export const mockDbTrajectoryArrayLoad: DbTrajectory[] = [
     creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
     area: 'BE',
     technology: '',
+    hasTimeSeries: false,
   },
 ];
 
@@ -158,6 +157,7 @@ export const mockDbTrajectoryArrayThermal: DbTrajectory[] = [
     creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
     area: 'AT',
     technology: '',
+    hasTimeSeries: false,
   },
   {
     id: 2,
@@ -168,6 +168,7 @@ export const mockDbTrajectoryArrayThermal: DbTrajectory[] = [
     creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
     area: 'BE',
     technology: '',
+    hasTimeSeries: false,
   },
 ];
 
@@ -181,6 +182,7 @@ export const mockEmptyDbTrajectoryArrayLoadSTS: DbTrajectory[] = [
     creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
     area: 'AT',
     technology: '',
+    hasTimeSeries: false,
   },
   {
     id: 2,
@@ -191,42 +193,9 @@ export const mockEmptyDbTrajectoryArrayLoadSTS: DbTrajectory[] = [
     creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
     area: 'BE',
     technology: '',
+    hasTimeSeries: false,
   },
 ];
-
-export const mockDbTrajectoryArraySpecificThermal: DbTrajectory[] = [
-  {
-    id: 1,
-    trajectoryName: 'area_PB_2024',
-    type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
-    version: 3,
-    userName: 'mouad',
-    creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-    area: 'AT',
-    technology: '',
-  },
-  {
-    id: 2,
-    trajectoryName: 'area_PB_2026',
-    type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
-    version: 3,
-    userName: 'mouad',
-    creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
-    area: 'BE',
-    technology: '',
-  },
-];
-
-export const mockDbTrajectoryArrayCommonThermal: DbTrajectory = {
-  id: 23,
-  trajectoryName: 'area_PB_2026',
-  type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER,
-  version: 3,
-  userName: 'mouad',
-  creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
-  area: 'BE',
-  technology: '',
-};
 
 export const mockEmptyDbTrajectoryArrayLoad: DbTrajectory[] = [
   {
@@ -238,6 +207,7 @@ export const mockEmptyDbTrajectoryArrayLoad: DbTrajectory[] = [
     creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
     area: 'ES',
     technology: '',
+    hasTimeSeries: false,
   },
   {
     id: 2,
@@ -248,6 +218,7 @@ export const mockEmptyDbTrajectoryArrayLoad: DbTrajectory[] = [
     creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
     area: 'DEkf',
     technology: '',
+    hasTimeSeries: false,
   },
 ];
 
@@ -261,6 +232,7 @@ export const mockDbTrajectoryArrayWithDuplicate: DbTrajectory[] = [
     creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
     area: 'AT',
     technology: '',
+    hasTimeSeries: false,
   },
   {
     id: 2,
@@ -271,6 +243,7 @@ export const mockDbTrajectoryArrayWithDuplicate: DbTrajectory[] = [
     creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
     area: 'BE',
     technology: '',
+    hasTimeSeries: false,
   },
   {
     id: 1,
@@ -281,6 +254,7 @@ export const mockDbTrajectoryArrayWithDuplicate: DbTrajectory[] = [
     creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
     area: 'AT',
     technology: '',
+    hasTimeSeries: false,
   },
   {
     id: 1,
@@ -291,6 +265,7 @@ export const mockDbTrajectoryArrayWithDuplicate: DbTrajectory[] = [
     creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
     area: 'AT',
     technology: '',
+    hasTimeSeries: false,
   },
 ];
 
@@ -415,6 +390,7 @@ export const mockEmptyDbTrajectoryLoadOthers: DbTrajectory = {
   creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
   area: 'OTHERS',
   technology: '',
+  hasTimeSeries: false,
 };
 
 export const mockEmptyDbTrajectoryLoadFR: DbTrajectory = {
@@ -426,4 +402,5 @@ export const mockEmptyDbTrajectoryLoadFR: DbTrajectory = {
   creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
   area: 'FR',
   technology: '',
+  hasTimeSeries: false,
 };

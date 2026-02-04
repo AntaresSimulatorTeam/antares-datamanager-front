@@ -115,6 +115,7 @@ describe('addTrajectories', () => {
             creationDate: '2025' as unknown as Date,
             area: 'CZ',
             technology: '',
+            hasTimeSeries: false,
           },
         ],
         warningMessages: [],
