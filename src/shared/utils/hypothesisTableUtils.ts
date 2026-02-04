@@ -118,11 +118,11 @@ export const buildAreaOptions = (
   const newArea: CheckBoxData[] = (trajectoryAreas || [])
     .filter((trajectoryArea) => !defaultAreas?.some((item) => item.name === trajectoryArea.areaName))
     .map((trajectoryArea) => ({
-      name: trajectoryArea.areaName,
+      name: trajectoryArea.areaName?.toUpperCase(),
       isDefault: false,
     }));
   const defaultAreaOptions: CheckBoxData[] = (defaultAreas ?? []).map((area) => ({
-    name: area.name,
+    name: area?.name?.toUpperCase(),
     isDefault: true,
   }));
   return [...defaultAreaOptions, ...newArea];
@@ -143,8 +143,8 @@ export const buildCheckValuesList = (
 ): string[] => {
   const areasValuesChecked: string[] = (areaWithTrajectory ?? [])
     .filter((trajectoryArea) => !defaultAreas?.some((item) => item.name === trajectoryArea.area))
-    .map((trajectory) => trajectory.area);
-  const defaultCheckedValues = (defaultAreas ?? []).map((item) => item.name);
+    .map((trajectory) => trajectory.area?.toUpperCase());
+  const defaultCheckedValues = (defaultAreas ?? []).map((item) => item.name?.toUpperCase());
 
   return [...defaultCheckedValues, ...areasValuesChecked];
 };
@@ -174,6 +174,8 @@ export const buildCheckListBox = (
 ): { areaOptions: CheckBoxData[]; checkedValues: string[] } => {
   const areaOptions: CheckBoxData[] = buildAreaOptions(trajectoryAreas, defaultAreas);
   const checkedValues: string[] = buildCheckValuesList(areaWithTrajectory, defaultAreas);
+  console.log('=========== areaOptions', areaOptions);
+  console.log('=========== checkedValues', checkedValues);
   return { areaOptions, checkedValues };
 };
 
