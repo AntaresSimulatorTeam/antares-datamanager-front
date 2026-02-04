@@ -106,7 +106,7 @@ export const fetchTrajectoriesFromFS = async (
  *
  * @param {TRAJECTORY_TYPE} trajectoryType - Type of the trajectory (AREA, LINK, LOAD...)
  * @param {string | undefined} area - The geographical area associated with the trajectory, may be undefined.
- * @param {string} trajectoryName - The name of the trajectory to be uploaded.
+ * @param {string} trajectoryToUse - The name of the trajectory to be uploaded.
  * @param {string} horizon - The time horizon associated with the trajectory.
  * @param {number} studyId - The unique identifier for the associated study.
  * @param {boolean} isCivilYear - Indicates whether the horizon is based on the civil or a different calendar year.
@@ -118,7 +118,7 @@ export const fetchTrajectoriesFromFS = async (
  */
 export const uploadTrajectory = async (
   trajectoryType: TRAJECTORY_TYPE,
-  trajectoryName: string,
+  trajectoryToUse: string,
   horizon: string,
   studyId: number,
   area: string | undefined,
@@ -127,6 +127,7 @@ export const uploadTrajectory = async (
   subArea?: string,
 ): Promise<DbTrajectory> => {
   let urlApi;
+  const trajectoryName = encodeURIComponent(trajectoryToUse);
   if (trajectoryType === TRAJECTORY_TYPE.LOAD) {
     urlApi = `${TRAJECTORY_ENDPOINT}/load?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   } else if (trajectoryType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
