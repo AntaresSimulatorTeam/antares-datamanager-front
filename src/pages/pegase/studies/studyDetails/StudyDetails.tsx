@@ -94,7 +94,7 @@ const StudyDetails = () => {
         <PegaseBreadcrumb items={headerItems} />
       </div>
       <RdsDivider />
-      <div className="flex flex-1 flex-col gap-4 overflow-hidden px-3 pb-3">
+      <div className="flex flex-1 flex-col gap-2 overflow-hidden px-3 pb-3">
         <DetailsContent content={studyData} onClickButton={toggleModal} />
 
         <div className="flex flex-1 flex-col overflow-hidden">
