@@ -50,13 +50,13 @@ export const useFetchHypothesisTrajectories = (
       try {
         let technologies;
         // TODO implement DSR type
-        const result = TRAJECTORY_TYPE.DSR ? [] : await getStudyTrajectories(id, trajType);
-        if (trajectoryType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
+        const result = trajType === TRAJECTORY_TYPE.DSR ? [] : await getStudyTrajectories(id, trajType);
+        if (trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
           const thermalOptions = await getThermalTechnologyList();
           technologies = thermalOptions?.map((thermalOption) => thermalOption.name);
           setTechnologyList(technologies);
         }
-        if (trajectoryType === TRAJECTORY_TYPE.STS) {
+        if (trajType === TRAJECTORY_TYPE.STS) {
           technologies = STSTechnology;
           setTechnologyList(STSTechnology);
         }
@@ -102,7 +102,7 @@ export const useFetchHypothesisTrajectories = (
         const dataTrajectories = sortWithFixedPosition(isStudyGenerated ? filterRow(areaData) : areaData);
         let readOnlyAreas = {};
 
-        if (trajectoryType === TRAJECTORY_TYPE.DSR) {
+        if (trajType === TRAJECTORY_TYPE.DSR) {
           dataTrajectories.push({
             hypothesis: t('dsr.@capacityModulation'),
             trajectory: null,
@@ -118,7 +118,7 @@ export const useFetchHypothesisTrajectories = (
         } else {
           const readOnlySubRows = retrieveReadOnlyArea(dataTrajectories, defaultAreaListNotInList);
 
-          if (trajectoryType === TRAJECTORY_TYPE.DSR) {
+          if (trajType === TRAJECTORY_TYPE.DSR) {
             const hasSpecificTrajectory = dataTrajectories.some((row) => row.status === TRAJECTORY_SELECTION_STATUS.OK);
 
             readOnlyAreas = {
