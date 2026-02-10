@@ -117,6 +117,7 @@
     "@enr": "ENR",
     "@misc": "Misc",
     "@sts": "STS",
+    "@dsr": "DSR",
     "@trajectory": "Trajectory to use",
     "@select_trajectory": "Select a trajectory",
     "@select_project": "Selecta project",
@@ -156,6 +157,10 @@
     "@costs": "Cost",
     "@economics": "Economic",
     "@paramModulationMessage": "At least one \"Specific\" trajectory must be defined in order to complete the \"Param modulation\" trajectory."
+  },
+  "dsr": {
+    "@capacityModulation": "Capacity Modulation",
+    "@capacityModulationMessage": "At least one area trajectory must be defined in order to complete the \"Capacity modulation\" Trajectory."
   },
   "trajectoryViewModal": {
     "@title_area": "Areas",

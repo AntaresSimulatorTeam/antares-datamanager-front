@@ -22,15 +22,14 @@ export const LabelWithButtonPreview = ({
   hasPreview = true,
   alignment = '',
   disabled = false,
+  isReadOnly,
 }: LabelWithButtonPreviewProps) => {
   const { t } = useTranslation();
+
+  const colorLabel = `${isReadOnly ? 'text-gray-600' : status === TRAJECTORY_SELECTION_STATUS.OK ? 'text-primary-800' : status === TRAJECTORY_SELECTION_STATUS.ERROR ? 'text-error-800' : 'text-gray-900'}`;
   return (
     <div className={`${alignment ?? undefined} flex items-center justify-between gap-2`}>
-      <span
-        className={`${status === TRAJECTORY_SELECTION_STATUS.OK ? 'text-primary-800' : status === TRAJECTORY_SELECTION_STATUS.ERROR ? 'text-error-800' : 'text-gray-900'}`}
-      >
-        {`${value} ${extraValue ?? ''}`}
-      </span>
+      <span className={colorLabel}>{`${value} ${extraValue ?? ''}`}</span>
       {hasPreview && (
         <StdButton
           label={t('studyDetails.@preview')}

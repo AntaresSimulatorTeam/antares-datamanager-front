@@ -19,6 +19,7 @@ import { getAlignment, hasLabelDefault } from '@/shared/utils/hypothesisTableUti
 import StdButton from '@common/base/stdButton/StdButton.tsx';
 import { getSubRowListWithArea, getSubRowsList } from '@/shared/utils/trajectoryUtils.ts';
 import StdIconButton from '@common/base/stdIconButton/StdIconButton.tsx';
+import { getInformationMessage } from '@/shared/helpers/hypothesisTableHelper.ts';
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
 const getExpandableHypothesisTableHeaders = ({
@@ -36,11 +37,12 @@ const getExpandableHypothesisTableHeaders = ({
   columnHelper.accessor('hypothesis', {
     header: columnHeader || t('studyDetails.@areas'),
     size: type === TRAJECTORY_TYPE.STS ? 200 : 233,
-    cell: ({ getValue, row }) => {
+    cell: ({ getValue, row, table }) => {
       const { status, isDefault, hypothesis } = row.original;
       const subRowListName = getSubRowsList(row);
       const subRowListWithArea = getSubRowListWithArea(subRowListName, t, type);
       const isTechnology = list?.length ? list?.includes(hypothesis) : false;
+      const informationMessage = getInformationMessage(table.getRowCount(), type);
 
       return (
         <div className="flex gap-1 py-1">
@@ -70,9 +72,9 @@ const getExpandableHypothesisTableHeaders = ({
               <div className="text-gray-600">{` | +${subRowListWithArea?.messageNb}`}</div>
             </RdsTextTooltip>
           )}
-          {row.depth === 0 && row.index === 1 && type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER && (
-            <RdsTextTooltip text={t('thermal.@paramModulationMessage')} offset={5} placement="right">
-              <StdIcon name={StdIconId.Info} />
+          {row.depth === 0 && row.index === informationMessage?.index && informationMessage && (
+            <RdsTextTooltip text={t(`${informationMessage.messageKey}`)} offset={5} placement="right">
+              <StdIcon name={StdIconId.Info} color={row.getReadOnly() ? 'text-gray-600' : 'text-gray-900'} />
             </RdsTextTooltip>
           )}
         </div>
