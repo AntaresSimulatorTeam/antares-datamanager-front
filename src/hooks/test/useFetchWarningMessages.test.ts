@@ -92,4 +92,12 @@ describe('useFetchWarningMessages', () => {
       expect(result.current.warningMessages).toEqual(mockBuiltMessages);
     });
   });
+
+  it('does not fetch warning messages for DSR type', async () => {
+    const { result } = renderHook(() => useFetchWarningMessages(123, TRAJECTORY_TYPE.DSR));
+
+    await waitFor(() => {
+      expect(result.current.warningMessages).toBeUndefined();
+    });
+  });
 });
