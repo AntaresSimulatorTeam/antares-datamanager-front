@@ -117,6 +117,7 @@
     "@enr": "Energie renouvelable",
     "@misc": "Misc",
     "@sts": "STS",
+    "@dsr": "DSR",
     "@trajectory": "Trajectoire",
     "@select_trajectory": "Selectionner une trajectoire",
     "@select_project": "Selectionner un nom de projet",
@@ -155,6 +156,10 @@
     "@costs": "Coûts",
     "@economics": "Économique",
     "@paramModulationMessage": "Au moins une trajectoire \"Specific\" doit être renseignée afin de pouvoir renseigner une trajectoire \"Param modulation\"."
+  },
+  "dsr": {
+    "@capacityModulation": "Capacity Modulation",
+    "@capacityModulationMessage": "At least one area trajectory must be defined in order to complete the \"Capacity modulation\" Trajectory."
   },
   "trajectoryViewModal": {
     "@title_area": "Zones",

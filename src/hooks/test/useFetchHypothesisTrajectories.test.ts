@@ -8,6 +8,7 @@ import {
   mockDbTrajectory,
   mockDbTrajectoryArrayLoad,
   mockDbTrajectoryArrayThermal,
+  mockEmptyDbTrajectoryArrayDSR,
   mockEmptyDbTrajectoryArrayLoad,
   mockEmptyDbTrajectoryArrayLoadSTS,
   mockEmptyDbTrajectoryLoadFR,
@@ -562,6 +563,60 @@ describe('useFetchHypothesisTrajectories', () => {
           isDeletable: false,
           status: TRAJECTORY_SELECTION_STATUS.MISSING,
           subRows: technologiesHypothesis,
+          trajectory: null,
+        },
+      ]);
+    });
+  });
+
+  it('should include Capacity modulation as last row when trajectoryType is DSR', async () => {
+    const defaultAreas = [{ name: 'FR' }];
+    const areas = [{ areaName: 'FR' }, { areaName: 'AT' }, { areaName: 'BE' }] as TrajectoryAreaData[];
+    mockUseStudy.mockImplementation(
+      () =>
+        ({
+          ['DSR']: { trajectories: mockEmptyDbTrajectoryArrayDSR, warningMessages: [] },
+        }) as Partial<StudyState>,
+    );
+    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue([]);
+
+    const { result } = renderHook(() =>
+      useFetchHypothesisTrajectories(areas, 5, TRAJECTORY_TYPE.DSR, defaultAreas, false),
+    );
+
+    await waitFor(() => {
+      expect(defaultConfigService.getThermalTechnologyList).not.toHaveBeenCalled();
+      expect(result.current.hypothesisTrajectories).toEqual([
+        {
+          hypothesis: 'AT',
+          isDefault: false,
+          isDeletable: true,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          subRows: null,
+          trajectory: null,
+        },
+        {
+          hypothesis: 'BE',
+          isDefault: false,
+          isDeletable: true,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          subRows: null,
+          trajectory: null,
+        },
+        {
+          hypothesis: 'Other areas',
+          isDefault: true,
+          isDeletable: false,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          subRows: null,
+          trajectory: null,
+        },
+        {
+          hypothesis: 'dsr.@capacityModulation',
+          isDefault: false,
+          isDeletable: false,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          subRows: null,
           trajectory: null,
         },
       ]);

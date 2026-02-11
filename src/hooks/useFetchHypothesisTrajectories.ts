@@ -1,4 +1,4 @@
-import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CheckBoxData, DbTrajectory, HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
@@ -19,6 +19,7 @@ import { buildCheckListBox, getDefaultAreaNotIncludedInAreaList } from '@/shared
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { getThermalTechnologyList } from '@/shared/services/defaultConfigService.ts';
 import { STSTechnology } from '@/mocks/data/list/names.ts';
+import { useTranslation } from 'react-i18next';
 
 export const useFetchHypothesisTrajectories = (
   areas: TrajectoryAreaData[],
@@ -34,6 +35,7 @@ export const useFetchHypothesisTrajectories = (
   const [technologyList, setTechnologyList] = useState<string[]>([]);
   const studyState = useStudy();
   const dispatch = useStudyDispatch();
+  const { t } = useTranslation();
   const emptyAreaSelected: DbTrajectory[] = useMemo(() => {
     if (trajectoryType && !isStudyGenerated) {
       return (
@@ -47,13 +49,14 @@ export const useFetchHypothesisTrajectories = (
     async (id: number, trajType: TRAJECTORY_TYPE) => {
       try {
         let technologies;
-        const result = await getStudyTrajectories(id, trajType);
-        if (trajectoryType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
+        // TODO implement DSR type
+        const result = trajType === TRAJECTORY_TYPE.DSR ? [] : await getStudyTrajectories(id, trajType);
+        if (trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
           const thermalOptions = await getThermalTechnologyList();
           technologies = thermalOptions?.map((thermalOption) => thermalOption.name);
           setTechnologyList(technologies);
         }
-        if (trajectoryType === TRAJECTORY_TYPE.STS) {
+        if (trajType === TRAJECTORY_TYPE.STS) {
           technologies = STSTechnology;
           setTechnologyList(STSTechnology);
         }
@@ -65,6 +68,7 @@ export const useFetchHypothesisTrajectories = (
           trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY || trajectoryType === TRAJECTORY_TYPE.STS
             ? removeDuplicateByTechnology(allAreas)
             : removeDuplicate(allAreas);
+
         dispatch?.({
           type: STUDY_ACTION.ADD_TRAJECTORIES,
           payload: {
@@ -95,15 +99,35 @@ export const useFetchHypothesisTrajectories = (
             : arrayWithoutDuplicate
                 .map((trajectory) => buildRowWithSubRowsData(trajectory, defaultAreas, defaultAreaListNotInList, null))
                 .filter(Boolean);
-        let dataTrajectories = [];
+        const dataTrajectories = sortWithFixedPosition(isStudyGenerated ? filterRow(areaData) : areaData);
         let readOnlyAreas = {};
 
+        if (trajType === TRAJECTORY_TYPE.DSR) {
+          dataTrajectories.push({
+            hypothesis: t('dsr.@capacityModulation'),
+            trajectory: null,
+            status: TRAJECTORY_SELECTION_STATUS.MISSING,
+            isDefault: false,
+            isDeletable: false,
+            subRows: null,
+          });
+        }
+
         if (isStudyGenerated) {
-          dataTrajectories = sortWithFixedPosition(filterRow(areaData));
           readOnlyAreas = generateReadOnlyIndexMap(dataTrajectories);
         } else {
-          dataTrajectories = sortWithFixedPosition(areaData);
-          readOnlyAreas = retrieveReadOnlyArea(dataTrajectories, defaultAreaListNotInList);
+          const readOnlySubRows = retrieveReadOnlyArea(dataTrajectories, defaultAreaListNotInList);
+
+          if (trajType === TRAJECTORY_TYPE.DSR) {
+            const hasSpecificTrajectory = dataTrajectories.some((row) => row.status === TRAJECTORY_SELECTION_STATUS.OK);
+
+            readOnlyAreas = {
+              ...readOnlySubRows,
+              [dataTrajectories.length - 1]: !hasSpecificTrajectory,
+            };
+          } else {
+            readOnlyAreas = readOnlySubRows;
+          }
         }
         setHypothesisTrajectories(dataTrajectories);
         setReadOnlyRow(readOnlyAreas);

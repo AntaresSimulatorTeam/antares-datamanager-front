@@ -45,7 +45,7 @@ import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
 import { TrajectoryDataVisualisation } from '@common/modal/TrajectoryDataVisualisation.tsx';
 import { useTranslation } from 'react-i18next';
 
-const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
+export const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const studyState = useStudy();
   const dispatch = useStudyDispatch();
   const { t } = useTranslation();
@@ -217,5 +217,3 @@ const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
     </div>
   );
 };
-
-export default STSTab;

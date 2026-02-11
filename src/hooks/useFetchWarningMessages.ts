@@ -11,13 +11,13 @@ export const useFetchWarningMessages = (studyId: number | null, type: TRAJECTORY
   const [warningMessages, setWarningMessages] = useState<WarningMessage[]>([]);
   const studyState = useStudy();
   const dispatch = useStudyDispatch();
+  // TODO remove DSR when api ok
+  const hasWarningMessage = type !== TRAJECTORY_TYPE.STS && type !== TRAJECTORY_TYPE.DSR;
 
   useEffect(() => {
     const fetchWarningMessages = async (id: number, trajectoryType: TRAJECTORY_TYPE, state: Partial<StudyState>) => {
       const isNotGenerated = state.studyStatus !== StudyStatus.GENERATED;
-      // TODO: remove this when STS api is implemented
-      const warningMessagesFromType: WarningMessage[] =
-        trajectoryType === TRAJECTORY_TYPE.STS ? [] : await fetchWarningMessagesFromType(trajectoryType, id);
+      const warningMessagesFromType: WarningMessage[] = await fetchWarningMessagesFromType(trajectoryType, id);
       try {
         if (trajectoryType === TRAJECTORY_TYPE.AREA) {
           const dataWarningMessageArea = buildDataWarningMessage(
@@ -70,7 +70,7 @@ export const useFetchWarningMessages = (studyId: number | null, type: TRAJECTORY
         dispatch?.({ type: STUDY_ACTION.SKIP_MESSAGE, payload: { discardActionTriggered: false } });
       }
     };
-    if (studyId != null && type) {
+    if (studyId != null && type && hasWarningMessage) {
       void fetchWarningMessages(studyId, type, studyState);
     }
   }, [

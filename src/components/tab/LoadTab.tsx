@@ -25,7 +25,7 @@ import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow
 import { CheckBoxListWithSearchBar } from '@/components/list/CheckBoxListWithSearchBar.tsx';
 import { filterRow, generateReadOnlyIndexMap, getAreaTrajectoryName } from '@/shared/utils/trajectoryUtils.ts';
 
-const LoadTab = ({ defaultAreas, areas, studyData }: TabProps) => {
+export const LoadTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const studyState = useStudy();
   const dispatch = useStudyDispatch();
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
@@ -167,5 +167,3 @@ const LoadTab = ({ defaultAreas, areas, studyData }: TabProps) => {
     </div>
   );
 };
-
-export default LoadTab;

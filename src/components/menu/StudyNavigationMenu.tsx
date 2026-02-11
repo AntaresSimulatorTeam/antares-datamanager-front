@@ -5,21 +5,21 @@
  */
 
 import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from 'react';
-import LoadTab from '@/components/tab/LoadTab.tsx';
-import { AreaLinkTab } from '@/components/tab/AreaLinkTab.tsx';
-import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useTranslation } from 'react-i18next';
 import { useStudy } from '@/store/contexts/StudyContext.tsx';
 import { HypothesisTab, StudyDTO, WarningTrajectoryType } from '@/shared/types';
 import StdAvatar from '@common/layout/stdAvatar/StdAvatar.tsx';
-import { ThermalMenu } from '@/components/menu/ThermalMenu.tsx';
 import { getStudyMenu } from '@/shared/utils/trajectoryUtils.ts';
 import { useFetchAreas } from '@/hooks/useFetchAreas.ts';
 import { countWarning } from '@/shared/utils/warningUtils.ts';
 import { getNbMessagesFromTrajectoryType } from '@/shared/services/trajectoryService.ts';
 import StdTabItem from '@common/layout/stdTabs/StdTabItem.tsx';
-import STSTab from '@/components/tab/STSTab.tsx';
+import { AreaLinkTab } from '@/components/tab/AreaLinkTab.tsx';
+import { LoadTab } from '@/components/tab/LoadTab.tsx';
+import { ThermalMenu } from '@/components/menu/ThermalMenu.tsx';
+import { STSTab } from '@/components/tab/STSTab.tsx';
+import DSRTab from '@/components/tab/DSRTab.tsx';
 
 type StudyNavigationMenuProps = {
   onRenderActiveComponent?: (content: ReactNode | null) => void;
@@ -46,16 +46,16 @@ const StudyNavigationMenu = ({
 
   const renderActiveComponent = (): ReactNode | null => {
     switch (activeTab.name) {
-      case TRAJECTORY_TYPE.AREA:
-        return <AreaLinkTab setErrorMessage={setErrorMessage} studyData={studyData} />;
       case TRAJECTORY_TYPE.LOAD:
         return <LoadTab defaultAreas={areaDefault} areas={trajectoryAreas} studyData={studyData} />;
       case TRAJECTORY_TYPE.THERMAL_CAPACITY:
         return <ThermalMenu defaultAreas={areaDefault} areas={trajectoryAreas} studyData={studyData} />;
       case TRAJECTORY_TYPE.STS:
         return <STSTab defaultAreas={areaDefault} areas={trajectoryAreas} studyData={studyData} />;
+      case TRAJECTORY_TYPE.DSR:
+        return <DSRTab defaultAreas={areaDefault} areas={trajectoryAreas} studyData={studyData} />;
       default:
-        return null;
+        return <AreaLinkTab setErrorMessage={setErrorMessage} studyData={studyData} />;
     }
   };
 
@@ -92,7 +92,6 @@ const StudyNavigationMenu = ({
         const nbWarning = warningTrajectory ? countWarning(warningTrajectory, tab.name) : 0;
         return (
           <div className="flex items-center space-x-2" key={tab.name}>
-            <StdIcon name={tab.icon} />
             <StdTabItem
               key={tab.name}
               name={tab.name}
@@ -100,6 +99,7 @@ const StudyNavigationMenu = ({
               active={activeTab.name === tab.name}
               disabled={tab.isDisabled}
               onClick={() => !tab.isDisabled && setActiveTab(tab)}
+              icon={tab.icon}
             />
             {nbWarning > 0 && activeTab.name !== tab.name && (
               <StdAvatar

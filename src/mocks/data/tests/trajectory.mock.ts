@@ -197,6 +197,31 @@ export const mockEmptyDbTrajectoryArrayLoadSTS: DbTrajectory[] = [
   },
 ];
 
+export const mockEmptyDbTrajectoryArrayDSR: DbTrajectory[] = [
+  {
+    id: 1,
+    trajectoryName: '',
+    type: TRAJECTORY_TYPE.DSR,
+    version: 3,
+    userName: 'mouad',
+    creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+    area: 'AT',
+    technology: '',
+    hasTimeSeries: false,
+  },
+  {
+    id: 2,
+    trajectoryName: '',
+    type: TRAJECTORY_TYPE.DSR,
+    version: 3,
+    userName: 'mouad',
+    creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+    area: 'BE',
+    technology: '',
+    hasTimeSeries: false,
+  },
+];
+
 export const mockEmptyDbTrajectoryArrayLoad: DbTrajectory[] = [
   {
     id: 1,

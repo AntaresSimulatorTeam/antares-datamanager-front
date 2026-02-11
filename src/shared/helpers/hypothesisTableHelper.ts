@@ -106,3 +106,17 @@ export const findSpecificTrajectoryToDelete = (
 
   return match?.trajectory ?? null;
 };
+
+export const getInformationMessage = (
+  nbRows: number,
+  type?: TRAJECTORY_TYPE,
+): { messageKey: string; index: number } | null => {
+  switch (type) {
+    case TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER:
+      return { messageKey: 'thermal.@paramModulationMessage', index: 1 };
+    case TRAJECTORY_TYPE.DSR:
+      return { messageKey: 'dsr.@capacityModulationMessage', index: Math.max(nbRows - 1, 0) };
+    default:
+      return null;
+  }
+};

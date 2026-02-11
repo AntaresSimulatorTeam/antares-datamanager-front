@@ -7,6 +7,7 @@ import {
   collectTrajectoriesRecursively,
   findSpecificTrajectoryToDelete,
   getCheckedValues,
+  getInformationMessage,
   getReadOnlyForGeneratedStudy,
   getSpecificTrajectories,
   shouldOpenDeletionModal,
@@ -480,5 +481,41 @@ describe('findSpecificTrajectoryToDelete', () => {
 
     const result = findSpecificTrajectoryToDelete(subRows, 'H1');
     expect(result).toEqual(traj2);
+  });
+});
+
+describe('getInformationMessage', () => {
+  it('retourne null si le type est undefined', () => {
+    expect(getInformationMessage(3, undefined)).toBeNull();
+  });
+
+  it('retourne le message thermal avec index = 1', () => {
+    const result = getInformationMessage(5, TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER);
+
+    expect(result).toEqual({
+      messageKey: 'thermal.@paramModulationMessage',
+      index: 1,
+    });
+  });
+
+  it('retourne le message DSR avec index = nbRows - 1', () => {
+    const result = getInformationMessage(4, TRAJECTORY_TYPE.DSR);
+
+    expect(result).toEqual({
+      messageKey: 'dsr.@capacityModulationMessage',
+      index: 3,
+    });
+  });
+
+  it('retourne un index minimum de 0 pour DSR si nbRows <= 1', () => {
+    expect(getInformationMessage(1, TRAJECTORY_TYPE.DSR)).toEqual({
+      messageKey: 'dsr.@capacityModulationMessage',
+      index: 0,
+    });
+
+    expect(getInformationMessage(0, TRAJECTORY_TYPE.DSR)).toEqual({
+      messageKey: 'dsr.@capacityModulationMessage',
+      index: 0,
+    });
   });
 });

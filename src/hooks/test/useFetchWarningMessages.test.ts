@@ -22,7 +22,7 @@ vi.mock('@/shared/utils/warningUtils', async (importOriginal) => {
 });
 
 describe('useFetchWarningMessages', () => {
-  beforeEach(() => {
+  afterEach(() => {
     vi.clearAllMocks();
   });
 
@@ -90,6 +90,23 @@ describe('useFetchWarningMessages', () => {
       );
       expect(buildDataWarningMessage).toHaveBeenCalled();
       expect(result.current.warningMessages).toEqual(mockBuiltMessages);
+    });
+  });
+
+  it('does not fetch warning messages for STS type', async () => {
+    const { result } = renderHook(() => useFetchWarningMessages(123, TRAJECTORY_TYPE.STS));
+
+    await waitFor(() => {
+      expect(result.current.warningMessages).toHaveLength(0);
+    });
+  });
+
+  // TODO remove when control
+  it('does not fetch warning messages for DSR type', async () => {
+    const { result } = renderHook(() => useFetchWarningMessages(123, TRAJECTORY_TYPE.DSR));
+
+    await waitFor(() => {
+      expect(result.current.warningMessages).toHaveLength(0);
     });
   });
 });
