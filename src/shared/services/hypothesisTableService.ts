@@ -137,7 +137,7 @@ export const handleTrajectorySearch = async (
  * @param {Dispatch<SetStateAction<HypothesisRowData[]>>} setData - State update function for maintaining the overall row data structure.
  * @param {string[]} options - Options list for TRAJECTORY_TYPE.THERMAL_CAPACITY or TRAJECTORY_TYPE.STS type
  * @param {{ name: string }[]} defaultAreas
- * @param setReadOnly
+ * @param {Dispatch<SetStateAction<ReadOnlyObject>>} setReadOnly - State update function for maintaining the readonly lines.
  * @returns {void}
  */
 export const addRow = (
