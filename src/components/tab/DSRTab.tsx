@@ -1,5 +1,5 @@
 import { CheckBoxData, DbTrajectory, HypothesisRowData, RowStatus, SelectOption, TabProps } from '@/shared/types';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { CheckBoxListWithSearchBar } from '@/components/list/CheckBoxListWithSearchBar.tsx';
 import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
@@ -9,11 +9,15 @@ import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/Pega
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
-import { useStudy } from '@/store/contexts/StudyContext.tsx';
+import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
+import { addRow } from '@/shared/services/hypothesisTableService.ts';
+import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow.ts';
 
 const DSRTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const studyState = useStudy();
+  const dispatch = useStudyDispatch();
   const [rowIdSelected, _setRowIdSelected] = useState<string>('0');
+  const [_rowToDelete, setRowToDelete] = useState<{ index: number; value?: string } | null>(null);
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
   const [data, setData] = useState<HypothesisRowData[]>([]);
@@ -26,6 +30,7 @@ const DSRTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   );
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
     useFetchHypothesisTrajectories(areas, studyData?.id, TRAJECTORY_TYPE.DSR, defaultAreas, isStudyGenerated);
+  const { removeRow } = useHypothesisTableRemoveRow(studyData, dispatch, setData, setCheckedValues, setReadOnly);
 
   useEffect(() => {
     const setHypothesis = () => {
@@ -37,12 +42,27 @@ const DSRTab = ({ defaultAreas, areas, studyData }: TabProps) => {
     setHypothesis();
   }, [hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow]);
 
+  const handleSelectionChange = useCallback(
+    async (value: string, isChecked?: boolean): Promise<void> => {
+      const indexRow = data.findIndex((row) => row.hypothesis === value);
+      if (isChecked) {
+        addRow(TRAJECTORY_TYPE.DSR, value, dispatch, setCheckedValues, setData, [], [], setReadOnly);
+      } else if (shouldOpenDeletionModal(TRAJECTORY_TYPE.DSR, indexRow, data)) {
+        setRowToDelete({ index: indexRow, value });
+        setIsDeletionModalOpen(true);
+      } else {
+        await removeRow(TRAJECTORY_TYPE.DSR, value, indexRow, data);
+      }
+    },
+    [data, dispatch, removeRow, setCheckedValues],
+  );
+
   return (
     <div className="flex min-h-0 w-full gap-6">
       <CheckBoxListWithSearchBar
         checkedValues={checkedValues}
         options={areasOptions}
-        handleSelectionChange={() => {}}
+        handleSelectionChange={handleSelectionChange}
         dividerPosition={defaultAreas.length}
         disabled={false}
       />
@@ -75,12 +95,12 @@ const DSRTab = ({ defaultAreas, areas, studyData }: TabProps) => {
             }
           }
         }}
-        removeRow={(_value: string, rowId?: string) => {
+        removeRow={(value: string, rowId?: string) => {
           if (shouldOpenDeletionModal(TRAJECTORY_TYPE.DSR, Number(rowId), data)) {
-            //setRowToDelete({ index: Number(rowId), value });
+            setRowToDelete({ index: Number(rowId), value });
             setIsDeletionModalOpen(true);
           } else {
-            //void removeRow(TRAJECTORY_TYPE.STS, value, Number(rowId), data);
+            void removeRow(TRAJECTORY_TYPE.DSR, value, Number(rowId), data);
           }
         }}
         type={TRAJECTORY_TYPE.DSR}

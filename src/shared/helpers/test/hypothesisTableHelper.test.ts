@@ -5,6 +5,7 @@ import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/traj
 import { mockDbTrajectory } from '@/mocks/data/tests/trajectory.mock.ts';
 import {
   collectTrajectoriesRecursively,
+  computeDsrDataAndReadOnly,
   findSpecificTrajectoryToDelete,
   getCheckedValues,
   getInformationMessage,
@@ -517,5 +518,79 @@ describe('getInformationMessage', () => {
       messageKey: 'dsr.@capacityModulationMessage',
       index: 0,
     });
+  });
+});
+
+describe('computeDsrDataAndReadOnly', () => {
+  const row = (hypothesis: string, status: TRAJECTORY_SELECTION_STATUS): HypothesisRowData => ({
+    hypothesis,
+    trajectory: null,
+    status,
+  });
+  it('append le dernier item de prev à la fin des données', () => {
+    const prev = [row('A', TRAJECTORY_SELECTION_STATUS.MISSING), row('LAST', TRAJECTORY_SELECTION_STATUS.MISSING)];
+    const nextSortedWithoutLast = [
+      row('B', TRAJECTORY_SELECTION_STATUS.MISSING),
+      row('C', TRAJECTORY_SELECTION_STATUS.OK),
+    ];
+
+    const { data } = computeDsrDataAndReadOnly(prev, nextSortedWithoutLast);
+
+    expect(data.map((r) => r.hypothesis)).toEqual(['B', 'C', 'LAST']);
+  });
+
+  it('ne crash pas si prev est vide (pas de lastItem)', () => {
+    const prev: HypothesisRowData[] = [];
+    const nextSortedWithoutLast = [row('B', TRAJECTORY_SELECTION_STATUS.MISSING)];
+
+    const { data, computeReadOnly } = computeDsrDataAndReadOnly(prev, nextSortedWithoutLast);
+
+    expect(data.map((r) => r.hypothesis)).toEqual(['B']);
+    expect(computeReadOnly({})).toEqual({ 0: true }); // pas de OK => last index readOnly = true
+  });
+
+  it('computeReadOnly: nettoie les clés numériques existantes et ne garde que le dernier index', () => {
+    const prev = [row('X', TRAJECTORY_SELECTION_STATUS.MISSING), row('LAST', TRAJECTORY_SELECTION_STATUS.MISSING)];
+    const nextSortedWithoutLast = [
+      row('A', TRAJECTORY_SELECTION_STATUS.MISSING),
+      row('B', TRAJECTORY_SELECTION_STATUS.MISSING),
+    ]; // => data length = 3, lastIndex = 2
+
+    const { computeReadOnly } = computeDsrDataAndReadOnly(prev, nextSortedWithoutLast);
+
+    const prevReadOnly: ReadOnlyObject = {
+      0: true,
+      1: true,
+      foo: true, // doit être conservé (clé non numérique)
+      '2.subRows.0': true, // conservé (non purement numérique)
+    };
+
+    const next = computeReadOnly(prevReadOnly);
+
+    expect(next).toEqual({
+      foo: true,
+      '2.subRows.0': true,
+      2: true, // pas de OK => readOnly sur le dernier index
+    });
+  });
+
+  it('computeReadOnly: met le dernier index à false s’il existe une trajectoire spécifique (OK)', () => {
+    const prev = [row('A', TRAJECTORY_SELECTION_STATUS.MISSING), row('LAST', TRAJECTORY_SELECTION_STATUS.MISSING)];
+    const nextSortedWithoutLast = [row('B', TRAJECTORY_SELECTION_STATUS.OK)]; // OK => hasSpecificTrajectory = true
+
+    const { data, computeReadOnly } = computeDsrDataAndReadOnly(prev, nextSortedWithoutLast);
+
+    expect(data.map((r) => r.hypothesis)).toEqual(['B', 'LAST']);
+    expect(computeReadOnly({ 0: true, 1: true })).toEqual({ 1: false }); // nettoie 0/1 et remet lastIndex=1 à false
+  });
+
+  it('si data est vide (lastIndex = -1), computeReadOnly ne rajoute rien', () => {
+    const prev: HypothesisRowData[] = [];
+    const nextSortedWithoutLast: HypothesisRowData[] = [];
+
+    const { data, computeReadOnly } = computeDsrDataAndReadOnly(prev, nextSortedWithoutLast);
+
+    expect(data).toEqual([]);
+    expect(computeReadOnly({ 0: true, foo: true })).toEqual({ foo: true }); // supprime "0", ne peut pas définir lastIndex
   });
 });
