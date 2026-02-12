@@ -33,6 +33,8 @@ import { generateTrajectoryViewHeader } from '@/components/header/TrajectoryView
 import { TFunction } from 'i18next';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { getSchemeData } from '@/shared/utils/hypothesisTableUtils.ts';
+import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
+import { computeDsrDataAndReadOnly } from '@/shared/helpers/hypothesisTableHelper.ts';
 
 export const handleTrajectoryError = (
   type: TRAJECTORY_TYPE,
@@ -135,6 +137,7 @@ export const handleTrajectorySearch = async (
  * @param {Dispatch<SetStateAction<HypothesisRowData[]>>} setData - State update function for maintaining the overall row data structure.
  * @param {string[]} options - Options list for TRAJECTORY_TYPE.THERMAL_CAPACITY or TRAJECTORY_TYPE.STS type
  * @param {{ name: string }[]} defaultAreas
+ * @param {Dispatch<SetStateAction<ReadOnlyObject>>} setReadOnly - State update function for maintaining the readonly lines.
  * @returns {void}
  */
 export const addRow = (
@@ -145,6 +148,7 @@ export const addRow = (
   setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
   options?: string[],
   defaultAreas?: { name: string }[],
+  setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
 ): void => {
   dispatch?.({
     type: STUDY_ACTION.ADD_TRAJECTORIES,
@@ -164,6 +168,12 @@ export const addRow = (
     if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
       const newSubRows = prev?.[0]?.subRows ? sortWithFixedPosition([...prev[0].subRows, newRow]) : [newRow];
       updatedData = [{ ...prev[0], subRows: newSubRows }, ...prev.slice(1)];
+    } else if (type === TRAJECTORY_TYPE.DSR) {
+      const rest = prev.slice(0, -1);
+      const sorted = sortWithFixedPosition([newRow, ...rest]);
+      const { data, computeReadOnly } = computeDsrDataAndReadOnly(prev, sorted);
+      updatedData = data;
+      setReadOnly?.(computeReadOnly);
     } else {
       updatedData = sortWithFixedPosition([newRow, ...prev]);
     }

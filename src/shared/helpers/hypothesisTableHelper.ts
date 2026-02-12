@@ -2,6 +2,7 @@ import { DbTrajectory, HypothesisRowData, TrajectoryAreaData } from '@/shared/ty
 import { retrieveReadOnlyArea } from '@/shared/utils/trajectoryUtils.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
+import { DsrUpdateResult } from '@/shared/types/HypothesisTable.ts';
 
 /**
  * Retrieve read only row of a study generated
@@ -119,4 +120,32 @@ export const getInformationMessage = (
     default:
       return null;
   }
+};
+
+export const computeDsrDataAndReadOnly = (
+  prev: HypothesisRowData[],
+  nextSortedWithoutLast: HypothesisRowData[],
+): DsrUpdateResult<HypothesisRowData> => {
+  const lastItem = prev.length > 0 ? prev.at(-1) : undefined;
+
+  const data = lastItem ? [...nextSortedWithoutLast, lastItem] : nextSortedWithoutLast;
+
+  const hasSpecificTrajectory = nextSortedWithoutLast.some((row) => row.status === TRAJECTORY_SELECTION_STATUS.OK);
+
+  const lastIndex = data.length - 1;
+
+  const computeReadOnly = (prevReadOnly: ReadOnlyObject) => {
+    const next = { ...prevReadOnly };
+    for (const key of Object.keys(next)) {
+      if (/^\d+$/.test(key)) delete next[key];
+    }
+
+    if (lastIndex >= 0) {
+      next[lastIndex] = !hasSpecificTrajectory;
+    }
+
+    return next;
+  };
+
+  return { data, computeReadOnly };
 };

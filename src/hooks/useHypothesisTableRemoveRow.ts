@@ -8,6 +8,7 @@ import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { useTranslation } from 'react-i18next';
 import {
   collectTrajectoriesRecursively,
+  computeDsrDataAndReadOnly,
   findSpecificTrajectoryToDelete,
   getSpecificTrajectories,
 } from '@/shared/helpers/hypothesisTableHelper.ts';
@@ -18,6 +19,7 @@ export const useHypothesisTableRemoveRow = (
   dispatch: Dispatch<StudyActionType> | null,
   setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
   setCheckedValues: Dispatch<SetStateAction<string[]>>,
+  setReadOnly?: Dispatch<SetStateAction<Record<string, boolean>>>,
 ) => {
   const { t } = useTranslation();
 
@@ -58,7 +60,7 @@ export const useHypothesisTableRemoveRow = (
         }
 
         // --- Suppression backend ---
-        if (study.id && trajectoryIds.length > 0) {
+        if (study.id && trajectoryIds?.length > 0) {
           if (trajectoryIds.length > 1) {
             await unlinkMultipleTrajectoriesFromStudy(study.id, trajectoryIds);
           } else {
@@ -93,6 +95,16 @@ export const useHypothesisTableRemoveRow = (
 
             return [{ ...prev[0], subRows: newSubRows }, ...prev.slice(1)];
           });
+        } else if (type === TRAJECTORY_TYPE.DSR) {
+          setData((prev) => {
+            const rest = prev.length > 0 ? prev.slice(0, -1) : [];
+            const newData = rest.filter((r) => r.hypothesis !== value);
+            const sorted = sortWithFixedPosition(newData);
+            const { data: updatedData, computeReadOnly } = computeDsrDataAndReadOnly(prev, sorted);
+            setReadOnly?.(computeReadOnly);
+
+            return updatedData;
+          });
         } else {
           setData(sortWithFixedPosition(data.filter((r) => r.hypothesis !== value)));
         }
@@ -113,7 +125,7 @@ export const useHypothesisTableRemoveRow = (
         });
       }
     },
-    [study, dispatch, setData, setCheckedValues, t],
+    [study.id, study.name, dispatch, setCheckedValues, setData, setReadOnly, t],
   );
 
   return { removeRow };

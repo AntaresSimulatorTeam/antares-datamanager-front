@@ -29,6 +29,7 @@ import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { generateTrajectoryViewHeader } from '@/components/header/TrajectoryViewHeader.tsx';
 import { TFunction } from 'i18next';
+import { ReadOnlyObject } from '@/shared/types/HypothesisTable.ts';
 
 vi.mock('@/shared/notification/notification');
 
@@ -490,11 +491,11 @@ describe('addRow', () => {
     vi.useFakeTimers();
   });
   afterEach(() => {
-    vi.restoreAllMocks();
+    vi.clearAllMocks();
     vi.useRealTimers();
   });
 
-  it('should dispatch action and update state without subRows', () => {
+  it('should dispatch action and update state for LOAD type', () => {
     const mockDispatch = vi.fn();
     const mockSetCheckedValues = vi.fn<Dispatch<SetStateAction<string[]>>>();
     const mockSetData = vi.fn<Dispatch<SetStateAction<HypothesisRowData[]>>>();
@@ -652,11 +653,17 @@ describe('addRow', () => {
       },
     ] as unknown as HypothesisRowData[];
 
-    addRow(TRAJECTORY_TYPE.LOAD, 'ThermalHypothesis', mockDispatch, mockSetCheckedValues, mockSetData);
+    addRow(
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+      'ThermalHypothesis',
+      mockDispatch,
+      mockSetCheckedValues,
+      mockSetData,
+    );
 
     const updater = mockSetData.mock.calls[0][0] as (prev: HypothesisRowData[]) => HypothesisRowData[];
     const newRow = updater(prevData);
-    expect(newRow[0].subRows).toBeUndefined();
+    expect(newRow[0].subRows).toHaveLength(1);
   });
 
   it('should include subRows for STS type', () => {
@@ -667,6 +674,7 @@ describe('addRow', () => {
     addRow(TRAJECTORY_TYPE.STS, 'STSHypothesis', mockDispatch, mockSetCheckedValues, mockSetData, STSTechnology);
 
     const updater = mockSetData.mock.calls[0][0] as (prev: HypothesisRowData[]) => HypothesisRowData[];
+
     const newRow = updater([]);
     expect(newRow[0]?.subRows).toHaveLength(STSTechnology.length);
     expect(newRow[0].subRows?.[0]).toMatchObject({
@@ -687,6 +695,51 @@ describe('addRow', () => {
 
     expect(mockSetCheckedValues).toHaveBeenCalled();
     expect(mockSetData).toHaveBeenCalled();
+  });
+
+  it('should add item and keep last item et call setReadOnly through computeDsrDataAndReadOnly', () => {
+    // Arrange
+    const value = 'AREA_1';
+
+    const mockDispatch = vi.fn();
+    const mockSetCheckedValues = vi.fn<Dispatch<SetStateAction<string[]>>>();
+    const mockSetData = vi.fn<Dispatch<SetStateAction<HypothesisRowData[]>>>();
+    const mockSetReadOnly = vi.fn<Dispatch<SetStateAction<ReadOnlyObject>>>();
+
+    // Act
+    addRow(TRAJECTORY_TYPE.DSR, value, mockDispatch, mockSetCheckedValues, mockSetData, [], [], mockSetReadOnly);
+    const updater = mockSetData.mock.calls[0][0] as (prev: HypothesisRowData[]) => HypothesisRowData[];
+    const newRow = updater([]);
+    // Assert dispatch
+    expect(mockDispatch).toHaveBeenCalledTimes(1);
+    expect(mockDispatch).toHaveBeenCalledWith({
+      type: STUDY_ACTION.ADD_TRAJECTORIES,
+      payload: {
+        [TRAJECTORY_TYPE.DSR]: {
+          trajectories: [
+            {
+              id: 'DEMAND-NewHypothesis',
+              trajectoryName: '',
+              type: TRAJECTORY_TYPE.DSR,
+              version: 0,
+              userName: 'user',
+              creationDate: new Date(),
+              area: value,
+              technology: '',
+              state: TRAJECTORY_SELECTION_STATUS.MISSING,
+              hasTimeSeries: false,
+            },
+          ],
+        },
+      },
+    });
+    expect(newRow[0]).toMatchObject({
+      hypothesis: value,
+      trajectory: null,
+      status: TRAJECTORY_SELECTION_STATUS.MISSING,
+      isDefault: false,
+      subRows: null,
+    });
   });
 });
 

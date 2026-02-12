@@ -6,11 +6,26 @@ import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow
 import { unlinkMultipleTrajectoriesFromStudy, unlinkTrajectoryFromStudy } from '@/shared/services/trajectoryService.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { notifyAlert } from '@/shared/notification/notification.tsx';
+import { computeDsrDataAndReadOnly } from '@/shared/helpers/hypothesisTableHelper.ts';
+import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
+import { ReadOnlyObject } from '@/shared/types/HypothesisTable.ts';
 
 vi.mock('@/shared/services/trajectoryService', () => ({
   unlinkTrajectoryFromStudy: vi.fn(),
   unlinkMultipleTrajectoriesFromStudy: vi.fn(),
 }));
+
+vi.mock('@/shared/utils/sortUtils.ts', () => ({
+  sortWithFixedPosition: vi.fn(),
+}));
+
+vi.mock('@/shared/helpers/hypothesisTableHelper.ts', async (importOriginal) => {
+  const actual: Mock = await importOriginal();
+  return {
+    ...actual,
+    computeDsrDataAndReadOnly: vi.fn(),
+  };
+});
 
 vi.mock('@/shared/notification/notification', () => ({
   notifyAlert: vi.fn(),
@@ -26,6 +41,7 @@ describe('useHypothesisTableRemoveRow', () => {
   const mockDispatch = vi.fn();
   const mockSetData = vi.fn();
   const mockSetCheckedValues = vi.fn();
+  const mockSetReadOnly = vi.fn();
 
   const study = { id: 'study-001', name: 'Demo Study' } as unknown as StudyDTO;
 
@@ -307,5 +323,67 @@ describe('useHypothesisTableRemoveRow', () => {
         subRows: [],
       },
     ]);
+  });
+
+  it('DSR: met à jour le tableau via computeDsrDataAndReadOnly et appelle setReadOnly avec computeReadOnly', async () => {
+    const { result } = renderHook(() =>
+      useHypothesisTableRemoveRow(study, mockDispatch, mockSetData, mockSetCheckedValues, mockSetReadOnly),
+    );
+
+    const value = 'AREA_1';
+    const dsrData: HypothesisRowData[] = [
+      {
+        hypothesis: value,
+        trajectory: { id: 55, trajectoryName: 'Traj 55', area: value } as DbTrajectory,
+        status: TRAJECTORY_SELECTION_STATUS.OK,
+        subRows: [],
+      },
+      {
+        hypothesis: 'LAST',
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+        subRows: [],
+      },
+    ];
+
+    // Le hook enlève "value" de rest, donc newData devient []
+    const sorted = [{ hypothesis: 'SORTED', trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING }];
+    vi.mocked(sortWithFixedPosition).mockReturnValue(sorted);
+
+    const computeReadOnlyFn = vi.fn((ro: ReadOnlyObject) => ro);
+    const updatedData = [{ hypothesis: 'UPDATED', trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING }];
+
+    vi.mocked(computeDsrDataAndReadOnly).mockReturnValue({
+      data: updatedData,
+      computeReadOnly: computeReadOnlyFn,
+    });
+
+    await result.current.removeRow(TRAJECTORY_TYPE.DSR, value, 0, dsrData);
+
+    // TODO ajouter ce test quand l'api attach sera adaptée et utilisée dans l'onglet DSR
+    // 1) unlink backend (une seule trajectoire)
+    // expect(unlinkTrajectoryFromStudy).toHaveBeenCalledWith(55, 'study-001');
+
+    // 2) dispatch store
+    expect(mockDispatch).toHaveBeenCalledWith({
+      type: STUDY_ACTION.DELETE_TRAJECTORY,
+      payload: { area: value, type: TRAJECTORY_TYPE.DSR },
+    });
+
+    // 3) setData reçoit un updater : on l’exécute pour vérifier les appels internes (tri + helper + setReadOnly)
+    expect(mockSetData).toHaveBeenCalledTimes(1);
+    const dataUpdater = mockSetData.mock.calls[0][0] as (prev: HypothesisRowData[]) => HypothesisRowData[];
+
+    const next = dataUpdater(dsrData);
+
+    expect(sortWithFixedPosition).toHaveBeenCalledWith([]); // newData = []
+    expect(computeDsrDataAndReadOnly).toHaveBeenCalledWith(dsrData, sorted);
+    expect(mockSetReadOnly).toHaveBeenCalledWith(computeReadOnlyFn);
+    expect(next).toBe(updatedData);
+
+    // 4) setCheckedValues : suppression de la valeur
+    expect(mockSetCheckedValues).toHaveBeenCalledTimes(1);
+    const checkedUpdater = mockSetCheckedValues.mock.calls[0][0] as (prev: string[]) => string[];
+    expect(checkedUpdater([value, 'OTHER'])).toEqual(['OTHER']);
   });
 });
