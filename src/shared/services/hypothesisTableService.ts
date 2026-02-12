@@ -169,7 +169,7 @@ export const addRow = (
       const newSubRows = prev?.[0]?.subRows ? sortWithFixedPosition([...prev[0].subRows, newRow]) : [newRow];
       updatedData = [{ ...prev[0], subRows: newSubRows }, ...prev.slice(1)];
     } else if (type === TRAJECTORY_TYPE.DSR) {
-      const rest = prev.length > 0 ? prev.slice(0, -1) : [];
+      const rest = prev.slice(0, -1);
       const sorted = sortWithFixedPosition([newRow, ...rest]);
       const { data, computeReadOnly } = computeDsrDataAndReadOnly(prev, sorted);
       updatedData = data;

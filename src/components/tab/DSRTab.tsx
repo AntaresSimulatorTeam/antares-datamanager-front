@@ -51,7 +51,11 @@ const DSRTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         setRowToDelete({ index: indexRow, value });
         setIsDeletionModalOpen(true);
       } else {
-        await removeRow(TRAJECTORY_TYPE.DSR, value, indexRow, data);
+        try {
+          await removeRow(TRAJECTORY_TYPE.DSR, value, indexRow, data);
+        } catch {
+        // silent handler
+        }
       }
     },
     [data, dispatch, removeRow, setCheckedValues],
