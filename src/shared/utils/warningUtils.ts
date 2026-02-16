@@ -43,13 +43,18 @@ export const buildDataWarningMessage = (
   isNotGenerated: boolean,
   studyId: number,
   handleClickItem: ((id: number) => Promise<void>) | null,
-): DataWarningMessage[] =>
-  (messages || []).map((message: WarningMessage) => ({
-    ...message,
-    trajectoryType: tabName,
-    onClickItem: isNotGenerated ? handleClickItem : null,
-    studyId,
-  }));
+): DataWarningMessage[] => {
+  if (messages?.length > 0) {
+    return messages.map((message: WarningMessage) => ({
+      ...message,
+      trajectoryType: tabName,
+      onClickItem: isNotGenerated ? handleClickItem : null,
+      studyId,
+    }));
+  } else {
+    return [];
+  }
+};
 
 /**
  * Transforms the input data object into a structured `CardDataType` object.

@@ -58,15 +58,17 @@ export const useFetchWarningMessages = (studyId: number | null, type: TRAJECTORY
             ),
           );
         } else {
-          setWarningMessages(
-            buildDataWarningMessage(
-              warningMessagesFromType,
-              trajectoryType,
-              isNotGenerated,
-              id,
-              studyState.discardWarningMessage ?? null,
-            ),
-          );
+          warningMessagesFromType.length > 0
+            ? setWarningMessages(
+                buildDataWarningMessage(
+                  warningMessagesFromType,
+                  trajectoryType,
+                  isNotGenerated,
+                  id,
+                  studyState.discardWarningMessage ?? null,
+                ),
+              )
+            : setWarningMessages([]);
         }
       } finally {
         dispatch?.({ type: STUDY_ACTION.SKIP_MESSAGE, payload: { discardActionTriggered: false } });
