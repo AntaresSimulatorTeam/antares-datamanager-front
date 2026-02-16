@@ -11,13 +11,15 @@ export const useFetchWarningMessages = (studyId: number | null, type: TRAJECTORY
   const [warningMessages, setWarningMessages] = useState<WarningMessage[]>([]);
   const studyState = useStudy();
   const dispatch = useStudyDispatch();
-  // TODO remove DSR when api ok
-  const hasWarningMessage = type !== TRAJECTORY_TYPE.STS && type !== TRAJECTORY_TYPE.DSR;
 
   useEffect(() => {
     const fetchWarningMessages = async (id: number, trajectoryType: TRAJECTORY_TYPE, state: Partial<StudyState>) => {
       const isNotGenerated = state.studyStatus !== StudyStatus.GENERATED;
-      const warningMessagesFromType: WarningMessage[] = await fetchWarningMessagesFromType(trajectoryType, id);
+      // TODO remove DSR when api ok
+      const hasWarningMessage = type !== TRAJECTORY_TYPE.STS && type !== TRAJECTORY_TYPE.DSR;
+      const warningMessagesFromType: WarningMessage[] = hasWarningMessage
+        ? await fetchWarningMessagesFromType(trajectoryType, id)
+        : [];
       try {
         if (trajectoryType === TRAJECTORY_TYPE.AREA) {
           const dataWarningMessageArea = buildDataWarningMessage(
@@ -56,21 +58,23 @@ export const useFetchWarningMessages = (studyId: number | null, type: TRAJECTORY
             ),
           );
         } else {
-          setWarningMessages(
-            buildDataWarningMessage(
-              warningMessagesFromType,
-              trajectoryType,
-              isNotGenerated,
-              id,
-              studyState.discardWarningMessage ?? null,
-            ),
-          );
+          warningMessagesFromType.length > 0
+            ? setWarningMessages(
+                buildDataWarningMessage(
+                  warningMessagesFromType,
+                  trajectoryType,
+                  isNotGenerated,
+                  id,
+                  studyState.discardWarningMessage ?? null,
+                ),
+              )
+            : setWarningMessages([]);
         }
       } finally {
         dispatch?.({ type: STUDY_ACTION.SKIP_MESSAGE, payload: { discardActionTriggered: false } });
       }
     };
-    if (studyId != null && type && hasWarningMessage) {
+    if (studyId != null && type) {
       void fetchWarningMessages(studyId, type, studyState);
     }
   }, [
