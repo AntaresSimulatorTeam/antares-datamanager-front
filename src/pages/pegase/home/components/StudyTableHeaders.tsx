@@ -58,7 +58,10 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
   columnHelper.accessor('creationDate', {
     header: t('home.@creation_date'),
     size: 200,
-    cell: ({ getValue }) => formatDateToDDMMYYYY(getValue(), true),
+    cell: ({ getValue }) => {
+      const value = getValue();
+      return value ? formatDateToDDMMYYYY(value, true) : '';
+    },
   }),
 
   columnHelper.accessor('createdBy', {
@@ -87,6 +90,15 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
           <div>{sentenceCase(status)}</div>
         </div>
       );
+    },
+  }),
+
+  columnHelper.accessor('generationDate', {
+    header: t('home.@generation_date'),
+    size: 200,
+    cell: ({ getValue }) => {
+      const value = getValue();
+      return value ? formatDateToDDMMYYYY(value, true) : '';
     },
   }),
 ];
