@@ -15,6 +15,7 @@ export interface StudyDTO {
   name: string;
   createdBy: string | undefined;
   creationDate: Date;
+  generationDate?: Date;
   keywords: string[];
   project: string;
   projectId: string;

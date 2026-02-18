@@ -41,6 +41,7 @@
     "@status": "Status",
     "@horizon": "Horizon",
     "@creation_date": "Date de création",
+    "@generation_date": "Date de génération",
     "@keywords": "Mots-clés",
     "@project": "Projet",
     "@my_studies": "Mes études",
