@@ -8,6 +8,8 @@ import {
   TRAJECTORY_COUNT_WARNING_ENDPOINT,
   TRAJECTORY_DATA_BASE_ENDPOINT,
   TRAJECTORY_DATA_FILE_ENDPOINT,
+  TRAJECTORY_DSR_CAPACITY_MODULATION,
+  TRAJECTORY_DSR_CLUSTER,
   TRAJECTORY_ENDPOINT,
   TRAJECTORY_FILE_SYSTEM_ENDPOINT,
   TRAJECTORY_LINK_TO_STUDY_ENDPOINT,
@@ -144,6 +146,10 @@ export const uploadTrajectory = async (
     urlApi = `${TRAJECTORY_THERMAL_ECONOMIC_PARAMETER_IMPORT}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   } else if (trajectoryType === TRAJECTORY_TYPE.STS) {
     urlApi = `${TRAJECTORY_STS}?area=${area}&technology=${subArea}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
+  } else if (trajectoryType === TRAJECTORY_TYPE.DSR) {
+    urlApi = `${TRAJECTORY_DSR_CLUSTER}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
+  } else if (trajectoryType === TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION) {
+    urlApi = `${TRAJECTORY_DSR_CAPACITY_MODULATION}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   } else {
     urlApi = `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   }

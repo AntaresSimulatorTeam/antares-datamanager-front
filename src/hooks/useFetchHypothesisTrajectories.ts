@@ -49,8 +49,7 @@ export const useFetchHypothesisTrajectories = (
     async (id: number, trajType: TRAJECTORY_TYPE) => {
       try {
         let technologies;
-        // TODO implement DSR type
-        const result = trajType === TRAJECTORY_TYPE.DSR ? [] : await getStudyTrajectories(id, trajType);
+        const result = await getStudyTrajectories(id, trajType);
         if (trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
           const thermalOptions = await getThermalTechnologyList();
           technologies = thermalOptions?.map((thermalOption) => thermalOption.name);
