@@ -64,7 +64,7 @@ export const useTrajectoryImport = (
             const hasSpecificTrajectory =
               data.some((row) => row.status === TRAJECTORY_SELECTION_STATUS.OK) && newTrajectory.hasTimeSeries;
             setReadOnly?.((prev) => {
-              const lastIndex = Object.keys(prev)?.length - 1;
+              const lastIndex = Math.max(Object.keys(prev)?.length - 1, 0);
               return { ...prev, [lastIndex]: !hasSpecificTrajectory };
             });
           }

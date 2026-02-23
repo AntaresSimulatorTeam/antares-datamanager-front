@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { uploadTrajectory } from '@/shared/services/trajectoryService.ts';
 import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
-import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory';
+import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory';
 import { HypothesisRowData, StudyDTO, UserState } from '@/shared/types';
 import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.ts';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
@@ -275,6 +275,28 @@ describe('useTrajectoryImport', () => {
       2030,
       'study-001',
       OTHER_AREAS,
+      expect.any(Function),
+      false,
+      undefined,
+    );
+  });
+
+  it('should use set read only when trajectory type is DSR', async () => {
+    const dataWithOther = [{ hypothesis: 'AT', status: TRAJECTORY_SELECTION_STATUS.OK }] as HypothesisRowData[];
+    (uploadTrajectory as Mock).mockResolvedValue({ id: 102, hasTimeSeries: true });
+
+    const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch, mockSetReadOnly));
+
+    await act(async () => {
+      await result.current.importTrajectory(TRAJECTORY_TYPE.DSR, value, [0], dataWithOther, mockSetData);
+    });
+
+    expect(uploadTrajectory).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.DSR,
+      'Trajectory A',
+      2030,
+      'study-001',
+      'AT',
       expect.any(Function),
       false,
       undefined,
