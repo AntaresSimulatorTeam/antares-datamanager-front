@@ -136,6 +136,31 @@ describe('useTrajectoryImport', () => {
     expect(result.current.progress).toBeGreaterThanOrEqual(0);
   });
 
+  it('should import trajectory and call attachTrajectory', async () => {
+    const mockTrajectory = { id: 101, trajectoryName: 'Trajectory A' };
+    (uploadTrajectory as Mock).mockResolvedValue(mockTrajectory);
+
+    const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch));
+
+    await act(async () => {
+      await result.current.importTrajectory(TRAJECTORY_TYPE.STS, value, [0, 0], data, mockSetData);
+    });
+
+    expect(uploadTrajectory).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.STS,
+      'Trajectory A',
+      2030,
+      'study-001',
+      'Solar',
+      expect.any(Function),
+      false,
+      'Tech A',
+    );
+
+    expect(result.current.fileStatus).toBe('success');
+    expect(result.current.progress).toBeGreaterThanOrEqual(0);
+  });
+
   it('should handle error and call handleTrajectoryError', async () => {
     (uploadTrajectory as Mock).mockRejectedValue({
       antaresErrorMessage: 'upload failed',
@@ -224,6 +249,28 @@ describe('useTrajectoryImport', () => {
 
     expect(uploadTrajectory).toHaveBeenCalledWith(
       TRAJECTORY_TYPE.LOAD,
+      'Trajectory A',
+      2030,
+      'study-001',
+      OTHER_AREAS,
+      expect.any(Function),
+      false,
+      undefined,
+    );
+  });
+
+  it('should use OTHER_AREAS when hypothesis is OTHER_AREAS_LABEL', async () => {
+    const dataWithOther = [{ hypothesis: OTHER_AREAS_LABEL }] as HypothesisRowData[];
+    (uploadTrajectory as Mock).mockResolvedValue({ id: 102 });
+
+    const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch));
+
+    await act(async () => {
+      await result.current.importTrajectory(TRAJECTORY_TYPE.DSR, value, [0], dataWithOther, mockSetData);
+    });
+
+    expect(uploadTrajectory).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.DSR,
       'Trajectory A',
       2030,
       'study-001',
