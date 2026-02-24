@@ -1,6 +1,14 @@
 import { useTranslation } from 'react-i18next';
 import { useCallback, useEffect, useState } from 'react';
-import { CheckBoxData, DbTrajectory, HypothesisRowData, RowStatus, SelectOption, TabProps } from '@/shared/types';
+import {
+  CheckBoxData,
+  DbTrajectory,
+  HypothesisRowData,
+  RowStatus,
+  SelectOption,
+  TableOperationRow,
+  TabProps,
+} from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import getEditableHypothesisTableHeaders from '@/components/header/EditableHypothesisTableHeaders.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
@@ -43,7 +51,12 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const [data, setData] = useState<HypothesisRowData[]>([]);
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
   const [rowIdSelected, setRowIdSelected] = useState<string>('0');
-  const [rowToDelete, setRowToDelete] = useState<{ index: number | number[]; value?: string } | null>(null);
+  const [rowToDelete, setRowToDelete] = useState<{
+    index: number;
+    subIndex?: number;
+    value?: string;
+    operation: TableOperationRow;
+  } | null>(null);
   const [isDeletionModalOpen, setIsDeletionModalOpen] = useState(false);
   const [isStudyGenerated, setIsStudyGenerated] = useState(
     studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED,
@@ -65,7 +78,7 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch);
   const { attachTrajectory } = useTrajectoryAttach(studyData, studyState, dispatch);
   const { removeRow } = useHypothesisTableRemoveRow(studyData, dispatch, setTechnicalData, setCheckedValues);
-  const { detachTrajectory } = useTrajectoryDetach(studyData, dispatch);
+  const { detachTrajectory } = useTrajectoryDetach(studyData, dispatch, setReadOnly);
 
   useEffect(() => {
     const setHypothesis = () => {
@@ -106,7 +119,7 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
       } else if (
         shouldOpenDeletionModal(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, 0, technicalData, value)
       ) {
-        setRowToDelete({ index: 0, value });
+        setRowToDelete({ index: 0, value, operation: 'remove' });
         setIsDeletionModalOpen(true);
       } else {
         await removeRow(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, value, 0, technicalData);
@@ -170,7 +183,7 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
                   technicalData[topIndex]?.subRows?.[subIndex]?.status === TRAJECTORY_SELECTION_STATUS.OK &&
                   shouldDeleteParamModulation(0, technicalData)
                 ) {
-                  setRowToDelete({ index: [topIndex, subIndex], value: value as string });
+                  setRowToDelete({ index: topIndex, subIndex, value: value as string, operation: 'empty' });
                   setIsDeletionModalOpen(true);
                 } else {
                   await detachTrajectory(
@@ -210,7 +223,7 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
             if (
               shouldOpenDeletionModal(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, 0, technicalData, value)
             ) {
-              setRowToDelete({ index: 0, value });
+              setRowToDelete({ index: 0, value, operation: 'remove' });
               setIsDeletionModalOpen(true);
             } else {
               await removeRow(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, value, 0, technicalData);
@@ -312,14 +325,14 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
           }
           onConfirm={async () => {
             if (rowToDelete?.value) {
-              if (Array.isArray(rowToDelete.index)) {
-                const [topIndex, subIndex] = rowToDelete.index;
-                const row = subIndex != null ? technicalData[topIndex]?.subRows?.[subIndex] : technicalData[topIndex];
+              if (rowToDelete?.operation === 'empty') {
+                const { index, subIndex } = rowToDelete;
+                const row = subIndex != null ? technicalData[index]?.subRows?.[subIndex] : technicalData[index];
                 const current = row?.trajectory ?? null;
-                if (current) {
+                if (current && subIndex != null) {
                   await detachTrajectory(
                     TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
-                    rowToDelete?.index,
+                    [index, subIndex],
                     'empty',
                     current,
                     setTechnicalData,

@@ -13,6 +13,7 @@ import {
   getSpecificTrajectories,
 } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
+import { shouldDeleteCapacityModulation } from '@/shared/utils/trajectoryUtils.ts';
 
 export const useHypothesisTableRemoveRow = (
   study: StudyDTO,
@@ -51,8 +52,19 @@ export const useHypothesisTableRemoveRow = (
               trajectoryIds = [specificTrajectory.id];
             }
           }
-
-          // --- CAS 2 : AUTRES TYPES (récursif) ---
+        } else if (type === TRAJECTORY_TYPE.DSR) {
+          const specificTrajectory = findSpecificTrajectoryToDelete(data, value);
+          trajectoryToDelete = specificTrajectory;
+          const lastIndex = data?.length - 1;
+          if (specificTrajectory) {
+            if (shouldDeleteCapacityModulation(data, value)) {
+              const modulation =
+                data[lastIndex]?.status === TRAJECTORY_SELECTION_STATUS.OK ? data[lastIndex]?.trajectory : null;
+              trajectoryIds = [...(modulation ? [modulation.id] : []), specificTrajectory.id];
+            } else {
+              trajectoryIds = [specificTrajectory.id];
+            }
+          }
         } else {
           const allTrajectories = collectTrajectoriesRecursively(row);
           trajectoryIds = allTrajectories.map((trajectory) => trajectory.id);

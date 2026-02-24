@@ -9,8 +9,13 @@ import { useTranslation } from 'react-i18next';
 import { notifyAlert } from '@/shared/notification/notification.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
+import { ReadOnlyObject } from '@/shared/types/HypothesisTable.ts';
 
-export const useTrajectoryDetach = (study: StudyDTO, dispatch: Dispatch<StudyActionType> | null) => {
+export const useTrajectoryDetach = (
+  study: StudyDTO,
+  dispatch: Dispatch<StudyActionType> | null,
+  setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
+) => {
   const { user } = useUser();
   const { t } = useTranslation();
 
@@ -53,6 +58,26 @@ export const useTrajectoryDetach = (study: StudyDTO, dispatch: Dispatch<StudyAct
               ];
               return setNestedData(newData, indexArray, newEmptyTrajectory);
             } else {
+              return setNestedData(prev, indexArray, newEmptyTrajectory);
+            }
+          });
+        } else if (type === TRAJECTORY_TYPE.DSR) {
+          setData((prev) => {
+            const lastIndex = Math.max(Object.keys(prev)?.length - 1, 0);
+            if (additionalTrajectory?.type === TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION) {
+              const newData = [
+                ...prev.slice(0, lastIndex),
+                { ...prev[lastIndex], trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING },
+              ];
+              setReadOnly?.((prevItem) => ({ ...prevItem, [lastIndex]: true }));
+              return setNestedData(newData, indexArray, newEmptyTrajectory);
+            } else {
+              const isLastSpecificTrajectory =
+                prev.filter(
+                  (item) =>
+                    item?.status === TRAJECTORY_SELECTION_STATUS.OK && item?.trajectory?.type === TRAJECTORY_TYPE.DSR,
+                )?.length === 1;
+              setReadOnly?.((prevItem) => ({ ...prevItem, [lastIndex]: isLastSpecificTrajectory }));
               return setNestedData(prev, indexArray, newEmptyTrajectory);
             }
           });

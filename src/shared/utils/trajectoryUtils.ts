@@ -801,6 +801,20 @@ export const shouldDeleteParamModulation = (index: number, data: HypothesisRowDa
   );
 };
 
+export const shouldDeleteCapacityModulation = (rows: HypothesisRowData[], value: string): boolean => {
+  const lastIndex = Math.max(rows?.length - 1, 0);
+  const dataToCheck = rows.slice(0, lastIndex - 1);
+  const isLastTrajectory = dataToCheck?.length === 1;
+  const newData = dataToCheck.filter((row) => row?.hypothesis != value);
+  const hasAtLeastOneTrajectoryWithTS = newData.some(
+    (row) => row.trajectory != null && row.status === TRAJECTORY_SELECTION_STATUS.OK && row.trajectory?.hasTimeSeries,
+  );
+  if (hasAtLeastOneTrajectoryWithTS || isLastTrajectory) {
+    return (rows[lastIndex]?.trajectory && rows[lastIndex]?.status === TRAJECTORY_SELECTION_STATUS.OK) ?? false;
+  }
+  return false;
+};
+
 /**
  * Determines if the given trajectory type is one of the unique trajectory types.
  *

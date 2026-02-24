@@ -7,11 +7,13 @@ import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.
 import { isUniqueTrajectoryType, normalize, setNestedData } from '@/shared/utils/trajectoryUtils.ts';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { useTranslation } from 'react-i18next';
+import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 
 export const useTrajectoryAttach = (
   study: StudyDTO,
   studyState: Partial<StudyState>,
   dispatch: Dispatch<StudyActionType> | null,
+  setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
 ) => {
   const { user } = useUser();
   const { t } = useTranslation();
@@ -65,21 +67,35 @@ export const useTrajectoryAttach = (
             trajectory: newDbTrajectory,
             status: TRAJECTORY_SELECTION_STATUS.OK,
           };
-
-          setData((prev) => setNestedData(prev, indexArray, newTrajectory));
+          let newData: HypothesisRowData[] = [];
+          setData((prev) => {
+            newData = setNestedData(prev, indexArray, newTrajectory);
+            type === TRAJECTORY_TYPE.AREA && setReadOnly?.({ '0': false, '1': false });
+            if (type === TRAJECTORY_TYPE.DSR) {
+              const hasModulationTrajectory =
+                newData.some(
+                  (row) => row.status === TRAJECTORY_SELECTION_STATUS.OK && row?.trajectory?.hasTimeSeries,
+                ) || newDbTrajectory.hasTimeSeries;
+              setReadOnly?.((prevItem) => {
+                const lastIndex = Math.max(Object.keys(prev)?.length - 1, 0);
+                return { ...prevItem, [lastIndex]: !hasModulationTrajectory };
+              });
+            }
+            return newData;
+          });
         }
       } catch (error) {
         if (indexArray.length) {
           const message = t('studyDetails.@notificationAlert', {
             studyName: study?.name,
-            trajectoryName: trajectory.trajectoryName,
-            trajectoryType: trajectory.area,
+            trajectoryName: trajectory?.trajectoryName,
+            trajectoryType: trajectory?.area,
           });
           handleTrajectoryError(
             type,
             indexArray,
-            { id: trajectory.id, label: trajectory.trajectoryName },
-            trajectory.area ?? '',
+            { id: trajectory?.id, label: trajectory?.trajectoryName },
+            trajectory?.area ?? '',
             user?.profile?.sub ?? '',
             setData,
             {
@@ -90,7 +106,7 @@ export const useTrajectoryAttach = (
         }
       }
     },
-    [study?.id, study?.name, studyState, dispatch, t, user?.profile?.sub],
+    [study?.id, study?.name, studyState, dispatch, setReadOnly, t, user?.profile?.sub],
   );
 
   return { attachTrajectory };

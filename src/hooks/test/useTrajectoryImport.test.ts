@@ -8,7 +8,6 @@ import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
-import { ReadOnlyObject } from '@/shared/types/HypothesisTable.ts';
 
 vi.mock('@/shared/services/trajectoryService', () => ({
   uploadTrajectory: vi.fn(),
@@ -85,7 +84,6 @@ describe('useTrajectoryImport', () => {
 
     expect(result.current.fileStatus).toBe('success');
     expect(result.current.progress).toBeGreaterThanOrEqual(0);
-    expect(mockSetReadOnly).toHaveBeenCalled();
   });
 
   it('should import LINK trajectory and not call setReadOnly', async () => {
@@ -316,19 +314,6 @@ describe('useTrajectoryImport', () => {
     await act(async () => {
       await result.current.importTrajectory(TRAJECTORY_TYPE.DSR, value, [0], dataWithOther, mockSetData);
     });
-
-    // Vérifie que le setter a été appelé
-    expect(mockSetReadOnly).toHaveBeenCalled();
-    // Récupère l’argument passé au setter
-    const setterArg = mockSetReadOnly.mock.calls[0][0] as (prev: ReadOnlyObject) => ReadOnlyObject;
-    // Vérifie que c’est une fonction (setter fonctionnel)
-    expect(typeof setterArg).toBe('function');
-    // Simule un ancien état
-    const prevState = { '0': false, '1': true };
-    // Exécute la fonction pour obtenir le nouvel état
-    const newState = setterArg(prevState);
-    // Vérifie le nouvel état
-    expect(newState).toEqual({ '0': false, '1': false });
 
     expect(uploadTrajectory).toHaveBeenCalledWith(
       TRAJECTORY_TYPE.DSR,
