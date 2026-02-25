@@ -1,134 +1,64 @@
 import { Dispatch, SetStateAction, useCallback } from 'react';
-import { DbTrajectory, HypothesisRowData, StudyActionType, StudyDTO } from '@/shared/types';
-import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { unlinkMultipleTrajectoriesFromStudy, unlinkTrajectoryFromStudy } from '@/shared/services/trajectoryService.ts';
+import { useTrajectoryDeletionLogic } from './useTrajectoryDeletionLogic';
+import { HypothesisRowData, StudyActionType, StudyDTO } from '@/shared/types';
+import { ReadOnlyObject } from '@/shared/types/HypothesisTable.ts';
+import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { notifyAlert } from '@/shared/notification/notification.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { useTranslation } from 'react-i18next';
-import {
-  collectTrajectoriesRecursively,
-  computeDsrDataAndReadOnly,
-  findSpecificTrajectoryToDelete,
-  getSpecificTrajectories,
-} from '@/shared/helpers/hypothesisTableHelper.ts';
-import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
-import { shouldDeleteCapacityModulation } from '@/shared/utils/trajectoryUtils.ts';
+import { updateTableAfterRowDeletion } from '@/shared/helpers/hypothesisTableHelper.ts';
 
 export const useHypothesisTableRemoveRow = (
   study: StudyDTO,
   dispatch: Dispatch<StudyActionType> | null,
   setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
   setCheckedValues: Dispatch<SetStateAction<string[]>>,
-  setReadOnly?: Dispatch<SetStateAction<Record<string, boolean>>>,
+  setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
 ) => {
   const { t } = useTranslation();
+  const { computeDeletion, performBackendDeletion } = useTrajectoryDeletionLogic(study);
 
   const removeRow = useCallback(
-    async (type: TRAJECTORY_TYPE, value: string, indexRow: number, data: HypothesisRowData[]) => {
+    async (type: TRAJECTORY_TYPE, indexRow: number, data: HypothesisRowData[], hypothesis: string): Promise<void> => {
       try {
-        const row = data[indexRow];
-        if (!row) return;
+        // 1. Détermination des trajectoires à supprimer
+        const { trajectoryIds, trajectoryToDelete } = computeDeletion(type, data, indexRow, null, hypothesis);
 
-        let trajectoryIds: number[] = [];
-        let trajectoryToDelete: DbTrajectory | null = null;
+        // 2. Suppression backend
+        await performBackendDeletion(trajectoryIds);
 
-        // --- CAS 1 : THERMAL SPECIFIC ---
-        if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
-          const specificTrajectory = findSpecificTrajectoryToDelete(data[0]?.subRows, value);
-
-          trajectoryToDelete = specificTrajectory;
-
-          const allSpecific = getSpecificTrajectories(data[0]?.subRows);
-
-          const isLastSpecific = allSpecific.length === 1;
-
-          if (specificTrajectory) {
-            if (isLastSpecific) {
-              const modulation = data[1]?.status === TRAJECTORY_SELECTION_STATUS.OK ? data[1]?.trajectory : null;
-
-              trajectoryIds = [...(modulation ? [modulation.id] : []), specificTrajectory.id];
-            } else {
-              trajectoryIds = [specificTrajectory.id];
-            }
-          }
-        } else if (type === TRAJECTORY_TYPE.DSR) {
-          const specificTrajectory = findSpecificTrajectoryToDelete(data, value);
-          trajectoryToDelete = specificTrajectory;
-          const lastIndex = data?.length - 1;
-          if (specificTrajectory) {
-            if (shouldDeleteCapacityModulation(data, value)) {
-              const modulation =
-                data[lastIndex]?.status === TRAJECTORY_SELECTION_STATUS.OK ? data[lastIndex]?.trajectory : null;
-              trajectoryIds = [...(modulation ? [modulation.id] : []), specificTrajectory.id];
-            } else {
-              trajectoryIds = [specificTrajectory.id];
-            }
-          }
-        } else {
-          const allTrajectories = collectTrajectoriesRecursively(row);
-          trajectoryIds = allTrajectories.map((trajectory) => trajectory.id);
-          trajectoryToDelete = row.trajectory;
-        }
-
-        // --- Suppression backend ---
-        if (study.id && trajectoryIds?.length > 0) {
-          if (trajectoryIds.length > 1) {
-            await unlinkMultipleTrajectoriesFromStudy(study.id, trajectoryIds);
-          } else {
-            await unlinkTrajectoryFromStudy(trajectoryIds[0], study.id);
-          }
-        }
-
-        // --- Mise à jour du store ---
+        // 3. Mise à jour du store
         const area =
           trajectoryToDelete?.area ??
-          (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER ? value : row.hypothesis);
+          (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER ? hypothesis : data[indexRow]?.hypothesis);
 
         dispatch?.({
           type: STUDY_ACTION.DELETE_TRAJECTORY,
           payload: { area, type },
         });
 
-        // --- Mise à jour du tableau ---
-        if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
-          setData((prev) => {
-            const newSubRows = prev[0].subRows?.filter((s) => s.hypothesis !== value) ?? [];
+        // 4. Mise à jour du tableau (factorisée)
+        const { newData, newReadOnly } = await updateTableAfterRowDeletion({
+          type,
+          data,
+          hypothesis,
+          trajectoryIds,
+          studyId: study.id,
+          horizon: study.horizon,
+        });
 
-            const deletedModulation = trajectoryIds.length > 1;
+        setData(newData);
+        if (newReadOnly) setReadOnly?.((prev) => ({ ...prev, ...newReadOnly }));
 
-            if (deletedModulation) {
-              return [
-                { ...prev[0], subRows: newSubRows },
-                { ...prev[1], trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING },
-                ...prev.slice(2),
-              ];
-            }
-
-            return [{ ...prev[0], subRows: newSubRows }, ...prev.slice(1)];
-          });
-        } else if (type === TRAJECTORY_TYPE.DSR) {
-          setData((prev) => {
-            const rest = prev.length > 0 ? prev.slice(0, -1) : [];
-            const newData = rest.filter((r) => r.hypothesis !== value);
-            const sorted = sortWithFixedPosition(newData);
-            const { data: updatedData, computeReadOnly } = computeDsrDataAndReadOnly(prev, sorted);
-            setReadOnly?.(computeReadOnly);
-
-            return updatedData;
-          });
-        } else {
-          setData(sortWithFixedPosition(data.filter((r) => r.hypothesis !== value)));
-        }
-
-        // --- Mise à jour des cases cochées ---
-        setCheckedValues((prev) => prev.filter((v) => v !== value));
+        // 5. Mise à jour des cases cochées
+        setCheckedValues((prev) => prev.filter((v) => v !== hypothesis));
       } catch (error) {
         notifyAlert({
           icon: StdIconId.Close,
           message: t('studyDetails.@notificationAlert', {
             studyName: study.name,
-            trajectoryName: value,
+            trajectoryName: hypothesis,
             trajectoryType: data[indexRow]?.hypothesis,
           }),
           content: (error as Error).message,
@@ -137,7 +67,18 @@ export const useHypothesisTableRemoveRow = (
         });
       }
     },
-    [study.id, study.name, dispatch, setCheckedValues, setData, setReadOnly, t],
+    [
+      computeDeletion,
+      performBackendDeletion,
+      dispatch,
+      study.id,
+      study.horizon,
+      study.name,
+      setData,
+      setCheckedValues,
+      setReadOnly,
+      t,
+    ],
   );
 
   return { removeRow };

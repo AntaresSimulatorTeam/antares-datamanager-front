@@ -190,7 +190,7 @@
   "trajectoryDeletionModal": {
     "@confirmDeleteTitle": "Confirm you want to delete this area",
     "@confirmDeleteMessage": "You have entered the trajectory of one or more compliant technologies. This action will delete the associated trajectories. Please confirm you wish to proceed.",
-    "@confirmDeletionParamMessage": "This action will delete the associated trajectories. Please confirm you wish to proceed.",
+    "@confirmDeletionMessage": "This action will delete the associated trajectories. Please confirm you wish to proceed.",
     "@confirmDeletionCapacityMessage": "This action will delete the trajectory associated with “capacity modulation”. Please confirm you wish to proceed.",
     "@confirmMultipleDeletionParamMessage": "This action will delete the associated trajectories with “Param modulation”. Please confirm you wish to proceed.",
     "@confirm": "Confirm",

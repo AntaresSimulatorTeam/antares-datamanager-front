@@ -8,17 +8,18 @@ import {
   removeDuplicate,
   removeDuplicateByTechnology,
   retrieveReadOnlyArea,
+  setNestedData,
 } from '@/shared/utils/trajectoryUtils.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
-import { DsrUpdateResult } from '@/shared/types/HypothesisTable.ts';
 import { getDefaultAreaNotIncludedInAreaList } from '@/shared/utils/hypothesisTableUtils.ts';
-import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
 import { fetchTrajectoriesFromTypes } from '@/shared/services/hypothesisTableService.ts';
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { getThermalTechnologyList } from '@/shared/services/defaultConfigService.ts';
 import { STSTechnology } from '@/mocks/data/list/names.ts';
 import { TFunction } from 'i18next';
+import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
+import { isParamModulationRequired } from '@/shared/services/trajectoryService.ts';
 
 /**
  * Retrieve read only row of a study generated
@@ -37,14 +38,14 @@ export const getReadOnlyForGeneratedStudy = (rows: HypothesisRowData[]): ReadOnl
  * @param {TRAJECTORY_TYPE} type
  * @param {number} indexRow - index of the paren row
  * @param {HypothesisRowData[]} data
- * @param {string} value
+ * @param hypothesis
  * @return {boolean} True if a trajectory is linked to an area for all trajectory type (expect THERMAL_CAPACITY) or at least two trajectories linked to one area and to one technology
  */
 export const shouldOpenDeletionModal = (
   type: TRAJECTORY_TYPE,
   indexRow: number,
   data: HypothesisRowData[],
-  value?: string,
+  hypothesis?: string,
 ): boolean => {
   const row = data[indexRow];
   if (!row) return false;
@@ -53,7 +54,9 @@ export const shouldOpenDeletionModal = (
 
   const subRowsWithTrajectory = (row.subRows || []).filter(
     (item) =>
-      item.trajectory && item.status === TRAJECTORY_SELECTION_STATUS.OK && (!value || item.hypothesis === value),
+      item.trajectory &&
+      item.status === TRAJECTORY_SELECTION_STATUS.OK &&
+      (!hypothesis || item.hypothesis === hypothesis),
   );
 
   switch (type) {
@@ -112,14 +115,12 @@ export const getSpecificTrajectories = (subRows?: HypothesisRowData[] | null): D
 };
 
 export const findSpecificTrajectoryToDelete = (
-  subRows: HypothesisRowData[] | null | undefined,
+  rows: HypothesisRowData[] | null | undefined,
   value: string,
 ): DbTrajectory | null => {
-  if (!subRows) return null;
+  if (!rows) return null;
 
-  const match = subRows.find(
-    (s) => s.hypothesis === value && s.trajectory && s.status === TRAJECTORY_SELECTION_STATUS.OK,
-  );
+  const match = rows.find((s) => s.hypothesis === value && s.trajectory && s.status === TRAJECTORY_SELECTION_STATUS.OK);
 
   return match?.trajectory ?? null;
 };
@@ -138,32 +139,46 @@ export const getInformationMessage = (
   }
 };
 
+export interface ComputeDsrResult {
+  data: HypothesisRowData[];
+  readOnlyPatch: ReadOnlyObject; // uniquement les clés à mettre à jour
+}
+
+/**
+ * Recalcule le tableau DSR après ajout/suppression d’une ligne
+ * et génère un patch readOnly à fusionner avec l’état existant.
+ */
+export interface ComputeDsrResult {
+  data: HypothesisRowData[];
+  readOnlyPatch: ReadOnlyObject;
+  indexesToClear: number[];
+}
+
 export const computeDsrDataAndReadOnly = (
   prev: HypothesisRowData[],
-  nextSortedWithoutLast: HypothesisRowData[],
-): DsrUpdateResult<HypothesisRowData> => {
-  const lastItem = prev.length > 0 ? prev.at(-1) : undefined;
+  sortedSpecific: HypothesisRowData[],
+): ComputeDsrResult => {
+  const modulationRow = prev[prev.length - 1];
+  const oldModulationIndex = prev.length - 1;
 
-  const data = lastItem ? [...nextSortedWithoutLast, lastItem] : nextSortedWithoutLast;
+  const data = [...sortedSpecific, modulationRow];
+  const newModulationIndex = data.length - 1;
 
-  const hasSpecificTrajectory = nextSortedWithoutLast.some((row) => row.status === TRAJECTORY_SELECTION_STATUS.OK);
+  const readOnlyPatch: ReadOnlyObject = {};
+  const indexesToClear: number[] = [];
 
-  const lastIndex = data.length - 1;
+  indexesToClear.push(oldModulationIndex);
+  const specificRows = sortedSpecific.filter(
+    (row) => row.status === TRAJECTORY_SELECTION_STATUS.OK && row.trajectory?.type === TRAJECTORY_TYPE.DSR,
+  );
+  const hasTimeSeries = specificRows.some((row) => row.trajectory?.hasTimeSeries === true);
 
-  const computeReadOnly = (prevReadOnly: ReadOnlyObject) => {
-    const next = { ...prevReadOnly };
-    for (const key of Object.keys(next)) {
-      if (/^\d+$/.test(key)) delete next[key];
-    }
+  // readOnly = true si :
+  // - aucune trajectoire spécifique
+  // - OU au moins une trajectoire spécifique avec hasTimeSeries = true
+  readOnlyPatch[newModulationIndex] = specificRows.length === 0 || !hasTimeSeries;
 
-    if (lastIndex >= 0) {
-      next[lastIndex] = !hasSpecificTrajectory;
-    }
-
-    return next;
-  };
-
-  return { data, computeReadOnly };
+  return { data, readOnlyPatch, indexesToClear };
 };
 
 export const fetchAndNormalizeTrajectories = async ({
@@ -307,4 +322,139 @@ export const buildReadOnlyMap = ({
     ...readOnlySubRows,
     [rows.length - 1]: !hasSpecificTrajectory,
   };
+};
+
+export interface RowDeletionParams {
+  type: TRAJECTORY_TYPE;
+  data: HypothesisRowData[];
+  hypothesis: string;
+  trajectoryIds: number[];
+  studyId: number;
+  horizon: string;
+}
+
+export interface RowDeletionResult {
+  newData: HypothesisRowData[];
+  newReadOnly?: ReadOnlyObject;
+  indexesToClear?: number[];
+}
+
+export const updateTableAfterRowDeletion = async ({
+  type,
+  data,
+  hypothesis,
+  trajectoryIds,
+  studyId,
+  horizon,
+}: RowDeletionParams): Promise<RowDeletionResult> => {
+  // THERMAL SPECIFIC (comme dans removeRow)
+  if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
+    const newSubRows = data[0].subRows?.filter((s) => s.hypothesis !== hypothesis) ?? [];
+
+    const deletedModulation = trajectoryIds.length > 1;
+
+    let newData: HypothesisRowData[];
+
+    if (deletedModulation) {
+      newData = [
+        { ...data[0], subRows: newSubRows },
+        {
+          ...data[1],
+          trajectory: null,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+        },
+        ...data.slice(2),
+      ];
+    } else {
+      newData = [{ ...data[0], subRows: newSubRows }, ...data.slice(1)];
+    }
+
+    const isRequired = await isParamModulationRequired(studyId, horizon);
+
+    return {
+      newData,
+      newReadOnly: { ['1']: !isRequired },
+    };
+  }
+
+  // DSR (comme dans removeRow : on filtre + sort, pas de nested)
+  if (type === TRAJECTORY_TYPE.DSR) {
+    const rest = data.slice(0, -1);
+    const filtered = rest.filter((r) => r.hypothesis !== hypothesis);
+    const sorted = sortWithFixedPosition(filtered);
+    const { data: updatedData, readOnlyPatch, indexesToClear } = computeDsrDataAndReadOnly(data, sorted);
+    return { newData: updatedData, newReadOnly: readOnlyPatch, indexesToClear };
+  }
+
+  // Cas générique
+  const filtered = data.filter((r) => r.hypothesis !== hypothesis);
+  return { newData: sortWithFixedPosition(filtered) };
+};
+
+export interface CellDetachParams {
+  type: TRAJECTORY_TYPE;
+  data: HypothesisRowData[];
+  additionalTrajectory: DbTrajectory | null;
+  indexArray: number[];
+  studyId: number;
+  horizon: string;
+}
+
+export interface CellDetachResult {
+  newData: HypothesisRowData[];
+  newReadOnly?: ReadOnlyObject;
+}
+
+export const updateTableAfterCellDetach = async ({
+  type,
+  data,
+  additionalTrajectory,
+  indexArray,
+  studyId,
+  horizon,
+}: CellDetachParams): Promise<CellDetachResult> => {
+  const empty = {
+    trajectory: null,
+    status: TRAJECTORY_SELECTION_STATUS.MISSING,
+  };
+
+  // THERMAL SPECIFIC (comme dans detachTrajectory)
+  if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
+    let baseData = data;
+
+    if (additionalTrajectory?.type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER) {
+      baseData = [{ ...data[0] }, { ...data[1], ...empty }, ...data.slice(2)];
+    }
+
+    const newData = setNestedData(baseData, indexArray, empty);
+    const isRequired = await isParamModulationRequired(studyId, horizon);
+
+    return {
+      newData,
+      newReadOnly: { ['1']: !isRequired },
+    };
+  }
+
+  // DSR (comme dans detachTrajectory)
+  if (type === TRAJECTORY_TYPE.DSR) {
+    let baseData = data;
+    if (additionalTrajectory?.type === TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION) {
+      const lastIndex = Math.max(0, data?.length - 1);
+      baseData = [...data.slice(0, lastIndex), { ...data[lastIndex], ...empty }];
+    }
+    const updated = setNestedData(baseData, indexArray, empty);
+    const specific = updated.slice(0, -1);
+    const sortedSpecific = sortWithFixedPosition(specific);
+    // 4. On applique la logique DSR complète
+    const { data: newData, readOnlyPatch } = computeDsrDataAndReadOnly(updated, sortedSpecific);
+
+    return {
+      newData,
+      newReadOnly: readOnlyPatch,
+    };
+  }
+
+  // Cas générique nested
+  const newData = setNestedData(data, indexArray, empty);
+  return { newData };
 };

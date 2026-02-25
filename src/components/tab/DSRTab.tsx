@@ -76,7 +76,7 @@ const DSRTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         setIsDeletionModalOpen(true);
       } else {
         try {
-          await removeRow(TRAJECTORY_TYPE.DSR, value, indexRow, data);
+          await removeRow(TRAJECTORY_TYPE.DSR, indexRow, data, value);
         } catch {
           // silent handler
         }
@@ -104,19 +104,15 @@ const DSRTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         progress={progress}
         idSelected={String(rowIdSelected)}
         isReadOnlyEnable={true}
-        handleSearch={async (fileNameContains: string, rowId: string) =>
-          await handleTrajectorySearch(
-            Number(rowId) === Math.max(data.length - 1, 0)
-              ? TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION
-              : TRAJECTORY_TYPE.DSR,
-            setDbTrajectories,
-            studyData?.horizon,
-            {
-              area: Number(rowId) === Math.max(data.length - 1, 0) ? '' : data[Number(rowId)]?.hypothesis,
-              fileNameContains,
-            },
-          )
-        }
+        handleSearch={async (fileNameContains: string, rowId: string) => {
+          const isLastIndex = Number(rowId) === Math.max(data.length - 1, 0);
+          const type = isLastIndex ? TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION : TRAJECTORY_TYPE.DSR;
+          const area = !isLastIndex ? data[Number(rowId)]?.hypothesis : '';
+          return await handleTrajectorySearch(type, setDbTrajectories, studyData?.horizon, {
+            area,
+            fileNameContains,
+          });
+        }}
         handleImport={async (rowId: string) => {
           const isLastIndex = Number(rowId) === Math.max(data.length - 1, 0);
           await handleFetchTrajectoriesFS(
@@ -129,16 +125,18 @@ const DSRTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         }}
         updateData={async (rowId: string, value: unknown, status: RowStatus) => {
           const index = Number(rowId);
-          const trajectory = data[index]?.trajectory;
+          const row = data[index];
+          const trajectory = row?.trajectory;
           const isLastIndex = index === Math.max(data.length - 1, 0);
           const type = isLastIndex ? TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION : TRAJECTORY_TYPE.DSR;
           if (status === 'empty' || status === 'emptyError') {
             if (trajectory) {
-              if (type === TRAJECTORY_TYPE.DSR && shouldDeleteCapacityModulation(data, value as string)) {
-                setRowToDelete({ index, value: data[index]?.hypothesis, operation: 'empty' });
+              const hypothesis = row?.hypothesis ?? '';
+              if (type === TRAJECTORY_TYPE.DSR && shouldDeleteCapacityModulation(data, index)) {
+                setRowToDelete({ index, value: hypothesis, operation: 'empty' });
                 setIsDeletionModalOpen(true);
               } else {
-                await detachTrajectory(type, [index], status, trajectory, setData);
+                await detachTrajectory(type, [index], setData, data, status, hypothesis);
               }
             }
           } else if (status === 'success') {
@@ -149,13 +147,14 @@ const DSRTab = ({ defaultAreas, areas, studyData }: TabProps) => {
           }
         }}
         removeRow={(value: string, rowId?: string) => {
-          const isLastIndex = Number(rowId) === Math.max(data.length - 1, 0);
+          const index = Number(rowId ?? '0');
+          const isLastIndex = index === Math.max(data.length - 1, 0);
           const type = isLastIndex ? TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION : TRAJECTORY_TYPE.DSR;
-          if (type === TRAJECTORY_TYPE.DSR && shouldDeleteCapacityModulation(data, value)) {
-            setRowToDelete({ index: Number(rowId), value, operation: 'remove' });
+          if (type === TRAJECTORY_TYPE.DSR && shouldOpenDeletionModal(TRAJECTORY_TYPE.DSR, index, data)) {
+            setRowToDelete({ index, value, operation: 'remove' });
             setIsDeletionModalOpen(true);
           } else {
-            void removeRow(TRAJECTORY_TYPE.DSR, value, Number(rowId), data);
+            void removeRow(TRAJECTORY_TYPE.DSR, index, data, value);
           }
         }}
         type={TRAJECTORY_TYPE.DSR}
@@ -187,23 +186,18 @@ const DSRTab = ({ defaultAreas, areas, studyData }: TabProps) => {
             if (rowToDelete?.value) {
               const { value, index, operation } = rowToDelete;
               if (operation === 'remove') {
-                await removeRow(TRAJECTORY_TYPE.DSR, value, index, data);
+                await removeRow(TRAJECTORY_TYPE.DSR, index, data, value);
               } else if (data?.[index]?.trajectory) {
-                const lastIndex = Math.max(0, data.length - 1);
-                const additionalTrajectory = data?.[lastIndex]?.trajectory ?? null;
-                await detachTrajectory(
-                  TRAJECTORY_TYPE.DSR,
-                  [rowToDelete.index],
-                  'empty',
-                  data?.[index]?.trajectory,
-                  setData,
-                  additionalTrajectory,
-                );
+                await detachTrajectory(TRAJECTORY_TYPE.DSR, [index], setData, data, 'empty', data?.[index]?.hypothesis);
               }
               setIsDeletionModalOpen(false);
             }
           }}
-          message={t('trajectoryDeletionModal.@confirmDeletionCapacityMessage')}
+          message={
+            rowToDelete?.index != null && shouldDeleteCapacityModulation(data, rowToDelete.index)
+              ? t('trajectoryDeletionModal.@confirmDeletionCapacityMessage')
+              : t('trajectoryDeletionModal.@confirmDeletionMessage')
+          }
         />
       )}
     </div>

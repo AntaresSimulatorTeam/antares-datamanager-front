@@ -131,7 +131,7 @@ export const handleTrajectorySearch = async (
  * Updates the application state by adding a new trajectory row and handling associated logic.
  *
  * @param {TRAJECTORY_TYPE} type - The type of trajectory to be added. Used to determine the structure of the row and sub-rows.
- * @param {string} value - The value associated with the new trajectory. Typically used for unique identification.
+ * @param area
  * @param {Dispatch<StudyActionType> | null} dispatch - Dispatch function to update the study state. If null, the dispatch operation is skipped.
  * @param {Dispatch<SetStateAction<string[]>>} setCheckedValues - State update function for maintaining the checked values in the UI.
  * @param {Dispatch<SetStateAction<HypothesisRowData[]>>} setData - State update function for maintaining the overall row data structure.
@@ -142,7 +142,7 @@ export const handleTrajectorySearch = async (
  */
 export const addRow = (
   type: TRAJECTORY_TYPE,
-  value: string,
+  area: string,
   dispatch: Dispatch<StudyActionType> | null,
   setCheckedValues: Dispatch<SetStateAction<string[]>>,
   setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
@@ -154,14 +154,14 @@ export const addRow = (
     type: STUDY_ACTION.ADD_TRAJECTORIES,
     payload: {
       [type]: {
-        trajectories: [buildEmptyTrajectory(value, type)],
+        trajectories: [buildEmptyTrajectory(area, type)],
       },
     },
   });
 
   const subRows = isTrajectorySubrowsType(type) && options ? options : [];
-  const newRow: HypothesisRowData = buildEmptyRowWithSubRowsData(value, subRows, type, defaultAreas);
-  setCheckedValues((prev) => [...prev, value]);
+  const newRow: HypothesisRowData = buildEmptyRowWithSubRowsData(area, subRows, type, defaultAreas);
+  setCheckedValues((prev) => [...prev, area]);
 
   setData((prev) => {
     let updatedData: HypothesisRowData[];
@@ -171,9 +171,17 @@ export const addRow = (
     } else if (type === TRAJECTORY_TYPE.DSR) {
       const rest = prev.slice(0, -1);
       const sorted = sortWithFixedPosition([newRow, ...rest]);
-      const { data, computeReadOnly } = computeDsrDataAndReadOnly(prev, sorted);
+      const { data, readOnlyPatch, indexesToClear } = computeDsrDataAndReadOnly(prev, sorted);
       updatedData = data;
-      setReadOnly?.(computeReadOnly);
+      setReadOnly?.((prevItems) => {
+        const next = { ...prevItems };
+        indexesToClear.forEach((i) => delete next[i]);
+        Object.entries(readOnlyPatch).forEach(([key, value]) => {
+          next[key] = value;
+        });
+
+        return next;
+      });
     } else {
       updatedData = sortWithFixedPosition([newRow, ...prev]);
     }

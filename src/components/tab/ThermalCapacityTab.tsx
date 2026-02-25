@@ -99,7 +99,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         setRowToDelete({ index: indexRow, value });
         setIsDeletionModalOpen(true);
       } else {
-        await removeRow(TRAJECTORY_TYPE.THERMAL_CAPACITY, value, indexRow, data);
+        await removeRow(TRAJECTORY_TYPE.THERMAL_CAPACITY, indexRow, data, value);
       }
     },
     [data, dispatch, removeRow, setCheckedValues, setData],
@@ -150,9 +150,16 @@ const ThermalCapacityTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         updateData={(rowId: string, value: unknown, status: RowStatus) => {
           const indexArray = rowId.split('.').map(Number);
           if (status === 'empty' || status === 'emptyError') {
-            const trajectorySelected: DbTrajectory | null = getRowDataSelected(data, indexArray)?.trajectory ?? null;
-            if (trajectorySelected) {
-              void detachTrajectory(TRAJECTORY_TYPE.THERMAL_CAPACITY, indexArray, status, trajectorySelected, setData);
+            const row = getRowDataSelected(data, indexArray) ?? null;
+            if (row) {
+              void detachTrajectory(
+                TRAJECTORY_TYPE.THERMAL_CAPACITY,
+                indexArray,
+                setData,
+                data,
+                status,
+                row?.hypothesis,
+              );
             }
           } else if (status === 'success') {
             const dbTrajectory =
@@ -169,7 +176,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas, studyData }: TabProps) => {
             setRowToDelete({ index: Number(rowId), value });
             setIsDeletionModalOpen(true);
           } else {
-            void removeRow(TRAJECTORY_TYPE.THERMAL_CAPACITY, value, Number(rowId), data);
+            void removeRow(TRAJECTORY_TYPE.THERMAL_CAPACITY, Number(rowId), data, value);
           }
         }}
       />
@@ -193,7 +200,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas, studyData }: TabProps) => {
           onClose={() => setIsDeletionModalOpen(false)}
           onConfirm={async () => {
             if (rowToDelete?.value) {
-              await removeRow(TRAJECTORY_TYPE.THERMAL_CAPACITY, rowToDelete?.value, rowToDelete.index, data);
+              await removeRow(TRAJECTORY_TYPE.THERMAL_CAPACITY, rowToDelete.index, data, rowToDelete?.value);
               setIsDeletionModalOpen(false);
             }
           }}

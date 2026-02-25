@@ -104,7 +104,7 @@ export const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         setRowToDelete({ index: indexRow, value });
         setIsDeletionModalOpen(true);
       } else if (indexRow >= 0) {
-        await removeRow(TRAJECTORY_TYPE.STS, value, indexRow, data);
+        await removeRow(TRAJECTORY_TYPE.STS, indexRow, data, value);
       }
     },
     [data, dispatch, removeRow, stsTechnologies],
@@ -153,9 +153,9 @@ export const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         updateData={async (rowId: string, value: unknown, status: RowStatus) => {
           const indexArray = rowId.split('.').map(Number);
           if (status === 'empty' || status === 'emptyError') {
-            const current = data[indexArray[0]]?.subRows?.[indexArray[1]]?.trajectory ?? null;
-            if (current) {
-              await detachTrajectory(TRAJECTORY_TYPE.STS, indexArray, status, current, setData);
+            const hypothesis = data[indexArray[0]]?.subRows?.[indexArray[1]]?.hypothesis ?? null;
+            if (hypothesis) {
+              await detachTrajectory(TRAJECTORY_TYPE.STS, indexArray, setData, data, status, hypothesis);
             }
           } else if (status === 'success') {
             const dbTrajectory =
@@ -172,7 +172,7 @@ export const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
             setRowToDelete({ index: Number(rowId), value });
             setIsDeletionModalOpen(true);
           } else {
-            void removeRow(TRAJECTORY_TYPE.STS, value, Number(rowId), data);
+            void removeRow(TRAJECTORY_TYPE.STS, Number(rowId), data, value);
           }
         }}
         type={TRAJECTORY_TYPE.STS}
@@ -208,7 +208,7 @@ export const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
           onClose={() => setIsDeletionModalOpen(false)}
           onConfirm={async () => {
             if (rowToDelete?.value) {
-              await removeRow(TRAJECTORY_TYPE.STS, rowToDelete?.value, rowToDelete.index, data);
+              await removeRow(TRAJECTORY_TYPE.STS, rowToDelete.index, data, rowToDelete?.value);
               setIsDeletionModalOpen(false);
             }
           }}
