@@ -1,8 +1,24 @@
 import { DbTrajectory, HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
-import { retrieveReadOnlyArea } from '@/shared/utils/trajectoryUtils.ts';
+import {
+  buildDefaultEmptyTrajectoryList,
+  buildRowWithSubRowsData,
+  convertIntoHypothesisRowWithTechnologies,
+  filterRow,
+  generateReadOnlyIndexMap,
+  removeDuplicate,
+  removeDuplicateByTechnology,
+  retrieveReadOnlyArea,
+} from '@/shared/utils/trajectoryUtils.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { DsrUpdateResult } from '@/shared/types/HypothesisTable.ts';
+import { getDefaultAreaNotIncludedInAreaList } from '@/shared/utils/hypothesisTableUtils.ts';
+import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
+import { fetchTrajectoriesFromTypes } from '@/shared/services/hypothesisTableService.ts';
+import { getStudyTrajectories } from '@/shared/services/studyService.ts';
+import { getThermalTechnologyList } from '@/shared/services/defaultConfigService.ts';
+import { STSTechnology } from '@/mocks/data/list/names.ts';
+import { TFunction } from 'i18next';
 
 /**
  * Retrieve read only row of a study generated
@@ -148,4 +164,147 @@ export const computeDsrDataAndReadOnly = (
   };
 
   return { data, computeReadOnly };
+};
+
+export const fetchAndNormalizeTrajectories = async ({
+  id,
+  trajType,
+  defaultAreas,
+  emptyAreaSelected,
+}: {
+  id: number;
+  trajType: TRAJECTORY_TYPE;
+  defaultAreas?: { name: string }[];
+  emptyAreaSelected: DbTrajectory[];
+}) => {
+  let result;
+  let technologies;
+  let dsrCmResult = [];
+
+  if (trajType === TRAJECTORY_TYPE.DSR) {
+    const types = [TRAJECTORY_TYPE.DSR, TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION];
+    result = await fetchTrajectoriesFromTypes(id, types);
+
+    const dsrCluster = result?.[TRAJECTORY_TYPE.DSR] ?? [];
+    dsrCmResult = result?.[TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION] ?? [];
+
+    const defaultEmpty = buildDefaultEmptyTrajectoryList(trajType, dsrCluster, defaultAreas);
+    const all = [...dsrCluster, ...emptyAreaSelected, ...defaultEmpty];
+
+    return {
+      trajectories: removeDuplicate(all),
+      dsrCmResult,
+      technologies: null,
+    };
+  }
+
+  // Other types
+  result = await getStudyTrajectories(id, trajType);
+
+  if (trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
+    const thermalOptions = await getThermalTechnologyList();
+    technologies = thermalOptions.map((t) => t.name);
+  }
+
+  if (trajType === TRAJECTORY_TYPE.STS) {
+    technologies = STSTechnology;
+  }
+
+  const defaultEmpty = buildDefaultEmptyTrajectoryList(trajType, result, defaultAreas);
+  const all = [...(result || []), ...emptyAreaSelected, ...defaultEmpty];
+
+  const trajectories =
+    trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY || trajType === TRAJECTORY_TYPE.STS
+      ? removeDuplicateByTechnology(all)
+      : removeDuplicate(all);
+
+  return {
+    trajectories,
+    dsrCmResult: [],
+    technologies,
+  };
+};
+
+export const buildPayload = (trajType: TRAJECTORY_TYPE, trajectories: DbTrajectory[], dsrCmResult: DbTrajectory[]) => ({
+  [trajType]: { trajectories },
+  ...(dsrCmResult.length > 0 && {
+    [TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION]: {
+      trajectories: dsrCmResult,
+    },
+  }),
+});
+
+export const buildHypothesisRows = ({
+  trajType,
+  trajectories,
+  defaultAreas,
+  areas,
+  technologies,
+  isStudyGenerated,
+  t,
+  dsrCmResult,
+}: {
+  trajType: TRAJECTORY_TYPE;
+  trajectories: DbTrajectory[];
+  defaultAreas: { name: string }[] | undefined;
+  areas: TrajectoryAreaData[];
+  technologies?: string[] | null;
+  isStudyGenerated?: boolean;
+  t: TFunction<'translation', undefined>;
+  dsrCmResult: DbTrajectory[];
+}) => {
+  const defaultNotIncluded = getDefaultAreaNotIncludedInAreaList(defaultAreas ?? [], areas);
+
+  let rows =
+    trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY || trajType === TRAJECTORY_TYPE.STS
+      ? convertIntoHypothesisRowWithTechnologies(trajectories, defaultNotIncluded, defaultAreas, technologies ?? [])
+      : trajectories
+          .map((trajectory) => buildRowWithSubRowsData(trajectory, defaultAreas, defaultNotIncluded, null))
+          .filter(Boolean);
+
+  rows = sortWithFixedPosition(isStudyGenerated ? filterRow(rows) : rows);
+
+  if (trajType === TRAJECTORY_TYPE.DSR) {
+    const hasCm = dsrCmResult.length > 0;
+    rows.push({
+      hypothesis: t('dsr.@capacityModulation'),
+      trajectory: hasCm ? dsrCmResult[0] : null,
+      status: hasCm ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+      isDefault: false,
+      isDeletable: false,
+      subRows: null,
+    });
+  }
+
+  return rows;
+};
+
+export const buildReadOnlyMap = ({
+  rows,
+  trajType,
+  isStudyGenerated,
+  defaultAreaListNotInList,
+}: {
+  rows: HypothesisRowData[];
+  trajType: TRAJECTORY_TYPE;
+  isStudyGenerated?: boolean;
+  defaultAreaListNotInList: string[];
+}) => {
+  if (isStudyGenerated) {
+    return generateReadOnlyIndexMap(rows);
+  }
+
+  // Appel correct avec les deux arguments
+  const readOnlySubRows = retrieveReadOnlyArea(rows, defaultAreaListNotInList);
+
+  if (trajType !== TRAJECTORY_TYPE.DSR) {
+    return readOnlySubRows;
+  }
+
+  const hasSpecificTrajectory = rows.some((row) => row.status === TRAJECTORY_SELECTION_STATUS.OK);
+
+  return {
+    ...readOnlySubRows,
+    [rows.length - 1]: !hasSpecificTrajectory,
+  };
 };

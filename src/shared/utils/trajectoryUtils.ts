@@ -769,7 +769,8 @@ export const getQueryParamAreaValue = (trajectoryType: TRAJECTORY_TYPE, hypothes
     trajectoryType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER ||
     trajectoryType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER ||
     trajectoryType === TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER ||
-    trajectoryType === TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER
+    trajectoryType === TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER ||
+    trajectoryType === TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION
   ) {
     area = undefined;
   }

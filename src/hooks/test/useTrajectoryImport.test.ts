@@ -2,12 +2,13 @@ import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { uploadTrajectory } from '@/shared/services/trajectoryService.ts';
 import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
-import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory';
+import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory';
 import { HypothesisRowData, StudyDTO, UserState } from '@/shared/types';
 import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.ts';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
+import { ReadOnlyObject } from '@/shared/types/HypothesisTable.ts';
 
 vi.mock('@/shared/services/trajectoryService', () => ({
   uploadTrajectory: vi.fn(),
@@ -136,6 +137,31 @@ describe('useTrajectoryImport', () => {
     expect(result.current.progress).toBeGreaterThanOrEqual(0);
   });
 
+  it('should import trajectory and call attachTrajectory', async () => {
+    const mockTrajectory = { id: 101, trajectoryName: 'Trajectory A' };
+    (uploadTrajectory as Mock).mockResolvedValue(mockTrajectory);
+
+    const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch));
+
+    await act(async () => {
+      await result.current.importTrajectory(TRAJECTORY_TYPE.STS, value, [0, 0], data, mockSetData);
+    });
+
+    expect(uploadTrajectory).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.STS,
+      'Trajectory A',
+      2030,
+      'study-001',
+      'Solar',
+      expect.any(Function),
+      false,
+      'Tech A',
+    );
+
+    expect(result.current.fileStatus).toBe('success');
+    expect(result.current.progress).toBeGreaterThanOrEqual(0);
+  });
+
   it('should handle error and call handleTrajectoryError', async () => {
     (uploadTrajectory as Mock).mockRejectedValue({
       antaresErrorMessage: 'upload failed',
@@ -228,6 +254,63 @@ describe('useTrajectoryImport', () => {
       2030,
       'study-001',
       OTHER_AREAS,
+      expect.any(Function),
+      false,
+      undefined,
+    );
+  });
+
+  it('should use OTHER_AREAS when hypothesis is OTHER_AREAS_LABEL', async () => {
+    const dataWithOther = [{ hypothesis: OTHER_AREAS_LABEL }] as HypothesisRowData[];
+    (uploadTrajectory as Mock).mockResolvedValue({ id: 102 });
+
+    const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch));
+
+    await act(async () => {
+      await result.current.importTrajectory(TRAJECTORY_TYPE.DSR, value, [0], dataWithOther, mockSetData);
+    });
+
+    expect(uploadTrajectory).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.DSR,
+      'Trajectory A',
+      2030,
+      'study-001',
+      OTHER_AREAS,
+      expect.any(Function),
+      false,
+      undefined,
+    );
+  });
+
+  it('should use set read only when trajectory type is DSR', async () => {
+    const dataWithOther = [{ hypothesis: 'AT', status: TRAJECTORY_SELECTION_STATUS.OK }] as HypothesisRowData[];
+    (uploadTrajectory as Mock).mockResolvedValue({ id: 102, hasTimeSeries: true });
+
+    const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch, mockSetReadOnly));
+
+    await act(async () => {
+      await result.current.importTrajectory(TRAJECTORY_TYPE.DSR, value, [0], dataWithOther, mockSetData);
+    });
+
+    // Vérifie que le setter a été appelé
+    expect(mockSetReadOnly).toHaveBeenCalled();
+    // Récupère l’argument passé au setter
+    const setterArg = mockSetReadOnly.mock.calls[0][0] as (prev: ReadOnlyObject) => ReadOnlyObject;
+    // Vérifie que c’est une fonction (setter fonctionnel)
+    expect(typeof setterArg).toBe('function');
+    // Simule un ancien état
+    const prevState = { '0': false, '1': true };
+    // Exécute la fonction pour obtenir le nouvel état
+    const newState = setterArg(prevState);
+    // Vérifie le nouvel état
+    expect(newState).toEqual({ '0': false, '1': false });
+
+    expect(uploadTrajectory).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.DSR,
+      'Trajectory A',
+      2030,
+      'study-001',
+      'AT',
       expect.any(Function),
       false,
       undefined,

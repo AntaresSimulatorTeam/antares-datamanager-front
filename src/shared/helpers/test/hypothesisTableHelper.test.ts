@@ -1,11 +1,15 @@
-import { Mock, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { DbTrajectory, HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { mockDbTrajectory } from '@/mocks/data/tests/trajectory.mock.ts';
 import {
+  buildHypothesisRows,
+  buildPayload,
+  buildReadOnlyMap,
   collectTrajectoriesRecursively,
   computeDsrDataAndReadOnly,
+  fetchAndNormalizeTrajectories,
   findSpecificTrajectoryToDelete,
   getCheckedValues,
   getInformationMessage,
@@ -13,22 +17,27 @@ import {
   getSpecificTrajectories,
   shouldOpenDeletionModal,
 } from '@/shared/helpers/hypothesisTableHelper.ts';
-import { retrieveReadOnlyArea } from '@/shared/utils/trajectoryUtils.ts';
+import * as trajectoryUtils from '@/shared/utils/trajectoryUtils.ts';
+import * as hypothesisTableService from '@/shared/services/hypothesisTableService.ts';
+import * as studyService from '@/shared/services/studyService.ts';
+import * as defaultConfigService from '@/shared/services/defaultConfigService.ts';
+import * as sortUtils from '@/shared/utils/sortUtils.ts';
 
-vi.mock('@/shared/utils/trajectoryUtils.ts', async (importOriginal) => {
-  const actual: Mock = await importOriginal();
-  return {
-    ...actual,
-    retrieveReadOnlyArea: vi.fn(() => ({ H1: true, H3: true })),
-  };
-});
+import { generateReadOnlyIndexMap, retrieveReadOnlyArea } from '../../utils/trajectoryUtils';
+import { TFunction } from 'i18next';
+
+vi.mock('@/shared/services/trajectoryService');
+vi.mock('@/shared/services/hypothesisTableService');
+vi.mock('@/shared/services/defaultConfigService');
+vi.mock('@/shared/services/studyService');
+vi.mock('@/shared/utils/trajectoryUtils.ts');
+vi.mock('@/shared/utils/sortUtils.ts');
 
 describe('getReadOnlyForGeneratedStudy', () => {
   const mockReadOnlyResult: ReadOnlyObject = { H1: true, H3: true };
 
   it('should call setReadOnly with the result of retrieveReadOnlyArea for rows without trajectory', () => {
-    const mockRetrieveReadOnlyArea = retrieveReadOnlyArea as Mock<typeof retrieveReadOnlyArea>;
-    mockRetrieveReadOnlyArea.mockReturnValue(mockReadOnlyResult);
+    vi.mocked(trajectoryUtils.retrieveReadOnlyArea).mockReturnValue(mockReadOnlyResult);
     const mockRows: HypothesisRowData[] = [
       { hypothesis: 'H1', trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING },
       { hypothesis: 'H2', trajectory: mockDbTrajectory, status: TRAJECTORY_SELECTION_STATUS.OK },
@@ -40,7 +49,7 @@ describe('getReadOnlyForGeneratedStudy', () => {
 
     getReadOnlyForGeneratedStudy(mockRows);
 
-    expect(retrieveReadOnlyArea).toHaveBeenCalledWith(mockRows, expectedHypotheses);
+    expect(trajectoryUtils.retrieveReadOnlyArea).toHaveBeenCalledWith(mockRows, expectedHypotheses);
   });
 });
 
@@ -592,5 +601,329 @@ describe('computeDsrDataAndReadOnly', () => {
 
     expect(data).toEqual([]);
     expect(computeReadOnly({ 0: true, foo: true })).toEqual({ foo: true }); // supprime "0", ne peut pas définir lastIndex
+  });
+});
+
+describe('fetchAndNormalizeTrajectories (Vitest)', () => {
+  const defaultAreas = [{ name: 'A' }, { name: 'B' }];
+  const emptyAreaSelected = [{ id: 99, trajectoryName: '' }] as DbTrajectory[];
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  // ---------------------------------------------------------
+  // CASE 1 — DSR
+  // ---------------------------------------------------------
+  it('should fetch and normalize DSR trajectories including DSR_CM', async () => {
+    vi.mocked(hypothesisTableService.fetchTrajectoriesFromTypes).mockResolvedValue({
+      DSR: [{ id: 1, trajectoryName: 'Cluster1' }] as DbTrajectory[],
+      DSR_CAPACITY_MODULATION: [{ id: 2, trajectoryName: 'CM1' }] as DbTrajectory[],
+    });
+
+    vi.mocked(trajectoryUtils.buildDefaultEmptyTrajectoryList).mockReturnValue([
+      { id: 3, trajectoryName: '' },
+    ] as DbTrajectory[]);
+
+    vi.mocked(trajectoryUtils.removeDuplicate).mockReturnValue([
+      { id: 1, trajectoryName: 'Cluster1' },
+      { id: 99, trajectoryName: '' },
+      { id: 3, trajectoryName: '' },
+    ] as DbTrajectory[]);
+
+    const result = await fetchAndNormalizeTrajectories({
+      id: 10,
+      trajType: TRAJECTORY_TYPE.DSR,
+      defaultAreas,
+      emptyAreaSelected,
+    });
+
+    expect(hypothesisTableService.fetchTrajectoriesFromTypes).toHaveBeenCalledWith(10, [
+      TRAJECTORY_TYPE.DSR,
+      TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION,
+    ]);
+
+    expect(result).toEqual({
+      trajectories: [
+        { id: 1, trajectoryName: 'Cluster1' },
+        { id: 99, trajectoryName: '' },
+        { id: 3, trajectoryName: '' },
+      ],
+      dsrCmResult: [{ id: 2, trajectoryName: 'CM1' }],
+      technologies: null,
+    });
+  });
+
+  // ---------------------------------------------------------
+  // CASE 2 — THERMAL_CAPACITY
+  // ---------------------------------------------------------
+  it('should fetch thermal trajectories and map technologies', async () => {
+    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue([
+      { id: 10, trajectoryName: 'T1', technology: 'Gas' },
+    ] as DbTrajectory[]);
+
+    vi.mocked(defaultConfigService.getThermalTechnologyList).mockResolvedValue([{ name: 'Gas' }, { name: 'Coal' }]);
+
+    vi.mocked(trajectoryUtils.buildDefaultEmptyTrajectoryList).mockReturnValue([
+      { id: 11, trajectoryName: '' },
+    ] as DbTrajectory[]);
+
+    vi.mocked(trajectoryUtils.removeDuplicateByTechnology).mockReturnValue([
+      { id: 10, trajectoryName: 'T1', technology: 'Gas' },
+      { id: 99, trajectoryName: '' },
+      { id: 11, trajectoryName: '' },
+    ] as DbTrajectory[]);
+
+    const result = await fetchAndNormalizeTrajectories({
+      id: 5,
+      trajType: TRAJECTORY_TYPE.THERMAL_CAPACITY,
+      defaultAreas,
+      emptyAreaSelected,
+    });
+
+    expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.THERMAL_CAPACITY);
+
+    expect(result).toEqual({
+      trajectories: [
+        { id: 10, trajectoryName: 'T1', technology: 'Gas' },
+        { id: 99, trajectoryName: '' },
+        { id: 11, trajectoryName: '' },
+      ],
+      dsrCmResult: [],
+      technologies: ['Gas', 'Coal'],
+    });
+  });
+
+  // ---------------------------------------------------------
+  // CASE 3 — STS
+  // ---------------------------------------------------------
+  it('should fetch STS trajectories and use STS technologies', async () => {
+    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue([
+      { id: 20, trajectoryName: 'STS1', technology: 'Battery' },
+    ] as DbTrajectory[]);
+
+    vi.mocked(trajectoryUtils.buildDefaultEmptyTrajectoryList).mockReturnValue([]);
+
+    vi.mocked(trajectoryUtils.removeDuplicateByTechnology).mockReturnValue([
+      { id: 20, trajectoryName: 'STS1', technology: 'Battery' },
+    ] as DbTrajectory[]);
+
+    const result = await fetchAndNormalizeTrajectories({
+      id: 7,
+      trajType: TRAJECTORY_TYPE.STS,
+      defaultAreas,
+      emptyAreaSelected,
+    });
+
+    expect(result.trajectories.length).toBe(1);
+    expect(result.dsrCmResult).toEqual([]);
+    expect(result.technologies).toBeDefined();
+  });
+
+  // ---------------------------------------------------------
+  // CASE 4 — Generic type
+  // ---------------------------------------------------------
+  it('should fetch generic trajectories and remove duplicates', async () => {
+    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue([{ id: 30, trajectoryName: 'X' }] as DbTrajectory[]);
+
+    vi.mocked(trajectoryUtils.buildDefaultEmptyTrajectoryList).mockReturnValue([
+      { id: 31, trajectoryName: '' },
+    ] as DbTrajectory[]);
+
+    vi.mocked(trajectoryUtils.removeDuplicate).mockReturnValue([
+      { id: 30, trajectoryName: 'X' },
+      { id: 99, trajectoryName: '' },
+      { id: 31, trajectoryName: '' },
+    ] as DbTrajectory[]);
+
+    const result = await fetchAndNormalizeTrajectories({
+      id: 3,
+      trajType: TRAJECTORY_TYPE.LOAD,
+      defaultAreas,
+      emptyAreaSelected,
+    });
+
+    expect(result).toEqual({
+      trajectories: [
+        { id: 30, trajectoryName: 'X' },
+        { id: 99, trajectoryName: '' },
+        { id: 31, trajectoryName: '' },
+      ],
+      dsrCmResult: [],
+      technologies: undefined,
+    });
+  });
+});
+
+describe('buildPayload', () => {
+  it('should build a simple payload when no DSR_CM', () => {
+    const result = buildPayload(TRAJECTORY_TYPE.DSR, [{ id: 1 }] as DbTrajectory[], []);
+
+    expect(result).toEqual({
+      DSR: { trajectories: [{ id: 1 }] },
+    });
+  });
+
+  it('should include DSR_CM when provided', () => {
+    const result = buildPayload(TRAJECTORY_TYPE.DSR, [{ id: 1 }] as DbTrajectory[], [{ id: 2 }] as DbTrajectory[]);
+
+    expect(result).toEqual({
+      DSR: { trajectories: [{ id: 1 }] },
+      DSR_CAPACITY_MODULATION: { trajectories: [{ id: 2 }] },
+    });
+  });
+
+  it('should not include DSR_CM when empty', () => {
+    const result = buildPayload(TRAJECTORY_TYPE.DSR, [{ id: 1 }] as DbTrajectory[], []);
+
+    expect(result).toEqual({
+      DSR: { trajectories: [{ id: 1 }] },
+    });
+  });
+});
+
+describe('buildReadOnlyMap', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  const rows = [{ status: 'OK' }, { status: 'MISSING' }] as HypothesisRowData[];
+
+  const defaultAreaListNotInList = ['A', 'B'];
+
+  it('should use generateReadOnlyIndexMap when study is generated', () => {
+    vi.mocked(trajectoryUtils.generateReadOnlyIndexMap).mockReturnValue({ 0: true, 1: true });
+
+    const result = buildReadOnlyMap({
+      rows,
+      trajType: TRAJECTORY_TYPE.DSR,
+      isStudyGenerated: true,
+      defaultAreaListNotInList,
+    });
+
+    expect(result).toEqual({ 0: true, 1: true });
+    expect(generateReadOnlyIndexMap).toHaveBeenCalledWith(rows);
+  });
+
+  it('should use retrieveReadOnlyArea when study is not generated', () => {
+    vi.mocked(trajectoryUtils.retrieveReadOnlyArea).mockReturnValue({ 0: false, 1: true });
+
+    const result = buildReadOnlyMap({
+      rows,
+      trajType: TRAJECTORY_TYPE.THERMAL_CAPACITY,
+      isStudyGenerated: false,
+      defaultAreaListNotInList,
+    });
+
+    expect(result).toEqual({ 0: false, 1: true });
+    expect(retrieveReadOnlyArea).toHaveBeenCalledWith(rows, defaultAreaListNotInList);
+  });
+
+  it('should add DSR-specific readonly rule', () => {
+    vi.mocked(trajectoryUtils.retrieveReadOnlyArea).mockReturnValue({ 0: false });
+
+    const result = buildReadOnlyMap({
+      rows,
+      trajType: TRAJECTORY_TYPE.DSR,
+      isStudyGenerated: false,
+      defaultAreaListNotInList,
+    });
+
+    // dernière ligne = index 1
+    expect(result).toEqual({
+      0: false,
+      1: false, // car au moins un row.status === OK
+    });
+  });
+
+  it('should lock last row when no OK trajectory in DSR', () => {
+    const rowsNoOk = [{ status: 'MISSING' }, { status: 'MISSING' }] as unknown as HypothesisRowData[];
+
+    vi.mocked(trajectoryUtils.retrieveReadOnlyArea).mockReturnValue({ 0: false });
+
+    const result = buildReadOnlyMap({
+      rows: rowsNoOk,
+      trajType: TRAJECTORY_TYPE.DSR,
+      isStudyGenerated: false,
+      defaultAreaListNotInList,
+    });
+
+    expect(result).toEqual({
+      0: false,
+      1: true, // verrouillé car aucun OK
+    });
+  });
+});
+
+describe('buildHypothesisRows', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  const t = vi.fn((key: string) => key) as unknown as TFunction<'translation', undefined>;
+
+  it('should build rows for THERMAL_CAPACITY', () => {
+    vi.mocked(trajectoryUtils.convertIntoHypothesisRowWithTechnologies).mockReturnValue([
+      { id: 1 },
+    ] as unknown as HypothesisRowData[]);
+    vi.mocked(sortUtils.sortWithFixedPosition).mockReturnValue([{ id: 1 }] as unknown as HypothesisRowData[]);
+
+    const result = buildHypothesisRows({
+      trajType: TRAJECTORY_TYPE.THERMAL_CAPACITY,
+      trajectories: [{ id: 10 }] as unknown as DbTrajectory[],
+      defaultAreas: [],
+      areas: [],
+      technologies: ['Gas'],
+      isStudyGenerated: false,
+      t,
+      dsrCmResult: [],
+    });
+
+    expect(trajectoryUtils.convertIntoHypothesisRowWithTechnologies).toHaveBeenCalled();
+    expect(result).toEqual([{ id: 1 }]);
+  });
+
+  it('should build rows for generic type', () => {
+    vi.mocked(trajectoryUtils.buildRowWithSubRowsData).mockReturnValue({ id: 1 } as unknown as HypothesisRowData);
+    vi.mocked(sortUtils.sortWithFixedPosition).mockReturnValue([{ id: 1 }] as unknown as HypothesisRowData[]);
+
+    const result = buildHypothesisRows({
+      trajType: TRAJECTORY_TYPE.LOAD,
+      trajectories: [{ id: 10 }] as DbTrajectory[],
+      defaultAreas: [],
+      areas: [],
+      technologies: [],
+      isStudyGenerated: false,
+      t,
+      dsrCmResult: [],
+    });
+
+    expect(trajectoryUtils.buildRowWithSubRowsData).toHaveBeenCalled();
+    expect(result).toEqual([{ id: 1 }]);
+  });
+
+  it('should add DSR capacity modulation row', () => {
+    vi.mocked(trajectoryUtils.buildRowWithSubRowsData).mockReturnValue({ id: 1 } as unknown as HypothesisRowData);
+    vi.mocked(sortUtils.sortWithFixedPosition).mockReturnValue([{ id: 1 }] as unknown as HypothesisRowData[]);
+
+    const result = buildHypothesisRows({
+      trajType: TRAJECTORY_TYPE.DSR,
+      trajectories: [{ id: 10 }] as DbTrajectory[],
+      defaultAreas: [],
+      areas: [],
+      technologies: [],
+      isStudyGenerated: false,
+      t,
+      dsrCmResult: [{ id: 99 }] as DbTrajectory[],
+    });
+
+    expect(result[result.length - 1]).toEqual({
+      hypothesis: 'dsr.@capacityModulation',
+      trajectory: { id: 99 },
+      status: 'OK',
+      isDefault: false,
+      isDeletable: false,
+      subRows: null,
+    });
   });
 });

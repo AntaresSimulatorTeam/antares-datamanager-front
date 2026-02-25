@@ -630,6 +630,32 @@ describe('uploadTrajectory', () => {
     });
   });
 
+  it('should import DSR trajectory into data base', async () => {
+    await uploadTrajectory(TRAJECTORY_TYPE.DSR, 'param', '2030-2031', 25, 'FR', onProgress, false);
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        `https://mockapi.com/v1/trajectory/dsr-cluster?area=FR&trajectoryToUse=param&horizon=2030-2031&studyId=25&isCivilYear=false`,
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
+
+  it('should import DSR_CAPACITY_MODULATION trajectory into data base', async () => {
+    await uploadTrajectory(TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION, 'param', '2030-2031', 25, '', onProgress);
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        `https://mockapi.com/v1/trajectory/dsr-capacity-modulation?trajectoryToUse=param&horizon=2030-2031&studyId=25`,
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
+
   it('should handle fetch failure gracefully', async () => {
     vi.mocked(progressService.fetchWithProgress).mockRejectedValueOnce({
       message: 'Failed to import trajectory to data base',
