@@ -18,7 +18,6 @@ vi.mock('@/shared/utils/trajectoryUtils.ts', () => ({
 vi.mock('@/shared/helpers/hypothesisTableHelper.ts', () => ({
   findSpecificTrajectoryToDelete: vi.fn(),
   getSpecificTrajectories: vi.fn(),
-  shouldDeleteCapacityModulation: vi.fn(),
   collectTrajectoriesRecursively: vi.fn(),
 }));
 
