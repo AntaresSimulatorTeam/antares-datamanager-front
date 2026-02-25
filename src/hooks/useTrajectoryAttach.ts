@@ -80,13 +80,13 @@ export const useTrajectoryAttach = (
               newData = setNestedData(prev, indexArray, newTrajectory);
               type === TRAJECTORY_TYPE.AREA && setReadOnly?.({ '0': false, '1': false });
               if (type === TRAJECTORY_TYPE.DSR) {
-                const hasModulationTrajectory =
+                const hasTrajectoryWithTS =
                   newData.some(
                     (row) => row.status === TRAJECTORY_SELECTION_STATUS.OK && row?.trajectory?.hasTimeSeries,
                   ) || newDbTrajectory.hasTimeSeries;
                 setReadOnly?.((prevReadOnly) => {
                   const lastIndex = Math.max(Object.keys(prev)?.length - 1, 0);
-                  return { ...prevReadOnly, [lastIndex]: !hasModulationTrajectory };
+                  return { ...prevReadOnly, [lastIndex]: !hasTrajectoryWithTS };
                 });
               }
               return newData;

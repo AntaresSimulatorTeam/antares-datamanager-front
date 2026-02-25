@@ -1,7 +1,7 @@
 import { describe, expect, it, Mock, vi } from 'vitest';
-import { renderHook } from '@testing-library/react';
-import { DbTrajectory, StudyDTO, StudyState, UserState } from '@/shared/types';
-import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { act, renderHook } from '@testing-library/react';
+import { DbTrajectory, HypothesisRowData, StudyDTO, StudyState, UserState } from '@/shared/types';
+import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import * as trajectoryService from '@/shared/services/trajectoryService.ts';
 import * as studyService from '@/shared/services/studyService.ts';
 import * as trajectoryUtils from '@/shared/utils/trajectoryUtils.ts';
@@ -9,6 +9,8 @@ import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
 import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { useUser } from '@/store/contexts/UserContext.tsx';
+import { ReadOnlyObject } from '@/shared/types/HypothesisTable.ts';
+import { Dispatch, SetStateAction } from 'react';
 
 vi.mock('@/shared/services/trajectoryService', async (importOriginal) => {
   const actual: Mock = await importOriginal();
@@ -16,6 +18,7 @@ vi.mock('@/shared/services/trajectoryService', async (importOriginal) => {
     ...actual,
     getStudyTrajectoriesWithWarnings: vi.fn(),
     linkTrajectoryToStudy: vi.fn(),
+    isParamModulationRequired: vi.fn(),
   };
 });
 
@@ -32,6 +35,7 @@ vi.mock('@/shared/utils/trajectoryUtils', async (importOriginal) => {
   return {
     ...actual,
     isUniqueTrajectoryType: vi.fn(),
+    setNestedData: vi.fn(),
   };
 });
 
@@ -209,5 +213,285 @@ describe('useTrajectoryAttach', () => {
         content: 'link failed',
       }),
     );
+  });
+
+  it('attache une trajectoire thermique spécifique et met à jour readOnly selon isParamModulationRequired', async () => {
+    const studyThermal = { id: 1, horizon: 2030 } as unknown as StudyDTO;
+    const studyStateThermal = {
+      THERMAL_TECHNICAL_SPECIFIC_PARAMETER: { trajectories: [] },
+    } as StudyState;
+
+    const dispatch = vi.fn();
+    const setReadOnly = vi.fn();
+    const setData: Dispatch<SetStateAction<HypothesisRowData[]>> = vi.fn((fn: SetStateAction<HypothesisRowData[]>) => {
+      const prev = [{ hypothesis: 'FR' }] as HypothesisRowData[];
+      // Si fn est une fonction, on l'exécute
+      if (typeof fn === 'function') {
+        return (fn as (prev: HypothesisRowData[]) => HypothesisRowData[])(prev);
+      }
+      // Sinon, c'est une valeur directe
+      return fn;
+    });
+
+    const newTrajectoryThermal = {
+      id: 10,
+      type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+    } as unknown as DbTrajectory;
+
+    vi.mocked(trajectoryService.linkTrajectoryToStudy).mockResolvedValue(newTrajectory);
+    vi.mocked(trajectoryService.isParamModulationRequired).mockResolvedValue(true);
+    vi.mocked(trajectoryUtils.setNestedData).mockReturnValue([
+      { hypothesis: 'FR', status: TRAJECTORY_SELECTION_STATUS.OK },
+    ] as HypothesisRowData[]);
+
+    const { result } = renderHook(() => useTrajectoryAttach(studyThermal, studyStateThermal, dispatch, setReadOnly));
+
+    await act(async () => {
+      await result.current.attachTrajectory(
+        TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+        [0, 1],
+        'success',
+        newTrajectoryThermal,
+        setData,
+      );
+    });
+
+    // Vérifie l'appel backend
+    expect(trajectoryService.linkTrajectoryToStudy).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+      10,
+      1,
+    );
+
+    // Vérifie la logique métier
+    expect(trajectoryService.isParamModulationRequired).toHaveBeenCalledWith(1, 2030);
+
+    // Vérifie la mise à jour des données
+    expect(trajectoryUtils.setNestedData).toHaveBeenCalled();
+    expect(setReadOnly).toHaveBeenCalledWith(expect.any(Function));
+
+    // Vérifie que readOnly est mis à jour avec !isRequired
+    const readOnlyUpdater = setReadOnly.mock.calls[0][0] as (prev: ReadOnlyObject) => ReadOnlyObject;
+    const updatedReadOnly = readOnlyUpdater({ '1': false });
+    expect(updatedReadOnly).toEqual({ '1': false }); // car isRequired = true → !true = false
+
+    // Vérifie le dispatch ADD
+    expect(dispatch).toHaveBeenCalledWith({
+      type: STUDY_ACTION.ADD_TRAJECTORIES,
+      payload: {
+        [TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]: {
+          trajectories: [newTrajectory],
+        },
+      },
+    });
+  });
+
+  it('update la trajectoire si elle existe déjà', async () => {
+    const studySpecific = { id: 1, horizon: 2030 } as unknown as StudyDTO;
+    const studyStateSpecific = {
+      THERMAL_TECHNICAL_SPECIFIC_PARAMETER: {
+        trajectories: [{ id: 10, type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, area: 'FR' }],
+      },
+    } as StudyState;
+
+    const dispatch = vi.fn();
+    const setReadOnly = vi.fn();
+    const setData: Dispatch<SetStateAction<HypothesisRowData[]>> = vi.fn((fn: SetStateAction<HypothesisRowData[]>) => {
+      const prev = [{ hypothesis: 'FR' }] as HypothesisRowData[];
+      // Si fn est une fonction, on l'exécute
+      if (typeof fn === 'function') {
+        return (fn as (prev: HypothesisRowData[]) => HypothesisRowData[])(prev);
+      }
+      // Sinon, c'est une valeur directe
+      return fn;
+    });
+
+    const newTrajectorySpecific = {
+      id: 10,
+      type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+      area: 'FR',
+    } as DbTrajectory;
+
+    vi.mocked(trajectoryService.linkTrajectoryToStudy).mockResolvedValue(newTrajectorySpecific);
+    vi.mocked(trajectoryService.isParamModulationRequired).mockResolvedValue(false);
+    vi.mocked(trajectoryUtils.setNestedData).mockReturnValue([
+      { hypothesis: 'FR', status: TRAJECTORY_SELECTION_STATUS.OK },
+    ] as HypothesisRowData[]);
+
+    const { result } = renderHook(() => useTrajectoryAttach(studySpecific, studyStateSpecific, dispatch, setReadOnly));
+
+    await act(async () => {
+      await result.current.attachTrajectory(
+        TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+        [0],
+        'success',
+        newTrajectorySpecific,
+        setData,
+      );
+    });
+
+    // Vérifie que UPDATE est appelé
+    expect(dispatch).toHaveBeenCalledWith({
+      type: STUDY_ACTION.UPDATE_TRAJECTORY,
+      payload: {
+        trajectory: newTrajectorySpecific,
+        status: 'success',
+      },
+    });
+
+    // Vérifie readOnly = !isRequired = !false = true
+    const readOnlyUpdater = setReadOnly.mock.calls[0][0] as (prev: ReadOnlyObject) => ReadOnlyObject;
+    const updated = readOnlyUpdater({ '1': false });
+    expect(updated).toEqual({ '1': true });
+  });
+
+  it('met à jour les données et setReadOnly pour le type AREA', async () => {
+    const studyArea = { id: 1 } as StudyDTO;
+    const studyStateArea = {
+      AREA: { trajectories: [] },
+    } as StudyState;
+
+    const dispatch = vi.fn();
+    const setReadOnly = vi.fn();
+    const setData: Dispatch<SetStateAction<HypothesisRowData[]>> = vi.fn((fn: SetStateAction<HypothesisRowData[]>) => {
+      const prev = [{ hypothesis: 'FR' }] as HypothesisRowData[];
+      // Si fn est une fonction, on l'exécute
+      if (typeof fn === 'function') {
+        return (fn as (prev: HypothesisRowData[]) => HypothesisRowData[])(prev);
+      }
+      // Sinon, c'est une valeur directe
+      return fn;
+    });
+
+    const newTrajectoryArea = {
+      id: 10,
+      type: TRAJECTORY_TYPE.AREA,
+    } as DbTrajectory;
+
+    vi.mocked(trajectoryService.linkTrajectoryToStudy).mockResolvedValue(newTrajectoryArea);
+    vi.mocked(trajectoryUtils.setNestedData).mockReturnValue([{ updated: true }] as unknown as HypothesisRowData[]);
+
+    const { result } = renderHook(() => useTrajectoryAttach(studyArea, studyStateArea, dispatch, setReadOnly));
+
+    await act(async () => {
+      await result.current.attachTrajectory(TRAJECTORY_TYPE.AREA, [0], 'success', newTrajectoryArea, setData);
+    });
+
+    // Vérifie la mise à jour des données
+    expect(trajectoryUtils.setNestedData).toHaveBeenCalled();
+
+    // Vérifie setReadOnly
+    expect(setReadOnly).toHaveBeenCalledWith({ '0': false, '1': false });
+
+    // Vérifie le dispatch ADD
+    expect(dispatch).toHaveBeenCalledWith({
+      type: STUDY_ACTION.ADD_TRAJECTORIES,
+      payload: {
+        [TRAJECTORY_TYPE.AREA]: {
+          trajectories: [newTrajectoryArea],
+        },
+      },
+    });
+  });
+
+  it('met à jour readOnly pour DSR selon hasTimeSeries = true', async () => {
+    const studyDSR = { id: 1 } as StudyDTO;
+    const studyStateDSR = {
+      DSR: { trajectories: [] },
+    } as StudyState;
+
+    const dispatch = vi.fn();
+    const setReadOnly = vi.fn();
+    const setData: Dispatch<SetStateAction<HypothesisRowData[]>> = vi.fn((fn: SetStateAction<HypothesisRowData[]>) => {
+      const prev = [
+        { status: TRAJECTORY_SELECTION_STATUS.ERROR },
+        { status: TRAJECTORY_SELECTION_STATUS.OK, trajectory: { hasTimeSeries: false } },
+      ] as HypothesisRowData[];
+      // Si fn est une fonction, on l'exécute
+      if (typeof fn === 'function') {
+        return (fn as (prev: HypothesisRowData[]) => HypothesisRowData[])(prev);
+      }
+      // Sinon, c'est une valeur directe
+      return fn;
+    });
+
+    const newTrajectoryDsr = {
+      id: 10,
+      type: TRAJECTORY_TYPE.DSR,
+      hasTimeSeries: true,
+    } as unknown as DbTrajectory;
+
+    vi.mocked(trajectoryService.linkTrajectoryToStudy).mockResolvedValue(newTrajectoryDsr);
+    vi.mocked(trajectoryUtils.setNestedData).mockReturnValue([
+      { status: TRAJECTORY_SELECTION_STATUS.ERROR },
+      { status: TRAJECTORY_SELECTION_STATUS.OK, trajectory: { hasTimeSeries: false } },
+      { status: TRAJECTORY_SELECTION_STATUS.OK, trajectory: { hasTimeSeries: true } },
+    ] as HypothesisRowData[]);
+
+    const { result } = renderHook(() => useTrajectoryAttach(studyDSR, studyStateDSR, dispatch, setReadOnly));
+
+    await act(async () => {
+      await result.current.attachTrajectory(TRAJECTORY_TYPE.DSR, [1], 'success', newTrajectoryDsr, setData);
+    });
+
+    // Vérifie setNestedData
+    expect(trajectoryUtils.setNestedData).toHaveBeenCalled();
+
+    // Vérifie que setReadOnly est appelé avec une fonction
+    expect(setReadOnly).toHaveBeenCalledWith(expect.any(Function));
+
+    // On exécute la fonction pour vérifier le résultat
+    const updater = setReadOnly.mock.calls[0][0] as (prev: ReadOnlyObject) => ReadOnlyObject;
+    const updated = updater({ 0: true, 1: true });
+
+    // hasTimeSeries = true → readOnly[lastIndex] = false
+    expect(updated).toEqual({ 0: true, 1: false });
+  });
+
+  it('met à jour readOnly pour DSR selon hasTimeSeries = false', async () => {
+    const studyDSR2 = { id: 1 } as StudyDTO;
+    const studyStateDSR2 = {
+      DSR: { trajectories: [] },
+    } as StudyState;
+
+    const dispatch = vi.fn();
+    const setReadOnly = vi.fn();
+    const setData: Dispatch<SetStateAction<HypothesisRowData[]>> = vi.fn((fn: SetStateAction<HypothesisRowData[]>) => {
+      const prev = [
+        { status: TRAJECTORY_SELECTION_STATUS.OK, trajectory: { hasTimeSeries: false } },
+      ] as HypothesisRowData[];
+      // Si fn est une fonction, on l'exécute
+      if (typeof fn === 'function') {
+        return (fn as (prev: HypothesisRowData[]) => HypothesisRowData[])(prev);
+      }
+      // Sinon, c'est une valeur directe
+      return fn;
+    });
+
+    const newTrajectoryDSR2 = {
+      id: 10,
+      type: TRAJECTORY_TYPE.DSR,
+      hasTimeSeries: false,
+    } as DbTrajectory;
+
+    vi.mocked(trajectoryService.linkTrajectoryToStudy).mockResolvedValue(newTrajectoryDSR2);
+    vi.mocked(trajectoryUtils.setNestedData).mockReturnValue([
+      { status: TRAJECTORY_SELECTION_STATUS.OK, trajectory: { hasTimeSeries: false } },
+      { status: TRAJECTORY_SELECTION_STATUS.OK, trajectory: { hasTimeSeries: false } },
+    ] as HypothesisRowData[]);
+
+    const { result } = renderHook(() => useTrajectoryAttach(studyDSR2, studyStateDSR2, dispatch, setReadOnly));
+
+    await act(async () => {
+      await result.current.attachTrajectory(TRAJECTORY_TYPE.DSR, [0], 'success', newTrajectoryDSR2, setData);
+    });
+
+    expect(setReadOnly).toHaveBeenCalledWith(expect.any(Function));
+
+    const updater = setReadOnly.mock.calls[0][0] as (prev: ReadOnlyObject) => ReadOnlyObject;
+    const updated = updater({ 0: false });
+
+    // hasTimeSeries = false → readOnly[lastIndex] = true
+    expect(updated).toEqual({ 0: true });
   });
 });
