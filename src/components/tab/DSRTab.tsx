@@ -11,8 +11,13 @@ import { useCallback, useEffect, useState } from 'react';
 import { CheckBoxListWithSearchBar } from '@/components/list/CheckBoxListWithSearchBar.tsx';
 import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { getAreaTrajectoryName, shouldDeleteCapacityModulation } from '@/shared/utils/trajectoryUtils.ts';
-import { shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
+import {
+  filterRow,
+  generateReadOnlyIndexMap,
+  getAreaTrajectoryName,
+  shouldDeleteCapacityModulation,
+} from '@/shared/utils/trajectoryUtils.ts';
+import { getCheckedValues, shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
@@ -46,7 +51,7 @@ const DSRTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
   const [isDeletionModalOpen, setIsDeletionModalOpen] = useState(false);
-  const [isStudyGenerated, _setIsStudyGenerated] = useState(
+  const [isStudyGenerated, setIsStudyGenerated] = useState(
     studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED,
   );
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
@@ -65,6 +70,18 @@ const DSRTab = ({ defaultAreas, areas, studyData }: TabProps) => {
     };
     setHypothesis();
   }, [hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow]);
+
+  useEffect(() => {
+    if (studyState.studyStatus === StudyStatus.GENERATED) {
+      setIsStudyGenerated(true);
+      const newData = filterRow(data);
+      setData(newData);
+      const newCheckedValues = getCheckedValues(newData, areas, defaultAreas);
+      setCheckedValues(newCheckedValues);
+      const rows = generateReadOnlyIndexMap(newData);
+      setReadOnly(rows);
+    }
+  }, [studyState.studyStatus]);
 
   const handleSelectionChange = useCallback(
     async (value: string, isChecked?: boolean): Promise<void> => {
