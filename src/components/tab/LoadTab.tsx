@@ -39,7 +39,14 @@ export const LoadTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const [rowToDelete, setRowToDelete] = useState<{ index: number; value?: string } | null>(null);
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
-    useFetchHypothesisTrajectories(areas, TRAJECTORY_TYPE.LOAD, defaultAreas, studyData, studyState.studyStatus);
+    useFetchHypothesisTrajectories(
+      areas,
+      TRAJECTORY_TYPE.LOAD,
+      defaultAreas,
+      studyData?.id,
+      studyData?.status,
+      studyState.studyStatus,
+    );
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch);
   const { attachTrajectory } = useTrajectoryAttach(studyData, studyState, dispatch);
   const { removeRow } = useHypothesisTableRemoveRow(studyData, dispatch, setData, setCheckedValues);

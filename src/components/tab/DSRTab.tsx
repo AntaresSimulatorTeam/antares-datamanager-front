@@ -47,7 +47,14 @@ const DSRTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
   const [isDeletionModalOpen, setIsDeletionModalOpen] = useState(false);
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
-    useFetchHypothesisTrajectories(areas, TRAJECTORY_TYPE.DSR, defaultAreas, studyData, studyState.studyStatus);
+    useFetchHypothesisTrajectories(
+      areas,
+      TRAJECTORY_TYPE.DSR,
+      defaultAreas,
+      studyData?.id,
+      studyData?.status,
+      studyState.studyStatus,
+    );
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch, setReadOnly);
   const { removeRow } = useHypothesisTableRemoveRow(studyData, dispatch, setData, setCheckedValues, setReadOnly);
   const { attachTrajectory } = useTrajectoryAttach(studyData, studyState, dispatch, setReadOnly);

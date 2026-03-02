@@ -1,4 +1,4 @@
-import { CheckBoxData, HypothesisRowData, StudyDTO, TrajectoryAreaData } from '@/shared/types';
+import { CheckBoxData, HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ReadOnlyObject } from '@/shared/types/HypothesisTable.ts';
@@ -18,8 +18,9 @@ export const useFetchHypothesisTrajectories = (
   areas: TrajectoryAreaData[],
   trajectoryType: TRAJECTORY_TYPE,
   defaultAreas: { name: string }[],
-  study: StudyDTO,
-  studyStatus?: StudyStatus,
+  studyId: number,
+  studyStatus: StudyStatus,
+  studyContextStatus?: StudyStatus,
 ) => {
   const [hypothesisTrajectories, setHypothesisTrajectories] = useState<HypothesisRowData[]>([]);
   const [areasTrajectoryOptions, setAreasTrajectoryOptions] = useState<CheckBoxData[]>();
@@ -49,7 +50,7 @@ export const useFetchHypothesisTrajectories = (
   const fetchAreas = useCallback(
     async (id: number, trajType: TRAJECTORY_TYPE) => {
       try {
-        const isStudyGenerated = studyStatus === StudyStatus.GENERATED || study.status === StudyStatus.GENERATED;
+        const isStudyGenerated = studyContextStatus === StudyStatus.GENERATED || studyStatus === StudyStatus.GENERATED;
         const contextTrajectories = studyState?.[trajType]?.trajectories ?? [];
         let shouldSkipFetch = false;
         if (studyStatus === StudyStatus.GENERATED && contextTrajectories) {
@@ -111,15 +112,15 @@ export const useFetchHypothesisTrajectories = (
         console.error('fetchAreas error', error);
       }
     },
-    [studyStatus, study.status, studyState, areas, defaultAreas, t, emptyAreaSelected, dispatch],
+    [areas, defaultAreas, t, emptyAreaSelected],
   );
 
   /**
    * Déclenchement automatique
    */
   useEffect(() => {
-    study?.id != null && void fetchAreas(study.id, trajectoryType);
-  }, [areas, defaultAreas, study?.id, studyStatus, trajectoryType]);
+    studyId != null && void fetchAreas(studyId, trajectoryType);
+  }, [studyId, trajectoryType]);
 
   return {
     hypothesisTrajectories,

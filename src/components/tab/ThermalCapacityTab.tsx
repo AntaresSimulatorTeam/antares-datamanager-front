@@ -44,7 +44,8 @@ const ThermalCapacityTab = ({ defaultAreas, areas, studyData }: TabProps) => {
       areas,
       TRAJECTORY_TYPE.THERMAL_CAPACITY,
       defaultAreas,
-      studyData,
+      studyData?.id,
+      studyData?.status,
       studyState.studyStatus,
     );
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch);

@@ -237,7 +237,7 @@ export const fetchAndNormalizeTrajectories = async ({
   }
 
   const defaultEmpty = buildDefaultEmptyTrajectoryList(trajType, result, defaultAreas);
-  const all = [...(result || []), ...emptyAreaSelected, ...defaultEmpty];
+  const all = [...(result || []), ...emptyAreaSelected, ...(defaultEmpty || [])];
 
   const trajectories =
     trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY || trajType === TRAJECTORY_TYPE.STS

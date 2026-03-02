@@ -58,7 +58,14 @@ export const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const [rowToDelete, setRowToDelete] = useState<{ index: number; value?: string } | null>(null);
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow, technologyList } =
-    useFetchHypothesisTrajectories(areas, TRAJECTORY_TYPE.STS, defaultAreas, studyData, studyState.studyStatus);
+    useFetchHypothesisTrajectories(
+      areas,
+      TRAJECTORY_TYPE.STS,
+      defaultAreas,
+      studyData?.id,
+      studyData?.status,
+      studyState.studyStatus,
+    );
   const { removeRow } = useHypothesisTableRemoveRow(studyData, dispatch, setData, setCheckedValues);
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch);
   const { detachTrajectory } = useTrajectoryDetach(studyData, dispatch);
