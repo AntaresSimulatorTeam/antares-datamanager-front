@@ -72,11 +72,14 @@ export const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const { attachTrajectory } = useTrajectoryAttach(studyData, studyState, dispatch);
 
   useEffect(() => {
-    areasTrajectoryOptions && setAreasOptions(areasTrajectoryOptions);
-    dropDownListOptions && setCheckedValues(dropDownListOptions);
-    technologyList && setStsTechnologies(technologyList);
-    hypothesisTrajectories && setData(hypothesisTrajectories);
-    setReadOnly(readOnlyRow);
+    const setStsHypothesis = () => {
+      areasTrajectoryOptions && setAreasOptions(areasTrajectoryOptions);
+      dropDownListOptions && setCheckedValues(dropDownListOptions);
+      technologyList && setStsTechnologies(technologyList);
+      hypothesisTrajectories && setData(hypothesisTrajectories);
+      setReadOnly(readOnlyRow);
+    };
+    setStsHypothesis();
   }, [
     hypothesisTrajectories,
     areasTrajectoryOptions,

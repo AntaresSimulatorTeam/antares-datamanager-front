@@ -53,13 +53,13 @@ export const LoadTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const { detachTrajectory } = useTrajectoryDetach(studyData, dispatch);
 
   useEffect(() => {
-    const setHypothesis = () => {
+    const setLoadHypothesis = () => {
       areasTrajectoryOptions && setAreasOptions(areasTrajectoryOptions);
       dropDownListOptions && setCheckedValues(dropDownListOptions);
       hypothesisTrajectories && setData(hypothesisTrajectories);
       setReadOnly(readOnlyRow);
     };
-    setHypothesis();
+    setLoadHypothesis();
   }, [hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow, studyState.studyStatus]);
 
   const handleSelectionChange = useCallback(

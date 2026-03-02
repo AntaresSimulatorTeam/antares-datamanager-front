@@ -61,13 +61,13 @@ const DSRTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const { detachTrajectory } = useTrajectoryDetach(studyData, dispatch, setReadOnly);
 
   useEffect(() => {
-    const setHypothesis = () => {
+    const setDsrHypothesis = () => {
       areasTrajectoryOptions && setAreasOptions(areasTrajectoryOptions);
       dropDownListOptions && setCheckedValues(dropDownListOptions);
       hypothesisTrajectories && setData(hypothesisTrajectories);
       setReadOnly(readOnlyRow);
     };
-    setHypothesis();
+    setDsrHypothesis();
   }, [hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow, studyState.studyStatus]);
 
   const handleSelectionChange = useCallback(
