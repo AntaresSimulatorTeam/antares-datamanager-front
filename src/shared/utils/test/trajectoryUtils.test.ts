@@ -29,6 +29,7 @@ import {
   removeDuplicate,
   retrieveReadOnlyArea,
   setNestedData,
+  shouldDeleteCapacityModulation,
   shouldDeleteParamModulation,
   shouldHaveSubRows,
 } from '../trajectoryUtils';
@@ -1380,5 +1381,60 @@ describe('filterRow', () => {
     ] as unknown as HypothesisRowData[];
     const result = filterRow(data);
     expect(result).toHaveLength(1);
+  });
+});
+
+describe('shouldDeleteCapacityModulation', () => {
+  const makeRow = ({ hasTS = false, status = TRAJECTORY_SELECTION_STATUS.OK, withTrajectory = true } = {}) => ({
+    trajectory: withTrajectory ? { hasTimeSeries: hasTS } : null,
+    status,
+  });
+
+  it('returns false if last row is not a valid OK trajectory', () => {
+    const rows = [
+      makeRow({ hasTS: true }),
+      makeRow({ hasTS: true, status: TRAJECTORY_SELECTION_STATUS.ERROR }), // dernière ligne KO
+    ] as HypothesisRowData[];
+
+    expect(shouldDeleteCapacityModulation(rows, 0)).toBe(false);
+  });
+
+  it('returns false if the row at index has no timeSeries', () => {
+    const rows = [
+      makeRow({ hasTS: false }),
+      makeRow({ hasTS: true }), // dernière ligne OK
+    ] as HypothesisRowData[];
+
+    expect(shouldDeleteCapacityModulation(rows, 0)).toBe(false);
+  });
+
+  it('returns true when there is at least one OK trajectory with TS before last row', () => {
+    const rows = [
+      makeRow({ hasTS: true }), // OK + TS
+      makeRow({ hasTS: true }), // dernière ligne OK
+    ] as HypothesisRowData[];
+
+    expect(shouldDeleteCapacityModulation(rows, 0)).toBe(true);
+  });
+
+  it('returns true when deleting the row leaves only one trajectory before last row', () => {
+    const rows = [
+      makeRow({ hasTS: true }), // index 0
+      makeRow({ hasTS: false }), // index 1
+      makeRow({ hasTS: true }), // dernière ligne OK
+    ] as HypothesisRowData[];
+
+    // Après suppression de l’index 0 → il reste 1 seule trajectoire
+    expect(shouldDeleteCapacityModulation(rows, 0)).toBe(true);
+  });
+
+  it('returns false when no TS exists and more than one trajectory remains', () => {
+    const rows = [
+      makeRow({ hasTS: false }),
+      makeRow({ hasTS: false }),
+      makeRow({ hasTS: true }), // dernière ligne OK
+    ] as HypothesisRowData[];
+
+    expect(shouldDeleteCapacityModulation(rows, 0)).toBe(false);
   });
 });

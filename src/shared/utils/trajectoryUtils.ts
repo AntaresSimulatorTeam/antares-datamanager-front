@@ -748,6 +748,10 @@ export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE, technology?: st
       return '\\\\thermal\\technical parameters';
     case TRAJECTORY_TYPE.STS:
       return `\\\\STS\\${technology}\\clusters`;
+    case TRAJECTORY_TYPE.DSR:
+      return `\\\\DSR\\cluster`;
+    case TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION:
+      return `\\\\DSR\\capacity modulation`;
     default:
       return null;
   }
@@ -799,6 +803,31 @@ export const shouldDeleteParamModulation = (index: number, data: HypothesisRowDa
   return (
     (hasOnlyOneSpecificTrajectory && data[1].trajectory && data[1].status === TRAJECTORY_SELECTION_STATUS.OK) || false
   );
+};
+
+export const shouldDeleteCapacityModulation = (rows: HypothesisRowData[], index: number): boolean => {
+  const lastIndex = rows.length - 1;
+  const lastRow = rows[lastIndex];
+
+  // La dernière ligne doit être une trajectoire OK
+  const lastIsValid = !!lastRow?.trajectory && lastRow.status === TRAJECTORY_SELECTION_STATUS.OK;
+  if (!lastIsValid) return false;
+
+  const dataToCheckWithoutLastRow = rows.slice(0, lastIndex);
+
+  // La ligne ciblée doit avoir une trajectoire avec timeSeries
+  const rowAtIndex = dataToCheckWithoutLastRow[index];
+  if (!rowAtIndex?.trajectory?.hasTimeSeries) return false;
+
+  // On récupère toutes les trajectoires avec timeSeries hors dernière ligne
+  const tsRows = dataToCheckWithoutLastRow
+    .map((row, i) => ({ row, i }))
+    .filter(({ row }) => row.trajectory?.hasTimeSeries);
+
+  // Vérifier que l'index donné est celui de la dernière trajectoire avec TS
+  const lastTSIndex = tsRows[tsRows.length - 1]?.i;
+
+  return index === lastTSIndex;
 };
 
 /**

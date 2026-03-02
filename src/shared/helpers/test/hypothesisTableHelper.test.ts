@@ -16,8 +16,11 @@ import {
   getReadOnlyForGeneratedStudy,
   getSpecificTrajectories,
   shouldOpenDeletionModal,
+  updateTableAfterCellDetach,
+  updateTableAfterRowDeletion,
 } from '@/shared/helpers/hypothesisTableHelper.ts';
 import * as trajectoryUtils from '@/shared/utils/trajectoryUtils.ts';
+import { setNestedData } from '@/shared/utils/trajectoryUtils.ts';
 import * as hypothesisTableService from '@/shared/services/hypothesisTableService.ts';
 import * as studyService from '@/shared/services/studyService.ts';
 import * as defaultConfigService from '@/shared/services/defaultConfigService.ts';
@@ -25,6 +28,7 @@ import * as sortUtils from '@/shared/utils/sortUtils.ts';
 
 import { generateReadOnlyIndexMap, retrieveReadOnlyArea } from '../../utils/trajectoryUtils';
 import { TFunction } from 'i18next';
+import { isParamModulationRequired } from '@/shared/services/trajectoryService.ts';
 
 vi.mock('@/shared/services/trajectoryService');
 vi.mock('@/shared/services/hypothesisTableService');
@@ -531,76 +535,120 @@ describe('getInformationMessage', () => {
 });
 
 describe('computeDsrDataAndReadOnly', () => {
-  const row = (hypothesis: string, status: TRAJECTORY_SELECTION_STATUS): HypothesisRowData => ({
-    hypothesis,
-    trajectory: null,
-    status,
-  });
-  it('append le dernier item de prev à la fin des données', () => {
-    const prev = [row('A', TRAJECTORY_SELECTION_STATUS.MISSING), row('LAST', TRAJECTORY_SELECTION_STATUS.MISSING)];
-    const nextSortedWithoutLast = [
-      row('B', TRAJECTORY_SELECTION_STATUS.MISSING),
-      row('C', TRAJECTORY_SELECTION_STATUS.OK),
-    ];
+  const modulationRow = {
+    hypothesis: 'MODULATION',
+    trajectory: { id: 999, type: TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION },
+    status: TRAJECTORY_SELECTION_STATUS.OK,
+  };
 
-    const { data } = computeDsrDataAndReadOnly(prev, nextSortedWithoutLast);
+  // --------------------------------------------------------------------
+  // 1. Aucune trajectoire spécifique → readOnly = true
+  // --------------------------------------------------------------------
+  it('met la modulation en readOnly si aucune trajectoire spécifique', () => {
+    const prev = [modulationRow] as HypothesisRowData[];
+    const sortedSpecific: HypothesisRowData[] = [];
 
-    expect(data.map((r) => r.hypothesis)).toEqual(['B', 'C', 'LAST']);
-  });
+    const { data, readOnlyPatch, indexesToClear } = computeDsrDataAndReadOnly(prev, sortedSpecific);
 
-  it('ne crash pas si prev est vide (pas de lastItem)', () => {
-    const prev: HypothesisRowData[] = [];
-    const nextSortedWithoutLast = [row('B', TRAJECTORY_SELECTION_STATUS.MISSING)];
-
-    const { data, computeReadOnly } = computeDsrDataAndReadOnly(prev, nextSortedWithoutLast);
-
-    expect(data.map((r) => r.hypothesis)).toEqual(['B']);
-    expect(computeReadOnly({})).toEqual({ 0: true }); // pas de OK => last index readOnly = true
+    expect(data).toEqual([modulationRow]);
+    expect(readOnlyPatch).toEqual({ 0: true });
+    expect(indexesToClear).toEqual([0]);
   });
 
-  it('computeReadOnly: nettoie les clés numériques existantes et ne garde que le dernier index', () => {
-    const prev = [row('X', TRAJECTORY_SELECTION_STATUS.MISSING), row('LAST', TRAJECTORY_SELECTION_STATUS.MISSING)];
-    const nextSortedWithoutLast = [
-      row('A', TRAJECTORY_SELECTION_STATUS.MISSING),
-      row('B', TRAJECTORY_SELECTION_STATUS.MISSING),
-    ]; // => data length = 3, lastIndex = 2
+  // --------------------------------------------------------------------
+  // 2. Trajectoires spécifiques sans timeSeries → readOnly = true
+  // --------------------------------------------------------------------
+  it('met la modulation en readOnly si aucune trajectoire spécifique n’a hasTimeSeries = true', () => {
+    const prev = [
+      {
+        hypothesis: 'H1',
+        trajectory: { id: 1, type: TRAJECTORY_TYPE.DSR, hasTimeSeries: false },
+        status: TRAJECTORY_SELECTION_STATUS.OK,
+      },
+      modulationRow,
+    ] as HypothesisRowData[];
 
-    const { computeReadOnly } = computeDsrDataAndReadOnly(prev, nextSortedWithoutLast);
+    const sortedSpecific = [prev[0]];
 
-    const prevReadOnly: ReadOnlyObject = {
-      0: true,
-      1: true,
-      foo: true, // doit être conservé (clé non numérique)
-      '2.subRows.0': true, // conservé (non purement numérique)
-    };
+    const { data, readOnlyPatch, indexesToClear } = computeDsrDataAndReadOnly(prev, sortedSpecific);
 
-    const next = computeReadOnly(prevReadOnly);
-
-    expect(next).toEqual({
-      foo: true,
-      '2.subRows.0': true,
-      2: true, // pas de OK => readOnly sur le dernier index
-    });
+    expect(data).toEqual([prev[0], modulationRow]);
+    expect(readOnlyPatch).toEqual({ 1: true });
+    expect(indexesToClear).toEqual([1]);
   });
 
-  it('computeReadOnly: met le dernier index à false s’il existe une trajectoire spécifique (OK)', () => {
-    const prev = [row('A', TRAJECTORY_SELECTION_STATUS.MISSING), row('LAST', TRAJECTORY_SELECTION_STATUS.MISSING)];
-    const nextSortedWithoutLast = [row('B', TRAJECTORY_SELECTION_STATUS.OK)]; // OK => hasSpecificTrajectory = true
+  // --------------------------------------------------------------------
+  // 3. Au moins une trajectoire spécifique avec timeSeries = true → readOnly = false
+  // --------------------------------------------------------------------
+  it('met la modulation en writable si au moins une trajectoire spécifique a hasTimeSeries = true', () => {
+    const prev = [
+      {
+        hypothesis: 'H1',
+        trajectory: { id: 1, type: TRAJECTORY_TYPE.DSR, hasTimeSeries: true },
+        status: TRAJECTORY_SELECTION_STATUS.OK,
+      },
+      modulationRow,
+    ] as HypothesisRowData[];
 
-    const { data, computeReadOnly } = computeDsrDataAndReadOnly(prev, nextSortedWithoutLast);
+    const sortedSpecific = [prev[0]];
 
-    expect(data.map((r) => r.hypothesis)).toEqual(['B', 'LAST']);
-    expect(computeReadOnly({ 0: true, 1: true })).toEqual({ 1: false }); // nettoie 0/1 et remet lastIndex=1 à false
+    const { data, readOnlyPatch, indexesToClear } = computeDsrDataAndReadOnly(prev, sortedSpecific);
+
+    expect(data).toEqual([prev[0], modulationRow]);
+    expect(readOnlyPatch).toEqual({ 1: false });
+    expect(indexesToClear).toEqual([1]);
   });
 
-  it('si data est vide (lastIndex = -1), computeReadOnly ne rajoute rien', () => {
-    const prev: HypothesisRowData[] = [];
-    const nextSortedWithoutLast: HypothesisRowData[] = [];
+  // --------------------------------------------------------------------
+  // 4. Index shifting : old index supprimé, nouveau index ajouté
+  // --------------------------------------------------------------------
+  it('retourne l’ancien index à supprimer et le nouveau index à mettre à jour', () => {
+    const prev = [
+      {
+        hypothesis: 'H1',
+        trajectory: { id: 1, type: TRAJECTORY_TYPE.DSR, hasTimeSeries: false },
+        status: TRAJECTORY_SELECTION_STATUS.OK,
+      },
+      {
+        hypothesis: 'H2',
+        trajectory: { id: 2, type: TRAJECTORY_TYPE.DSR, hasTimeSeries: false },
+        status: TRAJECTORY_SELECTION_STATUS.OK,
+      },
+      modulationRow,
+    ] as HypothesisRowData[];
 
-    const { data, computeReadOnly } = computeDsrDataAndReadOnly(prev, nextSortedWithoutLast);
+    const sortedSpecific = [prev[0], prev[1]];
 
-    expect(data).toEqual([]);
-    expect(computeReadOnly({ 0: true, foo: true })).toEqual({ foo: true }); // supprime "0", ne peut pas définir lastIndex
+    const { data, readOnlyPatch, indexesToClear } = computeDsrDataAndReadOnly(prev, sortedSpecific);
+
+    // La modulation doit être en dernière position
+    expect(data).toEqual([prev[0], prev[1], modulationRow]);
+
+    // L’ancien index était 2
+    expect(indexesToClear).toEqual([2]);
+
+    // Le nouveau index est aussi 2
+    expect(readOnlyPatch).toEqual({ 2: true });
+  });
+
+  // --------------------------------------------------------------------
+  // 5. Vérifie que la modulation est toujours la dernière ligne
+  // --------------------------------------------------------------------
+  it('place toujours la modulation en dernière ligne', () => {
+    const prev = [
+      {
+        hypothesis: 'H1',
+        trajectory: { id: 1, type: TRAJECTORY_TYPE.DSR, hasTimeSeries: false },
+        status: TRAJECTORY_SELECTION_STATUS.OK,
+      },
+      modulationRow,
+    ] as HypothesisRowData[];
+
+    const sortedSpecific = [prev[0]];
+
+    const { data } = computeDsrDataAndReadOnly(prev, sortedSpecific);
+
+    expect(data[data.length - 1]).toEqual(modulationRow);
   });
 });
 
@@ -924,6 +972,310 @@ describe('buildHypothesisRows', () => {
       isDefault: false,
       isDeletable: false,
       subRows: null,
+    });
+  });
+});
+
+vi.mock('@/shared/services/trajectoryService.ts', () => ({
+  isParamModulationRequired: vi.fn(),
+}));
+
+vi.mock('@/shared/utils/sortUtils', () => ({
+  sortWithFixedPosition: vi.fn(),
+}));
+
+describe('updateTableAfterRowDeletion', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  // ---------------------------------------------------------------------------
+  // THERMAL
+  // ---------------------------------------------------------------------------
+  describe('THERMAL_TECHNICAL_SPECIFIC_PARAMETER', () => {
+    it('supprime la subRow + remet la modulation à MISSING si deletedModulation = true', async () => {
+      const data = [
+        {
+          subRows: [
+            { hypothesis: 'H1', value: 1 },
+            { hypothesis: 'H2', value: 2 },
+          ],
+        },
+        {
+          status: 'OK',
+          trajectory: { id: 99 },
+        },
+        { foo: 'bar' },
+      ] as HypothesisRowData[];
+
+      vi.mocked(isParamModulationRequired).mockResolvedValue(false);
+
+      const result = await updateTableAfterRowDeletion({
+        type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+        data,
+        hypothesis: 'H1',
+        trajectoryIds: [99, 10], // modulation + specific
+        studyId: 42,
+        horizon: '2030',
+      });
+
+      expect(result.newData).toEqual([
+        {
+          ...data[0],
+          subRows: [{ hypothesis: 'H2', value: 2 }],
+        },
+        {
+          ...data[1],
+          trajectory: null,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+        },
+        data[2],
+      ]);
+
+      expect(result.newReadOnly).toEqual({ '1': true });
+    });
+
+    it('supprime seulement la subRow si deletedModulation = false', async () => {
+      const data = [
+        {
+          subRows: [
+            { hypothesis: 'H1', value: 1 },
+            { hypothesis: 'H2', value: 2 },
+          ],
+        },
+        { hypothesis: 'bar' },
+      ] as HypothesisRowData[];
+
+      vi.mocked(isParamModulationRequired).mockResolvedValue(true);
+
+      const result = await updateTableAfterRowDeletion({
+        type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+        data,
+        hypothesis: 'H1',
+        trajectoryIds: [10], // pas de modulation
+        studyId: 42,
+        horizon: '2030',
+      });
+
+      expect(result.newData).toEqual([
+        {
+          ...data[0],
+          subRows: [{ hypothesis: 'H2', value: 2 }],
+        },
+        data[1],
+      ]);
+
+      expect(result.newReadOnly).toEqual({ '1': false });
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // DSR
+  // ---------------------------------------------------------------------------
+  describe('DSR', () => {
+    it('filtre, trie et applique computeDsrDataAndReadOnly', async () => {
+      const data = [
+        { hypothesis: 'H1' },
+        { hypothesis: 'H2' },
+        { hypothesis: 'MODULATION' }, // last row
+      ] as HypothesisRowData[];
+
+      const sorted = [{ hypothesis: 'H2' }] as HypothesisRowData[];
+
+      vi.mocked(sortUtils.sortWithFixedPosition).mockReturnValue(sorted);
+
+      const result = await updateTableAfterRowDeletion({
+        type: TRAJECTORY_TYPE.DSR,
+        data,
+        hypothesis: 'H1',
+        trajectoryIds: [10],
+        studyId: 42,
+        horizon: '2030',
+      });
+
+      expect(result).toEqual({
+        newData: [
+          { hypothesis: 'H2' },
+          { hypothesis: 'MODULATION' }, // last row
+        ],
+        newReadOnly: { '1': true },
+        indexesToClear: [2],
+      });
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // GENERIC
+  // ---------------------------------------------------------------------------
+  describe('GENERIC', () => {
+    it('filtre et trie les lignes', async () => {
+      const data = [{ hypothesis: 'H1' }, { hypothesis: 'H2' }] as HypothesisRowData[];
+
+      const sorted = [{ hypothesis: 'H2' }] as HypothesisRowData[];
+
+      vi.mocked(sortUtils.sortWithFixedPosition).mockReturnValue(sorted);
+
+      const result = await updateTableAfterRowDeletion({
+        type: TRAJECTORY_TYPE.STS,
+        data,
+        hypothesis: 'H1',
+        trajectoryIds: [10],
+        studyId: 42,
+        horizon: '2030',
+      });
+
+      expect(result).toEqual({ newData: sorted });
+    });
+  });
+});
+
+describe('updateTableAfterCellDetach', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  // ---------------------------------------------------------------------------
+  // THERMAL
+  // ---------------------------------------------------------------------------
+  describe('THERMAL_TECHNICAL_SPECIFIC_PARAMETER', () => {
+    it('détache la cellule + remet la modulation à MISSING si additionalTrajectory est une modulation', async () => {
+      const data = [{ hypothesis: 'H1' }, { hypothesis: 'H2' }, { hypothesis: 'H3' }] as HypothesisRowData[];
+
+      const indexArray = [1];
+
+      const additionalTrajectory = {
+        type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER,
+      } as DbTrajectory;
+
+      const empty = {
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+      };
+
+      const baseData = [{ ...data[0] }, { ...data[1], ...empty }, data[2]];
+
+      vi.mocked(setNestedData).mockReturnValue(['updated'] as unknown as HypothesisRowData[]);
+      vi.mocked(isParamModulationRequired).mockResolvedValue(false);
+
+      const result = await updateTableAfterCellDetach({
+        type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+        data,
+        additionalTrajectory,
+        indexArray,
+        studyId: 42,
+        horizon: '2030',
+      });
+
+      expect(setNestedData).toHaveBeenCalledWith(baseData, indexArray, empty);
+
+      expect(result).toEqual({
+        newData: ['updated'],
+        newReadOnly: { '1': true },
+      });
+    });
+
+    it('détache la cellule sans toucher à la modulation si additionalTrajectory n’est pas une modulation', async () => {
+      const data = [{ hypothesis: 'H1' }, { hypothesis: 'H2' }] as HypothesisRowData[];
+
+      const indexArray = [0];
+
+      const additionalTrajectory = { type: TRAJECTORY_TYPE.LOAD } as DbTrajectory;
+
+      const empty = {
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+      };
+
+      vi.mocked(setNestedData).mockReturnValue(['updated'] as unknown as HypothesisRowData[]);
+      vi.mocked(isParamModulationRequired).mockResolvedValue(true);
+
+      const result = await updateTableAfterCellDetach({
+        type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+        data,
+        additionalTrajectory,
+        indexArray,
+        studyId: 42,
+        horizon: '2030',
+      });
+
+      expect(setNestedData).toHaveBeenCalledWith(data, indexArray, empty);
+
+      expect(result).toEqual({
+        newData: ['updated'],
+        newReadOnly: { '1': false },
+      });
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // DSR
+  // ---------------------------------------------------------------------------
+  describe('DSR', () => {
+    it('met à jour la cellule, trie les spécifiques et applique computeDsrDataAndReadOnly', async () => {
+      const data = [{ hypothesis: 'H1' }, { hypothesis: 'H2' }, { hypothesis: 'MODULATION' }] as HypothesisRowData[];
+
+      const indexArray = [1];
+
+      const empty = {
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+      };
+
+      const updated = ['updated'] as unknown as HypothesisRowData[];
+      const sortedSpecific = ['sorted'] as unknown as HypothesisRowData[];
+
+      vi.mocked(setNestedData).mockReturnValue(updated);
+      vi.mocked(sortUtils.sortWithFixedPosition).mockReturnValue(sortedSpecific);
+
+      const result = await updateTableAfterCellDetach({
+        type: TRAJECTORY_TYPE.DSR,
+        data,
+        additionalTrajectory: null,
+        indexArray,
+        studyId: 42,
+        horizon: '2030',
+      });
+
+      expect(setNestedData).toHaveBeenCalledWith(data, indexArray, empty);
+      expect(sortUtils.sortWithFixedPosition).toHaveBeenCalledWith(updated.slice(0, -1));
+
+      expect(result).toEqual({
+        newData: ['sorted', 'updated'],
+        newReadOnly: { 1: true },
+      });
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // GENERIC
+  // ---------------------------------------------------------------------------
+  describe('GENERIC', () => {
+    it('met à jour la cellule sans logique supplémentaire', async () => {
+      const data = [{ hypothesis: 'H1' }, { hypothesis: 'H2' }] as HypothesisRowData[];
+
+      const indexArray = [0];
+
+      const empty = {
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+      };
+
+      vi.mocked(setNestedData).mockReturnValue(['updated'] as unknown as HypothesisRowData[]);
+
+      const result = await updateTableAfterCellDetach({
+        type: TRAJECTORY_TYPE.STS,
+        data,
+        additionalTrajectory: null,
+        indexArray,
+        studyId: 42,
+        horizon: '2030',
+      });
+
+      expect(setNestedData).toHaveBeenCalledWith(data, indexArray, empty);
+
+      expect(result).toEqual({
+        newData: ['updated'],
+      });
     });
   });
 });

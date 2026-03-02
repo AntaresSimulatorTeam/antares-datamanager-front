@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useCallback, useState } from 'react';
 import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.ts';
 import { uploadTrajectory } from '@/shared/services/trajectoryService.ts';
-import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import {
   FileInputStatus,
@@ -28,7 +28,7 @@ export const useTrajectoryImport = (
   const { t } = useTranslation();
   const { user } = useUser();
 
-  const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch);
+  const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch, setReadOnly);
 
   const importTrajectory = useCallback(
     async (
@@ -59,15 +59,6 @@ export const useTrajectoryImport = (
 
         if (newTrajectory.id != null) {
           await attachTrajectory(type, indexArray, 'success', newTrajectory, setData);
-          type === TRAJECTORY_TYPE.AREA && setReadOnly?.({ '0': false, '1': false });
-          if (type === TRAJECTORY_TYPE.DSR) {
-            const hasSpecificTrajectory =
-              data.some((row) => row.status === TRAJECTORY_SELECTION_STATUS.OK) && newTrajectory.hasTimeSeries;
-            setReadOnly?.((prev) => {
-              const lastIndex = Math.max(Object.keys(prev)?.length - 1, 0);
-              return { ...prev, [lastIndex]: !hasSpecificTrajectory };
-            });
-          }
         }
       } catch (error) {
         setFileStatus('error');

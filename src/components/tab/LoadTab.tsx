@@ -79,7 +79,7 @@ export const LoadTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         setRowToDelete({ index: indexRow, value });
         setIsDeletionModalOpen(true);
       } else {
-        await removeRow(TRAJECTORY_TYPE.LOAD, value, indexRow, data);
+        await removeRow(TRAJECTORY_TYPE.LOAD, indexRow, data, value);
       }
     },
     [data, dispatch, removeRow, setCheckedValues],
@@ -124,14 +124,15 @@ export const LoadTab = ({ defaultAreas, areas, studyData }: TabProps) => {
             setRowToDelete({ index: Number(rowId), value });
             setIsDeletionModalOpen(true);
           } else {
-            void removeRow(TRAJECTORY_TYPE.LOAD, value, Number(rowId), data);
+            void removeRow(TRAJECTORY_TYPE.LOAD, Number(rowId), data, value);
           }
         }}
         updateData={(rowId: string, value: unknown, status: RowStatus) => {
           const index = Number(rowId);
-          const trajectory = data[index]?.trajectory;
+          const row = data[index];
+          const trajectory = row?.trajectory;
           if ((status === 'empty' && trajectory) || (status === 'emptyError' && trajectory)) {
-            void detachTrajectory(TRAJECTORY_TYPE.LOAD, [index], status, trajectory, setData);
+            void detachTrajectory(TRAJECTORY_TYPE.LOAD, [index], setData, data, status, row?.hypothesis);
           } else if (status === 'success') {
             const dbTrajectory = dbTrajectories.find((item) => item.trajectoryName === value) ?? trajectory;
             if (dbTrajectory)
@@ -158,7 +159,7 @@ export const LoadTab = ({ defaultAreas, areas, studyData }: TabProps) => {
           onClose={() => setIsDeletionModalOpen(false)}
           handleDeletionRow={async () => {
             if (rowToDelete?.value) {
-              await removeRow(TRAJECTORY_TYPE.LOAD, rowToDelete?.value, rowToDelete.index, data);
+              await removeRow(TRAJECTORY_TYPE.LOAD, rowToDelete.index, data, rowToDelete?.value);
               setIsDeletionModalOpen(false);
             }
           }}
