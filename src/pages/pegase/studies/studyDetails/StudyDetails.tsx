@@ -62,9 +62,10 @@ const StudyDetails = () => {
     try {
       setIsGenerating(true);
       await generateStudy(studyId);
-      setIsGenerating(false);
       dispatch?.({ type: STUDY_ACTION.SET_STUDY_STATUS, payload: StudyStatus.GENERATED });
     } catch {
+      // Silent handler
+    } finally {
       setIsGenerating(false);
     }
   };

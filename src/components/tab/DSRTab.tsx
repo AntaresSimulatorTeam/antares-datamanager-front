@@ -11,13 +11,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { CheckBoxListWithSearchBar } from '@/components/list/CheckBoxListWithSearchBar.tsx';
 import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import {
-  filterRow,
-  generateReadOnlyIndexMap,
-  getAreaTrajectoryName,
-  shouldDeleteCapacityModulation,
-} from '@/shared/utils/trajectoryUtils.ts';
-import { getCheckedValues, shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
+import { getAreaTrajectoryName, shouldDeleteCapacityModulation } from '@/shared/utils/trajectoryUtils.ts';
+import { shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
@@ -51,11 +46,8 @@ const DSRTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
   const [isDeletionModalOpen, setIsDeletionModalOpen] = useState(false);
-  const [isStudyGenerated, setIsStudyGenerated] = useState(
-    studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED,
-  );
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
-    useFetchHypothesisTrajectories(areas, studyData?.id, TRAJECTORY_TYPE.DSR, defaultAreas, isStudyGenerated);
+    useFetchHypothesisTrajectories(areas, TRAJECTORY_TYPE.DSR, defaultAreas, studyData, studyState.studyStatus);
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch, setReadOnly);
   const { removeRow } = useHypothesisTableRemoveRow(studyData, dispatch, setData, setCheckedValues, setReadOnly);
   const { attachTrajectory } = useTrajectoryAttach(studyData, studyState, dispatch, setReadOnly);
@@ -69,19 +61,7 @@ const DSRTab = ({ defaultAreas, areas, studyData }: TabProps) => {
       setReadOnly(readOnlyRow);
     };
     setHypothesis();
-  }, [hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow]);
-
-  useEffect(() => {
-    if (studyState.studyStatus === StudyStatus.GENERATED) {
-      setIsStudyGenerated(true);
-      const newData = filterRow(data);
-      setData(newData);
-      const newCheckedValues = getCheckedValues(newData, areas, defaultAreas);
-      setCheckedValues(newCheckedValues);
-      const rows = generateReadOnlyIndexMap(newData);
-      setReadOnly(rows);
-    }
-  }, [studyState.studyStatus]);
+  }, [hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow, studyState.studyStatus]);
 
   const handleSelectionChange = useCallback(
     async (value: string, isChecked?: boolean): Promise<void> => {
@@ -109,14 +89,16 @@ const DSRTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         options={areasOptions}
         handleSelectionChange={handleSelectionChange}
         dividerPosition={defaultAreas.length}
-        disabled={false}
+        disabled={studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED}
       />
       <PegaseHypothesisTable
         id="sts-table"
         data={data}
         getTableHeaders={getExpandableHypothesisTableHeaders}
         fileStatus={fileStatus}
-        isStudyGenerated={isStudyGenerated}
+        isStudyGenerated={
+          studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED
+        }
         readOnly={readOnly}
         progress={progress}
         idSelected={String(rowIdSelected)}

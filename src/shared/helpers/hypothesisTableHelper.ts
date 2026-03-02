@@ -1,4 +1,4 @@
-import { DbTrajectory, HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, StudyState, TrajectoryAreaData } from '@/shared/types';
 import {
   buildDefaultEmptyTrajectoryList,
   buildRowWithSubRowsData,
@@ -186,22 +186,33 @@ export const fetchAndNormalizeTrajectories = async ({
   trajType,
   defaultAreas,
   emptyAreaSelected,
+  shouldSkipFetch,
+  studyState,
 }: {
   id: number;
   trajType: TRAJECTORY_TYPE;
   defaultAreas?: { name: string }[];
   emptyAreaSelected: DbTrajectory[];
+  shouldSkipFetch: boolean;
+  studyState: StudyState;
 }) => {
   let result;
   let technologies;
+  const contextTrajectories = studyState?.[trajType]?.trajectories.filter((t) => t.trajectoryName.length > 0) ?? [];
+  let dsrCluster;
   let dsrCmResult = [];
 
   if (trajType === TRAJECTORY_TYPE.DSR) {
-    const types = [TRAJECTORY_TYPE.DSR, TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION];
-    result = await fetchTrajectoriesFromTypes(id, types);
-
-    const dsrCluster = result?.[TRAJECTORY_TYPE.DSR] ?? [];
-    dsrCmResult = result?.[TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION] ?? [];
+    if (!shouldSkipFetch) {
+      const types = [TRAJECTORY_TYPE.DSR, TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION];
+      result = await fetchTrajectoriesFromTypes(id, types);
+      dsrCluster = result?.[TRAJECTORY_TYPE.DSR] ?? [];
+      dsrCmResult = result?.[TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION] ?? [];
+    } else {
+      // 🔄 On récupère les données déjà présentes dans le store
+      dsrCluster = contextTrajectories;
+      dsrCmResult = studyState?.[TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION]?.trajectories ?? [];
+    }
 
     const defaultEmpty = buildDefaultEmptyTrajectoryList(trajType, dsrCluster, defaultAreas);
     const all = [...dsrCluster, ...emptyAreaSelected, ...defaultEmpty];
@@ -214,7 +225,7 @@ export const fetchAndNormalizeTrajectories = async ({
   }
 
   // Other types
-  result = await getStudyTrajectories(id, trajType);
+  result = shouldSkipFetch ? contextTrajectories : await getStudyTrajectories(id, trajType);
 
   if (trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
     const thermalOptions = await getThermalTechnologyList();

@@ -29,13 +29,8 @@ import {
   handleViewTrajectory,
 } from '@/shared/services/hypothesisTableService.ts';
 import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow.ts';
-import {
-  filterRow,
-  generateReadOnlyIndexMap,
-  getAreaTrajectoryName,
-  getRowDataSelected,
-} from '@/shared/utils/trajectoryUtils.ts';
-import { getCheckedValues, shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
+import { getAreaTrajectoryName, getRowDataSelected } from '@/shared/utils/trajectoryUtils.ts';
+import { shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
@@ -62,38 +57,27 @@ export const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [rowToDelete, setRowToDelete] = useState<{ index: number; value?: string } | null>(null);
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
-  const [isStudyGenerated, setIsStudyGenerated] = useState(
-    studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED,
-  );
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow, technologyList } =
-    useFetchHypothesisTrajectories(areas, studyData?.id, TRAJECTORY_TYPE.STS, defaultAreas, isStudyGenerated);
+    useFetchHypothesisTrajectories(areas, TRAJECTORY_TYPE.STS, defaultAreas, studyData, studyState.studyStatus);
   const { removeRow } = useHypothesisTableRemoveRow(studyData, dispatch, setData, setCheckedValues);
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch);
   const { detachTrajectory } = useTrajectoryDetach(studyData, dispatch);
   const { attachTrajectory } = useTrajectoryAttach(studyData, studyState, dispatch);
 
   useEffect(() => {
-    const setHypothesis = () => {
-      areasTrajectoryOptions && setAreasOptions(areasTrajectoryOptions);
-      dropDownListOptions && setCheckedValues(dropDownListOptions);
-      hypothesisTrajectories && setData(hypothesisTrajectories);
-      technologyList && setStsTechnologies(technologyList);
-      setReadOnly(readOnlyRow);
-    };
-    setHypothesis();
-  }, [hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow, technologyList]);
-
-  useEffect(() => {
-    if (studyState.studyStatus === StudyStatus.GENERATED) {
-      setIsStudyGenerated(true);
-      const newData = filterRow(data);
-      setData(newData);
-      const newCheckedValues = getCheckedValues(newData, areas, defaultAreas);
-      setCheckedValues(newCheckedValues);
-      const rows = generateReadOnlyIndexMap(data);
-      setReadOnly(rows);
-    }
-  }, [studyState.studyStatus]);
+    areasTrajectoryOptions && setAreasOptions(areasTrajectoryOptions);
+    dropDownListOptions && setCheckedValues(dropDownListOptions);
+    technologyList && setStsTechnologies(technologyList);
+    hypothesisTrajectories && setData(hypothesisTrajectories);
+    setReadOnly(readOnlyRow);
+  }, [
+    hypothesisTrajectories,
+    areasTrajectoryOptions,
+    dropDownListOptions,
+    readOnlyRow,
+    technologyList,
+    studyState.studyStatus,
+  ]);
 
   const handleSelectionChange = useCallback(
     async (value: string, isChecked: boolean) => {
@@ -117,14 +101,16 @@ export const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         options={areasOptions}
         handleSelectionChange={handleSelectionChange}
         dividerPosition={defaultAreas.length}
-        disabled={isStudyGenerated}
+        disabled={studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED}
       />
       <PegaseHypothesisTable
         id="sts-table"
         data={data}
         getTableHeaders={getExpandableHypothesisTableHeaders}
         fileStatus={fileStatus}
-        isStudyGenerated={isStudyGenerated}
+        isStudyGenerated={
+          studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED
+        }
         readOnly={readOnly}
         progress={progress}
         idSelected={String(rowIdSelected)}
