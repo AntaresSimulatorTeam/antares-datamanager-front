@@ -61,8 +61,6 @@ export const useFetchHypothesisTrajectories = (
           trajType,
           defaultAreas,
           emptyAreaSelected,
-          shouldSkipFetch,
-          studyState,
         });
         // Mise à jour du store
         if (!shouldSkipFetch) {
@@ -120,7 +118,7 @@ export const useFetchHypothesisTrajectories = (
    */
   useEffect(() => {
     studyId != null && void fetchAreas(studyId, trajectoryType);
-  }, [studyId, trajectoryType]);
+  }, [studyId, trajectoryType, studyContextStatus]);
 
   return {
     hypothesisTrajectories,

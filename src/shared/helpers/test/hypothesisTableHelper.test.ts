@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
-import { DbTrajectory, HypothesisRowData, StudyState, TrajectoryAreaData } from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { mockDbTrajectory, mockEmptyDbTrajectoryArrayDSR } from '@/mocks/data/tests/trajectory.mock.ts';
+import { mockDbTrajectory } from '@/mocks/data/tests/trajectory.mock.ts';
 import {
   buildHypothesisRows,
   buildPayload,
@@ -664,7 +664,6 @@ describe('fetchAndNormalizeTrajectories (Vitest)', () => {
   // CASE 1 — DSR
   // ---------------------------------------------------------
   it('should fetch and normalize DSR trajectories including DSR_CM', async () => {
-    const studyState = { ['DSR']: { trajectories: mockEmptyDbTrajectoryArrayDSR } };
     vi.mocked(hypothesisTableService.fetchTrajectoriesFromTypes).mockResolvedValue({
       DSR: [{ id: 1, trajectoryName: 'Cluster1' }] as DbTrajectory[],
       DSR_CAPACITY_MODULATION: [{ id: 2, trajectoryName: 'CM1' }] as DbTrajectory[],
@@ -685,8 +684,6 @@ describe('fetchAndNormalizeTrajectories (Vitest)', () => {
       trajType: TRAJECTORY_TYPE.DSR,
       defaultAreas,
       emptyAreaSelected,
-      shouldSkipFetch: false,
-      studyState,
     });
 
     expect(hypothesisTableService.fetchTrajectoriesFromTypes).toHaveBeenCalledWith(10, [
@@ -709,7 +706,6 @@ describe('fetchAndNormalizeTrajectories (Vitest)', () => {
   // CASE 2 — THERMAL_CAPACITY
   // ---------------------------------------------------------
   it('should fetch thermal trajectories and map technologies', async () => {
-    const studyState = { ['lOAD']: { trajectories: [] } } as StudyState;
     vi.mocked(studyService.getStudyTrajectories).mockResolvedValue([
       { id: 10, trajectoryName: 'T1', technology: 'Gas' },
     ] as DbTrajectory[]);
@@ -731,8 +727,6 @@ describe('fetchAndNormalizeTrajectories (Vitest)', () => {
       trajType: TRAJECTORY_TYPE.THERMAL_CAPACITY,
       defaultAreas,
       emptyAreaSelected,
-      shouldSkipFetch: false,
-      studyState,
     });
 
     expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.THERMAL_CAPACITY);
@@ -752,7 +746,6 @@ describe('fetchAndNormalizeTrajectories (Vitest)', () => {
   // CASE 3 — STS
   // ---------------------------------------------------------
   it('should fetch STS trajectories and use STS technologies', async () => {
-    const studyState = { ['STS']: { trajectories: [] } } as StudyState;
     vi.mocked(studyService.getStudyTrajectories).mockResolvedValue([
       { id: 20, trajectoryName: 'STS1', technology: 'Battery' },
     ] as DbTrajectory[]);
@@ -768,8 +761,6 @@ describe('fetchAndNormalizeTrajectories (Vitest)', () => {
       trajType: TRAJECTORY_TYPE.STS,
       defaultAreas,
       emptyAreaSelected,
-      shouldSkipFetch: false,
-      studyState,
     });
 
     expect(result.trajectories.length).toBe(1);
@@ -781,7 +772,6 @@ describe('fetchAndNormalizeTrajectories (Vitest)', () => {
   // CASE 4 — Generic type
   // ---------------------------------------------------------
   it('should fetch generic trajectories and remove duplicates', async () => {
-    const studyState = { ['LOAD']: { trajectories: [] } } as StudyState;
     vi.mocked(studyService.getStudyTrajectories).mockResolvedValue([{ id: 30, trajectoryName: 'X' }] as DbTrajectory[]);
 
     vi.mocked(trajectoryUtils.buildDefaultEmptyTrajectoryList).mockReturnValue([
@@ -799,8 +789,6 @@ describe('fetchAndNormalizeTrajectories (Vitest)', () => {
       trajType: TRAJECTORY_TYPE.LOAD,
       defaultAreas,
       emptyAreaSelected,
-      shouldSkipFetch: false,
-      studyState,
     });
 
     expect(result).toEqual({
