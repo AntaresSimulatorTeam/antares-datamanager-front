@@ -57,6 +57,10 @@ export const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [rowToDelete, setRowToDelete] = useState<{ index: number; value?: string } | null>(null);
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
+  const { removeRow } = useHypothesisTableRemoveRow(studyData, dispatch, setData, setCheckedValues);
+  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch);
+  const { detachTrajectory } = useTrajectoryDetach(studyData, dispatch);
+  const { attachTrajectory } = useTrajectoryAttach(studyData, studyState, dispatch);
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow, technologyList } =
     useFetchHypothesisTrajectories(
       areas,
@@ -66,10 +70,6 @@ export const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
       studyData?.status,
       studyState.studyStatus,
     );
-  const { removeRow } = useHypothesisTableRemoveRow(studyData, dispatch, setData, setCheckedValues);
-  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch);
-  const { detachTrajectory } = useTrajectoryDetach(studyData, dispatch);
-  const { attachTrajectory } = useTrajectoryAttach(studyData, studyState, dispatch);
 
   useEffect(() => {
     const setStsHypothesis = () => {
@@ -107,20 +107,17 @@ export const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   return (
     <div className="flex min-h-0 w-full gap-6">
       <CheckBoxListWithSearchBar
+        disabled={studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED}
         checkedValues={checkedValues}
         options={areasOptions}
         handleSelectionChange={handleSelectionChange}
         dividerPosition={defaultAreas.length}
-        disabled={studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED}
       />
       <PegaseHypothesisTable
         id="sts-table"
         data={data}
         getTableHeaders={getExpandableHypothesisTableHeaders}
         fileStatus={fileStatus}
-        isStudyGenerated={
-          studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED
-        }
         readOnly={readOnly}
         progress={progress}
         idSelected={String(rowIdSelected)}
@@ -180,6 +177,9 @@ export const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
             void handleViewTrajectory(trajectory, setTrajectoryData, setIsViewModalOpen, t);
           }
         }}
+        isStudyGenerated={
+          studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED
+        }
       />
       {isModalOpen && (
         <ImportTrajectoryModal
