@@ -73,10 +73,10 @@ export const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
 
   useEffect(() => {
     const setStsHypothesis = () => {
-      areasTrajectoryOptions && setAreasOptions(areasTrajectoryOptions);
-      dropDownListOptions && setCheckedValues(dropDownListOptions);
       technologyList && setStsTechnologies(technologyList);
       hypothesisTrajectories && setData(hypothesisTrajectories);
+      areasTrajectoryOptions && setAreasOptions(areasTrajectoryOptions);
+      dropDownListOptions && setCheckedValues(dropDownListOptions);
       setReadOnly(readOnlyRow);
     };
     setStsHypothesis();
