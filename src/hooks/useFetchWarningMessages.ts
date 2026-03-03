@@ -15,7 +15,6 @@ export const useFetchWarningMessages = (studyId: number | null, type: TRAJECTORY
   useEffect(() => {
     const fetchWarningMessages = async (id: number, trajectoryType: TRAJECTORY_TYPE, state: Partial<StudyState>) => {
       const isNotGenerated = state.studyStatus !== StudyStatus.GENERATED;
-      // TODO remove DSR when api ok
       const hasWarningMessage = type !== TRAJECTORY_TYPE.STS && type !== TRAJECTORY_TYPE.DSR;
       const warningMessagesFromType: WarningMessage[] = hasWarningMessage
         ? await fetchWarningMessagesFromType(trajectoryType, id)

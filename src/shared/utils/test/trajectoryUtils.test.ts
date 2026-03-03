@@ -539,7 +539,7 @@ describe('getStudyMenu', () => {
   it('should return correct tab structure when area is not linked', () => {
     const result: HypothesisTab[] = getStudyMenu(mockTranslate, false);
 
-    expect(result.length).toBe(5);
+    expect(result.length).toBe(6);
 
     expect(result[0]).toEqual({
       name: TRAJECTORY_TYPE.AREA,
