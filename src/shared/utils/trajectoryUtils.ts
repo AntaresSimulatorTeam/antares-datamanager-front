@@ -753,6 +753,8 @@ export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE, technology?: st
       return `\\\\DSR\\cluster`;
     case TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION:
       return `\\\\DSR\\capacity modulation`;
+    case TRAJECTORY_TYPE.MISC_CAPACITY:
+      return `\\\\MISC\\installed power`;
     default:
       return null;
   }

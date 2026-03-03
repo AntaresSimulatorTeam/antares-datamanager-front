@@ -814,6 +814,10 @@ describe('getPathFromTrajectoryType', () => {
     expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.STS, 'DSR')).toBe('\\\\STS\\DSR\\clusters');
   });
 
+  it('should return technical path for MISC_CAPACITY type', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.MISC_CAPACITY)).toBe('\\\\MISC\\installed power');
+  });
+
   it('should return technical path for unknown type', () => {
     expect(getPathFromTrajectoryType('UNKNOWN_TYPE' as TRAJECTORY_TYPE)).toBeNull();
   });
@@ -1381,6 +1385,49 @@ describe('filterRow', () => {
     ] as unknown as HypothesisRowData[];
     const result = filterRow(data);
     expect(result).toHaveLength(1);
+  });
+
+  it('devrait transformer un row ERROR en MISSING si des subRows valides existent', () => {
+    const data = [
+      {
+        isDefault: false,
+        isDeletable: true,
+        status: TRAJECTORY_SELECTION_STATUS.ERROR,
+        trajectory: { id: 40 } as DbTrajectory,
+        subRows: [
+          {
+            isDefault: false,
+            isDeletable: true,
+            status: TRAJECTORY_SELECTION_STATUS.OK,
+            trajectory: { id: 1 } as DbTrajectory,
+            subRows: null,
+          },
+          {
+            isDefault: false,
+            isDeletable: true,
+            status: TRAJECTORY_SELECTION_STATUS.ERROR,
+            trajectory: { id: 2 } as DbTrajectory,
+            subRows: null,
+          },
+        ] as HypothesisRowData[],
+      },
+    ] as HypothesisRowData[];
+
+    const result = filterRow(data);
+
+    expect(result).toHaveLength(1);
+
+    const row = result[0];
+
+    // 🔹 Cas 2 : row doit devenir MISSING car il a des subRows valides
+    expect(row.status).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
+    expect(row.trajectory).toBeNull();
+
+    // 🔹 subRows doivent être filtrés :
+    // - sub1 OK → conservé
+    // - sub2 ERROR → transformé en MISSING puis filtré (car pas OK et pas default)
+    expect(row.subRows).toHaveLength(1);
+    expect(row.subRows?.[0].status).toBe(TRAJECTORY_SELECTION_STATUS.OK);
   });
 });
 
