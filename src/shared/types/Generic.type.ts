@@ -87,3 +87,9 @@ export const isTrajectorySubrowsType = (value: unknown): value is TrajectoryWith
   [TRAJECTORY_TYPE.THERMAL_CAPACITY, TRAJECTORY_TYPE.STS].includes(value as TrajectoryWithSubRowsType);
 
 export type TableOperationRow = 'empty' | 'remove';
+
+export interface MenuProps {
+  defaultAreas: { name: string }[];
+  areas: TrajectoryAreaData[];
+  studyData: StudyDTO;
+}
