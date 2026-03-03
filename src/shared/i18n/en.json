@@ -163,6 +163,10 @@
     "@capacityModulation": "Capacity Modulation",
     "@capacityModulationMessage": "At least one area trajectory must be defined in order to complete the \"Capacity modulation\" Trajectory."
   },
+  "misc": {
+    "@installedPower": "Installed Power",
+    "@loadFactor": "Load Factor"
+  },
   "trajectoryViewModal": {
     "@title_area": "Areas",
     "@title_link": "Links",

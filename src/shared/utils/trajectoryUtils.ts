@@ -527,6 +527,7 @@ export const getStudyMenu = (t: (value: string) => string, isTrajectoryAreaLinke
   },
   { name: TRAJECTORY_TYPE.STS, label: t('studyDetails.@sts'), icon: StdIconId.BatteryChargingFull, isDisabled: true },
   { name: TRAJECTORY_TYPE.DSR, label: t('studyDetails.@dsr'), icon: StdIconId.InkEraser, isDisabled: true },
+  { name: TRAJECTORY_TYPE.MISC_CAPACITY, label: t('studyDetails.@misc'), icon: StdIconId.Category, isDisabled: true },
 ];
 
 /**

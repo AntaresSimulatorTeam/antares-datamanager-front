@@ -3,25 +3,27 @@ import StdTabItem from '@common/layout/stdTabs/StdTabItem.tsx';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useTranslation } from 'react-i18next';
 import { ReactNode, useState } from 'react';
-import ThermalCapacityTab from '@/components/tab/ThermalCapacityTab.tsx';
-import { ParametersTab } from '@/components/tab/ParametersTab.tsx';
+import MiscInstalledPowerTab from '@/components/tab/MiscInstalledPowerTab.tsx';
+import MiscLoadFactorTab from '@/components/tab/MiscLoadFactor.tsx';
 import { MenuProps } from '@/shared/types';
 
-export const ThermalMenu = ({ defaultAreas, areas, studyData }: MenuProps) => {
+export const MiscMenu = ({ defaultAreas, areas, studyData }: MenuProps) => {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState<TRAJECTORY_TYPE>(TRAJECTORY_TYPE.THERMAL_CAPACITY);
+  const [activeTab, setActiveTab] = useState<TRAJECTORY_TYPE>(TRAJECTORY_TYPE.MISC_CAPACITY);
   const [activeComponent, setActiveComponent] = useState<ReactNode>(
-    <ThermalCapacityTab defaultAreas={defaultAreas} areas={areas} studyData={studyData} />,
+    <MiscInstalledPowerTab defaultAreas={defaultAreas} areas={areas} studyData={studyData} />,
   );
 
   const renderActiveComponent = (tab: TRAJECTORY_TYPE): void => {
     switch (tab) {
-      case TRAJECTORY_TYPE.THERMAL_PARAMETER:
-        return setActiveComponent(<ParametersTab defaultAreas={defaultAreas} areas={areas} studyData={studyData} />);
-      case TRAJECTORY_TYPE.THERMAL_CAPACITY:
+      case TRAJECTORY_TYPE.MISC_LOAD:
+        return setActiveComponent(
+          <MiscLoadFactorTab defaultAreas={defaultAreas} areas={areas} studyData={studyData} />,
+        );
+      case TRAJECTORY_TYPE.MISC_CAPACITY:
       default:
         return setActiveComponent(
-          <ThermalCapacityTab defaultAreas={defaultAreas} areas={areas} studyData={studyData} />,
+          <MiscInstalledPowerTab defaultAreas={defaultAreas} areas={areas} studyData={studyData} />,
         );
     }
   };
@@ -42,8 +44,8 @@ export const ThermalMenu = ({ defaultAreas, areas, studyData }: MenuProps) => {
           />
         )}
         items={[
-          { name: TRAJECTORY_TYPE.THERMAL_CAPACITY, label: t('thermal.@installedPower') },
-          { name: TRAJECTORY_TYPE.THERMAL_PARAMETER, label: t('thermal.@parameters') },
+          { name: TRAJECTORY_TYPE.MISC_CAPACITY, label: t('misc.@installedPower') },
+          { name: TRAJECTORY_TYPE.MISC_LOAD, label: t('misc.@loadFactor') },
         ]}
       />
       {activeComponent}
