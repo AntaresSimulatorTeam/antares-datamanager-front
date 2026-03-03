@@ -144,7 +144,7 @@ const MiscInstalledPowerTab = ({ defaultAreas, areas, studyData }: TabProps) => 
           onClose={() => setIsDeletionModalOpen(false)}
           handleDeletionRow={async () => {
             if (rowToDelete?.value) {
-              await removeRow(TRAJECTORY_TYPE.LOAD, rowToDelete.index, data, rowToDelete?.value);
+              await removeRow(TRAJECTORY_TYPE.MISC_CAPACITY, rowToDelete.index, data, rowToDelete?.value);
               setIsDeletionModalOpen(false);
             }
           }}
