@@ -44,6 +44,7 @@ export const TRAJECTORY_STS = `${BASE_URL}/v1/trajectory/st-storage`;
 export const TRAJECTORY_DSR_CLUSTER = `${BASE_URL}/v1/trajectory/dsr-cluster`;
 export const TRAJECTORY_DSR_CAPACITY_MODULATION = `${BASE_URL}/v1/trajectory/dsr-capacity-modulation`;
 export const TRAJECTORY_THERMAL_PARAM_MODULATION = `${BASE_URL}/v1/trajectory/param-modulation/check`;
+export const TRAJECTORY_MISC_INSTALLED_POWER = `${BASE_URL}/v1/trajectory/installed-misc`;
 
 //ABOUT
 export const ACTUATOR_ENDPOINT = `${BASE_URL}/actuator/info`;

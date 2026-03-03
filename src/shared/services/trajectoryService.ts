@@ -13,6 +13,7 @@ import {
   TRAJECTORY_ENDPOINT,
   TRAJECTORY_FILE_SYSTEM_ENDPOINT,
   TRAJECTORY_LINK_TO_STUDY_ENDPOINT,
+  TRAJECTORY_MISC_INSTALLED_POWER,
   TRAJECTORY_STS,
   TRAJECTORY_THERMAL_COMMON_PARAMETER_IMPORT,
   TRAJECTORY_THERMAL_COSTS_PARAMETER_IMPORT,
@@ -150,6 +151,8 @@ export const uploadTrajectory = async (
     urlApi = `${TRAJECTORY_DSR_CLUSTER}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
   } else if (trajectoryType === TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION) {
     urlApi = `${TRAJECTORY_DSR_CAPACITY_MODULATION}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
+  } else if (trajectoryType === TRAJECTORY_TYPE.MISC_CAPACITY) {
+    urlApi = `${TRAJECTORY_MISC_INSTALLED_POWER}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   } else {
     urlApi = `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   }
