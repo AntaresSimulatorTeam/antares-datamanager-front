@@ -707,6 +707,19 @@ describe('uploadTrajectory', () => {
       );
     });
   });
+
+  it('should import MISC Load factor trajectory into data base', async () => {
+    await uploadTrajectory(TRAJECTORY_TYPE.MISC_LOAD, 'cluster_battery_PEMMEDB25', '2030-2031', 87, 'AT', onProgress);
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/trajectory/load-factor-misc?area=AT&trajectoryToUse=cluster_battery_PEMMEDB25&horizon=2030-2031&studyId=87',
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
 });
 
 describe('isParamModulationRequired', () => {
