@@ -138,7 +138,7 @@ const getExpandableHypothesisTableHeaders = ({
                 label={t('studyDetails.@preview')}
                 icon={StdIconId.Preview}
                 position="left"
-                disabled={row.getReadOnly() || (!isStudyGenerated && !hasTrajectory)}
+                disabled={(row.getReadOnly() && !hasTrajectory) || (!isStudyGenerated && !hasTrajectory)}
                 onClick={() => void options?.meta?.viewData?.(row.id)}
                 variant="outlined"
                 size="small"

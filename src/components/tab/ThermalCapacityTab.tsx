@@ -9,12 +9,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
-import {
-  filterRow,
-  generateReadOnlyIndexMap,
-  getAreaTrajectoryName,
-  getRowDataSelected,
-} from '@/shared/utils/trajectoryUtils.ts';
+import { getAreaTrajectoryName, getRowDataSelected } from '@/shared/utils/trajectoryUtils.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
@@ -26,7 +21,7 @@ import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
 import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow.ts';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
-import { getCheckedValues, shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
+import { shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
 import { CheckBoxListWithSearchBar } from '@/components/list/CheckBoxListWithSearchBar.tsx';
 
@@ -44,16 +39,14 @@ const ThermalCapacityTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const [rowToDelete, setRowToDelete] = useState<{ index: number; value?: string } | null>(null);
   const [isDeletionModalOpen, setIsDeletionModalOpen] = useState(false);
-  const [isStudyGenerated, setIsStudyGenerated] = useState(
-    studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED,
-  );
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow, technologyList } =
     useFetchHypothesisTrajectories(
       areas,
-      studyData?.id,
       TRAJECTORY_TYPE.THERMAL_CAPACITY,
       defaultAreas,
-      isStudyGenerated,
+      studyData?.id,
+      studyData?.status,
+      studyState.studyStatus,
     );
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch);
   const { attachTrajectory } = useTrajectoryAttach(studyData, studyState, dispatch);
@@ -61,27 +54,19 @@ const ThermalCapacityTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const { detachTrajectory } = useTrajectoryDetach(studyData, dispatch);
 
   useEffect(() => {
-    const setThermalHypothesis = () => {
-      areasTrajectoryOptions && setAreasOptions(areasTrajectoryOptions);
-      dropDownListOptions && setCheckedValues(dropDownListOptions);
-      hypothesisTrajectories && setData(hypothesisTrajectories);
-      technologyList && setInstalledPowerTechnologies(technologyList);
-      setReadOnly(readOnlyRow);
-    };
-    setThermalHypothesis();
-  }, [areasTrajectoryOptions, dropDownListOptions, hypothesisTrajectories, technologyList, readOnlyRow]);
-
-  useEffect(() => {
-    if (studyState.studyStatus === StudyStatus.GENERATED) {
-      setIsStudyGenerated(true);
-      const newData = filterRow(data);
-      setData(newData);
-      const newCheckedValues = getCheckedValues(newData, areas, defaultAreas);
-      setCheckedValues(newCheckedValues);
-      const rows = generateReadOnlyIndexMap(data);
-      setReadOnly(rows);
-    }
-  }, [studyState.studyStatus]);
+    areasTrajectoryOptions && setAreasOptions(areasTrajectoryOptions);
+    dropDownListOptions && setCheckedValues(dropDownListOptions);
+    hypothesisTrajectories && setData(hypothesisTrajectories);
+    technologyList && setInstalledPowerTechnologies(technologyList);
+    setReadOnly(readOnlyRow);
+  }, [
+    areasTrajectoryOptions,
+    dropDownListOptions,
+    hypothesisTrajectories,
+    technologyList,
+    readOnlyRow,
+    studyState.studyStatus,
+  ]);
 
   const handleSelectionChange = useCallback(
     async (value: string, isChecked?: boolean) => {
@@ -102,7 +87,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         await removeRow(TRAJECTORY_TYPE.THERMAL_CAPACITY, indexRow, data, value);
       }
     },
-    [data, dispatch, removeRow, setCheckedValues, setData],
+    [data, dispatch, installedPowerTechnologies, removeRow],
   );
 
   return (
@@ -112,14 +97,16 @@ const ThermalCapacityTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         options={areasOptions}
         handleSelectionChange={handleSelectionChange}
         dividerPosition={defaultAreas.length}
-        disabled={isStudyGenerated}
+        disabled={studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED}
       />
       <PegaseHypothesisTable
         id="thermal-table"
         data={data}
         getTableHeaders={getExpandableHypothesisTableHeaders}
         fileStatus={fileStatus}
-        isStudyGenerated={isStudyGenerated}
+        isStudyGenerated={
+          studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED
+        }
         readOnly={readOnly}
         progress={progress}
         idSelected={rowIdSelected}

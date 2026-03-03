@@ -64,7 +64,6 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
 
   const selectedRowId = Object.keys(rowSelection)[0];
   const selectedStatus = rows[Number.parseInt(selectedRowId || '-1')]?.status?.toUpperCase() as StudyStatus;
-  const isDuplicateActive = selectedStatus === StudyStatus.GENERATED;
   const isDeleteActive = selectedStatus === StudyStatus.ERROR || selectedStatus === StudyStatus.IN_PROGRESS;
 
   const handleDuplicate = () => {
@@ -126,12 +125,7 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
                 onClick={() => void navigateToStudy(rows[Number.parseInt(selectedRowId || '-1')])}
                 variant="outlined"
               />
-              <StdButton
-                label={t('study.@duplicate')}
-                onClick={handleDuplicate}
-                variant="outlined"
-                disabled={!isDuplicateActive}
-              />
+              <StdButton label={t('study.@duplicate')} onClick={handleDuplicate} variant="outlined" />
               <StdButton
                 label={t('study.@delete')}
                 onClick={handleDeleteClick}

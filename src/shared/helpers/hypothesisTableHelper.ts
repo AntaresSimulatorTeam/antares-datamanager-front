@@ -194,13 +194,13 @@ export const fetchAndNormalizeTrajectories = async ({
 }) => {
   let result;
   let technologies;
+  let dsrCluster;
   let dsrCmResult = [];
 
   if (trajType === TRAJECTORY_TYPE.DSR) {
     const types = [TRAJECTORY_TYPE.DSR, TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION];
     result = await fetchTrajectoriesFromTypes(id, types);
-
-    const dsrCluster = result?.[TRAJECTORY_TYPE.DSR] ?? [];
+    dsrCluster = result?.[TRAJECTORY_TYPE.DSR] ?? [];
     dsrCmResult = result?.[TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION] ?? [];
 
     const defaultEmpty = buildDefaultEmptyTrajectoryList(trajType, dsrCluster, defaultAreas);
@@ -226,7 +226,7 @@ export const fetchAndNormalizeTrajectories = async ({
   }
 
   const defaultEmpty = buildDefaultEmptyTrajectoryList(trajType, result, defaultAreas);
-  const all = [...(result || []), ...emptyAreaSelected, ...defaultEmpty];
+  const all = [...(result || []), ...emptyAreaSelected, ...(defaultEmpty || [])];
 
   const trajectories =
     trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY || trajType === TRAJECTORY_TYPE.STS

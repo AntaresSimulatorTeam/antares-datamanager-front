@@ -145,6 +145,17 @@ export const mockDbTrajectoryArrayLoad: DbTrajectory[] = [
     technology: '',
     hasTimeSeries: false,
   },
+  {
+    id: 6,
+    trajectoryName: 'area_PB_2026',
+    type: TRAJECTORY_TYPE.LOAD,
+    version: 3,
+    userName: 'mouad',
+    creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+    area: 'FR',
+    technology: '',
+    hasTimeSeries: false,
+  },
 ];
 
 export const mockDbTrajectoryArrayThermal: DbTrajectory[] = [

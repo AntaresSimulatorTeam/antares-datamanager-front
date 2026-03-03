@@ -824,10 +824,8 @@ export const shouldDeleteCapacityModulation = (rows: HypothesisRowData[], index:
     .map((row, i) => ({ row, i }))
     .filter(({ row }) => row.trajectory?.hasTimeSeries);
 
-  // Vérifier que l'index donné est celui de la dernière trajectoire avec TS
-  const lastTSIndex = tsRows[tsRows.length - 1]?.i;
-
-  return index === lastTSIndex;
+  // Vérifier qu'il n'y a plus qu'une trajectoire avec TS
+  return tsRows.length === 1;
 };
 
 /**

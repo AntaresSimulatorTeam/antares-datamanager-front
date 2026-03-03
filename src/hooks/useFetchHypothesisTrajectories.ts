@@ -12,13 +12,15 @@ import {
 } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { buildCheckListBox, getDefaultAreaNotIncludedInAreaList } from '@/shared/utils/hypothesisTableUtils.ts';
+import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 
 export const useFetchHypothesisTrajectories = (
   areas: TrajectoryAreaData[],
-  studyId?: number,
-  trajectoryType?: TRAJECTORY_TYPE,
-  defaultAreas?: { name: string }[],
-  isStudyGenerated?: boolean,
+  trajectoryType: TRAJECTORY_TYPE,
+  defaultAreas: { name: string }[],
+  studyId: number,
+  studyStatus: StudyStatus,
+  studyContextStatus?: StudyStatus,
 ) => {
   const [hypothesisTrajectories, setHypothesisTrajectories] = useState<HypothesisRowData[]>([]);
   const [areasTrajectoryOptions, setAreasTrajectoryOptions] = useState<CheckBoxData[]>();
@@ -34,13 +36,13 @@ export const useFetchHypothesisTrajectories = (
    * Zones vides déjà présentes dans l’étude (si non générée)
    */
   const emptyAreaSelected = useMemo(() => {
-    if (trajectoryType && !isStudyGenerated) {
+    if (trajectoryType && studyStatus !== StudyStatus.GENERATED) {
       return (
         studyState?.[trajectoryType]?.trajectories?.filter((trajectory) => trajectory?.trajectoryName?.length < 1) ?? []
       );
     }
     return [];
-  }, [isStudyGenerated, trajectoryType]);
+  }, [studyState, studyStatus, trajectoryType]);
 
   /**
    * Fonction principale de récupération + normalisation
@@ -48,18 +50,25 @@ export const useFetchHypothesisTrajectories = (
   const fetchAreas = useCallback(
     async (id: number, trajType: TRAJECTORY_TYPE) => {
       try {
+        const isStudyGenerated = studyContextStatus === StudyStatus.GENERATED || studyStatus === StudyStatus.GENERATED;
+        const contextTrajectories = studyState?.[trajType]?.trajectories ?? [];
+        let shouldSkipFetch = false;
+        if (studyStatus === StudyStatus.GENERATED && contextTrajectories) {
+          shouldSkipFetch = studyStatus === StudyStatus.GENERATED && Boolean(contextTrajectories?.length > 0);
+        }
         const { trajectories, dsrCmResult, technologies } = await fetchAndNormalizeTrajectories({
           id,
           trajType,
           defaultAreas,
           emptyAreaSelected,
         });
-
         // Mise à jour du store
-        dispatch?.({
-          type: STUDY_ACTION.ADD_TRAJECTORIES,
-          payload: buildPayload(trajType, trajectories, dsrCmResult),
-        });
+        if (!shouldSkipFetch) {
+          dispatch?.({
+            type: STUDY_ACTION.ADD_TRAJECTORIES,
+            payload: buildPayload(trajType, trajectories, dsrCmResult ?? []),
+          });
+        }
 
         // Options dropdown + checkbox
         const list = buildCheckListBox(trajectories, areas, defaultAreas);
@@ -101,17 +110,15 @@ export const useFetchHypothesisTrajectories = (
         console.error('fetchAreas error', error);
       }
     },
-    [areas, defaultAreas, emptyAreaSelected, isStudyGenerated, dispatch],
+    [areas, defaultAreas, t, emptyAreaSelected],
   );
 
   /**
    * Déclenchement automatique
    */
   useEffect(() => {
-    if (studyId != null && trajectoryType) {
-      void fetchAreas(studyId, trajectoryType);
-    }
-  }, [studyId, trajectoryType]);
+    studyId != null && void fetchAreas(studyId, trajectoryType);
+  }, [studyId, trajectoryType, studyContextStatus]);
 
   return {
     hypothesisTrajectories,

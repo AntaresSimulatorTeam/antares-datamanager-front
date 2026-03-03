@@ -115,7 +115,7 @@ export const useTrajectoryAttach = (
         }
       }
     },
-    [study?.id, study?.name, studyState, dispatch, setReadOnly, t, user?.profile?.sub],
+    [study.id, study?.horizon, study?.name, studyState, dispatch, setReadOnly, t, user?.profile?.sub],
   );
 
   return { attachTrajectory };
