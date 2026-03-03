@@ -57,7 +57,9 @@ export const useFetchFixHypothesisTrajectories = (
           '1': !results[0]?.length || (!results[1]?.length && options.isStudyGenerated),
         });
       } else if (options.isStudyGenerated) {
-        setReadOnlyRow(buildReadOnlyRow([...dataTrajectories.keys()]));
+        const indexes = [...dataTrajectories.keys()];
+        const onlyRows = buildReadOnlyRow(indexes);
+        setReadOnlyRow(onlyRows);
       }
     } catch {
       // Silent handler
@@ -70,5 +72,7 @@ export const useFetchFixHypothesisTrajectories = (
     }
   }, [studyId]);
 
-  return options.withReadOnlyRow ? { hypothesisTrajectories, readOnlyRow } : { hypothesisTrajectories };
+  return options.withReadOnlyRow || options.isStudyGenerated
+    ? { hypothesisTrajectories, readOnlyRow }
+    : { hypothesisTrajectories };
 };
