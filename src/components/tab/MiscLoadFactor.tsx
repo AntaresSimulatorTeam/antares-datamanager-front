@@ -8,7 +8,6 @@ import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { addRow } from '@/shared/services/hypothesisTableService.ts';
-import { shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow.ts';
 
 const MiscLoadFactorTab = ({ defaultAreas, areas, studyData }: TabProps) => {
@@ -18,8 +17,6 @@ const MiscLoadFactorTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const [data, setData] = useState<HypothesisRowData[]>([]);
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
-  const [_rowToDelete, setRowToDelete] = useState<{ index: number; value?: string } | null>(null);
-  const [_isDeletionModalOpen, setIsDeletionModalOpen] = useState(false);
 
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
     useFetchHypothesisTrajectories(
@@ -47,9 +44,6 @@ const MiscLoadFactorTab = ({ defaultAreas, areas, studyData }: TabProps) => {
       const indexRow = data.findIndex((row) => row.hypothesis === value);
       if (isChecked) {
         addRow(TRAJECTORY_TYPE.MISC_LOAD, value, dispatch, setCheckedValues, setData);
-      } else if (shouldOpenDeletionModal(TRAJECTORY_TYPE.MISC_LOAD, indexRow, data)) {
-        setRowToDelete({ index: indexRow, value });
-        setIsDeletionModalOpen(true);
       } else {
         await removeRow(TRAJECTORY_TYPE.MISC_LOAD, indexRow, data, value);
       }
@@ -75,15 +69,8 @@ const MiscLoadFactorTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         readOnly={readOnly}
         progress={0}
         idSelected={'0'}
-        handleSearch={async (_fileNameContains: string, _rowId: string) => Promise.resolve([])}
-        handleImport={async (_rowId: string) => Promise.resolve()}
         removeRow={(value: string, rowId?: string) => {
-          if (shouldOpenDeletionModal(TRAJECTORY_TYPE.MISC_LOAD, Number(rowId), data)) {
-            setRowToDelete({ index: Number(rowId), value });
-            setIsDeletionModalOpen(true);
-          } else {
-            void removeRow(TRAJECTORY_TYPE.MISC_LOAD, Number(rowId), data, value);
-          }
+          void removeRow(TRAJECTORY_TYPE.MISC_LOAD, Number(rowId), data, value);
         }}
         updateData={(_rowId: string, _value: unknown, _status: RowStatus) => Promise.resolve()}
         isReadOnlyEnable={true}
