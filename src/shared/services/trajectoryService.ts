@@ -127,7 +127,7 @@ export const uploadTrajectory = async (
   studyId: number,
   area: string | undefined,
   onProgress: (progress: number) => void,
-  isCivilYear?: boolean,
+  isCivilYear: boolean = false,
   subArea?: string,
 ): Promise<DbTrajectory> => {
   let urlApi;
@@ -153,7 +153,7 @@ export const uploadTrajectory = async (
   } else if (trajectoryType === TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION) {
     urlApi = `${TRAJECTORY_DSR_CAPACITY_MODULATION}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   } else if (trajectoryType === TRAJECTORY_TYPE.MISC_CAPACITY) {
-    urlApi = `${TRAJECTORY_MISC_INSTALLED_POWER}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
+    urlApi = `${TRAJECTORY_MISC_INSTALLED_POWER}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
   } else if (trajectoryType === TRAJECTORY_TYPE.MISC_LOAD) {
     urlApi = `${TRAJECTORY_MISC_LOAD_FACTOR}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   } else {
