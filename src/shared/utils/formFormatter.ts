@@ -14,7 +14,9 @@ export const convertToSelectionOptionType = (trajectories: DbTrajectory[]): Sele
   }));
 
 export const isRepositoryTrajectory = (type: TRAJECTORY_TYPE) =>
-  type === TRAJECTORY_TYPE.LOAD || type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER;
+  type === TRAJECTORY_TYPE.LOAD ||
+  type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER ||
+  type === TRAJECTORY_TYPE.MISC_LOAD;
 
 export const convertToFSSelectionOptionType = (options: FsTrajectory[]): SelectOption[] =>
   options.map((option, indexTrajectory) => ({
