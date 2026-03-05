@@ -40,10 +40,10 @@ const MiscInstalledPowerTab = ({ defaultAreas, areas, studyData }: TabProps) => 
       studyData?.status,
       studyState.studyStatus,
     );
-  const { removeRow } = useHypothesisTableRemoveRow(studyData, dispatch, setData, setCheckedValues);
-  const { detachTrajectory } = useTrajectoryDetach(studyData, dispatch);
-  const { attachTrajectory } = useTrajectoryAttach(studyData, studyState, dispatch);
-  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch);
+  const { removeRow } = useHypothesisTableRemoveRow(studyData, dispatch, setData, setCheckedValues, setReadOnly);
+  const { detachTrajectory } = useTrajectoryDetach(studyData, dispatch, setReadOnly);
+  const { attachTrajectory } = useTrajectoryAttach(studyData, studyState, dispatch, setReadOnly);
+  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch, setReadOnly);
 
   useEffect(() => {
     const setMiscInstalledPowerHypothesis = () => {
