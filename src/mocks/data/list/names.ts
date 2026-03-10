@@ -223,5 +223,6 @@ export const ThermalOptions = [
 ];
 
 export const STSTechnology = ['Battery', 'DSR', 'EV', 'Pondage', 'PSP'];
+export const RESTechnology = ['Offshore wind', 'Onshore wind', 'Solar PV', 'solar thermo'];
 
 export const Technologies = ThermalOptions.concat(STSTechnology);

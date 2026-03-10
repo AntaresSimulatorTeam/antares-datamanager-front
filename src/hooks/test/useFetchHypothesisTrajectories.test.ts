@@ -8,6 +8,7 @@ import {
   mockDbTrajectory,
   mockDbTrajectoryArrayLoad,
   mockDbTrajectoryArrayThermal,
+  mockDefaultEmptyDbTrajectoryArrayDSR,
   mockEmptyDbTrajectoryArrayDSR,
   mockEmptyDbTrajectoryArrayLoad,
   mockEmptyDbTrajectoryArrayLoadSTS,
@@ -97,7 +98,9 @@ describe('useFetchHypothesisTrajectories', () => {
     vi.mocked(trajectoryUtils.buildDefaultEmptyTrajectoryList).mockImplementation(() => [
       mockEmptyDbTrajectoryLoadOthers,
     ]);
-    const { result } = renderHook(() => useFetchHypothesisTrajectories([], TRAJECTORY_TYPE.LOAD, [], 5, study.status));
+    const { result } = renderHook(() =>
+      useFetchHypothesisTrajectories([], [TRAJECTORY_TYPE.LOAD], [], 5, study.status),
+    );
 
     await waitFor(() => {
       expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.LOAD);
@@ -113,86 +116,88 @@ describe('useFetchHypothesisTrajectories', () => {
           },
         },
       });
-      expect(result.current.hypothesisTrajectories).toEqual([
-        {
-          hypothesis: 'AT',
-          isDefault: false,
-          isDeletable: true,
-          status: TRAJECTORY_SELECTION_STATUS.OK,
-          subRows: null,
-          trajectory: {
-            id: 1,
-            trajectoryName: 'area_PB_2024',
-            type: TRAJECTORY_TYPE.LOAD,
-            version: 3,
-            userName: 'mouad',
-            creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-            area: 'AT',
-            technology: '',
-            hasTimeSeries: false,
+      expect(result.current.hypothesisTrajectories).toEqual({
+        [TRAJECTORY_TYPE.LOAD]: [
+          {
+            hypothesis: 'AT',
+            isDefault: false,
+            isDeletable: true,
+            status: TRAJECTORY_SELECTION_STATUS.OK,
+            subRows: null,
+            trajectory: {
+              id: 1,
+              trajectoryName: 'area_PB_2024',
+              type: TRAJECTORY_TYPE.LOAD,
+              version: 3,
+              userName: 'mouad',
+              creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+              area: 'AT',
+              technology: '',
+              hasTimeSeries: false,
+            },
           },
-        },
-        {
-          hypothesis: 'BE',
-          isDefault: false,
-          isDeletable: true,
-          status: TRAJECTORY_SELECTION_STATUS.OK,
-          subRows: null,
-          trajectory: {
-            id: 2,
-            trajectoryName: 'area_PB_2026',
-            type: TRAJECTORY_TYPE.LOAD,
-            version: 3,
-            userName: 'mouad',
-            creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
-            area: 'BE',
-            technology: '',
-            hasTimeSeries: false,
+          {
+            hypothesis: 'BE',
+            isDefault: false,
+            isDeletable: true,
+            status: TRAJECTORY_SELECTION_STATUS.OK,
+            subRows: null,
+            trajectory: {
+              id: 2,
+              trajectoryName: 'area_PB_2026',
+              type: TRAJECTORY_TYPE.LOAD,
+              version: 3,
+              userName: 'mouad',
+              creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+              area: 'BE',
+              technology: '',
+              hasTimeSeries: false,
+            },
           },
-        },
-        {
-          hypothesis: 'DEkf',
-          isDefault: false,
-          isDeletable: true,
-          status: TRAJECTORY_SELECTION_STATUS.MISSING,
-          subRows: null,
-          trajectory: null,
-        },
-        {
-          hypothesis: 'ES',
-          isDefault: false,
-          isDeletable: true,
-          status: TRAJECTORY_SELECTION_STATUS.MISSING,
-          subRows: null,
-          trajectory: null,
-        },
-        {
-          hypothesis: 'FR',
-          isDefault: false,
-          isDeletable: true,
-          status: TRAJECTORY_SELECTION_STATUS.OK,
-          subRows: null,
-          trajectory: {
-            id: 6,
-            trajectoryName: 'area_PB_2026',
-            type: TRAJECTORY_TYPE.LOAD,
-            version: 3,
-            userName: 'mouad',
-            creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
-            area: 'FR',
-            technology: '',
-            hasTimeSeries: false,
+          {
+            hypothesis: 'DEkf',
+            isDefault: false,
+            isDeletable: true,
+            status: TRAJECTORY_SELECTION_STATUS.MISSING,
+            subRows: null,
+            trajectory: null,
           },
-        },
-        {
-          hypothesis: OTHER_AREAS_LABEL,
-          isDefault: true,
-          isDeletable: false,
-          status: TRAJECTORY_SELECTION_STATUS.MISSING,
-          subRows: null,
-          trajectory: null,
-        },
-      ]);
+          {
+            hypothesis: 'ES',
+            isDefault: false,
+            isDeletable: true,
+            status: TRAJECTORY_SELECTION_STATUS.MISSING,
+            subRows: null,
+            trajectory: null,
+          },
+          {
+            hypothesis: 'FR',
+            isDefault: false,
+            isDeletable: true,
+            status: TRAJECTORY_SELECTION_STATUS.OK,
+            subRows: null,
+            trajectory: {
+              id: 6,
+              trajectoryName: 'area_PB_2026',
+              type: TRAJECTORY_TYPE.LOAD,
+              version: 3,
+              userName: 'mouad',
+              creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+              area: 'FR',
+              technology: '',
+              hasTimeSeries: false,
+            },
+          },
+          {
+            hypothesis: OTHER_AREAS_LABEL,
+            isDefault: true,
+            isDeletable: false,
+            status: TRAJECTORY_SELECTION_STATUS.MISSING,
+            subRows: null,
+            trajectory: null,
+          },
+        ],
+      });
     });
   });
 
@@ -211,7 +216,7 @@ describe('useFetchHypothesisTrajectories', () => {
       mockEmptyDbTrajectoryLoadOthers,
     ]);
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories([], TRAJECTORY_TYPE.LOAD, [{ name: 'FR' }], 5, study.status),
+      useFetchHypothesisTrajectories([], [TRAJECTORY_TYPE.LOAD], [{ name: 'FR' }], 5, study.status),
     );
 
     await waitFor(() => {
@@ -229,86 +234,88 @@ describe('useFetchHypothesisTrajectories', () => {
           },
         },
       });
-      expect(result.current.hypothesisTrajectories).toEqual([
-        {
-          hypothesis: 'FR',
-          isDefault: true,
-          isDeletable: false,
-          status: TRAJECTORY_SELECTION_STATUS.OK,
-          subRows: null,
-          trajectory: {
-            id: 6,
-            trajectoryName: 'area_PB_2026',
-            type: TRAJECTORY_TYPE.LOAD,
-            version: 3,
-            userName: 'mouad',
-            creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
-            area: 'FR',
-            technology: '',
-            hasTimeSeries: false,
+      expect(result.current.hypothesisTrajectories).toEqual({
+        [TRAJECTORY_TYPE.LOAD]: [
+          {
+            hypothesis: 'FR',
+            isDefault: true,
+            isDeletable: false,
+            status: TRAJECTORY_SELECTION_STATUS.OK,
+            subRows: null,
+            trajectory: {
+              id: 6,
+              trajectoryName: 'area_PB_2026',
+              type: TRAJECTORY_TYPE.LOAD,
+              version: 3,
+              userName: 'mouad',
+              creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+              area: 'FR',
+              technology: '',
+              hasTimeSeries: false,
+            },
           },
-        },
-        {
-          hypothesis: 'AT',
-          isDefault: false,
-          isDeletable: true,
-          status: TRAJECTORY_SELECTION_STATUS.OK,
-          subRows: null,
-          trajectory: {
-            id: 1,
-            trajectoryName: 'area_PB_2024',
-            type: TRAJECTORY_TYPE.LOAD,
-            version: 3,
-            userName: 'mouad',
-            creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-            area: 'AT',
-            technology: '',
-            hasTimeSeries: false,
+          {
+            hypothesis: 'AT',
+            isDefault: false,
+            isDeletable: true,
+            status: TRAJECTORY_SELECTION_STATUS.OK,
+            subRows: null,
+            trajectory: {
+              id: 1,
+              trajectoryName: 'area_PB_2024',
+              type: TRAJECTORY_TYPE.LOAD,
+              version: 3,
+              userName: 'mouad',
+              creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+              area: 'AT',
+              technology: '',
+              hasTimeSeries: false,
+            },
           },
-        },
-        {
-          hypothesis: 'BE',
-          isDefault: false,
-          isDeletable: true,
-          status: TRAJECTORY_SELECTION_STATUS.OK,
-          subRows: null,
-          trajectory: {
-            id: 2,
-            trajectoryName: 'area_PB_2026',
-            type: TRAJECTORY_TYPE.LOAD,
-            version: 3,
-            userName: 'mouad',
-            creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
-            area: 'BE',
-            technology: '',
-            hasTimeSeries: false,
+          {
+            hypothesis: 'BE',
+            isDefault: false,
+            isDeletable: true,
+            status: TRAJECTORY_SELECTION_STATUS.OK,
+            subRows: null,
+            trajectory: {
+              id: 2,
+              trajectoryName: 'area_PB_2026',
+              type: TRAJECTORY_TYPE.LOAD,
+              version: 3,
+              userName: 'mouad',
+              creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+              area: 'BE',
+              technology: '',
+              hasTimeSeries: false,
+            },
           },
-        },
-        {
-          hypothesis: 'DEkf',
-          isDefault: false,
-          isDeletable: true,
-          status: TRAJECTORY_SELECTION_STATUS.MISSING,
-          subRows: null,
-          trajectory: null,
-        },
-        {
-          hypothesis: 'ES',
-          isDefault: false,
-          isDeletable: true,
-          status: TRAJECTORY_SELECTION_STATUS.MISSING,
-          subRows: null,
-          trajectory: null,
-        },
-        {
-          hypothesis: OTHER_AREAS_LABEL,
-          isDefault: true,
-          isDeletable: false,
-          status: TRAJECTORY_SELECTION_STATUS.MISSING,
-          subRows: null,
-          trajectory: null,
-        },
-      ]);
+          {
+            hypothesis: 'DEkf',
+            isDefault: false,
+            isDeletable: true,
+            status: TRAJECTORY_SELECTION_STATUS.MISSING,
+            subRows: null,
+            trajectory: null,
+          },
+          {
+            hypothesis: 'ES',
+            isDefault: false,
+            isDeletable: true,
+            status: TRAJECTORY_SELECTION_STATUS.MISSING,
+            subRows: null,
+            trajectory: null,
+          },
+          {
+            hypothesis: OTHER_AREAS_LABEL,
+            isDefault: true,
+            isDeletable: false,
+            status: TRAJECTORY_SELECTION_STATUS.MISSING,
+            subRows: null,
+            trajectory: null,
+          },
+        ],
+      });
     });
   });
 
@@ -329,7 +336,7 @@ describe('useFetchHypothesisTrajectories', () => {
     const { result } = renderHook(() =>
       useFetchHypothesisTrajectories(
         [],
-        TRAJECTORY_TYPE.LOAD,
+        [TRAJECTORY_TYPE.LOAD],
         [{ name: 'FR' }],
         5,
         study.status,
@@ -348,70 +355,72 @@ describe('useFetchHypothesisTrajectories', () => {
           },
         },
       });
-      expect(result.current.hypothesisTrajectories).toEqual([
-        {
-          hypothesis: 'FR',
-          isDefault: true,
-          isDeletable: false,
-          status: TRAJECTORY_SELECTION_STATUS.OK,
-          subRows: null,
-          trajectory: {
-            id: 6,
-            trajectoryName: 'area_PB_2026',
-            type: TRAJECTORY_TYPE.LOAD,
-            version: 3,
-            userName: 'mouad',
-            creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
-            area: 'FR',
-            technology: '',
-            hasTimeSeries: false,
+      expect(result.current.hypothesisTrajectories).toEqual({
+        [TRAJECTORY_TYPE.LOAD]: [
+          {
+            hypothesis: 'FR',
+            isDefault: true,
+            isDeletable: false,
+            status: TRAJECTORY_SELECTION_STATUS.OK,
+            subRows: null,
+            trajectory: {
+              id: 6,
+              trajectoryName: 'area_PB_2026',
+              type: TRAJECTORY_TYPE.LOAD,
+              version: 3,
+              userName: 'mouad',
+              creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+              area: 'FR',
+              technology: '',
+              hasTimeSeries: false,
+            },
           },
-        },
-        {
-          hypothesis: 'AT',
-          isDefault: false,
-          isDeletable: true,
-          status: TRAJECTORY_SELECTION_STATUS.OK,
-          subRows: null,
-          trajectory: {
-            id: 1,
-            trajectoryName: 'area_PB_2024',
-            type: TRAJECTORY_TYPE.LOAD,
-            version: 3,
-            userName: 'mouad',
-            creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-            area: 'AT',
-            technology: '',
-            hasTimeSeries: false,
+          {
+            hypothesis: 'AT',
+            isDefault: false,
+            isDeletable: true,
+            status: TRAJECTORY_SELECTION_STATUS.OK,
+            subRows: null,
+            trajectory: {
+              id: 1,
+              trajectoryName: 'area_PB_2024',
+              type: TRAJECTORY_TYPE.LOAD,
+              version: 3,
+              userName: 'mouad',
+              creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+              area: 'AT',
+              technology: '',
+              hasTimeSeries: false,
+            },
           },
-        },
-        {
-          hypothesis: 'BE',
-          isDefault: false,
-          isDeletable: true,
-          status: TRAJECTORY_SELECTION_STATUS.OK,
-          subRows: null,
-          trajectory: {
-            id: 2,
-            trajectoryName: 'area_PB_2026',
-            type: TRAJECTORY_TYPE.LOAD,
-            version: 3,
-            userName: 'mouad',
-            creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
-            area: 'BE',
-            technology: '',
-            hasTimeSeries: false,
+          {
+            hypothesis: 'BE',
+            isDefault: false,
+            isDeletable: true,
+            status: TRAJECTORY_SELECTION_STATUS.OK,
+            subRows: null,
+            trajectory: {
+              id: 2,
+              trajectoryName: 'area_PB_2026',
+              type: TRAJECTORY_TYPE.LOAD,
+              version: 3,
+              userName: 'mouad',
+              creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+              area: 'BE',
+              technology: '',
+              hasTimeSeries: false,
+            },
           },
-        },
-        {
-          hypothesis: OTHER_AREAS_LABEL,
-          isDefault: true,
-          isDeletable: false,
-          status: TRAJECTORY_SELECTION_STATUS.MISSING,
-          subRows: null,
-          trajectory: null,
-        },
-      ]);
+          {
+            hypothesis: OTHER_AREAS_LABEL,
+            isDefault: true,
+            isDeletable: false,
+            status: TRAJECTORY_SELECTION_STATUS.MISSING,
+            subRows: null,
+            trajectory: null,
+          },
+        ],
+      });
     });
   });
 
@@ -424,7 +433,7 @@ describe('useFetchHypothesisTrajectories', () => {
     const { result } = renderHook(() =>
       useFetchHypothesisTrajectories(
         [],
-        TRAJECTORY_TYPE.LOAD,
+        [TRAJECTORY_TYPE.LOAD],
         [{ name: 'FR' }, { name: 'BE' }],
         5,
         StudyStatus.IN_PROGRESS,
@@ -442,70 +451,72 @@ describe('useFetchHypothesisTrajectories', () => {
           },
         },
       });
-      expect(result.current.hypothesisTrajectories).toEqual([
-        {
-          hypothesis: 'BE',
-          isDefault: true,
-          isDeletable: false,
-          status: TRAJECTORY_SELECTION_STATUS.OK,
-          subRows: null,
-          trajectory: {
-            id: 2,
-            trajectoryName: 'area_PB_2026',
-            type: TRAJECTORY_TYPE.LOAD,
-            version: 3,
-            userName: 'mouad',
-            creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
-            area: 'BE',
-            technology: '',
-            hasTimeSeries: false,
+      expect(result.current.hypothesisTrajectories).toEqual({
+        [TRAJECTORY_TYPE.LOAD]: [
+          {
+            hypothesis: 'BE',
+            isDefault: true,
+            isDeletable: false,
+            status: TRAJECTORY_SELECTION_STATUS.OK,
+            subRows: null,
+            trajectory: {
+              id: 2,
+              trajectoryName: 'area_PB_2026',
+              type: TRAJECTORY_TYPE.LOAD,
+              version: 3,
+              userName: 'mouad',
+              creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+              area: 'BE',
+              technology: '',
+              hasTimeSeries: false,
+            },
           },
-        },
-        {
-          hypothesis: 'FR',
-          isDefault: true,
-          isDeletable: false,
-          status: TRAJECTORY_SELECTION_STATUS.OK,
-          subRows: null,
-          trajectory: {
-            id: 6,
-            trajectoryName: 'area_PB_2026',
-            type: TRAJECTORY_TYPE.LOAD,
-            version: 3,
-            userName: 'mouad',
-            creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
-            area: 'FR',
-            technology: '',
-            hasTimeSeries: false,
+          {
+            hypothesis: 'FR',
+            isDefault: true,
+            isDeletable: false,
+            status: TRAJECTORY_SELECTION_STATUS.OK,
+            subRows: null,
+            trajectory: {
+              id: 6,
+              trajectoryName: 'area_PB_2026',
+              type: TRAJECTORY_TYPE.LOAD,
+              version: 3,
+              userName: 'mouad',
+              creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+              area: 'FR',
+              technology: '',
+              hasTimeSeries: false,
+            },
           },
-        },
-        {
-          hypothesis: 'AT',
-          isDefault: false,
-          isDeletable: true,
-          status: TRAJECTORY_SELECTION_STATUS.OK,
-          subRows: null,
-          trajectory: {
-            id: 1,
-            trajectoryName: 'area_PB_2024',
-            type: TRAJECTORY_TYPE.LOAD,
-            version: 3,
-            userName: 'mouad',
-            creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
-            area: 'AT',
-            technology: '',
-            hasTimeSeries: false,
+          {
+            hypothesis: 'AT',
+            isDefault: false,
+            isDeletable: true,
+            status: TRAJECTORY_SELECTION_STATUS.OK,
+            subRows: null,
+            trajectory: {
+              id: 1,
+              trajectoryName: 'area_PB_2024',
+              type: TRAJECTORY_TYPE.LOAD,
+              version: 3,
+              userName: 'mouad',
+              creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+              area: 'AT',
+              technology: '',
+              hasTimeSeries: false,
+            },
           },
-        },
-        {
-          hypothesis: OTHER_AREAS_LABEL,
-          isDefault: true,
-          isDeletable: false,
-          status: TRAJECTORY_SELECTION_STATUS.MISSING,
-          subRows: null,
-          trajectory: null,
-        },
-      ]);
+          {
+            hypothesis: OTHER_AREAS_LABEL,
+            isDefault: true,
+            isDeletable: false,
+            status: TRAJECTORY_SELECTION_STATUS.MISSING,
+            subRows: null,
+            trajectory: null,
+          },
+        ],
+      });
     });
   });
 
@@ -516,28 +527,33 @@ describe('useFetchHypothesisTrajectories', () => {
     vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArrayLoad);
 
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories(areas, TRAJECTORY_TYPE.LOAD, defaultAreas, 5, StudyStatus.IN_PROGRESS),
+      useFetchHypothesisTrajectories(areas, [TRAJECTORY_TYPE.LOAD], defaultAreas, 5, StudyStatus.IN_PROGRESS),
     );
 
     await waitFor(() => {
-      expect(result.current.areasTrajectoryOptions).toEqual([
-        { name: 'FR', isDefault: true },
-        { name: 'BE', isDefault: true },
-        { name: 'AT', isDefault: false },
-      ]);
+      expect(result.current.areasTrajectoryOptions).toEqual({
+        [TRAJECTORY_TYPE.LOAD]: [
+          { name: 'FR', isDefault: true },
+          { name: 'BE', isDefault: true },
+          { name: 'AT', isDefault: false },
+        ],
+      });
     });
   });
 
   it('should build correct dropDownListOptions from default and fetched trajectories', async () => {
     const defaultAreas = [{ name: 'FR' }];
+    const areas = [{ areaName: 'AT' }, { areaName: 'BE' }] as TrajectoryAreaData[];
     vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArrayLoad);
 
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories([], TRAJECTORY_TYPE.LOAD, defaultAreas, 5, StudyStatus.IN_PROGRESS),
+      useFetchHypothesisTrajectories(areas, [TRAJECTORY_TYPE.LOAD], defaultAreas, 5, StudyStatus.IN_PROGRESS),
     );
 
     await waitFor(() => {
-      expect(result.current.dropDownListOptions).toEqual(expect.arrayContaining(['FR', 'AT', 'BE']));
+      expect(result.current.dropDownListOptions).toEqual({
+        [TRAJECTORY_TYPE.LOAD]: ['FR', 'AT', 'BE', 'OTHERS'],
+      });
     });
   });
 
@@ -554,7 +570,7 @@ describe('useFetchHypothesisTrajectories', () => {
     const { result } = renderHook(() =>
       useFetchHypothesisTrajectories(
         areas,
-        TRAJECTORY_TYPE.LOAD,
+        [TRAJECTORY_TYPE.LOAD],
         defaultAreas,
         5,
         StudyStatus.GENERATED,
@@ -563,7 +579,9 @@ describe('useFetchHypothesisTrajectories', () => {
     );
 
     await waitFor(() => {
-      expect(result.current.readOnlyRow).toEqual({ '0': true, '1': true, '2': true, '3': true });
+      expect(result.current.readOnlyRow).toEqual({
+        [TRAJECTORY_TYPE.LOAD]: { '0': true, '1': true, '2': true },
+      });
     });
   });
 
@@ -582,10 +600,14 @@ describe('useFetchHypothesisTrajectories', () => {
     }));
 
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories([], TRAJECTORY_TYPE.THERMAL_CAPACITY, [], 7, StudyStatus.IN_PROGRESS),
+      useFetchHypothesisTrajectories([], [TRAJECTORY_TYPE.THERMAL_CAPACITY], [], 7, StudyStatus.IN_PROGRESS),
     );
 
-    await waitFor(() => expect(result.current.hypothesisTrajectories[0].subRows).toEqual(technologiesHypothesis));
+    await waitFor(() =>
+      expect(result.current.hypothesisTrajectories?.[TRAJECTORY_TYPE.THERMAL_CAPACITY]?.[0]?.subRows).toEqual(
+        technologiesHypothesis,
+      ),
+    );
   });
 
   it('should include STSTechnology when trajectoryType is STS', async () => {
@@ -610,7 +632,7 @@ describe('useFetchHypothesisTrajectories', () => {
     const { result } = renderHook(() =>
       useFetchHypothesisTrajectories(
         areas,
-        TRAJECTORY_TYPE.STS,
+        [TRAJECTORY_TYPE.STS],
         defaultAreas,
         7,
         StudyStatus.IN_PROGRESS,
@@ -620,7 +642,7 @@ describe('useFetchHypothesisTrajectories', () => {
 
     await waitFor(() => {
       expect(defaultConfigService.getThermalTechnologyList).not.toHaveBeenCalled();
-      expect(result.current.hypothesisTrajectories).toEqual([
+      expect(result.current.hypothesisTrajectories?.[TRAJECTORY_TYPE.STS]).toEqual([
         {
           hypothesis: 'AT',
           isDefault: false,
@@ -658,81 +680,86 @@ describe('useFetchHypothesisTrajectories', () => {
           ['DSR']: { trajectories: mockEmptyDbTrajectoryArrayDSR, warningMessages: [] },
         }) as Partial<StudyState>,
     );
+    vi.mocked(trajectoryUtils.buildDefaultEmptyTrajectoryList).mockImplementationOnce(() => [
+      mockDefaultEmptyDbTrajectoryArrayDSR,
+    ]);
     vi.mocked(studyService.getStudyTrajectories).mockResolvedValue([]);
 
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories(areas, TRAJECTORY_TYPE.DSR, defaultAreas, 5, StudyStatus.IN_PROGRESS),
+      useFetchHypothesisTrajectories(areas, [TRAJECTORY_TYPE.DSR], defaultAreas, 5, StudyStatus.IN_PROGRESS),
     );
 
     await waitFor(() => {
       expect(defaultConfigService.getThermalTechnologyList).not.toHaveBeenCalled();
-      expect(result.current.hypothesisTrajectories).toEqual([
-        {
-          hypothesis: 'AT',
-          isDefault: false,
-          isDeletable: true,
-          status: TRAJECTORY_SELECTION_STATUS.MISSING,
-          subRows: null,
-          trajectory: null,
-        },
-        {
-          hypothesis: 'BE',
-          isDefault: false,
-          isDeletable: true,
-          status: TRAJECTORY_SELECTION_STATUS.MISSING,
-          subRows: null,
-          trajectory: null,
-        },
-        {
-          hypothesis: 'Other areas',
-          isDefault: true,
-          isDeletable: false,
-          status: TRAJECTORY_SELECTION_STATUS.MISSING,
-          subRows: null,
-          trajectory: null,
-        },
-        {
-          hypothesis: 'dsr.@capacityModulation',
-          isDefault: false,
-          isDeletable: false,
-          status: TRAJECTORY_SELECTION_STATUS.MISSING,
-          subRows: null,
-          trajectory: null,
-        },
-      ]);
+      expect(result.current.hypothesisTrajectories).toEqual({
+        [TRAJECTORY_TYPE.DSR]: [
+          {
+            hypothesis: 'AT',
+            isDefault: false,
+            isDeletable: true,
+            status: TRAJECTORY_SELECTION_STATUS.MISSING,
+            subRows: null,
+            trajectory: null,
+          },
+          {
+            hypothesis: 'BE',
+            isDefault: false,
+            isDeletable: true,
+            status: TRAJECTORY_SELECTION_STATUS.MISSING,
+            subRows: null,
+            trajectory: null,
+          },
+          {
+            hypothesis: 'Other areas',
+            isDefault: true,
+            isDeletable: false,
+            status: TRAJECTORY_SELECTION_STATUS.MISSING,
+            subRows: null,
+            trajectory: null,
+          },
+          {
+            hypothesis: 'dsr.@capacityModulation',
+            isDefault: false,
+            isDeletable: false,
+            status: TRAJECTORY_SELECTION_STATUS.MISSING,
+            subRows: null,
+            trajectory: null,
+          },
+        ],
+      });
     });
   });
 
   it('should not call api if only study id is provided', async () => {
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories([], TRAJECTORY_TYPE.DSR, [], 5, StudyStatus.IN_PROGRESS),
+      useFetchHypothesisTrajectories([], [TRAJECTORY_TYPE.DSR], [], 5, StudyStatus.IN_PROGRESS),
     );
 
     await waitFor(() => {
       expect(studyService.getStudyTrajectories).toHaveBeenCalledTimes(0);
-      expect(result.current.hypothesisTrajectories).toEqual([]);
+      expect(result.current.hypothesisTrajectories?.[TRAJECTORY_TYPE.DSR]).toBeUndefined();
     });
   });
 
   it('should not call api when no arguments area provided', async () => {
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories([], TRAJECTORY_TYPE.DSR, [], 5, StudyStatus.IN_PROGRESS),
+      useFetchHypothesisTrajectories([], [TRAJECTORY_TYPE.DSR], [], 5, StudyStatus.IN_PROGRESS),
     );
 
     await waitFor(() => {
       expect(studyService.getStudyTrajectories).toHaveBeenCalledTimes(0);
-      expect(result.current.hypothesisTrajectories).toEqual([]);
+      expect(result.current.hypothesisTrajectories?.[TRAJECTORY_TYPE.DSR]).toBeUndefined();
     });
   });
 
   it('should throw error when api call throw an exception', async () => {
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories([], TRAJECTORY_TYPE.DSR, [], 5, StudyStatus.IN_PROGRESS),
+      useFetchHypothesisTrajectories([], [TRAJECTORY_TYPE.DSR], [], 5, StudyStatus.IN_PROGRESS),
     );
 
     await waitFor(() => {
       expect(studyService.getStudyTrajectories).toHaveBeenCalledTimes(0);
-      expect(result.current.hypothesisTrajectories).toEqual([]);
+      expect(result.current.hypothesisTrajectories?.[TRAJECTORY_TYPE.DSR]).toBeUndefined();
     });
   });
 });

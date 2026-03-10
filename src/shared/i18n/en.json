@@ -115,7 +115,7 @@
     "@areas_links": "Areas & Links",
     "@load": "Load",
     "@thermal": "Thermal",
-    "@enr": "ENR",
+    "@res": "RES",
     "@misc": "Misc",
     "@sts": "STS",
     "@dsr": "DSR",
@@ -166,6 +166,11 @@
   "misc": {
     "@installedPower": "Installed Power",
     "@loadFactor": "Load Factor"
+  },
+  "res": {
+    "@distribution": "Distribution",
+    "@zonalDistribution": "Zonal Distribution",
+    "@technologyDistribution": "Technology Distribution"
   },
   "trajectoryViewModal": {
     "@title_area": "Areas",

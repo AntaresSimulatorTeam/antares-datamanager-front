@@ -35,7 +35,7 @@ const MiscLoadFactorTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
     useFetchHypothesisTrajectories(
       areas,
-      TRAJECTORY_TYPE.MISC_LOAD,
+      [TRAJECTORY_TYPE.MISC_LOAD],
       defaultAreas,
       studyData?.id,
       studyData?.status,
@@ -47,13 +47,20 @@ const MiscLoadFactorTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch);
 
   useEffect(() => {
-    const setMiscLoadHypothesis = () => {
-      areasTrajectoryOptions && setAreasOptions(areasTrajectoryOptions);
-      dropDownListOptions && setCheckedValues(dropDownListOptions);
-      hypothesisTrajectories && setData(hypothesisTrajectories);
-      setReadOnly(readOnlyRow);
-    };
-    setMiscLoadHypothesis();
+    const mapping = [
+      [areasTrajectoryOptions, setAreasOptions],
+      [dropDownListOptions, setCheckedValues],
+      [hypothesisTrajectories, setData],
+      [readOnlyRow, setReadOnly],
+    ] as const;
+
+    mapping.forEach(([record, setter]) => {
+      const value = record?.[TRAJECTORY_TYPE.MISC_LOAD];
+      if (value !== undefined) {
+        // @ts-ignore
+        setter(value);
+      }
+    });
   }, [hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow, studyState.studyStatus]);
 
   const handleSelectionChange = useCallback(

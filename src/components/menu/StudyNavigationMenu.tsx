@@ -21,6 +21,7 @@ import { ThermalMenu } from '@/components/menu/ThermalMenu.tsx';
 import { STSTab } from '@/components/tab/STSTab.tsx';
 import DSRTab from '@/components/tab/DSRTab.tsx';
 import { MiscMenu } from '@/components/menu/MiscMenu.tsx';
+import { ResMenu } from '@/components/menu/ResMenu.tsx';
 
 type StudyNavigationMenuProps = {
   onRenderActiveComponent?: (content: ReactNode | null) => void;
@@ -57,6 +58,8 @@ const StudyNavigationMenu = ({
         return <DSRTab defaultAreas={areaDefault} areas={trajectoryAreas} studyData={studyData} />;
       case TRAJECTORY_TYPE.MISC_CAPACITY:
         return <MiscMenu defaultAreas={areaDefault} areas={trajectoryAreas} studyData={studyData} />;
+      case TRAJECTORY_TYPE.RES_CAPACITY:
+        return <ResMenu defaultAreas={areaDefault} areas={trajectoryAreas} studyData={studyData} />;
       default:
         return <AreaLinkTab setErrorMessage={setErrorMessage} studyData={studyData} />;
     }

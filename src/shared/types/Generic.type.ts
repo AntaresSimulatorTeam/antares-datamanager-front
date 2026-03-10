@@ -84,7 +84,21 @@ export interface TableHeadersGetterProps extends TableHeadersProps {
 }
 
 export const isTrajectorySubrowsType = (value: unknown): value is TrajectoryWithSubRowsType =>
-  [TRAJECTORY_TYPE.THERMAL_CAPACITY, TRAJECTORY_TYPE.STS].includes(value as TrajectoryWithSubRowsType);
+  [
+    TRAJECTORY_TYPE.THERMAL_CAPACITY,
+    TRAJECTORY_TYPE.STS,
+    TRAJECTORY_TYPE.RES_CAPACITY,
+    TRAJECTORY_TYPE.RES_LOAD,
+    TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION,
+  ].includes(value as TrajectoryWithSubRowsType);
+
+export const isTrajectoryResType = (value: unknown): value is TrajectoryWithSubRowsType =>
+  [
+    TRAJECTORY_TYPE.RES_CAPACITY,
+    TRAJECTORY_TYPE.RES_LOAD,
+    TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION,
+    TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION,
+  ].includes(value as TrajectoryWithSubRowsType);
 
 export type TableOperationRow = 'empty' | 'remove';
 
