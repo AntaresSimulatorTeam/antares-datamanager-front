@@ -7,6 +7,9 @@ import * as defaultConfigService from '@/shared/services/defaultConfigService.ts
 import {
   mockDbTrajectory,
   mockDbTrajectoryArrayLoad,
+  mockDbTrajectoryArrayResCapacity,
+  mockDbTrajectoryArrayResDistribution,
+  mockDbTrajectoryArrayResLoad,
   mockDbTrajectoryArrayThermal,
   mockDefaultEmptyDbTrajectoryArrayDSR,
   mockEmptyDbTrajectoryArrayDSR,
@@ -20,7 +23,7 @@ import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
 import * as trajectoryUtils from '@/shared/utils/trajectoryUtils.ts';
 import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
-import { STSTechnology, ThermalOptions } from '@/mocks/data/list/names.ts';
+import { RESTechnology, STSTechnology, ThermalOptions } from '@/mocks/data/list/names.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 
 vi.mock('@/shared/services/trajectoryService');
@@ -727,6 +730,79 @@ describe('useFetchHypothesisTrajectories', () => {
           },
         ],
       });
+    });
+  });
+
+  it.skip('should include ResOptions when trajectoryType is RES_CAPACITY', async () => {
+    const defaultAreas = [{ name: 'FR' }];
+    const areas = [{ areaName: 'AT' }, { areaName: 'BE' }] as TrajectoryAreaData[];
+    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArrayResCapacity);
+    const technologiesHypothesis = RESTechnology.map((option) => ({
+      hypothesis: option,
+      isDefault: false,
+      isDeletable: false,
+      status: TRAJECTORY_SELECTION_STATUS.MISSING,
+      subRows: null,
+      trajectory: null,
+    }));
+
+    const { result } = renderHook(() =>
+      useFetchHypothesisTrajectories(areas, [TRAJECTORY_TYPE.RES_CAPACITY], defaultAreas, 7, StudyStatus.IN_PROGRESS),
+    );
+
+    await waitFor(() => {
+      expect(result.current.hypothesisTrajectories?.[TRAJECTORY_TYPE.RES_CAPACITY]?.[0]?.subRows).toEqual(
+        technologiesHypothesis,
+      );
+    });
+  });
+
+  it.skip('should include ResOptions when trajectoryType is RES_LOAD', async () => {
+    const defaultAreas = [{ name: 'FR' }];
+    const areas = [{ areaName: 'AT' }, { areaName: 'BE' }] as TrajectoryAreaData[];
+    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArrayResLoad);
+    const technologiesHypothesis = RESTechnology.map((option) => ({
+      hypothesis: option,
+      isDefault: false,
+      isDeletable: false,
+      status: TRAJECTORY_SELECTION_STATUS.MISSING,
+      subRows: null,
+      trajectory: null,
+    }));
+
+    const { result } = renderHook(() =>
+      useFetchHypothesisTrajectories(areas, [TRAJECTORY_TYPE.RES_LOAD], defaultAreas, 7, StudyStatus.IN_PROGRESS),
+    );
+
+    await waitFor(() => {
+      expect(result.current.hypothesisTrajectories?.[TRAJECTORY_TYPE.RES_LOAD]?.[0]?.subRows).toEqual(
+        technologiesHypothesis,
+      );
+    });
+  });
+
+  it.skip('should include ResOptions when trajectoryTypes are RES_ZONAL_DISTRIBUTION and RES_TECHNOLOGY_DISTRIBUTION', async () => {
+    const defaultAreas = [{ name: 'FR' }];
+    const areas = [{ areaName: 'AT' }, { areaName: 'BE' }] as TrajectoryAreaData[];
+    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArrayResDistribution);
+
+    const { result } = renderHook(() =>
+      useFetchHypothesisTrajectories(
+        areas,
+        [TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION, TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION],
+        defaultAreas,
+        7,
+        StudyStatus.IN_PROGRESS,
+      ),
+    );
+
+    await waitFor(() => {
+      expect(result.current.hypothesisTrajectories?.[TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION]).toEqual(
+        mockDbTrajectoryArrayResDistribution[0],
+      );
+      expect(result.current.hypothesisTrajectories?.[TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION]).toEqual(
+        mockDbTrajectoryArrayResDistribution[1],
+      );
     });
   });
 

@@ -465,10 +465,3 @@ export const updateTableAfterCellDetach = async ({
   const newData = setNestedData(data, indexArray, empty);
   return { newData };
 };
-
-export const applyIfExists = <T>(record: Record<string, T> | undefined, type: string, setter: (value: T) => void) => {
-  const value = record?.[type];
-  if (value !== undefined) {
-    setter(value);
-  }
-};

@@ -183,6 +183,81 @@ export const mockDbTrajectoryArrayThermal: DbTrajectory[] = [
   },
 ];
 
+export const mockDbTrajectoryArrayResDistribution: DbTrajectory[] = [
+  {
+    id: 1,
+    trajectoryName: 'area_PB_2024',
+    type: TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION,
+    version: 3,
+    userName: 'mouad',
+    creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+    area: 'AT',
+    technology: '',
+    hasTimeSeries: false,
+  },
+  {
+    id: 2,
+    trajectoryName: 'area_PB_2026',
+    type: TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION,
+    version: 3,
+    userName: 'mouad',
+    creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+    area: 'BE',
+    technology: '',
+    hasTimeSeries: false,
+  },
+];
+
+export const mockDbTrajectoryArrayResLoad: DbTrajectory[] = [
+  {
+    id: 1,
+    trajectoryName: 'area_PB_2024',
+    type: TRAJECTORY_TYPE.RES_CAPACITY,
+    version: 3,
+    userName: 'mouad',
+    creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+    area: 'AT',
+    technology: '',
+    hasTimeSeries: false,
+  },
+  {
+    id: 2,
+    trajectoryName: 'area_PB_2026',
+    type: TRAJECTORY_TYPE.RES_CAPACITY,
+    version: 3,
+    userName: 'mouad',
+    creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+    area: 'BE',
+    technology: '',
+    hasTimeSeries: false,
+  },
+];
+
+export const mockDbTrajectoryArrayResCapacity: DbTrajectory[] = [
+  {
+    id: 1,
+    trajectoryName: 'area_PB_2024',
+    type: TRAJECTORY_TYPE.RES_CAPACITY,
+    version: 3,
+    userName: 'mouad',
+    creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+    area: 'AT',
+    technology: '',
+    hasTimeSeries: false,
+  },
+  {
+    id: 2,
+    trajectoryName: 'area_PB_2026',
+    type: TRAJECTORY_TYPE.RES_CAPACITY,
+    version: 3,
+    userName: 'mouad',
+    creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+    area: 'BE',
+    technology: '',
+    hasTimeSeries: false,
+  },
+];
+
 export const mockEmptyDbTrajectoryArrayLoadSTS: DbTrajectory[] = [
   {
     id: 1,
