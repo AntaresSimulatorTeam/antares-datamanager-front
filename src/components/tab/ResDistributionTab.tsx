@@ -21,6 +21,7 @@ import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
 import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
 import { useTranslation } from 'react-i18next';
+import getEditableHypothesisTableHeaders from '@/components/header/EditableHypothesisTableHeaders.tsx';
 
 const ResDistributionTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const studyState = useStudy();
@@ -49,23 +50,14 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const { detachTrajectory } = useTrajectoryDetach(studyData, dispatch);
 
   useEffect(() => {
-    const mapping = [
-      [hypothesisTrajectories, setData],
-      [hypothesisTrajectories, setTechnologyData],
-      [readOnlyRow, setReadOnly],
-    ] as const;
-
-    types.forEach((type) => {
-      mapping.forEach(([record, setter]) => {
-        const value = record?.[type];
-        if (value !== undefined) {
-          // @ts-ignore
-          setter(value);
-        }
-      });
-    });
-    const resTechnologies = technologyList?.[TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION];
+    const zonalData = hypothesisTrajectories?.[TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION];
+    zonalData && setData(zonalData);
+    const technologyResData = hypothesisTrajectories?.[TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION];
+    technologyResData && setTechnologyData(technologyResData);
+    const resTechnologies = technologyList?.[TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION];
     resTechnologies && setTechnologies(resTechnologies);
+    const resReadOnly = readOnlyRow?.[TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION];
+    resReadOnly && setReadOnly(resReadOnly);
   }, [hypothesisTrajectories, technologyList, readOnlyRow, studyState.studyStatus]);
 
   return (
@@ -74,7 +66,7 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         id="zonal-distribution-table"
         columnHeader={t('res.@zonalDistribution')}
         data={data}
-        getTableHeaders={getExpandableHypothesisTableHeaders}
+        getTableHeaders={getEditableHypothesisTableHeaders}
         fileStatus={fileStatus}
         isStudyGenerated={
           studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED
