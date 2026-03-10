@@ -1190,6 +1190,11 @@ describe('shouldHaveSubRows', () => {
     expect(shouldHaveSubRows(excludedAreas, entry)).toBe(false);
   });
 
+  it('returns false for non-thermal in excluded area', () => {
+    const entry = { type: 'RES_ZONAL_DISTRIBUTION', area: 'AREA_1' } as DbTrajectory;
+    expect(shouldHaveSubRows(excludedAreas, entry)).toBe(false);
+  });
+
   it('returns true when mainEntry is undefined', () => {
     expect(shouldHaveSubRows(excludedAreas, undefined)).toBe(true);
   });
