@@ -818,6 +818,10 @@ describe('getPathFromTrajectoryType', () => {
     expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.MISC_CAPACITY)).toBe('\\\\MISC\\installed power');
   });
 
+  it('should return technical path for MISC_LOAD type', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.MISC_LOAD)).toBe('\\\\MISC\\load factor');
+  });
+
   it('should return technical path for unknown type', () => {
     expect(getPathFromTrajectoryType('UNKNOWN_TYPE' as TRAJECTORY_TYPE)).toBeNull();
   });
