@@ -814,6 +814,14 @@ describe('getPathFromTrajectoryType', () => {
     expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.STS, 'DSR')).toBe('\\\\STS\\DSR\\clusters');
   });
 
+  it('should return technical path for DSR type', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.DSR)).toBe('\\\\DSR\\cluster');
+  });
+
+  it('should return technical path for DSR_CAPACITY_MODULATION type', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION)).toBe('\\\\DSR\\capacity modulation');
+  });
+
   it('should return technical path for MISC_CAPACITY type', () => {
     expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.MISC_CAPACITY)).toBe('\\\\MISC\\installed power');
   });
