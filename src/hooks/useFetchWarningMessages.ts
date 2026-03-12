@@ -15,7 +15,11 @@ export const useFetchWarningMessages = (studyId: number | null, type: TRAJECTORY
   useEffect(() => {
     const fetchWarningMessages = async (id: number, trajectoryType: TRAJECTORY_TYPE, state: Partial<StudyState>) => {
       const isNotGenerated = state.studyStatus !== StudyStatus.GENERATED;
-      const hasWarningMessage = type !== TRAJECTORY_TYPE.STS && type !== TRAJECTORY_TYPE.DSR;
+      const hasWarningMessage =
+        type !== TRAJECTORY_TYPE.STS &&
+        type !== TRAJECTORY_TYPE.DSR &&
+        type !== TRAJECTORY_TYPE.RES_CAPACITY &&
+        type !== TRAJECTORY_TYPE.RES_LOAD;
       const warningMessagesFromType: WarningMessage[] = hasWarningMessage
         ? await fetchWarningMessagesFromType(trajectoryType, id)
         : [];

@@ -25,7 +25,7 @@ import { shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.
 import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
 import { CheckBoxListWithSearchBar } from '@/components/list/CheckBoxListWithSearchBar.tsx';
 
-const ThermalCapacityTab = ({ defaultAreas, areas, studyData }: TabProps) => {
+const ExpandableTab = ({ defaultAreas, areas, studyData, type }: TabProps & { type: TRAJECTORY_TYPE }) => {
   const studyState = useStudy();
   const dispatch = useStudyDispatch();
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
@@ -42,7 +42,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow, technologyList } =
     useFetchHypothesisTrajectories(
       areas,
-      TRAJECTORY_TYPE.THERMAL_CAPACITY,
+      [type],
       defaultAreas,
       studyData?.id,
       studyData?.status,
@@ -54,11 +54,21 @@ const ThermalCapacityTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const { detachTrajectory } = useTrajectoryDetach(studyData, dispatch);
 
   useEffect(() => {
-    areasTrajectoryOptions && setAreasOptions(areasTrajectoryOptions);
-    dropDownListOptions && setCheckedValues(dropDownListOptions);
-    hypothesisTrajectories && setData(hypothesisTrajectories);
-    technologyList && setInstalledPowerTechnologies(technologyList);
-    setReadOnly(readOnlyRow);
+    const mapping = [
+      [areasTrajectoryOptions, setAreasOptions],
+      [dropDownListOptions, setCheckedValues],
+      [technologyList, setInstalledPowerTechnologies],
+      [hypothesisTrajectories, setData],
+      [readOnlyRow, setReadOnly],
+    ] as const;
+
+    mapping.forEach(([record, setter]) => {
+      const value = record?.[type];
+      if (value !== undefined) {
+        // @ts-ignore
+        setter(value);
+      }
+    });
   }, [
     areasTrajectoryOptions,
     dropDownListOptions,
@@ -66,28 +76,22 @@ const ThermalCapacityTab = ({ defaultAreas, areas, studyData }: TabProps) => {
     technologyList,
     readOnlyRow,
     studyState.studyStatus,
+    type,
   ]);
 
   const handleSelectionChange = useCallback(
     async (value: string, isChecked?: boolean) => {
       const indexRow = data.findIndex((row) => row.hypothesis === value);
       if (isChecked) {
-        addRow(
-          TRAJECTORY_TYPE.THERMAL_CAPACITY,
-          value,
-          dispatch,
-          setCheckedValues,
-          setData,
-          installedPowerTechnologies,
-        );
-      } else if (shouldOpenDeletionModal(TRAJECTORY_TYPE.THERMAL_CAPACITY, indexRow, data)) {
+        addRow(type, value, dispatch, setCheckedValues, setData, installedPowerTechnologies);
+      } else if (shouldOpenDeletionModal(type, indexRow, data)) {
         setRowToDelete({ index: indexRow, value });
         setIsDeletionModalOpen(true);
       } else {
-        await removeRow(TRAJECTORY_TYPE.THERMAL_CAPACITY, indexRow, data, value);
+        await removeRow(type, indexRow, data, value);
       }
     },
-    [data, dispatch, installedPowerTechnologies, removeRow],
+    [data, dispatch, installedPowerTechnologies, removeRow, type],
   );
 
   return (
@@ -110,13 +114,13 @@ const ThermalCapacityTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         readOnly={readOnly}
         progress={progress}
         idSelected={rowIdSelected}
-        type={TRAJECTORY_TYPE.THERMAL_CAPACITY}
+        type={type}
         list={installedPowerTechnologies}
         handleSearch={async (fileNameContains: string, rowId: string) => {
           const indexArray = rowId.split('.').map(Number);
           const technology =
             indexArray?.length > 1 ? data[indexArray[0]]?.subRows?.[indexArray[1]]?.hypothesis : undefined;
-          return await handleTrajectorySearch(TRAJECTORY_TYPE.THERMAL_CAPACITY, setDbTrajectories, studyData?.horizon, {
+          return await handleTrajectorySearch(type, setDbTrajectories, studyData?.horizon, {
             area: data[indexArray[0]]?.hypothesis,
             technology,
             fileNameContains,
@@ -125,7 +129,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         handleImport={async (rowId: string) => {
           const indexArray = rowId.split('.').map(Number);
           await handleFetchTrajectoriesFS(
-            TRAJECTORY_TYPE.THERMAL_CAPACITY,
+            type,
             rowId,
             setOptionsFS,
             setRowIdSelected,
@@ -139,14 +143,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas, studyData }: TabProps) => {
           if (status === 'empty' || status === 'emptyError') {
             const row = getRowDataSelected(data, indexArray) ?? null;
             if (row) {
-              void detachTrajectory(
-                TRAJECTORY_TYPE.THERMAL_CAPACITY,
-                indexArray,
-                setData,
-                data,
-                status,
-                row?.hypothesis,
-              );
+              void detachTrajectory(type, indexArray, setData, data, status, row?.hypothesis);
             }
           } else if (status === 'success') {
             const dbTrajectory =
@@ -154,16 +151,16 @@ const ThermalCapacityTab = ({ defaultAreas, areas, studyData }: TabProps) => {
                 ? dbTrajectories.find((item) => item.id === value)
                 : getRowDataSelected(data, indexArray)?.trajectory;
             if (dbTrajectory) {
-              void attachTrajectory(TRAJECTORY_TYPE.THERMAL_CAPACITY, indexArray, status, dbTrajectory, setData);
+              void attachTrajectory(type, indexArray, status, dbTrajectory, setData);
             }
           }
         }}
         removeRow={(value: string, rowId?: string) => {
-          if (shouldOpenDeletionModal(TRAJECTORY_TYPE.THERMAL_CAPACITY, Number(rowId), data)) {
+          if (shouldOpenDeletionModal(type, Number(rowId), data)) {
             setRowToDelete({ index: Number(rowId), value });
             setIsDeletionModalOpen(true);
           } else {
-            void removeRow(TRAJECTORY_TYPE.THERMAL_CAPACITY, Number(rowId), data, value);
+            void removeRow(type, Number(rowId), data, value);
           }
         }}
       />
@@ -174,10 +171,10 @@ const ThermalCapacityTab = ({ defaultAreas, areas, studyData }: TabProps) => {
             toggleModal();
             if (value != null) {
               const indexArray = rowIdSelected.split('.').map(Number);
-              await importTrajectory(TRAJECTORY_TYPE.THERMAL_CAPACITY, value, indexArray, data, setData);
+              await importTrajectory(type, value, indexArray, data, setData);
             }
           }}
-          trajectoryType={TRAJECTORY_TYPE.THERMAL_CAPACITY}
+          trajectoryType={type}
           hypothesis={getAreaTrajectoryName(rowIdSelected, data)}
         />
       )}
@@ -187,7 +184,7 @@ const ThermalCapacityTab = ({ defaultAreas, areas, studyData }: TabProps) => {
           onClose={() => setIsDeletionModalOpen(false)}
           onConfirm={async () => {
             if (rowToDelete?.value) {
-              await removeRow(TRAJECTORY_TYPE.THERMAL_CAPACITY, rowToDelete.index, data, rowToDelete?.value);
+              await removeRow(type, rowToDelete.index, data, rowToDelete?.value);
               setIsDeletionModalOpen(false);
             }
           }}
@@ -197,4 +194,4 @@ const ThermalCapacityTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   );
 };
 
-export default ThermalCapacityTab;
+export default ExpandableTab;

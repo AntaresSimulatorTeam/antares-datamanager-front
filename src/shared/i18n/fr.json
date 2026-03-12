@@ -115,7 +115,7 @@
     "@areas_links": "Zones & Liens",
     "@load": "Consommation",
     "@thermal": "Central thermique",
-    "@enr": "Energie renouvelable",
+    "@res": "Energie renouvelable",
     "@misc": "Misc",
     "@sts": "STS",
     "@dsr": "DSR",
@@ -165,6 +165,9 @@
   "misc": {
     "@installedPower": "Installed Power",
     "@loadFactor": "Load Factor"
+  },
+  "res": {
+    "@distribution": "Distribution"
   },
   "trajectoryViewModal": {
     "@title_area": "Zones",

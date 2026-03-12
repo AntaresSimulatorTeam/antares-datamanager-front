@@ -41,7 +41,7 @@ export const LoadTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
     useFetchHypothesisTrajectories(
       areas,
-      TRAJECTORY_TYPE.LOAD,
+      [TRAJECTORY_TYPE.LOAD],
       defaultAreas,
       studyData?.id,
       studyData?.status,
@@ -53,14 +53,21 @@ export const LoadTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const { detachTrajectory } = useTrajectoryDetach(studyData, dispatch);
 
   useEffect(() => {
-    const setLoadHypothesis = () => {
-      areasTrajectoryOptions && setAreasOptions(areasTrajectoryOptions);
-      dropDownListOptions && setCheckedValues(dropDownListOptions);
-      hypothesisTrajectories && setData(hypothesisTrajectories);
-      setReadOnly(readOnlyRow);
-    };
-    setLoadHypothesis();
-  }, [hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow, studyState.studyStatus]);
+    const mapping = [
+      [areasTrajectoryOptions, setAreasOptions],
+      [dropDownListOptions, setCheckedValues],
+      [hypothesisTrajectories, setData],
+      [readOnlyRow, setReadOnly],
+    ] as const;
+
+    mapping.forEach(([record, setter]) => {
+      const value = record?.[TRAJECTORY_TYPE.LOAD];
+      if (value !== undefined) {
+        // @ts-ignore
+        setter(value);
+      }
+    });
+  }, [hypothesisTrajectories]);
 
   const handleSelectionChange = useCallback(
     async (value: string, isChecked?: boolean): Promise<void> => {

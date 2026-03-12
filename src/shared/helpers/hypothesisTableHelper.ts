@@ -1,4 +1,10 @@
-import { DbTrajectory, HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
+import {
+  DbTrajectory,
+  HypothesisRowData,
+  isTrajectoryResType,
+  isTrajectorySubrowsType,
+  TrajectoryAreaData,
+} from '@/shared/types';
 import {
   buildDefaultEmptyTrajectoryList,
   buildRowWithSubRowsData,
@@ -16,7 +22,7 @@ import { getDefaultAreaNotIncludedInAreaList } from '@/shared/utils/hypothesisTa
 import { fetchTrajectoriesFromTypes } from '@/shared/services/hypothesisTableService.ts';
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { getThermalTechnologyList } from '@/shared/services/defaultConfigService.ts';
-import { STSTechnology } from '@/mocks/data/list/names.ts';
+import { RESTechnology, STSTechnology } from '@/mocks/data/list/names.ts';
 import { TFunction } from 'i18next';
 import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
 import { isParamModulationRequired } from '@/shared/services/trajectoryService.ts';
@@ -204,7 +210,7 @@ export const fetchAndNormalizeTrajectories = async ({
     dsrCmResult = result?.[TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION] ?? [];
 
     const defaultEmpty = buildDefaultEmptyTrajectoryList(trajType, dsrCluster, defaultAreas);
-    const all = [...dsrCluster, ...emptyAreaSelected, ...defaultEmpty];
+    const all = [...(dsrCluster || []), ...(emptyAreaSelected || []), ...(defaultEmpty || [])];
 
     return {
       trajectories: removeDuplicate(all),
@@ -212,9 +218,10 @@ export const fetchAndNormalizeTrajectories = async ({
       technologies: null,
     };
   }
+  const isResType = isTrajectoryResType(trajType);
 
   // Other types
-  result = await getStudyTrajectories(id, trajType);
+  result = isResType ? [] : await getStudyTrajectories(id, trajType);
 
   if (trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
     const thermalOptions = await getThermalTechnologyList();
@@ -225,13 +232,14 @@ export const fetchAndNormalizeTrajectories = async ({
     technologies = STSTechnology;
   }
 
+  if (isResType) {
+    technologies = RESTechnology;
+  }
+
   const defaultEmpty = buildDefaultEmptyTrajectoryList(trajType, result, defaultAreas);
   const all = [...(result || []), ...emptyAreaSelected, ...(defaultEmpty || [])];
 
-  const trajectories =
-    trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY || trajType === TRAJECTORY_TYPE.STS
-      ? removeDuplicateByTechnology(all)
-      : removeDuplicate(all);
+  const trajectories = isTrajectorySubrowsType(trajType) ? removeDuplicateByTechnology(all) : removeDuplicate(all);
 
   return {
     trajectories,
@@ -270,12 +278,11 @@ export const buildHypothesisRows = ({
 }) => {
   const defaultNotIncluded = getDefaultAreaNotIncludedInAreaList(defaultAreas ?? [], areas);
 
-  let rows =
-    trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY || trajType === TRAJECTORY_TYPE.STS
-      ? convertIntoHypothesisRowWithTechnologies(trajectories, defaultNotIncluded, defaultAreas, technologies ?? [])
-      : trajectories
-          .map((trajectory) => buildRowWithSubRowsData(trajectory, defaultAreas, defaultNotIncluded, null))
-          .filter(Boolean);
+  let rows = isTrajectorySubrowsType(trajType)
+    ? convertIntoHypothesisRowWithTechnologies(trajectories, defaultNotIncluded, defaultAreas, technologies ?? [])
+    : trajectories
+        .map((trajectory) => buildRowWithSubRowsData(trajectory, defaultAreas, defaultNotIncluded, null))
+        .filter(Boolean);
 
   rows = sortWithFixedPosition(isStudyGenerated ? filterRow(rows) : rows);
 

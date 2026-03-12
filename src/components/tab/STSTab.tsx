@@ -64,7 +64,7 @@ export const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow, technologyList } =
     useFetchHypothesisTrajectories(
       areas,
-      TRAJECTORY_TYPE.STS,
+      [TRAJECTORY_TYPE.STS],
       defaultAreas,
       studyData?.id,
       studyData?.status,
@@ -72,22 +72,22 @@ export const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
     );
 
   useEffect(() => {
-    const setStsHypothesis = () => {
-      technologyList && setStsTechnologies(technologyList);
-      hypothesisTrajectories && setData(hypothesisTrajectories);
-      areasTrajectoryOptions && setAreasOptions(areasTrajectoryOptions);
-      dropDownListOptions && setCheckedValues(dropDownListOptions);
-      setReadOnly(readOnlyRow);
-    };
-    setStsHypothesis();
-  }, [
-    hypothesisTrajectories,
-    areasTrajectoryOptions,
-    dropDownListOptions,
-    readOnlyRow,
-    technologyList,
-    studyState.studyStatus,
-  ]);
+    const mapping = [
+      [areasTrajectoryOptions, setAreasOptions],
+      [dropDownListOptions, setCheckedValues],
+      [hypothesisTrajectories, setData],
+      [technologyList, setStsTechnologies],
+      [readOnlyRow, setReadOnly],
+    ] as const;
+
+    mapping.forEach(([record, setter]) => {
+      const value = record?.[TRAJECTORY_TYPE.STS];
+      if (value !== undefined) {
+        // @ts-ignore
+        setter(value);
+      }
+    });
+  }, [hypothesisTrajectories, studyState.studyStatus]);
 
   const handleSelectionChange = useCallback(
     async (value: string, isChecked: boolean) => {
@@ -169,7 +169,7 @@ export const STSTab = ({ defaultAreas, areas, studyData }: TabProps) => {
           }
         }}
         type={TRAJECTORY_TYPE.STS}
-        list={technologyList}
+        list={stsTechnologies}
         handleViewData={(rowId: string) => {
           const indexArray = rowId.split('.').map(Number);
           const trajectory = data[indexArray[0]]?.subRows?.[indexArray[1]]?.trajectory;

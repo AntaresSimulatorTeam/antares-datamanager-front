@@ -177,7 +177,7 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
           updateData={async (rowId: string, value: unknown, status: RowStatus) => {
             const [topIndex, subIndex] = rowId.split('.').map(Number);
             if (status === 'empty' || status === 'emptyError') {
-              const row = subIndex != null ? technicalData[topIndex]?.subRows?.[subIndex] : technicalData[topIndex];
+              const row = subIndex == null ? technicalData[topIndex] : technicalData[topIndex]?.subRows?.[subIndex];
               const current = row?.trajectory ?? null;
               if (current) {
                 if (
@@ -318,7 +318,7 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
             if (rowToDelete?.value) {
               if (rowToDelete?.operation === 'empty') {
                 const { index, subIndex, value } = rowToDelete;
-                const row = subIndex != null ? technicalData[index]?.subRows?.[subIndex] : technicalData[index];
+                const row = subIndex == null ? technicalData[index] : technicalData[index]?.subRows?.[subIndex];
                 const current = row?.trajectory ?? null;
                 if (current && subIndex != null) {
                   await detachTrajectory(

@@ -425,9 +425,9 @@ describe('buildDefaultEmptyTrajectoryList', () => {
 
     const result = buildDefaultEmptyTrajectoryList(type, trajectories, defaultAreas);
 
-    expect(result[0].area).toEqual(OTHER_AREAS);
-    expect(result[1].area).toEqual('ZoneA');
-    expect(result[2].area).toEqual('ZoneB');
+    expect(result[0].area).toEqual('ZoneA');
+    expect(result[1].area).toEqual('ZoneB');
+    expect(result[2].area).toEqual(OTHER_AREAS);
   });
 
   it('should exclude areas already linked to a trajectory with empty technology', () => {
@@ -437,8 +437,8 @@ describe('buildDefaultEmptyTrajectoryList', () => {
 
     const result = buildDefaultEmptyTrajectoryList(type, trajectories, defaultAreas);
 
-    expect(result[0].area).toEqual(OTHER_AREAS);
-    expect(result[1].area).toEqual('ZoneB');
+    expect(result[0].area).toEqual('ZoneB');
+    expect(result[1].area).toEqual(OTHER_AREAS);
   });
 
   it('should return only OTHER_AREAS when no defaultAreas are provided and trajectories are empty', () => {
@@ -539,7 +539,7 @@ describe('getStudyMenu', () => {
   it('should return correct tab structure when area is not linked', () => {
     const result: HypothesisTab[] = getStudyMenu(mockTranslate, false);
 
-    expect(result.length).toBe(6);
+    expect(result.length).toBe(7);
 
     expect(result[0]).toEqual({
       name: TRAJECTORY_TYPE.AREA,
@@ -1187,6 +1187,11 @@ describe('shouldHaveSubRows', () => {
 
   it('returns false for non-thermal in excluded area', () => {
     const entry = { type: 'LOAD', area: 'AREA_1' } as DbTrajectory;
+    expect(shouldHaveSubRows(excludedAreas, entry)).toBe(false);
+  });
+
+  it('returns false for non-thermal in excluded area', () => {
+    const entry = { type: 'RES_ZONAL_DISTRIBUTION', area: 'AREA_1' } as DbTrajectory;
     expect(shouldHaveSubRows(excludedAreas, entry)).toBe(false);
   });
 

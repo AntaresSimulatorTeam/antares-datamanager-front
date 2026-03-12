@@ -255,10 +255,10 @@ export const buildDefaultEmptyTrajectoryList = (
   trajectories: DbTrajectory[],
   defaultAreas?: { name: string }[],
 ): DbTrajectory[] => {
-  const areaDefault = [
-    { name: OTHER_AREAS },
-    ...(Array.isArray(defaultAreas) && defaultAreas.length > 0 ? defaultAreas : []),
-  ];
+  const areaDefault = [...(Array.isArray(defaultAreas) && defaultAreas.length > 0 ? defaultAreas : [])];
+  type !== TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION &&
+    type !== TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION &&
+    areaDefault.push({ name: OTHER_AREAS });
 
   // Check if default areas (without technology) are not already linked to a trajectory
   const defaultAreasNotLinkedToTrajectory =
@@ -281,9 +281,14 @@ export const shouldHaveSubRows = (areasToExclude: string[], mainEntry?: DbTrajec
   const isOther = mainEntry.area === OTHER_AREAS;
   switch (mainEntry.type) {
     case TRAJECTORY_TYPE.STS:
+    case TRAJECTORY_TYPE.RES_CAPACITY:
+    case TRAJECTORY_TYPE.RES_LOAD:
+    case TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION:
       return true;
     case TRAJECTORY_TYPE.THERMAL_CAPACITY:
       return !isOther && !isInExcluded;
+    case TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION:
+      return false;
     default:
       return isOther || !isInExcluded;
   }
@@ -528,6 +533,12 @@ export const getStudyMenu = (t: (value: string) => string, isTrajectoryAreaLinke
   { name: TRAJECTORY_TYPE.STS, label: t('studyDetails.@sts'), icon: StdIconId.BatteryChargingFull, isDisabled: true },
   { name: TRAJECTORY_TYPE.DSR, label: t('studyDetails.@dsr'), icon: StdIconId.InkEraser, isDisabled: true },
   { name: TRAJECTORY_TYPE.MISC_CAPACITY, label: t('studyDetails.@misc'), icon: StdIconId.Category, isDisabled: true },
+  {
+    name: TRAJECTORY_TYPE.RES_CAPACITY,
+    label: t('studyDetails.@res'),
+    icon: StdIconId.EnergySavingsLeaf,
+    isDisabled: true,
+  },
 ];
 
 /**

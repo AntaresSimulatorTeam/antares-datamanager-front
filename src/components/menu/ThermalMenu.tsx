@@ -3,7 +3,7 @@ import StdTabItem from '@common/layout/stdTabs/StdTabItem.tsx';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useTranslation } from 'react-i18next';
 import { ReactNode, useState } from 'react';
-import ThermalCapacityTab from '@/components/tab/ThermalCapacityTab.tsx';
+import ExpandableTab from '@/components/tab/ExpandableTab.tsx';
 import { ParametersTab } from '@/components/tab/ParametersTab.tsx';
 import { MenuProps } from '@/shared/types';
 
@@ -11,7 +11,12 @@ export const ThermalMenu = ({ defaultAreas, areas, studyData }: MenuProps) => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<TRAJECTORY_TYPE>(TRAJECTORY_TYPE.THERMAL_CAPACITY);
   const [activeComponent, setActiveComponent] = useState<ReactNode>(
-    <ThermalCapacityTab defaultAreas={defaultAreas} areas={areas} studyData={studyData} />,
+    <ExpandableTab
+      defaultAreas={defaultAreas}
+      areas={areas}
+      studyData={studyData}
+      type={TRAJECTORY_TYPE.THERMAL_CAPACITY}
+    />,
   );
 
   const renderActiveComponent = (tab: TRAJECTORY_TYPE): void => {
@@ -21,7 +26,12 @@ export const ThermalMenu = ({ defaultAreas, areas, studyData }: MenuProps) => {
       case TRAJECTORY_TYPE.THERMAL_CAPACITY:
       default:
         return setActiveComponent(
-          <ThermalCapacityTab defaultAreas={defaultAreas} areas={areas} studyData={studyData} />,
+          <ExpandableTab
+            defaultAreas={defaultAreas}
+            areas={areas}
+            studyData={studyData}
+            type={TRAJECTORY_TYPE.THERMAL_CAPACITY}
+          />,
         );
     }
   };
