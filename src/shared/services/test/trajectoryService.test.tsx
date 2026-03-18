@@ -10,6 +10,7 @@ import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import {
   fetchTrajectoriesFromDB,
   fetchTrajectoriesFromFS,
+  getResTechnologyList,
   getNbMessagesFromTrajectoryType,
   getStudyTrajectoriesWithWarnings,
   getTrajectoryDataByTypeAndId,
@@ -145,6 +146,37 @@ describe('fetchTrajectoriesFromDB', () => {
     await expect(async () => fetchTrajectoriesFromDB(TRAJECTORY_TYPE.AREA, '2023-2024')).rejects.toThrowError(
       'Failed to fetch trajectories from data base',
     );
+  });
+});
+
+describe('getResTechnologyList', () => {
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('returns a list of technology names when API responds with label fields', async () => {
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
+      ok: true,
+      json: async () => Promise.resolve([{ label: 'Offshore Wind' }, { label: 'Solar PV' }]),
+    });
+
+    const result = await getResTechnologyList();
+
+    await waitFor(() => {
+      expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
+      expect(AuthService.authFetch).toHaveBeenCalledWith('https://mockapi.com/v1/trajectory/res-types');
+      expect(result).toEqual(['Offshore Wind', 'Solar PV']);
+    });
+  });
+
+  it('throws a friendly error when the API call fails', async () => {
+    vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
+      antaresErrorMessage: 'Failed to fetch res types',
+      date: new Date(),
+      type: ERROR_MESSAGE_TYPE.BUSINESS,
+    });
+
+    await expect(async () => getResTechnologyList()).rejects.toThrowError('Failed to fetch res types');
   });
 });
 

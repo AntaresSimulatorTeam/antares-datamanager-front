@@ -7,6 +7,7 @@
 import {
   TRAJECTORY_COUNT_WARNING_ENDPOINT,
   TRAJECTORY_DATA_BASE_ENDPOINT,
+  TRAJECTORY_RES_TYPES,
   TRAJECTORY_DATA_FILE_ENDPOINT,
   TRAJECTORY_DSR_CAPACITY_MODULATION,
   TRAJECTORY_DSR_CLUSTER,
@@ -72,6 +73,22 @@ export const fetchTrajectoriesFromDB = async (
     return (await (response as Response).json()) as DbTrajectory[];
   } catch (error) {
     throw new Error((error as BackendError).antaresErrorMessage);
+  }
+};
+
+/**
+ * Fetch RES technology list from backend
+ * @returns {Promise<string[]>}
+ */
+export const getResTechnologyList = async (): Promise<string[]> => {
+  try {
+    const response = await AuthService.authFetch(TRAJECTORY_RES_TYPES);
+    if (!response) return [];
+    const data = (await (response as Response).json()) as { name: string }[];
+    return data.map((d) => d.label);
+  } catch (error) {
+    // In case of error, bubble up a friendly message
+    throw new Error((error as BackendError)?.antaresErrorMessage || 'Failed to fetch RES technology list');
   }
 };
 

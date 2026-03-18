@@ -1,6 +1,7 @@
 import { beforeEach, describe, Mock, vi } from 'vitest';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
-import { StudyDTO, StudyState, TrajectoryAreaData } from '@/shared/types';
+import { StudyDTO, StudyState, TrajectoryAreaData, DbTrajectory } from '@/shared/types';
+import { fetchAndNormalizeTrajectories } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { renderHook, waitFor } from '@testing-library/react';
 import * as studyService from '@/shared/services/studyService.ts';
 import * as defaultConfigService from '@/shared/services/defaultConfigService.ts';
@@ -23,7 +24,8 @@ import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
 import * as trajectoryUtils from '@/shared/utils/trajectoryUtils.ts';
 import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
-import { RESTechnology, STSTechnology, ThermalOptions } from '@/mocks/data/list/names.ts';
+import { STSTechnology, ThermalOptions } from '@/mocks/data/list/names.ts';
+import { getResTechnologyList } from '@/shared/services/trajectoryService.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 
 vi.mock('@/shared/services/trajectoryService');
@@ -733,11 +735,57 @@ describe('useFetchHypothesisTrajectories', () => {
     });
   });
 
+  it('returns RES technologies and normalized trajectories when trajectory type is RES_CAPACITY', async () => {
+    const defaultAreas = [{ name: 'FR' }];
+    const emptyAreaSelected = [{ id: 99, trajectoryName: '' }] as DbTrajectory[];
+
+    vi.mocked(trajectoryUtils.buildDefaultEmptyTrajectoryList).mockReturnValue([
+      { id: 11, trajectoryName: '' },
+    ] as DbTrajectory[]);
+    const expectedTrajectories = [
+      { id: 1, trajectoryName: 'R1' },
+      { id: 99, trajectoryName: '' },
+      { id: 11, trajectoryName: '' },
+    ] as DbTrajectory[];
+    vi.spyOn(trajectoryUtils, 'removeDuplicate').mockReturnValue(expectedTrajectories as any);
+    vi.spyOn(trajectoryUtils, 'removeDuplicateByTechnology').mockReturnValue(expectedTrajectories as any);
+
+    const trajectoryService = await import('@/shared/services/trajectoryService.ts');
+    vi.mocked(trajectoryService.getResTechnologyList).mockResolvedValue(['Offshore Wind', 'Solar PV']);
+
+    const result = await fetchAndNormalizeTrajectories({
+      id: 7,
+      trajType: TRAJECTORY_TYPE.RES_CAPACITY,
+      defaultAreas,
+      emptyAreaSelected,
+    });
+
+    expect(trajectoryService.getResTechnologyList).toHaveBeenCalled();
+    expect(result.technologies).toEqual(['Offshore Wind', 'Solar PV']);
+    expect(result.trajectories).toEqual(expectedTrajectories);
+    expect(result.dsrCmResult).toEqual([]);
+  });
+
+  it('propagates error when fetching RES technologies fails', async () => {
+    const trajectoryService = await import('@/shared/services/trajectoryService.ts');
+    vi.mocked(trajectoryService.getResTechnologyList).mockRejectedValue(new Error('res-fetch-failed'));
+
+    await expect(
+      fetchAndNormalizeTrajectories({
+        id: 1,
+        trajType: TRAJECTORY_TYPE.RES_LOAD,
+        defaultAreas: [],
+        emptyAreaSelected: [],
+      }),
+    ).rejects.toThrow('res-fetch-failed');
+  });
+
   it.skip('should include ResOptions when trajectoryType is RES_CAPACITY', async () => {
     const defaultAreas = [{ name: 'FR' }];
     const areas = [{ areaName: 'AT' }, { areaName: 'BE' }] as TrajectoryAreaData[];
     vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArrayResCapacity);
-    const technologiesHypothesis = RESTechnology.map((option) => ({
+    const restTech = await getResTechnologyList();
+    const technologiesHypothesis = restTech.map((option) => ({
       hypothesis: option,
       isDefault: false,
       isDeletable: false,
@@ -761,7 +809,8 @@ describe('useFetchHypothesisTrajectories', () => {
     const defaultAreas = [{ name: 'FR' }];
     const areas = [{ areaName: 'AT' }, { areaName: 'BE' }] as TrajectoryAreaData[];
     vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArrayResLoad);
-    const technologiesHypothesis = RESTechnology.map((option) => ({
+    const restTech2 = await getResTechnologyList();
+    const technologiesHypothesis = restTech2.map((option) => ({
       hypothesis: option,
       isDefault: false,
       isDeletable: false,

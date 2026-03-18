@@ -22,10 +22,10 @@ import { getDefaultAreaNotIncludedInAreaList } from '@/shared/utils/hypothesisTa
 import { fetchTrajectoriesFromTypes } from '@/shared/services/hypothesisTableService.ts';
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { getThermalTechnologyList } from '@/shared/services/defaultConfigService.ts';
-import { RESTechnology, STSTechnology } from '@/mocks/data/list/names.ts';
+import { STSTechnology } from '@/mocks/data/list/names.ts';
 import { TFunction } from 'i18next';
 import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
-import { isParamModulationRequired } from '@/shared/services/trajectoryService.ts';
+import { isParamModulationRequired, getResTechnologyList } from '@/shared/services/trajectoryService.ts';
 
 /**
  * Retrieve read only row of a study generated
@@ -233,7 +233,7 @@ export const fetchAndNormalizeTrajectories = async ({
   }
 
   if (isResType) {
-    technologies = RESTechnology;
+    technologies = await getResTechnologyList();
   }
 
   const defaultEmpty = buildDefaultEmptyTrajectoryList(trajType, result, defaultAreas);
