@@ -28,6 +28,7 @@ export const PROJECT_SEARCH_ENDPOINT = `${BASE_URL}/v1/project/search`;
 export const TRAJECTORY_ENDPOINT = `${BASE_URL}/v1/trajectory`;
 export const TRAJECTORY_FILE_SYSTEM_ENDPOINT = `${BASE_URL}/v1/trajectory/fs`;
 export const TRAJECTORY_DATA_BASE_ENDPOINT = `${BASE_URL}/v1/trajectory/db`;
+export const TRAJECTORY_RES_TYPES = `${BASE_URL}/v1/trajectory/res-types`;
 export const TRAJECTORY_LINK_TO_STUDY_ENDPOINT = `${BASE_URL}/v1/trajectory/attach`;
 export const TRAJECTORY_UNLINK_TO_STUDY_ENDPOINT = `${BASE_URL}/v1/trajectory/detach`;
 export const TRAJECTORY_UNLINK_MULTIPLE_TO_STUDY_ENDPOINT = `${BASE_URL}/v1/trajectory/detach/batch`;
