@@ -84,7 +84,8 @@ export const getResTechnologyList = async (): Promise<string[]> => {
   try {
     const response = await AuthService.authFetch(TRAJECTORY_RES_TYPES);
     if (!response) return [];
-    const data = (await (response as Response).json()) as { name: string }[];
+    const data = (await (response as Response).json()) as { label: string }[];
+    // map to labels
     return data.map((d) => d.label);
   } catch (error) {
     // In case of error, bubble up a friendly message
