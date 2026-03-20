@@ -7,9 +7,10 @@
 import { BackendError, DbTrajectory, PaginatedResponse, StudyDTO } from '@/shared/types';
 import { STUDY_GENERATE_ENDPOINT, STUDY_SEARCH_ENDPOINT, TRAJECTORY_ENDPOINT } from '@/shared/const/apiEndPoint';
 import { STUDY_ENDPOINT, STUDY_KEYWORDS_SEARCH_ENDPOINT } from '@/shared/const/apiEndPoint.ts';
-import { notifyToast } from '@/shared/notification/notification.tsx';
+import { notifyAlert, notifyToast } from '@/shared/notification/notification.tsx';
 import { AuthService } from '@/shared/services/authService.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 /**
  * Retrieve a list of studies from a term
@@ -187,7 +188,16 @@ export const generateStudy = async (id: number): Promise<void> => {
       },
     });
   } catch (error) {
+    if ((error as BackendError).antaresErrorMessage ){
+      notifyAlert({
+        icon: StdIconId.Close,
+        message: (error as BackendError).antaresErrorMessage,
+        type: 'error',
+        filledIcon: true,
+      });
+    }
     throw new Error((error as BackendError).antaresErrorMessage);
+
   }
 };
 
