@@ -156,7 +156,7 @@ describe('handleFetchTrajectoriesFS', () => {
     await handleFetchTrajectoriesFS(type, rowId, setOptionsFS, setRowIdSelected, toggleModal, hypothesis);
 
     expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith(type, hypothesis);
-    expect(formFormatter.convertToFSSelectionOptionType).toHaveBeenCalledWith(mockResults);
+    expect(formFormatter.convertToFSSelectionOptionType).toHaveBeenCalledWith(mockResults, hypothesis);
     expect(setOptionsFS).toHaveBeenCalledWith(mockConvertedOptions);
     expect(setRowIdSelected).toHaveBeenCalledWith(rowId);
     expect(toggleModal).toHaveBeenCalled();
@@ -177,7 +177,7 @@ describe('handleFetchTrajectoriesFS', () => {
     await handleFetchTrajectoriesFS(type, rowId, setOptionsFS, setRowIdSelected, toggleModal, OTHER_AREAS_LABEL);
 
     expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith(type, OTHER_AREAS);
-    expect(formFormatter.convertToFSSelectionOptionType).toHaveBeenCalledWith(mockResults);
+    expect(formFormatter.convertToFSSelectionOptionType).toHaveBeenCalledWith(mockResults, OTHER_AREAS);
     expect(setOptionsFS).toHaveBeenCalledWith(mockConvertedOptions);
     expect(setRowIdSelected).toHaveBeenCalledWith(rowId);
     expect(toggleModal).toHaveBeenCalled();
@@ -199,7 +199,7 @@ describe('handleFetchTrajectoriesFS', () => {
     await handleFetchTrajectoriesFS(type, rowId, setOptionsFS, setRowIdSelected, toggleModal, hypothesis);
 
     expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith(type, 'FR');
-    expect(formFormatter.convertToFSSelectionOptionType).toHaveBeenCalledWith(mockResults);
+    expect(formFormatter.convertToFSSelectionOptionType).toHaveBeenCalledWith(mockResults, 'FR');
     expect(setOptionsFS).toHaveBeenCalledWith(mockConvertedOptions);
     expect(setRowIdSelected).toHaveBeenCalledWith(rowId);
     expect(toggleModal).toHaveBeenCalled();
@@ -221,7 +221,7 @@ describe('handleFetchTrajectoriesFS', () => {
     await handleFetchTrajectoriesFS(type, rowId, setOptionsFS, setRowIdSelected, toggleModal, hypothesis);
 
     expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith(type, OTHER_AREAS);
-    expect(formFormatter.convertToFSSelectionOptionType).toHaveBeenCalledWith(mockResults);
+    expect(formFormatter.convertToFSSelectionOptionType).toHaveBeenCalledWith(mockResults, OTHER_AREAS);
     expect(setOptionsFS).toHaveBeenCalledWith(mockConvertedOptions);
     expect(setRowIdSelected).toHaveBeenCalledWith(rowId);
     expect(toggleModal).toHaveBeenCalled();
@@ -242,7 +242,7 @@ describe('handleFetchTrajectoriesFS', () => {
     await handleFetchTrajectoriesFS(type, rowId, setOptionsFS, setRowIdSelected, toggleModal, OTHER_AREAS_LABEL);
 
     expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith(type, OTHER_AREAS);
-    expect(formFormatter.convertToFSSelectionOptionType).toHaveBeenCalledWith(mockResults);
+    expect(formFormatter.convertToFSSelectionOptionType).toHaveBeenCalledWith(mockResults, OTHER_AREAS);
     expect(setOptionsFS).toHaveBeenCalledWith(mockConvertedOptions);
     expect(setRowIdSelected).toHaveBeenCalledWith(rowId);
     expect(toggleModal).toHaveBeenCalled();
@@ -264,7 +264,7 @@ describe('handleFetchTrajectoriesFS', () => {
     await handleFetchTrajectoriesFS(type, rowId, setOptionsFS, setRowIdSelected, toggleModal, hypothesis);
 
     expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith(type, 'FR');
-    expect(formFormatter.convertToFSSelectionOptionType).toHaveBeenCalledWith(mockResults);
+    expect(formFormatter.convertToFSSelectionOptionType).toHaveBeenCalledWith(mockResults, 'FR');
     expect(setOptionsFS).toHaveBeenCalledWith(mockConvertedOptions);
     expect(setRowIdSelected).toHaveBeenCalledWith(rowId);
     expect(toggleModal).toHaveBeenCalled();
@@ -286,7 +286,7 @@ describe('handleFetchTrajectoriesFS', () => {
     await handleFetchTrajectoriesFS(type, rowId, setOptionsFS, setRowIdSelected, toggleModal, hypothesis);
 
     expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith(type, OTHER_AREAS);
-    expect(formFormatter.convertToFSSelectionOptionType).toHaveBeenCalledWith(mockResults);
+    expect(formFormatter.convertToFSSelectionOptionType).toHaveBeenCalledWith(mockResults, OTHER_AREAS);
     expect(setOptionsFS).toHaveBeenCalledWith(mockConvertedOptions);
     expect(setRowIdSelected).toHaveBeenCalledWith(rowId);
     expect(toggleModal).toHaveBeenCalled();
@@ -307,7 +307,7 @@ describe('handleFetchTrajectoriesFS', () => {
     await handleFetchTrajectoriesFS(type, rowId, setOptionsFS, setRowIdSelected, toggleModal, OTHER_AREAS_LABEL);
 
     expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith(type, OTHER_AREAS);
-    expect(formFormatter.convertToFSSelectionOptionType).toHaveBeenCalledWith(mockResults);
+    expect(formFormatter.convertToFSSelectionOptionType).toHaveBeenCalledWith(mockResults, OTHER_AREAS);
     expect(setOptionsFS).toHaveBeenCalledWith(mockConvertedOptions);
     expect(setRowIdSelected).toHaveBeenCalledWith(rowId);
     expect(toggleModal).toHaveBeenCalled();
@@ -329,7 +329,7 @@ describe('handleFetchTrajectoriesFS', () => {
     await handleFetchTrajectoriesFS(type, rowId, setOptionsFS, setRowIdSelected, toggleModal, hypothesis);
 
     expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith(type, 'FR');
-    expect(formFormatter.convertToFSSelectionOptionType).toHaveBeenCalledWith(mockResults);
+    expect(formFormatter.convertToFSSelectionOptionType).toHaveBeenCalledWith(mockResults, OTHER_AREAS);
     expect(setOptionsFS).toHaveBeenCalledWith(mockConvertedOptions);
     expect(setRowIdSelected).toHaveBeenCalledWith(rowId);
     expect(toggleModal).toHaveBeenCalled();
@@ -351,7 +351,7 @@ describe('handleFetchTrajectoriesFS', () => {
     await handleFetchTrajectoriesFS(type, rowId, setOptionsFS, setRowIdSelected, toggleModal, hypothesis);
 
     expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith(type, OTHER_AREAS);
-    expect(formFormatter.convertToFSSelectionOptionType).toHaveBeenCalledWith(mockResults);
+    expect(formFormatter.convertToFSSelectionOptionType).toHaveBeenCalledWith(mockResults, OTHER_AREAS);
     expect(setOptionsFS).toHaveBeenCalledWith(mockConvertedOptions);
     expect(setRowIdSelected).toHaveBeenCalledWith(rowId);
     expect(toggleModal).toHaveBeenCalled();
