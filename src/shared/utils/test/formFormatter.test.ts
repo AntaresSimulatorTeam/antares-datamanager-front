@@ -8,6 +8,8 @@ import {
   mockFsTrajectoryAreaArray,
   mockFsTrajectoryLoadArray,
   mockFsTrajectoryParaModulationArray,
+  mockFsTrajectoryResArray,
+  mockFsTrajectoryResFRArray,
 } from '@/mocks/data/tests/trajectory.mock.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 
@@ -44,6 +46,20 @@ describe('convertToFSSelectionOptionType', () => {
       { id: 0, label: 'params' },
       { id: 1, label: 'params_2' },
       { id: 2, label: 'params_PEMMDB' },
+    ]);
+  });
+  it('should return an array of SelectOption type in which label is the trajectory name when array of RES as an argument', () => {
+    expect(convertToFSSelectionOptionType(mockFsTrajectoryResArray)).toEqual([
+      { id: 0, label: 'installedRES_BP_2028' },
+      { id: 1, label: 'installedRES_BP_2027' },
+      { id: 2, label: 'installedRES_BP_2030_2050' },
+    ]);
+  });
+  it('should return an array of SelectOption type in which label is the trajectory name when array of RES - FR as an argument', () => {
+    expect(convertToFSSelectionOptionType(mockFsTrajectoryResFRArray, 'FR')).toEqual([
+      { id: 0, label: 'BP_REF_A' },
+      { id: 1, label: 'BP_REF_B' },
+      { id: 2, label: 'BP_REF_C' },
     ]);
   });
   it('should return an empty array when empty array as an argument', () => {

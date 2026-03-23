@@ -7,7 +7,6 @@
 import {
   TRAJECTORY_COUNT_WARNING_ENDPOINT,
   TRAJECTORY_DATA_BASE_ENDPOINT,
-  TRAJECTORY_RES_TYPES,
   TRAJECTORY_DATA_FILE_ENDPOINT,
   TRAJECTORY_DSR_CAPACITY_MODULATION,
   TRAJECTORY_DSR_CLUSTER,
@@ -16,6 +15,8 @@ import {
   TRAJECTORY_LINK_TO_STUDY_ENDPOINT,
   TRAJECTORY_MISC_INSTALLED_POWER,
   TRAJECTORY_MISC_LOAD_FACTOR,
+  TRAJECTORY_RES_INSTALLED_POWER,
+  TRAJECTORY_RES_TYPES,
   TRAJECTORY_STS,
   TRAJECTORY_THERMAL_COMMON_PARAMETER_IMPORT,
   TRAJECTORY_THERMAL_COSTS_PARAMETER_IMPORT,
@@ -84,7 +85,7 @@ export const getResTechnologyList = async (): Promise<string[]> => {
   try {
     const response = await AuthService.authFetch(TRAJECTORY_RES_TYPES);
     if (!response) return [];
-    const data = (await (response as Response).json()) as { label: string }[];
+    const data = (await response.json()) as { label: string }[];
     // map to labels
     return data.map((d) => d.label);
   } catch (error) {
@@ -174,6 +175,8 @@ export const uploadTrajectory = async (
     urlApi = `${TRAJECTORY_MISC_INSTALLED_POWER}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
   } else if (trajectoryType === TRAJECTORY_TYPE.MISC_LOAD) {
     urlApi = `${TRAJECTORY_MISC_LOAD_FACTOR}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
+  } else if (trajectoryType === TRAJECTORY_TYPE.RES_CAPACITY) {
+    urlApi = `${TRAJECTORY_RES_INSTALLED_POWER}?area=${area}&technology=${subArea ?? ''}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
   } else {
     urlApi = `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   }
