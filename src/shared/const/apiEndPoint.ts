@@ -47,6 +47,7 @@ export const TRAJECTORY_DSR_CAPACITY_MODULATION = `${BASE_URL}/v1/trajectory/dsr
 export const TRAJECTORY_THERMAL_PARAM_MODULATION = `${BASE_URL}/v1/trajectory/param-modulation/check`;
 export const TRAJECTORY_MISC_INSTALLED_POWER = `${BASE_URL}/v1/trajectory/installed-misc`;
 export const TRAJECTORY_MISC_LOAD_FACTOR = `${BASE_URL}/v1/trajectory/load-factor-misc`;
+export const TRAJECTORY_RES_INSTALLED_POWER = `${BASE_URL}/v1/trajectory/installed-power-res`;
 
 //ABOUT
 export const ACTUATOR_ENDPOINT = `${BASE_URL}/actuator/info`;

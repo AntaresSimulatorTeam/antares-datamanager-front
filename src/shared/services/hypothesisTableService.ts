@@ -86,7 +86,7 @@ export const handleFetchTrajectoriesFS = async (
   try {
     const area = getQueryParamAreaValue(type, hypothesis);
     const results = area ? await fetchTrajectoriesFromFS(type, area) : await fetchTrajectoriesFromFS(type);
-    setOptionsFS(convertToFSSelectionOptionType(results));
+    setOptionsFS(convertToFSSelectionOptionType(results, area));
     setRowIdSelected(rowId);
     toggleModal();
   } catch {

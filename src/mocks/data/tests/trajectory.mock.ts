@@ -456,6 +456,42 @@ export const mockFsTrajectorySTSArray: FsTrajectory[] = [
   },
 ];
 
+export const mockFsTrajectoryResArray: FsTrajectory[] = [
+  {
+    trajectoryName: 'installedRES_BP_2028.xlsx',
+    type: TRAJECTORY_TYPE.RES_CAPACITY,
+    lastModifiedDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+  },
+  {
+    trajectoryName: 'installedRES_BP_2027.xlsx',
+    type: TRAJECTORY_TYPE.RES_CAPACITY,
+    lastModifiedDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+  },
+  {
+    trajectoryName: 'installedRES_BP_2030_2050.xlsx',
+    type: TRAJECTORY_TYPE.RES_CAPACITY,
+    lastModifiedDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+  },
+];
+
+export const mockFsTrajectoryResFRArray: FsTrajectory[] = [
+  {
+    trajectoryName: 'BP_REF_A',
+    type: TRAJECTORY_TYPE.RES_CAPACITY,
+    lastModifiedDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+  },
+  {
+    trajectoryName: 'BP_REF_B',
+    type: TRAJECTORY_TYPE.RES_CAPACITY,
+    lastModifiedDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+  },
+  {
+    trajectoryName: 'BP_REF_C',
+    type: TRAJECTORY_TYPE.RES_CAPACITY,
+    lastModifiedDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+  },
+];
+
 export const mockFsTrajectoryParaModulationArray: FsTrajectory[] = [
   {
     trajectoryName: 'params',
