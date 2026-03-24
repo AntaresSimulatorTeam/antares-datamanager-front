@@ -25,7 +25,7 @@ import { getThermalTechnologyList } from '@/shared/services/defaultConfigService
 import { STSTechnology } from '@/mocks/data/list/names.ts';
 import { TFunction } from 'i18next';
 import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
-import { isParamModulationRequired, getResTechnologyList } from '@/shared/services/trajectoryService.ts';
+import { getResTechnologyList, isParamModulationRequired } from '@/shared/services/trajectoryService.ts';
 
 /**
  * Retrieve read only row of a study generated
@@ -221,7 +221,7 @@ export const fetchAndNormalizeTrajectories = async ({
   const isResType = isTrajectoryResType(trajType);
 
   // Other types
-  result = isResType ? [] : await getStudyTrajectories(id, trajType);
+  result = await getStudyTrajectories(id, trajType);
 
   if (trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
     const thermalOptions = await getThermalTechnologyList();

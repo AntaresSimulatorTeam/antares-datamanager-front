@@ -688,10 +688,15 @@ export const getSubRowListWithArea = (
   if (
     type === TRAJECTORY_TYPE.THERMAL_CAPACITY ||
     type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER ||
-    type === TRAJECTORY_TYPE.STS
+    type === TRAJECTORY_TYPE.STS ||
+    type === TRAJECTORY_TYPE.RES_CAPACITY
   ) {
     let prefix: string = '';
-    if (type === TRAJECTORY_TYPE.THERMAL_CAPACITY || type === TRAJECTORY_TYPE.STS) {
+    if (
+      type === TRAJECTORY_TYPE.THERMAL_CAPACITY ||
+      type === TRAJECTORY_TYPE.STS ||
+      type === TRAJECTORY_TYPE.RES_CAPACITY
+    ) {
       prefix = t('thermal.@installedPowerInformation');
     }
     if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {

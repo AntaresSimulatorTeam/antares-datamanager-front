@@ -17,6 +17,7 @@ import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { getAreaTrajectoryName } from '@/shared/utils/trajectoryUtils.ts';
 import { DeletionModal } from '@common/modal/DeletionModal.tsx';
+import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 
 const MiscLoadFactorTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const studyState = useStudy();
@@ -85,14 +86,16 @@ const MiscLoadFactorTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         options={areasOptions}
         handleSelectionChange={handleSelectionChange}
         dividerPosition={defaultAreas.length}
-        disabled={false}
+        disabled={studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED}
       />
       <PegaseHypothesisTable
         id="misc-load-factor-table"
         data={data}
         getTableHeaders={getEditableHypothesisTableHeaders}
         fileStatus={fileStatus}
-        isStudyGenerated={false}
+        isStudyGenerated={
+          studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED
+        }
         readOnly={readOnly}
         progress={progress}
         idSelected={String(rowIdSelected)}

@@ -17,6 +17,7 @@ import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
 import { DeletionModal } from '@common/modal/DeletionModal.tsx';
+import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 
 const MiscInstalledPowerTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const studyState = useStudy();
@@ -84,14 +85,16 @@ const MiscInstalledPowerTab = ({ defaultAreas, areas, studyData }: TabProps) => 
         options={areasOptions}
         handleSelectionChange={handleSelectionChange}
         dividerPosition={defaultAreas.length}
-        disabled={false}
+        disabled={studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED}
       />
       <PegaseHypothesisTable
         id="misc-capacity-table"
         data={data}
         getTableHeaders={getEditableHypothesisTableHeaders}
         fileStatus={fileStatus}
-        isStudyGenerated={false}
+        isStudyGenerated={
+          studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED
+        }
         readOnly={readOnly}
         progress={progress}
         idSelected={String(rowIdSelected)}
