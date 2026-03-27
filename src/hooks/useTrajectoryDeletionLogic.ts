@@ -91,14 +91,11 @@ export const useTrajectoryDeletionLogic = (study: StudyDTO) => {
         }
 
         const row =
-          type === TRAJECTORY_TYPE.STS && data[rowIndex].subRows && !!indexArray?.length
-            ? data[rowIndex].subRows[indexArray[1]]
-            : data[rowIndex];
+          data[rowIndex].subRows && indexArray?.length == 2 ? data[rowIndex].subRows[indexArray[1]] : data[rowIndex];
         const allTrajectories = collectTrajectoriesRecursively(row);
         trajectoryIds = allTrajectories.map((t) => t.id);
         trajectoryToDelete = row.trajectory;
       }
-
       return { trajectoryIds, trajectoryToDelete, additionalTrajectory };
     },
     [],
