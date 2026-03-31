@@ -53,6 +53,7 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData }: TabProps) => {
     const zonalData = hypothesisTrajectories?.[TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION];
     zonalData && setData(zonalData);
     const technologyResData = hypothesisTrajectories?.[TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION];
+    console.log('================ ', technologyResData, '=================');
     technologyResData && setTechnologyData(technologyResData);
     const resTechnologies = technologyList?.[TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION];
     resTechnologies && setTechnologies(resTechnologies);
