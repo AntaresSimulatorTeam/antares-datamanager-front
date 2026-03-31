@@ -155,7 +155,7 @@ export const uploadTrajectory = async (
 ): Promise<DbTrajectory> => {
   let urlApi;
   const trajectoryName = encodeURIComponent(trajectoryToUse);
-  console.log('========================== trajectoryType', trajectoryType);
+
   if (trajectoryType === TRAJECTORY_TYPE.LOAD) {
     urlApi = `${TRAJECTORY_ENDPOINT}/load?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   } else if (trajectoryType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {

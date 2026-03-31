@@ -787,6 +787,92 @@ describe('uploadTrajectory', () => {
       );
     });
   });
+
+  it('should import RES Load factor trajectory into data base', async () => {
+    await uploadTrajectory(
+      TRAJECTORY_TYPE.RES_LOAD,
+      'PEMMEDB25',
+      '2030-2031',
+      87,
+      'AT',
+      onProgress,
+      false,
+      'Wind Offshore',
+    );
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/trajectory/load-factor-res?area=AT&technology=wind_offshore&trajectoryToUse=PEMMEDB25&horizon=2030-2031&studyId=87',
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
+
+  it('should import RES Zonal distribution trajectory into data base', async () => {
+    await uploadTrajectory(
+      TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION,
+      'repartition_zonal_PEMMEDB25',
+      '2030-2031',
+      87,
+      'AT',
+      onProgress,
+      false,
+    );
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/trajectory/zonal-distribution-res?area=AT&technology=&trajectoryToUse=repartition_zonal_PEMMEDB25&horizon=2030-2031&studyId=87&isCivilYear=false',
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
+
+  it('should import RES Technology distribution trajectory with technology into data base', async () => {
+    await uploadTrajectory(
+      TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION,
+      'repartition_techno_PEMMEDB25',
+      '2030-2031',
+      87,
+      'AT',
+      onProgress,
+      false,
+      'Wind Offshore',
+    );
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/trajectory/technology-distribution-res?area=AT&technology=wind_offshore&trajectoryToUse=repartition_techno_PEMMEDB25&horizon=2030-2031&studyId=87&isCivilYear=false',
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
+
+  it('should import RES Technology distribution trajectory without technology into data base', async () => {
+    await uploadTrajectory(
+      TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION,
+      'repartition_techno_PEMMEDB25',
+      '2030-2031',
+      87,
+      'AT',
+      onProgress,
+      false,
+    );
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/trajectory/technology-distribution-res?area=AT&trajectoryToUse=repartition_techno_PEMMEDB25&horizon=2030-2031&studyId=87&isCivilYear=false',
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
 });
 
 describe('isParamModulationRequired', () => {
