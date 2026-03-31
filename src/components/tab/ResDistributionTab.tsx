@@ -53,6 +53,7 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData }: TabProps) => {
     const zonalData = hypothesisTrajectories?.[TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION];
     zonalData && setData(zonalData);
     const technologyResData = hypothesisTrajectories?.[TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION];
+    console.log('================ ', technologyResData, '=================');
     technologyResData && setTechnologyData(technologyResData);
     const resTechnologies = technologyList?.[TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION];
     resTechnologies && setTechnologies(resTechnologies);
@@ -72,9 +73,8 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData }: TabProps) => {
           studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED
         }
         readOnly={readOnly}
-        progress={progress}
         idSelected={rowIdSelected}
-        type={TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION}
+        progress={selectedType === TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION ? progress : 0}
         handleSearch={async (fileNameContains: string, rowId: string) => {
           const indexArray = rowId.split('.').map(Number);
           const technology =
@@ -138,7 +138,7 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData }: TabProps) => {
           studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED
         }
         readOnly={readOnly}
-        progress={progress}
+        progress={selectedType === TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION ? progress : 0}
         idSelected={rowIdSelected}
         type={TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION}
         list={technologies}

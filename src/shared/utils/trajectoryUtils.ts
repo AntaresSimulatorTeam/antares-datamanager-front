@@ -7,6 +7,7 @@ import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { generateId } from '@/shared/utils/defaultUtils.ts';
 import { Row } from '@tanstack/react-table';
 import { TFunction } from 'i18next';
+import { snakeCase } from '@/shared/utils/textUtils.ts';
 
 /**
  * Get trajectory status from row status
@@ -325,11 +326,13 @@ export const convertIntoHypothesisRowWithTechnologies = (
   );
 
   return Object.entries(groupedByArea).map(([area, entries]) => {
-    const mainEntry = entries.find((e) => e.technology === '');
+    const mainEntry = entries.find((e) => e.technology === '' || e.technology == null);
     const subRows: HypothesisRowData[] | null = shouldHaveSubRows(areasNotInTrajectoryArea, mainEntry)
       ? options.map((option: string) => {
-          const trajectoryTechnology: DbTrajectory | undefined = entries.find(
-            (entry) => normalizeTechnology(entry?.technology) == normalizeTechnology(option),
+          const trajectoryTechnology: DbTrajectory | undefined = entries.find((entry) =>
+            entry?.type === TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION
+              ? normalizeTechnology(entry?.technology) == snakeCase(option)
+              : normalizeTechnology(entry?.technology) == normalizeTechnology(option),
           );
           return {
             hypothesis: option,
@@ -566,22 +569,28 @@ export const getRowDataSelected = (data: HypothesisRowData[], indexArray: number
  * Get a name composed of an area name and a technology name
  * @param {string} rowIdSelected
  * @param {HypothesisRowData[]} data
- * @return {{area: string, technology?: string} | undefined}
+ * @return {{area: string, technology?: string, isDefault: boolean} | undefined}
  */
 export const getAreaTrajectoryName = (
   rowIdSelected: string,
   data: HypothesisRowData[],
-): { area?: string; technology?: string } | undefined => {
+): { area: string; technology?: string; isDefault: boolean } | undefined => {
   const [mainIndex, subIndex] = rowIdSelected.split('.').map(Number);
-  const hypothesisInfo = {} as { area: string; technology?: string };
+  const hypothesisInfo = {} as { area: string; technology?: string; isDefault: boolean };
 
   const mainRow = data[mainIndex];
   if (!mainRow?.hypothesis) return;
-  if (mainRow.hypothesis) hypothesisInfo.area = mainRow.hypothesis;
+  if (mainRow.hypothesis) {
+    hypothesisInfo.area = mainRow.hypothesis;
+    hypothesisInfo.isDefault = mainRow.isDefault ?? false;
+  }
 
   const subRow = mainRow.subRows?.[subIndex];
 
-  if (subRow?.hypothesis) hypothesisInfo.technology = subRow.hypothesis;
+  if (subRow?.hypothesis) {
+    hypothesisInfo.technology = subRow.hypothesis;
+    hypothesisInfo.isDefault = (mainRow.isDefault || subRow.isDefault) ?? false;
+  }
   return hypothesisInfo;
 };
 
@@ -689,13 +698,15 @@ export const getSubRowListWithArea = (
     type === TRAJECTORY_TYPE.THERMAL_CAPACITY ||
     type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER ||
     type === TRAJECTORY_TYPE.STS ||
-    type === TRAJECTORY_TYPE.RES_CAPACITY
+    type === TRAJECTORY_TYPE.RES_CAPACITY ||
+    type === TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION
   ) {
     let prefix: string = '';
     if (
       type === TRAJECTORY_TYPE.THERMAL_CAPACITY ||
       type === TRAJECTORY_TYPE.STS ||
-      type === TRAJECTORY_TYPE.RES_CAPACITY
+      type === TRAJECTORY_TYPE.RES_CAPACITY ||
+      type === TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION
     ) {
       prefix = t('thermal.@installedPowerInformation');
     }
@@ -749,10 +760,13 @@ export const isTechnicalParametersType = (type: TRAJECTORY_TYPE): boolean =>
  * Determines the file path based on the trajectory type.
  *
  * @param {TRAJECTORY_TYPE} type - The trajectory type used to select the corresponding file path.
- * @param {string} technology
+ * @param { area: string; technology: string; isDefault: boolean } hypothesis
  * @returns {string | null} The file path associated with the given trajectory type.
  */
-export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE, technology?: string): string | null => {
+export const getPathFromTrajectoryType = (
+  type: TRAJECTORY_TYPE,
+  hypothesis?: { area: string; technology?: string; isDefault: boolean },
+): string | null => {
   switch (type) {
     case TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER:
       return '\\\\thermal\\economic parameters\\economic';
@@ -764,7 +778,7 @@ export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE, technology?: st
     case TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER:
       return '\\\\thermal\\technical parameters';
     case TRAJECTORY_TYPE.STS:
-      return `\\\\STS\\${technology}\\clusters`;
+      return hypothesis?.technology ? `\\\\STS\\${hypothesis?.technology}\\clusters` : `\\\\STS\\clusters`;
     case TRAJECTORY_TYPE.DSR:
       return '\\\\DSR\\cluster';
     case TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION:
@@ -773,6 +787,14 @@ export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE, technology?: st
       return '\\\\MISC\\installed power';
     case TRAJECTORY_TYPE.MISC_LOAD:
       return '\\\\MISC\\load factor';
+    case TRAJECTORY_TYPE.RES_CAPACITY:
+      return `\\\\RES\\installed power${hypothesis?.isDefault && hypothesis?.area != OTHER_AREAS_LABEL ? `\\${hypothesis?.area}` : ''}`;
+    case TRAJECTORY_TYPE.RES_LOAD:
+      return '\\\\RES\\load factor';
+    case TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION:
+      return '\\\\RES\\technicalParameters';
+    case TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION:
+      return '\\\\RES\\technicalParameters';
     default:
       return null;
   }

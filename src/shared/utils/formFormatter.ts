@@ -17,7 +17,8 @@ export const isRepositoryTrajectory = (type: TRAJECTORY_TYPE, area?: string) =>
   type === TRAJECTORY_TYPE.LOAD ||
   type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER ||
   type === TRAJECTORY_TYPE.MISC_LOAD ||
-  (type === TRAJECTORY_TYPE.RES_CAPACITY && area === 'FR');
+  (type === TRAJECTORY_TYPE.RES_CAPACITY && area === 'FR') ||
+  type === TRAJECTORY_TYPE.RES_LOAD;
 
 export const convertToFSSelectionOptionType = (options: FsTrajectory[], area?: string): SelectOption[] =>
   options.map((option, indexTrajectory) => ({

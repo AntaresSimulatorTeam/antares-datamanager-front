@@ -15,13 +15,13 @@ interface ImportTrajectoryModalProps {
   options: SelectOption[] | undefined;
   onClose: (value?: SelectOption) => Promise<void>;
   trajectoryType: TRAJECTORY_TYPE;
-  hypothesis?: { area?: string; technology?: string };
+  hypothesis?: { area: string; technology?: string; isDefault: boolean };
 }
 
 export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, hypothesis }: ImportTrajectoryModalProps) => {
   const { t } = useTranslation();
   const [trajectorySelected, setTrajectorySelected] = useState<SelectOption | null>(null);
-  const path = getPathFromTrajectoryType(trajectoryType, hypothesis?.technology);
+  const path = getPathFromTrajectoryType(trajectoryType, hypothesis);
 
   const handleSelectOption = (value: SelectOption | null) => {
     if (value) {

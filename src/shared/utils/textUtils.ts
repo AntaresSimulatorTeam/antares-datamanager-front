@@ -17,3 +17,5 @@ export const titleCase = (str: string, shouldLower = false) => {
 export const sentenceCase = (str: string) => titleCase(str.replace(/_/g, ' '), true);
 
 export const avatarCase = (str: string) => titleCase(str.substring(0, 2));
+
+export const snakeCase = (str: string) => str?.trim().toLowerCase().replace(/\s+/g, '_') ?? '';
