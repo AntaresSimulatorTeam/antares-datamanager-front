@@ -734,8 +734,16 @@ describe('getAreaTrajectoryName', () => {
   ] as HypothesisRowData[];
 
   it('should return combined hypothesis for valid rowIdSelected', () => {
-    expect(getAreaTrajectoryName('0.1', mockData)).toStrictEqual({ area: 'Energy', technology: 'Wind' });
-    expect(getAreaTrajectoryName('1.0', mockData)).toStrictEqual({ area: 'Transport', technology: 'Electric' });
+    expect(getAreaTrajectoryName('0.1', mockData)).toStrictEqual({
+      area: 'Energy',
+      technology: 'Wind',
+      isDefault: false,
+    });
+    expect(getAreaTrajectoryName('1.0', mockData)).toStrictEqual({
+      area: 'Transport',
+      technology: 'Electric',
+      isDefault: false,
+    });
   });
 
   it('should return only main hypothesis if subRow hypothesis is missing', () => {
@@ -747,6 +755,7 @@ describe('getAreaTrajectoryName', () => {
     ] as HypothesisRowData[];
     expect(getAreaTrajectoryName('0.0', dataWithMissingSubHypothesis)).toStrictEqual({
       area: 'Agriculture',
+      isDefault: false,
     });
   });
 
@@ -811,7 +820,9 @@ describe('getPathFromTrajectoryType', () => {
   });
 
   it('should return technical path for STS', () => {
-    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.STS, 'DSR')).toBe('\\\\STS\\DSR\\clusters');
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.STS, { area: 'AT', technology: 'DSR', isDefault: false })).toBe(
+      '\\\\STS\\DSR\\clusters',
+    );
   });
 
   it('should return technical path for DSR type', () => {
@@ -828,6 +839,36 @@ describe('getPathFromTrajectoryType', () => {
 
   it('should return technical path for MISC_LOAD type', () => {
     expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.MISC_LOAD)).toBe('\\\\MISC\\load factor');
+  });
+
+  it('should return technical path for RES_CAPACITY type and default area', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.RES_CAPACITY, { area: 'FR', isDefault: true })).toBe(
+      '\\\\RES\\installed power\\FR',
+    );
+  });
+
+  it('should return technical path for RES_CAPACITY type and Other areas', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.RES_CAPACITY, { area: OTHER_AREAS_LABEL, isDefault: true })).toBe(
+      '\\\\RES\\installed power',
+    );
+  });
+
+  it('should return technical path for RES_CAPACITY type and specific area', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.RES_CAPACITY, { area: 'AT', isDefault: false })).toBe(
+      '\\\\RES\\installed power',
+    );
+  });
+
+  it('should return technical path for RES_LOAD type', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.RES_LOAD)).toBe('\\\\RES\\load factor');
+  });
+
+  it('should return technical path for RES_TECHNOLOGY_DISTRIBUTION type', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION)).toBe('\\\\RES\\technicalParameters');
+  });
+
+  it('should return technical path for RES_ZONAL_DISTRIBUTION type', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION)).toBe('\\\\RES\\technicalParameters');
   });
 
   it('should return technical path for unknown type', () => {

@@ -21,7 +21,7 @@ import { simulateProgress } from '@/shared/utils/hypothesisTableUtils.ts';
 export const fetchWithProgress = async (
   url: string,
   options: RequestInit = {},
-  onProgress: (value: number) => void,
+  onProgress: ((progress: number) => void) | undefined,
 ): Promise<Response> => {
   const duration = 2000;
 

@@ -8,23 +8,10 @@ import {
   TRAJECTORY_COUNT_WARNING_ENDPOINT,
   TRAJECTORY_DATA_BASE_ENDPOINT,
   TRAJECTORY_DATA_FILE_ENDPOINT,
-  TRAJECTORY_DSR_CAPACITY_MODULATION,
-  TRAJECTORY_DSR_CLUSTER,
-  TRAJECTORY_ENDPOINT,
   TRAJECTORY_FILE_SYSTEM_ENDPOINT,
   TRAJECTORY_LINK_TO_STUDY_ENDPOINT,
-  TRAJECTORY_MISC_INSTALLED_POWER,
-  TRAJECTORY_MISC_LOAD_FACTOR,
-  TRAJECTORY_RES_INSTALLED_POWER,
   TRAJECTORY_RES_TYPES,
-  TRAJECTORY_STS,
-  TRAJECTORY_THERMAL_COMMON_PARAMETER_IMPORT,
-  TRAJECTORY_THERMAL_COSTS_PARAMETER_IMPORT,
-  TRAJECTORY_THERMAL_ECONOMIC_PARAMETER_IMPORT,
-  TRAJECTORY_THERMAL_INSTALLED_POWER_IMPORT,
-  TRAJECTORY_THERMAL_MODULATION_PARAMETER_IMPORT,
   TRAJECTORY_THERMAL_PARAM_MODULATION,
-  TRAJECTORY_THERMAL_SPECIFIC_PARAMETER_IMPORT,
   TRAJECTORY_UNLINK_ALL_TO_STUDY_ENDPOINT,
   TRAJECTORY_UNLINK_MULTIPLE_TO_STUDY_ENDPOINT,
   TRAJECTORY_UNLINK_TO_STUDY_ENDPOINT,
@@ -45,6 +32,7 @@ import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { fetchWarningMessagesFromType } from './warningService';
 import { isBusinessError } from '@/shared/utils/errorUtils.ts';
+import { getUrlApiUploadTrajectory } from '@/shared/utils/trajectoryUtils.ts';
 
 /**
  * Retrieve a list of trajectories by type and horizon from database
@@ -144,43 +132,21 @@ export const uploadTrajectory = async (
   trajectoryToUse: string,
   horizon: string,
   studyId: number,
-  area: string | undefined,
-  onProgress: (progress: number) => void,
+  area?: string,
+  onProgress?: (progress: number) => void,
   isCivilYear: boolean = false,
   subArea?: string,
 ): Promise<DbTrajectory> => {
-  let urlApi;
   const trajectoryName = encodeURIComponent(trajectoryToUse);
-  if (trajectoryType === TRAJECTORY_TYPE.LOAD) {
-    urlApi = `${TRAJECTORY_ENDPOINT}/load?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
-  } else if (trajectoryType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
-    urlApi = `${TRAJECTORY_THERMAL_INSTALLED_POWER_IMPORT}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}&technology=${subArea ?? ''}`;
-  } else if (trajectoryType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER) {
-    urlApi = `${TRAJECTORY_THERMAL_COMMON_PARAMETER_IMPORT}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
-  } else if (trajectoryType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
-    urlApi = `${TRAJECTORY_THERMAL_SPECIFIC_PARAMETER_IMPORT}?area=${subArea ?? ''}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
-  } else if (trajectoryType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER) {
-    urlApi = `${TRAJECTORY_THERMAL_MODULATION_PARAMETER_IMPORT}?area=${subArea ?? ''}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
-  } else if (trajectoryType === TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER) {
-    urlApi = `${TRAJECTORY_THERMAL_COSTS_PARAMETER_IMPORT}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
-  } else if (trajectoryType === TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER) {
-    urlApi = `${TRAJECTORY_THERMAL_ECONOMIC_PARAMETER_IMPORT}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
-  } else if (trajectoryType === TRAJECTORY_TYPE.STS) {
-    urlApi = `${TRAJECTORY_STS}?area=${area}&technology=${subArea}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
-  } else if (trajectoryType === TRAJECTORY_TYPE.DSR) {
-    urlApi = `${TRAJECTORY_DSR_CLUSTER}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
-  } else if (trajectoryType === TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION) {
-    urlApi = `${TRAJECTORY_DSR_CAPACITY_MODULATION}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
-  } else if (trajectoryType === TRAJECTORY_TYPE.MISC_CAPACITY) {
-    urlApi = `${TRAJECTORY_MISC_INSTALLED_POWER}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
-  } else if (trajectoryType === TRAJECTORY_TYPE.MISC_LOAD) {
-    urlApi = `${TRAJECTORY_MISC_LOAD_FACTOR}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
-  } else if (trajectoryType === TRAJECTORY_TYPE.RES_CAPACITY) {
-    urlApi = `${TRAJECTORY_RES_INSTALLED_POWER}?area=${area}&technology=${subArea ?? ''}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
-  } else {
-    urlApi = `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
-  }
-
+  const urlApi = getUrlApiUploadTrajectory(
+    trajectoryType,
+    studyId,
+    trajectoryName,
+    horizon,
+    area,
+    isCivilYear,
+    subArea,
+  );
   try {
     const response = await fetchWithProgress(
       urlApi,
