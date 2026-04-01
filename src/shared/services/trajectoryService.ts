@@ -48,7 +48,7 @@ import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { fetchWarningMessagesFromType } from './warningService';
 import { isBusinessError } from '@/shared/utils/errorUtils.ts';
-import { snakeCase } from '@/shared/utils/textUtils.ts';
+import { snakeCase, snakeCaseUnderscore } from '@/shared/utils/textUtils.ts';
 
 /**
  * Retrieve a list of trajectories by type and horizon from database
@@ -183,11 +183,11 @@ export const uploadTrajectory = async (
   } else if (trajectoryType === TRAJECTORY_TYPE.RES_CAPACITY) {
     urlApi = `${TRAJECTORY_RES_INSTALLED_POWER}?area=${area}&technology=${subArea ?? ''}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
   } else if (trajectoryType === TRAJECTORY_TYPE.RES_LOAD) {
-    const technology = subArea ? snakeCase(subArea) : '';
+    const technology = subArea ? encodeURIComponent(snakeCase(subArea)) : '';
     const technologyParam = technology ? `&technology=${technology}` : '';
     urlApi = `${TRAJECTORY_RES_LOAD_FACTOR}?area=${area}${technologyParam}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   } else if (trajectoryType === TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION) {
-    const technology = subArea ? snakeCase(subArea) : '';
+    const technology = subArea ? snakeCaseUnderscore(subArea) : '';
     const technologyParam = technology ? `&technology=${technology}` : '';
     urlApi = `${TRAJECTORY_RES_TECHNOLOGY_DISTRIBUTION}?area=${area}${technologyParam}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
   } else if (trajectoryType === TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION) {

@@ -699,14 +699,16 @@ export const getSubRowListWithArea = (
     type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER ||
     type === TRAJECTORY_TYPE.STS ||
     type === TRAJECTORY_TYPE.RES_CAPACITY ||
-    type === TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION
+    type === TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION ||
+    type === TRAJECTORY_TYPE.RES_LOAD
   ) {
     let prefix: string = '';
     if (
       type === TRAJECTORY_TYPE.THERMAL_CAPACITY ||
       type === TRAJECTORY_TYPE.STS ||
       type === TRAJECTORY_TYPE.RES_CAPACITY ||
-      type === TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION
+      type === TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION ||
+      type === TRAJECTORY_TYPE.RES_LOAD
     ) {
       prefix = t('thermal.@installedPowerInformation');
     }
