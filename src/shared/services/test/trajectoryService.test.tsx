@@ -803,7 +803,7 @@ describe('uploadTrajectory', () => {
     await waitFor(() => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
       expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
-        'https://mockapi.com/v1/trajectory/load-factor-res?area=AT&technology=wind_offshore&trajectoryToUse=PEMMEDB25&horizon=2030-2031&studyId=87',
+        'https://mockapi.com/v1/trajectory/load-factor-res?area=AT&technology=wind%20offshore&trajectoryToUse=PEMMEDB25&horizon=2030-2031&studyId=87',
         requestOptions,
         onProgress,
       );
