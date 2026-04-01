@@ -72,7 +72,7 @@ const getEditableHypothesisTableHeaders = ({
           <SelectInputWithButton
             onSelect={(value: SelectOption) => {
               setErrorInfo({ index: row.index, message: '' });
-              void table.options?.meta?.updateData?.(row.id, value.label, 'success');
+              void table.options?.meta?.updateData?.(row.id, value.id, 'success');
             }}
             onSearch={async (value?: string) => await table.options?.meta?.search?.(value ?? '', row.id)}
             onClickButton={async () => {
