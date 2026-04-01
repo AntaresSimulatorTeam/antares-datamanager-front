@@ -274,7 +274,7 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
               }
 
               if (status === 'success') {
-                const dbTrajectory = dbTrajectories.find((traj) => traj.id === value || traj.id === value) ?? null;
+                const dbTrajectory = dbTrajectories.find((traj) => traj.id === value) ?? null;
                 if (dbTrajectory) {
                   await attachTrajectory(type, indexArray, status, dbTrajectory, setData);
                 }
