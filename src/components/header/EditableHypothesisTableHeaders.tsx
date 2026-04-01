@@ -61,7 +61,7 @@ const getEditableHypothesisTableHeaders = ({
               setErrorInfo({ index: row.index, message: '' });
               void table.options?.meta?.updateData?.(
                 row.id,
-                trajectory?.trajectoryName,
+                trajectory?.id,
                 status === TRAJECTORY_SELECTION_STATUS.ERROR ? 'emptyError' : 'empty',
               );
             }}
