@@ -7,7 +7,25 @@ import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { generateId } from '@/shared/utils/defaultUtils.ts';
 import { Row } from '@tanstack/react-table';
 import { TFunction } from 'i18next';
-import { snakeCase } from '@/shared/utils/textUtils.ts';
+import { snakeCase, snakeCaseUnderscore } from '@/shared/utils/textUtils.ts';
+import {
+  TRAJECTORY_DSR_CAPACITY_MODULATION,
+  TRAJECTORY_DSR_CLUSTER,
+  TRAJECTORY_ENDPOINT,
+  TRAJECTORY_MISC_INSTALLED_POWER,
+  TRAJECTORY_MISC_LOAD_FACTOR,
+  TRAJECTORY_RES_INSTALLED_POWER,
+  TRAJECTORY_RES_LOAD_FACTOR,
+  TRAJECTORY_RES_TECHNOLOGY_DISTRIBUTION,
+  TRAJECTORY_RES_ZONAL_DISTRIBUTION,
+  TRAJECTORY_STS,
+  TRAJECTORY_THERMAL_COMMON_PARAMETER_IMPORT,
+  TRAJECTORY_THERMAL_COSTS_PARAMETER_IMPORT,
+  TRAJECTORY_THERMAL_ECONOMIC_PARAMETER_IMPORT,
+  TRAJECTORY_THERMAL_INSTALLED_POWER_IMPORT,
+  TRAJECTORY_THERMAL_MODULATION_PARAMETER_IMPORT,
+  TRAJECTORY_THERMAL_SPECIFIC_PARAMETER_IMPORT,
+} from '@/shared/const/apiEndPoint.ts';
 
 /**
  * Get trajectory status from row status
@@ -897,3 +915,50 @@ export const isUniqueTrajectoryType = (type: TRAJECTORY_TYPE): boolean =>
  * @returns {string} The normalized string.
  */
 export const normalize = (value: string | null): string => (value === null || value === '' ? '' : value);
+
+export const getUrlApiUploadTrajectory = (
+  trajectoryType: TRAJECTORY_TYPE,
+  studyId: number,
+  trajectoryName: string,
+  horizon: string,
+  area?: string,
+  isCivilYear?: boolean,
+  subArea?: string,
+) => {
+  switch (trajectoryType) {
+    case TRAJECTORY_TYPE.LOAD:
+      return `${TRAJECTORY_ENDPOINT}/load?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
+    case TRAJECTORY_TYPE.THERMAL_CAPACITY:
+      return `${TRAJECTORY_THERMAL_INSTALLED_POWER_IMPORT}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}&technology=${subArea ?? ''}`;
+    case TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER:
+      return `${TRAJECTORY_THERMAL_COMMON_PARAMETER_IMPORT}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
+    case TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER:
+      return `${TRAJECTORY_THERMAL_SPECIFIC_PARAMETER_IMPORT}?area=${subArea ?? ''}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
+    case TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER:
+      return `${TRAJECTORY_THERMAL_MODULATION_PARAMETER_IMPORT}?area=${subArea ?? ''}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
+    case TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER:
+      return `${TRAJECTORY_THERMAL_COSTS_PARAMETER_IMPORT}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
+    case TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER:
+      return `${TRAJECTORY_THERMAL_ECONOMIC_PARAMETER_IMPORT}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
+    case TRAJECTORY_TYPE.STS:
+      return `${TRAJECTORY_STS}?area=${area}&technology=${subArea}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
+    case TRAJECTORY_TYPE.DSR:
+      return `${TRAJECTORY_DSR_CLUSTER}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
+    case TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION:
+      return `${TRAJECTORY_DSR_CAPACITY_MODULATION}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
+    case TRAJECTORY_TYPE.MISC_CAPACITY:
+      return `${TRAJECTORY_MISC_INSTALLED_POWER}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
+    case TRAJECTORY_TYPE.MISC_LOAD:
+      return `${TRAJECTORY_MISC_LOAD_FACTOR}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
+    case TRAJECTORY_TYPE.RES_CAPACITY:
+      return `${TRAJECTORY_RES_INSTALLED_POWER}?area=${area}&technology=${subArea ?? ''}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
+    case TRAJECTORY_TYPE.RES_LOAD:
+      return `${TRAJECTORY_RES_LOAD_FACTOR}?area=${area}&technology=${subArea ? encodeURIComponent(snakeCase(subArea)) : ''}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
+    case TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION:
+      return `${TRAJECTORY_RES_TECHNOLOGY_DISTRIBUTION}?area=${area}${subArea ? `&technology=${encodeURIComponent(snakeCaseUnderscore(subArea))}` : ''}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
+    case TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION:
+      return `${TRAJECTORY_RES_ZONAL_DISTRIBUTION}?area=${area}&technology=${subArea ?? ''}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
+    default:
+      return `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
+  }
+};
