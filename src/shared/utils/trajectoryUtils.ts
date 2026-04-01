@@ -778,7 +778,7 @@ export const getPathFromTrajectoryType = (
     case TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER:
       return '\\\\thermal\\technical parameters';
     case TRAJECTORY_TYPE.STS:
-      return hypothesis?.technology ? `\\\\STS\\${hypothesis?.technology}\\clusters` : `\\\\STS\\clusters`;
+      return hypothesis?.technology ? `\\\\STS\\${hypothesis?.technology}\\clusters` : '\\\\STS\\clusters';
     case TRAJECTORY_TYPE.DSR:
       return '\\\\DSR\\cluster';
     case TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION:

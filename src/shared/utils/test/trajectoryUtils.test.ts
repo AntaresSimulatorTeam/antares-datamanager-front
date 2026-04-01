@@ -841,6 +841,36 @@ describe('getPathFromTrajectoryType', () => {
     expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.MISC_LOAD)).toBe('\\\\MISC\\load factor');
   });
 
+  it('should return technical path for RES_CAPACITY type and default area', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.RES_CAPACITY, { area: 'FR', isDefault: true })).toBe(
+      '\\\\RES\\installed power\\FR',
+    );
+  });
+
+  it('should return technical path for RES_CAPACITY type and Other areas', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.RES_CAPACITY, { area: OTHER_AREAS_LABEL, isDefault: true })).toBe(
+      '\\\\RES\\installed power',
+    );
+  });
+
+  it('should return technical path for RES_CAPACITY type and specific area', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.RES_CAPACITY, { area: 'AT', isDefault: false })).toBe(
+      '\\\\RES\\installed power',
+    );
+  });
+
+  it('should return technical path for RES_LOAD type', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.RES_LOAD)).toBe('\\\\RES\\load factor');
+  });
+
+  it('should return technical path for RES_TECHNOLOGY_DISTRIBUTION type', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION)).toBe('\\\\RES\\technicalParameters');
+  });
+
+  it('should return technical path for RES_ZONAL_DISTRIBUTION type', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION)).toBe('\\\\RES\\technicalParameters');
+  });
+
   it('should return technical path for unknown type', () => {
     expect(getPathFromTrajectoryType('UNKNOWN_TYPE' as TRAJECTORY_TYPE)).toBeNull();
   });
