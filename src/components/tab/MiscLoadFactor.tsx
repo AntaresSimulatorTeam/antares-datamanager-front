@@ -130,7 +130,7 @@ const MiscLoadFactorTab = ({ defaultAreas, areas, studyData }: TabProps) => {
           if ((status === 'empty' && trajectory) || (status === 'emptyError' && trajectory)) {
             void detachTrajectory(TRAJECTORY_TYPE.MISC_LOAD, [index], setData, data, status, row?.hypothesis);
           } else if (status === 'success') {
-            const dbTrajectory = dbTrajectories.find((item) => item.trajectoryName === value) ?? trajectory;
+            const dbTrajectory = dbTrajectories.find((item) => item.id === value) ?? trajectory;
             if (dbTrajectory)
               void attachTrajectory(TRAJECTORY_TYPE.MISC_LOAD, [Number(rowId)], status, dbTrajectory, setData);
           }

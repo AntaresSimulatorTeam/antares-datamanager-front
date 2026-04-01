@@ -216,10 +216,10 @@ export const AreaLinkTab = ({ setErrorMessage, studyData }: AreaLinkTabProps) =>
     setErrorMessage(t('studyDetails.@add_trajectories_message'));
   };
 
-  const handleTrajectoryUpdate = async (rowId: string, value: string, status: RowStatus) => {
+  const handleTrajectoryUpdate = async (rowId: string, id: number, status: RowStatus) => {
     const rowIndex = Number(rowId);
     const trajectory = data[rowIndex]?.trajectory;
-    const dbTrajectory = dbTrajectories.find((item: DbTrajectory) => item.trajectoryName === value) ?? trajectory;
+    const dbTrajectory = dbTrajectories.find((item: DbTrajectory) => item.id === id) ?? trajectory;
     try {
       if (dbTrajectory?.id != null && status === 'success') {
         setErrorMessage('');
@@ -283,7 +283,7 @@ export const AreaLinkTab = ({ setErrorMessage, studyData }: AreaLinkTabProps) =>
         progress={progress}
         idSelected={String(rowIdSelected)}
         updateData={(rowId: string, value: unknown, status: RowStatus) => {
-          void handleTrajectoryUpdate(rowId, value as string, status);
+          void handleTrajectoryUpdate(rowId, value as number, status);
         }}
         handleSearch={async (fileNameContains: string, rowId: string) => {
           const index = Number(rowId);

@@ -96,7 +96,7 @@ const getExpandableHypothesisTableHeaders = ({
               setErrorInfo({ index: row.index, message: '' });
               void options?.meta?.updateData?.(
                 row.id,
-                trajectory?.trajectoryName,
+                trajectory?.id,
                 status === TRAJECTORY_SELECTION_STATUS.ERROR ? 'emptyError' : 'empty',
               );
             }}
