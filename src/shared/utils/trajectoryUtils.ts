@@ -349,7 +349,7 @@ export const convertIntoHypothesisRowWithTechnologies = (
       ? options.map((option: string) => {
           const trajectoryTechnology: DbTrajectory | undefined = entries.find((entry) =>
             entry?.type === TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION
-              ? normalizeTechnology(entry?.technology) == snakeCase(option)
+              ? normalizeTechnology(entry?.technology) == snakeCaseUnderscore(option)
               : normalizeTechnology(entry?.technology) == normalizeTechnology(option),
           );
           return {
