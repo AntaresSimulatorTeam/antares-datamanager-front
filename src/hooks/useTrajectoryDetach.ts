@@ -34,6 +34,7 @@ export const useTrajectoryDetach = (
         null,
         indexArray,
         hypothesis,
+        status,
       );
       try {
         // 2. Suppression backend si nécessaire
