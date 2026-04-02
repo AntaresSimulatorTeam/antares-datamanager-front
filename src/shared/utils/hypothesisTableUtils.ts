@@ -79,7 +79,7 @@ export const transformToSubRowKeys = (readOnlyState: Record<number, boolean>): R
  * The progress value represents the completion percentage of the simulation.
  * @returns {Promise<void>} A Promise that resolves when the progress simulation reaches 100%.
  */
-export const simulateProgress = async (duration: number, onProgress: (value: number) => void): Promise<void> =>
+export const simulateProgress = async (duration: number, onProgress?: (value: number) => void): Promise<void> =>
   new Promise((resolve) => {
     let startTime: number | null = null;
 
@@ -87,7 +87,7 @@ export const simulateProgress = async (duration: number, onProgress: (value: num
       if (!startTime) startTime = timestamp;
       const elapsed = timestamp - startTime;
       const progress = Math.min((elapsed / duration) * 100, 100);
-      onProgress(progress);
+      onProgress?.(progress);
 
       if (progress < 100) {
         requestAnimationFrame(updateProgress);
