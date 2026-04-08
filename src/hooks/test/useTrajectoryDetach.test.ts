@@ -99,6 +99,7 @@ describe('useTrajectoryDetach', () => {
       null,
       [0],
       'H1',
+      'empty',
     );
 
     // performBackendDeletion appelé

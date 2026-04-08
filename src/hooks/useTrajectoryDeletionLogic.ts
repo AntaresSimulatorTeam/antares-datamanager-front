@@ -7,7 +7,7 @@ import {
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { shouldDeleteCapacityModulation } from '@/shared/utils/trajectoryUtils.ts';
 import { unlinkMultipleTrajectoriesFromStudy, unlinkTrajectoryFromStudy } from '@/shared/services/trajectoryService.ts';
-import { DbTrajectory, HypothesisRowData, StudyDTO } from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, RowStatus, StudyDTO } from '@/shared/types';
 
 /**
  * Structure de retour de computeDeletion
@@ -35,6 +35,7 @@ export const useTrajectoryDeletionLogic = (study: StudyDTO) => {
       indexRow: number | null,
       indexArray: number[] | null,
       hypothesis: string,
+      status?: RowStatus,
     ): DeletionResult => {
       let trajectoryIds: number[] = [];
       let trajectoryToDelete: DbTrajectory | null = null;
@@ -92,8 +93,12 @@ export const useTrajectoryDeletionLogic = (study: StudyDTO) => {
 
         const row =
           data[rowIndex].subRows && indexArray?.length == 2 ? data[rowIndex].subRows[indexArray[1]] : data[rowIndex];
-        const allTrajectories = collectTrajectoriesRecursively(row);
-        trajectoryIds = allTrajectories.map((t) => t.id);
+        if (status === 'empty') {
+          trajectoryIds = row?.trajectory?.id ? [row.trajectory.id] : [];
+        } else {
+          const allTrajectories = collectTrajectoriesRecursively(row);
+          trajectoryIds = allTrajectories.map((t) => t.id);
+        }
         trajectoryToDelete = row.trajectory;
       }
       return { trajectoryIds, trajectoryToDelete, additionalTrajectory };
