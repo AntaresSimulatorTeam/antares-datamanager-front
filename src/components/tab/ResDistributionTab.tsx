@@ -22,6 +22,7 @@ import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
 import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
 import { useTranslation } from 'react-i18next';
 import getEditableHypothesisTableHeaders from '@/components/header/EditableHypothesisTableHeaders.tsx';
+import { snakeCaseUnderscore } from '@/shared/utils/textUtils.ts';
 
 const ResDistributionTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const studyState = useStudy();
@@ -145,13 +146,14 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData }: TabProps) => {
           const indexArray = rowId.split('.').map(Number);
           const technology =
             indexArray?.length > 1 ? technologyData[indexArray[0]]?.subRows?.[indexArray[1]]?.hypothesis : undefined;
+          const formattedTechnology = technology ? snakeCaseUnderscore(technology) : undefined;
           return await handleTrajectorySearch(
             TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION,
             setDbTrajectories,
             studyData?.horizon,
             {
               area: technologyData[indexArray[0]]?.hypothesis,
-              technology,
+              technology: formattedTechnology,
               fileNameContains,
             },
           );
@@ -213,7 +215,10 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData }: TabProps) => {
             }
           }}
           trajectoryType={selectedType}
-          hypothesis={getAreaTrajectoryName(rowIdSelected, data)}
+          hypothesis={getAreaTrajectoryName(
+            rowIdSelected,
+            selectedType === TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION ? data : technologyData,
+          )}
         />
       )}
     </div>
