@@ -128,6 +128,7 @@ const ExpandableTab = ({ defaultAreas, areas, studyData, type }: TabProps & { ty
         }}
         handleImport={async (rowId: string) => {
           const indexArray = rowId.split('.').map(Number);
+          const isDefaultArea = defaultAreas?.some((area) => area.name === data[indexArray[0]]?.hypothesis);
           await handleFetchTrajectoriesFS(
             type,
             rowId,
@@ -135,6 +136,7 @@ const ExpandableTab = ({ defaultAreas, areas, studyData, type }: TabProps & { ty
             setRowIdSelected,
             toggleModal,
             data[indexArray[0]]?.hypothesis,
+            isDefaultArea,
           );
         }}
         isReadOnlyEnable={true}

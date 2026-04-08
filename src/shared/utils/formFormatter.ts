@@ -13,18 +13,18 @@ export const convertToSelectionOptionType = (trajectories: DbTrajectory[]): Sele
     label: trajectory.trajectoryName,
   }));
 
-export const isRepositoryTrajectory = (type: TRAJECTORY_TYPE, area?: string) =>
+export const isRepositoryTrajectory = (type: TRAJECTORY_TYPE, isDefaultArea = false) =>
   type === TRAJECTORY_TYPE.LOAD ||
   type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER ||
   type === TRAJECTORY_TYPE.MISC_LOAD ||
-  (type === TRAJECTORY_TYPE.RES_CAPACITY && area === 'FR') ||
+  (type === TRAJECTORY_TYPE.RES_CAPACITY && isDefaultArea) ||
   type === TRAJECTORY_TYPE.RES_LOAD;
 
-export const convertToFSSelectionOptionType = (options: FsTrajectory[], area?: string): SelectOption[] =>
+export const convertToFSSelectionOptionType = (options: FsTrajectory[], isDefaultArea = false): SelectOption[] =>
   options.map((option, indexTrajectory) => ({
     id: indexTrajectory,
     label:
-      option.trajectoryName && !isRepositoryTrajectory(option.type, area)
+      option.trajectoryName && !isRepositoryTrajectory(option.type, isDefaultArea)
         ? option.trajectoryName.substring(0, option.trajectoryName.lastIndexOf('.'))
         : option.trajectoryName,
   }));
