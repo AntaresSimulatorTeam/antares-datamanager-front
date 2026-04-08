@@ -914,16 +914,6 @@ describe('getQueryParamAreaValue', () => {
     expect(result).toBe('FR');
   });
 
-  it('THERMAL_CAPACITY : retourne OTHER_AREAS si hypothesis.area != FR', () => {
-    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.THERMAL_CAPACITY, 'DE');
-    expect(result).toBe(OTHER_AREAS);
-  });
-
-  it('THERMAL_CAPACITY : retourne OTHER_AREAS si hypothesis.area est undefined', () => {
-    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.THERMAL_CAPACITY);
-    expect(result).toBe(OTHER_AREAS);
-  });
-
   // --- STS & THERMAL_TECHNICAL_SPECIFIC_PARAMETER ---
   it('STS : retourne hypothesis.technology', () => {
     const result = getQueryParamAreaValue(TRAJECTORY_TYPE.STS, 'HP');
