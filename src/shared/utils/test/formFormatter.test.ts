@@ -56,7 +56,7 @@ describe('convertToFSSelectionOptionType', () => {
     ]);
   });
   it('should return an array of SelectOption type in which label is the trajectory name when array of RES - FR as an argument', () => {
-    expect(convertToFSSelectionOptionType(mockFsTrajectoryResFRArray, 'FR')).toEqual([
+    expect(convertToFSSelectionOptionType(mockFsTrajectoryResFRArray, true)).toEqual([
       { id: 0, label: 'BP_REF_A' },
       { id: 1, label: 'BP_REF_B' },
       { id: 2, label: 'BP_REF_C' },
