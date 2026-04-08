@@ -600,14 +600,15 @@ export const getAreaTrajectoryName = (
   if (!mainRow?.hypothesis) return;
   if (mainRow.hypothesis) {
     hypothesisInfo.area = mainRow.hypothesis;
-    hypothesisInfo.isDefault = mainRow.isDefault ?? false;
+    hypothesisInfo.isDefault = (mainRow.isDefault && mainRow.hypothesis !== OTHER_AREAS_LABEL) ?? false;
   }
 
   const subRow = mainRow.subRows?.[subIndex];
 
   if (subRow?.hypothesis) {
     hypothesisInfo.technology = subRow.hypothesis;
-    hypothesisInfo.isDefault = (mainRow.isDefault || subRow.isDefault) ?? false;
+    hypothesisInfo.isDefault =
+      ((mainRow.isDefault && mainRow.hypothesis !== OTHER_AREAS_LABEL) || subRow.isDefault) ?? false;
   }
   return hypothesisInfo;
 };
@@ -829,9 +830,6 @@ export const getPathFromTrajectoryType = (
 
 export const getQueryParamAreaValue = (trajectoryType: TRAJECTORY_TYPE, hypothesis?: string): string | undefined => {
   let area = hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : hypothesis;
-  if (trajectoryType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
-    area = hypothesis === 'FR' ? 'FR' : OTHER_AREAS;
-  }
   if (
     trajectoryType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER ||
     trajectoryType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER ||

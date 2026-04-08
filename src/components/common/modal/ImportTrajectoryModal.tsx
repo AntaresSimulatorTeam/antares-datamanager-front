@@ -46,7 +46,7 @@ export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, hypoth
           getQueryParamAreaValue(trajectoryType, searchHypothesis),
           searchTerm,
         );
-        return convertToFSSelectionOptionType(results, searchHypothesis);
+        return convertToFSSelectionOptionType(results, hypothesis?.isDefault);
       } catch (error) {
         // silent handler
       }

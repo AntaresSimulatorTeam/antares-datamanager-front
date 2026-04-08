@@ -72,6 +72,7 @@ export const handleTrajectoryError = (
  * @param {Dispatch<SetStateAction<string>>} setRowIdSelected - State dispatcher for updating the selected row ID after processing.
  * @param {Function} toggleModal - A function to toggle the visibility of a modal, typically used to display or hide UI elements during or after the process.
  * @param {string} hypothesis - An optional parameter representing a hypothesis that determines additional query parameters.
+ * @param isDefaultArea
  * @returns {Promise<void>} Resolves to no value upon successful completion of the operation.
  * @throws Will silently handle errors during data fetching or processing without throwing or exposing exceptions.
  */
@@ -82,11 +83,12 @@ export const handleFetchTrajectoriesFS = async (
   setRowIdSelected: Dispatch<SetStateAction<string>>,
   toggleModal: () => void,
   hypothesis?: string,
+  isDefaultArea = false,
 ): Promise<void> => {
   try {
     const area = getQueryParamAreaValue(type, hypothesis);
     const results = area ? await fetchTrajectoriesFromFS(type, area) : await fetchTrajectoriesFromFS(type);
-    setOptionsFS(convertToFSSelectionOptionType(results, area));
+    setOptionsFS(convertToFSSelectionOptionType(results, isDefaultArea));
     setRowIdSelected(rowId);
     toggleModal();
   } catch {
