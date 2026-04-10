@@ -16,12 +16,8 @@ import { countWarning } from '@/shared/utils/warningUtils.ts';
 import { getNbMessagesFromTrajectoryType } from '@/shared/services/trajectoryService.ts';
 import StdTabItem from '@common/layout/stdTabs/StdTabItem.tsx';
 import { AreaLinkTab } from '@/components/tab/AreaLinkTab.tsx';
-import { LoadTab } from '@/components/tab/LoadTab.tsx';
-import { ThermalMenu } from '@/components/menu/ThermalMenu.tsx';
-import { STSTab } from '@/components/tab/STSTab.tsx';
-import DSRTab from '@/components/tab/DSRTab.tsx';
-import { MiscMenu } from '@/components/menu/MiscMenu.tsx';
-import { ResMenu } from '@/components/menu/ResMenu.tsx';
+import { TabMenu } from '@/components/menu/TabMenu.tsx';
+import ExpandableTab from '@/components/tab/ExpandableTab.tsx';
 
 type StudyNavigationMenuProps = {
   onRenderActiveComponent?: (content: ReactNode | null) => void;
@@ -46,20 +42,16 @@ const StudyNavigationMenu = ({
   const [warningTrajectory, setWarningTrajectory] = useState<WarningTrajectoryType>();
   const { areaDefault, trajectoryAreas } = useFetchAreas(studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0]);
 
-  const renderActiveComponent = (): ReactNode | null => {
-    switch (activeTab.name) {
+  const renderActiveComponent = (type: TRAJECTORY_TYPE): ReactNode | null => {
+    switch (type) {
       case TRAJECTORY_TYPE.LOAD:
-        return <LoadTab defaultAreas={areaDefault} areas={trajectoryAreas} studyData={studyData} />;
-      case TRAJECTORY_TYPE.THERMAL_CAPACITY:
-        return <ThermalMenu defaultAreas={areaDefault} areas={trajectoryAreas} studyData={studyData} />;
-      case TRAJECTORY_TYPE.STS:
-        return <STSTab defaultAreas={areaDefault} areas={trajectoryAreas} studyData={studyData} />;
       case TRAJECTORY_TYPE.DSR:
-        return <DSRTab defaultAreas={areaDefault} areas={trajectoryAreas} studyData={studyData} />;
+      case TRAJECTORY_TYPE.STS:
+        return <ExpandableTab type={type} defaultAreas={areaDefault} areas={trajectoryAreas} studyData={studyData} />;
+      case TRAJECTORY_TYPE.THERMAL_CAPACITY:
       case TRAJECTORY_TYPE.MISC_CAPACITY:
-        return <MiscMenu defaultAreas={areaDefault} areas={trajectoryAreas} studyData={studyData} />;
       case TRAJECTORY_TYPE.RES_CAPACITY:
-        return <ResMenu defaultAreas={areaDefault} areas={trajectoryAreas} studyData={studyData} />;
+        return <TabMenu type={type} defaultAreas={areaDefault} areas={trajectoryAreas} studyData={studyData} />;
       default:
         return <AreaLinkTab setErrorMessage={setErrorMessage} studyData={studyData} />;
     }
@@ -86,7 +78,7 @@ const StudyNavigationMenu = ({
     if (onRenderActiveComponent) {
       if (!activeTab.isDisabled) {
         setErrorMessage('');
-        onRenderActiveComponent(renderActiveComponent());
+        onRenderActiveComponent(renderActiveComponent(activeTab.name));
       }
     }
     void countNbWarningMessages(studyData?.id);

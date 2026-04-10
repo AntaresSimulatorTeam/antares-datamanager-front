@@ -165,6 +165,55 @@ export const buildEmptyTrajectory = (area: string, type: TRAJECTORY_TYPE, techno
   state: TRAJECTORY_SELECTION_STATUS.MISSING,
 });
 
+export const shouldBeDeletable = (
+  type?: TRAJECTORY_TYPE,
+  defaultAreas?: { name: string }[],
+  trajectory?: DbTrajectory | null,
+): boolean => {
+  if (!trajectory) return false;
+  const isDefault = defaultAreas?.some((item: { name: string }) => item.name === trajectory.area) ?? false;
+  return !isDefault && OTHER_AREAS !== trajectory.area && type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER;
+};
+
+const buildRowBase = ({
+  hypothesis,
+  trajectory,
+  isDefault,
+  isDeletable,
+  subRowOptions,
+  defaultAreas,
+  type,
+}: {
+  hypothesis: string;
+  trajectory: DbTrajectory | null;
+  isDefault: boolean;
+  isDeletable: boolean;
+  subRowOptions?: string[] | null;
+  defaultAreas?: { name: string }[];
+  type?: TRAJECTORY_TYPE;
+}): HypothesisRowData => ({
+  hypothesis,
+  trajectory,
+  status: trajectory ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+  isDefault,
+  isDeletable,
+  subRows: subRowOptions?.length
+    ? subRowOptions.map((option) => ({
+        hypothesis: option,
+        trajectory: trajectory && option === trajectory?.technology ? trajectory : null,
+        status:
+          trajectory && option === trajectory?.technology
+            ? TRAJECTORY_SELECTION_STATUS.OK
+            : TRAJECTORY_SELECTION_STATUS.MISSING,
+        isDefault:
+          type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER &&
+          defaultAreas?.some((area) => area.name === option),
+        isDeletable: shouldBeDeletable(type, defaultAreas, trajectory),
+        subRows: null,
+      }))
+    : null,
+});
+
 /**
  * Generates row data with optional sub-rows based on a trajectory and associated options.
  *
@@ -177,40 +226,26 @@ export const buildEmptyTrajectory = (area: string, type: TRAJECTORY_TYPE, techno
  */
 export const buildRowWithSubRowsData = (
   trajectory: DbTrajectory,
-  defaultAreas?: {
-    name: string;
-  }[],
+  defaultAreas?: { name: string }[],
   areasNotInTrajectoryArea?: string[],
   subRowOptions?: string[] | null,
 ): HypothesisRowData => {
-  const isDefault = defaultAreas?.some((item: { name: string }) => item.name === trajectory.area) ?? false;
-  return {
+  const isDefault = defaultAreas?.some((item) => item.name === trajectory.area) ?? false;
+
+  const shouldHaveSubRows =
+    trajectory.area &&
+    trajectory.area !== OTHER_AREAS &&
+    !areasNotInTrajectoryArea?.includes(trajectory.area) &&
+    subRowOptions;
+
+  return buildRowBase({
     hypothesis: getDefaultLabel(trajectory.area ?? ''),
     trajectory: trajectory.trajectoryName && !trajectory?.technology ? trajectory : null,
-    status:
-      trajectory.trajectoryName && !trajectory?.technology
-        ? TRAJECTORY_SELECTION_STATUS.OK
-        : TRAJECTORY_SELECTION_STATUS.MISSING,
     isDefault: isDefault || OTHER_AREAS === trajectory.area,
     isDeletable: !isDefault && OTHER_AREAS !== trajectory.area,
-    subRows:
-      trajectory.area &&
-      trajectory.area !== OTHER_AREAS &&
-      !areasNotInTrajectoryArea?.some((item) => item === trajectory.area) &&
-      subRowOptions
-        ? subRowOptions?.map((option) => {
-            const hasTechnology = trajectory?.trajectoryName && option === trajectory?.technology;
-            return {
-              hypothesis: option,
-              trajectory: hasTechnology ? trajectory : null,
-              status: hasTechnology ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
-              isDefault: true,
-              isDeletable: false,
-              subRows: null,
-            };
-          })
-        : null,
-  };
+    subRowOptions: shouldHaveSubRows ? subRowOptions : null,
+    defaultAreas,
+  });
 };
 
 /**
@@ -227,26 +262,18 @@ export const buildEmptyRowWithSubRowsData = (
   subRows: string[],
   type: TRAJECTORY_TYPE,
   defaultAreas?: { name: string }[],
-): HypothesisRowData => ({
-  hypothesis: value,
-  trajectory: null,
-  status: TRAJECTORY_SELECTION_STATUS.MISSING,
-  isDefault: defaultAreas?.some((area) => area.name === value) ?? false,
-  isDeletable: !defaultAreas?.some((area) => area.name === value),
-  subRows: subRows?.length
-    ? subRows.map((option) => ({
-        hypothesis: option,
-        trajectory: null,
-        status: TRAJECTORY_SELECTION_STATUS.MISSING,
-        isDefault: !!(
-          type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER &&
-          defaultAreas?.some((area) => area.name === option)
-        ),
-        isDeletable: defaultAreas ? !defaultAreas?.some((area) => area.name === value) : false,
-        subRows: null,
-      }))
-    : null,
-});
+): HypothesisRowData => {
+  const isDefault = defaultAreas?.some((item) => item.name === value) ?? false;
+  return buildRowBase({
+    hypothesis: value,
+    trajectory: null,
+    isDefault,
+    isDeletable: !isDefault && OTHER_AREAS !== value,
+    subRowOptions: subRows,
+    defaultAreas,
+    type,
+  });
+};
 
 /**
  * Determines if a given area is linked to any trajectory with an empty technology field in the provided trajectory list.
@@ -334,48 +361,48 @@ export const convertIntoHypothesisRowWithTechnologies = (
   defaultAreas: { name: string }[] | undefined,
   options: string[],
 ): HypothesisRowData[] => {
-  const groupedByArea: Record<string, DbTrajectory[]> = data.reduce(
-    (acc, item) => {
-      if (item.area && !acc[item.area]) acc[item.area] = [];
-      item.area && acc[item.area].push(item);
-      return acc;
-    },
-    {} as Record<string, DbTrajectory[]>,
-  );
+  const groupedByArea = data.reduce<Record<string, DbTrajectory[]>>((acc, item) => {
+    if (item.area) {
+      acc[item.area] = acc[item.area] || [];
+      acc[item.area].push(item);
+    }
+    return acc;
+  }, {});
 
   return Object.entries(groupedByArea).map(([area, entries]) => {
-    const mainEntry = entries.find((e) => e.technology === '' || e.technology == null);
-    const subRows: HypothesisRowData[] | null = shouldHaveSubRows(areasNotInTrajectoryArea, mainEntry)
-      ? options.map((option: string) => {
-          const trajectoryTechnology: DbTrajectory | undefined = entries.find((entry) =>
-            entry?.type === TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION
-              ? normalizeTechnology(entry?.technology) == snakeCaseUnderscore(option)
-              : normalizeTechnology(entry?.technology) == normalizeTechnology(option),
+    const mainEntry = entries.find((e) => !e.technology);
+
+    const subRows = shouldHaveSubRows(areasNotInTrajectoryArea, mainEntry)
+      ? options.map((option) => {
+          const matchedTech = entries.find((entry) =>
+            entry.type === TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION
+              ? normalizeTechnology(entry.technology) === snakeCaseUnderscore(option)
+              : normalizeTechnology(entry.technology) === normalizeTechnology(option),
           );
-          return {
+
+          return buildRowBase({
             hypothesis: option,
-            trajectory: trajectoryTechnology?.trajectoryName ? trajectoryTechnology : null,
-            status: trajectoryTechnology?.trajectoryName
-              ? TRAJECTORY_SELECTION_STATUS.OK
-              : TRAJECTORY_SELECTION_STATUS.MISSING,
+            trajectory: matchedTech?.trajectoryName ? matchedTech : null,
             isDefault: false,
             isDeletable: false,
-            subRows: null,
-          };
+            subRowOptions: null,
+            defaultAreas,
+          });
         })
       : null;
 
-    const isDefault = defaultAreas?.some((item: { name: string }) => item.name === mainEntry?.area) ?? false;
+    const isDefault = defaultAreas?.some((a) => a.name === mainEntry?.area) ?? false;
+
     return {
-      hypothesis: getDefaultLabel(area),
-      trajectory: mainEntry?.trajectoryName ? mainEntry : null,
-      status:
-        mainEntry?.trajectoryName && !mainEntry?.technology
-          ? TRAJECTORY_SELECTION_STATUS.OK
-          : TRAJECTORY_SELECTION_STATUS.MISSING,
-      isDefault: isDefault || mainEntry?.area === OTHER_AREAS,
-      subRows: subRows?.length ? subRows : null,
-      isDeletable: !isDefault && mainEntry?.area !== OTHER_AREAS,
+      ...buildRowBase({
+        hypothesis: getDefaultLabel(area),
+        trajectory: mainEntry?.trajectoryName ? mainEntry : null,
+        isDefault: isDefault || mainEntry?.area === OTHER_AREAS,
+        isDeletable: !isDefault && mainEntry?.area !== OTHER_AREAS,
+        subRowOptions: null,
+        defaultAreas,
+      }),
+      subRows,
     };
   });
 };
