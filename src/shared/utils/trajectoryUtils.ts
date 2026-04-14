@@ -148,7 +148,7 @@ export const shouldHaveSubRows = (areasToExclude: string[], mainEntry: DbTraject
     case TRAJECTORY_TYPE.RES_CAPACITY:
     case TRAJECTORY_TYPE.RES_LOAD:
     case TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION:
-      return true;
+      return !isInExcluded;
     case TRAJECTORY_TYPE.THERMAL_CAPACITY:
       return !isOther && !isInExcluded;
     case TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION:
