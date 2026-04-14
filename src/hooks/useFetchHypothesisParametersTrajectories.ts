@@ -109,7 +109,6 @@ export const useFetchHypothesisParametersTrajectories = (
           defaultAreaListNotInList,
           defaultAreas,
           [],
-          TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
         );
 
         const specificAreaSelected = isStudyGenerated
