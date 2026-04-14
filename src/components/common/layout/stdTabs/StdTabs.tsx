@@ -24,7 +24,7 @@ const StdTabs = <TPrimary extends StdTabItemPrimary, TSecondary extends StdTabIt
 
   useEffect(() => {
     const firstActive = items.find((item) => item.active);
-    setPrimaryCurrentTab(firstActive?.id || items[0].id);
+    setPrimaryCurrentTab(firstActive?.id || items[0]?.id);
   }, [items]);
 
   const secondaryTabs = useMemo(() => {

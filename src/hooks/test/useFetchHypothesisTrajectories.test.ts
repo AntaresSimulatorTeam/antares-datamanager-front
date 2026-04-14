@@ -1,6 +1,6 @@
 import { beforeEach, describe, Mock, vi } from 'vitest';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
-import { StudyDTO, StudyState, TrajectoryAreaData, DbTrajectory } from '@/shared/types';
+import { DbTrajectory, StudyDTO, StudyState, TrajectoryAreaData } from '@/shared/types';
 import { fetchAndNormalizeTrajectories } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { renderHook, waitFor } from '@testing-library/react';
 import * as studyService from '@/shared/services/studyService.ts';
@@ -128,7 +128,7 @@ describe('useFetchHypothesisTrajectories', () => {
             isDefault: false,
             isDeletable: true,
             status: TRAJECTORY_SELECTION_STATUS.OK,
-            subRows: null,
+            subRows: [],
             trajectory: {
               id: 1,
               trajectoryName: 'area_PB_2024',
@@ -146,7 +146,7 @@ describe('useFetchHypothesisTrajectories', () => {
             isDefault: false,
             isDeletable: true,
             status: TRAJECTORY_SELECTION_STATUS.OK,
-            subRows: null,
+            subRows: [],
             trajectory: {
               id: 2,
               trajectoryName: 'area_PB_2026',
@@ -164,7 +164,7 @@ describe('useFetchHypothesisTrajectories', () => {
             isDefault: false,
             isDeletable: true,
             status: TRAJECTORY_SELECTION_STATUS.MISSING,
-            subRows: null,
+            subRows: [],
             trajectory: null,
           },
           {
@@ -172,7 +172,7 @@ describe('useFetchHypothesisTrajectories', () => {
             isDefault: false,
             isDeletable: true,
             status: TRAJECTORY_SELECTION_STATUS.MISSING,
-            subRows: null,
+            subRows: [],
             trajectory: null,
           },
           {
@@ -180,7 +180,7 @@ describe('useFetchHypothesisTrajectories', () => {
             isDefault: false,
             isDeletable: true,
             status: TRAJECTORY_SELECTION_STATUS.OK,
-            subRows: null,
+            subRows: [],
             trajectory: {
               id: 6,
               trajectoryName: 'area_PB_2026',
@@ -198,7 +198,7 @@ describe('useFetchHypothesisTrajectories', () => {
             isDefault: true,
             isDeletable: false,
             status: TRAJECTORY_SELECTION_STATUS.MISSING,
-            subRows: null,
+            subRows: [],
             trajectory: null,
           },
         ],
@@ -264,7 +264,7 @@ describe('useFetchHypothesisTrajectories', () => {
             isDefault: false,
             isDeletable: true,
             status: TRAJECTORY_SELECTION_STATUS.OK,
-            subRows: null,
+            subRows: [],
             trajectory: {
               id: 1,
               trajectoryName: 'area_PB_2024',
@@ -282,7 +282,7 @@ describe('useFetchHypothesisTrajectories', () => {
             isDefault: false,
             isDeletable: true,
             status: TRAJECTORY_SELECTION_STATUS.OK,
-            subRows: null,
+            subRows: [],
             trajectory: {
               id: 2,
               trajectoryName: 'area_PB_2026',
@@ -300,7 +300,7 @@ describe('useFetchHypothesisTrajectories', () => {
             isDefault: false,
             isDeletable: true,
             status: TRAJECTORY_SELECTION_STATUS.MISSING,
-            subRows: null,
+            subRows: [],
             trajectory: null,
           },
           {
@@ -308,7 +308,7 @@ describe('useFetchHypothesisTrajectories', () => {
             isDefault: false,
             isDeletable: true,
             status: TRAJECTORY_SELECTION_STATUS.MISSING,
-            subRows: null,
+            subRows: [],
             trajectory: null,
           },
           {
@@ -316,7 +316,7 @@ describe('useFetchHypothesisTrajectories', () => {
             isDefault: true,
             isDeletable: false,
             status: TRAJECTORY_SELECTION_STATUS.MISSING,
-            subRows: null,
+            subRows: [],
             trajectory: null,
           },
         ],
@@ -385,7 +385,7 @@ describe('useFetchHypothesisTrajectories', () => {
             isDefault: false,
             isDeletable: true,
             status: TRAJECTORY_SELECTION_STATUS.OK,
-            subRows: null,
+            subRows: [],
             trajectory: {
               id: 1,
               trajectoryName: 'area_PB_2024',
@@ -403,7 +403,7 @@ describe('useFetchHypothesisTrajectories', () => {
             isDefault: false,
             isDeletable: true,
             status: TRAJECTORY_SELECTION_STATUS.OK,
-            subRows: null,
+            subRows: [],
             trajectory: {
               id: 2,
               trajectoryName: 'area_PB_2026',
@@ -421,7 +421,7 @@ describe('useFetchHypothesisTrajectories', () => {
             isDefault: true,
             isDeletable: false,
             status: TRAJECTORY_SELECTION_STATUS.MISSING,
-            subRows: null,
+            subRows: [],
             trajectory: null,
           },
         ],
@@ -499,7 +499,7 @@ describe('useFetchHypothesisTrajectories', () => {
             isDefault: false,
             isDeletable: true,
             status: TRAJECTORY_SELECTION_STATUS.OK,
-            subRows: null,
+            subRows: [],
             trajectory: {
               id: 1,
               trajectoryName: 'area_PB_2024',
@@ -517,7 +517,7 @@ describe('useFetchHypothesisTrajectories', () => {
             isDefault: true,
             isDeletable: false,
             status: TRAJECTORY_SELECTION_STATUS.MISSING,
-            subRows: null,
+            subRows: [],
             trajectory: null,
           },
         ],
@@ -649,6 +649,14 @@ describe('useFetchHypothesisTrajectories', () => {
       expect(defaultConfigService.getThermalTechnologyList).not.toHaveBeenCalled();
       expect(result.current.hypothesisTrajectories?.[TRAJECTORY_TYPE.STS]).toEqual([
         {
+          hypothesis: 'FR',
+          isDefault: true,
+          isDeletable: false,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          subRows: technologiesHypothesis,
+          trajectory: null,
+        },
+        {
           hypothesis: 'AT',
           isDefault: false,
           isDeletable: true,
@@ -665,7 +673,7 @@ describe('useFetchHypothesisTrajectories', () => {
           trajectory: null,
         },
         {
-          hypothesis: 'Other areas',
+          hypothesis: OTHER_AREAS_LABEL,
           isDefault: true,
           isDeletable: false,
           status: TRAJECTORY_SELECTION_STATUS.MISSING,
@@ -699,11 +707,19 @@ describe('useFetchHypothesisTrajectories', () => {
       expect(result.current.hypothesisTrajectories).toEqual({
         [TRAJECTORY_TYPE.DSR]: [
           {
+            hypothesis: 'FR',
+            isDefault: true,
+            isDeletable: false,
+            status: TRAJECTORY_SELECTION_STATUS.MISSING,
+            subRows: [],
+            trajectory: null,
+          },
+          {
             hypothesis: 'AT',
             isDefault: false,
             isDeletable: true,
             status: TRAJECTORY_SELECTION_STATUS.MISSING,
-            subRows: null,
+            subRows: [],
             trajectory: null,
           },
           {
@@ -711,7 +727,7 @@ describe('useFetchHypothesisTrajectories', () => {
             isDefault: false,
             isDeletable: true,
             status: TRAJECTORY_SELECTION_STATUS.MISSING,
-            subRows: null,
+            subRows: [],
             trajectory: null,
           },
           {
@@ -719,7 +735,7 @@ describe('useFetchHypothesisTrajectories', () => {
             isDefault: true,
             isDeletable: false,
             status: TRAJECTORY_SELECTION_STATUS.MISSING,
-            subRows: null,
+            subRows: [],
             trajectory: null,
           },
           {
@@ -747,8 +763,8 @@ describe('useFetchHypothesisTrajectories', () => {
       { id: 99, trajectoryName: '' },
       { id: 11, trajectoryName: '' },
     ] as DbTrajectory[];
-    vi.spyOn(trajectoryUtils, 'removeDuplicate').mockReturnValue(expectedTrajectories as any);
-    vi.spyOn(trajectoryUtils, 'removeDuplicateByTechnology').mockReturnValue(expectedTrajectories as any);
+    vi.spyOn(trajectoryUtils, 'removeDuplicate').mockReturnValue(expectedTrajectories);
+    vi.spyOn(trajectoryUtils, 'removeDuplicateByTechnology').mockReturnValue(expectedTrajectories);
 
     const trajectoryService = await import('@/shared/services/trajectoryService.ts');
     vi.mocked(trajectoryService.getResTechnologyList).mockResolvedValue(['Offshore Wind', 'Solar PV']);

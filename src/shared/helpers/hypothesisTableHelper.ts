@@ -7,7 +7,6 @@ import {
 } from '@/shared/types';
 import {
   buildDefaultEmptyTrajectoryList,
-  buildRowWithSubRowsData,
   convertIntoHypothesisRowWithTechnologies,
   filterRow,
   generateReadOnlyIndexMap,
@@ -280,11 +279,12 @@ export const buildHypothesisRows = ({
 }) => {
   const defaultNotIncluded = getDefaultAreaNotIncludedInAreaList(defaultAreas ?? [], areas);
 
-  let rows = isTrajectorySubrowsType(trajType)
-    ? convertIntoHypothesisRowWithTechnologies(trajectories, defaultNotIncluded, defaultAreas, technologies ?? [])
-    : trajectories
-        .map((trajectory) => buildRowWithSubRowsData(trajectory, defaultAreas, defaultNotIncluded, null))
-        .filter(Boolean);
+  let rows = convertIntoHypothesisRowWithTechnologies(
+    trajectories,
+    defaultNotIncluded,
+    defaultAreas,
+    technologies ?? [],
+  );
 
   rows = sortWithFixedPosition(isStudyGenerated ? filterRow(rows) : rows);
 
@@ -460,6 +460,23 @@ export const updateTableAfterCellDetach = async ({
     return {
       newData,
       newReadOnly: readOnlyPatch,
+    };
+  }
+
+  if (type === TRAJECTORY_TYPE.AREA) {
+    const hasLinks = indexArray[0] === 0 && data[1].trajectory;
+    const newData = data.map((item, index) =>
+      index === indexArray[0] || hasLinks
+        ? {
+            ...item,
+            trajectory: null,
+            status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          }
+        : item,
+    );
+    return {
+      newData,
+      newReadOnly: { '0': false, '1': indexArray[0] === 0 },
     };
   }
 

@@ -83,7 +83,13 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
     setCheckedValues,
     setReadOnly,
   );
-  const { detachTrajectory } = useTrajectoryDetach(studyData, dispatch, setReadOnly);
+  const { detachTrajectory } = useTrajectoryDetach(
+    studyData,
+    dispatch,
+    setReadOnly,
+    setIsDeletionModalOpen,
+    setRowIdSelected,
+  );
 
   useEffect(() => {
     const setHypothesis = () => {

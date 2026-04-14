@@ -517,7 +517,7 @@ describe('addRow', () => {
       trajectory: null,
       status: TRAJECTORY_SELECTION_STATUS.MISSING,
       isDefault: false,
-      subRows: null,
+      subRows: [],
     });
   });
 
@@ -603,7 +603,7 @@ describe('addRow', () => {
       trajectory: null,
       status: TRAJECTORY_SELECTION_STATUS.MISSING,
       isDefault: false,
-      subRows: null,
+      subRows: [],
     });
   });
 
@@ -721,7 +721,7 @@ describe('addRow', () => {
       trajectory: null,
       status: TRAJECTORY_SELECTION_STATUS.MISSING,
       isDefault: false,
-      subRows: null,
+      subRows: [],
     });
   });
 });

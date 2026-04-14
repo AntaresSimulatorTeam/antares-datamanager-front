@@ -132,18 +132,33 @@ export const removeDuplicateByTechnology = (array?: DbTrajectory[]): DbTrajector
   }, []);
 
 /**
- * Create row data for a hypothesis table
- * @param {string} areaName
- * @param {boolean} isDefault
- * @param {DbTrajectory | null} trajectory
- * @return {HypothesisRowData}
+ * Determines whether a given trajectory should have sub-rows based on specified conditions.
+ *
+ * @param {string[]} areasToExclude - A list of area identifiers to exclude from consideration.
+ * @param {DbTrajectory} [mainEntry] - An optional trajectory data object containing information about type and area.
+ * @returns {boolean} True if the trajectory should have sub-rows, otherwise false.
  */
-export const buildRowData = (areaName: string, isDefault: boolean, trajectory?: DbTrajectory): HypothesisRowData => ({
-  hypothesis: areaName === OTHER_AREAS ? OTHER_AREAS_LABEL : areaName,
-  trajectory: trajectory?.trajectoryName ? trajectory : null,
-  status: trajectory?.trajectoryName ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
-  isDefault,
-});
+export const shouldHaveSubRows = (areasToExclude: string[], mainEntry: DbTrajectory | null): boolean => {
+  if (!mainEntry) return true;
+
+  const isInExcluded = areasToExclude.includes(mainEntry.area);
+  const isOther = mainEntry.area === OTHER_AREAS;
+  switch (mainEntry.type) {
+    case TRAJECTORY_TYPE.STS:
+    case TRAJECTORY_TYPE.RES_CAPACITY:
+    case TRAJECTORY_TYPE.RES_LOAD:
+    case TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION:
+      return true;
+    case TRAJECTORY_TYPE.THERMAL_CAPACITY:
+      return !isOther && !isInExcluded;
+    case TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION:
+      return false;
+    default:
+      return isOther || !isInExcluded;
+  }
+};
+
+const normalizeTechnology = (s: string | undefined | null) => s?.trim().toLowerCase();
 
 /**
  * Create an empty database trajectory
@@ -175,103 +190,125 @@ export const shouldBeDeletable = (
   return !isDefault && OTHER_AREAS !== trajectory.area && type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER;
 };
 
-const buildRowBase = ({
+const findTechnologyMatch = (entries: DbTrajectory[], option: string) =>
+  entries.find((entry) =>
+    entry.type === TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION
+      ? normalizeTechnology(entry.technology) === snakeCaseUnderscore(option)
+      : normalizeTechnology(entry.technology) === normalizeTechnology(option),
+  ) ?? null;
+
+const computeStatus = (trajectory: DbTrajectory | null) =>
+  trajectory?.trajectoryName ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING;
+
+const computeIsDefault = (area: string | undefined, defaultAreas?: { name: string }[]) =>
+  defaultAreas?.some((a) => a.name === area) ?? false;
+
+const buildRow = ({
   hypothesis,
   trajectory,
   isDefault,
   isDeletable,
-  subRowOptions,
-  defaultAreas,
-  type,
 }: {
   hypothesis: string;
   trajectory: DbTrajectory | null;
   isDefault: boolean;
   isDeletable: boolean;
-  subRowOptions?: string[] | null;
-  defaultAreas?: { name: string }[];
-  type?: TRAJECTORY_TYPE;
 }): HypothesisRowData => ({
   hypothesis,
-  trajectory,
-  status: trajectory ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+  trajectory: trajectory?.trajectoryName ? trajectory : null,
+  status: computeStatus(trajectory),
   isDefault,
   isDeletable,
-  subRows: subRowOptions?.length
-    ? subRowOptions.map((option) => ({
-        hypothesis: option,
-        trajectory: trajectory && option === trajectory?.technology ? trajectory : null,
-        status:
-          trajectory && option === trajectory?.technology
-            ? TRAJECTORY_SELECTION_STATUS.OK
-            : TRAJECTORY_SELECTION_STATUS.MISSING,
-        isDefault:
-          type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER &&
-          defaultAreas?.some((area) => area.name === option),
-        isDeletable: shouldBeDeletable(type, defaultAreas, trajectory),
-        subRows: null,
-      }))
-    : null,
+  subRows: null,
 });
 
-/**
- * Generates row data with optional sub-rows based on a trajectory and associated options.
- *
- * @param {DbTrajectory} trajectory - The trajectory object containing load area and other properties.
- * @param {string[]} subRowOptions - An array of sub-row options to be considered for sub-rows.
- * @param {{name: string}[]} [defaultAreas] - An optional array of default areas used to check if a trajectory is default.
- * @param {string[]} [areasNotInTrajectoryArea] - An optional array of area names not included in the trajectory's area.
- *
- * @returns {HypothesisRowData} An object representing the row data, which includes the trajectory hypothesis, status, default status, and optional sub-rows data.
- */
-export const buildRowWithSubRowsData = (
-  trajectory: DbTrajectory,
+const buildSubRows = (
+  entries: DbTrajectory[],
+  options: string[],
   defaultAreas?: { name: string }[],
-  areasNotInTrajectoryArea?: string[],
-  subRowOptions?: string[] | null,
-): HypothesisRowData => {
-  const isDefault = defaultAreas?.some((item) => item.name === trajectory.area) ?? false;
+): HypothesisRowData[] =>
+  options.map((option) => {
+    const matchedTech = findTechnologyMatch(entries, option);
 
-  const shouldHaveSubRows =
-    trajectory.area &&
-    trajectory.area !== OTHER_AREAS &&
-    !areasNotInTrajectoryArea?.includes(trajectory.area) &&
-    subRowOptions;
-
-  return buildRowBase({
-    hypothesis: getDefaultLabel(trajectory.area ?? ''),
-    trajectory: trajectory.trajectoryName && !trajectory?.technology ? trajectory : null,
-    isDefault: isDefault || OTHER_AREAS === trajectory.area,
-    isDeletable: !isDefault && OTHER_AREAS !== trajectory.area,
-    subRowOptions: shouldHaveSubRows ? subRowOptions : null,
-    defaultAreas,
+    return buildRow({
+      hypothesis: option,
+      trajectory: matchedTech ?? null,
+      isDefault: false,
+      isDeletable: shouldBeDeletable(matchedTech?.type, defaultAreas, matchedTech ?? null),
+    });
   });
+
+export const buildRowWithSubRows = ({
+  hypothesis,
+  trajectory,
+  techEntries,
+  options,
+  defaultAreas,
+  areasNotInTrajectoryArea,
+}: {
+  hypothesis: string;
+  trajectory: DbTrajectory | null;
+  techEntries?: DbTrajectory[]; // <--- ajouté
+  options: string[];
+  defaultAreas?: { name: string }[];
+  areasNotInTrajectoryArea: string[];
+}): HypothesisRowData => {
+  const isDefault = computeIsDefault(hypothesis, defaultAreas);
+  const isOtherArea = hypothesis === OTHER_AREAS_LABEL;
+
+  const baseRow = buildRow({
+    hypothesis,
+    trajectory,
+    isDefault: isDefault || isOtherArea,
+    isDeletable: !isDefault && !isOtherArea,
+  });
+
+  // Si aucune subrow n'est attendue
+  if (!shouldHaveSubRows(areasNotInTrajectoryArea, trajectory)) {
+    return { ...baseRow, subRows: null };
+  }
+
+  // On génère toujours une subrow par option
+  const subRows = buildSubRows(techEntries ?? [], options, defaultAreas);
+
+  return { ...baseRow, subRows };
 };
 
-/**
- * Constructs an object representing a row with optional sub-rows data.
- *
- * @param {string} value - The hypothesis value for the main row.
- * @param {string[]} subRows - Array of options for sub-rows.
- * @param type
- * @param defaultAreas
- * @returns {HypothesisRowData} An object representing the row, containing details such as hypothesis, trajectory, status, isDefault, isDeletable, and optionally subRows if hasSubRows is true.
- */
-export const buildEmptyRowWithSubRowsData = (
-  value: string,
-  subRows: string[],
-  type: TRAJECTORY_TYPE,
-  defaultAreas?: { name: string }[],
-): HypothesisRowData => {
-  const isDefault = defaultAreas?.some((item) => item.name === value) ?? false;
-  return buildRowBase({
-    hypothesis: value,
-    trajectory: null,
-    isDefault,
-    isDeletable: !isDefault && OTHER_AREAS !== value,
-    subRowOptions: subRows,
-    defaultAreas,
-    type,
+export const convertIntoHypothesisRowWithTechnologies = (
+  data: DbTrajectory[],
+  areasNotInTrajectoryArea: string[],
+  defaultAreas: { name: string }[] | undefined,
+  options: string[],
+): HypothesisRowData[] => {
+  const groupedByArea = data.reduce<Record<string, DbTrajectory[]>>((acc, item) => {
+    if (item.area) {
+      acc[item.area] = acc[item.area] || [];
+      acc[item.area].push(item);
+    }
+    return acc;
+  }, {});
+
+  const allAreas = new Set([
+    ...Object.keys(groupedByArea),
+    ...areasNotInTrajectoryArea,
+    ...(defaultAreas?.map((a) => a.name) ?? []),
+  ]);
+
+  return Array.from(allAreas).map((area) => {
+    const entries = groupedByArea[area] ?? [];
+
+    const parentEntry = entries.find((e) => !e.technology || e.technology.trim() === '') ?? null;
+
+    const techEntries = entries.filter((e) => e.technology && e.technology.trim() !== '');
+
+    return buildRowWithSubRows({
+      hypothesis: getDefaultLabel(area),
+      trajectory: parentEntry,
+      techEntries,
+      options,
+      defaultAreas,
+      areasNotInTrajectoryArea,
+    });
   });
 };
 
@@ -311,100 +348,6 @@ export const buildDefaultEmptyTrajectoryList = (
     trajectories.length === 0 ? areaDefault : areaDefault.filter((area) => !isTrajectoryLinked(area, trajectories));
   // Then build default empty areas
   return (defaultAreasNotLinkedToTrajectory || []).map((defaultArea) => buildEmptyTrajectory(defaultArea.name, type));
-};
-
-/**
- * Determines whether a given trajectory should have sub-rows based on specified conditions.
- *
- * @param {string[]} areasToExclude - A list of area identifiers to exclude from consideration.
- * @param {DbTrajectory} [mainEntry] - An optional trajectory data object containing information about type and area.
- * @returns {boolean} True if the trajectory should have sub-rows, otherwise false.
- */
-export const shouldHaveSubRows = (areasToExclude: string[], mainEntry?: DbTrajectory): boolean => {
-  if (!mainEntry) return true;
-
-  const isInExcluded = areasToExclude.includes(mainEntry.area);
-  const isOther = mainEntry.area === OTHER_AREAS;
-  switch (mainEntry.type) {
-    case TRAJECTORY_TYPE.STS:
-    case TRAJECTORY_TYPE.RES_CAPACITY:
-    case TRAJECTORY_TYPE.RES_LOAD:
-    case TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION:
-      return true;
-    case TRAJECTORY_TYPE.THERMAL_CAPACITY:
-      return !isOther && !isInExcluded;
-    case TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION:
-      return false;
-    default:
-      return isOther || !isInExcluded;
-  }
-};
-
-const normalizeTechnology = (s: string | undefined | null) => s?.trim().toLowerCase();
-
-/**
- * Transforms data into a structured array of hypothesis rows, enriched with associated technologies.
- *
- * @param {DbTrajectory[]} data - An array of trajectory data objects, where each object contains detailed information
- *                                about a trajectory, including its area and associated technology.
- * @param {string[]} areasNotInTrajectoryArea - A list of areas that should not be included in the main trajectory area.
- * @param {{ name: string }[] | undefined} defaultAreas - An optional array of default area objects, where each object
- *                                                       contains a name field that specifies a default area.
- *
- * @param {string[]} options - Thechnologies names array
- * @returns {HypothesisRowData[]} An array of hypothesis row objects, each containing trajectory details,
- *                                technology-specific sub-rows, and metadata like status and default indicators.
- */
-export const convertIntoHypothesisRowWithTechnologies = (
-  data: DbTrajectory[],
-  areasNotInTrajectoryArea: string[],
-  defaultAreas: { name: string }[] | undefined,
-  options: string[],
-): HypothesisRowData[] => {
-  const groupedByArea = data.reduce<Record<string, DbTrajectory[]>>((acc, item) => {
-    if (item.area) {
-      acc[item.area] = acc[item.area] || [];
-      acc[item.area].push(item);
-    }
-    return acc;
-  }, {});
-
-  return Object.entries(groupedByArea).map(([area, entries]) => {
-    const mainEntry = entries.find((e) => !e.technology);
-
-    const subRows = shouldHaveSubRows(areasNotInTrajectoryArea, mainEntry)
-      ? options.map((option) => {
-          const matchedTech = entries.find((entry) =>
-            entry.type === TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION
-              ? normalizeTechnology(entry.technology) === snakeCaseUnderscore(option)
-              : normalizeTechnology(entry.technology) === normalizeTechnology(option),
-          );
-
-          return buildRowBase({
-            hypothesis: option,
-            trajectory: matchedTech?.trajectoryName ? matchedTech : null,
-            isDefault: false,
-            isDeletable: false,
-            subRowOptions: null,
-            defaultAreas,
-          });
-        })
-      : null;
-
-    const isDefault = defaultAreas?.some((a) => a.name === mainEntry?.area) ?? false;
-
-    return {
-      ...buildRowBase({
-        hypothesis: getDefaultLabel(area),
-        trajectory: mainEntry?.trajectoryName ? mainEntry : null,
-        isDefault: isDefault || mainEntry?.area === OTHER_AREAS,
-        isDeletable: !isDefault && mainEntry?.area !== OTHER_AREAS,
-        subRowOptions: null,
-        defaultAreas,
-      }),
-      subRows,
-    };
-  });
 };
 
 /**

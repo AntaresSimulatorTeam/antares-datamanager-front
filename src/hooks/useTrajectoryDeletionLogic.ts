@@ -82,7 +82,6 @@ export const useTrajectoryDeletionLogic = (study: StudyDTO) => {
           }
         }
       }
-
       // --- Cas générique ---
       else {
         const rowIndex = indexRow ?? indexArray?.[0];

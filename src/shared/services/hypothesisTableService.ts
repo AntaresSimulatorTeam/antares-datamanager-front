@@ -1,7 +1,7 @@
 import {
-  buildEmptyRowWithSubRowsData,
   buildEmptyTrajectory,
   buildErrorTrajectory,
+  buildRowWithSubRows,
   getQueryParamAreaValue,
   setNestedData,
 } from '@/shared/utils/trajectoryUtils.ts';
@@ -35,6 +35,7 @@ import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { getSchemeData } from '@/shared/utils/hypothesisTableUtils.ts';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { computeDsrDataAndReadOnly } from '@/shared/helpers/hypothesisTableHelper.ts';
+import { TrajectorySearchParams } from '@/shared/types/HypothesisTable.ts';
 
 export const handleTrajectoryError = (
   type: TRAJECTORY_TYPE,
@@ -115,7 +116,7 @@ export const handleTrajectorySearch = async (
   type: TRAJECTORY_TYPE,
   setDbTrajectories: Dispatch<SetStateAction<DbTrajectory[]>>,
   studyHorizon: string,
-  options: { area?: string; technology?: string; fileNameContains?: string },
+  options: TrajectorySearchParams,
 ): Promise<SelectOption[] | undefined> => {
   try {
     if (options?.area && options.area === OTHER_AREAS_LABEL) {
@@ -162,7 +163,13 @@ export const addRow = (
   });
 
   const subRows = isTrajectorySubrowsType(type) && options ? options : [];
-  const newRow: HypothesisRowData = buildEmptyRowWithSubRowsData(area, subRows, type, defaultAreas);
+  const newRow: HypothesisRowData = buildRowWithSubRows({
+    hypothesis: area,
+    trajectory: null,
+    options: subRows,
+    defaultAreas,
+    areasNotInTrajectoryArea: [],
+  });
   setCheckedValues((prev) => [...prev, area]);
 
   setData((prev) => {

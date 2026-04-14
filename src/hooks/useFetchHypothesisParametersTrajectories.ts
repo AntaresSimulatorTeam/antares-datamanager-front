@@ -12,7 +12,7 @@ import {
 import {
   buildDefaultEmptyTrajectoryList,
   buildEmptyTrajectory,
-  buildRowWithSubRowsData,
+  convertIntoHypothesisRowWithTechnologies,
   generateReadOnlyIndexMap,
   removeDuplicate,
   retrieveReadOnlyArea,
@@ -104,9 +104,13 @@ export const useFetchHypothesisParametersTrajectories = (
         const defaultAreaListNotInList: string[] = getDefaultAreaNotIncludedInAreaList(defaultAreas ?? [], areas);
 
         // Hypothesis table
-        const specificAreaData = arrayWithoutDuplicate
-          ?.map((trajectory) => buildRowWithSubRowsData(trajectory, defaultAreas, defaultAreaListNotInList, null))
-          .filter(Boolean);
+        const specificAreaData = convertIntoHypothesisRowWithTechnologies(
+          arrayWithoutDuplicate,
+          defaultAreaListNotInList,
+          defaultAreas,
+          [],
+          TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+        );
 
         const specificAreaSelected = isStudyGenerated
           ? specificAreaData.filter(

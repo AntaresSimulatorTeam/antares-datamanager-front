@@ -42,21 +42,6 @@ const StudyNavigationMenu = ({
   const [warningTrajectory, setWarningTrajectory] = useState<WarningTrajectoryType>();
   const { areaDefault, trajectoryAreas } = useFetchAreas(studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0]);
 
-  const renderActiveComponent = (type: TRAJECTORY_TYPE): ReactNode | null => {
-    switch (type) {
-      case TRAJECTORY_TYPE.LOAD:
-      case TRAJECTORY_TYPE.DSR:
-      case TRAJECTORY_TYPE.STS:
-        return <ExpandableTab type={type} defaultAreas={areaDefault} areas={trajectoryAreas} studyData={studyData} />;
-      case TRAJECTORY_TYPE.THERMAL_CAPACITY:
-      case TRAJECTORY_TYPE.MISC_CAPACITY:
-      case TRAJECTORY_TYPE.RES_CAPACITY:
-        return <TabMenu type={type} defaultAreas={areaDefault} areas={trajectoryAreas} studyData={studyData} />;
-      default:
-        return <AreaLinkTab setErrorMessage={setErrorMessage} studyData={studyData} />;
-    }
-  };
-
   useEffect(() => {
     setTabs((prev) =>
       prev.map((tab) => ({
@@ -67,6 +52,20 @@ const StudyNavigationMenu = ({
   }, [studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories]);
 
   useEffect(() => {
+    const renderActiveComponent = (type: TRAJECTORY_TYPE): ReactNode | null => {
+      switch (type) {
+        case TRAJECTORY_TYPE.LOAD:
+        case TRAJECTORY_TYPE.DSR:
+        case TRAJECTORY_TYPE.STS:
+          return <ExpandableTab type={type} defaultAreas={areaDefault} areas={trajectoryAreas} studyData={studyData} />;
+        case TRAJECTORY_TYPE.THERMAL_CAPACITY:
+        case TRAJECTORY_TYPE.MISC_CAPACITY:
+        case TRAJECTORY_TYPE.RES_CAPACITY:
+          return <TabMenu type={type} defaultAreas={areaDefault} areas={trajectoryAreas} studyData={studyData} />;
+        default:
+          return <AreaLinkTab setErrorMessage={setErrorMessage} studyData={studyData} />;
+      }
+    };
     const countNbWarningMessages = async (id: number) => {
       try {
         const result = await getNbMessagesFromTrajectoryType(id);
@@ -82,7 +81,16 @@ const StudyNavigationMenu = ({
       }
     }
     void countNbWarningMessages(studyData?.id);
-  }, [activeTab, onRenderActiveComponent, studyData?.id, studyState]);
+  }, [
+    activeTab,
+    areaDefault,
+    onRenderActiveComponent,
+    setErrorMessage,
+    studyData,
+    studyData?.id,
+    studyState,
+    trajectoryAreas,
+  ]);
 
   return (
     <div className="flex space-x-4 p-4">

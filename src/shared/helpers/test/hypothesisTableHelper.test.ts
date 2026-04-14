@@ -932,7 +932,9 @@ describe('buildHypothesisRows', () => {
   });
 
   it('should build rows for generic type', () => {
-    vi.mocked(trajectoryUtils.buildRowWithSubRowsData).mockReturnValue({ id: 1 } as unknown as HypothesisRowData);
+    vi.mocked(trajectoryUtils.convertIntoHypothesisRowWithTechnologies).mockReturnValue({
+      id: 1,
+    } as unknown as HypothesisRowData[]);
     vi.mocked(sortUtils.sortWithFixedPosition).mockReturnValue([{ id: 1 }] as unknown as HypothesisRowData[]);
 
     const result = buildHypothesisRows({
@@ -946,12 +948,14 @@ describe('buildHypothesisRows', () => {
       dsrCmResult: [],
     });
 
-    expect(trajectoryUtils.buildRowWithSubRowsData).toHaveBeenCalled();
+    expect(trajectoryUtils.convertIntoHypothesisRowWithTechnologies).toHaveBeenCalled();
     expect(result).toEqual([{ id: 1 }]);
   });
 
   it('should add DSR capacity modulation row', () => {
-    vi.mocked(trajectoryUtils.buildRowWithSubRowsData).mockReturnValue({ id: 1 } as unknown as HypothesisRowData);
+    vi.mocked(trajectoryUtils.convertIntoHypothesisRowWithTechnologies).mockReturnValue({
+      id: 1,
+    } as unknown as HypothesisRowData[]);
     vi.mocked(sortUtils.sortWithFixedPosition).mockReturnValue([{ id: 1 }] as unknown as HypothesisRowData[]);
 
     const result = buildHypothesisRows({
