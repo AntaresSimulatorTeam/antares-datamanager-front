@@ -464,7 +464,7 @@ export const updateTableAfterCellDetach = async ({
   }
 
   if (type === TRAJECTORY_TYPE.AREA) {
-    const hasLinks = indexArray[0] === 0 && data[1].trajectory;
+    const hasLinks = indexArray[0] === 0 && data[1]?.trajectory;
     const newData = data.map((item, index) =>
       index === indexArray[0] || hasLinks
         ? {

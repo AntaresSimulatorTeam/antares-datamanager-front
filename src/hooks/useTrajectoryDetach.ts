@@ -69,46 +69,47 @@ export const useTrajectoryDetach = (
         if ((error as TrajectoryBackendError).message.includes('Confirmation required')) {
           setRowIdSelected?.(String(indexArray[0]));
           setIsDeletionModalOpen?.(true);
-        } else if (type === TRAJECTORY_TYPE.AREA) {
-          const newDbTrajectory = buildErrorTrajectory(
-            indexArray[0] === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
-            trajectoryIds[0],
-            trajectoryToDelete?.trajectoryName ?? '',
-            user?.profile?.sub ?? null,
-            '',
-          );
-          //Case: area control failed and a trajectory Links is linked to the study with ok status
-          const shouldUnlink =
-            indexArray[0] === 0 && data[1]?.trajectory && data[1]?.status !== TRAJECTORY_SELECTION_STATUS.ERROR;
-          if (shouldUnlink && data[1]?.trajectory?.id) {
-            await performBackendDeletion([data[1]?.trajectory?.id]);
-            dispatch?.({
-              type: STUDY_ACTION.CLEAR_TRAJECTORY_BY_TYPE,
-              payload: [TRAJECTORY_TYPE.LINK],
-            } as StudyActionType);
-          }
-          setData((prev) =>
-            prev.map((item, index) => {
-              if (index === indexArray[0]) {
-                return {
-                  ...item,
-                  trajectory: newDbTrajectory,
-                  status: TRAJECTORY_SELECTION_STATUS.ERROR,
-                };
-              } else if (shouldUnlink) {
-                return {
-                  ...item,
-                  trajectory: null,
-                  status: TRAJECTORY_SELECTION_STATUS.MISSING,
-                };
-              } else {
-                return item;
-              }
-            }),
-          );
-
-          setReadOnly?.({ '0': false, '1': false });
         } else {
+          if (type === TRAJECTORY_TYPE.AREA) {
+            const newDbTrajectory = buildErrorTrajectory(
+              indexArray[0] === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
+              trajectoryIds[0],
+              trajectoryToDelete?.trajectoryName ?? '',
+              user?.profile?.sub ?? null,
+              '',
+            );
+            //Case: area control failed and a trajectory Links is linked to the study with ok status
+            const shouldUnlink =
+              indexArray[0] === 0 && data[1]?.trajectory && data[1]?.status !== TRAJECTORY_SELECTION_STATUS.ERROR;
+            if (shouldUnlink && data[1]?.trajectory?.id) {
+              await performBackendDeletion([data[1]?.trajectory?.id]);
+              dispatch?.({
+                type: STUDY_ACTION.CLEAR_TRAJECTORY_BY_TYPE,
+                payload: [TRAJECTORY_TYPE.LINK],
+              } as StudyActionType);
+            }
+            setData((prev) =>
+              prev.map((item, index) => {
+                if (index === indexArray[0]) {
+                  return {
+                    ...item,
+                    trajectory: newDbTrajectory,
+                    status: TRAJECTORY_SELECTION_STATUS.ERROR,
+                  };
+                } else if (shouldUnlink) {
+                  return {
+                    ...item,
+                    trajectory: null,
+                    status: TRAJECTORY_SELECTION_STATUS.MISSING,
+                  };
+                } else {
+                  return item;
+                }
+              }),
+            );
+
+            setReadOnly?.({ '0': false, '1': false });
+          }
           const message = t('studyDetails.@notificationAlert', {
             studyName: study.name,
             trajectoryName: trajectoryToDelete?.trajectoryName,

@@ -38,7 +38,6 @@ export const AreaLinkTab = ({ setErrorMessage, studyData }: AreaLinkTabProps) =>
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const dispatch = useStudyDispatch();
   const { t } = useTranslation();
-  //const { user } = useUser();
   const [optionsFS, setOptionsFS] = useState<SelectOption[] | undefined>();
   const [rowIdSelected, setRowIdSelected] = useState<string>('0');
   const [trajectoryData, setTrajectoryData] = useState<TrajectoryViewData | undefined>();
