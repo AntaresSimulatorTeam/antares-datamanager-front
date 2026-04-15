@@ -38,7 +38,7 @@ const PegaseCard = ({
   const { buttonContainerClasses, primaryButtonContainerClasses, secondaryButtonContainerClasses } =
     cardClassBuilder(secondaryButtonPosition);
   return (
-    <div
+    <section
       className="flex h-full w-full cursor-pointer flex-col gap-2 p-2"
       style={{
         borderRadius: '0.375rem',
@@ -46,6 +46,7 @@ const PegaseCard = ({
       }}
       onClick={buttons ? undefined : onClick}
       onKeyDown={buttons ? undefined : onClick}
+      role="region"
     >
       <PegaseCardTitle
         id={`${id}-title`}
@@ -77,7 +78,7 @@ const PegaseCard = ({
           )}
         </div>
       )}
-    </div>
+    </section>
   );
 };
 
