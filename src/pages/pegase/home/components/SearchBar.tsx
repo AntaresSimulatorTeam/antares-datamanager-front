@@ -20,7 +20,7 @@ const SearchBar = ({ onSearch, placeholder }: SearchBarProps) => {
         onChange={onSearch}
         onSearch={onSearch}
         placeHolder={placeholder ?? t('home.@searchBar')}
-        variant="outlined"
+        variant="filled"
       />
     </div>
   );

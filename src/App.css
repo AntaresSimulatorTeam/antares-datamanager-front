@@ -1,12 +1,10 @@
-@layer rte-design-system-react
+@layer design-system-rte;
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  overflow: hidden;
-  margin: 0 auto;
   text-align: center;
   font-family: 'Nunito Sans Variable', system-ui, sans-serif;
   font-weight: 400;

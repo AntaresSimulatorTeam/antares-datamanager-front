@@ -64,8 +64,8 @@ const ProjectContent = () => {
   };
 
   return (
-    <div className="flex w-full flex-1 flex-col gap-3">
-      <div className="flex gap-4 py-2">
+    <div className="m-0 flex w-full flex-1 flex-col gap-3">
+      <div className="flex items-center gap-4">
         <SearchBar onSearch={(value?: string) => setSearchTerm(value)} />
         <RdsChip
           label={t('home.@my_projects')}
@@ -73,7 +73,13 @@ const ProjectContent = () => {
           status={activeChip ? 'secondary' : 'primary'}
         />
       </div>
-      <div className="grid w-full grid-cols-3 gap-3">
+      <div
+        className="grid w-full gap-3"
+        style={{
+          gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+          margin: 0,
+        }}
+      >
         {(projects.length > intervalSize ? projects.splice(0, 9) : projects || []).map((project) => {
           const dropdownItems: StdDropdownOption[] = [
             pinOption(false, () => void handlePinProject(project.id), pinnedProjects?.length >= 3),

@@ -18,7 +18,7 @@ const Settings = () => {
     void i18n.changeLanguage(lang);
   };
   return (
-    <div className="grid gap-3 p-2">
+    <div className="flex gap-3 p-6">
       <div className="flex gap-1">
         <RdsSwitch
           label="Theme"
