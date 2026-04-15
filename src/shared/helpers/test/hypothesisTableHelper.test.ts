@@ -835,7 +835,10 @@ describe('buildReadOnlyMap', () => {
     vi.clearAllMocks();
   });
 
-  const rows = [{ status: 'OK' }, { status: 'MISSING' }] as HypothesisRowData[];
+  const rows = [
+    { status: 'OK', trajectory: { area: 'FR', hasTimeSeries: true } },
+    { status: 'MISSING' },
+  ] as HypothesisRowData[];
 
   const defaultAreaListNotInList = ['A', 'B'];
 
@@ -880,7 +883,28 @@ describe('buildReadOnlyMap', () => {
     // dernière ligne = index 1
     expect(result).toEqual({
       0: false,
-      1: false, // car au moins un row.status === OK
+      1: false, // car au moins un row.status === OK et hasTimeSeries at TRUE
+    });
+  });
+
+  it('should not add DSR-specific readonly rule if trajectory oK but hasTimeSeries false', () => {
+    vi.mocked(trajectoryUtils.retrieveReadOnlyArea).mockReturnValue({ 0: false });
+    const rowsNoTS = [
+      { status: 'OK', trajectory: { area: 'FR', hasTimeSeries: false } },
+      { status: 'MISSING' },
+    ] as HypothesisRowData[];
+
+    const result = buildReadOnlyMap({
+      rows: rowsNoTS,
+      trajType: TRAJECTORY_TYPE.DSR,
+      isStudyGenerated: false,
+      defaultAreaListNotInList,
+    });
+
+    // dernière ligne = index 1
+    expect(result).toEqual({
+      0: false,
+      1: true,
     });
   });
 
