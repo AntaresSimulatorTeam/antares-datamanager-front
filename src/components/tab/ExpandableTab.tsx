@@ -16,7 +16,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
-import { getAreaTrajectoryName, shouldDeleteCapacityModulation } from '@/shared/utils/trajectoryUtils.ts';
+import { getAreaTrajectoryName, getDeletionModalMessage } from '@/shared/utils/trajectoryUtils.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
@@ -232,11 +232,9 @@ const ExpandableTab = ({ defaultAreas, areas, studyData, type }: TabProps & { ty
             }
           }}
           message={
-            type === TRAJECTORY_TYPE.DSR &&
-            rowToDelete?.index != null &&
-            shouldDeleteCapacityModulation(data, rowToDelete.index)
-              ? t('trajectoryDeletionModal.@confirmDeletionCapacityMessage')
-              : t('trajectoryDeletionModal.@confirmDeletionMessage')
+            rowToDelete?.index == null
+              ? t('trajectoryDeletionModal.@confirmDeletionMessage')
+              : t(`${getDeletionModalMessage(type, rowToDelete.index, data)}`)
           }
         />
       )}

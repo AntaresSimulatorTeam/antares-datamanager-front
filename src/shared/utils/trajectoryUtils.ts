@@ -859,6 +859,20 @@ export const shouldDeleteCapacityModulation = (rows: HypothesisRowData[], index:
   return tsRows.length === 1;
 };
 
+export const getDeletionModalMessage = (type: TRAJECTORY_TYPE, index: number, data: HypothesisRowData[]) => {
+  if (type === TRAJECTORY_TYPE.DSR && shouldDeleteCapacityModulation(data, index)) {
+    return 'trajectoryDeletionModal.@confirmDeletionCapacityMessage';
+  }
+  if (type === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
+    const hasTrajectory = !!data[index]?.trajectory && data[index]?.status === TRAJECTORY_SELECTION_STATUS.OK;
+    const hasTrajectoryTechnology = data[index]?.subRows?.some(
+      (subRow) => !!subRow.trajectory && subRow.status === TRAJECTORY_SELECTION_STATUS.OK,
+    );
+    if (hasTrajectory && hasTrajectoryTechnology) return 'trajectoryDeletionModal.@confirmDeleteMessage';
+  }
+  return 'trajectoryDeletionModal.@confirmDeletionMessage';
+};
+
 /**
  * Determines if the given trajectory type is one of the unique trajectory types.
  *
