@@ -7,7 +7,7 @@
 import { PropsWithChildren } from 'react';
 import cardClassBuilder from './cardClassBuilder';
 import PegaseCardTitle, { PegaseCardTitleProps } from './pegaseCardTitle/PegaseCardTitle';
-import { RdsButton, RdsButtonProps, RdsCard, RdsCardProps } from 'rte-design-system-react';
+import { RdsButton, RdsButtonProps, RdsCardProps } from 'rte-design-system-react';
 
 export type PegaseCardSecondaryButtonPosition = 'default' | 'center';
 
@@ -38,40 +38,47 @@ const PegaseCard = ({
   const { buttonContainerClasses, primaryButtonContainerClasses, secondaryButtonContainerClasses } =
     cardClassBuilder(secondaryButtonPosition);
   return (
-    <RdsCard id={id} onClick={buttons ? undefined : onClick}>
-      <div className="flex h-full w-full cursor-pointer flex-col gap-2 p-2">
-        <PegaseCardTitle
-          id={`${id}-title`}
-          title={title}
-          onClick={buttons ? onClick : undefined}
-          icons={icons}
-          lineClamp={lineClamp}
-          dropdownOptions={dropdownOptions}
-          tag={tag}
-        />
-        <div className="flex grow">{children}</div>
-        {buttons && (
-          <div className={buttonContainerClasses}>
-            {buttons.secondary && (
-              <div className={secondaryButtonContainerClasses}>
-                <RdsButton
-                  id={id && `${id}-secondary-button`}
-                  size="small"
-                  color="secondary"
-                  variant="text"
-                  {...buttons.secondary}
-                />
-              </div>
-            )}
-            {buttons.primary && (
-              <div className={primaryButtonContainerClasses}>
-                <RdsButton id={id && `${id}-primary-button`} size="small" {...buttons.primary} />
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-    </RdsCard>
+    <section
+      className="flex h-full w-full cursor-pointer flex-col gap-2 p-2"
+      style={{
+        borderRadius: '0.375rem',
+        boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.2), 0 2px 4px -2px rgb(0 0 0 / 0.2)',
+      }}
+      onClick={buttons ? undefined : onClick}
+      onKeyDown={buttons ? undefined : onClick}
+      role="region"
+    >
+      <PegaseCardTitle
+        id={`${id}-title`}
+        title={title}
+        onClick={buttons ? onClick : undefined}
+        icons={icons}
+        lineClamp={lineClamp}
+        dropdownOptions={dropdownOptions}
+        tag={tag}
+      />
+      <div className="flex grow">{children}</div>
+      {buttons && (
+        <div className={buttonContainerClasses}>
+          {buttons.secondary && (
+            <div className={secondaryButtonContainerClasses}>
+              <RdsButton
+                id={id && `${id}-secondary-button`}
+                size="small"
+                color="secondary"
+                variant="text"
+                {...buttons.secondary}
+              />
+            </div>
+          )}
+          {buttons.primary && (
+            <div className={primaryButtonContainerClasses}>
+              <RdsButton id={id && `${id}-primary-button`} size="small" {...buttons.primary} />
+            </div>
+          )}
+        </div>
+      )}
+    </section>
   );
 };
 

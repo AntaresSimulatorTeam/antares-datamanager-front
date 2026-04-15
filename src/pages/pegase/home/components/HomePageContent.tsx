@@ -33,9 +33,9 @@ const HomePageContent = () => {
   };
 
   return (
-    <div className="flex w-full flex-1 flex-col justify-start">
+    <div className="flex w-full flex-1 flex-col justify-start gap-4">
       <StdHeading title={t('home.@study_table_title')} />
-      <div className="flex gap-4 py-2">
+      <div className="flex items-center gap-4">
         <SearchBar onSearch={searchStudy} />
         <RdsChip
           label={t('home.@my_studies')}

@@ -5,7 +5,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { RdsInputText, RdsModal } from 'rte-design-system-react';
+import { RdsModal } from 'rte-design-system-react';
 import { useTranslation } from 'react-i18next';
 import KeywordsInput from '@/components/input/KeywordsInput.tsx';
 import HorizonInput from '@/components/input/HorizonInput';
@@ -19,6 +19,7 @@ import StdButton from '@common/base/stdButton/StdButton';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { hasArrayChanged } from '@/shared/utils/arrayUtils.ts';
 import ProjectInput from '@/components/input/ProjectInput.tsx';
+import StdInputText from '@/components/forms/stdInputText/StdInputText.tsx';
 
 interface StudyCreationModalProps {
   isOpen?: boolean;
@@ -116,8 +117,11 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
         <div className="flex flex-col gap-4 self-stretch">
           <div className="flex justify-between gap-2">
             <div className="w-1/2">
-              <RdsInputText
-                label={t('modal.@input_name')}
+              <div className="my-0.25 flex items-center justify-start p-0.5 text-button-s">
+                <div className="text-gray-700">{t('modal.@input_name')}</div>
+                <div className={'text-error-600'}>*</div>
+              </div>
+              <StdInputText
                 value={studyName}
                 onChange={handleStudyNameChange}
                 variant="outlined"
