@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useCallback } from 'react';
-import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { HypothesisRowData, RowStatus, StudyActionType, StudyDTO } from '@/shared/types';
+import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { HypothesisRowData, RowStatus, StudyActionType, StudyDTO, TrajectoryBackendError } from '@/shared/types';
 import { ReadOnlyObject } from '@/shared/types/HypothesisTable.ts';
 import { useTrajectoryDeletionLogic } from './useTrajectoryDeletionLogic';
 import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.ts';
@@ -8,11 +8,14 @@ import { useUser } from '@/store/contexts/UserContext.tsx';
 import { useTranslation } from 'react-i18next';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { updateTableAfterCellDetach } from '@/shared/helpers/hypothesisTableHelper.ts';
+import { buildErrorTrajectory } from '@/shared/utils/trajectoryUtils.ts';
 
 export const useTrajectoryDetach = (
   study: StudyDTO,
   dispatch: Dispatch<StudyActionType> | null,
   setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
+  setIsDeletionModalOpen?: Dispatch<SetStateAction<boolean>>,
+  setRowIdSelected?: Dispatch<SetStateAction<string>>,
 ) => {
   const { user } = useUser();
   const { t } = useTranslation();
@@ -36,6 +39,7 @@ export const useTrajectoryDetach = (
         hypothesis,
         status,
       );
+
       try {
         // 2. Suppression backend si nécessaire
         if (trajectoryToDelete && trajectoryIds?.length > 0 && status === 'empty') {
@@ -62,21 +66,66 @@ export const useTrajectoryDetach = (
         setData(newData);
         if (newReadOnly) setReadOnly?.((prev) => ({ ...prev, ...newReadOnly }));
       } catch (error) {
-        const message = t('studyDetails.@notificationAlert', {
-          studyName: study.name,
-          trajectoryName: trajectoryToDelete?.trajectoryName,
-          trajectoryType: trajectoryToDelete?.area,
-        });
+        if ((error as TrajectoryBackendError).message.includes('Confirmation required')) {
+          setRowIdSelected?.(String(indexArray[0]));
+          setIsDeletionModalOpen?.(true);
+        } else {
+          if (type === TRAJECTORY_TYPE.AREA) {
+            const newDbTrajectory = buildErrorTrajectory(
+              indexArray[0] === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
+              trajectoryIds[0],
+              trajectoryToDelete?.trajectoryName ?? '',
+              user?.profile?.sub ?? null,
+              '',
+            );
+            //Case: area control failed and a trajectory Links is linked to the study with ok status
+            const shouldUnlink =
+              indexArray[0] === 0 && data[1]?.trajectory && data[1]?.status !== TRAJECTORY_SELECTION_STATUS.ERROR;
+            if (shouldUnlink && data[1]?.trajectory?.id) {
+              await performBackendDeletion([data[1]?.trajectory?.id]);
+              dispatch?.({
+                type: STUDY_ACTION.CLEAR_TRAJECTORY_BY_TYPE,
+                payload: [TRAJECTORY_TYPE.LINK],
+              } as StudyActionType);
+            }
+            setData((prev) =>
+              prev.map((item, index) => {
+                if (index === indexArray[0]) {
+                  return {
+                    ...item,
+                    trajectory: newDbTrajectory,
+                    status: TRAJECTORY_SELECTION_STATUS.ERROR,
+                  };
+                } else if (shouldUnlink) {
+                  return {
+                    ...item,
+                    trajectory: null,
+                    status: TRAJECTORY_SELECTION_STATUS.MISSING,
+                  };
+                } else {
+                  return item;
+                }
+              }),
+            );
 
-        handleTrajectoryError(
-          type,
-          indexArray,
-          { id: trajectoryToDelete?.id ?? 0, label: trajectoryToDelete?.trajectoryName ?? '' },
-          trajectoryToDelete?.area ?? '',
-          user?.profile?.sub ?? '',
-          setData,
-          { message, content: (error as Error)?.message },
-        );
+            setReadOnly?.({ '0': false, '1': false });
+          }
+          const message = t('studyDetails.@notificationAlert', {
+            studyName: study.name,
+            trajectoryName: trajectoryToDelete?.trajectoryName,
+            trajectoryType: trajectoryToDelete?.area,
+          });
+
+          handleTrajectoryError(
+            type,
+            indexArray,
+            { id: trajectoryToDelete?.id ?? 0, label: trajectoryToDelete?.trajectoryName ?? '' },
+            trajectoryToDelete?.area ?? '',
+            user?.profile?.sub ?? '',
+            setData,
+            { message, content: (error as Error)?.message },
+          );
+        }
       }
     },
     [

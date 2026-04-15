@@ -106,4 +106,5 @@ export interface MenuProps {
   defaultAreas: { name: string }[];
   areas: TrajectoryAreaData[];
   studyData: StudyDTO;
+  type: TRAJECTORY_TYPE;
 }

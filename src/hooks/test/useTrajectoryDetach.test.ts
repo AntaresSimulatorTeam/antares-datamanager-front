@@ -2,9 +2,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach';
 import { useTrajectoryDeletionLogic } from '@/hooks/useTrajectoryDeletionLogic';
-import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import * as hypothesisTableHelper from '@/shared/helpers/hypothesisTableHelper.ts';
-import { HypothesisRowData, StudyDTO } from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, StudyDTO } from '@/shared/types';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import * as hypothesisTableService from '@/shared/services/hypothesisTableService.ts';
 
@@ -46,6 +46,8 @@ describe('useTrajectoryDetach', () => {
   const mockDispatch = vi.fn();
   const mockSetReadOnly = vi.fn();
   const mockSetData = vi.fn();
+  const mockSetRowIdSelected = vi.fn();
+  const mockSetIsDeletionModalOpen = vi.fn();
 
   const sampleData = [
     {
@@ -152,5 +154,94 @@ describe('useTrajectoryDetach', () => {
     });
 
     expect(hypothesisTableService.handleTrajectoryError).toHaveBeenCalled();
+  });
+
+  // --------------------------------------------------------------------
+  //  TEST 3 : Erreur avec trajectoryToDelete → Confirmed required => open modal
+  // --------------------------------------------------------------------
+  it('ouvre la modal en cas d’erreur avec Confirmed required', async () => {
+    vi.mocked(useTrajectoryDeletionLogic).mockReturnValue({
+      computeDeletion: vi.fn().mockReturnValue({
+        trajectoryIds: [10],
+        trajectoryToDelete: {
+          id: 10,
+          area: 'AREA_X',
+          trajectoryName: 'Traj X',
+        },
+        additionalTrajectory: null,
+      }),
+      performBackendDeletion: vi.fn().mockRejectedValue(new Error('Confirmation required')),
+    });
+
+    const { result } = renderHook(() =>
+      useTrajectoryDetach(study, mockDispatch, mockSetReadOnly, mockSetIsDeletionModalOpen, mockSetRowIdSelected),
+    );
+
+    await act(async () => {
+      await result.current.detachTrajectory(TRAJECTORY_TYPE.AREA, [0], mockSetData, sampleData, 'empty', 'H1');
+    });
+
+    expect(mockSetIsDeletionModalOpen).toHaveBeenCalledWith(true);
+    expect(mockSetRowIdSelected).toHaveBeenCalledWith('0');
+  });
+
+  // --------------------------------------------------------------------
+  //  TEST 4 : area control failed and a trajectory Links is linked to the study with ok status
+  // --------------------------------------------------------------------
+  it("le contrôle de de l'area échoue et une trajectoire Links est liée", async () => {
+    vi.mocked(useTrajectoryDeletionLogic).mockReturnValue({
+      computeDeletion: vi.fn().mockReturnValue({
+        trajectoryIds: [10],
+        trajectoryToDelete: {
+          id: 10,
+          area: 'AREA_X',
+          trajectoryName: 'Traj X',
+        },
+        additionalTrajectory: null,
+      }),
+      performBackendDeletion: vi.fn().mockRejectedValueOnce(new Error('Boom')),
+    });
+    const data = [
+      { hypothesis: 'H1', trajectory: { id: 10, type: TRAJECTORY_TYPE.AREA, hasTimeSeries: false }, status: 'OK' },
+      { hypothesis: 'H2', trajectory: { id: 11, type: TRAJECTORY_TYPE.LINK, hasTimeSeries: false }, status: 'OK' },
+    ] as HypothesisRowData[];
+
+    const { result } = renderHook(() =>
+      useTrajectoryDetach(study, mockDispatch, mockSetReadOnly, mockSetIsDeletionModalOpen, mockSetRowIdSelected),
+    );
+
+    await act(async () => {
+      await result.current.detachTrajectory(TRAJECTORY_TYPE.AREA, [0], mockSetData, data, 'empty', 'H1');
+    });
+
+    expect(useTrajectoryDeletionLogic(study).performBackendDeletion).toHaveBeenCalledTimes(2);
+    expect(mockDispatch).toHaveBeenCalledWith({
+      type: STUDY_ACTION.CLEAR_TRAJECTORY_BY_TYPE,
+      payload: [TRAJECTORY_TYPE.LINK],
+    });
+    expect(mockSetData).toHaveBeenCalled();
+    const setDataCallback = mockSetData.mock.calls[0][0] as (prev: HypothesisRowData[]) => HypothesisRowData[];
+    const resultData = setDataCallback([
+      {
+        hypothesis: 'H1',
+        trajectory: { id: 10, type: TRAJECTORY_TYPE.AREA, hasTimeSeries: false } as DbTrajectory,
+        status: TRAJECTORY_SELECTION_STATUS.ERROR,
+      },
+      { hypothesis: 'H2', trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING },
+    ]);
+    expect(Object.keys(resultData[0].trajectory as DbTrajectory)).toEqual([
+      'id',
+      'trajectoryName',
+      'technology',
+      'type',
+      'version',
+      'userName',
+      'creationDate',
+      'area',
+      'state',
+      'hasTimeSeries',
+    ]);
+    expect(resultData[0].status).toBe(TRAJECTORY_SELECTION_STATUS.ERROR);
+    expect(mockSetReadOnly).toHaveBeenCalledWith({ '0': false, '1': false });
   });
 });

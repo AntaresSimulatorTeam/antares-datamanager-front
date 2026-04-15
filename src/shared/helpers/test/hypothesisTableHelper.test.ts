@@ -835,7 +835,10 @@ describe('buildReadOnlyMap', () => {
     vi.clearAllMocks();
   });
 
-  const rows = [{ status: 'OK' }, { status: 'MISSING' }] as HypothesisRowData[];
+  const rows = [
+    { status: 'OK', trajectory: { area: 'FR', hasTimeSeries: true } },
+    { status: 'MISSING' },
+  ] as HypothesisRowData[];
 
   const defaultAreaListNotInList = ['A', 'B'];
 
@@ -880,7 +883,28 @@ describe('buildReadOnlyMap', () => {
     // dernière ligne = index 1
     expect(result).toEqual({
       0: false,
-      1: false, // car au moins un row.status === OK
+      1: false, // car au moins un row.status === OK et hasTimeSeries at TRUE
+    });
+  });
+
+  it('should not add DSR-specific readonly rule if trajectory oK but hasTimeSeries false', () => {
+    vi.mocked(trajectoryUtils.retrieveReadOnlyArea).mockReturnValue({ 0: false });
+    const rowsNoTS = [
+      { status: 'OK', trajectory: { area: 'FR', hasTimeSeries: false } },
+      { status: 'MISSING' },
+    ] as HypothesisRowData[];
+
+    const result = buildReadOnlyMap({
+      rows: rowsNoTS,
+      trajType: TRAJECTORY_TYPE.DSR,
+      isStudyGenerated: false,
+      defaultAreaListNotInList,
+    });
+
+    // dernière ligne = index 1
+    expect(result).toEqual({
+      0: false,
+      1: true,
     });
   });
 
@@ -932,7 +956,9 @@ describe('buildHypothesisRows', () => {
   });
 
   it('should build rows for generic type', () => {
-    vi.mocked(trajectoryUtils.buildRowWithSubRowsData).mockReturnValue({ id: 1 } as unknown as HypothesisRowData);
+    vi.mocked(trajectoryUtils.convertIntoHypothesisRowWithTechnologies).mockReturnValue({
+      id: 1,
+    } as unknown as HypothesisRowData[]);
     vi.mocked(sortUtils.sortWithFixedPosition).mockReturnValue([{ id: 1 }] as unknown as HypothesisRowData[]);
 
     const result = buildHypothesisRows({
@@ -946,12 +972,14 @@ describe('buildHypothesisRows', () => {
       dsrCmResult: [],
     });
 
-    expect(trajectoryUtils.buildRowWithSubRowsData).toHaveBeenCalled();
+    expect(trajectoryUtils.convertIntoHypothesisRowWithTechnologies).toHaveBeenCalled();
     expect(result).toEqual([{ id: 1 }]);
   });
 
   it('should add DSR capacity modulation row', () => {
-    vi.mocked(trajectoryUtils.buildRowWithSubRowsData).mockReturnValue({ id: 1 } as unknown as HypothesisRowData);
+    vi.mocked(trajectoryUtils.convertIntoHypothesisRowWithTechnologies).mockReturnValue({
+      id: 1,
+    } as unknown as HypothesisRowData[]);
     vi.mocked(sortUtils.sortWithFixedPosition).mockReturnValue([{ id: 1 }] as unknown as HypothesisRowData[]);
 
     const result = buildHypothesisRows({
@@ -1242,6 +1270,89 @@ describe('updateTableAfterCellDetach', () => {
       expect(result).toEqual({
         newData: ['sorted', 'updated'],
         newReadOnly: { 1: true },
+      });
+    });
+  });
+
+  describe('AREA', () => {
+    it('détache la 1ère cellule', async () => {
+      const data = [
+        { hypothesis: 'H1', trajectory: { trajectoryName: 'name', area: 'H1' } },
+        { hypothesis: 'H2' },
+      ] as HypothesisRowData[];
+
+      const indexArray = [0];
+
+      const result = await updateTableAfterCellDetach({
+        type: TRAJECTORY_TYPE.AREA,
+        data,
+        additionalTrajectory: null,
+        indexArray,
+        studyId: 42,
+        horizon: '2030',
+      });
+
+      expect(result).toEqual({
+        newData: [
+          { hypothesis: 'H1', status: TRAJECTORY_SELECTION_STATUS.MISSING, trajectory: null },
+          { hypothesis: 'H2' },
+        ],
+        newReadOnly: { '0': false, '1': true },
+      });
+    });
+
+    it('détache la 2nd cellule', async () => {
+      const data = [
+        { hypothesis: 'H1', trajectory: { trajectoryName: 'name', area: 'H1' } },
+        { hypothesis: 'H2', trajectory: { trajectoryName: 'name', area: 'H2' } },
+      ] as HypothesisRowData[];
+
+      const indexArray = [1];
+
+      const result = await updateTableAfterCellDetach({
+        type: TRAJECTORY_TYPE.AREA,
+        data,
+        additionalTrajectory: null,
+        indexArray,
+        studyId: 42,
+        horizon: '2030',
+      });
+
+      expect(result).toEqual({
+        newData: [
+          {
+            hypothesis: 'H1',
+            trajectory: { trajectoryName: 'name', area: 'H1' },
+          },
+          { hypothesis: 'H2', status: TRAJECTORY_SELECTION_STATUS.MISSING, trajectory: null },
+        ],
+        newReadOnly: { '0': false, '1': false },
+      });
+    });
+
+    it('détache la 1ère cellule + détache la 2nd si elle est présente', async () => {
+      const data = [
+        { hypothesis: 'H1', trajectory: { trajectoryName: 'name', area: 'H1' } },
+        { hypothesis: 'H2', trajectory: { trajectoryName: 'name', area: 'H2' } },
+      ] as HypothesisRowData[];
+
+      const indexArray = [0];
+
+      const result = await updateTableAfterCellDetach({
+        type: TRAJECTORY_TYPE.AREA,
+        data,
+        additionalTrajectory: null,
+        indexArray,
+        studyId: 42,
+        horizon: '2030',
+      });
+
+      expect(result).toEqual({
+        newData: [
+          { hypothesis: 'H1', status: TRAJECTORY_SELECTION_STATUS.MISSING, trajectory: null },
+          { hypothesis: 'H2', status: TRAJECTORY_SELECTION_STATUS.MISSING, trajectory: null },
+        ],
+        newReadOnly: { '0': false, '1': true },
       });
     });
   });
