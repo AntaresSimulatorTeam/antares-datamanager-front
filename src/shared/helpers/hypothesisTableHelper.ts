@@ -325,7 +325,9 @@ export const buildReadOnlyMap = ({
     return readOnlySubRows;
   }
 
-  const hasSpecificTrajectory = rows.some((row) => row.status === TRAJECTORY_SELECTION_STATUS.OK);
+  const hasSpecificTrajectory = rows.some(
+    (row) => row.status === TRAJECTORY_SELECTION_STATUS.OK && row.trajectory?.hasTimeSeries,
+  );
 
   return {
     ...readOnlySubRows,
