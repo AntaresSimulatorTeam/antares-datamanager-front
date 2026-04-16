@@ -148,6 +148,8 @@ export const shouldHaveSubRows = (areasToExclude: string[], mainEntry: DbTraject
     case TRAJECTORY_TYPE.RES_CAPACITY:
     case TRAJECTORY_TYPE.RES_LOAD:
     case TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION:
+    case TRAJECTORY_TYPE.HYDRO_CAPACITY:
+    case TRAJECTORY_TYPE.HYDRO_PSP:
       return !isInExcluded;
     case TRAJECTORY_TYPE.THERMAL_CAPACITY:
       return !isOther && !isInExcluded;
@@ -950,3 +952,13 @@ export const getUrlApiUploadTrajectory = (
       return `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   }
 };
+
+export const isEmptyRow = (
+  type: TRAJECTORY_TYPE,
+  hypothesis: string,
+  rowDepth: number,
+  t: TFunction<'translation', undefined>,
+) =>
+  hypothesis === t('thermal.@specific') ||
+  ((type === TRAJECTORY_TYPE.STS || type === TRAJECTORY_TYPE.HYDRO_CAPACITY || type === TRAJECTORY_TYPE.HYDRO_PSP) &&
+    rowDepth === 0);

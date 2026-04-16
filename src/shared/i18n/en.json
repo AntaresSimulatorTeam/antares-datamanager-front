@@ -175,7 +175,8 @@
   },
   "hydro": {
     "@capacity": "Hydro",
-    "@psp_virtual": "PSP virtual"
+    "@psp_virtual": "PSP virtual",
+    "@series": "Series"
   },
   "trajectoryViewModal": {
     "@title_area": "Areas",

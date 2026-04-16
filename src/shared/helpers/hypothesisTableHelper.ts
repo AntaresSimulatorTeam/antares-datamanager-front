@@ -1,6 +1,7 @@
 import {
   DbTrajectory,
   HypothesisRowData,
+  isTrajectoryHydroType,
   isTrajectoryResType,
   isTrajectorySubrowsType,
   TrajectoryAreaData,
@@ -193,11 +194,13 @@ export const fetchAndNormalizeTrajectories = async ({
   trajType,
   defaultAreas,
   emptyAreaSelected,
+  t,
 }: {
   id: number;
   trajType: TRAJECTORY_TYPE;
   defaultAreas?: { name: string }[];
   emptyAreaSelected: DbTrajectory[];
+  t: TFunction<'translation', undefined>;
 }) => {
   let result;
   let technologies;
@@ -220,16 +223,14 @@ export const fetchAndNormalizeTrajectories = async ({
     };
   }
   const isResType = isTrajectoryResType(trajType);
+  const isHydroType = isTrajectoryHydroType(trajType);
 
   // Other types
-  result =
-    trajType === TRAJECTORY_TYPE.HYDRO_CAPACITY || trajType === TRAJECTORY_TYPE.HYDRO_PSP
-      ? []
-      : await getStudyTrajectories(id, trajType);
+  result = isHydroType ? [] : await getStudyTrajectories(id, trajType);
 
   if (trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
     const thermalOptions = await getThermalTechnologyList();
-    technologies = thermalOptions.map((t) => t.name);
+    technologies = thermalOptions.map((option) => option.name);
   }
 
   if (trajType === TRAJECTORY_TYPE.STS) {
@@ -238,6 +239,10 @@ export const fetchAndNormalizeTrajectories = async ({
 
   if (isResType) {
     technologies = await getResTechnologyList();
+  }
+
+  if (isHydroType) {
+    technologies = [t('hydro.@series'), t('thermal.@parametersTechnical')];
   }
 
   const defaultEmpty = buildDefaultEmptyTrajectoryList(trajType, result, defaultAreas);

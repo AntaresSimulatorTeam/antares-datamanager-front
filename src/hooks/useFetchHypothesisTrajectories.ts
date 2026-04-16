@@ -90,6 +90,7 @@ export const useFetchHypothesisTrajectories = (
               trajType,
               defaultAreas,
               emptyAreaSelected: emptyAreaSelected?.[trajType] ?? [],
+              t,
             });
 
             const list = buildCheckListBox(trajectories, areas, defaultAreas);
