@@ -20,3 +20,5 @@ export const avatarCase = (str: string) => titleCase(str.substring(0, 2));
 
 export const snakeCaseUnderscore = (str: string) => str?.trim().toLowerCase().replace(/\s+/g, '_') ?? '';
 export const snakeCase = (str: string) => str?.trim().toLowerCase().replace(/\s+/g, ' ') ?? '';
+
+export const normalizeTechnology = (s: string | undefined | null) => s?.trim().toLowerCase();
