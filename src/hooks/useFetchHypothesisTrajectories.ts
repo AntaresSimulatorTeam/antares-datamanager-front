@@ -99,7 +99,7 @@ export const useFetchHypothesisTrajectories = (
               trajectories: shouldSkipFetch ? contextTrajectories : trajectories,
               defaultAreas,
               areas,
-              technologies: trajType === TRAJECTORY_TYPE.HYDRO_CAPACITY ? technologies : undefined,
+              technologies,
               isStudyGenerated,
               t,
               dsrCmResult,

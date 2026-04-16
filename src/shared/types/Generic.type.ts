@@ -90,7 +90,7 @@ export const isTrajectorySubrowsType = (value: unknown): value is TrajectoryWith
     TRAJECTORY_TYPE.RES_CAPACITY,
     TRAJECTORY_TYPE.RES_LOAD,
     TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION,
-    TRAJECTORY_TYPE.HYDRO_CAPACITY,
+    TRAJECTORY_TYPE.HYDRO_SERIES,
     TRAJECTORY_TYPE.HYDRO_PSP,
   ].includes(value as TrajectoryWithSubRowsType);
 
@@ -103,7 +103,7 @@ export const isTrajectoryResType = (value: unknown): value is TrajectoryWithSubR
   ].includes(value as TrajectoryWithSubRowsType);
 
 export const isTrajectoryHydroType = (value: unknown): value is TrajectoryWithSubRowsType =>
-  [TRAJECTORY_TYPE.HYDRO_CAPACITY, TRAJECTORY_TYPE.HYDRO_PSP].includes(value as TrajectoryWithSubRowsType);
+  [TRAJECTORY_TYPE.HYDRO_SERIES, TRAJECTORY_TYPE.HYDRO_PSP].includes(value as TrajectoryWithSubRowsType);
 
 export type TableOperationRow = 'empty' | 'remove';
 

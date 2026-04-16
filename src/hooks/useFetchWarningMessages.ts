@@ -20,7 +20,7 @@ export const useFetchWarningMessages = (studyId: number | null, type: TRAJECTORY
         type !== TRAJECTORY_TYPE.DSR &&
         type !== TRAJECTORY_TYPE.RES_CAPACITY &&
         type !== TRAJECTORY_TYPE.RES_LOAD &&
-        type !== TRAJECTORY_TYPE.HYDRO_CAPACITY &&
+        type !== TRAJECTORY_TYPE.HYDRO_SERIES &&
         type !== TRAJECTORY_TYPE.HYDRO_PSP;
       const warningMessagesFromType: WarningMessage[] = hasWarningMessage
         ? await fetchWarningMessagesFromType(trajectoryType, id)

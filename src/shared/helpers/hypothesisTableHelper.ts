@@ -135,13 +135,16 @@ export const findSpecificTrajectoryToDelete = (
 
 export const getInformationMessage = (
   nbRows: number,
-  type?: TRAJECTORY_TYPE,
-): { messageKey: string; index: number } | null => {
+  type: TRAJECTORY_TYPE,
+  rowId?: string,
+): { messageKey: string; id: string } | null => {
   switch (type) {
     case TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER:
-      return { messageKey: 'thermal.@paramModulationMessage', index: 1 };
+      return { messageKey: 'thermal.@paramModulationMessage', id: '1' };
     case TRAJECTORY_TYPE.DSR:
-      return { messageKey: 'dsr.@capacityModulationMessage', index: Math.max(nbRows - 1, 0) };
+      return { messageKey: 'dsr.@capacityModulationMessage', id: String(Math.max(nbRows - 1, 0)) };
+    case TRAJECTORY_TYPE.HYDRO_SERIES:
+      return rowId?.split('.')[1] === '1' ? { messageKey: 'hydro.@informationMessage', id: rowId } : null;
     default:
       return null;
   }

@@ -61,7 +61,7 @@ const StudyNavigationMenu = ({
         case TRAJECTORY_TYPE.THERMAL_CAPACITY:
         case TRAJECTORY_TYPE.MISC_CAPACITY:
         case TRAJECTORY_TYPE.RES_CAPACITY:
-        case TRAJECTORY_TYPE.HYDRO_CAPACITY:
+        case TRAJECTORY_TYPE.HYDRO_SERIES:
           return <TabMenu type={type} defaultAreas={areaDefault} areas={trajectoryAreas} studyData={studyData} />;
         default:
           return <AreaLinkTab setErrorMessage={setErrorMessage} studyData={studyData} />;

@@ -148,7 +148,7 @@ export const shouldHaveSubRows = (areasToExclude: string[], mainEntry: DbTraject
     case TRAJECTORY_TYPE.RES_CAPACITY:
     case TRAJECTORY_TYPE.RES_LOAD:
     case TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION:
-    case TRAJECTORY_TYPE.HYDRO_CAPACITY:
+    case TRAJECTORY_TYPE.HYDRO_SERIES:
     case TRAJECTORY_TYPE.HYDRO_PSP:
       return !isInExcluded;
     case TRAJECTORY_TYPE.THERMAL_CAPACITY:
@@ -531,7 +531,7 @@ export const getStudyMenu = (t: (value: string) => string, isTrajectoryAreaLinke
     isDisabled: true,
   },
   {
-    name: TRAJECTORY_TYPE.HYDRO_CAPACITY,
+    name: TRAJECTORY_TYPE.HYDRO_SERIES,
     label: t('studyDetails.@hydro'),
     icon: StdIconId.Water,
     isDisabled: true,
@@ -969,5 +969,5 @@ export const isEmptyRow = (
   t: TFunction<'translation', undefined>,
 ) =>
   hypothesis === t('thermal.@specific') ||
-  ((type === TRAJECTORY_TYPE.STS || type === TRAJECTORY_TYPE.HYDRO_CAPACITY || type === TRAJECTORY_TYPE.HYDRO_PSP) &&
+  ((type === TRAJECTORY_TYPE.STS || type === TRAJECTORY_TYPE.HYDRO_SERIES || type === TRAJECTORY_TYPE.HYDRO_PSP) &&
     rowDepth === 0);

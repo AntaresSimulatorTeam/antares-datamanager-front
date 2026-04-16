@@ -176,7 +176,8 @@
   "hydro": {
     "@capacity": "Hydro",
     "@psp_virtual": "PSP virtual",
-    "@series": "Series"
+    "@series": "Series",
+    "@informationMessage": "At least one \"mod\" file must be defined to use Technical parameters"
   },
   "trajectoryViewModal": {
     "@title_area": "Areas",

@@ -42,7 +42,8 @@ const getExpandableHypothesisTableHeaders = ({
       const subRowListName = getSubRowsList(row);
       const subRowListWithArea = getSubRowListWithArea(subRowListName, t, type);
       const isTechnology = list?.length ? list?.includes(hypothesis) : false;
-      const informationMessage = getInformationMessage(table.getRowCount(), type);
+      const informationMessage = type ? getInformationMessage(table.getRowCount(), type, row.id) : null;
+      console.log('=================== informationMessage', informationMessage);
 
       return (
         <div className="flex gap-1 py-1">
@@ -72,7 +73,7 @@ const getExpandableHypothesisTableHeaders = ({
               <div className="text-gray-600">{` | +${subRowListWithArea?.messageNb}`}</div>
             </RdsTextTooltip>
           )}
-          {row.depth === 0 && row.index === informationMessage?.index && informationMessage && (
+          {row.id === informationMessage?.id && informationMessage && (
             <RdsTextTooltip text={t(`${informationMessage.messageKey}`)} offset={5} placement="right">
               <StdIcon name={StdIconId.Info} color={row.getReadOnly() ? 'text-gray-600' : 'text-gray-900'} />
             </RdsTextTooltip>
