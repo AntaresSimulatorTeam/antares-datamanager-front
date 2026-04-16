@@ -21,6 +21,7 @@ import {
   getSubRowListWithArea,
   getSubRowsList,
   getTrajectoryTypeByIndex,
+  isEmptyRow,
   isMatchingTrajectoryType,
   isTechnicalParametersType,
   isTrajectoryLinked,
@@ -34,7 +35,7 @@ import {
 } from '../trajectoryUtils';
 import { defaultAreaNotInAreaTrajectoryList, rowData, rowDataTwo } from '@/mocks/data/tests/hypothesisTable.mock.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { afterEach, beforeEach, MockInstance, vi } from 'vitest';
+import { afterEach, beforeEach, Mock, MockInstance, vi } from 'vitest';
 import {
   mockDbTrajectory,
   mockDbTrajectoryAREA,
@@ -1487,5 +1488,42 @@ describe('findTechnologyMatch', () => {
   it('utilise normalizeTechnology pour les types non RES_TECHNOLOGY_DISTRIBUTION', () => {
     findTechnologyMatch(entries, 'wind turbine');
     expect(normalizeSpy).toHaveBeenCalledWith('Wind Turbine');
+  });
+});
+
+describe('isEmptyRow', () => {
+  const mockT = vi.fn((key: string) => key) as unknown as TFunction<'translation'>;
+  const mockTMock = mockT as unknown as Mock;
+
+  it('retourne true si hypothesis correspond à t("thermal.@specific")', () => {
+    mockTMock.mockReturnValueOnce('SPECIFIC_VALUE');
+
+    const result = isEmptyRow(TRAJECTORY_TYPE.STS, 'SPECIFIC_VALUE', 5, mockT);
+
+    expect(result).toBe(true);
+  });
+
+  it('retourne true si type est STS et rowDepth = 0', () => {
+    mockTMock.mockReturnValue('OTHER');
+
+    const result = isEmptyRow(TRAJECTORY_TYPE.STS, 'foo', 0, mockT);
+
+    expect(result).toBe(true);
+  });
+
+  it('retourne true si type est HYDRO_SERIES et rowDepth = 0', () => {
+    mockTMock.mockReturnValue('OTHER');
+
+    const result = isEmptyRow(TRAJECTORY_TYPE.HYDRO_SERIES, 'foo', 0, mockT);
+
+    expect(result).toBe(true);
+  });
+
+  it('retourne false si aucune condition n’est remplie', () => {
+    mockTMock.mockReturnValue('OTHER');
+
+    const result = isEmptyRow(TRAJECTORY_TYPE.STS, 'foo', 2, mockT);
+
+    expect(result).toBe(false);
   });
 });
