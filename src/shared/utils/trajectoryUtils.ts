@@ -530,6 +530,12 @@ export const getStudyMenu = (t: (value: string) => string, isTrajectoryAreaLinke
     icon: StdIconId.EnergySavingsLeaf,
     isDisabled: true,
   },
+  {
+    name: TRAJECTORY_TYPE.HYDRO_CAPACITY,
+    label: t('studyDetails.@hydro'),
+    icon: StdIconId.Water,
+    isDisabled: true,
+  },
 ];
 
 /**

@@ -142,7 +142,8 @@
     "@or": "or",
     "@viewLog": "View Log",
     "@notificationAlert": "Erreur: {{studyName}} - {{trajectoryName}} aucun paramètre n'a pas être enregistré pour {{trajectoryType}}",
-    "@default": "Par défaut"
+    "@default": "Par défaut",
+    "@hydro": "Hydro"
   },
   "thermal": {
     "@installedPower": "Capacités installées",
@@ -168,6 +169,10 @@
   },
   "res": {
     "@distribution": "Distribution"
+  },
+  "hydro": {
+    "@capacity": "Hydro",
+    "@psp_virtual": "PSP virtual"
   },
   "trajectoryViewModal": {
     "@title_area": "Zones",

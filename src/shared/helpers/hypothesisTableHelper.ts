@@ -222,7 +222,10 @@ export const fetchAndNormalizeTrajectories = async ({
   const isResType = isTrajectoryResType(trajType);
 
   // Other types
-  result = await getStudyTrajectories(id, trajType);
+  result =
+    trajType === TRAJECTORY_TYPE.HYDRO_CAPACITY || trajType === TRAJECTORY_TYPE.HYDRO_PSP
+      ? []
+      : await getStudyTrajectories(id, trajType);
 
   if (trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
     const thermalOptions = await getThermalTechnologyList();

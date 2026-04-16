@@ -143,7 +143,8 @@
     "@or": "or",
     "@viewLog": "View Log",
     "@notificationAlert": "Error: {{studyName}} - {{trajectoryName}} no parameter cannot be saved for {{trajectoryType}}",
-    "@default": "Default"
+    "@default": "Default",
+    "@hydro": "Hydro"
   },
   "thermal": {
     "@installedPower": "Installed Power",
@@ -171,6 +172,10 @@
     "@distribution": "Distribution",
     "@zonalDistribution": "Zonal Distribution",
     "@technologyDistribution": "Technology Distribution"
+  },
+  "hydro": {
+    "@capacity": "Hydro",
+    "@psp_virtual": "PSP virtual"
   },
   "trajectoryViewModal": {
     "@title_area": "Areas",
