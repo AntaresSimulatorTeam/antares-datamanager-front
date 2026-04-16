@@ -90,7 +90,6 @@ export const useFetchHypothesisTrajectories = (
               trajType,
               defaultAreas,
               emptyAreaSelected: emptyAreaSelected?.[trajType] ?? [],
-              t,
             });
 
             const list = buildCheckListBox(trajectories, areas, defaultAreas);
@@ -100,7 +99,7 @@ export const useFetchHypothesisTrajectories = (
               trajectories: shouldSkipFetch ? contextTrajectories : trajectories,
               defaultAreas,
               areas,
-              technologies,
+              technologies: trajType === TRAJECTORY_TYPE.HYDRO_CAPACITY ? technologies : undefined,
               isStudyGenerated,
               t,
               dsrCmResult,

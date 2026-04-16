@@ -801,6 +801,37 @@ describe('fetchAndNormalizeTrajectories (Vitest)', () => {
       technologies: undefined,
     });
   });
+
+  // ---------------------------------------------------------
+  // CASE 5 — Hydro type
+  // ---------------------------------------------------------
+  it('should fetch generic trajectories and remove duplicates', async () => {
+    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue([{ id: 30, trajectoryName: 'X' }] as DbTrajectory[]);
+
+    vi.mocked(trajectoryUtils.buildDefaultEmptyTrajectoryList).mockReturnValue([
+      { id: 31, trajectoryName: '' },
+    ] as DbTrajectory[]);
+
+    vi.mocked(trajectoryUtils.removeDuplicate).mockReturnValue([
+      { id: 30, trajectoryName: 'X' },
+      { id: 99, trajectoryName: '' },
+      { id: 31, trajectoryName: '' },
+    ] as DbTrajectory[]);
+
+    const result = await fetchAndNormalizeTrajectories({
+      id: 3,
+      trajType: TRAJECTORY_TYPE.HYDRO_CAPACITY,
+      defaultAreas,
+      emptyAreaSelected,
+    });
+
+    expect(result).toEqual({
+      // TODO : test trajectories result when import is implemented
+      trajectories: undefined,
+      dsrCmResult: [],
+      technologies: ['Series', 'Technical parameters'],
+    });
+  });
 });
 
 describe('buildPayload', () => {

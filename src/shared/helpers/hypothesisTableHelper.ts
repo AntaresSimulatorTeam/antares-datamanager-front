@@ -22,7 +22,7 @@ import { getDefaultAreaNotIncludedInAreaList } from '@/shared/utils/hypothesisTa
 import { fetchTrajectoriesFromTypes } from '@/shared/services/hypothesisTableService.ts';
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { getThermalTechnologyList } from '@/shared/services/defaultConfigService.ts';
-import { STSTechnology } from '@/mocks/data/list/names.ts';
+import { HydroSubRows, STSTechnology } from '@/mocks/data/list/names.ts';
 import { TFunction } from 'i18next';
 import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
 import { getResTechnologyList, isParamModulationRequired } from '@/shared/services/trajectoryService.ts';
@@ -194,13 +194,11 @@ export const fetchAndNormalizeTrajectories = async ({
   trajType,
   defaultAreas,
   emptyAreaSelected,
-  t,
 }: {
   id: number;
   trajType: TRAJECTORY_TYPE;
   defaultAreas?: { name: string }[];
   emptyAreaSelected: DbTrajectory[];
-  t: TFunction<'translation', undefined>;
 }) => {
   let result;
   let technologies;
@@ -242,7 +240,7 @@ export const fetchAndNormalizeTrajectories = async ({
   }
 
   if (isHydroType) {
-    technologies = [t('hydro.@series'), t('thermal.@parametersTechnical')];
+    technologies = HydroSubRows;
   }
 
   const defaultEmpty = buildDefaultEmptyTrajectoryList(trajType, result, defaultAreas);
