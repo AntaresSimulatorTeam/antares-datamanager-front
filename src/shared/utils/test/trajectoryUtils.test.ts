@@ -524,6 +524,32 @@ describe('getAreaTrajectoryName', () => {
   ] as HypothesisRowData[];
 
   it('should return combined hypothesis for valid rowIdSelected', () => {
+    expect(getAreaTrajectoryName('0', mockData, TRAJECTORY_TYPE.AREA)).toStrictEqual({
+      area: 'Energy',
+      isDefault: false,
+      type: TRAJECTORY_TYPE.AREA,
+    });
+    expect(getAreaTrajectoryName('1', mockData, TRAJECTORY_TYPE.LINK)).toStrictEqual({
+      area: 'Transport',
+      isDefault: false,
+      type: TRAJECTORY_TYPE.LINK,
+    });
+  });
+
+  it('should return combined hypothesis for valid rowIdSelected', () => {
+    expect(getAreaTrajectoryName('1', mockData, TRAJECTORY_TYPE.DSR)).toStrictEqual({
+      area: 'Transport',
+      isDefault: false,
+      type: TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION,
+    });
+    expect(getAreaTrajectoryName('0', mockData, TRAJECTORY_TYPE.DSR)).toStrictEqual({
+      area: 'Energy',
+      isDefault: false,
+      type: TRAJECTORY_TYPE.DSR,
+    });
+  });
+
+  it('should return combined hypothesis for valid rowIdSelected', () => {
     expect(getAreaTrajectoryName('0.1', mockData, TRAJECTORY_TYPE.RES_CAPACITY)).toStrictEqual({
       area: 'Energy',
       technology: 'Wind',
@@ -616,6 +642,10 @@ describe('getPathFromTrajectoryType', () => {
     expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.STS, { area: 'AT', technology: 'DSR', isDefault: false })).toBe(
       '\\\\STS\\DSR\\clusters',
     );
+  });
+
+  it('should return technical path for STS', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.STS, { area: 'AT', isDefault: false })).toBe('\\\\STS\\clusters');
   });
 
   it('should return technical path for DSR type', () => {

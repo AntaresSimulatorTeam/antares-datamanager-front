@@ -80,7 +80,6 @@ export const handleFetchTrajectoriesFS = async (
 ): Promise<SelectOption[] | undefined> => {
   try {
     const area = getQueryParamAreaValue(type, hypothesis);
-    console.log('handleFetchTrajectoriesFS', hypothesis);
     const results = await fetchTrajectoriesFromFS(type, area, searchTerm);
     return convertToFSSelectionOptionType(results, hypothesis.isDefault);
   } catch {

@@ -993,5 +993,4 @@ export const isEmptyRow = (
   t: TFunction<'translation', undefined>,
 ) =>
   hypothesis === t('thermal.@specific') ||
-  ((type === TRAJECTORY_TYPE.STS || type === TRAJECTORY_TYPE.HYDRO_SERIES || type === TRAJECTORY_TYPE.HYDRO_PSP) &&
-    rowDepth === 0);
+  ((type === TRAJECTORY_TYPE.STS || type === TRAJECTORY_TYPE.HYDRO_SERIES) && rowDepth === 0);
