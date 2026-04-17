@@ -769,6 +769,26 @@ describe('getQueryParamAreaValue', () => {
     expect(result).toBe('BOILER');
   });
 
+  it('THERMAL_TECHNICAL_SPECIFIC_PARAMETER : retourne hypothesis.technology', () => {
+    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, {
+      type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+      technology: OTHER_AREAS_LABEL,
+      area: 'specific',
+      isDefault: false,
+    });
+    expect(result).toBe(OTHER_AREAS);
+  });
+
+  it('THERMAL_TECHNICAL_SPECIFIC_PARAMETER : retourne hypothesis.technology', () => {
+    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, {
+      type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+      technology: 'FR',
+      area: 'specific',
+      isDefault: false,
+    });
+    expect(result).toBe('FR');
+  });
+
   // --- THERMAL_TECHNICAL_MODULATION_PARAMETER ---
   it('THERMAL_TECHNICAL_MODULATION_PARAMETER : retourne toujours undefined', () => {
     const result = getQueryParamAreaValue(TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER, {
