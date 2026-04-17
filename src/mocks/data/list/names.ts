@@ -223,5 +223,6 @@ export const ThermalOptions = [
 ];
 
 export const STSTechnology = ['Battery', 'DSR', 'EV', 'Pondage', 'PSP'];
+export const HydroSubRows = ['Series', 'Technical parameters'];
 
 export const Technologies = ThermalOptions.concat(STSTechnology);

@@ -500,7 +500,7 @@ describe('findSpecificTrajectoryToDelete', () => {
 
 describe('getInformationMessage', () => {
   it('retourne null si le type est undefined', () => {
-    expect(getInformationMessage(3, undefined)).toBeNull();
+    expect(getInformationMessage(3, undefined as unknown as TRAJECTORY_TYPE)).toBeNull();
   });
 
   it('retourne le message thermal avec index = 1', () => {
@@ -508,7 +508,7 @@ describe('getInformationMessage', () => {
 
     expect(result).toEqual({
       messageKey: 'thermal.@paramModulationMessage',
-      index: 1,
+      id: '1',
     });
   });
 
@@ -517,19 +517,40 @@ describe('getInformationMessage', () => {
 
     expect(result).toEqual({
       messageKey: 'dsr.@capacityModulationMessage',
-      index: 3,
+      id: '3',
     });
   });
 
   it('retourne un index minimum de 0 pour DSR si nbRows <= 1', () => {
     expect(getInformationMessage(1, TRAJECTORY_TYPE.DSR)).toEqual({
       messageKey: 'dsr.@capacityModulationMessage',
-      index: 0,
+      id: '0',
     });
 
     expect(getInformationMessage(0, TRAJECTORY_TYPE.DSR)).toEqual({
       messageKey: 'dsr.@capacityModulationMessage',
-      index: 0,
+      id: '0',
+    });
+  });
+
+  it('retourne le message HYDRO_SERIES avec id "1"', () => {
+    const result = getInformationMessage(4, TRAJECTORY_TYPE.HYDRO_SERIES, '1');
+
+    expect(result).toBeNull();
+  });
+
+  it('retourne le message HYDRO_SERIES avec id "1.0"', () => {
+    const result = getInformationMessage(4, TRAJECTORY_TYPE.HYDRO_SERIES, '1.0');
+
+    expect(result).toBeNull();
+  });
+
+  it('retourne le message HYDRO_SERIES avec id "1.1"', () => {
+    const result = getInformationMessage(4, TRAJECTORY_TYPE.HYDRO_SERIES, '1.1');
+
+    expect(result).toEqual({
+      messageKey: 'hydro.@informationMessage',
+      id: '1.1',
     });
   });
 });
@@ -656,7 +677,7 @@ describe('fetchAndNormalizeTrajectories (Vitest)', () => {
   const defaultAreas = [{ name: 'A' }, { name: 'B' }];
   const emptyAreaSelected = [{ id: 99, trajectoryName: '' }] as DbTrajectory[];
 
-  beforeEach(() => {
+  afterEach(() => {
     vi.clearAllMocks();
   });
 
@@ -716,7 +737,7 @@ describe('fetchAndNormalizeTrajectories (Vitest)', () => {
       { id: 11, trajectoryName: '' },
     ] as DbTrajectory[]);
 
-    vi.mocked(trajectoryUtils.removeDuplicateByTechnology).mockReturnValue([
+    vi.mocked(trajectoryUtils.removeDuplicateByTechnology).mockReturnValueOnce([
       { id: 10, trajectoryName: 'T1', technology: 'Gas' },
       { id: 99, trajectoryName: '' },
       { id: 11, trajectoryName: '' },
@@ -752,7 +773,7 @@ describe('fetchAndNormalizeTrajectories (Vitest)', () => {
 
     vi.mocked(trajectoryUtils.buildDefaultEmptyTrajectoryList).mockReturnValue([]);
 
-    vi.mocked(trajectoryUtils.removeDuplicateByTechnology).mockReturnValue([
+    vi.mocked(trajectoryUtils.removeDuplicateByTechnology).mockReturnValueOnce([
       { id: 20, trajectoryName: 'STS1', technology: 'Battery' },
     ] as DbTrajectory[]);
 
@@ -799,6 +820,37 @@ describe('fetchAndNormalizeTrajectories (Vitest)', () => {
       ],
       dsrCmResult: [],
       technologies: undefined,
+    });
+  });
+
+  // ---------------------------------------------------------
+  // CASE 5 — Hydro type
+  // ---------------------------------------------------------
+  it('should fetch generic trajectories and remove duplicates', async () => {
+    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue([{ id: 30, trajectoryName: 'X' }] as DbTrajectory[]);
+
+    vi.mocked(trajectoryUtils.buildDefaultEmptyTrajectoryList).mockReturnValue([
+      { id: 31, trajectoryName: '' },
+    ] as DbTrajectory[]);
+
+    vi.mocked(trajectoryUtils.removeDuplicate).mockReturnValue([
+      { id: 30, trajectoryName: 'X' },
+      { id: 99, trajectoryName: '' },
+      { id: 31, trajectoryName: '' },
+    ] as DbTrajectory[]);
+
+    const result = await fetchAndNormalizeTrajectories({
+      id: 3,
+      trajType: TRAJECTORY_TYPE.HYDRO_SERIES,
+      defaultAreas,
+      emptyAreaSelected,
+    });
+
+    expect(result).toEqual({
+      // TODO : test trajectories result when import is implemented
+      trajectories: undefined,
+      dsrCmResult: [],
+      technologies: ['Series', 'Technical parameters'],
     });
   });
 });

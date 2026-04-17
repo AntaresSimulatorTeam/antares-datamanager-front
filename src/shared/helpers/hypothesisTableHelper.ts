@@ -1,6 +1,7 @@
 import {
   DbTrajectory,
   HypothesisRowData,
+  isTrajectoryHydroType,
   isTrajectoryResType,
   isTrajectorySubrowsType,
   TrajectoryAreaData,
@@ -21,7 +22,7 @@ import { getDefaultAreaNotIncludedInAreaList } from '@/shared/utils/hypothesisTa
 import { fetchTrajectoriesFromTypes } from '@/shared/services/hypothesisTableService.ts';
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { getThermalTechnologyList } from '@/shared/services/defaultConfigService.ts';
-import { STSTechnology } from '@/mocks/data/list/names.ts';
+import { HydroSubRows, STSTechnology } from '@/mocks/data/list/names.ts';
 import { TFunction } from 'i18next';
 import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
 import { getResTechnologyList, isParamModulationRequired } from '@/shared/services/trajectoryService.ts';
@@ -134,13 +135,16 @@ export const findSpecificTrajectoryToDelete = (
 
 export const getInformationMessage = (
   nbRows: number,
-  type?: TRAJECTORY_TYPE,
-): { messageKey: string; index: number } | null => {
+  type: TRAJECTORY_TYPE,
+  rowId?: string,
+): { messageKey: string; id: string } | null => {
   switch (type) {
     case TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER:
-      return { messageKey: 'thermal.@paramModulationMessage', index: 1 };
+      return { messageKey: 'thermal.@paramModulationMessage', id: '1' };
     case TRAJECTORY_TYPE.DSR:
-      return { messageKey: 'dsr.@capacityModulationMessage', index: Math.max(nbRows - 1, 0) };
+      return { messageKey: 'dsr.@capacityModulationMessage', id: String(Math.max(nbRows - 1, 0)) };
+    case TRAJECTORY_TYPE.HYDRO_SERIES:
+      return rowId?.split('.')[1] === '1' ? { messageKey: 'hydro.@informationMessage', id: rowId } : null;
     default:
       return null;
   }
@@ -220,13 +224,14 @@ export const fetchAndNormalizeTrajectories = async ({
     };
   }
   const isResType = isTrajectoryResType(trajType);
+  const isHydroType = isTrajectoryHydroType(trajType);
 
   // Other types
-  result = await getStudyTrajectories(id, trajType);
+  result = isHydroType ? [] : await getStudyTrajectories(id, trajType);
 
   if (trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
     const thermalOptions = await getThermalTechnologyList();
-    technologies = thermalOptions.map((t) => t.name);
+    technologies = thermalOptions.map((option) => option.name);
   }
 
   if (trajType === TRAJECTORY_TYPE.STS) {
@@ -235,6 +240,10 @@ export const fetchAndNormalizeTrajectories = async ({
 
   if (isResType) {
     technologies = await getResTechnologyList();
+  }
+
+  if (isHydroType) {
+    technologies = HydroSubRows;
   }
 
   const defaultEmpty = buildDefaultEmptyTrajectoryList(trajType, result, defaultAreas);

@@ -6,10 +6,12 @@ import {
   buildReadOnlyRow,
   convertIntoHypothesisRowWithTechnologies,
   filterRow,
+  findTechnologyMatch,
   generateReadOnlyIndexMap,
   getAreaTrajectoryName,
   getBgColor,
   getDefaultLabel,
+  getDeletionModalMessage,
   getHypothesis,
   getPathFromTrajectoryType,
   getQueryParamAreaValue,
@@ -19,6 +21,7 @@ import {
   getSubRowListWithArea,
   getSubRowsList,
   getTrajectoryTypeByIndex,
+  isEmptyRow,
   isMatchingTrajectoryType,
   isTechnicalParametersType,
   isTrajectoryLinked,
@@ -32,7 +35,7 @@ import {
 } from '../trajectoryUtils';
 import { defaultAreaNotInAreaTrajectoryList, rowData, rowDataTwo } from '@/mocks/data/tests/hypothesisTable.mock.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { afterEach, beforeEach, vi } from 'vitest';
+import { afterEach, beforeEach, Mock, MockInstance, vi } from 'vitest';
 import {
   mockDbTrajectory,
   mockDbTrajectoryAREA,
@@ -47,6 +50,7 @@ import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { Row } from '@tanstack/react-table';
 import { ThermalOptions } from '@/mocks/data/list/names.ts';
 import { TFunction } from 'i18next';
+import * as textUtils from '@/shared/utils/textUtils.ts';
 
 describe('getStatus', () => {
   it("should return an ERROR selection status for 'error' status", () => {
@@ -157,36 +161,6 @@ describe('removeDuplicate', () => {
   });
 });
 
-// describe('buildRowData', () => {
-//   it("should return an 'other' row data with OK status", () => {
-//     const rowDataOther = buildRowData(OTHER_AREAS, true, mockDbTrajectory);
-//     expect(rowDataOther).toStrictEqual({
-//       hypothesis: OTHER_AREAS_LABEL,
-//       trajectory: mockDbTrajectory,
-//       status: TRAJECTORY_SELECTION_STATUS.OK,
-//       isDefault: true,
-//     });
-//   });
-//   it("should return an 'other' row data with MISSING status", () => {
-//     const rowDataOther = buildRowData(OTHER_AREAS, true);
-//     expect(rowDataOther).toStrictEqual({
-//       hypothesis: OTHER_AREAS_LABEL,
-//       trajectory: null,
-//       status: TRAJECTORY_SELECTION_STATUS.MISSING,
-//       isDefault: true,
-//     });
-//   });
-//   it('should return a row data with OK status', () => {
-//     const rowDataOk = buildRowData('FR', false, mockDbTrajectory);
-//     expect(rowDataOk).toStrictEqual({
-//       hypothesis: 'FR',
-//       trajectory: mockDbTrajectory,
-//       status: TRAJECTORY_SELECTION_STATUS.OK,
-//       isDefault: false,
-//     });
-//   });
-// });
-
 describe('buildEmptyTrajectory', () => {
   it('should generate a trajectory with expected default fields', () => {
     const area = 'ZoneX';
@@ -203,187 +177,6 @@ describe('buildEmptyTrajectory', () => {
     expect(result.creationDate).toBeInstanceOf(Date);
   });
 });
-
-// describe('buildRowWithSubRowsData', () => {
-//   const subRowOptions = ['Option A', 'Option B'];
-//
-//   it('returns correct data when area is OTHER_AREAS', () => {
-//     const trajectory = { area: OTHER_AREAS, technology: '', trajectoryName: 'name' } as DbTrajectory;
-//
-//     const result = buildRowWithSubRowsData(trajectory, [], [], subRowOptions);
-//
-//     expect(result).toEqual({
-//       hypothesis: OTHER_AREAS_LABEL,
-//       trajectory,
-//       status: TRAJECTORY_SELECTION_STATUS.OK,
-//       isDefault: true,
-//       isDeletable: false,
-//       subRows: null,
-//     });
-//   });
-//
-//   it('returns correct data when area is undefined', () => {
-//     const trajectory = { technology: '', trajectoryName: 'name' } as DbTrajectory;
-//
-//     const result = buildRowWithSubRowsData(trajectory, [], [], subRowOptions);
-//
-//     expect(result).toEqual({
-//       hypothesis: '',
-//       trajectory,
-//       status: TRAJECTORY_SELECTION_STATUS.OK,
-//       isDefault: false,
-//       isDeletable: false,
-//       subRows: null,
-//     });
-//   });
-//
-//   it('returns correct data when trajectory has name and is in defaultAreas', () => {
-//     const trajectory = { area: 'Zone 1', trajectoryName: 'T1', technology: '' } as DbTrajectory;
-//     const defaultAreas = [{ name: 'Zone 1' }];
-//
-//     const result = buildRowWithSubRowsData(trajectory, defaultAreas, [], subRowOptions);
-//
-//     expect(result).toEqual({
-//       hypothesis: 'Zone 1',
-//       trajectory,
-//       status: TRAJECTORY_SELECTION_STATUS.OK,
-//       isDefault: true,
-//       isDeletable: false,
-//       subRows: [
-//         {
-//           hypothesis: 'Option A',
-//           trajectory: null,
-//           status: TRAJECTORY_SELECTION_STATUS.MISSING,
-//           isDefault: false,
-//           isDeletable: false,
-//           subRows: null,
-//         },
-//         {
-//           hypothesis: 'Option B',
-//           trajectory: null,
-//           status: TRAJECTORY_SELECTION_STATUS.MISSING,
-//           isDefault: false,
-//           isDeletable: false,
-//           subRows: null,
-//         },
-//       ],
-//     });
-//   });
-//
-//   it('returns correct data when trajectory has name and technology', () => {
-//     const trajectory = { area: 'Zone 1', trajectoryName: 'T1', technology: 'Option A' } as DbTrajectory;
-//
-//     const result = buildRowWithSubRowsData(trajectory, [], [], subRowOptions);
-//
-//     expect(result).toEqual({
-//       hypothesis: 'Zone 1',
-//       trajectory: null,
-//       status: TRAJECTORY_SELECTION_STATUS.MISSING,
-//       isDefault: false,
-//       isDeletable: false,
-//       subRows: [
-//         {
-//           hypothesis: 'Option A',
-//           trajectory,
-//           status: TRAJECTORY_SELECTION_STATUS.OK,
-//           isDefault: false,
-//           isDeletable: false,
-//           subRows: null,
-//         },
-//         {
-//           hypothesis: 'Option B',
-//           trajectory: null,
-//           status: TRAJECTORY_SELECTION_STATUS.MISSING,
-//           isDefault: false,
-//           isDeletable: false,
-//           subRows: null,
-//         },
-//       ],
-//     });
-//   });
-//
-//   it('excludes subRows if area is in areasNotInTrajectoryArea', () => {
-//     const trajectory = { area: 'Zone 2' } as DbTrajectory;
-//     const areasNotInTrajectoryArea = ['Zone 2'];
-//
-//     const result = buildRowWithSubRowsData(trajectory, undefined, areasNotInTrajectoryArea, subRowOptions);
-//
-//     expect(result.subRows).toBeNull();
-//   });
-//
-//   it('marks isDefault as false if not in defaultAreas and not OTHER_AREAS', () => {
-//     const trajectory = { area: 'Zone 3' } as DbTrajectory;
-//     const defaultAreas = [{ name: 'Zone 1' }];
-//
-//     const result = buildRowWithSubRowsData(trajectory, defaultAreas, [], subRowOptions);
-//
-//     expect(result.isDefault).toBe(false);
-//   });
-// });
-
-// describe('buildEmptyRowWithSubRowsData', () => {
-//   it('crée une ligne sans sous-lignes quand subRows est vide', () => {
-//     const result = buildEmptyRowWithSubRowsData('Main hypothesis', [], TRAJECTORY_TYPE.STS);
-//     expect(result).toEqual({
-//       hypothesis: 'Main hypothesis',
-//       trajectory: null,
-//       status: TRAJECTORY_SELECTION_STATUS.MISSING,
-//       isDefault: false,
-//       isDeletable: true,
-//       subRows: null,
-//     });
-//   });
-//
-//   it('crée une ligne avec des sous-lignes quand subRows est fourni', () => {
-//     const result = buildEmptyRowWithSubRowsData('Main hypothesis', ['Sub A', 'Sub B'], TRAJECTORY_TYPE.STS);
-//     expect(result.hypothesis).toBe('Main hypothesis');
-//     expect(result.subRows).toHaveLength(2);
-//
-//     expect(result.subRows?.[0]).toEqual({
-//       hypothesis: 'Sub A',
-//       trajectory: null,
-//       status: TRAJECTORY_SELECTION_STATUS.MISSING,
-//       isDefault: false,
-//       isDeletable: false,
-//       subRows: null,
-//     });
-//
-//     expect(result.subRows?.[1]).toEqual({
-//       hypothesis: 'Sub B',
-//       trajectory: null,
-//       status: TRAJECTORY_SELECTION_STATUS.MISSING,
-//       isDefault: false,
-//       isDeletable: false,
-//       subRows: null,
-//     });
-//   });
-//
-//   it("assure que la ligne principale est toujours deletable si l'area est non default", () => {
-//     const result = buildEmptyRowWithSubRowsData('Main hypothesis', ['Sub'], TRAJECTORY_TYPE.STS, [{ name: 'FR' }]);
-//     expect(result.isDeletable).toBe(true);
-//     expect(result.isDefault).toBe(false);
-//   });
-//
-//   it("assure que la ligne principale est toujours deletable si l'area est non default", () => {
-//     const result = buildEmptyRowWithSubRowsData('Main hypothesis', ['Sub'], TRAJECTORY_TYPE.STS);
-//     expect(result.isDeletable).toBe(true);
-//     expect(result.isDefault).toBe(false);
-//   });
-//
-//   it("assure que la ligne principale est non deletable si l'area est default", () => {
-//     const result = buildEmptyRowWithSubRowsData('Main hypothesis', ['Sub'], TRAJECTORY_TYPE.STS, [
-//       { name: 'Main hypothesis' },
-//     ]);
-//     expect(result.isDeletable).toBe(false);
-//     expect(result.isDefault).toBe(true);
-//   });
-//
-//   it('assure que les sous-lignes sont non default (si pas SPECIFIC PARAM et pas dans la liste des default areas) et non deletable', () => {
-//     const result = buildEmptyRowWithSubRowsData('Main hypothesis', ['Sub'], TRAJECTORY_TYPE.STS);
-//     expect(result.subRows?.[0].isDefault).toBe(false);
-//     expect(result.subRows?.[0].isDeletable).toBe(false);
-//   });
-// });
 
 describe('isTrajectoryLinked', () => {
   it('should return true when a matching trajectory with empty technology exists', () => {
@@ -536,7 +329,7 @@ describe('getStudyMenu', () => {
   it('should return correct tab structure when area is not linked', () => {
     const result: HypothesisTab[] = getStudyMenu(mockTranslate, false);
 
-    expect(result.length).toBe(7);
+    expect(result.length).toBe(8);
 
     expect(result[0]).toEqual({
       name: TRAJECTORY_TYPE.AREA,
@@ -1528,5 +1321,209 @@ describe('shouldDeleteCapacityModulation', () => {
     ] as HypothesisRowData[];
 
     expect(shouldDeleteCapacityModulation(rows, 0)).toBe(false);
+  });
+});
+
+describe('getDeletionModalMessage', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  // --- 1. Cas DSR + shouldDeleteCapacityModulation = true
+  it('retourne confirmDeletionCapacityMessage pour DSR quand shouldDeleteCapacityModulation = true', () => {
+    const baseRow = {
+      hypothesis: 'H1',
+      trajectory: { trajectoryName: 'BP', hasTimeSeries: true },
+      status: TRAJECTORY_SELECTION_STATUS.OK,
+      subRows: [],
+    };
+
+    const data = [
+      baseRow,
+      {
+        hypothesis: 'H2',
+        trajectory: { trajectoryName: 'BP', hasTimeSeries: false },
+        status: TRAJECTORY_SELECTION_STATUS.OK,
+        subRows: [],
+      },
+      {
+        hypothesis: 'modulation',
+        trajectory: { trajectoryName: 'BP', hasTimeSeries: false },
+        status: TRAJECTORY_SELECTION_STATUS.OK,
+        subRows: [],
+      },
+    ] as unknown as HypothesisRowData[];
+
+    const result = getDeletionModalMessage(TRAJECTORY_TYPE.DSR, 0, data);
+
+    expect(result).toBe('trajectoryDeletionModal.@confirmDeletionCapacityMessage');
+  });
+
+  // --- 2. Cas DSR + shouldDeleteCapacityModulation = false
+  it('retourne confirmDeletionMessage pour DSR quand shouldDeleteCapacityModulation = false', () => {
+    const baseRow = {
+      hypothesis: 'H1',
+      trajectory: { trajectoryName: 'BP', hasTimeSeries: true },
+      status: TRAJECTORY_SELECTION_STATUS.OK,
+      subRows: [],
+    };
+
+    const data = [
+      baseRow,
+      {
+        hypothesis: 'H2',
+        trajectory: { trajectoryName: 'BP', hasTimeSeries: true },
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+        subRows: [],
+      },
+      {
+        hypothesis: 'modulation',
+        trajectory: { trajectoryName: 'BP', hasTimeSeries: false },
+        status: TRAJECTORY_SELECTION_STATUS.OK,
+        subRows: [],
+      },
+    ] as unknown as HypothesisRowData[];
+    const result = getDeletionModalMessage(TRAJECTORY_TYPE.DSR, 0, data);
+
+    expect(result).toBe('trajectoryDeletionModal.@confirmDeletionMessage');
+  });
+
+  // --- 3. Cas THERMAL_CAPACITY + hasTrajectory && hasTrajectoryTech
+  it('retourne confirmDeleteMessage pour THERMAL_CAPACITY quand les deux trajectoires sont valides', () => {
+    const baseRow = {
+      hypothesis: 'H1',
+      trajectory: {
+        trajectoryName: 'BP',
+        hasTimeSeries: true,
+      },
+      status: TRAJECTORY_SELECTION_STATUS.OK,
+      subRows: [
+        {
+          hypothesis: 'H1',
+          trajectory: { trajectoryName: 'BP_23', hasTimeSeries: true, subRows: [] },
+          status: TRAJECTORY_SELECTION_STATUS.OK,
+          subRows: [],
+        },
+      ],
+    };
+
+    const data = [baseRow] as unknown as HypothesisRowData[];
+    const result = getDeletionModalMessage(TRAJECTORY_TYPE.THERMAL_CAPACITY, 0, data);
+
+    expect(result).toBe('trajectoryDeletionModal.@confirmDeleteMessage');
+  });
+
+  // --- 4. Cas THERMAL_CAPACITY mais une des conditions est fausse
+  it('retourne confirmDeletionMessage pour THERMAL_CAPACITY quand une condition est fausse', () => {
+    const baseRow = {
+      hypothesis: 'H1',
+      trajectory: {
+        trajectoryName: 'BP',
+        hasTimeSeries: true,
+      },
+      status: TRAJECTORY_SELECTION_STATUS.OK,
+      subRows: null,
+    };
+
+    const data = [baseRow] as unknown as HypothesisRowData[];
+    const result = getDeletionModalMessage(TRAJECTORY_TYPE.THERMAL_CAPACITY, 0, data);
+
+    expect(result).toBe('trajectoryDeletionModal.@confirmDeletionMessage');
+  });
+
+  // --- 5. Cas par défaut (autre type)
+  it('retourne confirmDeletionMessage pour un type non géré', () => {
+    const baseRow = {
+      hypothesis: 'H1',
+      trajectory: {
+        trajectoryName: 'BP',
+        hasTimeSeries: true,
+      },
+      status: TRAJECTORY_SELECTION_STATUS.OK,
+      subRows: null,
+    };
+
+    const data = [baseRow] as unknown as HypothesisRowData[];
+    const result = getDeletionModalMessage('OTHER_TYPE' as unknown as TRAJECTORY_TYPE, 0, data);
+
+    expect(result).toBe('trajectoryDeletionModal.@confirmDeletionMessage');
+  });
+});
+
+let normalizeSpy: MockInstance<(s: string | undefined | null) => string | undefined>;
+let snakeSpy: MockInstance<(str: string) => string>;
+
+beforeEach(() => {
+  normalizeSpy = vi.spyOn(textUtils, 'normalizeTechnology');
+  snakeSpy = vi.spyOn(textUtils, 'snakeCaseUnderscore');
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
+describe('findTechnologyMatch', () => {
+  const entries = [
+    { type: 'OTHER', technology: 'Solar Panel' },
+    { type: TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION, technology: 'heat_pump' },
+    { type: 'OTHER', technology: 'Wind Turbine' },
+  ] as DbTrajectory[];
+
+  it('retourne une entrée correspondant à une technologie simple', () => {
+    const result = findTechnologyMatch(entries, 'solar panel');
+    expect(result).toEqual(entries[0]);
+  });
+
+  it('retourne une entrée correspondant à RES_TECHNOLOGY_DISTRIBUTION avec snakeCase', () => {
+    const result = findTechnologyMatch(entries, 'Heat Pump');
+    expect(snakeSpy).toHaveBeenCalledWith('Heat Pump');
+    expect(result).toEqual(entries[1]);
+  });
+
+  it('retourne null si aucune technologie ne correspond', () => {
+    const result = findTechnologyMatch(entries, 'Geothermal');
+    expect(result).toBeNull();
+  });
+
+  it('utilise normalizeTechnology pour les types non RES_TECHNOLOGY_DISTRIBUTION', () => {
+    findTechnologyMatch(entries, 'wind turbine');
+    expect(normalizeSpy).toHaveBeenCalledWith('Wind Turbine');
+  });
+});
+
+describe('isEmptyRow', () => {
+  const mockT = vi.fn((key: string) => key) as unknown as TFunction<'translation'>;
+  const mockTMock = mockT as unknown as Mock;
+
+  it('retourne true si hypothesis correspond à t("thermal.@specific")', () => {
+    mockTMock.mockReturnValueOnce('SPECIFIC_VALUE');
+
+    const result = isEmptyRow(TRAJECTORY_TYPE.STS, 'SPECIFIC_VALUE', 5, mockT);
+
+    expect(result).toBe(true);
+  });
+
+  it('retourne true si type est STS et rowDepth = 0', () => {
+    mockTMock.mockReturnValue('OTHER');
+
+    const result = isEmptyRow(TRAJECTORY_TYPE.STS, 'foo', 0, mockT);
+
+    expect(result).toBe(true);
+  });
+
+  it('retourne true si type est HYDRO_SERIES et rowDepth = 0', () => {
+    mockTMock.mockReturnValue('OTHER');
+
+    const result = isEmptyRow(TRAJECTORY_TYPE.HYDRO_SERIES, 'foo', 0, mockT);
+
+    expect(result).toBe(true);
+  });
+
+  it('retourne false si aucune condition n’est remplie', () => {
+    mockTMock.mockReturnValue('OTHER');
+
+    const result = isEmptyRow(TRAJECTORY_TYPE.STS, 'foo', 2, mockT);
+
+    expect(result).toBe(false);
   });
 });

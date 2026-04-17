@@ -44,6 +44,8 @@ export const TabMenu = ({ defaultAreas, areas, studyData, type }: MenuProps) => 
         { name: TRAJECTORY_TYPE.THERMAL_CAPACITY, label: t('misc.@installedPower') },
         { name: TRAJECTORY_TYPE.THERMAL_PARAMETER, label: t('thermal.@parameters') },
       ];
+    } else if (trajectoryType === TRAJECTORY_TYPE.HYDRO_SERIES) {
+      return [{ name: TRAJECTORY_TYPE.HYDRO_SERIES, label: t('hydro.@capacity') }];
     } else {
       const itemsTab = [
         { name: trajectoryType, label: t('misc.@installedPower') },

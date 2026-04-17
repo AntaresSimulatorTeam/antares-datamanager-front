@@ -7,7 +7,7 @@ import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { generateId } from '@/shared/utils/defaultUtils.ts';
 import { Row } from '@tanstack/react-table';
 import { TFunction } from 'i18next';
-import { snakeCase, snakeCaseUnderscore } from '@/shared/utils/textUtils.ts';
+import { normalizeTechnology, snakeCase, snakeCaseUnderscore } from '@/shared/utils/textUtils.ts';
 import {
   TRAJECTORY_DSR_CAPACITY_MODULATION,
   TRAJECTORY_DSR_CLUSTER,
@@ -148,6 +148,8 @@ export const shouldHaveSubRows = (areasToExclude: string[], mainEntry: DbTraject
     case TRAJECTORY_TYPE.RES_CAPACITY:
     case TRAJECTORY_TYPE.RES_LOAD:
     case TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION:
+    case TRAJECTORY_TYPE.HYDRO_SERIES:
+    case TRAJECTORY_TYPE.HYDRO_PSP:
       return !isInExcluded;
     case TRAJECTORY_TYPE.THERMAL_CAPACITY:
       return !isOther && !isInExcluded;
@@ -157,8 +159,6 @@ export const shouldHaveSubRows = (areasToExclude: string[], mainEntry: DbTraject
       return isOther || !isInExcluded;
   }
 };
-
-const normalizeTechnology = (s: string | undefined | null) => s?.trim().toLowerCase();
 
 /**
  * Create an empty database trajectory
@@ -190,7 +190,7 @@ export const shouldBeDeletable = (
   return !isDefault && OTHER_AREAS !== trajectory.area && type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER;
 };
 
-const findTechnologyMatch = (entries: DbTrajectory[], option: string) =>
+export const findTechnologyMatch = (entries: DbTrajectory[], option: string) =>
   entries.find((entry) =>
     entry.type === TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION
       ? normalizeTechnology(entry.technology) === snakeCaseUnderscore(option)
@@ -530,6 +530,12 @@ export const getStudyMenu = (t: (value: string) => string, isTrajectoryAreaLinke
     icon: StdIconId.EnergySavingsLeaf,
     isDisabled: true,
   },
+  {
+    name: TRAJECTORY_TYPE.HYDRO_SERIES,
+    label: t('studyDetails.@hydro'),
+    icon: StdIconId.Water,
+    isDisabled: true,
+  },
 ];
 
 /**
@@ -859,17 +865,28 @@ export const shouldDeleteCapacityModulation = (rows: HypothesisRowData[], index:
   return tsRows.length === 1;
 };
 
+const hasValidTrajectory = (row?: HypothesisRowData) =>
+  !!row?.trajectory && row?.status === TRAJECTORY_SELECTION_STATUS.OK;
+
+const hasValidTrajectoryTechnology = (row?: HypothesisRowData) =>
+  row?.subRows?.some((subRow) => !!subRow.trajectory && subRow.status === TRAJECTORY_SELECTION_STATUS.OK);
+
 export const getDeletionModalMessage = (type: TRAJECTORY_TYPE, index: number, data: HypothesisRowData[]) => {
+  const row = data[index];
+
   if (type === TRAJECTORY_TYPE.DSR && shouldDeleteCapacityModulation(data, index)) {
     return 'trajectoryDeletionModal.@confirmDeletionCapacityMessage';
   }
+
   if (type === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
-    const hasTrajectory = !!data[index]?.trajectory && data[index]?.status === TRAJECTORY_SELECTION_STATUS.OK;
-    const hasTrajectoryTechnology = data[index]?.subRows?.some(
-      (subRow) => !!subRow.trajectory && subRow.status === TRAJECTORY_SELECTION_STATUS.OK,
-    );
-    if (hasTrajectory && hasTrajectoryTechnology) return 'trajectoryDeletionModal.@confirmDeleteMessage';
+    const hasTrajectory = hasValidTrajectory(row);
+    const hasTrajectoryTech = hasValidTrajectoryTechnology(row);
+
+    if (hasTrajectory && hasTrajectoryTech) {
+      return 'trajectoryDeletionModal.@confirmDeleteMessage';
+    }
   }
+
   return 'trajectoryDeletionModal.@confirmDeletionMessage';
 };
 
@@ -944,3 +961,13 @@ export const getUrlApiUploadTrajectory = (
       return `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   }
 };
+
+export const isEmptyRow = (
+  type: TRAJECTORY_TYPE,
+  hypothesis: string,
+  rowDepth: number,
+  t: TFunction<'translation', undefined>,
+) =>
+  hypothesis === t('thermal.@specific') ||
+  ((type === TRAJECTORY_TYPE.STS || type === TRAJECTORY_TYPE.HYDRO_SERIES || type === TRAJECTORY_TYPE.HYDRO_PSP) &&
+    rowDepth === 0);

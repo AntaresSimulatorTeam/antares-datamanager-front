@@ -17,7 +17,7 @@ import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 import { RdsTextTooltip } from 'rte-design-system-react';
 import { getAlignment, hasLabelDefault } from '@/shared/utils/hypothesisTableUtils.ts';
 import StdButton from '@common/base/stdButton/StdButton.tsx';
-import { getSubRowListWithArea, getSubRowsList } from '@/shared/utils/trajectoryUtils.ts';
+import { getSubRowListWithArea, getSubRowsList, isEmptyRow } from '@/shared/utils/trajectoryUtils.ts';
 import StdIconButton from '@common/base/stdIconButton/StdIconButton.tsx';
 import { getInformationMessage } from '@/shared/helpers/hypothesisTableHelper.ts';
 
@@ -42,7 +42,7 @@ const getExpandableHypothesisTableHeaders = ({
       const subRowListName = getSubRowsList(row);
       const subRowListWithArea = getSubRowListWithArea(subRowListName, t, type);
       const isTechnology = list?.length ? list?.includes(hypothesis) : false;
-      const informationMessage = getInformationMessage(table.getRowCount(), type);
+      const informationMessage = type ? getInformationMessage(table.getRowCount(), type, row.id) : null;
 
       return (
         <div className="flex gap-1 py-1">
@@ -72,7 +72,7 @@ const getExpandableHypothesisTableHeaders = ({
               <div className="text-gray-600">{` | +${subRowListWithArea?.messageNb}`}</div>
             </RdsTextTooltip>
           )}
-          {row.depth === 0 && row.index === informationMessage?.index && informationMessage && (
+          {row.id === informationMessage?.id && informationMessage && (
             <RdsTextTooltip text={t(`${informationMessage.messageKey}`)} offset={5} placement="right">
               <StdIcon name={StdIconId.Info} color={row.getReadOnly() ? 'text-gray-600' : 'text-gray-900'} />
             </RdsTextTooltip>
@@ -86,7 +86,7 @@ const getExpandableHypothesisTableHeaders = ({
     size: type === TRAJECTORY_TYPE.STS ? 520 : 623,
     cell: ({ row, table: { options } }) => {
       const { trajectory, status, hypothesis } = row.original;
-      if (hypothesis === t('thermal.@specific') || (type === TRAJECTORY_TYPE.STS && row.depth === 0)) return null;
+      if (type && isEmptyRow(type, hypothesis, row.depth, t)) return null;
       return trajectory?.trajectoryName && status !== TRAJECTORY_SELECTION_STATUS.MISSING ? (
         <div className="flex w-full items-center gap-2">
           <LabelWithDeleteButton

@@ -113,5 +113,6 @@ export enum StdIconId {
   Visibility = 'visibility',
   Warning = 'warning',
   WarningFilled = 'warning-filled',
+  Water = 'water',
   Width = 'width',
 }
