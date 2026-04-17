@@ -77,13 +77,13 @@ export const handleFetchTrajectoriesFS = async (
   type: TRAJECTORY_TYPE,
   hypothesis: { type: TRAJECTORY_TYPE; area: string; technology?: string; isDefault: boolean },
   searchTerm?: string,
-): Promise<SelectOption[] | undefined> => {
+): Promise<SelectOption[]> => {
   try {
     const area = getQueryParamAreaValue(type, hypothesis);
     const results = await fetchTrajectoriesFromFS(type, area, searchTerm);
     return convertToFSSelectionOptionType(results, hypothesis.isDefault);
   } catch {
-    // Silent handler
+    return [];
   }
 };
 

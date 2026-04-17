@@ -21,22 +21,22 @@ export const ImportTrajectoryModal = ({ isOpen, onClose, trajectoryType, hypothe
   const { t } = useTranslation();
   const [trajectorySelected, setTrajectorySelected] = useState<SelectOption | null>(null);
   const path = getPathFromTrajectoryType(trajectoryType, hypothesis);
-  const [options, setOptions] = useState<SelectOption[] | undefined>();
+  const [options, setOptions] = useState<SelectOption[]>([]);
+  const [placeholder, setPlaceholder] = useState<string>(t('studyDetails.@select_no_trajectory'));
+  const [isInputDisabled, setIsInputDisabled] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchOptions = async () => {
       const optionsFS = await handleFetchTrajectoriesFS(trajectoryType, hypothesis);
       optionsFS && setOptions(optionsFS);
+      const placeholderSelect =
+        optionsFS?.length > 0 ? t('studyDetails.@select_trajectory') : t('studyDetails.@select_no_trajectory');
+      setPlaceholder(placeholderSelect);
+      setIsInputDisabled(optionsFS?.length === 0);
     };
     if (!isOpen) return;
     void fetchOptions();
-  }, [hypothesis, hypothesis.area, hypothesis?.isDefault, hypothesis.type, isOpen, trajectoryType]);
-
-  const handleSelectOption = (value: SelectOption | null) => {
-    if (value) {
-      setTrajectorySelected(value);
-    }
-  };
+  }, [hypothesis, hypothesis.area, hypothesis.isDefault, hypothesis.type, isOpen, t, trajectoryType]);
 
   const resetField = () => {
     setTrajectorySelected(null);
@@ -56,13 +56,14 @@ export const ImportTrajectoryModal = ({ isOpen, onClose, trajectoryType, hypothe
             <div className="w-[400px]">
               <SelectAndSearchableInput
                 options={options}
-                defaultPlaceHolder={t('studyDetails.@select_trajectory')}
-                onSelect={handleSelectOption}
+                defaultPlaceHolder={placeholder}
+                onSelect={setTrajectorySelected}
                 isSearchable={true}
                 setSearchTerm={async (value?: string) =>
                   await handleFetchTrajectoriesFS(trajectoryType, hypothesis, value)
                 }
                 resetField={resetField}
+                isInputDisabled={isInputDisabled}
               />
             </div>
             {trajectoryType === TRAJECTORY_TYPE.STS && (

@@ -124,7 +124,7 @@
     "@select_project": "Selecta project",
     "@select_area": "Add an area first",
     "@import_file": "Import",
-    "@select_file_fs_error": "Not such files on file system",
+    "@select_no_trajectory": "No trajectory in the file system",
     "@import_from_file_system": "Import a trajectory for",
     "@select_from": "Select from {{path}}",
     "@import": "Import",

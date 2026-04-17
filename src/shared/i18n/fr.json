@@ -123,7 +123,7 @@
     "@select_trajectory": "Selectionner une trajectoire",
     "@select_project": "Selectionner un nom de projet",
     "@select_file": "Selectionner un fichier",
-    "@select_file_fs_error": "Aucun fichier au niveau du système fichier",
+    "@select_no_trajectory": "Aucune trajectoire au niveau du système fichier",
     "@import_from_file_system": "Importer une trajectoire pour",
     "@select_from": "Select from {{path}}",
     "@import": "Importer",

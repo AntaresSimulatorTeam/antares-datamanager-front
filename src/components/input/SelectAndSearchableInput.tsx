@@ -39,7 +39,6 @@ const SelectAndSearchableInput = ({
   const [optionsSelection, setOptionsSelection] = useState<SelectOption[] | undefined>(options ?? []);
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [isSelectEnable, setIsSelectEnable] = useState<boolean>(true);
-  const [placeHolder] = useState<string>(defaultPlaceHolder);
   const [valueInput, setValueInput] = useState<string>(defaultValue ?? '');
   const dropdownList = useRef<HTMLDivElement | null>(null);
   const selectInputClass = isInputDisabled ? `bg-gray-200 border-opacity-0 cursor-not-allowed pointer-events-none` : '';
@@ -116,7 +115,7 @@ const SelectAndSearchableInput = ({
             setIsDropdownOpen(false);
           }
         }}
-        placeHolder={placeHolder}
+        placeHolder={defaultPlaceHolder}
         variant="outlined"
         value={valueInput}
         disabled={isInputDisabled}

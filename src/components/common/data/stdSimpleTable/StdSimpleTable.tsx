@@ -24,7 +24,7 @@ export type StdSimpleTableProps<TData> = {
   removeRow?: (value: string, rowId?: string) => void | Promise<void>;
   viewData?: (rowId: string) => void | Promise<void>;
   search?: (value: string, rowId: string) => Promise<SelectOption[] | undefined> | undefined;
-  importData?: (rowId: string, index?: number) => Promise<void>;
+  importData?: (rowId: string, index?: number) => void;
 } & Omit<TableCoreProps<TData>, 'table'> &
   Omit<TableOptions<TData>, 'getCoreRowModel'>;
 

@@ -1,5 +1,5 @@
 import StdSimpleTable from '@common/data/stdSimpleTable/StdSimpleTable.tsx';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   ErrorMessageType,
   ExpandedState,
@@ -71,17 +71,6 @@ export const PegaseHypothesisTable = ({
     [getTableHeaders, t, errorInfo, isStudyGenerated, progress, fileStatus, idSelected, columnHeader, type, list],
   );
 
-  const onHandleImport = useCallback(
-    async (rowId: string) => {
-      try {
-        await handleImport?.(rowId);
-      } catch {
-        setErrorInfo({ index: Number(rowId), message: t('studyDetails.@select_file_fs_error') });
-      }
-    },
-    [handleImport, t],
-  );
-
   return (
     <div className="flex h-fit w-full">
       <StdSimpleTable
@@ -95,7 +84,7 @@ export const PegaseHypothesisTable = ({
         onExpandedChange={setExpanded}
         getSubRows={(originalRow) => originalRow.subRows ?? undefined}
         search={(value: string, rowId: string) => handleSearch?.(value, rowId)}
-        importData={async (rowId: string) => await onHandleImport(rowId)}
+        importData={(rowId: string) => handleImport?.(rowId)}
         removeRow={(value: string, rowId?: string) => void removeRow?.(value, rowId)}
         updateData={(rowId: string, value: unknown, status: RowStatus) => void updateData?.(rowId, value, status)}
         viewData={handleViewData ? (rowId: string) => void handleViewData?.(rowId) : undefined}
