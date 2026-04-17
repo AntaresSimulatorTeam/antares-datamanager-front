@@ -32,7 +32,6 @@ import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirm
 import { CheckBoxListWithSearchBar } from '@/components/list/CheckBoxListWithSearchBar.tsx';
 import { useTranslation } from 'react-i18next';
 import { TrajectoryDataVisualisation } from '@common/modal/TrajectoryDataVisualisation.tsx';
-import { useTrajectoryFetchFromFSHandler } from '@/hooks/useTrajectoryFetchFromFSHandler.ts';
 import { RowToDeleteProps } from '@/shared/types/HypothesisTable.ts';
 import { useHypothesisTableUpdateHandler } from '@/hooks/useHypothesisTableUpdateHandler.ts';
 
@@ -47,7 +46,6 @@ const ExpandableTab = ({ defaultAreas, areas, studyData, type }: TabProps & { ty
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
   const [installedPowerTechnologies, setInstalledPowerTechnologies] = useState<string[]>([]);
   const { isModalOpen, toggleModal } = useNewStudyModal();
-  const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
   const [trajectoryData, setTrajectoryData] = useState<TrajectoryViewData | undefined>();
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
@@ -70,14 +68,7 @@ const ExpandableTab = ({ defaultAreas, areas, studyData, type }: TabProps & { ty
     studyData,
     setDbTrajectories,
   });
-  const { handleFetchFromFS } = useTrajectoryFetchFromFSHandler({
-    data,
-    type,
-    defaultAreas,
-    setOptionsFS,
-    setRowIdSelected,
-    toggleModal,
-  });
+
   const { handleHypothesisTableUpdate } = useHypothesisTableUpdateHandler({
     studyData,
     data,
@@ -203,7 +194,10 @@ const ExpandableTab = ({ defaultAreas, areas, studyData, type }: TabProps & { ty
         type={type}
         list={installedPowerTechnologies}
         handleSearch={handleSearch}
-        handleImport={handleFetchFromFS}
+        handleImport={(rowId: string) => {
+          setRowIdSelected(rowId);
+          toggleModal();
+        }}
         isReadOnlyEnable={true}
         updateData={handleHypothesisTableUpdate}
         removeRow={removeTableRow}
@@ -211,10 +205,10 @@ const ExpandableTab = ({ defaultAreas, areas, studyData, type }: TabProps & { ty
       />
       {isModalOpen && (
         <ImportTrajectoryModal
-          options={optionsFS}
+          isOpen={isModalOpen}
           onClose={handleCloseImportModal}
           trajectoryType={getTypeToImport()}
-          hypothesis={getAreaTrajectoryName(rowIdSelected, data)}
+          hypothesis={getAreaTrajectoryName(rowIdSelected, data, type)}
         />
       )}
       {isViewModalOpen && trajectoryData && (

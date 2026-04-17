@@ -14,7 +14,7 @@ import { DbTrajectory, HypothesisRowData, SelectOption, StudyDTO, TrajectoryView
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
-import { filterRow } from '@/shared/utils/trajectoryUtils.ts';
+import { filterRow, getAreaTrajectoryName } from '@/shared/utils/trajectoryUtils.ts';
 import { TrajectoryDataVisualisation } from '@common/modal/TrajectoryDataVisualisation.tsx';
 import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
@@ -25,7 +25,6 @@ import { getReadOnlyForGeneratedStudy } from '@/shared/helpers/hypothesisTableHe
 import getEditableHypothesisTableHeaders from '@/components/header/EditableHypothesisTableHeaders.tsx';
 import { useFetchFixHypothesisTrajectories } from '@/hooks/useFetchFixHypothesisTrajectories.ts';
 import { useTrajectorySearchHandler } from '@/hooks/useTrajectorySearchHandler.ts';
-import { useTrajectoryFetchFromFSHandler } from '@/hooks/useTrajectoryFetchFromFSHandler.ts';
 import { useHypothesisTableUpdateHandler } from '@/hooks/useHypothesisTableUpdateHandler.ts';
 
 interface AreaLinkTabProps {
@@ -38,7 +37,6 @@ export const AreaLinkTab = ({ setErrorMessage, studyData }: AreaLinkTabProps) =>
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const dispatch = useStudyDispatch();
   const { t } = useTranslation();
-  const [optionsFS, setOptionsFS] = useState<SelectOption[] | undefined>();
   const [rowIdSelected, setRowIdSelected] = useState<string>('0');
   const [trajectoryData, setTrajectoryData] = useState<TrajectoryViewData | undefined>();
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -62,14 +60,6 @@ export const AreaLinkTab = ({ setErrorMessage, studyData }: AreaLinkTabProps) =>
     type: TRAJECTORY_TYPE.AREA,
     studyData,
     setDbTrajectories,
-  });
-  const { handleFetchFromFS } = useTrajectoryFetchFromFSHandler({
-    data,
-    type: TRAJECTORY_TYPE.AREA,
-    defaultAreas: [],
-    setOptionsFS,
-    setRowIdSelected,
-    toggleModal,
   });
   const { handleHypothesisTableUpdate } = useHypothesisTableUpdateHandler({
     studyData,
@@ -126,7 +116,10 @@ export const AreaLinkTab = ({ setErrorMessage, studyData }: AreaLinkTabProps) =>
         idSelected={String(rowIdSelected)}
         handleSearch={handleSearch}
         updateData={handleHypothesisTableUpdate}
-        handleImport={handleFetchFromFS}
+        handleImport={(rowId: string) => {
+          setRowIdSelected(rowId);
+          toggleModal();
+        }}
         handleViewData={(rowId: string) => {
           const index = Number(rowId);
           const trajectory = data[index].trajectory;
@@ -137,7 +130,7 @@ export const AreaLinkTab = ({ setErrorMessage, studyData }: AreaLinkTabProps) =>
       />
       {isModalOpen && (
         <ImportTrajectoryModal
-          options={optionsFS}
+          isOpen={isModalOpen}
           onClose={async (value?: SelectOption) => {
             toggleModal();
             if (value != null) {
@@ -151,6 +144,7 @@ export const AreaLinkTab = ({ setErrorMessage, studyData }: AreaLinkTabProps) =>
             }
           }}
           trajectoryType={rowIdSelected === '0' ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK}
+          hypothesis={getAreaTrajectoryName(rowIdSelected, data, TRAJECTORY_TYPE.AREA)}
         />
       )}
       {isViewModalOpen && trajectoryData && (

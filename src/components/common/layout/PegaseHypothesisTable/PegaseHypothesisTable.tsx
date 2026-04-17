@@ -19,7 +19,7 @@ interface PegaseHypothesisTableProps extends TableHeadersProps {
   getTableHeaders: (context: TableHeadersGetterProps) => TableOptions<HypothesisRowData>['columns'];
   readOnly?: ReadOnlyObject;
   handleSearch?: (fileNameContains: string, rowId: string) => Promise<SelectOption[] | undefined>;
-  handleImport?: (rowId: string) => Promise<void>;
+  handleImport?: (rowId: string) => void;
   isReadOnlyEnable?: boolean;
   removeRow?: (value: string, rowId?: string) => void | Promise<void>;
   updateData?: (rowId: string, value: unknown, status: RowStatus) => void | Promise<void>;

@@ -68,30 +68,21 @@ export const handleTrajectoryError = (
  * @async
  * @function handleFetchTrajectoriesFS
  * @param {TRAJECTORY_TYPE} type - The type of trajectory to fetch. Determines the context or criteria for the query.
- * @param {string} rowId - The unique identifier for the row being processed or selected.
- * @param {Dispatch<SetStateAction<SelectOption[] | undefined>>} setOptionsFS - State dispatcher for updating the options available after fetching trajectories.
- * @param {Dispatch<SetStateAction<string>>} setRowIdSelected - State dispatcher for updating the selected row ID after processing.
- * @param {Function} toggleModal - A function to toggle the visibility of a modal, typically used to display or hide UI elements during or after the process.
- * @param {string} hypothesis - An optional parameter representing a hypothesis that determines additional query parameters.
- * @param isDefaultArea
+ * @param hypothesis
+ * @param searchTerm
  * @returns {Promise<void>} Resolves to no value upon successful completion of the operation.
  * @throws Will silently handle errors during data fetching or processing without throwing or exposing exceptions.
  */
 export const handleFetchTrajectoriesFS = async (
   type: TRAJECTORY_TYPE,
-  rowId: string,
-  setOptionsFS: Dispatch<SetStateAction<SelectOption[] | undefined>>,
-  setRowIdSelected: Dispatch<SetStateAction<string>>,
-  toggleModal: () => void,
-  hypothesis?: string,
-  isDefaultArea = false,
-): Promise<void> => {
+  hypothesis: { type: TRAJECTORY_TYPE; area: string; technology?: string; isDefault: boolean },
+  searchTerm?: string,
+): Promise<SelectOption[] | undefined> => {
   try {
     const area = getQueryParamAreaValue(type, hypothesis);
-    const results = area ? await fetchTrajectoriesFromFS(type, area) : await fetchTrajectoriesFromFS(type);
-    setOptionsFS(convertToFSSelectionOptionType(results, isDefaultArea));
-    setRowIdSelected(rowId);
-    toggleModal();
+    console.log('handleFetchTrajectoriesFS', hypothesis);
+    const results = await fetchTrajectoriesFromFS(type, area, searchTerm);
+    return convertToFSSelectionOptionType(results, hypothesis.isDefault);
   } catch {
     // Silent handler
   }

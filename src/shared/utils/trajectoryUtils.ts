@@ -560,23 +560,68 @@ export const getRowDataSelected = (data: HypothesisRowData[], indexArray: number
   indexArray.length === 2 ? (data[indexArray[0]].subRows?.[indexArray[1]] ?? null) : (data[indexArray[0]] ?? null);
 
 /**
+ * Determines the area name according to the trajectory type and the hypothesis
+ * @param {TRAJECTORY_TYPE} trajectoryType
+ * @param { type: TRAJECTORY_TYPE; area: string; technology?: string; isDefault: boolean } hypothesis
+ * @return {string}
+ */
+
+export const getQueryParamAreaValue = (
+  trajectoryType: TRAJECTORY_TYPE,
+  hypothesis: { type: TRAJECTORY_TYPE; area: string; technology?: string; isDefault: boolean },
+): string => {
+  let area = hypothesis.area === OTHER_AREAS_LABEL ? OTHER_AREAS : hypothesis.area;
+  if (
+    trajectoryType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER ||
+    trajectoryType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER ||
+    trajectoryType === TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER ||
+    trajectoryType === TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER ||
+    trajectoryType === TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION ||
+    trajectoryType === TRAJECTORY_TYPE.AREA ||
+    trajectoryType === TRAJECTORY_TYPE.LINK
+  ) {
+    area = '';
+  }
+  if (
+    (trajectoryType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER ||
+      trajectoryType === TRAJECTORY_TYPE.STS) &&
+    hypothesis?.technology
+  ) {
+    area = hypothesis.technology === OTHER_AREAS_LABEL ? OTHER_AREAS : hypothesis.technology;
+  }
+  return area;
+};
+
+/**
  * Get a name composed of an area name and a technology name
  * @param {string} rowIdSelected
  * @param {HypothesisRowData[]} data
- * @return {{area: string, technology?: string, isDefault: boolean} | undefined}
+ * @param type
+ * @return {{area: string, technology?: string, isDefault: boolean}}
  */
 export const getAreaTrajectoryName = (
   rowIdSelected: string,
   data: HypothesisRowData[],
-): { area: string; technology?: string; isDefault: boolean } | undefined => {
+  type: TRAJECTORY_TYPE,
+): { type: TRAJECTORY_TYPE; area: string; technology?: string; isDefault: boolean } => {
   const [mainIndex, subIndex] = rowIdSelected.split('.').map(Number);
-  const hypothesisInfo = {} as { area: string; technology?: string; isDefault: boolean };
+  const hypothesisInfo = {} as { type: TRAJECTORY_TYPE; area: string; technology?: string; isDefault: boolean };
+
+  const isLastIndex = mainIndex === Math.max(data.length - 1, 0);
 
   const mainRow = data[mainIndex];
-  if (!mainRow?.hypothesis) return;
+  if (!mainRow?.hypothesis) return hypothesisInfo;
   if (mainRow.hypothesis) {
+    hypothesisInfo.type = type;
     hypothesisInfo.area = mainRow.hypothesis;
     hypothesisInfo.isDefault = (mainRow.isDefault && mainRow.hypothesis !== OTHER_AREAS_LABEL) ?? false;
+    if (type === TRAJECTORY_TYPE.AREA) {
+      hypothesisInfo.type = mainIndex === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK;
+    }
+    if (type === TRAJECTORY_TYPE.DSR) {
+      if (isLastIndex) hypothesisInfo.type = TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION;
+      hypothesisInfo.isDefault = false;
+    }
   }
 
   const subRow = mainRow.subRows?.[subIndex];
@@ -795,27 +840,6 @@ export const getPathFromTrajectoryType = (
     default:
       return null;
   }
-};
-
-/**
- * Determines the area name according to the trajectory type and the hypothesis
- * @param {TRAJECTORY_TYPE} trajectoryType
- * @param {string | undefined } hypothesis
- * @return {string | undefined}
- */
-
-export const getQueryParamAreaValue = (trajectoryType: TRAJECTORY_TYPE, hypothesis?: string): string | undefined => {
-  let area = hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : hypothesis;
-  if (
-    trajectoryType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER ||
-    trajectoryType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER ||
-    trajectoryType === TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER ||
-    trajectoryType === TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER ||
-    trajectoryType === TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION
-  ) {
-    area = undefined;
-  }
-  return area;
 };
 
 /**

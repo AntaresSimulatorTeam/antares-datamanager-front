@@ -15,7 +15,7 @@ import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/Pega
 import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
-import { handleFetchTrajectoriesFS, handleTrajectorySearch } from '@/shared/services/hypothesisTableService.ts';
+import { handleTrajectorySearch } from '@/shared/services/hypothesisTableService.ts';
 import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
@@ -34,7 +34,6 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
   const [technologies, setTechnologies] = useState<string[]>([]);
   const { isModalOpen, toggleModal } = useNewStudyModal();
-  const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const [selectedType, setSelectedType] = useState<TRAJECTORY_TYPE>(TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION);
   const types = [TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION, TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION];
@@ -90,17 +89,10 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData }: TabProps) => {
             },
           );
         }}
-        handleImport={async (rowId: string) => {
-          const indexArray = rowId.split('.').map(Number);
+        handleImport={(rowId: string) => {
+          setRowIdSelected(rowId);
           setSelectedType(TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION);
-          await handleFetchTrajectoriesFS(
-            TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION,
-            rowId,
-            setOptionsFS,
-            setRowIdSelected,
-            toggleModal,
-            data[indexArray[0]]?.hypothesis,
-          );
+          toggleModal();
         }}
         isReadOnlyEnable={true}
         updateData={(rowId: string, value: unknown, status: RowStatus) => {
@@ -158,17 +150,10 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData }: TabProps) => {
             },
           );
         }}
-        handleImport={async (rowId: string) => {
-          const indexArray = rowId.split('.').map(Number);
+        handleImport={(rowId: string) => {
+          setRowIdSelected(rowId);
           setSelectedType(TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION);
-          await handleFetchTrajectoriesFS(
-            TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION,
-            rowId,
-            setOptionsFS,
-            setRowIdSelected,
-            toggleModal,
-            technologyData[indexArray[0]]?.hypothesis,
-          );
+          toggleModal();
         }}
         isReadOnlyEnable={true}
         updateData={(rowId: string, value: unknown, status: RowStatus) => {
@@ -204,7 +189,7 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData }: TabProps) => {
       />
       {isModalOpen && (
         <ImportTrajectoryModal
-          options={optionsFS}
+          isOpen={isModalOpen}
           onClose={async (value?: SelectOption) => {
             toggleModal();
             if (value != null) {
@@ -218,6 +203,7 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData }: TabProps) => {
           hypothesis={getAreaTrajectoryName(
             rowIdSelected,
             selectedType === TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION ? data : technologyData,
+            selectedType,
           )}
         />
       )}

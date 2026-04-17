@@ -524,15 +524,17 @@ describe('getAreaTrajectoryName', () => {
   ] as HypothesisRowData[];
 
   it('should return combined hypothesis for valid rowIdSelected', () => {
-    expect(getAreaTrajectoryName('0.1', mockData)).toStrictEqual({
+    expect(getAreaTrajectoryName('0.1', mockData, TRAJECTORY_TYPE.RES_CAPACITY)).toStrictEqual({
       area: 'Energy',
       technology: 'Wind',
       isDefault: false,
+      type: TRAJECTORY_TYPE.RES_CAPACITY,
     });
-    expect(getAreaTrajectoryName('1.0', mockData)).toStrictEqual({
+    expect(getAreaTrajectoryName('1.0', mockData, TRAJECTORY_TYPE.RES_CAPACITY)).toStrictEqual({
       area: 'Transport',
       technology: 'Electric',
       isDefault: false,
+      type: TRAJECTORY_TYPE.RES_CAPACITY,
     });
   });
 
@@ -543,19 +545,20 @@ describe('getAreaTrajectoryName', () => {
         subRows: [{}],
       },
     ] as HypothesisRowData[];
-    expect(getAreaTrajectoryName('0.0', dataWithMissingSubHypothesis)).toStrictEqual({
+    expect(getAreaTrajectoryName('0.0', dataWithMissingSubHypothesis, TRAJECTORY_TYPE.RES_CAPACITY)).toStrictEqual({
       area: 'Agriculture',
       isDefault: false,
+      type: TRAJECTORY_TYPE.RES_CAPACITY,
     });
   });
 
   it('should return undefined if mainRow is missing', () => {
-    expect(getAreaTrajectoryName('5.0', mockData)).toBeUndefined();
+    expect(getAreaTrajectoryName('5.0', mockData, TRAJECTORY_TYPE.RES_CAPACITY)).toEqual({});
   });
 
   it('should return empty string if both hypotheses are missing', () => {
     const emptyData: HypothesisRowData[] = [{}, {}] as HypothesisRowData[];
-    expect(getAreaTrajectoryName('0.0', emptyData)).toBeUndefined();
+    expect(getAreaTrajectoryName('0.0', emptyData, TRAJECTORY_TYPE.RES_CAPACITY)).toEqual({});
   });
 });
 
@@ -684,64 +687,100 @@ describe('getDefaultLabel', () => {
 });
 
 describe('getQueryParamAreaValue', () => {
-  it('retourne undefined si hypothesis est undefined', () => {
-    expect(getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD)).toBeUndefined();
-  });
-
   it('retourne area si hypothesis.area est défini et différent de OTHER_AREAS_LABEL', () => {
-    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD, 'FR');
+    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD, {
+      type: TRAJECTORY_TYPE.LOAD,
+      technology: '',
+      area: 'FR',
+      isDefault: false,
+    });
     expect(result).toBe('FR');
   });
 
   it('remplace OTHER_AREAS_LABEL par OTHER_AREAS', () => {
-    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD, OTHER_AREAS_LABEL);
+    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD, {
+      type: TRAJECTORY_TYPE.LOAD,
+      technology: '',
+      area: OTHER_AREAS_LABEL,
+      isDefault: false,
+    });
     expect(result).toBe(OTHER_AREAS);
   });
 
   // --- THERMAL_CAPACITY ---
   it('THERMAL_CAPACITY : retourne FR si hypothesis.area = FR', () => {
-    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.THERMAL_CAPACITY, 'FR');
+    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.THERMAL_CAPACITY, {
+      type: TRAJECTORY_TYPE.LOAD,
+      technology: '',
+      area: 'FR',
+      isDefault: false,
+    });
     expect(result).toBe('FR');
   });
 
   // --- STS & THERMAL_TECHNICAL_SPECIFIC_PARAMETER ---
   it('STS : retourne hypothesis.technology', () => {
-    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.STS, 'HP');
+    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.STS, {
+      type: TRAJECTORY_TYPE.LOAD,
+      technology: '',
+      area: 'HP',
+      isDefault: false,
+    });
     expect(result).toBe('HP');
   });
 
   it('THERMAL_TECHNICAL_SPECIFIC_PARAMETER : retourne hypothesis.technology', () => {
-    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, 'BOILER');
+    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, {
+      type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+      technology: '',
+      area: 'BOILER',
+      isDefault: false,
+    });
     expect(result).toBe('BOILER');
-  });
-
-  it('STS : retourne undefined si technology est undefined', () => {
-    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.STS);
-    expect(result).toBeUndefined();
   });
 
   // --- THERMAL_TECHNICAL_MODULATION_PARAMETER ---
   it('THERMAL_TECHNICAL_MODULATION_PARAMETER : retourne toujours undefined', () => {
-    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER, 'param');
-    expect(result).toBeUndefined();
+    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER, {
+      type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER,
+      technology: '',
+      area: 'param',
+      isDefault: false,
+    });
+    expect(result).toEqual('');
   });
 
   // --- THERMAL_TECHNICAL_COMMON_PARAMETER ---
   it('THERMAL_TECHNICAL_COMMON_PARAMETER : retourne toujours undefined', () => {
-    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER, 'common');
-    expect(result).toBeUndefined();
+    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER, {
+      type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER,
+      technology: '',
+      area: 'common',
+      isDefault: false,
+    });
+    expect(result).toEqual('');
   });
 
   // --- THERMAL_ECONOMIC_COST_PARAMETER ---
   it('THERMAL_ECONOMIC_COST_PARAMETER : retourne toujours undefined', () => {
-    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER, 'cost');
-    expect(result).toBeUndefined();
+    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER, {
+      type: TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER,
+      technology: '',
+      area: 'cost',
+      isDefault: false,
+    });
+    expect(result).toEqual('');
   });
 
   // --- THERMAL_ECONOMIC_PARAMETER ---
   it('THERMAL_ECONOMIC_PARAMETER : retourne toujours undefined', () => {
-    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER, 'economic');
-    expect(result).toBeUndefined();
+    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER, {
+      type: TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER,
+      technology: '',
+      area: 'economic',
+      isDefault: false,
+    });
+    expect(result).toEqual('');
   });
 });
 
