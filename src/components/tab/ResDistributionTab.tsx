@@ -5,7 +5,7 @@
  */
 
 import { DbTrajectory, HypothesisRowData, RowStatus, SelectOption, TabProps } from '@/shared/types';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
@@ -15,7 +15,7 @@ import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/Pega
 import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
-import { handleFetchTrajectoriesFS, handleTrajectorySearch } from '@/shared/services/hypothesisTableService.ts';
+import { handleTrajectorySearch } from '@/shared/services/hypothesisTableService.ts';
 import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
@@ -23,6 +23,7 @@ import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajec
 import { useTranslation } from 'react-i18next';
 import getEditableHypothesisTableHeaders from '@/components/header/EditableHypothesisTableHeaders.tsx';
 import { snakeCaseUnderscore } from '@/shared/utils/textUtils.ts';
+import { useTrajectoryFetchFromFSHandler } from '@/hooks/useTrajectoryFetchFromFSHandler.ts';
 
 const ResDistributionTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const studyState = useStudy();
@@ -49,6 +50,12 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch);
   const { attachTrajectory } = useTrajectoryAttach(studyData, studyState, dispatch);
   const { detachTrajectory } = useTrajectoryDetach(studyData, dispatch);
+  const { handleFetchFromFS } = useTrajectoryFetchFromFSHandler({
+    defaultAreas,
+    setOptionsFS,
+    setRowIdSelected,
+    toggleModal,
+  });
 
   useEffect(() => {
     const zonalData = hypothesisTrajectories?.[TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION];
@@ -60,6 +67,55 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData }: TabProps) => {
     const resReadOnly = readOnlyRow?.[TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION];
     resReadOnly && setReadOnly(resReadOnly);
   }, [hypothesisTrajectories, technologyList, readOnlyRow, studyState.studyStatus]);
+
+  const handleTrajectoryFromDB = useCallback(
+    async (tableType: TRAJECTORY_TYPE, tableData: HypothesisRowData[], fileNameContains: string, rowId: string) => {
+      const indexArray = rowId.split('.').map(Number);
+      const technology =
+        indexArray?.length > 1 ? tableData[indexArray[0]]?.subRows?.[indexArray[1]]?.hypothesis : undefined;
+      const formattedTechnology =
+        tableType === TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION && technology
+          ? snakeCaseUnderscore(technology)
+          : technology;
+      return await handleTrajectorySearch(tableType, setDbTrajectories, studyData?.horizon, {
+        area: tableData[indexArray[0]]?.hypothesis,
+        technology: formattedTechnology,
+        fileNameContains,
+      });
+    },
+    [studyData?.horizon],
+  );
+
+  const handleFetchTrajectoriesFromFS = useCallback(
+    async (rowId: string, tableType: TRAJECTORY_TYPE, tableData: HypothesisRowData[]) => {
+      setSelectedType(tableType);
+      await handleFetchFromFS(tableType, tableData, rowId);
+    },
+    [handleFetchFromFS],
+  );
+
+  const handleUpdateTableData = useCallback(
+    async (tableType: TRAJECTORY_TYPE, rowId: string, value: unknown, status: RowStatus) => {
+      const indexArray = rowId.split('.').map(Number);
+      const dataToUse = tableType === TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION ? data : technologyData;
+      const setterToUse = tableType === TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION ? setData : setTechnologyData;
+      if (status === 'empty' || status === 'emptyError') {
+        const row = getRowDataSelected(data, indexArray) ?? null;
+        if (row) {
+          await detachTrajectory(tableType, indexArray, setterToUse, dataToUse, status, row?.hypothesis);
+        }
+      } else if (status === 'success') {
+        const dbTrajectory =
+          dbTrajectories.length > 0
+            ? dbTrajectories.find((item) => item.id === value)
+            : getRowDataSelected(dataToUse, indexArray)?.trajectory;
+        if (dbTrajectory) {
+          await attachTrajectory(tableType, indexArray, status, dbTrajectory, setterToUse);
+        }
+      }
+    },
+    [attachTrajectory, data, dbTrajectories, detachTrajectory, technologyData],
+  );
 
   return (
     <div className="flex h-fit w-full flex-col gap-6">
@@ -75,58 +131,16 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         readOnly={readOnly}
         idSelected={rowIdSelected}
         progress={selectedType === TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION ? progress : 0}
-        handleSearch={async (fileNameContains: string, rowId: string) => {
-          const indexArray = rowId.split('.').map(Number);
-          const technology =
-            indexArray?.length > 1 ? data[indexArray[0]]?.subRows?.[indexArray[1]]?.hypothesis : undefined;
-          return await handleTrajectorySearch(
-            TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION,
-            setDbTrajectories,
-            studyData?.horizon,
-            {
-              area: data[indexArray[0]]?.hypothesis,
-              technology,
-              fileNameContains,
-            },
-          );
-        }}
-        handleImport={async (rowId: string) => {
-          const indexArray = rowId.split('.').map(Number);
-          setSelectedType(TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION);
-          await handleFetchTrajectoriesFS(
-            TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION,
-            rowId,
-            setOptionsFS,
-            setRowIdSelected,
-            toggleModal,
-            data[indexArray[0]]?.hypothesis,
-          );
-        }}
+        handleSearch={async (fileNameContains: string, rowId: string) =>
+          await handleTrajectoryFromDB(TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION, data, fileNameContains, rowId)
+        }
+        handleImport={async (rowId: string) =>
+          await handleFetchTrajectoriesFromFS(rowId, TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION, data)
+        }
         isReadOnlyEnable={true}
-        updateData={(rowId: string, value: unknown, status: RowStatus) => {
-          const indexArray = rowId.split('.').map(Number);
-          if (status === 'empty' || status === 'emptyError') {
-            const row = getRowDataSelected(data, indexArray) ?? null;
-            if (row) {
-              void detachTrajectory(
-                TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION,
-                indexArray,
-                setData,
-                data,
-                status,
-                row?.hypothesis,
-              );
-            }
-          } else if (status === 'success') {
-            const dbTrajectory =
-              dbTrajectories.length > 0
-                ? dbTrajectories.find((item) => item.id === value)
-                : getRowDataSelected(data, indexArray)?.trajectory;
-            if (dbTrajectory) {
-              void attachTrajectory(TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION, indexArray, status, dbTrajectory, setData);
-            }
-          }
-        }}
+        updateData={async (rowId: string, value: unknown, status: RowStatus) =>
+          await handleUpdateTableData(TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION, rowId, value, status)
+        }
       />
       <PegaseHypothesisTable
         id="technology-distribution-table"
@@ -142,65 +156,21 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         idSelected={rowIdSelected}
         type={TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION}
         list={technologies}
-        handleSearch={async (fileNameContains: string, rowId: string) => {
-          const indexArray = rowId.split('.').map(Number);
-          const technology =
-            indexArray?.length > 1 ? technologyData[indexArray[0]]?.subRows?.[indexArray[1]]?.hypothesis : undefined;
-          const formattedTechnology = technology ? snakeCaseUnderscore(technology) : undefined;
-          return await handleTrajectorySearch(
+        handleSearch={async (fileNameContains: string, rowId: string) =>
+          await handleTrajectoryFromDB(
             TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION,
-            setDbTrajectories,
-            studyData?.horizon,
-            {
-              area: technologyData[indexArray[0]]?.hypothesis,
-              technology: formattedTechnology,
-              fileNameContains,
-            },
-          );
-        }}
-        handleImport={async (rowId: string) => {
-          const indexArray = rowId.split('.').map(Number);
-          setSelectedType(TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION);
-          await handleFetchTrajectoriesFS(
-            TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION,
+            technologyData,
+            fileNameContains,
             rowId,
-            setOptionsFS,
-            setRowIdSelected,
-            toggleModal,
-            technologyData[indexArray[0]]?.hypothesis,
-          );
-        }}
+          )
+        }
+        handleImport={async (rowId: string) =>
+          await handleFetchTrajectoriesFromFS(rowId, TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION, technologyData)
+        }
         isReadOnlyEnable={true}
-        updateData={(rowId: string, value: unknown, status: RowStatus) => {
-          const indexArray = rowId.split('.').map(Number);
-          if (status === 'empty' || status === 'emptyError') {
-            const row = getRowDataSelected(technologyData, indexArray) ?? null;
-            if (row) {
-              void detachTrajectory(
-                TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION,
-                indexArray,
-                setTechnologyData,
-                technologyData,
-                status,
-                row?.hypothesis,
-              );
-            }
-          } else if (status === 'success') {
-            const dbTrajectory =
-              dbTrajectories.length > 0
-                ? dbTrajectories.find((item) => item.id === value)
-                : getRowDataSelected(technologyData, indexArray)?.trajectory;
-            if (dbTrajectory) {
-              void attachTrajectory(
-                TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION,
-                indexArray,
-                status,
-                dbTrajectory,
-                setTechnologyData,
-              );
-            }
-          }
-        }}
+        updateData={async (rowId: string, value: unknown, status: RowStatus) =>
+          await handleUpdateTableData(TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION, rowId, value, status)
+        }
       />
       {isModalOpen && (
         <ImportTrajectoryModal

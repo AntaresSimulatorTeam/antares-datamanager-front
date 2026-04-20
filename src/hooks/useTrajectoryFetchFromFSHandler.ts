@@ -4,8 +4,6 @@ import { HypothesisRowData, SelectOption } from '@/shared/types';
 import { handleFetchTrajectoriesFS } from '@/shared/services/hypothesisTableService.ts';
 
 interface UseTrajectoryFetchFromFSHandlerArgs {
-  data: HypothesisRowData[];
-  type: TRAJECTORY_TYPE;
   defaultAreas: { name: string }[];
   setOptionsFS: Dispatch<SetStateAction<SelectOption[] | undefined>>;
   setRowIdSelected: Dispatch<SetStateAction<string>>;
@@ -13,15 +11,13 @@ interface UseTrajectoryFetchFromFSHandlerArgs {
 }
 
 export const useTrajectoryFetchFromFSHandler = ({
-  data,
-  type,
   defaultAreas,
   setOptionsFS,
   setRowIdSelected,
   toggleModal,
 }: UseTrajectoryFetchFromFSHandlerArgs) => {
   const handleFetchFromFS = useCallback(
-    async (rowId: string) => {
+    async (type: TRAJECTORY_TYPE, data: HypothesisRowData[], rowId: string) => {
       const indexArray = rowId.split('.').map(Number);
       let typeToUse = type;
       let areaToUse = data[indexArray[0]]?.hypothesis;
@@ -49,7 +45,7 @@ export const useTrajectoryFetchFromFSHandler = ({
         isDefaultArea,
       );
     },
-    [data, defaultAreas, setOptionsFS, setRowIdSelected, toggleModal, type],
+    [defaultAreas, setOptionsFS, setRowIdSelected, toggleModal],
   );
   return { handleFetchFromFS };
 };

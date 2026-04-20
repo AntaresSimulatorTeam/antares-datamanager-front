@@ -154,9 +154,12 @@ const getExpandableHypothesisTableHeaders = ({
     size: type === TRAJECTORY_TYPE.STS ? 200 : 233,
     cell: ({ row, table: { options } }) => {
       const { status, isDefault, hypothesis, isDeletable } = row.original;
-      if (hypothesis === t('thermal.@specific') || (type === TRAJECTORY_TYPE.STS && row.depth === 0 && isDefault))
+      if (
+        hypothesis === t('thermal.@specific') ||
+        ((type === TRAJECTORY_TYPE.STS || type === TRAJECTORY_TYPE.HYDRO_SERIES) && row.depth === 0 && isDefault)
+      )
         return null;
-      if (type === TRAJECTORY_TYPE.STS && row.depth === 0 && !isDefault) {
+      if ((type === TRAJECTORY_TYPE.STS || type === TRAJECTORY_TYPE.HYDRO_SERIES) && row.depth === 0 && !isDefault) {
         return (
           <div className={`${isDeletable ? 'pointer-events-auto visible' : 'pointer-events-none invisible'}`}>
             <StdIconButton
