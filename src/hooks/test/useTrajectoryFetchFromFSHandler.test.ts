@@ -24,8 +24,6 @@ describe('useTrajectoryFetchFromFSHandler', () => {
 
     const { result } = renderHook(() =>
       useTrajectoryFetchFromFSHandler({
-        data,
-        type: TRAJECTORY_TYPE.LOAD,
         defaultAreas,
         setOptionsFS,
         setRowIdSelected,
@@ -33,7 +31,7 @@ describe('useTrajectoryFetchFromFSHandler', () => {
       }),
     );
 
-    await result.current.handleFetchFromFS('0');
+    await result.current.handleFetchFromFS(TRAJECTORY_TYPE.LOAD, data, '0');
 
     expect(hypothesisTableService.handleFetchTrajectoriesFS).toHaveBeenCalledWith(
       TRAJECTORY_TYPE.LOAD,
@@ -54,8 +52,6 @@ describe('useTrajectoryFetchFromFSHandler', () => {
 
     const { result } = renderHook(() =>
       useTrajectoryFetchFromFSHandler({
-        data,
-        type: TRAJECTORY_TYPE.AREA,
         defaultAreas: [],
         setOptionsFS,
         setRowIdSelected,
@@ -63,7 +59,7 @@ describe('useTrajectoryFetchFromFSHandler', () => {
       }),
     );
 
-    await result.current.handleFetchFromFS('1');
+    await result.current.handleFetchFromFS(TRAJECTORY_TYPE.AREA, data,'1');
 
     expect(hypothesisTableService.handleFetchTrajectoriesFS).toHaveBeenCalledWith(
       TRAJECTORY_TYPE.LINK,
@@ -84,8 +80,6 @@ describe('useTrajectoryFetchFromFSHandler', () => {
 
     const { result } = renderHook(() =>
       useTrajectoryFetchFromFSHandler({
-        data,
-        type: TRAJECTORY_TYPE.DSR,
         defaultAreas: [{ name: 'Area A' }],
         setOptionsFS,
         setRowIdSelected,
@@ -93,7 +87,7 @@ describe('useTrajectoryFetchFromFSHandler', () => {
       }),
     );
 
-    await result.current.handleFetchFromFS('1');
+    await result.current.handleFetchFromFS(TRAJECTORY_TYPE.DSR, data, '1');
 
     expect(hypothesisTableService.handleFetchTrajectoriesFS).toHaveBeenCalledWith(
       TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION,
@@ -116,8 +110,6 @@ describe('useTrajectoryFetchFromFSHandler', () => {
 
     const { result } = renderHook(() =>
       useTrajectoryFetchFromFSHandler({
-        data,
-        type: TRAJECTORY_TYPE.STS,
         defaultAreas: [],
         setOptionsFS,
         setRowIdSelected,
@@ -125,7 +117,7 @@ describe('useTrajectoryFetchFromFSHandler', () => {
       }),
     );
 
-    await result.current.handleFetchFromFS('0.1');
+    await result.current.handleFetchFromFS(TRAJECTORY_TYPE.STS, data, '0.1');
 
     expect(hypothesisTableService.handleFetchTrajectoriesFS).toHaveBeenCalledWith(
       TRAJECTORY_TYPE.STS,

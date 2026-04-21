@@ -71,8 +71,6 @@ const ExpandableTab = ({ defaultAreas, areas, studyData, type }: TabProps & { ty
     setDbTrajectories,
   });
   const { handleFetchFromFS } = useTrajectoryFetchFromFSHandler({
-    data,
-    type,
     defaultAreas,
     setOptionsFS,
     setRowIdSelected,
@@ -203,7 +201,7 @@ const ExpandableTab = ({ defaultAreas, areas, studyData, type }: TabProps & { ty
         type={type}
         list={installedPowerTechnologies}
         handleSearch={handleSearch}
-        handleImport={handleFetchFromFS}
+        handleImport={async (rowId: string) => await handleFetchFromFS(type, data, rowId)}
         isReadOnlyEnable={true}
         updateData={handleHypothesisTableUpdate}
         removeRow={removeTableRow}

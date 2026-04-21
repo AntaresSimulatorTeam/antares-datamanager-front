@@ -68,11 +68,14 @@ export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, hypoth
             <div className="w-[400px]">
               <SelectAndSearchableInput
                 options={options}
-                defaultPlaceHolder={t('studyDetails.@select_trajectory')}
+                defaultPlaceHolder={
+                  options?.length ? t('studyDetails.@select_trajectory') : t('studyDetails.@select_no_trajectory')
+                }
                 onSelect={handleSelectOption}
                 isSearchable={true}
                 setSearchTerm={handleSearchTerm}
                 resetField={resetField}
+                isInputDisabled={!options?.length}
               />
             </div>
             {trajectoryType === TRAJECTORY_TYPE.STS && (

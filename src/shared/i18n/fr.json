@@ -121,6 +121,7 @@
     "@dsr": "DSR",
     "@trajectory": "Trajectoire",
     "@select_trajectory": "Selectionner une trajectoire",
+    "@select_no_trajectory": "Aucun trajectoire dans le file system",
     "@select_project": "Selectionner un nom de projet",
     "@select_file": "Selectionner un fichier",
     "@select_file_fs_error": "Aucun fichier au niveau du système fichier",

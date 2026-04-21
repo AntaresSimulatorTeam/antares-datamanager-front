@@ -64,8 +64,6 @@ export const AreaLinkTab = ({ setErrorMessage, studyData }: AreaLinkTabProps) =>
     setDbTrajectories,
   });
   const { handleFetchFromFS } = useTrajectoryFetchFromFSHandler({
-    data,
-    type: TRAJECTORY_TYPE.AREA,
     defaultAreas: [],
     setOptionsFS,
     setRowIdSelected,
@@ -126,7 +124,7 @@ export const AreaLinkTab = ({ setErrorMessage, studyData }: AreaLinkTabProps) =>
         idSelected={String(rowIdSelected)}
         handleSearch={handleSearch}
         updateData={handleHypothesisTableUpdate}
-        handleImport={handleFetchFromFS}
+        handleImport={async (rowId: string) => await handleFetchFromFS(TRAJECTORY_TYPE.AREA, data, rowId)}
         handleViewData={(rowId: string) => {
           const index = Number(rowId);
           const trajectory = data[index].trajectory;
@@ -156,11 +154,13 @@ export const AreaLinkTab = ({ setErrorMessage, studyData }: AreaLinkTabProps) =>
       {isViewModalOpen && trajectoryData && (
         <TrajectoryDataVisualisation trajectoryData={trajectoryData} onClose={() => setIsViewModalOpen(false)} />
       )}
-      <AreaDeletionConfirmationModal
-        isOpen={isDeletionModalOpen}
-        onClose={() => setIsDeletionModalOpen(false)}
-        onConfirm={handleConfirmedAreaDeletion}
-      />
+      {isDeletionModalOpen && (
+        <AreaDeletionConfirmationModal
+          isOpen={isDeletionModalOpen}
+          onClose={() => setIsDeletionModalOpen(false)}
+          onConfirm={handleConfirmedAreaDeletion}
+        />
+      )}
     </div>
   );
 };
