@@ -100,7 +100,7 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData }: TabProps) => {
       const dataToUse = tableType === TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION ? data : technologyData;
       const setterToUse = tableType === TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION ? setData : setTechnologyData;
       if (status === 'empty' || status === 'emptyError') {
-        const row = getRowDataSelected(data, indexArray) ?? null;
+        const row = getRowDataSelected(dataToUse, indexArray) ?? null;
         if (row) {
           await detachTrajectory(tableType, indexArray, setterToUse, dataToUse, status, row?.hypothesis);
         }
