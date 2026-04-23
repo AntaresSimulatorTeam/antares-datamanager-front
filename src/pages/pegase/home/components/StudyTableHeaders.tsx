@@ -10,10 +10,8 @@ import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter';
 import { createColumnHelper } from '@tanstack/react-table';
 import StdRadioButton from '@/components/forms/stdRadioButton/StdRadioButton.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
-import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
-import { getStatusIcon } from '@/shared/utils/iconUtils.ts';
 import { avatarCase, sentenceCase } from '@/shared/utils/textUtils.ts';
-import StdTagList from '@common/base/StdTagList/StdTagList.tsx';
+import { Tag } from '@design-system-rte/react';
 
 const columnHelper = createColumnHelper<StudyDTO>();
 
@@ -75,7 +73,10 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
   columnHelper.accessor('keywords', {
     header: t('home.@keywords'),
     size: 350,
-    cell: ({ getValue, row }) => <StdTagList id={`pegase-tags-${row.id}`} tags={getValue()} />,
+    cell: ({ getValue, row }) => {
+      const tagList = getValue();
+      return tagList.map((tag) => <Tag key={`pegase-tags-${row.id}`} color="azur" label={tag} />);
+    },
   }),
 
   columnHelper.accessor('status', {
@@ -83,13 +84,20 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
     size: 230,
     cell: ({ getValue }) => {
       const status = getValue();
-      const { icon, color } = getStatusIcon(status);
-      return (
-        <div className="flex gap-1">
-          <StdIcon name={icon} color={`text-${color}`} />
-          <div>{sentenceCase(status)}</div>
-        </div>
-      );
+      // TODO : use inconUtils method when iconName type will be importable
+      switch (status) {
+        case StudyStatus.GENERATED:
+          return (
+            <Tag iconName="publish" label={sentenceCase(status)} status="success" tagType="status" compactSpacing />
+          );
+        case StudyStatus.ERROR:
+          return <Tag iconName="error" label={sentenceCase(status)} status="alert" tagType="status" compactSpacing />;
+        case StudyStatus.IN_PROGRESS:
+        default:
+          return (
+            <Tag iconName="publish" label={sentenceCase(status)} status="information" tagType="status" compactSpacing />
+          );
+      }
     },
   }),
 

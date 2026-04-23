@@ -1,11 +1,10 @@
-import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import StdAvatar from '@common/layout/stdAvatar/StdAvatar.tsx';
 import { VirtualizerList } from '@/components/list/VirtualizerList.tsx';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CardWithIconTitle } from '@common/layout/CardWithIconTitle.tsx';
 import { convertDataToItem } from '@/shared/utils/warningUtils.ts';
+import { IconButton } from '@design-system-rte/react';
 
 interface Props<T> {
   content: T[];
@@ -27,9 +26,14 @@ export const ContainerWithExpander = <T,>({ content, placeholder }: Props<T>) =>
       } `}
     >
       <div className="flex w-full max-w-fit flex-col pt-2 sm:pt-1.5">
-        <button onClick={() => setIsOpen((prev) => !prev)}>
-          <StdIcon name={isOpen ? StdIconId.KeyboardArrowUp : StdIconId.KeyboardArrowDown} />
-        </button>
+        <IconButton
+          appearance="outlined"
+          aria-label="icon button aria label"
+          name={isOpen ? 'arrow-chevron-up' : 'arrow-chevron-down'}
+          onClick={() => setIsOpen((prev) => !prev)}
+          size="s"
+          variant="transparent"
+        />
       </div>
       <div className="flex h-full w-full flex-col items-center">
         <div className="flex w-full items-center gap-4 px-2 sm:gap-2 sm:p-1">

@@ -1,8 +1,8 @@
 import { MenuNavItem } from '@/shared/types';
-import StdIcon from '../../base/stdIcon/StdIcon';
 import { ItemBackgroundStyleConfig, ItemStyleConfig } from './StdNavbar';
 import { navbarItemClassBuilder } from './navbarClassBuilder.ts';
 import { Link } from 'react-router-dom';
+import { Icon } from '@design-system-rte/react';
 
 type StdNavbarMenuItemProps = {
   item: MenuNavItem;
@@ -27,7 +27,7 @@ const StdNavbarMenuItem = ({ item, expanded = true, selected = false, itemsStyle
   return (
     <Link className={navbarMenuItemClasses} key={key} {...otherProps} to={path}>
       <div className={`flex items-center gap-1 ${expanded ? 'flex-row' : 'flex-col'}`}>
-        <StdIcon name={icon} height={24} width={24} />
+        <Icon name={icon} size={24} />
         {label}
       </div>
     </Link>

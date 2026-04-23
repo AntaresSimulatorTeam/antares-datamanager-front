@@ -1,10 +1,10 @@
 import useActiveKeyboard from '@/hooks/common/useActiveKeyboard';
 import { useStdId } from '@/hooks/common/useStdId';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
-import StdIcon from '@common/base/stdIcon/StdIcon';
 import { MouseEventHandler } from 'react';
-import StdButton from '@common/base/stdButton/StdButton';
 import { tabItemClassBuilder } from './tabClassBuilder';
+import { Button } from '@design-system-rte/react';
+import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 
 export type TabItemType = 'primary' | 'secondary';
 
@@ -14,7 +14,7 @@ export type StdTabItemProps = {
   tabType?: TabItemType;
   id?: string;
   label?: string;
-  icon?: StdIconId;
+  icon?: StdIconId | string;
   active?: boolean;
   disabled?: boolean;
   button?: {
@@ -63,11 +63,12 @@ const StdTabItem = ({
         {icon && <StdIcon name={icon} width={ICON_SIZE} height={ICON_SIZE} />}
         {label && <span className="whitespace-nowrap">{label}</span>}
         {button && (
-          <StdButton
+          <Button
+            label={label ?? ''}
             icon={button.icon}
             onClick={button.onClick}
             variant="transparent"
-            size="extraSmall"
+            size="s"
             disabled={disabled}
           />
         )}

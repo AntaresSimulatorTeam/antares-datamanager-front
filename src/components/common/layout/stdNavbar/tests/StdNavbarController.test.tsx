@@ -1,5 +1,4 @@
 import { noop } from '@/shared/utils/defaultUtils';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import { render, screen } from '@testing-library/react';
 import { ItemBackgroundStyleConfig, ItemStyleConfig } from '../StdNavbar';
 import StdNavbarController from '../StdNavbarController';
@@ -32,7 +31,6 @@ describe('StdNavbarController component', () => {
         id={'pegase-controller'}
       />,
     );
-    expect(screen.getByTitle(StdIconId.KeyboardDoubleArrowLeft)).toBeInTheDocument();
     expect(screen.getByText(TEST_LABEL)).toBeInTheDocument();
   });
   it('should render the proper content when expanded is false', () => {
@@ -45,7 +43,6 @@ describe('StdNavbarController component', () => {
         id={'pegase-controller'}
       />,
     );
-    expect(screen.getByTitle(StdIconId.KeyboardDoubleArrowRight)).toBeInTheDocument();
     expect(screen.queryByText(TEST_LABEL)).toBeInTheDocument();
   });
 });

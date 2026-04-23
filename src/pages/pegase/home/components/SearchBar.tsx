@@ -19,7 +19,7 @@ const SearchBar = ({ onSearch, placeholder }: SearchBarProps) => {
       <RdsSearchInput
         onChange={onSearch}
         onSearch={onSearch}
-        placeHolder={placeholder ?? t('home.@searchBar')}
+        placeHolder={placeholder ?? t('home.@search_placeholder')}
         variant="filled"
       />
     </div>

@@ -8,11 +8,11 @@ import { Dispatch, SetStateAction, useState } from 'react';
 import { fetchSuggestedKeywords } from '@/shared/services/studyService.ts';
 import { clsx } from 'clsx';
 import { useTranslation } from 'react-i18next';
-import StdButton from '@common/base/stdButton/StdButton';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import StdInputText from '@/components/forms/stdInputText/StdInputText.tsx';
 import { ERROR_CLASSES, HELPER_CLASSES } from '@/components/forms/stdInputText/textClassBuilder.ts';
 import { validateMaxLength } from '@/shared/utils/validateMaxTextLength.ts';
+import { Button, IconButton } from '@design-system-rte/react';
 
 interface KeywordsInputProps {
   keywords: string[];
@@ -145,13 +145,7 @@ const KeywordsInput = ({
         </div>
         <div className="mb-0.5">
           {shouldAddKeywordButton(keywordInput) && (
-            <StdButton
-              onClick={() => handleAddKeyword()}
-              icon={StdIconId.Add}
-              color="secondary"
-              size="extraSmall"
-              variant="transparent"
-            />
+            <IconButton onClick={() => handleAddKeyword()} name="add" size="s" variant="text" />
           )}
         </div>
       </div>
@@ -162,25 +156,18 @@ const KeywordsInput = ({
         {keywords.map((keyword, index) => (
           <div key={index} className="flex items-center gap-2 rounded bg-gray-200 px-1">
             <span>{keyword}</span>
-            <StdButton
-              icon={StdIconId.Close}
-              onClick={() => handleRemoveKeyword(index)}
-              size="extraSmall"
-              variant="text"
-              color="secondary"
-            />
+            <IconButton name="close" onClick={() => handleRemoveKeyword(index)} size="s" variant="text" />
           </div>
         ))}
       </div>
 
       {/* Clear All Keywords Button */}
       {keywords?.length > 0 && (
-        <StdButton
+        <Button
           label={t('projectModal.@keyword_button_clear')}
           icon={StdIconId.InkEraser}
           onClick={clearAllKeywords}
           variant="text"
-          color="secondary"
         />
       )}
     </div>

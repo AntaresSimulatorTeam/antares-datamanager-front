@@ -4,8 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
-import StdIcon from '@common/base/stdIcon/StdIcon';
+import { Icon } from '@design-system-rte/react';
 
 export function addSortColumn(
   headers: any[],
@@ -36,13 +35,13 @@ export function addSortColumn(
             <div>
               {sortBy[column.accessorKey as string] && sortedColumn === column.accessorKey ? (
                 sortBy[column.accessorKey as string] === 'asc' ? (
-                  <StdIcon name={StdIconId.ArrowUpwardAlt} color="primary" />
+                  <Icon name="arrow-alt-up" />
                 ) : (
-                  <StdIcon name={StdIconId.ArrowUpwardAlt} color="primary" />
+                  <Icon name="arrow-alt-down" />
                 )
               ) : (
                 <span className={`${isHeaderHovered ? 'opacity-100' : 'opacity-0'} transition-opacity duration-100`}>
-                  <StdIcon name={StdIconId.ArrowUpwardAlt} color="primary" />
+                  <Icon name="arrow-alt-up" />
                 </span>
               )}
             </div>

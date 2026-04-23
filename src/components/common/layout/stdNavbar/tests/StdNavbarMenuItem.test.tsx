@@ -24,7 +24,6 @@ describe('StdNavbarMenuItem component', () => {
     await renderWithStubRoutes(<StdNavbarMenuItem item={menuTopData[0]} itemsStyleConfig={DEFAULT_CONFIG} />);
     expect(document.querySelector(`#${menuTopData[0].id}`)).toBeInTheDocument();
     expect(screen.getByRole('link')).toBeInTheDocument();
-    expect(screen.getByTitle(menuTopData[0].icon)).toBeInTheDocument();
   });
   it('should render the item label if expanded is true', async () => {
     await renderWithStubRoutes(<StdNavbarMenuItem item={menuTopData[0]} expanded itemsStyleConfig={DEFAULT_CONFIG} />);

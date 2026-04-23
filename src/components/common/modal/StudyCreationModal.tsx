@@ -15,9 +15,8 @@ import { useUser } from '@/store/contexts/UserContext.tsx';
 import { notifyToast } from '@/shared/notification/notification';
 import { validateMaxLength } from '@/shared/utils/validateMaxTextLength';
 import { MAX_KEYWORD_LENGTH, MAX_KEYWORD_NUMBER, MAX_STUDY_NAME_LENGTH } from '@/shared/const/studyConfig';
-import StdButton from '@common/base/stdButton/StdButton';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import StdInputText from '@/components/forms/stdInputText/StdInputText.tsx';
+import { Button } from '@design-system-rte/react';
 
 interface StudyCreationModalProps {
   isOpen?: boolean;
@@ -141,13 +140,12 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
         </div>
       </RdsModal.Content>
       <RdsModal.Footer>
-        <StdButton label={t('components.quickAccess.@cancel')} onClick={onClose} color="secondary" />
-        <StdButton
-          icon={StdIconId.Add}
+        <Button label={t('components.quickAccess.@cancel')} onClick={onClose} variant="text" />
+        <Button
+          icon="add"
           label={t('modal.@button_create')}
           onClick={() => void saveStudyHandler()}
-          variant="contained"
-          color="primary"
+          variant="primary"
           disabled={!isFormValid}
         />
       </RdsModal.Footer>

@@ -15,9 +15,8 @@ import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { ProjectCreationModal } from '@common/modal/ProjectCreationModal.tsx';
 import { useState } from 'react';
 import { ProjectInfo, ProjectResponse } from '@/shared/types';
-import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { PegaseCardContent } from '@/components/pegase/pegaseCard/pegaseCardContent/PegaseCardContent.tsx';
+import { Icon } from '@design-system-rte/react';
 
 const PinnedProjectCards = () => {
   const { t } = useTranslation();
@@ -47,7 +46,7 @@ const PinnedProjectCards = () => {
             ]}
             id={project.id}
             onClick={() => void navigateToProject(project.id)}
-            icons={<StdIcon name={StdIconId.PushPin} color="text-primary-600" />}
+            icons={<Icon name="keep" color="text-primary-600" />}
           >
             <PegaseCardContent project={project} />
           </PegaseCard>

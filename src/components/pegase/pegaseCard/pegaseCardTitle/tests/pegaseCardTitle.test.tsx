@@ -8,16 +8,13 @@ import { render, screen, within } from '@testing-library/react';
 
 import { noop } from '@/shared/utils/common/defaultUtils';
 import PegaseCardTitle from '../PegaseCardTitle';
-import { RdsIconButton, RdsIconId, RdsTagProps } from 'rte-design-system-react';
 import { StdDropdownOption } from '@common/layout/stdDropdown/StdDropdown.tsx';
+import { IconButton } from '@design-system-rte/react';
 
 const TEST_TITLE = 'Card Title';
-const TEST_LEFT_ICON = RdsIconId.StarFilled;
-const TEST_LABEL = 'Test Tag';
+const TEST_LEFT_ICON = 'close';
 const TEST_ID = 'card-title-id';
-const TEST_TAG: Omit<RdsTagProps, 'onClose'> = {
-  label: TEST_LABEL,
-};
+
 const TEST_DROPDOWN_ITEMS: StdDropdownOption[] = [
   { key: 'op1', label: 'Option 1', value: 'op1', onItemClick: noop },
   { key: 'op2', label: 'Option 2', value: 'op2', onItemClick: noop },
@@ -36,20 +33,12 @@ describe('PegaseCardTitle', () => {
       <PegaseCardTitle
         id={TEST_ID}
         title={TEST_TITLE}
-        icons={<RdsIconButton icon={TEST_LEFT_ICON} onClick={noop} />}
+        icons={<IconButton name={TEST_LEFT_ICON} onClick={noop} />}
         dropdownOptions={TEST_DROPDOWN_ITEMS}
       />,
     );
     const cardTitle = screen.getByRole('banner');
     expect(cardTitle).toBeInTheDocument();
-  });
-
-  it('renders the PegaseCardTitle component with tag', () => {
-    render(<PegaseCardTitle id={TEST_ID} title={TEST_TITLE} tag={TEST_TAG} dropdownOptions={TEST_DROPDOWN_ITEMS} />);
-    const cardTitle = screen.getByRole('banner');
-    expect(cardTitle).toBeInTheDocument();
-
-    expect(screen.getByText(TEST_LABEL)).toBeInTheDocument();
   });
 
   it('renders the PegaseCardTitle component dropdown menu button disabled with empty dropdown items', () => {

@@ -35,7 +35,9 @@
   "home": {
     "@label": "Home",
     "@buttonNewProject": "New Project",
-    "@searchBar": "Search for a project, study, tag... ",
+    "@search_placeholder": "Search",
+    "@search_placeholder_study": "Search for a study",
+    "@search_placeholder_project": "Search for a project",
     "@study_name": "Study",
     "@user_name": "User",
     "@status": "Status",

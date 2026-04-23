@@ -72,7 +72,10 @@ const ProjectDetails = () => {
         <DetailsContent content={projectDetails} onClickButton={toggleModal} />
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-4">
-            <SearchBar onSearch={(value?: string) => setSearchTerm(value)} />
+            <SearchBar
+              onSearch={(value?: string) => setSearchTerm(value)}
+              placeholder={t('home.@search_placeholder_study')}
+            />
             <RdsChip
               label={t('home.@my_studies')}
               onClick={handleChipClick}

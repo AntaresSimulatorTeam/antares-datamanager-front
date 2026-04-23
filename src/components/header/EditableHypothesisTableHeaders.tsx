@@ -13,7 +13,7 @@ import { LabelWithDeleteButton } from '@common/data/LabelWithDeleteButton.tsx';
 import { SelectInputWithButton } from '@common/data/SelectInputWithButton.tsx';
 import { ProgressBar } from '@/components/forms/ProgressBar.tsx';
 import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
-import { RdsIconButton, RdsIconId } from 'rte-design-system-react';
+import { IconButton } from '@design-system-rte/react';
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
 
@@ -109,11 +109,7 @@ const getEditableHypothesisTableHeaders = ({
           <CellWithStatus status={status} />
           {options?.meta?.removeRow && !isDefault && !isStudyGenerated && (
             <div className={`${isDeletable ? 'pointer-events-auto visible' : 'pointer-events-none invisible'}`}>
-              <RdsIconButton
-                icon={RdsIconId.Delete}
-                size="small"
-                onClick={() => void options?.meta?.removeRow?.(hypothesis, row.id)}
-              />
+              <IconButton name="close" size="s" onClick={() => void options?.meta?.removeRow?.(hypothesis, row.id)} />
             </div>
           )}
         </div>

@@ -1,7 +1,6 @@
-import StdIcon from '../../base/stdIcon/StdIcon';
 import { ItemBackgroundStyleConfig, ItemStyleConfig } from './StdNavbar';
 import { navbarControllerClassBuilder } from './navbarClassBuilder.ts';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
+import { Icon } from '@design-system-rte/react';
 
 type StdNavbarControllerProps = {
   id: string;
@@ -15,7 +14,7 @@ type StdNavbarControllerProps = {
 };
 
 const StdNavbarController = ({ id, label, action, expanded = true, itemsStyleConfig }: StdNavbarControllerProps) => {
-  const iconId = expanded ? StdIconId.KeyboardDoubleArrowLeft : StdIconId.KeyboardDoubleArrowRight;
+  const iconId = expanded ? 'arrow-double-left' : 'arrow-double-right';
   const navbarControllerClasses = navbarControllerClassBuilder(
     expanded,
     itemsStyleConfig.itemBackground,
@@ -25,7 +24,7 @@ const StdNavbarController = ({ id, label, action, expanded = true, itemsStyleCon
   return (
     <button id={id} className={navbarControllerClasses} onClick={action}>
       <div className={`flex items-center gap-1 ${expanded ? 'flex-row' : 'flex-col'}`}>
-        {expanded ? <StdIcon name={iconId} isExplicit /> : <StdIcon name={iconId} isExplicit={false} alt={label} />}
+        <Icon name={iconId} />
         {label}
       </div>
     </button>

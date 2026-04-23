@@ -5,7 +5,6 @@ import { ReadOnlyObject } from '@/shared/types/HypothesisTable.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { notifyAlert } from '@/shared/notification/notification.tsx';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { useTranslation } from 'react-i18next';
 import { updateTableAfterRowDeletion } from '@/shared/helpers/hypothesisTableHelper.ts';
 
@@ -55,7 +54,7 @@ export const useHypothesisTableRemoveRow = (
         setCheckedValues((prev) => prev.filter((v) => v !== hypothesis));
       } catch (error) {
         notifyAlert({
-          icon: StdIconId.Close,
+          icon: 'check',
           message: t('studyDetails.@notificationAlert', {
             studyName: study.name,
             trajectoryName: hypothesis,

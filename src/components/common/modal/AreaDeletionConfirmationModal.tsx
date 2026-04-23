@@ -1,7 +1,7 @@
 import React from 'react';
 import { RdsModal } from 'rte-design-system-react';
 import { useTranslation } from 'react-i18next';
-import StdButton from '@common/base/stdButton/StdButton';
+import { Button } from '@design-system-rte/react';
 
 interface AreaDeletionConfirmationModalProps {
   isOpen?: boolean;
@@ -27,13 +27,8 @@ export const AreaDeletionConfirmationModal: React.FC<AreaDeletionConfirmationMod
         <p>{message ?? t('trajectoryDeletionModal.@confirmDeleteMessage')}</p>
       </RdsModal.Content>
       <RdsModal.Footer>
-        <StdButton label={t('trajectoryDeletionModal.@cancel')} variant="text" color="secondary" onClick={onClose} />
-        <StdButton
-          label={t('trajectoryDeletionModal.@confirm')}
-          variant="text"
-          color="danger"
-          onClick={() => void onConfirm()}
-        />
+        <Button label={t('trajectoryDeletionModal.@cancel')} variant="text" onClick={onClose} />
+        <Button label={t('trajectoryDeletionModal.@confirm')} variant="secondary" onClick={() => void onConfirm()} />
       </RdsModal.Footer>
     </RdsModal>
   );

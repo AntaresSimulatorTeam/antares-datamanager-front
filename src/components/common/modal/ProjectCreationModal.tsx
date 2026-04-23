@@ -13,8 +13,6 @@ import { notifyToast } from '@/shared/notification/notification.tsx';
 import { PROJECT_ACTION } from '@/shared/enum/project.ts';
 import { ProjectActionType, ProjectResponse } from '@/shared/types/Project.type.ts';
 import { useProjectDispatch } from '@/store/contexts/ProjectContext.tsx';
-import StdButton from '@common/base/stdButton/StdButton';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import StdInputText from '@/components/forms/stdInputText/StdInputText.tsx';
 import StdInputTextArea from '@common/forms/stdInputTextArea/StdInputTextArea.tsx';
 import { validateMaxLength } from '@/shared/utils/validateMaxTextLength.ts';
@@ -24,6 +22,7 @@ import {
   MAX_PROJECT_DESCRIPTION_LENGTH,
   MAX_PROJECT_NAME_LENGTH,
 } from '@/shared/const/studyConfig.ts';
+import { Button } from '@design-system-rte/react';
 
 interface ProjectCreationModalProps {
   onClose: () => void;
@@ -141,12 +140,12 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
         </div>
       </RdsModal.Content>
       <RdsModal.Footer>
-        <StdButton label={t('components.quickAccess.@cancel')} onClick={onClose} color="secondary" />
-        <StdButton
-          icon={projectInfo ? StdIconId.Edit : StdIconId.Add}
+        <Button label={t('components.quickAccess.@cancel')} onClick={onClose} variant="text" />
+        <Button
+          icon={projectInfo ? 'edit' : 'add'}
           label={projectInfo ? t('modal.@button_update') : t('modal.@button_create')}
           onClick={() => void handleCreateProject()}
-          variant="contained"
+          variant="primary"
           color="primary"
           disabled={!isFormValid}
         />

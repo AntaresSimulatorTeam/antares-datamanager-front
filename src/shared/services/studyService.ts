@@ -10,7 +10,6 @@ import { STUDY_ENDPOINT, STUDY_KEYWORDS_SEARCH_ENDPOINT } from '@/shared/const/a
 import { notifyAlert, notifyToast } from '@/shared/notification/notification.tsx';
 import { AuthService } from '@/shared/services/authService.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 /**
  * Retrieve a list of studies from a term
@@ -89,7 +88,9 @@ export const fetchSuggestedKeywords = async (partialName: string): Promise<strin
  * @throws {BackendError} Throws an error if the update fails on the server-side.
  */
 export const saveStudy = async (
-  studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate' | 'projectId' | 'generationDate'> & { id: number | undefined },
+  studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate' | 'projectId' | 'generationDate'> & {
+    id: number | undefined;
+  },
 ): Promise<void> => {
   try {
     await AuthService.authFetch(`${STUDY_ENDPOINT}`, {
@@ -188,16 +189,15 @@ export const generateStudy = async (id: number): Promise<void> => {
       },
     });
   } catch (error) {
-    if ((error as BackendError).antaresErrorMessage ){
+    if ((error as BackendError).antaresErrorMessage) {
       notifyAlert({
-        icon: StdIconId.Close,
+        icon: 'close',
         message: (error as BackendError).antaresErrorMessage,
         type: 'error',
         filledIcon: true,
       });
     }
     throw new Error((error as BackendError).antaresErrorMessage);
-
   }
 };
 

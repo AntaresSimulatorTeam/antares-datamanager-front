@@ -2,7 +2,6 @@ import { TailwindColorClass } from '@/shared/types/TailwindColorClass.type';
 import { ElementType, PropsWithChildren, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AnchorDefaultAsType } from '@common/base/element.type';
-import StdDivider from '../stdDivider/StdDivider';
 import StdNavbarController from './StdNavbarController';
 import StdNavbarLogoHeader from './StdNavbarLogoHeader';
 import StdNavbarMenu from './StdNavbarMenu';
@@ -10,6 +9,7 @@ import StdNavbarTextHeader from './StdNavbarTextHeader';
 import { navbarClassBuilder } from './navbarClassBuilder.ts';
 import { NavbarContextProvider } from '@/store/contexts/navbarContext.tsx';
 import { MenuNavItem, TailwindUtilityColorClass, ZIndex } from '@/shared/types';
+import { Divider } from '@design-system-rte/react';
 
 export type NavbarConfig<E extends ElementType = AnchorDefaultAsType> = {
   header: HeaderStyleConfig<E>;
@@ -108,10 +108,11 @@ const StdNavbar = <E extends ElementType = AnchorDefaultAsType>({
       <NavbarContextProvider expanded={expanded} setExpanded={setExpanded} config={config}>
         {children}
       </NavbarContextProvider>
-
-      <StdDivider extraClasses="mt-auto" />
+      <div className="mt-auto">
+        <Divider />
+      </div>
       <StdNavbarMenu menuItems={bottomItems} expanded={expanded} itemsStyleConfig={{ itemBackground, itemContent }} />
-      <StdDivider />
+      <Divider />
       <StdNavbarController
         id={`${id}-controller`}
         action={toggleExpanded}

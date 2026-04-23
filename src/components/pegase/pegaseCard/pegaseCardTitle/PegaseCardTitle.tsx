@@ -6,25 +6,22 @@
 
 import { ReactElement } from 'react';
 import cardTitleClassBuilder from './cardTitleClassBuilder';
-import { RdsFloatingWrapper, RdsIconButtonProps, RdsTagProps } from 'rte-design-system-react';
-import StdButton from '@common/base/stdButton/StdButton';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
+import { RdsFloatingWrapper, RdsIconButtonProps } from 'rte-design-system-react';
 import StdDropdown, { StdDropdownOption } from '@common/layout/stdDropdown/StdDropdown.tsx';
-import StdTag from '@common/base/stdTag/StdTag.tsx';
+import { IconButton } from '@design-system-rte/react';
 
 export type PegaseCardTitleProps = {
   id: string;
   title: string;
   dropdownOptions: StdDropdownOption[];
   icons?: ReactElement<RdsIconButtonProps>;
-  tag?: Omit<RdsTagProps, 'onClose'>;
   lineClamp?: number;
   onClick?: () => void;
 };
 
 const { Trigger, Element } = RdsFloatingWrapper;
 
-const PegaseCardTitle = ({ title, dropdownOptions, icons, tag, lineClamp, onClick, id }: PegaseCardTitleProps) => {
+const PegaseCardTitle = ({ title, dropdownOptions, icons, lineClamp, onClick, id }: PegaseCardTitleProps) => {
   const { titleClasses } = cardTitleClassBuilder(lineClamp, !!onClick);
   return (
     <header className="flex items-start justify-between gap-1">
@@ -39,22 +36,17 @@ const PegaseCardTitle = ({ title, dropdownOptions, icons, tag, lineClamp, onClic
             {title}
           </span>
         )}
-        {tag && (
-          <menu className="flex items-center">
-            <StdTag {...tag} id={`${id}-tag`} />
-          </menu>
-        )}
       </div>
       <div role="presentation" onClick={(e) => e.stopPropagation()}>
         <RdsFloatingWrapper placement={'bottom-start'} fallbackPlacements={['bottom-end']} autoClose>
           <Trigger>
-            <StdButton
+            <IconButton
               id={`${id}-button`}
               data-testid="project-card-menu"
               aria-label="more-vert"
               variant="transparent"
-              size="small"
-              icon={StdIconId.MoreVert}
+              size="m"
+              name="more-vert"
               disabled={dropdownOptions.length === 0}
             />
           </Trigger>

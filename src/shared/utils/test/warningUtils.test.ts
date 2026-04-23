@@ -2,7 +2,6 @@ import { buildDataWarningMessage, convertDataToItem, countWarning, sortByLevel }
 import { WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
 import { mockDataMessage, mockWarningMessages, mockWarningMessagesWithTwo } from '@/mocks/data/tests/warning.mock.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { WarningTrajectoryType } from '@/shared/types';
 import { skipMessage } from '@/shared/services/warningService.ts';
 
@@ -121,10 +120,8 @@ describe('convertDataToItem', () => {
 
     expect(result).toEqual({
       code: '',
-      colorStatus: 'warning',
-      color: 'text-warning-500',
       colorBorder: 'hover:border-b-warning-500',
-      icon: StdIconId.Warning,
+      icon: 'warning',
       title: 'areas_BP23_A_ref - links_BP23_A_ref',
       buttonLabel: 'studyDetails.@skip',
       buttonTooltipText: 'studyDetails.@warningButtonTooltip',

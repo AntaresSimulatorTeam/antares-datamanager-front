@@ -1,5 +1,4 @@
 import { useStdId } from '@/hooks/useStdId';
-import { type StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import clsx from 'clsx';
 import { type JSX, useRef } from 'react';
@@ -18,7 +17,7 @@ export type StdDropdownOwnOption = {
   onItemClick?: (e: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>) => void;
   onCheckedChange?: (checked?: boolean) => void;
   disabled?: boolean;
-  icon?: StdIconId;
+  icon?: string;
   extraClasses?: string;
 };
 

@@ -7,7 +7,6 @@
 import { clsx } from 'clsx';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import { StdDropdownOption } from '@/components/common/layout/stdDropdown/StdDropdown';
 
 export const NO_WRAP_CLASS = 'whitespace-nowrap';
@@ -23,7 +22,7 @@ export const useDropdownOptions = () => {
         value: 'edit',
         onItemClick: onClick,
         disabled,
-        icon: StdIconId.Edit,
+        icon: 'edit',
         extraClasses: NO_WRAP_CLASS,
       }) as StdDropdownOption,
     [t],
@@ -35,7 +34,7 @@ export const useDropdownOptions = () => {
         key: 'delete',
         label: label ?? t('project.@delete'),
         value: 'delete',
-        icon: StdIconId.Delete,
+        icon: 'delete',
         onItemClick: disabled ? undefined : onClick,
         extraClasses: clsx(NO_WRAP_CLASS, '[&]:text-error-600 [&]:hover:text-error-600'),
         disabled,
@@ -49,7 +48,7 @@ export const useDropdownOptions = () => {
         key: 'pin',
         label: pinned ? t('project.@unpin') : t('project.@pin'),
         value: 'pin',
-        icon: pinned ? StdIconId.KeepOff : StdIconId.PushPin,
+        icon: pinned ? 'keep-off' : 'keep',
         onItemClick: disabled ? undefined : onClick,
         extraClasses: NO_WRAP_CLASS,
         disabled,

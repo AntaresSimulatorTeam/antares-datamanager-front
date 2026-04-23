@@ -1,10 +1,9 @@
 import { useStdId } from '@/hooks/useStdId';
 import { StdChangeHandler } from '@/shared/types/StdBase.type';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
-import StdButton from '@common/base/stdButton/StdButton';
 import { useRef } from 'react';
 import StdRequiredIndicator from '../stdRequiredIndicator/StdRequiredIndicator';
 import { textClassBuilder } from './textClassBuilder';
+import { IconButton } from '@design-system-rte/react';
 
 export type TextVariant = 'outlined' | 'text';
 
@@ -109,7 +108,7 @@ const StdInputText = ({
           autoFocus={autoFocus}
         />
         <div className={buttonClasses}>
-          <StdButton icon={StdIconId.Close} variant="text" color="secondary" size="extraSmall" onClick={clearValue} />
+          <IconButton name="close" variant="text" size="s" onClick={clearValue} />
         </div>
       </div>
       <span className={helperClasses}>{helperText}</span>

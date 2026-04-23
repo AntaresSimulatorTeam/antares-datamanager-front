@@ -36,7 +36,7 @@ const HomePageContent = () => {
     <div className="flex w-full flex-1 flex-col justify-start gap-4">
       <StdHeading title={t('home.@study_table_title')} />
       <div className="flex items-center gap-4">
-        <SearchBar onSearch={searchStudy} />
+        <SearchBar onSearch={searchStudy} placeholder={t('home.@search_placeholder_study')} />
         <RdsChip
           label={t('home.@my_studies')}
           onClick={handleChipClick}

@@ -1,5 +1,4 @@
 import { MenuNavItem } from '@/shared/types';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 export const menuTopData: MenuNavItem[] = [
   {
@@ -8,7 +7,7 @@ export const menuTopData: MenuNavItem[] = [
     label: 'Home',
     path: '/',
     as: 'a',
-    icon: StdIconId.Home,
+    icon: 'home',
     component: () => '',
   },
   {
@@ -17,7 +16,7 @@ export const menuTopData: MenuNavItem[] = [
     label: 'Project',
     path: '/projects',
     as: 'a',
-    icon: StdIconId.Folder,
+    icon: 'folder',
     component: () => '',
   },
   {
@@ -26,7 +25,7 @@ export const menuTopData: MenuNavItem[] = [
     label: 'logs',
     path: '/logs',
     as: 'a',
-    icon: StdIconId.ReceiptLong,
+    icon: 'text-snippet',
     component: () => '',
   },
   {
@@ -35,7 +34,7 @@ export const menuTopData: MenuNavItem[] = [
     label: 'parameters',
     path: '/parameters',
     as: 'a',
-    icon: StdIconId.Settings,
+    icon: 'settings',
     component: () => '',
   },
   {
@@ -44,7 +43,7 @@ export const menuTopData: MenuNavItem[] = [
     label: 'page.@antares',
     path: '/antares',
     as: 'a',
-    icon: StdIconId.Apps,
+    icon: 'apps',
     component: () => '',
   },
   {
@@ -53,7 +52,7 @@ export const menuTopData: MenuNavItem[] = [
     label: 'about',
     path: '/about',
     as: 'a',
-    icon: StdIconId.Info,
+    icon: 'info',
     component: () => '',
   },
 ];

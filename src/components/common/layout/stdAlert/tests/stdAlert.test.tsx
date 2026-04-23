@@ -1,11 +1,8 @@
 import { render, screen } from '@testing-library/react';
-
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import StdAlert from '../StdAlert';
 
 const TEST_MESSAGE = 'Label';
-const TEST_ICON = StdIconId.Add;
-const TEST_CLOSE_ICON = StdIconId.Close;
+const TEST_ICON = 'add';
 const TEST_ID = 'my-alert';
 const noop = () => {};
 const TEST_ACTION = {
@@ -32,9 +29,6 @@ describe('StdAlert', () => {
     expect(alert.textContent).toContain(TEST_MESSAGE);
     const [_, closeButton] = screen.getAllByRole('button');
     expect(closeButton).toBeInTheDocument();
-    const closeIcon = screen.getByTitle(TEST_CLOSE_ICON);
-    expect(closeIcon).toBeInTheDocument();
-    expect(closeButton.contains(closeIcon)).toBe(true);
   });
 
   it('renders the StdAlert component with action', () => {
@@ -55,9 +49,6 @@ describe('StdAlert', () => {
 
     const [_, actionButton, closeButton] = screen.getAllByRole('button');
     expect(closeButton).toBeInTheDocument();
-    const closeIcon = screen.getByTitle(TEST_CLOSE_ICON);
-    expect(closeIcon).toBeInTheDocument();
-    expect(closeButton.contains(closeIcon)).toBe(true);
 
     expect(actionButton).toBeInTheDocument();
     expect(actionButton.textContent).toBe(TEST_ACTION.label);

@@ -7,8 +7,7 @@
 import { MouseEvent, useRef, useState } from 'react';
 import { SelectOption } from '@/shared/types';
 import StdInputText from '@/components/forms/stdInputText/StdInputText.tsx';
-import StdButton from '@common/base/stdButton/StdButton';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
+import { IconButton } from '@design-system-rte/react';
 
 interface ProjectManagerProps {
   defaultPlaceHolder: string;
@@ -96,12 +95,11 @@ const SelectAndSearchableInput = ({
     <div className={`relative ${selectInputClass}`}>
       <div className="absolute right-0 top-1">
         {isSelectEnable && (
-          <StdButton
-            icon={isDropdownOpen ? StdIconId.KeyboardArrowDown : StdIconId.KeyboardArrowRight}
-            size="extraSmall"
+          <IconButton
+            name={isDropdownOpen ? 'arrow-chevron-down' : 'arrow-chevron-right'}
+            size="s"
             variant="text"
             onClick={(e) => void handleClickOnKeyboard(e)}
-            color="secondary"
             disabled={!isSelectEnable}
           />
         )}

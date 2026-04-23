@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
-import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
+import { Icon } from '@design-system-rte/react';
 
 interface CellWithStatusProps {
   status: TRAJECTORY_SELECTION_STATUS;
@@ -15,14 +14,14 @@ export const CellWithStatus = ({ status }: CellWithStatusProps) => {
       case TRAJECTORY_SELECTION_STATUS.OK:
         return (
           <>
-            <StdIcon name={StdIconId.Done} color="text-primary-600" />
+            <Icon name="check" color="#058075" />
             {t('studyDetails.@import_status_done')}
           </>
         );
       case TRAJECTORY_SELECTION_STATUS.ERROR:
         return (
           <>
-            <StdIcon name={StdIconId.Info} color="text-error-700" />
+            <Icon name="info" color="#de0236" />
             <div className="flex items-center gap-2 text-error-700">{t('studyDetails.@import_status_error')}</div>
           </>
         );
@@ -30,7 +29,7 @@ export const CellWithStatus = ({ status }: CellWithStatusProps) => {
       default:
         return (
           <>
-            <StdIcon name={StdIconId.QuestionMark} color="text-warning-500" />
+            <Icon name="question-mark" color="#f38a3f" />
             {t('studyDetails.@import_status_missing')}
           </>
         );

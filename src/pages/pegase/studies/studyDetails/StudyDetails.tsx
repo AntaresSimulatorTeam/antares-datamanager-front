@@ -13,7 +13,6 @@ import { useTranslation } from 'react-i18next';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { generateStudy, getStudyById } from '@/shared/services/studyService.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
-import { ButtonWithStdIcon } from '@/components/button/ButtonWithStdIcon.tsx';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { DetailsContent } from '@/components/banner/DetailsContent.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
@@ -24,6 +23,7 @@ import StudyModificationModal from '@common/modal/StudyModificationModal.tsx';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { useProjectNavigation } from '@/hooks/useProjectNavigation.ts';
 import { PegaseBreadcrumb } from '@common/layout/PegaseBreadcrumb/PegaseBreadcrumb.tsx';
+import { Button, Loader } from '@design-system-rte/react';
 
 const StudyDetails = () => {
   const [activeContent, setActiveContent] = useState<ReactNode>(null);
@@ -119,14 +119,18 @@ const StudyDetails = () => {
                 <div className="mr-1 text-error-600">{t('studyDetails.@add_trajectories_message')}</div>
               )}
               {errorMessage && <div className="mr-1 text-error-600">{errorMessage}</div>}
-              <ButtonWithStdIcon
-                label={t('studyDetails.@generate')}
-                onClick={() => studyData?.id && void handleGenerateStudy(studyData?.id)}
-                disabled={!studyState.AREA?.trajectories?.length || studyState.studyStatus === StudyStatus.GENERATED}
-                icon={StdIconId.CheckCircle}
-                position="right"
-                isLoading={isGenerating}
-              />
+              {isGenerating ? (
+                <Loader appearance="brand" label="Generating..." labelPosition="right" showLabel size="medium" />
+              ) : (
+                <Button
+                  label={t('studyDetails.@generate')}
+                  onClick={() => studyData?.id && void handleGenerateStudy(studyData?.id)}
+                  disabled={!studyState.AREA?.trajectories?.length || studyState.studyStatus === StudyStatus.GENERATED}
+                  icon="check-circle"
+                  iconPosition="right"
+                  size="m"
+                />
+              )}
             </div>
           </div>
         </div>

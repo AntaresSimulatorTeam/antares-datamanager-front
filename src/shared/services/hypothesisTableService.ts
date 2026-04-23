@@ -7,7 +7,6 @@ import {
 } from '@/shared/utils/trajectoryUtils.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { notifyAlert } from '@/shared/notification/notification.tsx';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { Dispatch, SetStateAction } from 'react';
 import {
   DbTrajectory,
@@ -54,7 +53,7 @@ export const handleTrajectoryError = (
   );
 
   notifyAlert({
-    icon: StdIconId.Close,
+    icon: 'close',
     message: alert.message,
     content: alert.content,
     type: 'error',

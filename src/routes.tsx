@@ -7,7 +7,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { lazy } from 'react';
 import { MenuNavItem } from './shared/types';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 const Settings = lazy(() => import('./pages/pegase/settings/Settings'));
 const HomePage = lazy(() => import('./pages/pegase/home/HomePage'));
@@ -24,7 +23,7 @@ export const menuTopData: MenuNavItem[] = [
     label: 'home.@label',
     path: '/',
     as: 'a',
-    icon: StdIconId.Home,
+    icon: 'home',
     component: HomePage,
   },
   {
@@ -33,7 +32,7 @@ export const menuTopData: MenuNavItem[] = [
     label: 'page.@project',
     path: '/projects',
     as: 'a',
-    icon: StdIconId.Folder,
+    icon: 'folder',
     component: ProjectsPage,
   },
   {
@@ -42,7 +41,7 @@ export const menuTopData: MenuNavItem[] = [
     label: 'page.@logs',
     path: '/logs',
     as: 'a',
-    icon: StdIconId.ReceiptLong,
+    icon: 'text-snippet',
     component: LogsPage,
   },
   {
@@ -51,7 +50,7 @@ export const menuTopData: MenuNavItem[] = [
     label: 'page.@parameters',
     path: '/parameters',
     as: 'a',
-    icon: StdIconId.Settings,
+    icon: 'settings',
     component: Settings,
   },
   {
@@ -60,7 +59,7 @@ export const menuTopData: MenuNavItem[] = [
     label: 'page.@antares',
     path: '/antares',
     as: 'a',
-    icon: StdIconId.Apps,
+    icon: 'apps',
     component: AntaresPage,
   },
   {
@@ -69,7 +68,7 @@ export const menuTopData: MenuNavItem[] = [
     label: 'page.@about',
     path: '/about',
     as: 'a',
-    icon: StdIconId.Info,
+    icon: 'info',
     component: About,
   },
 ];
@@ -81,7 +80,7 @@ export const menuBottomData: MenuNavItem[] = [
     label: 'page.@logout',
     path: '/logout',
     as: 'a',
-    icon: StdIconId.Logout,
+    icon: 'logout',
     component: LogoutPage,
   },
 ];

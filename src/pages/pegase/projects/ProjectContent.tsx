@@ -66,7 +66,10 @@ const ProjectContent = () => {
   return (
     <div className="m-0 flex w-full flex-1 flex-col gap-3">
       <div className="flex items-center gap-4">
-        <SearchBar onSearch={(value?: string) => setSearchTerm(value)} />
+        <SearchBar
+          onSearch={(value?: string) => setSearchTerm(value)}
+          placeholder={t('home.@search_placeholder_project')}
+        />
         <RdsChip
           label={t('home.@my_projects')}
           onClick={handleChipClick}
