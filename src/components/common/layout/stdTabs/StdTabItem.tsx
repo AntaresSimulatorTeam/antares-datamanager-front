@@ -14,7 +14,7 @@ export type StdTabItemProps = {
   tabType?: TabItemType;
   id?: string;
   label?: string;
-  icon?: StdIconId | string;
+  icon?: StdIconId;
   active?: boolean;
   disabled?: boolean;
   button?: {

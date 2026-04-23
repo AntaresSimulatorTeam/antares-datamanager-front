@@ -117,7 +117,7 @@ export const TrajectorySTSDataScheme = {
 } as const;
 
 export interface HypothesisTab extends Tab {
-  icon: StdIconId | string;
+  icon: StdIconId;
   isDisabled: boolean;
 }
 

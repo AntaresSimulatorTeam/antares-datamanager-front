@@ -52,7 +52,7 @@ const paddingTab = (tabType: TabItemType, icon?: StdIconId) => {
 export const tabItemClassBuilder = (
   tabType: TabItemType,
   keyboardActive: boolean,
-  icon?: StdIconId | string,
+  icon?: StdIconId,
   active?: boolean,
   disabled?: boolean,
   alwaysClickable?: boolean,
