@@ -10,6 +10,7 @@ import {
   HypothesisRowData,
   SelectOption,
   TabProps,
+  TechnologyType,
   TrajectoryViewData,
 } from '@/shared/types';
 import { useCallback, useEffect, useState } from 'react';
@@ -45,7 +46,7 @@ const ExpandableTab = ({ defaultAreas, areas, studyData, type }: TabProps & { ty
   const [data, setData] = useState<HypothesisRowData[]>([]);
   const [rowIdSelected, setRowIdSelected] = useState<string>('0');
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
-  const [installedPowerTechnologies, setInstalledPowerTechnologies] = useState<string[]>([]);
+  const [technologies, setTechnologies] = useState<TechnologyType[]>([]);
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
   const [trajectoryData, setTrajectoryData] = useState<TrajectoryViewData | undefined>();
@@ -69,6 +70,7 @@ const ExpandableTab = ({ defaultAreas, areas, studyData, type }: TabProps & { ty
     type,
     studyData,
     setDbTrajectories,
+    technologies,
   });
   const { handleFetchFromFS } = useTrajectoryFetchFromFSHandler({
     defaultAreas,
@@ -92,7 +94,7 @@ const ExpandableTab = ({ defaultAreas, areas, studyData, type }: TabProps & { ty
     const mapping = [
       [areasTrajectoryOptions, setAreasOptions],
       [dropDownListOptions, setCheckedValues],
-      [technologyList, setInstalledPowerTechnologies],
+      [technologyList, setTechnologies],
       [hypothesisTrajectories, setData],
       [readOnlyRow, setReadOnly],
     ] as const;
@@ -118,7 +120,16 @@ const ExpandableTab = ({ defaultAreas, areas, studyData, type }: TabProps & { ty
     async (value: string, isChecked?: boolean) => {
       const indexRow = data.findIndex((row) => row.hypothesis === value);
       if (isChecked) {
-        addRow(type, value, dispatch, setCheckedValues, setData, installedPowerTechnologies, [], setReadOnly);
+        addRow(
+          type,
+          value,
+          dispatch,
+          setCheckedValues,
+          setData,
+          technologies.map((technology) => technology.label),
+          [],
+          setReadOnly,
+        );
       } else if (shouldOpenDeletionModal(type, indexRow, data)) {
         setRowToDelete({ index: indexRow, value });
         setIsDeletionModalOpen(true);
@@ -126,7 +137,7 @@ const ExpandableTab = ({ defaultAreas, areas, studyData, type }: TabProps & { ty
         await removeRow(type, indexRow, data, value);
       }
     },
-    [data, dispatch, installedPowerTechnologies, removeRow, type],
+    [data, dispatch, technologies, removeRow, type],
   );
 
   const removeTableRow = useCallback(
@@ -151,7 +162,7 @@ const ExpandableTab = ({ defaultAreas, areas, studyData, type }: TabProps & { ty
         if (type === TRAJECTORY_TYPE.DSR && isLastIndex) {
           typeToUse = TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION;
         }
-        await importTrajectory(typeToUse, value, indexArray, data, setData);
+        await importTrajectory(typeToUse, value, indexArray, data, setData, technologies);
       }
     },
     [data, importTrajectory, rowIdSelected, toggleModal, type],
@@ -199,7 +210,7 @@ const ExpandableTab = ({ defaultAreas, areas, studyData, type }: TabProps & { ty
         progress={progress}
         idSelected={rowIdSelected}
         type={type}
-        list={installedPowerTechnologies}
+        list={technologies.map((technology) => technology.label)}
         handleSearch={handleSearch}
         handleImport={async (rowId: string) => await handleFetchFromFS(type, data, rowId)}
         isReadOnlyEnable={true}

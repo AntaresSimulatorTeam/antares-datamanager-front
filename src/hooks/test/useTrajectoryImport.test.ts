@@ -142,7 +142,9 @@ describe('useTrajectoryImport', () => {
     const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch));
 
     await act(async () => {
-      await result.current.importTrajectory(TRAJECTORY_TYPE.STS, value, [0, 0], data, mockSetData);
+      await result.current.importTrajectory(TRAJECTORY_TYPE.STS, value, [0, 0], data, mockSetData, [
+        { id: 1, label: 'Solar', code: 'solar' },
+      ]);
     });
 
     expect(uploadTrajectory).toHaveBeenCalledWith(
@@ -160,7 +162,7 @@ describe('useTrajectoryImport', () => {
     expect(result.current.progress).toBeGreaterThanOrEqual(0);
   });
 
-  it('should import trajectory and call attachTrajectory', async () => {
+  it('should import STS trajectory and call attachTrajectory', async () => {
     const mockTrajectory = { id: 101, trajectoryName: 'Trajectory A' };
     (uploadTrajectory as Mock).mockResolvedValue(mockTrajectory);
 

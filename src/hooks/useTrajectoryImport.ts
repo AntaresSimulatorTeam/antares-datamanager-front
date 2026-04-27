@@ -10,6 +10,7 @@ import {
   StudyActionType,
   StudyDTO,
   StudyState,
+  TechnologyType,
 } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 import { useUser } from '@/store/contexts/UserContext.tsx';
@@ -37,9 +38,14 @@ export const useTrajectoryImport = (
       indexArray: number[],
       data: HypothesisRowData[],
       setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
+      options?: TechnologyType[],
     ) => {
       const hypothesis = data[indexArray[0]]?.hypothesis;
-      const subArea = indexArray?.length > 1 ? data[indexArray[0]]?.subRows?.[indexArray[1]]?.hypothesis : undefined;
+      let subArea = indexArray?.length > 1 ? data[indexArray[0]]?.subRows?.[indexArray[1]]?.hypothesis : undefined;
+      const option = options ? options.find((opt) => opt.label === subArea) : null;
+      if (option) {
+        subArea = option.code;
+      }
       setFileStatus('loading');
       try {
         const newTrajectory = await uploadTrajectory(

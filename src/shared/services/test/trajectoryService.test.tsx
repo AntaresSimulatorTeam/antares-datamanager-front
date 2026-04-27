@@ -155,9 +155,13 @@ describe('getResTechnologyList', () => {
   });
 
   it('returns a list of technology names when API responds with label fields', async () => {
+    const results = [
+      { id: 1, label: 'Wind offshore', code: 'wind_offshore' },
+      { id: 1, label: 'Solar PV', code: 'solar_pv' },
+    ];
     vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
       ok: true,
-      json: async () => Promise.resolve([{ label: 'Offshore Wind' }, { label: 'Solar PV' }]),
+      json: async () => Promise.resolve(results),
     });
 
     const result = await getResTechnologyList();
@@ -165,7 +169,7 @@ describe('getResTechnologyList', () => {
     await waitFor(() => {
       expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
       expect(AuthService.authFetch).toHaveBeenCalledWith('https://mockapi.com/v1/trajectory/res-types');
-      expect(result).toEqual(['Offshore Wind', 'Solar PV']);
+      expect(result).toEqual(results);
     });
   });
 

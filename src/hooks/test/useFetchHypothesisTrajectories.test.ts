@@ -24,7 +24,7 @@ import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
 import * as trajectoryUtils from '@/shared/utils/trajectoryUtils.ts';
 import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
-import { STSTechnology, ThermalOptions } from '@/mocks/data/list/names.ts';
+import { STSTechnology, ThermalOptionsResults } from '@/mocks/data/list/names.ts';
 import { getResTechnologyList } from '@/shared/services/trajectoryService.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 
@@ -592,11 +592,9 @@ describe('useFetchHypothesisTrajectories', () => {
 
   it('should include ThermalOptions when trajectoryType is THERMAL_CAPACITY', async () => {
     vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArrayThermal);
-    vi.mocked(defaultConfigService.getThermalTechnologyList).mockResolvedValue(
-      ThermalOptions.map((option) => ({ name: option })),
-    );
-    const technologiesHypothesis = ThermalOptions.map((option) => ({
-      hypothesis: option,
+    vi.mocked(defaultConfigService.getThermalTechnologyList).mockResolvedValue(ThermalOptionsResults);
+    const technologiesHypothesis = ThermalOptionsResults.map((option) => ({
+      hypothesis: option.label,
       isDefault: false,
       isDeletable: false,
       status: TRAJECTORY_SELECTION_STATUS.MISSING,
@@ -626,7 +624,7 @@ describe('useFetchHypothesisTrajectories', () => {
     );
     vi.mocked(studyService.getStudyTrajectories).mockResolvedValue([]);
     const technologiesHypothesis = STSTechnology.map((option) => ({
-      hypothesis: option,
+      hypothesis: option.label,
       isDefault: false,
       isDeletable: false,
       status: TRAJECTORY_SELECTION_STATUS.MISSING,
@@ -767,7 +765,10 @@ describe('useFetchHypothesisTrajectories', () => {
     vi.spyOn(trajectoryUtils, 'removeDuplicateByTechnology').mockReturnValue(expectedTrajectories);
 
     const trajectoryService = await import('@/shared/services/trajectoryService.ts');
-    vi.mocked(trajectoryService.getResTechnologyList).mockResolvedValue(['Offshore Wind', 'Solar PV']);
+    vi.mocked(trajectoryService.getResTechnologyList).mockResolvedValue([
+      { id: 1, label: 'Offshore Wind', code: 'offshore_wind' },
+      { id: 2, label: "'Solar PV'", code: 'solar_pv' },
+    ]);
 
     const result = await fetchAndNormalizeTrajectories({
       id: 7,
@@ -777,7 +778,10 @@ describe('useFetchHypothesisTrajectories', () => {
     });
 
     expect(trajectoryService.getResTechnologyList).toHaveBeenCalled();
-    expect(result.technologies).toEqual(['Offshore Wind', 'Solar PV']);
+    expect(result.technologies).toEqual([
+      { id: 1, label: 'Offshore Wind', code: 'offshore_wind' },
+      { id: 2, label: "'Solar PV'", code: 'solar_pv' },
+    ]);
     expect(result.trajectories).toEqual(expectedTrajectories);
     expect(result.dsrCmResult).toEqual([]);
   });

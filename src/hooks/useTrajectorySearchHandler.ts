@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useCallback } from 'react';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { DbTrajectory, HypothesisRowData, SelectOption, StudyDTO } from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, SelectOption, StudyDTO, TechnologyType } from '@/shared/types';
 import { handleTrajectorySearch } from '@/shared/services/hypothesisTableService.ts';
 
 interface UseTrajectorySearchHandlerArgs {
@@ -8,6 +8,7 @@ interface UseTrajectorySearchHandlerArgs {
   type: TRAJECTORY_TYPE;
   studyData: StudyDTO;
   setDbTrajectories: Dispatch<SetStateAction<DbTrajectory[]>>;
+  technologies?: TechnologyType[];
 }
 
 export const useTrajectorySearchHandler = ({
@@ -15,6 +16,7 @@ export const useTrajectorySearchHandler = ({
   type,
   studyData,
   setDbTrajectories,
+  technologies,
 }: UseTrajectorySearchHandlerArgs) => {
   const handleSearch = useCallback(
     async (fileNameContains: string, rowId: string): Promise<SelectOption[] | undefined> => {
@@ -37,8 +39,11 @@ export const useTrajectorySearchHandler = ({
         areaToUse = isLastIndex ? '' : data[rowIndex]?.hypothesis;
       }
 
-      const technology = subIndex === undefined ? undefined : data[rowIndex]?.subRows?.[subIndex]?.hypothesis;
-
+      let technology = subIndex === undefined ? undefined : data[rowIndex]?.subRows?.[subIndex]?.hypothesis;
+      const option = technologies ? technologies.find((opt) => opt.label === technology) : null;
+      if (option) {
+        technology = option.code;
+      }
       return await handleTrajectorySearch(typeToUse, setDbTrajectories, studyData.horizon, {
         area: areaToUse,
         technology,

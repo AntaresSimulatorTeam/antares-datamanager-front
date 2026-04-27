@@ -136,3 +136,9 @@ export type DsrTrajectoryType = TRAJECTORY_TYPE.DSR | TRAJECTORY_TYPE.DSR_CAPACI
 export type ParamTrajectoryState = Record<ThermalParamTrajectoryType, TrajectoryState>;
 
 export type TrajectoryWithSubRowsType = TRAJECTORY_TYPE.THERMAL_CAPACITY | TRAJECTORY_TYPE.STS;
+
+export interface TechnologyType {
+  id: number;
+  label: string;
+  code: string;
+}

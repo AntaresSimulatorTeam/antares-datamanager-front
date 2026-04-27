@@ -3,7 +3,7 @@ import { AuthService } from '@/shared/services/authService.ts';
 import { waitFor } from '@testing-library/react';
 import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
 import { vi } from 'vitest';
-import { ThermalOptions } from '@/mocks/data/list/names.ts';
+import { ThermalOptions, ThermalOptionsResults } from '@/mocks/data/list/names.ts';
 
 vi.mock('@/envVariables', () => ({
   getEnvVariables: vi.fn(() => 'https://mockapi.com'),
@@ -59,7 +59,7 @@ describe('getThermalTechnologyList', () => {
       expect(AuthService.authFetch).toHaveBeenCalledWith(
         'https://mockapi.com/v1/default_config/thermal-technology-display',
       );
-      expect(result).toEqual(ThermalOptions);
+      expect(result).toEqual(ThermalOptionsResults);
     });
   });
 
