@@ -70,6 +70,7 @@ const ExpandableTab = ({ defaultAreas, areas, studyData, type }: TabProps & { ty
     type,
     studyData,
     setDbTrajectories,
+    technologies,
   });
   const { handleFetchFromFS } = useTrajectoryFetchFromFSHandler({
     defaultAreas,
