@@ -746,6 +746,8 @@ describe('getQueryParamAreaValue', () => {
 });
 
 describe('convertIntoHypothesisRowWithTechnologies', () => {
+  const TechnologyList = ThermalOptions.map((tech) => tech.name);
+
   it('should group by area and generate main entry with subRows', () => {
     const data = [
       { area: 'ZoneA', technology: '', trajectoryName: 'MainTrajectory' },
@@ -753,7 +755,12 @@ describe('convertIntoHypothesisRowWithTechnologies', () => {
       { area: 'ZoneA', technology: 'Biomass', trajectoryName: 'Trajectory2' },
     ] as DbTrajectory[];
 
-    const result = convertIntoHypothesisRowWithTechnologies(data, [], [{ name: 'ZoneA' }], ThermalOptions);
+    const result = convertIntoHypothesisRowWithTechnologies(
+      data,
+      [],
+      [{ name: 'ZoneA' }],
+      ThermalOptions.map((tech) => tech.name),
+    );
 
     expect(result).toHaveLength(1);
     expect(result[0]).toMatchObject({
@@ -771,7 +778,7 @@ describe('convertIntoHypothesisRowWithTechnologies', () => {
     const data = [
       { area: OTHER_AREAS, technology: '', trajectoryName: 'MainTrajectory', type: TRAJECTORY_TYPE.THERMAL_CAPACITY },
     ] as DbTrajectory[];
-    const result = convertIntoHypothesisRowWithTechnologies(data, [], [], ThermalOptions);
+    const result = convertIntoHypothesisRowWithTechnologies(data, [], [], TechnologyList);
 
     expect(result[0].subRows).toBeNull();
     expect(result[0].isDefault).toBe(true);
@@ -779,7 +786,7 @@ describe('convertIntoHypothesisRowWithTechnologies', () => {
 
   it('should return status MISSING if trajectoryName is missing', () => {
     const data = [{ area: 'ZoneB', technology: '', trajectoryName: '' }] as DbTrajectory[];
-    const result = convertIntoHypothesisRowWithTechnologies(data, [], [], ThermalOptions);
+    const result = convertIntoHypothesisRowWithTechnologies(data, [], [], TechnologyList);
 
     expect(result[0].status).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
     expect(result[0].trajectory).toBeNull();
@@ -787,7 +794,7 @@ describe('convertIntoHypothesisRowWithTechnologies', () => {
 
   it('should handle undefined defaultAreas', () => {
     const data = [{ area: 'ZoneC', technology: '', trajectoryName: 'TrajectoryX' }] as DbTrajectory[];
-    const result = convertIntoHypothesisRowWithTechnologies(data, [], undefined, ThermalOptions);
+    const result = convertIntoHypothesisRowWithTechnologies(data, [], undefined, TechnologyList);
 
     expect(result[0].isDefault).toBe(false);
   });
@@ -797,7 +804,7 @@ describe('convertIntoHypothesisRowWithTechnologies', () => {
       { area: 'ZoneD', technology: '', trajectoryName: 'MainTrajectory' },
       { area: 'ZoneD', technology: 'Tech1', trajectoryName: 'Trajectory1' },
     ] as DbTrajectory[];
-    const result = convertIntoHypothesisRowWithTechnologies(data, ['ZoneD'], [], ThermalOptions);
+    const result = convertIntoHypothesisRowWithTechnologies(data, ['ZoneD'], [], TechnologyList);
 
     expect(result[0].subRows).toBeNull();
   });

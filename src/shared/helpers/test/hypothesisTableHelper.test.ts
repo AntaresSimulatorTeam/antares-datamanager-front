@@ -29,6 +29,7 @@ import * as sortUtils from '@/shared/utils/sortUtils.ts';
 import { generateReadOnlyIndexMap, retrieveReadOnlyArea } from '../../utils/trajectoryUtils';
 import { TFunction } from 'i18next';
 import { isParamModulationRequired } from '@/shared/services/trajectoryService.ts';
+import { ThermalOptionsResults } from '@/mocks/data/list/names.ts';
 
 vi.mock('@/shared/services/trajectoryService');
 vi.mock('@/shared/services/hypothesisTableService');
@@ -731,7 +732,7 @@ describe('fetchAndNormalizeTrajectories (Vitest)', () => {
       { id: 10, trajectoryName: 'T1', technology: 'Gas' },
     ] as DbTrajectory[]);
 
-    vi.mocked(defaultConfigService.getThermalTechnologyList).mockResolvedValue([{ name: 'Gas' }, { name: 'Coal' }]);
+    vi.mocked(defaultConfigService.getThermalTechnologyList).mockResolvedValue(ThermalOptionsResults);
 
     vi.mocked(trajectoryUtils.buildDefaultEmptyTrajectoryList).mockReturnValue([
       { id: 11, trajectoryName: '' },
@@ -759,7 +760,7 @@ describe('fetchAndNormalizeTrajectories (Vitest)', () => {
         { id: 11, trajectoryName: '' },
       ],
       dsrCmResult: [],
-      technologies: ['Gas', 'Coal'],
+      technologies: ThermalOptionsResults,
     });
   });
 
@@ -850,7 +851,10 @@ describe('fetchAndNormalizeTrajectories (Vitest)', () => {
       // TODO : test trajectories result when import is implemented
       trajectories: undefined,
       dsrCmResult: [],
-      technologies: ['Series', 'Technical parameters'],
+      technologies: [
+        { id: 1, label: 'Series', code: 'Series' },
+        { id: 2, label: 'Technical parameters', code: 'Technical parameters' },
+      ],
     });
   });
 });

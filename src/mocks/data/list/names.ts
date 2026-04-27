@@ -4,6 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+import { TechnologyType } from '@/shared/types';
+
 export const LIST_NAME = [
   'Martin',
   'Bernard',
@@ -211,18 +213,37 @@ export const LIST_FIRSTNAME = [
 ];
 
 export const ThermalOptions = [
-  'Additional power',
-  'Biomass',
-  'CCGT',
-  'CHP',
-  'Coal',
-  'Nuclear',
-  'Other',
-  'Reserves',
-  'TAC',
+  { name: 'Additional power' },
+  { name: 'Biomass' },
+  { name: 'CCGT' },
+  { name: 'CHP' },
+  { name: 'Coal' },
+  { name: 'Nuclear' },
+  { name: 'Other' },
+  { name: 'Reserves' },
+  { name: 'TAC' },
 ];
 
-export const STSTechnology = ['Battery', 'DSR', 'EV', 'Pondage', 'PSP'];
-export const HydroSubRows = ['Series', 'Technical parameters'];
+export const ThermalOptionsResults = [
+  { id: 0, label: 'Additional power', code: 'Additional power' },
+  { id: 1, label: 'Biomass', code: 'Biomass' },
+  { id: 2, label: 'CCGT', code: 'CCGT' },
+  { id: 3, label: 'CHP', code: 'CHP' },
+  { id: 4, label: 'Coal', code: 'Coal' },
+  { id: 5, label: 'Nuclear', code: 'Nuclear' },
+  { id: 6, label: 'Other', code: 'Other' },
+  { id: 7, label: 'Reserves', code: 'Reserves' },
+  { id: 8, label: 'TAC', code: 'TAC' },
+];
 
-export const Technologies = ThermalOptions.concat(STSTechnology);
+export const STSTechnology: TechnologyType[] = [
+  { id: 1, label: 'Battery', code: 'Battery' },
+  { id: 2, label: 'DSR', code: 'DSR' },
+  { id: 3, label: 'EV', code: 'EV' },
+  { id: 4, label: 'Pondage', code: 'Pondage' },
+  { id: 5, label: 'PSP', code: 'PSP' },
+];
+export const HydroSubRows: TechnologyType[] = [
+  { id: 1, label: 'Series', code: 'Series' },
+  { id: 2, label: 'Technical parameters', code: 'Technical parameters' },
+];

@@ -1,4 +1,4 @@
-import { CheckBoxData, DbTrajectory, HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
+import { CheckBoxData, DbTrajectory, HypothesisRowData, TechnologyType, TrajectoryAreaData } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ReadOnlyObject } from '@/shared/types/HypothesisTable.ts';
@@ -18,7 +18,7 @@ interface FetchResult {
   trajType: TRAJECTORY_TYPE;
   trajectories: DbTrajectory[];
   dsrCmResult: DbTrajectory[] | null;
-  technologies?: string[] | null;
+  technologies?: TechnologyType[] | null;
   rows: HypothesisRowData[];
   list: {
     areaOptions: CheckBoxData[];
@@ -46,7 +46,9 @@ export const useFetchHypothesisTrajectories = (
     Record<TRAJECTORY_TYPE, string[] | undefined> | undefined
   >();
   const [readOnlyRow, setReadOnlyRow] = useState<Record<TRAJECTORY_TYPE, ReadOnlyObject | undefined> | undefined>();
-  const [technologyList, setTechnologyList] = useState<Record<TRAJECTORY_TYPE, string[] | undefined> | undefined>();
+  const [technologyList, setTechnologyList] = useState<
+    Record<TRAJECTORY_TYPE, TechnologyType[] | undefined> | undefined
+  >();
 
   const studyState = useStudy();
   const dispatch = useStudyDispatch();
@@ -93,13 +95,15 @@ export const useFetchHypothesisTrajectories = (
             });
 
             const list = buildCheckListBox(trajectories, areas, defaultAreas);
-
+            const labelTechnologies = technologies
+              ? technologies.map((technology: TechnologyType) => technology.label)
+              : [];
             const rows = buildHypothesisRows({
               trajType,
               trajectories: shouldSkipFetch ? contextTrajectories : trajectories,
               defaultAreas,
               areas,
-              technologies,
+              technologies: labelTechnologies,
               isStudyGenerated,
               t,
               dsrCmResult,
@@ -159,7 +163,7 @@ export const useFetchHypothesisTrajectories = (
           results.forEach(({ trajType, technologies }) => {
             if (technologies) next[trajType] = technologies;
           });
-          return next as Record<TRAJECTORY_TYPE, string[]>;
+          return next as Record<TRAJECTORY_TYPE, TechnologyType[]>;
         });
 
         setAreasTrajectoryOptions(
