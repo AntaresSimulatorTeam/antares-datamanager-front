@@ -1,7 +1,6 @@
 import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
-import StdButton from '@common/base/stdButton/StdButton.tsx';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@design-system-rte/react';
 
 interface LabelWithButtonPreviewProps {
   value: string;
@@ -31,14 +30,14 @@ export const LabelWithButtonPreview = ({
     <div className={`${alignment ?? undefined} flex items-center justify-between gap-2`}>
       <span className={colorLabel}>{`${value} ${extraValue ?? ''}`}</span>
       {hasPreview && (
-        <StdButton
+        <Button
           label={t('studyDetails.@preview')}
-          icon={StdIconId.Preview}
-          position="left"
           onClick={() => void onClick?.()}
+          variant="secondary"
           disabled={disabled}
-          variant="outlined"
-          size="small"
+          icon="visibility-show"
+          iconAppearance="filled"
+          size="s"
         />
       )}
     </div>

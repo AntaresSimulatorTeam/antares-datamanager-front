@@ -6,10 +6,8 @@ import { SelectOption } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { fetchTrajectoriesFromFS } from '@/shared/services/trajectoryService.ts';
 import { convertToFSSelectionOptionType } from '@/shared/utils/formFormatter.ts';
-import StdButton from '@common/base/stdButton/StdButton';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { getPathFromTrajectoryType, getQueryParamAreaValue } from '@/shared/utils/trajectoryUtils.ts';
-import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
+import { Button, Icon } from '@design-system-rte/react';
 
 interface ImportTrajectoryModalProps {
   options: SelectOption[] | undefined;
@@ -80,23 +78,22 @@ export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, hypoth
             </div>
             {trajectoryType === TRAJECTORY_TYPE.STS && (
               <div className="mt-1 flex items-center gap-1 text-body-s text-gray-600">
-                <StdIcon name={StdIconId.Info} width={15} height={15} />
+                <Icon name="info" size={15} />
                 <span>{t('trajectoryImportModal.@timeSeries')}</span>
               </div>
             )}
           </div>
           <div className="relative flex w-full justify-end gap-1 pb-2 pt-8">
-            <StdButton label="Cancel" onClick={() => void onClose()} color="secondary" />
-            <StdButton
-              icon={StdIconId.Add}
+            <Button label={t('trajectoryDeletionModal.@cancel')} onClick={() => void onClose()} variant="text" />
+            <Button
+              icon="add"
               label={t('studyDetails.@import')}
               onClick={() => {
                 if (trajectorySelected) {
                   void onClose(trajectorySelected);
                 }
               }}
-              variant="contained"
-              color="primary"
+              variant="primary"
               disabled={!trajectorySelected}
             />
           </div>

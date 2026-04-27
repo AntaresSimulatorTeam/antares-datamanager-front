@@ -7,6 +7,7 @@
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import Icon, { ExplicitIconProps, NonExplicitIconProps, PlainIconProps } from './Icon';
 
+// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 export type StdIconProps = (ExplicitIconProps | NonExplicitIconProps) & {
   name: StdIconId;
 } & Omit<PlainIconProps, 'url'>;

@@ -10,6 +10,9 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App.tsx';
 import './i18n.ts';
 import '@design-system-rte/react/style.css';
+import '@design-system-rte/core/css/rte-fonts.css';
+import '@design-system-rte/core/css/rte-themes.css';
+import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

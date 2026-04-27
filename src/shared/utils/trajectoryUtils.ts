@@ -512,28 +512,28 @@ export const getStudyMenu = (t: (value: string) => string, isTrajectoryAreaLinke
   {
     name: TRAJECTORY_TYPE.LOAD,
     label: t('studyDetails.@load'),
-    icon: StdIconId.BatteryChargingFull,
+    icon: StdIconId.BatteryChargingFull, // 'battery-charging-full'
     isDisabled: isTrajectoryAreaLinked,
   },
   {
     name: TRAJECTORY_TYPE.THERMAL_CAPACITY,
     label: t('studyDetails.@thermal'),
-    icon: StdIconId.LocalFireDepartment,
+    icon: StdIconId.LocalFireDepartment, // 'fire'
     isDisabled: isTrajectoryAreaLinked,
   },
-  { name: TRAJECTORY_TYPE.STS, label: t('studyDetails.@sts'), icon: StdIconId.BatteryChargingFull, isDisabled: true },
+  { name: TRAJECTORY_TYPE.STS, label: t('studyDetails.@sts'), icon: StdIconId.BatteryChargingFull, isDisabled: true }, // 'battery-charging-full'
   { name: TRAJECTORY_TYPE.DSR, label: t('studyDetails.@dsr'), icon: StdIconId.InkEraser, isDisabled: true },
-  { name: TRAJECTORY_TYPE.MISC_CAPACITY, label: t('studyDetails.@misc'), icon: StdIconId.Category, isDisabled: true },
+  { name: TRAJECTORY_TYPE.MISC_CAPACITY, label: t('studyDetails.@misc'), icon: StdIconId.Category, isDisabled: true }, // 'category'
   {
     name: TRAJECTORY_TYPE.RES_CAPACITY,
     label: t('studyDetails.@res'),
-    icon: StdIconId.EnergySavingsLeaf,
+    icon: StdIconId.EnergySavingsLeaf, // 'eco'
     isDisabled: true,
   },
   {
     name: TRAJECTORY_TYPE.HYDRO_SERIES,
     label: t('studyDetails.@hydro'),
-    icon: StdIconId.Water,
+    icon: StdIconId.Water, // 'water'
     isDisabled: true,
   },
 ];

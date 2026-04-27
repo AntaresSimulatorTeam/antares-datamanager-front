@@ -11,13 +11,12 @@ import { DisplayStatus } from '@/shared/types';
 
 import { AlertContainerId, BannerContainerId, ToastContainerId } from './containers';
 import StdAlert from '@common/layout/stdAlert/StdAlert.tsx';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 export type NotifyProps = {
   id?: string | number;
   message: string;
   type: DisplayStatus;
-  icon?: StdIconId;
+  icon?: string;
   filledIcon?: boolean;
 };
 

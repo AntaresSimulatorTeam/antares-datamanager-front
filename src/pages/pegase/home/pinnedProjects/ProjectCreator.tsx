@@ -7,7 +7,7 @@
 import { useTranslation } from 'react-i18next';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { ProjectCreationModal } from '@common/modal/ProjectCreationModal';
-import StdButton from '@common/base/stdButton/StdButton';
+import { Button } from '@design-system-rte/react';
 
 export const ProjectCreator = () => {
   const { t } = useTranslation();
@@ -15,7 +15,7 @@ export const ProjectCreator = () => {
 
   return (
     <div className="flex items-center justify-center border border-dashed border-primary-700 p-4">
-      <StdButton label={t('home.@buttonNewProject')} variant="outlined" color="primary" onClick={toggleModal} />
+      <Button label={t('home.@buttonNewProject')} variant="secondary" onClick={toggleModal} />
       {isModalOpen && <ProjectCreationModal onClose={toggleModal} />}
     </div>
   );

@@ -8,7 +8,6 @@ import { renderHook } from '@testing-library/react';
 import { NO_WRAP_CLASS, useDropdownOptions } from '@/hooks/useDropdownOptions';
 import { describe, expectTypeOf, it } from 'vitest';
 import { StdDropdownOption } from '@common/layout/stdDropdown/StdDropdown.tsx';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 describe('useDropdownOptions', () => {
   const mockOnClick = vi.fn();
@@ -32,7 +31,7 @@ describe('useDropdownOptions', () => {
       value: 'edit',
       onItemClick: mockOnClick,
       disabled: undefined,
-      icon: StdIconId.Edit,
+      icon: 'edit',
       extraClasses: NO_WRAP_CLASS,
     } as StdDropdownOption;
 
@@ -43,7 +42,7 @@ describe('useDropdownOptions', () => {
       value: 'edit',
       onItemClick: mockOnClick,
       disabled: undefined,
-      icon: StdIconId.Edit,
+      icon: 'edit',
       extraClasses: NO_WRAP_CLASS,
     });
     expect(result.current.editOption(mockOnClick)).toEqual({
@@ -52,7 +51,7 @@ describe('useDropdownOptions', () => {
       value: 'edit',
       onItemClick: mockOnClick,
       disabled: undefined,
-      icon: StdIconId.Edit,
+      icon: 'edit',
       extraClasses: NO_WRAP_CLASS,
     });
     expect(result.current.editOption(mockOnClick, 'Edit', true)).toEqual({
@@ -61,7 +60,7 @@ describe('useDropdownOptions', () => {
       value: 'edit',
       onItemClick: mockOnClick,
       disabled: true,
-      icon: StdIconId.Edit,
+      icon: 'edit',
       extraClasses: NO_WRAP_CLASS,
     });
   });
@@ -76,7 +75,7 @@ describe('useDropdownOptions', () => {
       value: 'delete',
       onItemClick: mockOnClick,
       disabled: undefined,
-      icon: StdIconId.Delete,
+      icon: 'delete',
       extraClasses: classes,
     } as StdDropdownOption;
 
@@ -87,7 +86,7 @@ describe('useDropdownOptions', () => {
       value: 'delete',
       onItemClick: mockOnClick,
       disabled: undefined,
-      icon: StdIconId.Delete,
+      icon: 'delete',
       extraClasses: classes,
     } as StdDropdownOption);
     expect(result.current.deleteOption(mockOnClick, undefined, false)).toEqual({
@@ -96,7 +95,7 @@ describe('useDropdownOptions', () => {
       value: 'delete',
       onItemClick: mockOnClick,
       disabled: false,
-      icon: StdIconId.Delete,
+      icon: 'delete',
       extraClasses: classes,
     } as StdDropdownOption);
   });
@@ -111,7 +110,7 @@ describe('useDropdownOptions', () => {
       value: 'delete',
       onItemClick: undefined,
       disabled: true,
-      icon: StdIconId.Delete,
+      icon: 'delete',
       extraClasses: classes,
     } as StdDropdownOption;
 
@@ -122,7 +121,7 @@ describe('useDropdownOptions', () => {
       value: 'delete',
       onItemClick: undefined,
       disabled: true,
-      icon: StdIconId.Delete,
+      icon: 'delete',
       extraClasses: classes,
     } as StdDropdownOption);
     expect(result.current.deleteOption(mockOnClick, undefined, true)).toEqual({
@@ -131,7 +130,7 @@ describe('useDropdownOptions', () => {
       value: 'delete',
       onItemClick: undefined,
       disabled: true,
-      icon: StdIconId.Delete,
+      icon: 'delete',
       extraClasses: classes,
     } as StdDropdownOption);
   });
@@ -143,7 +142,7 @@ describe('useDropdownOptions', () => {
       label: 'Unpin',
       value: 'pin',
       onItemClick: mockOnClick,
-      icon: StdIconId.KeepOff,
+      icon: 'keep-off',
       extraClasses: NO_WRAP_CLASS,
     } as StdDropdownOption;
 
@@ -153,7 +152,7 @@ describe('useDropdownOptions', () => {
       label: 'Pin',
       value: 'pin',
       onItemClick: mockOnClick,
-      icon: StdIconId.PushPin,
+      icon: 'keep',
       extraClasses: NO_WRAP_CLASS,
     } as StdDropdownOption);
   });
@@ -166,7 +165,7 @@ describe('useDropdownOptions', () => {
       value: 'pin',
       onItemClick: undefined,
       disabled: true,
-      icon: StdIconId.KeepOff,
+      icon: 'keep-off',
       extraClasses: NO_WRAP_CLASS,
     } as StdDropdownOption;
 
@@ -177,7 +176,7 @@ describe('useDropdownOptions', () => {
       value: 'pin',
       disabled: true,
       onItemClick: undefined,
-      icon: StdIconId.PushPin,
+      icon: 'keep',
       extraClasses: NO_WRAP_CLASS,
     } as StdDropdownOption);
   });

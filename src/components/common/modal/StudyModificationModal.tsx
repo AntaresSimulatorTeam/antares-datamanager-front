@@ -15,11 +15,10 @@ import { useUser } from '@/store/contexts/UserContext.tsx';
 import { notifyToast } from '@/shared/notification/notification';
 import { validateMaxLength } from '@/shared/utils/validateMaxTextLength';
 import { MAX_STUDY_NAME_LENGTH } from '@/shared/const/studyConfig';
-import StdButton from '@common/base/stdButton/StdButton';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { hasArrayChanged } from '@/shared/utils/arrayUtils.ts';
 import ProjectInput from '@/components/input/ProjectInput.tsx';
 import StdInputText from '@/components/forms/stdInputText/StdInputText.tsx';
+import { Button } from '@design-system-rte/react';
 
 interface StudyCreationModalProps {
   isOpen?: boolean;
@@ -157,13 +156,12 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
         </div>
       </RdsModal.Content>
       <RdsModal.Footer>
-        <StdButton label={t('components.quickAccess.@cancel')} onClick={onClose} color="secondary" />
-        <StdButton
-          icon={isDuplicateMode ? StdIconId.ContentCopy : StdIconId.Edit}
+        <Button label={t('components.quickAccess.@cancel')} onClick={onClose} variant="text" />
+        <Button
+          icon={isDuplicateMode ? 'copy' : 'edit'}
           label={isDuplicateMode ? t('study.@duplicate') : t('modal.@button_update')}
           onClick={() => void updateStudyHandler()}
-          variant="contained"
-          color="primary"
+          variant="primary"
           disabled={!isFormValid}
         />
       </RdsModal.Footer>

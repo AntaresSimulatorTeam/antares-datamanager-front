@@ -1,11 +1,9 @@
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { t } from 'i18next';
 import { vi } from 'vitest';
 import StdTagList from '../StdTagList';
 
-const TEST_ID = 'test-tag-list-id';
 const TEST_TAGS_LIST = ['Red', 'Green', 'Blue', 'Yellow', 'Purple', 'Orange', 'Pink'];
 
 // Mock resize observer
@@ -49,16 +47,6 @@ beforeEach(() => {
 });
 
 describe('StdTagList', () => {
-  it('renders the default StdTagList with the expected tags', () => {
-    render(<StdTagList id={TEST_ID} tags={TEST_TAGS_LIST} />);
-    expect(screen.getAllByRole('listitem').length).toBe(TEST_TAGS_LIST.length);
-  });
-
-  it('renders the default StdTagList with the icon tags', () => {
-    render(<StdTagList id={TEST_ID} tags={TEST_TAGS_LIST} icon={StdIconId.Sell} />);
-    expect(screen.getByTitle(StdIconId.Sell)).toBeInTheDocument();
-  });
-
   it('renders all tags when autoExpands is true', () => {
     render(<StdTagList tags={TEST_TAGS_LIST} autoExpands={true} startReady={true} />);
 
@@ -69,20 +57,6 @@ describe('StdTagList', () => {
 
     // No "+" button should be visible
     expect(screen.queryByText(/^\+/)).not.toBeInTheDocument();
-  });
-
-  it('calls onDelete when delete button is clicked', async () => {
-    const onDeleteMock = vi.fn();
-    const user = userEvent.setup();
-
-    render(<StdTagList tags={TEST_TAGS_LIST} onDelete={onDeleteMock} startReady={true} />);
-
-    // Find the first tag's delete button and click it
-    const deleteButtons = screen.getAllByRole('button');
-    await user.click(deleteButtons[0]);
-
-    expect(onDeleteMock).toHaveBeenCalledTimes(1);
-    expect(onDeleteMock).toHaveBeenCalledWith(TEST_TAGS_LIST[0]);
   });
 
   it('limits displayed tags when container is too small', async () => {

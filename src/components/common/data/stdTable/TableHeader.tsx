@@ -18,10 +18,10 @@ export const TableHeader = <TData,>(props: TableHeaderProps<TData>) => {
       className={headerClassBuilder(props)}
       style={
         columnSize === 'rem'
-          ? { width: header.getSize() != null ? `${toRem(header.getSize())}` : '100vw' }
+          ? { backgroundColor: '#1b8065', width: header.getSize() != null ? `${toRem(header.getSize())}` : '100vw' }
           : header.getSize() != null && columnSize === 'pixels'
-            ? { width: header.getSize() }
-            : { width: header.getSize() ?? '100%' }
+            ? { width: header.getSize(), backgroundColor: '#1b8065' }
+            : { width: header.getSize() ?? '100%', backgroundColor: '#1b8065' }
       }
     >
       <span>{header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}</span>

@@ -1,9 +1,0 @@
-{
-  "extends": "../tsconfig.json",
-  "compilerOptions": {
-    "types": ["cypress"],
-    "forceConsistentCasingInFileNames": true,
-    "strict": true
-  },
-  "include": ["../node_modules/cypress", "./**/*.ts"]
-}

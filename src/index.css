@@ -1,1 +1,6 @@
 @import '@fontsource-variable/nunito-sans';
+@import '@design-system-rte/core/css/rte-fonts.css';
+@import '@design-system-rte/core/css/rte-themes.css';
+@import '@design-system-rte/core/css/bleu_iceberg.css';
+@import '@design-system-rte/core/css/vert_foret.css';
+@import '@design-system-rte/core/css/violet.css';

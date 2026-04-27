@@ -6,12 +6,10 @@
 
 import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter';
 import { ProjectInfo, StudyDTO } from '@/shared/types';
-import StdIcon from '@common/base/stdIcon/StdIcon';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import { useTranslation } from 'react-i18next';
 import StdTagList from '@common/base/StdTagList/StdTagList.tsx';
-import StdButton from '@common/base/stdButton/StdButton.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
+import { Button, Icon, Tag } from '@design-system-rte/react';
 
 type DetailsContentProps = {
   content: StudyDTO | ProjectInfo;
@@ -38,30 +36,28 @@ export const DetailsContent = ({ content, onClickButton }: DetailsContentProps) 
             <>
               <div>|</div>
               <div className="flex items-center gap-1">
-                <StdIcon name={StdIconId.TimeLine} color="secondary" />
+                <Icon name="timeline" />
                 {(content as StudyDTO)?.horizon}
               </div>
             </>
           )}
           <div>|</div>
           <div className="flex items-center gap-1">
-            <StdIcon name={StdIconId.History} color="secondary" />
+            <Icon name="history" />
             {formatDateToDDMMYYYY(content?.creationDate)}
           </div>
           <div>|</div>
           <div className="flex items-center gap-1">
-            <StdIcon name={StdIconId.Person} color="secondary" />
+            <Icon name="user" />
             {t('studyDetails.@bannerCreatedBy', { createdBy: content?.createdBy ?? '' })}
           </div>
           {(content as StudyDTO)?.keywords?.length > 0 && (
             <>
               <div>|</div>
               <div className="w-72 flex h-3">
-                <StdTagList
-                  id={`${content.id}-tag-list`}
-                  tags={(content as StudyDTO).keywords}
-                  maxVisibleTags={(content as StudyDTO).keywords.length}
-                />
+                {(content as StudyDTO).keywords.map((keyword) => (
+                  <Tag key={keyword} label={keyword} color="azur" />
+                ))}
               </div>
             </>
           )}
@@ -75,13 +71,7 @@ export const DetailsContent = ({ content, onClickButton }: DetailsContentProps) 
           )}
         </div>
         {(('status' in content && content?.status !== StudyStatus.GENERATED) || 'studies' in content) && (
-          <StdButton
-            icon={StdIconId.Edit}
-            label={t('project.@edit')}
-            onClick={onClickButton}
-            variant="text"
-            color="primary"
-          ></StdButton>
+          <Button icon="edit" label={t('project.@edit')} onClick={onClickButton} variant="secondary"></Button>
         )}
       </div>
     </header>

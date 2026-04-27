@@ -18,8 +18,8 @@ import { useStudyNavigation } from '@/hooks/useStudyNavigation';
 import { useTranslation } from 'react-i18next';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal';
 import StudyCreationModal from '@common/modal/StudyCreationModal';
-import StdButton from '@common/base/stdButton/StdButton';
 import StudyModificationModal from '@common/modal/StudyModificationModal.tsx';
+import { Button } from '@design-system-rte/react';
 
 interface StudyTableDisplayProps {
   searchStudy: string | undefined;
@@ -120,21 +120,21 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
         <div className="flex gap-2">
           {selectedRowId !== undefined ? (
             <>
-              <StdButton
+              <Button
                 label={t('study.@open')}
                 onClick={() => void navigateToStudy(rows[Number.parseInt(selectedRowId || '-1')])}
-                variant="outlined"
+                variant="secondary"
               />
-              <StdButton label={t('study.@duplicate')} onClick={handleDuplicate} variant="outlined" />
-              <StdButton
+              <Button label={t('study.@duplicate')} onClick={handleDuplicate} variant="secondary" />
+              <Button
                 label={t('study.@delete')}
-                onClick={handleDeleteClick}
-                variant="outlined"
+                onClick={() => void handleDeleteClick()}
+                variant="secondary"
                 disabled={!isDeleteActive}
               />
             </>
           ) : (
-            projectInfo?.id && <StdButton label={t('studyModal.@new_study')} onClick={toggleModal} />
+            projectInfo?.id && <Button label={t('studyModal.@new_study')} onClick={toggleModal} />
           )}
         </div>
         <StudiesPagination count={count} intervalSize={intervalSize} current={currentPage} onChange={setPage} />

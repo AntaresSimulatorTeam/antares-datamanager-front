@@ -9,7 +9,6 @@ import {
   handleTrajectorySearch,
   handleViewTrajectory,
 } from '@/shared/services/hypothesisTableService.ts';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import {
   DbTrajectory,
   FsTrajectory,
@@ -130,7 +129,7 @@ describe('handleTrajectoryError', () => {
     expect(result[0].status).toBe(TRAJECTORY_SELECTION_STATUS.ERROR);
 
     expect(notifyAlert).toHaveBeenCalledWith({
-      icon: StdIconId.Close,
+      icon: 'close',
       message: alert.message,
       content: alert.content,
       type: 'error',

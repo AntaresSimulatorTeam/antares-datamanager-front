@@ -1,10 +1,9 @@
 import { useStdId } from '@/hooks/common/useStdId';
 import { StdChangeHandler } from '@/shared/types/StdBase.type';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { useEffect, useRef } from 'react';
-import StdIcon from '../../base/stdIcon/StdIcon';
 import StdRequiredIndicator from '../stdRequiredIndicator/StdRequiredIndicator';
 import { checkboxClassBuilder } from './checkboxClassBuilder';
+import { Icon } from '@design-system-rte/react';
 
 export type StdCheckboxProps = {
   defaultChecked?: boolean;
@@ -70,10 +69,10 @@ const StdCheckbox = ({
       />
       <div className={inputClasses}>
         <div className="done-icon hidden">
-          <StdIcon name={StdIconId.Done} color="text-gray-w" width={14} height={14} />
+          <Icon name="check" color="#fff" size={14} />
         </div>
         <div className="indeterminate-icon hidden">
-          <StdIcon name={StdIconId.HorizontalRule} color="text-gray-w" width={14} height={14} />
+          <Icon name="check-indeterminate" color="#fff" size={14} />
         </div>
       </div>
       <span className={labelClasses}>

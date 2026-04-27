@@ -4,9 +4,8 @@ import { useTranslation } from 'react-i18next';
 import StdSimpleTable from '@common/data/stdSimpleTable/StdSimpleTable.tsx';
 import { TrajectoryViewData } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
-import StdButton from '@common/base/stdButton/StdButton';
+import { Button, Icon } from '@design-system-rte/react';
 
 interface TrajectoryDataVisualisationProps {
   trajectoryData: TrajectoryViewData;
@@ -25,11 +24,11 @@ export const TrajectoryDataVisualisation = ({ trajectoryData, onClose }: Traject
   const icon =
     trajectory.type === TRAJECTORY_TYPE.AREA || trajectory.type === TRAJECTORY_TYPE.LINK
       ? StdIconId.LinkedServices
-      : StdIconId.BatteryChargingFull;
+      : 'battery-charging-full';
 
   return (
     <RdsModal size="medium">
-      <RdsModal.Title onClose={onClose} customIcon={<StdIcon name={icon} color="primary" />}>
+      <RdsModal.Title onClose={onClose} customIcon={<Icon name={icon} color="primary" />}>
         {`${title}: ${trajectory.trajectoryName}`}
       </RdsModal.Title>
       <RdsModal.Content>
@@ -44,7 +43,7 @@ export const TrajectoryDataVisualisation = ({ trajectoryData, onClose }: Traject
         </div>
       </RdsModal.Content>
       <RdsModal.Footer>
-        <StdButton label={t('project.@close')} onClick={onClose} color="primary" />
+        <Button label={t('project.@close')} onClick={onClose} variant="primary" />
       </RdsModal.Footer>
     </RdsModal>
   );

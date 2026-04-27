@@ -1,4 +1,3 @@
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
 import { CardDataType, DataWarningMessage, WarningMessage, WarningTrajectoryType } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
@@ -81,10 +80,8 @@ export const convertDataToItem = <T>(data: T, t: (value: string) => string): Car
 
   return {
     code: '',
-    colorStatus: 'warning',
-    color: 'text-warning-500',
     colorBorder: 'hover:border-b-warning-500',
-    icon: StdIconId.Warning,
+    icon: 'warning',
     title: `${trajectoryName ?? ''} ${secondTrajectory ? '-' : ''} ${secondTrajectory ?? ''}`,
     buttonLabel: isAck ? t('studyDetails.@skipped') : t('studyDetails.@skip'),
     buttonTooltipText: t('studyDetails.@warningButtonTooltip'),

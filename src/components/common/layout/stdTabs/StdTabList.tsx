@@ -1,9 +1,8 @@
 import { useStdId } from '@/hooks/common/useStdId';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { UIEventHandler, useEffect, useRef, useState } from 'react';
-import StdButton from '@common/base/stdButton/StdButton';
 import { TabItemType } from './StdTabItem';
 import { tabListClassBuilder } from './tabClassBuilder';
+import { IconButton } from '@design-system-rte/react';
 
 export type StdTabListProps<TItem> = {
   tabType: TabItemType;
@@ -82,11 +81,11 @@ const StdTabList = <TItem,>({
     <div role="tablist" id={id} className="relative">
       <div className="flex">
         <div className={buttonClasses.left}>
-          <StdButton
-            icon={StdIconId.KeyboardArrowLeft}
+          <IconButton
+            name="arrow-chevron-left"
             color="secondary"
-            size="small"
-            variant={isPrimaryDisplay ? 'contained' : 'text'}
+            size="s"
+            variant={isPrimaryDisplay ? 'primary' : 'text'}
             onClick={onArrowLeftClick}
           />
         </div>
@@ -95,11 +94,10 @@ const StdTabList = <TItem,>({
           {lastItem && lastItem()}
         </div>
         <div className={buttonClasses.right}>
-          <StdButton
-            icon={StdIconId.KeyboardArrowRight}
-            color="secondary"
-            size="small"
-            variant={isPrimaryDisplay ? 'contained' : 'text'}
+          <IconButton
+            name="arrow-chevron-right"
+            size="s"
+            variant={isPrimaryDisplay ? 'primary' : 'text'}
             onClick={onArrowRightClick}
           />
         </div>

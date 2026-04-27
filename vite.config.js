@@ -5,7 +5,7 @@
  */
 /// <reference types="vitest/config" />
 import react from '@vitejs/plugin-react';
-import path from 'path';
+import path from 'node:path';
 import { defineConfig } from 'vite';
 import topLevelAwait from 'vite-plugin-top-level-await';
 var DEFAULT_PORT = 8080;
@@ -53,7 +53,7 @@ export default defineConfig({
                 'src/pages/**',
             ],
         },
-        server: { deps: { inline: ['rte-design-system'] } },
+        server: { deps: { inline: ['rte-design-system', '@design-system-rte/react'] } },
     },
     server: {
         port: DEFAULT_PORT,

@@ -12,14 +12,11 @@ import { LabelWithButtonPreview } from '@common/data/LabelWithButtonPreview.tsx'
 import { LabelWithDeleteButton } from '@common/data/LabelWithDeleteButton.tsx';
 import { SelectInputWithButton } from '@common/data/SelectInputWithButton.tsx';
 import { ProgressBar } from '@/components/forms/ProgressBar.tsx';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
-import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
-import { RdsTextTooltip } from 'rte-design-system-react';
 import { getAlignment, hasLabelDefault } from '@/shared/utils/hypothesisTableUtils.ts';
-import StdButton from '@common/base/stdButton/StdButton.tsx';
 import { getSubRowListWithArea, getSubRowsList, isEmptyRow } from '@/shared/utils/trajectoryUtils.ts';
-import StdIconButton from '@common/base/stdIconButton/StdIconButton.tsx';
 import { getInformationMessage } from '@/shared/helpers/hypothesisTableHelper.ts';
+import { Button, Icon, IconButton } from '@design-system-rte/react';
+import StdTextTooltip from '@common/layout/stdTextTooltip/StdTextTooltip.tsx';
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
 const getExpandableHypothesisTableHeaders = ({
@@ -47,13 +44,14 @@ const getExpandableHypothesisTableHeaders = ({
       return (
         <div className="flex gap-1 py-1">
           {row.getCanExpand() && (
-            <button onClick={row.getToggleExpandedHandler()} style={{ cursor: 'pointer' }}>
-              {row.getIsExpanded() ? (
-                <StdIcon name={StdIconId.KeyboardArrowDown} />
-              ) : (
-                <StdIcon name={StdIconId.KeyboardArrowRight} />
-              )}
-            </button>
+            <IconButton
+              appearance="outlined"
+              aria-label="icon button aria label"
+              name={row.getIsExpanded() ? 'arrow-chevron-down' : 'arrow-chevron-right'}
+              onClick={row.getToggleExpandedHandler()}
+              size="s"
+              variant="transparent"
+            />
           )}
           <LabelWithButtonPreview
             value={getValue() as string}
@@ -68,14 +66,20 @@ const getExpandableHypothesisTableHeaders = ({
             }
           />
           {row.getCanExpand() && subRowListWithArea && subRowListWithArea?.messageNb > 0 && (
-            <RdsTextTooltip text={subRowListWithArea?.message} offset={5} placement="right">
+            <StdTextTooltip text={subRowListWithArea?.message} placement="right" offset={5}>
               <div className="text-gray-600">{` | +${subRowListWithArea?.messageNb}`}</div>
-            </RdsTextTooltip>
+            </StdTextTooltip>
           )}
           {row.id === informationMessage?.id && informationMessage && (
-            <RdsTextTooltip text={t(`${informationMessage.messageKey}`)} offset={5} placement="right">
-              <StdIcon name={StdIconId.Info} color={row.getReadOnly() ? 'text-gray-600' : 'text-gray-900'} />
-            </RdsTextTooltip>
+            <StdTextTooltip text={t(`${informationMessage.messageKey}`)} placement="right" offset={5}>
+              <Icon
+                appearance="outlined"
+                aria-label="info"
+                color={row.getReadOnly() ? '#6f767b' : '#11161a'}
+                name="info"
+                size={16}
+              />
+            </StdTextTooltip>
           )}
         </div>
       );
@@ -134,14 +138,14 @@ const getExpandableHypothesisTableHeaders = ({
             const hasTrajectory =
               trajectory?.hasTimeSeries && trajectory?.trajectoryName && status === TRAJECTORY_SELECTION_STATUS.OK;
             return (
-              <StdButton
+              <Button
                 label={t('studyDetails.@preview')}
-                icon={StdIconId.Preview}
-                position="left"
-                disabled={(row.getReadOnly() && !hasTrajectory) || (!isStudyGenerated && !hasTrajectory)}
                 onClick={() => void options?.meta?.viewData?.(row.id)}
-                variant="outlined"
-                size="small"
+                variant="primary"
+                disabled={(row.getReadOnly() && !hasTrajectory) || (!isStudyGenerated && !hasTrajectory)}
+                icon="visibility-show"
+                iconAppearance="filled"
+                size="s"
               />
             );
           },
@@ -154,18 +158,18 @@ const getExpandableHypothesisTableHeaders = ({
     size: type === TRAJECTORY_TYPE.STS ? 200 : 233,
     cell: ({ row, table: { options } }) => {
       const { status, isDefault, hypothesis, isDeletable } = row.original;
-      if (
-        hypothesis === t('thermal.@specific') ||
-        ((type === TRAJECTORY_TYPE.STS || type === TRAJECTORY_TYPE.HYDRO_SERIES) && row.depth === 0 && isDefault)
-      )
-        return null;
-      if ((type === TRAJECTORY_TYPE.STS || type === TRAJECTORY_TYPE.HYDRO_SERIES) && row.depth === 0 && !isDefault) {
+      const hasNoInput = (type === TRAJECTORY_TYPE.STS || type === TRAJECTORY_TYPE.HYDRO_SERIES) && row.depth === 0;
+      if (hypothesis === t('thermal.@specific') || (hasNoInput && isDefault)) return null;
+      if (hasNoInput && !isDefault) {
         return (
           <div className={`${isDeletable ? 'pointer-events-auto visible' : 'pointer-events-none invisible'}`}>
-            <StdIconButton
-              icon={StdIconId.Delete}
-              size="small"
+            <IconButton
+              appearance="outlined"
+              aria-label="icon button aria label"
+              name="delete"
               onClick={() => void options?.meta?.removeRow?.(hypothesis, row.id)}
+              size="s"
+              variant="transparent"
             />
           </div>
         );
@@ -179,10 +183,13 @@ const getExpandableHypothesisTableHeaders = ({
           <CellWithStatus status={status} />
           {options?.meta?.removeRow && !isDefault && !isStudyGenerated && (
             <div className={`${isDeletable ? 'pointer-events-auto visible' : 'pointer-events-none invisible'}`}>
-              <StdIconButton
-                icon={StdIconId.Delete}
-                size="small"
+              <IconButton
+                appearance="outlined"
+                aria-label="icon button aria label"
+                name="delete"
                 onClick={() => void options?.meta?.removeRow?.(hypothesis, row.id)}
+                size="s"
+                variant="transparent"
               />
             </div>
           )}

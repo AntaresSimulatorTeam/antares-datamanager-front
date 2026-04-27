@@ -1,12 +1,12 @@
-import StdButton from '@/components/common/base/stdButton/StdButton';
 import { render, screen } from '@testing-library/react';
 import { ELEMENT_PREFIX_ID, TRIGGER_PREFIX_ID } from '../../stdFloatingWrapper/StdFloatingWrapper';
 import StdPopover from '../StdPopover';
+import { Button } from '@design-system-rte/react';
 
 const TEST_ID = 'some-id';
-const TEST_TRIGGER = <StdButton label="trigger" />;
+const TEST_TRIGGER = <Button label="trigger" />;
 const TEST_CONTENT = <div>content</div>;
-const TEST_FOOTER = <StdButton label="button" />;
+const TEST_FOOTER = <Button label="button" />;
 
 const triggerId = `#${TRIGGER_PREFIX_ID}-${TEST_ID}`;
 const contentId = `#${ELEMENT_PREFIX_ID}-${TEST_ID}`;

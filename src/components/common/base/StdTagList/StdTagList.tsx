@@ -1,22 +1,18 @@
 import { useCountMaxTagsToFitInContainer } from '@/components/common/base/StdTagList/tagListUtils';
 import { useStdId } from '@/hooks/useStdId';
 import { stopPropagationAndPreventDefault } from '@/shared/utils/event/stopPropagation';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
 import clsx from 'clsx';
 import { memo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import StdPopover from '../../layout/stdPopover/StdPopover';
 import StdTextTooltip from '../../layout/stdTextTooltip/StdTextTooltip';
-import StdButton from '../stdButton/StdButton';
-import StdIcon from '../stdIcon/StdIcon';
-import StdTag from '../stdTag/StdTag';
 import { tagListClassBuilder } from './tagListClassBuilder';
+import { Button, Icon, Tag } from '@design-system-rte/react';
 
 type StdTagListProps = {
   tags: string[];
-  icon?: StdIconId;
+  icon?: string;
   tooltipText?: string;
-  onDelete?: (tag: string) => void;
   id?: string;
   autoExpands?: boolean;
   singleLine?: boolean;
@@ -34,7 +30,6 @@ const StdTagList = ({
   icon,
   tooltipText,
   id: propsId,
-  onDelete,
   autoExpands = false,
   singleLine = false,
   maxVisibleTags,
@@ -65,7 +60,7 @@ const StdTagList = ({
     <div id={id} className={clsx(TAG_LIST_CLASSES, { 'items-center': singleLine })}>
       {icon && (
         <StdTextTooltip text={tooltipText ?? t('components.tags.@tags')}>
-          <StdIcon name={icon} width={ICON_SIZE} height={ICON_SIZE} color="text-gray-700" />
+          <Icon name={icon} size={ICON_SIZE} color="#3b434a" />
         </StdTextTooltip>
       )}
       <div className={tagListClasses} ref={containerRef} role="list">
@@ -77,7 +72,7 @@ const StdTagList = ({
             className={idx >= (tagsNumber ?? 0) ? 'hidden' : ''}
             key={tag.toLowerCase()}
           >
-            <StdTag label={tags[idx]} onDelete={onDelete ? () => onDelete(tag) : undefined} />
+            <Tag label={tags[idx]} />
           </span>
         ))}
         {plusTagsVisible && (
@@ -95,10 +90,10 @@ const StdTagList = ({
               id={`${id}-popover`}
             >
               <StdPopover.Trigger>
-                <StdButton
+                <Button
                   color="primary"
-                  variant="outlined"
-                  size="extraSmall"
+                  variant="primary"
+                  size="s"
                   label={`+ ${isReady ? tags.length - (tagsNumber ?? 0) : '00'}`}
                   id={`${id}-popover-trigger`}
                 />
@@ -106,15 +101,15 @@ const StdTagList = ({
               <StdPopover.Content>
                 <div className="flex max-w-32 flex-wrap gap-x-0.5 gap-y-1">
                   {tags.slice(tagsNumber).map((tag) => (
-                    <StdTag label={tag} key={tag.toLowerCase()} />
+                    <Tag label={tag} key={tag.toLowerCase()} />
                   ))}
                 </div>
               </StdPopover.Content>
               <StdPopover.Footer>
-                <StdButton
+                <Button
                   label={t('components.popover.@close')}
-                  size="extraSmall"
-                  variant="outlined"
+                  size="s"
+                  variant="primary"
                   onClick={() => setShowPopover(false)}
                   id={`${id}-popover-close`}
                 />

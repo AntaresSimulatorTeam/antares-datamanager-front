@@ -1,16 +1,14 @@
 import { useRdsId } from 'rte-design-system-react';
 import { DisplayStatus } from '@/shared/types';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps';
-import StdIcon from '@common/base/stdIcon/StdIcon';
-import StdButton from '@common/base/stdButton/StdButton';
 import { alertClassBuilder } from './alertClassBuilder';
 import { useState } from 'react';
+import { Button, Icon, IconButton } from '@design-system-rte/react';
 
 const DEFAULT_ICON = {
-  success: StdIconId.Done,
-  error: StdIconId.Report,
-  warning: StdIconId.Warning,
-  info: StdIconId.Info,
+  success: 'check',
+  error: 'dangerous',
+  warning: 'warning',
+  info: 'error',
 };
 
 export interface AlertAction {
@@ -23,7 +21,7 @@ export interface StdAlertProps {
   content?: string;
   id?: string;
   status?: DisplayStatus;
-  icon?: StdIconId;
+  icon?: string;
   onClose?: () => void;
   action?: AlertAction;
   filledIcon?: boolean;
@@ -53,7 +51,7 @@ const StdAlert = ({
     >
       <div className={`flex ${expanded ? 'items-start' : 'items-center'} justify-start gap-2`}>
         <div className={iconClasses}>
-          <StdIcon name={icon ?? DEFAULT_ICON[status]} width={ICON_SIZE} height={ICON_SIZE} />
+          <Icon name={icon ?? DEFAULT_ICON[status]} size={ICON_SIZE} />
         </div>
         <div className="flex flex-col items-start gap-1 text-left">
           <span className={`${textClasses} ${expanded ? 'line-clamp-none' : 'line-clamp-1'}`}>{message}</span>
@@ -63,33 +61,23 @@ const StdAlert = ({
         </div>
       </div>
       <div className="flex min-w-fit items-center gap-1">
-        <StdButton
-          variant="transparent"
-          color="secondary"
+        <IconButton
+          variant="text"
           onClick={() => setExpanded((prev) => !prev)}
-          icon={expanded ? StdIconId.KeyboardArrowUp : StdIconId.KeyboardArrowDown}
-          size="small"
+          name={expanded ? 'arrow-chevron-up' : 'arrow-chevron-down'}
+          size="s"
         />
         {action && (
-          <StdButton
-            variant="outlined"
+          <Button
+            variant="text"
             onClick={action.onClick}
-            size="small"
+            size="s"
             color={status === 'error' ? 'danger' : 'secondary'}
             label={action.label}
             aria-label={action.label}
           />
         )}
-        {onClose && (
-          <StdButton
-            variant="transparent"
-            onClick={onClose}
-            size="small"
-            color="secondary"
-            icon={StdIconId.Close}
-            aria-label="Close"
-          />
-        )}
+        {onClose && <IconButton variant="text" onClick={onClose} size="s" name="close" aria-label="Close" />}
       </div>
     </div>
   );

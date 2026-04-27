@@ -7,10 +7,9 @@
 import { Flip, ToastContainer, ToastContainerProps, useToast, useToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './containers.css';
-import StdIcon from '@common/base/stdIcon/StdIcon.tsx';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { ToastProps } from 'node_modules/react-toastify/dist/types';
 import { ReactNode } from 'react';
+import { Icon } from '@design-system-rte/react';
 
 export type NotificationContainerProps = ToastContainerProps;
 
@@ -42,7 +41,7 @@ export const PegaseAlertContainer = () => (
     hideProgressBar
     newestOnTop={true}
     closeOnClick={false}
-    icon={() => <StdIcon name={StdIconId.Close} />}
+    icon={() => <Icon name="close" />}
   />
 );
 

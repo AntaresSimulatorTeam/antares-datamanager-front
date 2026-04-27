@@ -1,10 +1,10 @@
-import StdButton from '@/components/common/base/stdButton/StdButton';
 import { render, renderHook, screen } from '@testing-library/react';
 import { useState } from 'react';
 import StdFloatingWrapper from '../StdFloatingWrapper';
+import { Button } from '@design-system-rte/react';
 
 const TEST_FLOATING_WRAPPER_ID = 'floating-wrapper-id';
-const TEST_TRIGGER_COMPONENT = <StdButton />;
+const TEST_TRIGGER_COMPONENT = <Button label={''} />;
 const TEST_FLOATING_COMPONENT = <div role="region" />;
 
 describe('StdFloatingWrapper', () => {

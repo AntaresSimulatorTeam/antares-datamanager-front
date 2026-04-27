@@ -1,6 +1,4 @@
 import { WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
-import { ButtonColor } from '@/components/button/ButtonWithStdIcon.tsx';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { WithNullableFields } from '@/shared/types/Generic.type.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 
@@ -23,17 +21,14 @@ export interface DataWarningMessage extends WarningMessage {
   onClickItem: ((id: number) => Promise<void>) | null;
 }
 
-export interface CardDataType
-  extends WithNullableFields<
-    Omit<WarningMessage, 'level' | 'trajectoryId' | 'trajectoryName' | 'secondTrajectory'>,
-    'id' | 'content' | 'generatedBy' | 'generatedAt'
-  > {
+export interface CardDataType extends WithNullableFields<
+  Omit<WarningMessage, 'level' | 'trajectoryId' | 'trajectoryName' | 'secondTrajectory'>,
+  'id' | 'content' | 'generatedBy' | 'generatedAt'
+> {
   trajectoryId: number | null;
   trajectoryType: TRAJECTORY_TYPE | null;
-  colorStatus: ButtonColor;
-  color: string;
   colorBorder: string;
-  icon: StdIconId;
+  icon: string;
   title: string;
   onClickItem: ((id: number) => Promise<void>) | null;
   buttonLabel: string;

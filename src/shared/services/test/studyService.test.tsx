@@ -18,7 +18,6 @@ import {
   updateStudy,
 } from '@/shared/services/studyService.ts';
 import { notifyAlert, notifyToast } from '@/shared/notification/notification.tsx';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { mockStudy, mockStudyResponse } from '@/mocks/data/tests/study.mock.ts';
 import { mockDbTrajectoryArray } from '@/mocks/data/tests/trajectory.mock.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
@@ -218,7 +217,7 @@ describe('createStudy', () => {
     await expect(async () => generateStudy(1)).rejects.toThrowError('Failed to generate a study');
 
     expect(notifyAlert).toHaveBeenCalledWith({
-      icon: StdIconId.Close,
+      icon: 'close',
       message: 'Failed to generate a study',
       type: 'error',
       filledIcon: true,

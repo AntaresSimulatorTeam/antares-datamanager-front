@@ -1,7 +1,7 @@
 import SelectAndSearchableInput from '@/components/input/SelectAndSearchableInput.tsx';
 import { useTranslation } from 'react-i18next';
 import { SelectOption } from '@/shared/types';
-import StdButton from '@common/base/stdButton/StdButton';
+import { Button } from '@design-system-rte/react';
 
 interface SelectInputWithButtonProps {
   onSelect: (value: SelectOption) => void;
@@ -30,10 +30,10 @@ export const SelectInputWithButton = ({
         isInputDisabled={isDisabled}
       />
       <span>{t('studyDetails.@or')}</span>
-      <StdButton
+      <Button
         label={t('studyDetails.@import_file')}
-        variant="outlined"
         onClick={() => void onClickButton?.()}
+        variant="secondary"
         disabled={isDisabled}
       />
     </div>
