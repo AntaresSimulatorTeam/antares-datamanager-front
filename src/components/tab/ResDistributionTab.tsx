@@ -63,7 +63,10 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData }: TabProps) => {
     const technologyResData = hypothesisTrajectories?.[TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION];
     technologyResData && setTechnologyData(technologyResData);
     const resTechnologies = technologyList?.[TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION];
-    resTechnologies && setTechnologies(resTechnologies);
+    if (resTechnologies?.length) {
+      const labels = resTechnologies.map((technology) => technology.label);
+      setTechnologies(labels);
+    }
     const resReadOnly = readOnlyRow?.[TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION];
     resReadOnly && setReadOnly(resReadOnly);
   }, [hypothesisTrajectories, technologyList, readOnlyRow, studyState.studyStatus]);

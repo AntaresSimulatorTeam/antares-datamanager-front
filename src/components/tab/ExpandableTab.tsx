@@ -47,6 +47,7 @@ const ExpandableTab = ({ defaultAreas, areas, studyData, type }: TabProps & { ty
   const [rowIdSelected, setRowIdSelected] = useState<string>('0');
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
   const [technologies, setTechnologies] = useState<TechnologyType[]>([]);
+  const [technologiesLabel, setTechnologiesLabel] = useState<string[]>([]);
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
   const [trajectoryData, setTrajectoryData] = useState<TrajectoryViewData | undefined>();
@@ -106,6 +107,11 @@ const ExpandableTab = ({ defaultAreas, areas, studyData, type }: TabProps & { ty
         setter(value);
       }
     });
+
+    if (technologyList?.[type]) {
+      const labels = technologyList?.[type].map((technology) => technology.label);
+      setTechnologiesLabel(labels);
+    }
   }, [
     areasTrajectoryOptions,
     dropDownListOptions,
@@ -120,16 +126,7 @@ const ExpandableTab = ({ defaultAreas, areas, studyData, type }: TabProps & { ty
     async (value: string, isChecked?: boolean) => {
       const indexRow = data.findIndex((row) => row.hypothesis === value);
       if (isChecked) {
-        addRow(
-          type,
-          value,
-          dispatch,
-          setCheckedValues,
-          setData,
-          technologies.map((technology) => technology.label),
-          [],
-          setReadOnly,
-        );
+        addRow(type, value, dispatch, setCheckedValues, setData, technologiesLabel, [], setReadOnly);
       } else if (shouldOpenDeletionModal(type, indexRow, data)) {
         setRowToDelete({ index: indexRow, value });
         setIsDeletionModalOpen(true);
@@ -137,7 +134,7 @@ const ExpandableTab = ({ defaultAreas, areas, studyData, type }: TabProps & { ty
         await removeRow(type, indexRow, data, value);
       }
     },
-    [data, dispatch, technologies, removeRow, type],
+    [data, type, dispatch, technologiesLabel, removeRow],
   );
 
   const removeTableRow = useCallback(
@@ -210,7 +207,7 @@ const ExpandableTab = ({ defaultAreas, areas, studyData, type }: TabProps & { ty
         progress={progress}
         idSelected={rowIdSelected}
         type={type}
-        list={technologies.map((technology) => technology.label)}
+        list={technologiesLabel}
         handleSearch={handleSearch}
         handleImport={async (rowId: string) => await handleFetchFromFS(type, data, rowId)}
         isReadOnlyEnable={true}

@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { MouseEvent, useRef, useState } from 'react';
+import { MouseEvent, useCallback, useRef, useState } from 'react';
 import { SelectOption } from '@/shared/types';
 import StdInputText from '@/components/forms/stdInputText/StdInputText.tsx';
 import { IconButton } from '@design-system-rte/react';
@@ -43,53 +43,62 @@ const SelectAndSearchableInput = ({
   const dropdownList = useRef<HTMLDivElement | null>(null);
   const selectInputClass = isInputDisabled ? `bg-gray-200 border-opacity-0 cursor-not-allowed pointer-events-none` : '';
 
-  const handleInputChange = async (value: string) => {
-    try {
-      if (value) {
-        setValueInput(value);
-        setIsDropdownOpen(false);
-        setIsSelectEnable(false);
-        const results = await setSearchTerm?.(value);
-        setIsDropdownOpen(true);
+  const handleInputChange = useCallback(
+    async (value: string) => {
+      try {
+        if (value) {
+          setValueInput(value);
+          setIsDropdownOpen(false);
+          setIsSelectEnable(false);
+          const results = await setSearchTerm?.(value);
+          setIsDropdownOpen(true);
+          if (results && results.length > 0) {
+            setOptionsSelection(results);
+          } else {
+            setOptionsSelection([]);
+          }
+        } else {
+          resetField?.();
+          setValueInput('');
+          setIsSelectEnable(true);
+          setIsDropdownOpen(false);
+          setOptionsSelection(defaultOptions);
+        }
+      } catch {
+        // silent handler
+      }
+    },
+    [defaultOptions, resetField, setSearchTerm],
+  );
+
+  const handleSelectOption = useCallback(
+    (value: SelectOption) => {
+      setValueInput(value?.label);
+      onSelect(value);
+      setIsDropdownOpen(false);
+    },
+    [onSelect],
+  );
+
+  const handleClickOnKeyboard = useCallback(
+    async (event: MouseEvent<HTMLButtonElement>) => {
+      try {
+        const results = await setSearchTerm?.();
         if (results && results.length > 0) {
           setOptionsSelection(results);
         } else {
           setOptionsSelection([]);
         }
-      } else {
-        resetField?.();
-        setValueInput('');
-        setIsSelectEnable(true);
-        setIsDropdownOpen(false);
-        setOptionsSelection(defaultOptions);
+      } finally {
+        setIsDropdownOpen((prev) => !prev);
+        setTimeout(() => {
+          dropdownList.current?.focus();
+        }, 0);
+        event.stopPropagation();
       }
-    } catch {
-      // silent handler
-    }
-  };
-
-  const handleSelectOption = (value: SelectOption) => {
-    setValueInput(value?.label);
-    onSelect(value);
-    setIsDropdownOpen(false);
-  };
-
-  const handleClickOnKeyboard = async (event: MouseEvent<HTMLButtonElement>) => {
-    try {
-      const results = await setSearchTerm?.();
-      if (results && results.length > 0) {
-        setOptionsSelection(results);
-      } else {
-        setOptionsSelection([]);
-      }
-    } finally {
-      setIsDropdownOpen((prev) => !prev);
-      setTimeout(() => {
-        dropdownList.current?.focus();
-      }, 0);
-      event.stopPropagation();
-    }
-  };
+    },
+    [setSearchTerm],
+  );
 
   return (
     <div className={`relative ${selectInputClass}`}>
