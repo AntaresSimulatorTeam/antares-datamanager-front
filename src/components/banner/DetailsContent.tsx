@@ -9,7 +9,7 @@ import { ProjectInfo, StudyDTO } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 import StdTagList from '@common/base/StdTagList/StdTagList.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
-import { Button, Icon, Tag } from '@design-system-rte/react';
+import { Button, Icon } from '@design-system-rte/react';
 
 type DetailsContentProps = {
   content: StudyDTO | ProjectInfo;
@@ -52,22 +52,16 @@ export const DetailsContent = ({ content, onClickButton }: DetailsContentProps) 
             {t('studyDetails.@bannerCreatedBy', { createdBy: content?.createdBy ?? '' })}
           </div>
           {(content as StudyDTO)?.keywords?.length > 0 && (
-            <>
+            <div className="flex items-center gap-1">
               <div>|</div>
-              <div className="w-72 flex h-3">
-                {(content as StudyDTO).keywords.map((keyword) => (
-                  <Tag key={keyword} label={keyword} color="azur" />
-                ))}
-              </div>
-            </>
+              <StdTagList maxVisibleTags={2} id={`${content.id}-tag-list`} tags={(content as StudyDTO).keywords} />
+            </div>
           )}
           {(content as ProjectInfo)?.tags?.length > 0 && (
-            <>
+            <div className="flex items-center gap-1">
               <div>|</div>
-              <div className="flex h-3 w-32">
-                <StdTagList id={`${content.id}-tag-list`} tags={(content as ProjectInfo).tags} />
-              </div>
-            </>
+              <StdTagList maxVisibleTags={2} tags={(content as ProjectInfo).tags} />
+            </div>
           )}
         </div>
         {(('status' in content && content?.status !== StudyStatus.GENERATED) || 'studies' in content) && (

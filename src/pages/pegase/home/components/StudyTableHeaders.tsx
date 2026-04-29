@@ -11,7 +11,8 @@ import { createColumnHelper } from '@tanstack/react-table';
 import StdRadioButton from '@/components/forms/stdRadioButton/StdRadioButton.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { avatarCase, sentenceCase } from '@/shared/utils/textUtils.ts';
-import { Tag } from '@design-system-rte/react';
+import { Icon } from '@design-system-rte/react';
+import StdTagList from '@common/base/StdTagList/StdTagList.tsx';
 
 const columnHelper = createColumnHelper<StudyDTO>();
 
@@ -73,9 +74,9 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
   columnHelper.accessor('keywords', {
     header: t('home.@keywords'),
     size: 350,
-    cell: ({ getValue, row }) => {
+    cell: ({ getValue }) => {
       const tagList = getValue();
-      return tagList.map((tag) => <Tag key={`pegase-tags-${row.id}`} color="azur" label={tag} />);
+      return <StdTagList maxVisibleTags={2} tags={tagList} />;
     },
   }),
 
@@ -88,14 +89,25 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
       switch (status) {
         case StudyStatus.GENERATED:
           return (
-            <Tag iconName="publish" label={sentenceCase(status)} status="success" tagType="status" compactSpacing />
+            <div className="flex gap-2">
+              <Icon name="download-done" color="#0e6d40" />
+              <span> {sentenceCase(status)} </span>
+            </div>
           );
         case StudyStatus.ERROR:
-          return <Tag iconName="error" label={sentenceCase(status)} status="alert" tagType="status" compactSpacing />;
+          return (
+            <div className="flex gap-2">
+              <Icon name="information" color="#bd0536" />
+              <span> {sentenceCase(status)} </span>
+            </div>
+          );
         case StudyStatus.IN_PROGRESS:
         default:
           return (
-            <Tag iconName="publish" label={sentenceCase(status)} status="information" tagType="status" compactSpacing />
+            <div className="flex gap-2">
+              <Icon name="trending-up" color="#123fbb" />
+              <span> {sentenceCase(status)} </span>
+            </div>
           );
       }
     },

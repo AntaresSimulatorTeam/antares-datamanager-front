@@ -27,7 +27,6 @@ export const CardWithIconTitle = ({ data, size, transform }: CardWithIconTitlePr
               icon="arrow-chevron-right"
               iconAppearance="filled"
               size="s"
-              color={data.isAck ? '#3b434a' : '#bc3115'}
             />
           }
         </StdTextTooltip>
