@@ -17,7 +17,7 @@ export const VARIANT_CLASSES = {
 export const VARIANT_DISABLED_CLASSES =
   'border-l-gray-400 [&]:bg-gray-300 hover:bg-gray-100 [&]:text-gray-500 [&]:cursor-not-allowed';
 
-export const BUTTON_CLASSES = 'flex w-2.5 [&>button]:p-0';
+export const BUTTON_CLASSES = 'flex items-center [&>button]:p-0';
 export const HIDE_BUTTON_CLASSES = 'invisible';
 
 export const ERROR_CLASSES = {

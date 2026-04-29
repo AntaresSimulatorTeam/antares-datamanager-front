@@ -102,7 +102,7 @@ const SelectAndSearchableInput = ({
 
   return (
     <div className={`relative ${selectInputClass}`}>
-      <div className="absolute right-0 top-1">
+      <div className="absolute right-0 top-0.5">
         {isSelectEnable && (
           <IconButton
             name={isDropdownOpen ? 'arrow-chevron-down' : 'arrow-chevron-right'}
