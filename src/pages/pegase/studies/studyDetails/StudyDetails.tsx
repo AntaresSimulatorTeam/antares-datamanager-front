@@ -96,7 +96,7 @@ const StudyDetails = () => {
       </div>
       <RdsDivider />
       <div className="flex flex-1 flex-col gap-2 overflow-hidden px-3 pb-3">
-        <DetailsContent content={studyData} onClickButton={toggleModal} />
+        <DetailsContent content={studyData} onClickButton={toggleModal} tagsList={studyData?.keywords} />
 
         <div className="flex flex-1 flex-col overflow-hidden">
           <StudyNavigationMenu

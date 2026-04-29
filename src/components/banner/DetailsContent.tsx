@@ -13,17 +13,12 @@ import { Button, Icon } from '@design-system-rte/react';
 
 type DetailsContentProps = {
   content: StudyDTO | ProjectInfo;
+  tagsList?: string[];
   onClickButton?: () => void;
 };
 
-export const DetailsContent = ({ content, onClickButton }: DetailsContentProps) => {
+export const DetailsContent = ({ content, onClickButton, tagsList }: DetailsContentProps) => {
   const { t } = useTranslation();
-  const getTagList = (tags: string[]) => (
-    <div className="min-w-72 flex items-center gap-1">
-      <div>|</div>
-      <StdTagList maxVisibleTags={12} tags={tags} />
-    </div>
-  );
 
   return (
     <header className="group flex flex-col gap-1 rounded border border-gray-500 bg-gray-100 p-2">
@@ -57,8 +52,11 @@ export const DetailsContent = ({ content, onClickButton }: DetailsContentProps) 
             <Icon name="user" />
             {t('studyDetails.@bannerCreatedBy', { createdBy: content?.createdBy ?? '' })}
           </div>
-          {(content as StudyDTO)?.keywords?.length > 0 && getTagList((content as StudyDTO)?.keywords)}
-          {(content as ProjectInfo)?.tags?.length > 0 && getTagList((content as ProjectInfo)?.tags)}
+          {tagsList?.length && (
+            <div className="flex min-w-32 items-center gap-1">
+              <div>|</div> <StdTagList maxVisibleTags={2} tags={tagsList} />
+            </div>
+          )}
         </div>
         {(('status' in content && content?.status !== StudyStatus.GENERATED) || 'studies' in content) && (
           <Button icon="edit" label={t('project.@edit')} onClick={onClickButton} variant="secondary"></Button>
