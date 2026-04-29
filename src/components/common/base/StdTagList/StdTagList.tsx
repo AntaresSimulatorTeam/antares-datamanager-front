@@ -7,7 +7,8 @@ import { useTranslation } from 'react-i18next';
 import StdPopover from '../../layout/stdPopover/StdPopover';
 import StdTextTooltip from '../../layout/stdTextTooltip/StdTextTooltip';
 import { tagListClassBuilder } from './tagListClassBuilder';
-import { Button, Icon, Tag } from '@design-system-rte/react';
+import { Button, Icon } from '@design-system-rte/react';
+import StdTag from '@common/base/stdTag/StdTag.tsx';
 
 type StdTagListProps = {
   tags: string[];
@@ -72,7 +73,7 @@ const StdTagList = ({
             className={idx >= (tagsNumber ?? 0) ? 'hidden' : ''}
             key={tag.toLowerCase()}
           >
-            <Tag label={tags[idx]} />
+            <StdTag label={tags[idx]} />
           </span>
         ))}
         {plusTagsVisible && (
@@ -101,7 +102,7 @@ const StdTagList = ({
               <StdPopover.Content>
                 <div className="flex max-w-32 flex-wrap gap-x-0.5 gap-y-1">
                   {tags.slice(tagsNumber).map((tag) => (
-                    <Tag label={tag} key={tag.toLowerCase()} />
+                    <StdTag label={tag} key={tag.toLowerCase()} />
                   ))}
                 </div>
               </StdPopover.Content>
