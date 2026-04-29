@@ -13,10 +13,11 @@ import { Button, Icon } from '@design-system-rte/react';
 
 type DetailsContentProps = {
   content: StudyDTO | ProjectInfo;
+  tagsList?: string[];
   onClickButton?: () => void;
 };
 
-export const DetailsContent = ({ content, onClickButton }: DetailsContentProps) => {
+export const DetailsContent = ({ content, onClickButton, tagsList }: DetailsContentProps) => {
   const { t } = useTranslation();
 
   return (
@@ -51,16 +52,9 @@ export const DetailsContent = ({ content, onClickButton }: DetailsContentProps) 
             <Icon name="user" />
             {t('studyDetails.@bannerCreatedBy', { createdBy: content?.createdBy ?? '' })}
           </div>
-          {(content as StudyDTO)?.keywords?.length > 0 && (
-            <div className="min-w-72 flex items-center gap-1">
-              <div>|</div>
-              <StdTagList maxVisibleTags={12} tags={(content as StudyDTO).keywords} />
-            </div>
-          )}
-          {(content as ProjectInfo)?.tags?.length > 0 && (
-            <div className="min-w-72 flex items-center gap-1">
-              <div>|</div>
-              <StdTagList maxVisibleTags={12} tags={(content as ProjectInfo).tags} />
+          {tagsList?.length && (
+            <div className="flex min-w-32 items-center gap-1">
+              <div>|</div> <StdTagList maxVisibleTags={2} tags={tagsList} />
             </div>
           )}
         </div>

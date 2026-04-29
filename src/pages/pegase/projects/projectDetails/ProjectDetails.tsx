@@ -69,7 +69,7 @@ const ProjectDetails = () => {
       </div>
       <RdsDivider />
       <div className="flex flex-col gap-4 px-3 pb-3">
-        <DetailsContent content={projectDetails} onClickButton={toggleModal} />
+        <DetailsContent content={projectDetails} onClickButton={toggleModal} tagsList={projectDetails.tags} />
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-4">
             <SearchBar
