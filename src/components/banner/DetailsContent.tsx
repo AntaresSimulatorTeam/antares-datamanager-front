@@ -18,6 +18,12 @@ type DetailsContentProps = {
 
 export const DetailsContent = ({ content, onClickButton }: DetailsContentProps) => {
   const { t } = useTranslation();
+  const getTagList = (tags: string[]) => (
+    <div className="min-w-72 flex items-center gap-1">
+      <div>|</div>
+      <StdTagList maxVisibleTags={12} tags={tags} />
+    </div>
+  );
 
   return (
     <header className="group flex flex-col gap-1 rounded border border-gray-500 bg-gray-100 p-2">
@@ -51,18 +57,8 @@ export const DetailsContent = ({ content, onClickButton }: DetailsContentProps) 
             <Icon name="user" />
             {t('studyDetails.@bannerCreatedBy', { createdBy: content?.createdBy ?? '' })}
           </div>
-          {(content as StudyDTO)?.keywords?.length > 0 && (
-            <div className="min-w-72 flex items-center gap-1">
-              <div>|</div>
-              <StdTagList maxVisibleTags={12} tags={(content as StudyDTO).keywords} />
-            </div>
-          )}
-          {(content as ProjectInfo)?.tags?.length > 0 && (
-            <div className="min-w-72 flex items-center gap-1">
-              <div>|</div>
-              <StdTagList maxVisibleTags={12} tags={(content as ProjectInfo).tags} />
-            </div>
-          )}
+          {(content as StudyDTO)?.keywords?.length > 0 && getTagList((content as StudyDTO)?.keywords)}
+          {(content as ProjectInfo)?.tags?.length > 0 && getTagList((content as ProjectInfo)?.tags)}
         </div>
         {(('status' in content && content?.status !== StudyStatus.GENERATED) || 'studies' in content) && (
           <Button icon="edit" label={t('project.@edit')} onClick={onClickButton} variant="secondary"></Button>

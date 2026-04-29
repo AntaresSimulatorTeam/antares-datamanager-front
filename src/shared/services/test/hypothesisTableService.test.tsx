@@ -538,7 +538,7 @@ describe('addRow', () => {
     const newRow = updater([]);
     expect(newRow[0].subRows).toHaveLength(ThermalOptions.length);
     expect(newRow[0].subRows?.[0]).toMatchObject({
-      hypothesis: ThermalOptions[0],
+      hypothesis: ThermalOptions[0].name,
       trajectory: null,
       status: TRAJECTORY_SELECTION_STATUS.MISSING,
       isDefault: false,
@@ -660,7 +660,7 @@ describe('addRow', () => {
     const newRow = updater([]);
     expect(newRow[0]?.subRows).toHaveLength(STSTechnology.length);
     expect(newRow[0].subRows?.[0]).toMatchObject({
-      hypothesis: STSTechnology[0],
+      hypothesis: STSTechnology[0].label,
       trajectory: null,
       status: TRAJECTORY_SELECTION_STATUS.MISSING,
       isDefault: false,
