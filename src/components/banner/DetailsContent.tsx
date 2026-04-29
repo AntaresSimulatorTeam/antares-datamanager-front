@@ -52,15 +52,15 @@ export const DetailsContent = ({ content, onClickButton }: DetailsContentProps) 
             {t('studyDetails.@bannerCreatedBy', { createdBy: content?.createdBy ?? '' })}
           </div>
           {(content as StudyDTO)?.keywords?.length > 0 && (
-            <div className="flex items-center gap-1">
+            <div className="min-w-72 flex items-center gap-1">
               <div>|</div>
-              <StdTagList maxVisibleTags={2} id={`${content.id}-tag-list`} tags={(content as StudyDTO).keywords} />
+              <StdTagList maxVisibleTags={12} tags={(content as StudyDTO).keywords} />
             </div>
           )}
           {(content as ProjectInfo)?.tags?.length > 0 && (
-            <div className="flex items-center gap-1">
+            <div className="min-w-72 flex items-center gap-1">
               <div>|</div>
-              <StdTagList maxVisibleTags={2} tags={(content as ProjectInfo).tags} />
+              <StdTagList maxVisibleTags={12} tags={(content as ProjectInfo).tags} />
             </div>
           )}
         </div>
