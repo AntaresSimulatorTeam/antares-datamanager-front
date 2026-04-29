@@ -46,7 +46,7 @@ const PinnedProjectCards = () => {
             ]}
             id={project.id}
             onClick={() => void navigateToProject(project.id)}
-            icons={<Icon name="keep" color="text-primary-600" />}
+            icons={<Icon name="keep" appearance="filled" color="#1b8065" />}
           >
             <PegaseCardContent project={project} />
           </PegaseCard>
