@@ -68,7 +68,7 @@ describe('useTrajectoryImport', () => {
     const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch, mockSetReadOnly));
 
     await act(async () => {
-      await result.current.importTrajectory(TRAJECTORY_TYPE.AREA, value, [0, 0], data, mockSetData);
+      await result.current.importTrajectory(TRAJECTORY_TYPE.AREA, value, '0.0', data, mockSetData);
     });
 
     expect(uploadTrajectory).toHaveBeenCalledWith(
@@ -93,7 +93,7 @@ describe('useTrajectoryImport', () => {
     const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch, mockSetReadOnly));
 
     await act(async () => {
-      await result.current.importTrajectory(TRAJECTORY_TYPE.LINK, value, [0, 0], data, mockSetData);
+      await result.current.importTrajectory(TRAJECTORY_TYPE.LINK, value, '0.0', data, mockSetData);
     });
 
     expect(uploadTrajectory).toHaveBeenCalledWith(
@@ -117,7 +117,7 @@ describe('useTrajectoryImport', () => {
     const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch));
 
     await act(async () => {
-      await result.current.importTrajectory(TRAJECTORY_TYPE.LOAD, value, [0, 0], data, mockSetData);
+      await result.current.importTrajectory(TRAJECTORY_TYPE.LOAD, value, '0.0', data, mockSetData);
     });
 
     expect(uploadTrajectory).toHaveBeenCalledWith(
@@ -142,7 +142,7 @@ describe('useTrajectoryImport', () => {
     const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch));
 
     await act(async () => {
-      await result.current.importTrajectory(TRAJECTORY_TYPE.STS, value, [0, 0], data, mockSetData, [
+      await result.current.importTrajectory(TRAJECTORY_TYPE.STS, value, '0.0', data, mockSetData, [
         { id: 1, label: 'Solar', code: 'solar' },
       ]);
     });
@@ -169,7 +169,7 @@ describe('useTrajectoryImport', () => {
     const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch));
 
     await act(async () => {
-      await result.current.importTrajectory(TRAJECTORY_TYPE.STS, value, [0, 0], data, mockSetData);
+      await result.current.importTrajectory(TRAJECTORY_TYPE.STS, value, '0.0', data, mockSetData);
     });
 
     expect(uploadTrajectory).toHaveBeenCalledWith(
@@ -198,7 +198,7 @@ describe('useTrajectoryImport', () => {
     const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch));
 
     await act(async () => {
-      await result.current.importTrajectory(TRAJECTORY_TYPE.LOAD, value, [0], data, mockSetData);
+      await result.current.importTrajectory(TRAJECTORY_TYPE.LOAD, value, '0', data, mockSetData);
     });
 
     expect(result.current.fileStatus).toBe('error');
@@ -228,7 +228,7 @@ describe('useTrajectoryImport', () => {
     const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch));
 
     await act(async () => {
-      await result.current.importTrajectory(TRAJECTORY_TYPE.LOAD, value, [0], data, mockSetData);
+      await result.current.importTrajectory(TRAJECTORY_TYPE.LOAD, value, '0', data, mockSetData);
     });
 
     expect(result.current.fileStatus).toBe('error');
@@ -257,7 +257,7 @@ describe('useTrajectoryImport', () => {
     const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch));
 
     await act(async () => {
-      await result.current.importTrajectory(TRAJECTORY_TYPE.LOAD, value, [0], data, mockSetData);
+      await result.current.importTrajectory(TRAJECTORY_TYPE.LOAD, value, '0', data, mockSetData);
     });
 
     expect(handleTrajectoryError).not.toHaveBeenCalled();
@@ -270,7 +270,7 @@ describe('useTrajectoryImport', () => {
     const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch));
 
     await act(async () => {
-      await result.current.importTrajectory(TRAJECTORY_TYPE.LOAD, value, [0], dataWithOther, mockSetData);
+      await result.current.importTrajectory(TRAJECTORY_TYPE.LOAD, value, '0', dataWithOther, mockSetData);
     });
 
     expect(uploadTrajectory).toHaveBeenCalledWith(
@@ -286,13 +286,13 @@ describe('useTrajectoryImport', () => {
   });
 
   it('should use OTHER_AREAS when hypothesis is OTHER_AREAS_LABEL', async () => {
-    const dataWithOther = [{ hypothesis: OTHER_AREAS_LABEL }] as HypothesisRowData[];
+    const dataWithOther = [{ hypothesis: OTHER_AREAS_LABEL }, { hypothesis: 'Capacity' }] as HypothesisRowData[];
     (uploadTrajectory as Mock).mockResolvedValue({ id: 102 });
 
     const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch));
 
     await act(async () => {
-      await result.current.importTrajectory(TRAJECTORY_TYPE.DSR, value, [0], dataWithOther, mockSetData);
+      await result.current.importTrajectory(TRAJECTORY_TYPE.DSR, value, '0', dataWithOther, mockSetData);
     });
 
     expect(uploadTrajectory).toHaveBeenCalledWith(
@@ -308,13 +308,16 @@ describe('useTrajectoryImport', () => {
   });
 
   it('should use set read only when trajectory type is DSR', async () => {
-    const dataWithOther = [{ hypothesis: 'AT', status: TRAJECTORY_SELECTION_STATUS.OK }] as HypothesisRowData[];
+    const dataWithOther = [
+      { hypothesis: 'AT', status: TRAJECTORY_SELECTION_STATUS.OK },
+      { hypothesis: 'Capacity' },
+    ] as HypothesisRowData[];
     (uploadTrajectory as Mock).mockResolvedValue({ id: 102, hasTimeSeries: true });
 
     const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch, mockSetReadOnly));
 
     await act(async () => {
-      await result.current.importTrajectory(TRAJECTORY_TYPE.DSR, value, [0], dataWithOther, mockSetData);
+      await result.current.importTrajectory(TRAJECTORY_TYPE.DSR, value, '0', dataWithOther, mockSetData);
     });
 
     expect(uploadTrajectory).toHaveBeenCalledWith(

@@ -1,5 +1,6 @@
 import {
   DbTrajectory,
+  FetchResult,
   HypothesisRowData,
   isTrajectoryHydroType,
   isTrajectoryResType,
@@ -11,6 +12,7 @@ import {
   convertIntoHypothesisRowWithTechnologies,
   filterRow,
   generateReadOnlyIndexMap,
+  mergeRows,
   removeDuplicate,
   removeDuplicateByTechnology,
   retrieveReadOnlyArea,
@@ -223,11 +225,9 @@ export const fetchAndNormalizeTrajectories = async ({
       technologies: null,
     };
   }
-  const isResType = isTrajectoryResType(trajType);
-  const isHydroType = isTrajectoryHydroType(trajType);
 
   // Other types
-  result = isHydroType ? [] : await getStudyTrajectories(id, trajType);
+  result = await getStudyTrajectories(id, trajType);
 
   if (trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
     technologies = await getThermalTechnologyList();
@@ -237,11 +237,11 @@ export const fetchAndNormalizeTrajectories = async ({
     technologies = STSTechnology;
   }
 
-  if (isResType) {
+  if (isTrajectoryResType(trajType)) {
     technologies = await getResTechnologyList();
   }
 
-  if (isHydroType) {
+  if (isTrajectoryHydroType(trajType)) {
     technologies = HydroSubRows;
   }
 
@@ -275,6 +275,7 @@ export const buildHypothesisRows = ({
   isStudyGenerated,
   t,
   dsrCmResult,
+  allResults,
 }: {
   trajType: TRAJECTORY_TYPE;
   trajectories: DbTrajectory[];
@@ -284,7 +285,16 @@ export const buildHypothesisRows = ({
   isStudyGenerated?: boolean;
   t: TFunction<'translation', undefined>;
   dsrCmResult: DbTrajectory[];
+  allResults?: FetchResult[];
 }) => {
+  if (isTrajectoryHydroType(trajType) && allResults) {
+    const allHydroRows = allResults
+      .filter((r) => isTrajectoryHydroType(r.trajType))
+      .flatMap((r) => r.rows);
+    const merged = mergeRows(allHydroRows);
+    return sortWithFixedPosition(isStudyGenerated ? filterRow(merged) : merged);
+  }
+
   const defaultNotIncluded = getDefaultAreaNotIncludedInAreaList(defaultAreas ?? [], areas);
 
   let rows = convertIntoHypothesisRowWithTechnologies(
@@ -292,6 +302,7 @@ export const buildHypothesisRows = ({
     defaultNotIncluded,
     defaultAreas,
     technologies ?? [],
+    trajType,
   );
 
   rows = sortWithFixedPosition(isStudyGenerated ? filterRow(rows) : rows);
@@ -493,4 +504,16 @@ export const updateTableAfterCellDetach = async ({
   // Cas générique nested
   const newData = setNestedData(data, indexArray, empty);
   return { newData };
+};
+
+export const getTypeToImport = (type: TRAJECTORY_TYPE, id: string, data: HypothesisRowData[]) => {
+  let typeToUse = type;
+  const indexArray = id.split('.').map(Number);
+  if (type === TRAJECTORY_TYPE.DSR && indexArray[0] === Math.max(data.length - 1, 0)) {
+    typeToUse = TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION;
+  }
+  if (type === TRAJECTORY_TYPE.HYDRO_SERIES && indexArray.length === 2 && indexArray[1] === 1) {
+    typeToUse = TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS;
+  }
+  return typeToUse;
 };

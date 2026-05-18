@@ -25,7 +25,7 @@ import getEditableHypothesisTableHeaders from '@/components/header/EditableHypot
 import { snakeCaseUnderscore } from '@/shared/utils/textUtils.ts';
 import { useTrajectoryFetchFromFSHandler } from '@/hooks/useTrajectoryFetchFromFSHandler.ts';
 
-const ResDistributionTab = ({ defaultAreas, areas, studyData }: TabProps) => {
+const ResDistributionTab = ({ defaultAreas, areas, studyData, types }: TabProps & { types: TRAJECTORY_TYPE[] }) => {
   const studyState = useStudy();
   const dispatch = useStudyDispatch();
   const { t } = useTranslation();
@@ -38,7 +38,6 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const [selectedType, setSelectedType] = useState<TRAJECTORY_TYPE>(TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION);
-  const types = [TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION, TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION];
   const { hypothesisTrajectories, readOnlyRow, technologyList } = useFetchHypothesisTrajectories(
     areas,
     types,
@@ -181,10 +180,9 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData }: TabProps) => {
           onClose={async (value?: SelectOption) => {
             toggleModal();
             if (value != null) {
-              const indexArray = rowIdSelected.split('.').map(Number);
               const dataToUse = selectedType === TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION ? data : technologyData;
               const setterToUse = selectedType === TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION ? setData : setTechnologyData;
-              await importTrajectory(selectedType, value, indexArray, dataToUse, setterToUse);
+              await importTrajectory(selectedType, value, rowIdSelected, dataToUse, setterToUse);
             }
           }}
           trajectoryType={selectedType}

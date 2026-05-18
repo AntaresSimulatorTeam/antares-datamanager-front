@@ -1,6 +1,12 @@
 import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
 import { AccessorKeyColumnDefBase, DeepKeys, DeepValue, StringOrTemplateHeader } from '@tanstack/react-table';
-import { HypothesisRowData, TrajectoryAreaData, TrajectoryWithSubRowsType } from '@/shared/types/Trajectory.type.ts';
+import {
+  DbTrajectory,
+  HypothesisRowData,
+  TechnologyType,
+  TrajectoryAreaData,
+  TrajectoryWithSubRowsType,
+} from '@/shared/types/Trajectory.type.ts';
 import { Dispatch, SetStateAction } from 'react';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { TFunction } from 'i18next';
@@ -91,7 +97,6 @@ export const isTrajectorySubrowsType = (value: unknown): value is TrajectoryWith
     TRAJECTORY_TYPE.RES_LOAD,
     TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION,
     TRAJECTORY_TYPE.HYDRO_SERIES,
-    TRAJECTORY_TYPE.HYDRO_PSP,
   ].includes(value as TrajectoryWithSubRowsType);
 
 export const isTrajectoryResType = (value: unknown): value is TrajectoryWithSubRowsType =>
@@ -103,7 +108,9 @@ export const isTrajectoryResType = (value: unknown): value is TrajectoryWithSubR
   ].includes(value as TrajectoryWithSubRowsType);
 
 export const isTrajectoryHydroType = (value: unknown): value is TrajectoryWithSubRowsType =>
-  [TRAJECTORY_TYPE.HYDRO_SERIES, TRAJECTORY_TYPE.HYDRO_PSP].includes(value as TrajectoryWithSubRowsType);
+  [TRAJECTORY_TYPE.HYDRO_SERIES, TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS].includes(
+    value as TrajectoryWithSubRowsType,
+  );
 
 export type TableOperationRow = 'empty' | 'remove';
 
@@ -112,4 +119,18 @@ export interface MenuProps {
   areas: TrajectoryAreaData[];
   studyData: StudyDTO;
   type: TRAJECTORY_TYPE;
+}
+
+export interface FetchResult {
+  trajType: TRAJECTORY_TYPE;
+  trajectories: DbTrajectory[];
+  dsrCmResult: DbTrajectory[] | null;
+  technologies?: TechnologyType[] | null;
+  rows: HypothesisRowData[];
+  list: {
+    areaOptions: CheckBoxData[];
+    checkedValues: string[];
+  };
+  readOnlyMap: Record<string, boolean>;
+  shouldSkipFetch: boolean;
 }

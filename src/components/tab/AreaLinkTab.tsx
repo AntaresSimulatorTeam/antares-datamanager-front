@@ -142,7 +142,7 @@ export const AreaLinkTab = ({ setErrorMessage, studyData }: AreaLinkTabProps) =>
               await importTrajectory(
                 rowIdSelected === '0' ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
                 value,
-                [Number(rowIdSelected)],
+                rowIdSelected,
                 data,
                 setData,
               );

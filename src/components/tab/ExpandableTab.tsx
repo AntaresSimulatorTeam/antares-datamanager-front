@@ -28,7 +28,7 @@ import { addRow, handleViewTrajectory } from '@/shared/services/hypothesisTableS
 import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow.ts';
 import { useTrajectorySearchHandler } from '@/hooks/useTrajectorySearchHandler.ts';
-import { shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
+import { getTypeToImport, shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
 import { CheckBoxListWithSearchBar } from '@/components/list/CheckBoxListWithSearchBar.tsx';
 import { useTranslation } from 'react-i18next';
@@ -38,7 +38,13 @@ import { RowToDeleteProps } from '@/shared/types/HypothesisTable.ts';
 import { useHypothesisTableUpdateHandler } from '@/hooks/useHypothesisTableUpdateHandler.ts';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
 
-const ExpandableTab = ({ defaultAreas, areas, studyData, type }: TabProps & { type: TRAJECTORY_TYPE }) => {
+const ExpandableTab = ({
+  defaultAreas,
+  areas,
+  studyData,
+  tabType,
+  types,
+}: TabProps & { tabType: TRAJECTORY_TYPE; types: TRAJECTORY_TYPE[] }) => {
   const studyState = useStudy();
   const dispatch = useStudyDispatch();
   const { t } = useTranslation();
@@ -59,7 +65,7 @@ const ExpandableTab = ({ defaultAreas, areas, studyData, type }: TabProps & { ty
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow, technologyList } =
     useFetchHypothesisTrajectories(
       areas,
-      [type],
+      types,
       defaultAreas,
       studyData?.id,
       studyData?.status,
@@ -69,7 +75,7 @@ const ExpandableTab = ({ defaultAreas, areas, studyData, type }: TabProps & { ty
   const { removeRow } = useHypothesisTableRemoveRow(studyData, dispatch, setData, setCheckedValues, setReadOnly);
   const { handleSearch } = useTrajectorySearchHandler({
     data,
-    type,
+    type: tabType,
     studyData,
     setDbTrajectories,
     technologies,
@@ -83,7 +89,7 @@ const ExpandableTab = ({ defaultAreas, areas, studyData, type }: TabProps & { ty
   const { handleHypothesisTableUpdate } = useHypothesisTableUpdateHandler({
     studyData,
     data,
-    type,
+    type: tabType,
     setData,
     setRowIdSelected,
     setIsDeletionModalOpen,
@@ -111,15 +117,15 @@ const ExpandableTab = ({ defaultAreas, areas, studyData, type }: TabProps & { ty
     ] as const;
 
     mapping.forEach(([record, setter]) => {
-      const value = record?.[type];
+      const value = record?.[tabType];
       if (value !== undefined) {
         // @ts-ignore
         setter(value);
       }
     });
 
-    if (technologyList?.[type]) {
-      const labels = technologyList?.[type].map((technology) => technology.label);
+    if (tabType && technologyList?.[tabType]) {
+      const labels = technologyList[tabType].map((technology) => technology.label);
       setTechnologiesLabel(labels);
     }
   }, [
@@ -129,61 +135,45 @@ const ExpandableTab = ({ defaultAreas, areas, studyData, type }: TabProps & { ty
     technologyList,
     readOnlyRow,
     studyState.studyStatus,
-    type,
+    tabType,
   ]);
 
   const handleSelectionChange = useCallback(
     async (value: string, isChecked?: boolean) => {
       const indexRow = data.findIndex((row) => row.hypothesis === value);
       if (isChecked) {
-        addRow(type, value, dispatch, setCheckedValues, setData, technologiesLabel, [], setReadOnly);
-      } else if (shouldOpenDeletionModal(type, indexRow, data)) {
+        addRow(tabType, value, dispatch, setCheckedValues, setData, technologiesLabel, [], setReadOnly);
+      } else if (shouldOpenDeletionModal(tabType, indexRow, data)) {
         setRowToDelete({ index: indexRow, value });
         setIsDeletionModalOpen(true);
       } else {
-        await removeRow(type, indexRow, data, value);
+        await removeRow(tabType, indexRow, data, value);
       }
     },
-    [data, type, dispatch, technologiesLabel, removeRow],
+    [data, tabType, dispatch, technologiesLabel, removeRow],
   );
 
   const removeTableRow = useCallback(
     (value: string, rowId?: string) => {
-      if (shouldOpenDeletionModal(type, Number(rowId), data)) {
+      if (shouldOpenDeletionModal(tabType, Number(rowId), data)) {
         setRowToDelete({ index: Number(rowId), value, operation: 'remove' });
         setIsDeletionModalOpen(true);
       } else {
-        void removeRow(type, Number(rowId), data, value);
+        void removeRow(tabType, Number(rowId), data, value);
       }
     },
-    [data, removeRow, type],
+    [data, removeRow, tabType],
   );
 
   const handleCloseImportModal = useCallback(
     async (value?: SelectOption) => {
       toggleModal();
       if (value != null) {
-        let typeToUse = type;
-        const indexArray = rowIdSelected.split('.').map(Number);
-        const isLastIndex = indexArray[0] === Math.max(data.length - 1, 0);
-        if (type === TRAJECTORY_TYPE.DSR && isLastIndex) {
-          typeToUse = TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION;
-        }
-        await importTrajectory(typeToUse, value, indexArray, data, setData, technologies);
+        await importTrajectory(tabType, value, rowIdSelected, data, setData, technologies);
       }
     },
-    [data, importTrajectory, rowIdSelected, toggleModal, type],
+    [data, importTrajectory, rowIdSelected, technologies, toggleModal, tabType],
   );
-
-  const getTypeToImport = useCallback(() => {
-    let typeToUse = type;
-    const indexArray = rowIdSelected.split('.').map(Number);
-    const isLastIndex = indexArray[0] === Math.max(data.length - 1, 0);
-    if (type === TRAJECTORY_TYPE.DSR && isLastIndex) {
-      typeToUse = TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION;
-    }
-    return typeToUse;
-  }, [data, rowIdSelected, type]);
 
   const handleViewData = useCallback(
     (rowId: string) => {
@@ -216,20 +206,20 @@ const ExpandableTab = ({ defaultAreas, areas, studyData, type }: TabProps & { ty
         readOnly={readOnly}
         progress={progress}
         idSelected={rowIdSelected}
-        type={type}
+        type={tabType}
         list={technologiesLabel}
         handleSearch={handleSearch}
-        handleImport={async (rowId: string) => await handleFetchFromFS(type, data, rowId)}
+        handleImport={async (rowId: string) => await handleFetchFromFS(tabType, data, rowId)}
         isReadOnlyEnable={true}
         updateData={handleHypothesisTableUpdate}
         removeRow={removeTableRow}
-        handleViewData={type === TRAJECTORY_TYPE.STS ? handleViewData : undefined}
+        handleViewData={tabType === TRAJECTORY_TYPE.STS ? handleViewData : undefined}
       />
       {isModalOpen && (
         <ImportTrajectoryModal
           options={optionsFS}
           onClose={handleCloseImportModal}
-          trajectoryType={getTypeToImport()}
+          trajectoryType={getTypeToImport(tabType, rowIdSelected, data)}
           hypothesis={getAreaTrajectoryName(rowIdSelected, data)}
         />
       )}
@@ -245,16 +235,16 @@ const ExpandableTab = ({ defaultAreas, areas, studyData, type }: TabProps & { ty
             const { value, index, operation } = rowToDelete;
             // if the operation is a cell detach and not a row deletion
             if (operation === 'empty') {
-              await detachTrajectory(type, [index], setData, data, 'empty', value);
+              await detachTrajectory(tabType, [index], setData, data, 'empty', value);
             } else {
-              await removeRow(type, index, data, value);
+              await removeRow(tabType, index, data, value);
             }
             setIsDeletionModalOpen(false);
           }}
           message={
             rowToDelete?.index == null
               ? t('trajectoryDeletionModal.@confirmDeletionMessage')
-              : t(`${getDeletionModalMessage(type, rowToDelete.index, data)}`)
+              : t(`${getDeletionModalMessage(tabType, rowToDelete.index, data)}`)
           }
         />
       )}

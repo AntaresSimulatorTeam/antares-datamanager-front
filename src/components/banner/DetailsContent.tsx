@@ -7,9 +7,9 @@
 import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter';
 import { ProjectInfo, StudyDTO } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
-import StdTagList from '@common/base/StdTagList/StdTagList.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { Button, Icon } from '@design-system-rte/react';
+import StdTagList from '@common/base/StdTagList/StdTagList.tsx';
 
 type DetailsContentProps = {
   content: StudyDTO | ProjectInfo;
@@ -52,7 +52,7 @@ export const DetailsContent = ({ content, onClickButton, tagsList }: DetailsCont
             <Icon name="user" />
             {t('studyDetails.@bannerCreatedBy', { createdBy: content?.createdBy ?? '' })}
           </div>
-          {tagsList?.length && (
+          {tagsList?.length != null && tagsList.length > 0 && (
             <div className="flex min-w-32 items-center gap-1">
               <div>|</div> <StdTagList maxVisibleTags={2} tags={tagsList} />
             </div>

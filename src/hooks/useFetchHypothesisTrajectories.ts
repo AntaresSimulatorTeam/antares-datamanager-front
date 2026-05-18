@@ -1,6 +1,14 @@
-import { CheckBoxData, DbTrajectory, HypothesisRowData, TechnologyType, TrajectoryAreaData } from '@/shared/types';
+import {
+  CheckBoxData,
+  DbTrajectory,
+  FetchResult,
+  HypothesisRowData,
+  isTrajectoryHydroType,
+  TechnologyType,
+  TrajectoryAreaData,
+} from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ReadOnlyObject } from '@/shared/types/HypothesisTable.ts';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { useTranslation } from 'react-i18next';
@@ -10,23 +18,10 @@ import {
   buildReadOnlyMap,
   fetchAndNormalizeTrajectories,
 } from '@/shared/helpers/hypothesisTableHelper.ts';
-import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { buildCheckListBox, getDefaultAreaNotIncludedInAreaList } from '@/shared/utils/hypothesisTableUtils.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 
-interface FetchResult {
-  trajType: TRAJECTORY_TYPE;
-  trajectories: DbTrajectory[];
-  dsrCmResult: DbTrajectory[] | null;
-  technologies?: TechnologyType[] | null;
-  rows: HypothesisRowData[];
-  list: {
-    areaOptions: CheckBoxData[];
-    checkedValues: string[];
-  };
-  readOnlyMap: Record<string, boolean>;
-  shouldSkipFetch: boolean;
-}
+import { STUDY_ACTION } from '@/shared/enum/study.ts';
 
 export const useFetchHypothesisTrajectories = (
   areas: TrajectoryAreaData[],
@@ -54,6 +49,11 @@ export const useFetchHypothesisTrajectories = (
   const dispatch = useStudyDispatch();
   const { t } = useTranslation();
 
+  const studyStateRef = useRef(studyState);
+  studyStateRef.current = studyState;
+
+  const trajectoryTypesKey = trajectoryTypes.join(',');
+
   /**
    * Zones vides déjà présentes dans l’étude (si non générée)
    */
@@ -64,13 +64,13 @@ export const useFetchHypothesisTrajectories = (
 
     return trajectoryTypes.reduce<Record<TRAJECTORY_TYPE, DbTrajectory[]>>(
       (acc, type) => {
-        const trajectories = studyState?.[type]?.trajectories ?? [];
+        const trajectories = studyStateRef.current?.[type]?.trajectories ?? [];
         acc[type] = trajectories.filter((trajectory) => (trajectory?.trajectoryName?.length ?? 0) < 1);
         return acc;
       },
       {} as Record<TRAJECTORY_TYPE, DbTrajectory[]>,
     );
-  }, [studyStatus, trajectoryTypes]);
+  }, [studyStatus, trajectoryTypesKey]);
 
   /**
    * Fonction principale de récupération + normalisation
@@ -83,7 +83,7 @@ export const useFetchHypothesisTrajectories = (
         // 1) Lancer toutes les requêtes en parallèle
         const results: FetchResult[] = await Promise.all(
           trajTypes.map(async (trajType: TRAJECTORY_TYPE): Promise<FetchResult> => {
-            const contextTrajectories = studyState?.[trajType]?.trajectories ?? [];
+            const contextTrajectories = studyStateRef.current?.[trajType]?.trajectories ?? [];
 
             const shouldSkipFetch = studyStatus === StudyStatus.GENERATED && contextTrajectories.length > 0;
 
@@ -141,11 +141,30 @@ export const useFetchHypothesisTrajectories = (
           }
         });
 
+        let hydroRows: HypothesisRowData[] = [];
+        if (isTrajectoryHydroType(trajectoryTypes[0])) {
+          hydroRows = buildHypothesisRows({
+            trajType: TRAJECTORY_TYPE.HYDRO_SERIES,
+            trajectories: [],
+            defaultAreas,
+            areas,
+            technologies: [],
+            isStudyGenerated,
+            t,
+            dsrCmResult: [],
+            allResults: results,
+          });
+        }
+
         // 3) Mise à jour des states React (1 seul setState par state)
         setHypothesisTrajectories((prev) => {
           const next = { ...prev };
           results.forEach(({ trajType, rows }) => {
-            next[trajType] = rows;
+            if (isTrajectoryHydroType(trajType)) {
+              next[TRAJECTORY_TYPE.HYDRO_SERIES] = hydroRows;
+            } else {
+              next[trajType] = rows;
+            }
           });
           return next as Record<TRAJECTORY_TYPE, HypothesisRowData[]>;
         });
@@ -189,15 +208,19 @@ export const useFetchHypothesisTrajectories = (
         console.error('fetchAreas error', error);
       }
     },
-    [areas, defaultAreas, t, emptyAreaSelected],
+
+    [studyContextStatus, studyStatus, defaultAreas, emptyAreaSelected, areas, t, dispatch],
   );
+
+  const fetchAreasRef = useRef(fetchAreas);
+  fetchAreasRef.current = fetchAreas;
 
   /**
    * Déclenchement automatique
    */
   useEffect(() => {
-    studyId != null && void fetchAreas(studyId, trajectoryTypes);
-  }, [studyId, studyContextStatus, trajectoryTypes[0]]);
+    studyId != null && void fetchAreasRef.current(studyId, trajectoryTypes);
+  }, [studyId, studyContextStatus, trajectoryTypesKey]);
 
   return {
     hypothesisTrajectories,

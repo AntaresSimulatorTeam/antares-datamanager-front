@@ -295,11 +295,10 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
           onClose={async (value?: SelectOption) => {
             toggleModal();
             if (value != null) {
-              const indexArray = rowIdSelected.split('.').map(Number);
               const isTechnicalParamType = isTechnicalParametersType(selectedTrajectoryType);
               const dataTable = isTechnicalParamType ? technicalData : data;
               const setDataTable = isTechnicalParamType ? setTechnicalData : setData;
-              await importTrajectory(selectedTrajectoryType, value, indexArray, dataTable, setDataTable);
+              await importTrajectory(selectedTrajectoryType, value, rowIdSelected, dataTable, setDataTable);
             }
           }}
           trajectoryType={selectedTrajectoryType ?? getTrajectoryTypeByIndex(Number(rowIdSelected))}
