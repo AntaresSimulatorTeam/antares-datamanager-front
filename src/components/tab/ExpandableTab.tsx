@@ -36,6 +36,7 @@ import { TrajectoryDataVisualisation } from '@common/modal/TrajectoryDataVisuali
 import { useTrajectoryFetchFromFSHandler } from '@/hooks/useTrajectoryFetchFromFSHandler.ts';
 import { RowToDeleteProps } from '@/shared/types/HypothesisTable.ts';
 import { useHypothesisTableUpdateHandler } from '@/hooks/useHypothesisTableUpdateHandler.ts';
+import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
 
 const ExpandableTab = ({ defaultAreas, areas, studyData, type }: TabProps & { type: TRAJECTORY_TYPE }) => {
   const studyState = useStudy();
@@ -90,6 +91,15 @@ const ExpandableTab = ({ defaultAreas, areas, studyData, type }: TabProps & { ty
     setReadOnly,
     setRowToDelete,
   });
+
+  // used for deletion modal with "empty" operation (like DSR with capacity mod)
+  const { detachTrajectory } = useTrajectoryDetach(
+    studyData,
+    dispatch,
+    setReadOnly,
+    setIsDeletionModalOpen,
+    setRowIdSelected,
+  );
 
   useEffect(() => {
     const mapping = [
@@ -231,11 +241,15 @@ const ExpandableTab = ({ defaultAreas, areas, studyData, type }: TabProps & { ty
           isOpen={isDeletionModalOpen}
           onClose={() => setIsDeletionModalOpen(false)}
           onConfirm={async () => {
-            if (rowToDelete?.value) {
-              const { value, index } = rowToDelete;
+            if (!rowToDelete?.value) return;
+            const { value, index, operation } = rowToDelete;
+            // if the operation is a cell detach and not a row deletion
+            if (operation === 'empty') {
+              await detachTrajectory(type, [index], setData, data, 'empty', value);
+            } else {
               await removeRow(type, index, data, value);
-              setIsDeletionModalOpen(false);
             }
+            setIsDeletionModalOpen(false);
           }}
           message={
             rowToDelete?.index == null
