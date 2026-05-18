@@ -1,12 +1,12 @@
 import { AppBackendInfos, AppInfo } from '@/shared/types/AppInfo';
-import { ACTUATOR_ENDPOINT } from '@/shared/const/apiEndPoint';
+import { BACK_END_ACTUATOR_ENDPOINT, GENERATOR_ACTUATOR_ENDPOINT } from '@/shared/const/apiEndPoint';
 import packageJson from '../../../package.json';
 import { GIT_INFO } from '@/gitInfo.ts';
 import { Entries } from '@/shared/types/Generic.type.ts';
 import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter.ts';
 
 export const fetchBackendInfo = async (): Promise<AppInfo> => {
-  const apiUrl = `${ACTUATOR_ENDPOINT}`;
+  const apiUrl = `${BACK_END_ACTUATOR_ENDPOINT}`;
   const response = await fetch(apiUrl);
   if (!response.ok) {
     throw new Error('Error fetching app info');
@@ -23,6 +23,16 @@ export const fetchBackendInfo = async (): Promise<AppInfo> => {
   };
 };
 
+export const fetchGeneratorBackendInfo = async (): Promise<AppInfo> => {
+  const apiUrl = `${GENERATOR_ACTUATOR_ENDPOINT}`;
+  const response = await fetch(apiUrl);
+  if (!response.ok) {
+    throw new Error('Error fetching generator app info');
+  }
+
+  return response.json();
+};
+
 export const fetchAppInfo = async () => {
   try {
     const frontInfos = {
@@ -34,11 +44,21 @@ export const fetchAppInfo = async () => {
       commitTime: GIT_INFO?.commitTime ? formatDateToDDMMYYYY(GIT_INFO?.commitTime, true) : new Date().toISOString(),
     };
 
-    const data = await fetchBackendInfo();
-    return (Object.entries(data) as Entries<typeof data>)?.map(([key, value]) => ({
+    const backEndData = await fetchBackendInfo();
+    // fetch generator info but don't fail if unavailable
+    let generatorData: Partial<AppInfo> = {};
+    try {
+      generatorData = await fetchGeneratorBackendInfo();
+      console.log(generatorData);
+    } catch (e) {
+      // ignore generator fetch errors
+    }
+
+    return (Object.entries(backEndData) as Entries<typeof backEndData>)?.map(([key, value]) => ({
       info: key,
-      front: frontInfos[key],
+      front: frontInfos[key as keyof typeof frontInfos],
       back: value,
+      generator: (generatorData as any)[key] ?? key,
     }));
   } catch (error) {
     throw new Error((error as Error)?.message ?? '');

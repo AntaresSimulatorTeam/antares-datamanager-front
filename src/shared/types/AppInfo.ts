@@ -29,4 +29,5 @@ export interface AppData {
   info: string;
   front: string;
   back: string;
+  generator?: string;
 }

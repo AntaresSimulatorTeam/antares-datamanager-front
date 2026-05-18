@@ -225,7 +225,8 @@
     "@commitTime": "Commit Time",
     "@information": "Information",
     "@frontend": "Frontend",
-    "@backend": "Backend"
+      "@backend": "Backend",
+      "@generator": "Générateur"
   },
   "horizonInput": {
     "@validYearError": "Horizon doit être un numéro entre 2000 et 99999",
