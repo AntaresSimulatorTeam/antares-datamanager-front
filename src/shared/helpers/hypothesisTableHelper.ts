@@ -72,6 +72,7 @@ export const shouldOpenDeletionModal = (
     case TRAJECTORY_TYPE.STS:
     case TRAJECTORY_TYPE.RES_CAPACITY:
     case TRAJECTORY_TYPE.RES_LOAD:
+    case TRAJECTORY_TYPE.HYDRO_SERIES:
       return subRowsWithTrajectory.length > 0;
     case TRAJECTORY_TYPE.THERMAL_CAPACITY:
       return isRowTrajectoryValid && subRowsWithTrajectory.length > 0;
@@ -288,9 +289,7 @@ export const buildHypothesisRows = ({
   allResults?: FetchResult[];
 }) => {
   if (isTrajectoryHydroType(trajType) && allResults) {
-    const allHydroRows = allResults
-      .filter((r) => isTrajectoryHydroType(r.trajType))
-      .flatMap((r) => r.rows);
+    const allHydroRows = allResults.filter((r) => isTrajectoryHydroType(r.trajType)).flatMap((r) => r.rows);
     const merged = mergeRows(allHydroRows);
     return sortWithFixedPosition(isStudyGenerated ? filterRow(merged) : merged);
   }

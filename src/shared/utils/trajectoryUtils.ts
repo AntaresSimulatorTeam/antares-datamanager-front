@@ -1,10 +1,4 @@
-import {
-  DbTrajectory,
-  HypothesisRowData,
-  HypothesisTab,
-  isTrajectoryHydroType,
-  RowStatus,
-} from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, HypothesisTab, isTrajectoryHydroType, RowStatus } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { FileInputStatus } from 'rte-design-system-react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
@@ -343,7 +337,6 @@ export const mergeRows = (rows: HypothesisRowData[]): HypothesisRowData[] => {
 
   return [...map.values()];
 };
-
 
 export const convertIntoHypothesisRowWithTechnologies = (
   data: DbTrajectory[],
@@ -953,6 +946,10 @@ export const getDeletionModalMessage = (type: TRAJECTORY_TYPE, index: number, da
 
   if (type === TRAJECTORY_TYPE.DSR && shouldDeleteCapacityModulation(data, index)) {
     return 'trajectoryDeletionModal.@confirmDeletionCapacityMessage';
+  }
+
+  if (type === TRAJECTORY_TYPE.HYDRO_SERIES) {
+    return 'trajectoryDeletionModal.@confirmDeleteMessage';
   }
 
   if (type === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
