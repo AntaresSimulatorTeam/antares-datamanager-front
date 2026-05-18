@@ -16,6 +16,11 @@ export const AboutHeaders = (t: (value: string) => string): AccessorKeyColumnDef
     size: 300,
     cell: ({ getValue }) => <span>{getValue() as string | number}</span>,
   }),
+  columnHelperAbout.accessor('generator', {
+    header: t('about.@generator'),
+    size: 300,
+    cell: ({ getValue }) => <span>{getValue() as string | number}</span>,
+  }),
   columnHelperAbout.accessor('front', {
     header: t('about.@frontend'),
     size: 300,
