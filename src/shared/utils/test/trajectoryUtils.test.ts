@@ -1489,7 +1489,7 @@ describe('findTechnologyMatch', () => {
 
   it('retourne null si aucune technologie ne correspond', () => {
     const result = findTechnologyMatch(entries, 'Geothermal');
-    expect(result).toBeNull();
+    expect(result).toBeUndefined();
   });
 
   it('utilise normalizeTechnology pour les types non RES_TECHNOLOGY_DISTRIBUTION', () => {

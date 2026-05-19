@@ -38,8 +38,14 @@ export const useTrajectorySearchHandler = ({
         }
         areaToUse = isLastIndex ? '' : data[rowIndex]?.hypothesis;
       }
+      if (type === TRAJECTORY_TYPE.HYDRO_SERIES && indexArray.length === 2 && subIndex === 1) {
+        typeToUse = TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS;
+      }
 
-      let technology = subIndex === undefined ? undefined : data[rowIndex]?.subRows?.[subIndex]?.hypothesis;
+      let technology =
+        subIndex === undefined || type === TRAJECTORY_TYPE.HYDRO_SERIES
+          ? undefined
+          : data[rowIndex]?.subRows?.[subIndex]?.hypothesis;
       const option = technologies ? technologies.find((opt) => opt.label === technology) : null;
       if (option) {
         technology = option.code;

@@ -53,6 +53,9 @@ export const useHypothesisTableUpdateHandler = ({
       if (type === TRAJECTORY_TYPE.DSR && isLastIndex) {
         typeToUse = TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION;
       }
+      if (type === TRAJECTORY_TYPE.HYDRO_SERIES && indexArray.length === 2 && indexArray[1] === 1) {
+        typeToUse = TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS;
+      }
       if (status === 'empty' || status === 'emptyError') {
         const row = getRowDataSelected(data, indexArray) ?? null;
         if (row) {

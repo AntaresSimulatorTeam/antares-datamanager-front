@@ -57,7 +57,15 @@ const StudyNavigationMenu = ({
         case TRAJECTORY_TYPE.LOAD:
         case TRAJECTORY_TYPE.DSR:
         case TRAJECTORY_TYPE.STS:
-          return <ExpandableTab type={type} defaultAreas={areaDefault} areas={trajectoryAreas} studyData={studyData} />;
+          return (
+            <ExpandableTab
+              tabType={type}
+              types={[type]}
+              defaultAreas={areaDefault}
+              areas={trajectoryAreas}
+              studyData={studyData}
+            />
+          );
         case TRAJECTORY_TYPE.THERMAL_CAPACITY:
         case TRAJECTORY_TYPE.MISC_CAPACITY:
         case TRAJECTORY_TYPE.RES_CAPACITY:

@@ -2,7 +2,7 @@ import StdTabs from '@common/layout/stdTabs/StdTabs.tsx';
 import StdTabItem from '@common/layout/stdTabs/StdTabItem.tsx';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useTranslation } from 'react-i18next';
-import { ReactNode, useCallback, useEffect, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import ExpandableTab from '@/components/tab/ExpandableTab.tsx';
 import { ParametersTab } from '@/components/tab/ParametersTab.tsx';
 import { MenuProps } from '@/shared/types';
@@ -11,9 +11,13 @@ import ResDistributionTab from '@/components/tab/ResDistributionTab.tsx';
 export const TabMenu = ({ defaultAreas, areas, studyData, type }: MenuProps) => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<TRAJECTORY_TYPE>(type);
-  const [activeComponent, setActiveComponent] = useState<ReactNode>(
-    <ExpandableTab defaultAreas={defaultAreas} areas={areas} studyData={studyData} type={type} />,
+  const [activeComponent, setActiveComponent] = useState<ReactNode>(null);
+
+  const hydroTypes = useMemo(
+    () => [TRAJECTORY_TYPE.HYDRO_SERIES, TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS],
+    [],
   );
+  const singleType = useMemo(() => [type], [type]);
 
   const renderActiveComponent = useCallback(
     (tab: TRAJECTORY_TYPE) => {
@@ -22,15 +26,36 @@ export const TabMenu = ({ defaultAreas, areas, studyData, type }: MenuProps) => 
           return setActiveComponent(<ParametersTab defaultAreas={defaultAreas} areas={areas} studyData={studyData} />);
         case TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION:
           return setActiveComponent(
-            <ResDistributionTab defaultAreas={defaultAreas} areas={areas} studyData={studyData} />,
+            <ResDistributionTab
+              defaultAreas={defaultAreas}
+              areas={areas}
+              studyData={studyData}
+              types={[TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION, TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION]}
+            />,
+          );
+        case TRAJECTORY_TYPE.HYDRO_SERIES:
+          return setActiveComponent(
+            <ExpandableTab
+              tabType={tab}
+              defaultAreas={defaultAreas}
+              areas={areas}
+              studyData={studyData}
+              types={hydroTypes}
+            />,
           );
         default:
           return setActiveComponent(
-            <ExpandableTab defaultAreas={defaultAreas} areas={areas} studyData={studyData} type={tab} />,
+            <ExpandableTab
+              tabType={tab}
+              defaultAreas={defaultAreas}
+              areas={areas}
+              studyData={studyData}
+              types={singleType}
+            />,
           );
       }
     },
-    [areas, defaultAreas, studyData, type],
+    [areas, defaultAreas, studyData, type, hydroTypes, singleType],
   );
 
   useEffect(() => {

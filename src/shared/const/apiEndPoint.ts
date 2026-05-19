@@ -52,7 +52,8 @@ export const TRAJECTORY_RES_INSTALLED_POWER = `${BACK_END_BASE_URL}/v1/trajector
 export const TRAJECTORY_RES_LOAD_FACTOR = `${BACK_END_BASE_URL}/v1/trajectory/load-factor-res`;
 export const TRAJECTORY_RES_TECHNOLOGY_DISTRIBUTION = `${BACK_END_BASE_URL}/v1/trajectory/technology-distribution-res`;
 export const TRAJECTORY_RES_ZONAL_DISTRIBUTION = `${BACK_END_BASE_URL}/v1/trajectory/zonal-distribution-res`;
-
+export const TRAJECTORY_HYDRO_SERIES = `${BACK_END_BASE_URL}/v1/trajectory/hydro-series`;
+export const TRAJECTORY_HYDRO_TECHNICAL_PARAMETERS = `${BACK_END_BASE_URL}/v1/trajectory/hydro-technical-parameters`;
 //ABOUT
 export const BACK_END_ACTUATOR_ENDPOINT = `${BACK_END_BASE_URL}/actuator/info`;
 export const GENERATOR_ACTUATOR_ENDPOINT = `${GENERATOR_BASE_URL}/app-info`;

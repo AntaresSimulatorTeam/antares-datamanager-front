@@ -1,4 +1,4 @@
-import { DbTrajectory, HypothesisRowData, HypothesisTab, RowStatus } from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, HypothesisTab, isTrajectoryHydroType, RowStatus } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { FileInputStatus } from 'rte-design-system-react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
@@ -12,6 +12,8 @@ import {
   TRAJECTORY_DSR_CAPACITY_MODULATION,
   TRAJECTORY_DSR_CLUSTER,
   TRAJECTORY_ENDPOINT,
+  TRAJECTORY_HYDRO_SERIES,
+  TRAJECTORY_HYDRO_TECHNICAL_PARAMETERS,
   TRAJECTORY_MISC_INSTALLED_POWER,
   TRAJECTORY_MISC_LOAD_FACTOR,
   TRAJECTORY_RES_INSTALLED_POWER,
@@ -149,7 +151,7 @@ export const shouldHaveSubRows = (areasToExclude: string[], mainEntry: DbTraject
     case TRAJECTORY_TYPE.RES_LOAD:
     case TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION:
     case TRAJECTORY_TYPE.HYDRO_SERIES:
-    case TRAJECTORY_TYPE.HYDRO_PSP:
+    case TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS:
       return !isInExcluded;
     case TRAJECTORY_TYPE.THERMAL_CAPACITY:
       return !isOther && !isInExcluded;
@@ -190,12 +192,24 @@ export const shouldBeDeletable = (
   return !isDefault && OTHER_AREAS !== trajectory.area && type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER;
 };
 
+const normalizeOption = (str: string): string => str.toLowerCase().replace(/_/g, ' ').replace(/\s+/g, ' ').trim();
+
+const typeNameContains = (value: string, typeName: string): boolean => {
+  const normalizedValue = normalizeOption(value);
+  const normalizedType = normalizeOption(typeName.replace('HYDRO_', ''));
+  return normalizedType.includes(normalizedValue);
+};
+
 export const findTechnologyMatch = (entries: DbTrajectory[], option: string) =>
-  entries.find((entry) =>
-    entry.type === TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION
-      ? normalizeTechnology(entry.technology) === snakeCaseUnderscore(option)
-      : normalizeTechnology(entry.technology) === normalizeTechnology(option),
-  ) ?? null;
+  entries.find((entry) => {
+    if (entry.type === TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION) {
+      return normalizeTechnology(entry.technology) === snakeCaseUnderscore(option);
+    }
+    if (isTrajectoryHydroType(entry.type)) {
+      return typeNameContains(option, entry.type);
+    }
+    return normalizeTechnology(entry.technology) === normalizeTechnology(option);
+  });
 
 const computeStatus = (trajectory: DbTrajectory | null) =>
   trajectory?.trajectoryName ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING;
@@ -248,7 +262,7 @@ export const buildRowWithSubRows = ({
 }: {
   hypothesis: string;
   trajectory: DbTrajectory | null;
-  techEntries?: DbTrajectory[]; // <--- ajouté
+  techEntries?: DbTrajectory[];
   options: string[];
   defaultAreas?: { name: string }[];
   areasNotInTrajectoryArea: string[];
@@ -274,11 +288,62 @@ export const buildRowWithSubRows = ({
   return { ...baseRow, subRows };
 };
 
+export const mergeSubRows = (subRows: HypothesisRowData[]) => {
+  const map = new Map<string, HypothesisRowData>();
+
+  for (const sr of subRows) {
+    const key = sr.hypothesis;
+
+    // Si la clé n'existe pas encore → on stocke
+    if (!map.has(key)) {
+      map.set(key, sr);
+      continue;
+    }
+
+    const existing = map.get(key);
+
+    // Si le nouveau a une trajectory et pas l'existant → on remplace
+    if (!existing?.trajectory && sr.trajectory) {
+      map.set(key, sr);
+    }
+  }
+
+  return Array.from(map.values());
+};
+
+export const mergeRows = (rows: HypothesisRowData[]): HypothesisRowData[] => {
+  const map = new Map<string, HypothesisRowData>();
+
+  rows.forEach((row) => {
+    const key = row.hypothesis;
+
+    if (!map.has(key)) {
+      map.set(key, { ...row });
+      return;
+    }
+
+    const existing = map.get(key)!;
+
+    // Fusion des subRows
+    const mergedSubRows = [...(existing.subRows ?? []), ...(row.subRows ?? [])];
+
+    existing.subRows = mergeSubRows(mergedSubRows);
+
+    // Priorité à la row qui a une trajectory
+    if (!existing.trajectory && row.trajectory) {
+      existing.trajectory = row.trajectory;
+    }
+  });
+
+  return [...map.values()];
+};
+
 export const convertIntoHypothesisRowWithTechnologies = (
   data: DbTrajectory[],
   areasNotInTrajectoryArea: string[],
   defaultAreas: { name: string }[] | undefined,
   options: string[],
+  trajectoryType?: TRAJECTORY_TYPE,
 ): HypothesisRowData[] => {
   const groupedByArea = data.reduce<Record<string, DbTrajectory[]>>((acc, item) => {
     if (item.area) {
@@ -293,14 +358,19 @@ export const convertIntoHypothesisRowWithTechnologies = (
     ...areasNotInTrajectoryArea,
     ...(defaultAreas?.map((a) => a.name) ?? []),
   ]);
+  const isHydroType = isTrajectoryHydroType(trajectoryType);
 
   return Array.from(allAreas).map((area) => {
     const entries = groupedByArea[area] ?? [];
-
-    const parentEntry = entries.find((e) => !e.technology || e.technology.trim() === '') ?? null;
-
-    const techEntries = entries.filter((e) => e.technology && e.technology.trim() !== '');
-
+    let parentEntry;
+    let techEntries;
+    if (isHydroType) {
+      parentEntry = null;
+      techEntries = entries.filter((e) => e.trajectoryName.length > 0 && e.type === trajectoryType);
+    } else {
+      parentEntry = entries.find((e) => !e.technology || e.technology.trim() === '') ?? null;
+      techEntries = entries.filter((e) => e.technology && e.technology.trim() !== '');
+    }
     return buildRowWithSubRows({
       hypothesis: getDefaultLabel(area),
       trajectory: parentEntry,
@@ -878,6 +948,10 @@ export const getDeletionModalMessage = (type: TRAJECTORY_TYPE, index: number, da
     return 'trajectoryDeletionModal.@confirmDeletionCapacityMessage';
   }
 
+  if (type === TRAJECTORY_TYPE.HYDRO_SERIES) {
+    return 'trajectoryDeletionModal.@confirmDeleteMessage';
+  }
+
   if (type === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
     const hasTrajectory = hasValidTrajectory(row);
     const hasTrajectoryTech = hasValidTrajectoryTechnology(row);
@@ -957,6 +1031,11 @@ export const getUrlApiUploadTrajectory = (
       return `${TRAJECTORY_RES_TECHNOLOGY_DISTRIBUTION}?area=${area}${subArea ? `&technology=${encodeURIComponent(snakeCaseUnderscore(subArea))}` : ''}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
     case TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION:
       return `${TRAJECTORY_RES_ZONAL_DISTRIBUTION}?area=${area}&technology=${subArea ?? ''}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
+    case TRAJECTORY_TYPE.HYDRO_SERIES:
+      return `${TRAJECTORY_HYDRO_SERIES}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
+    case TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS:
+      return `${TRAJECTORY_HYDRO_TECHNICAL_PARAMETERS}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
+
     default:
       return `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   }

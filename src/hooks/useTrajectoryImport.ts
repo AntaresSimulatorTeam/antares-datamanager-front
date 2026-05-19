@@ -17,6 +17,7 @@ import { useUser } from '@/store/contexts/UserContext.tsx';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
 import { isBusinessError } from '@/shared/utils/errorUtils.ts';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
+import { getTypeToImport } from '@/shared/helpers/hypothesisTableHelper.ts';
 
 export const useTrajectoryImport = (
   study: StudyDTO,
@@ -35,11 +36,12 @@ export const useTrajectoryImport = (
     async (
       type: TRAJECTORY_TYPE,
       value: SelectOption,
-      indexArray: number[],
+      rowIdSelected: string,
       data: HypothesisRowData[],
       setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
       options?: TechnologyType[],
     ) => {
+      const indexArray = rowIdSelected.split('.').map(Number);
       const hypothesis = data[indexArray[0]]?.hypothesis;
       let subArea = indexArray?.length > 1 ? data[indexArray[0]]?.subRows?.[indexArray[1]]?.hypothesis : undefined;
       const option = options ? options.find((opt) => opt.label === subArea) : null;
@@ -47,9 +49,10 @@ export const useTrajectoryImport = (
         subArea = option.code;
       }
       setFileStatus('loading');
+      const typeToUse = getTypeToImport(type, rowIdSelected, data);
       try {
         const newTrajectory = await uploadTrajectory(
-          type,
+          typeToUse,
           value.label,
           study?.horizon,
           study?.id,
@@ -64,7 +67,7 @@ export const useTrajectoryImport = (
         setFileStatus('success');
 
         if (newTrajectory.id != null) {
-          await attachTrajectory(type, indexArray, 'success', newTrajectory, setData);
+          await attachTrajectory(typeToUse, indexArray, 'success', newTrajectory, setData);
         }
       } catch (error) {
         setFileStatus('error');
@@ -75,7 +78,7 @@ export const useTrajectoryImport = (
             trajectoryType: subArea ?? hypothesis,
           });
           handleTrajectoryError(
-            type,
+            typeToUse,
             indexArray,
             { id: value.id, label: value.label },
             subArea ?? hypothesis,
