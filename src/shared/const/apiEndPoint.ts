@@ -6,7 +6,7 @@
 
 import { getEnvVariables } from '@/envVariables.ts';
 
-const GENERATOR_BASE_URL = getEnvVariables('VITE_PEGASE_GENERATOR_HOST_URL');
+const GENERATOR_BASE_URL = getEnvVariables('VITE_PEGASE_FQDN');
 const BACK_END_BASE_URL = getEnvVariables('VITE_BACK_END_BASE_URL');
 
 // STUDY
