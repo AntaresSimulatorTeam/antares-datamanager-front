@@ -5,6 +5,7 @@
  */
 
 type EnvVariableType = {
+  VITE_PEGASE_FQDN: string;
   VITE_BACK_END_BASE_URL: string;
   VITE_OAUTH2_CLIENT_ID: string;
   VITE_OAUTH2_REDIRECT_URL: string;
@@ -16,6 +17,7 @@ type EnvVariableType = {
 
 // Environment Variable Template to Be Replaced at Runtime
 export const envVariables: EnvVariableType = {
+  VITE_PEGASE_FQDN: '${PEGASE_FQDN}',
   VITE_BACK_END_BASE_URL: '${URL_BACKEND}',
   VITE_OAUTH2_CLIENT_ID: '${PEGASE_OAUTH2_CLIENT_ID}',
   VITE_OAUTH2_REDIRECT_URL: '${PEGASE_OAUTH2_REDIRECT_URL}',
