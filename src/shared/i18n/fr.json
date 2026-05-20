@@ -177,7 +177,7 @@
     "@capacity": "Hydro",
     "@psp_virtual": "PSP virtual",
     "@series": "Series",
-    "@informationMessage": "At least one \"mod\" file must be defined to use Technical parameters"
+    "@informationMessage": "If a \"mod\" file is included in a \"series\" folder, the \"technical parameters\" folder is required."
   },
   "trajectoryViewModal": {
     "@title_area": "Zones",
@@ -225,8 +225,8 @@
     "@commitTime": "Commit Time",
     "@information": "Information",
     "@frontend": "Frontend",
-      "@backend": "Backend",
-      "@generator": "Générateur"
+    "@backend": "Backend",
+    "@generator": "Générateur"
   },
   "horizonInput": {
     "@validYearError": "Horizon doit être un numéro entre 2000 et 99999",

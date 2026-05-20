@@ -98,7 +98,6 @@ const ExpandableTab = ({
     setRowToDelete,
   });
 
-  // used for deletion modal with "empty" operation (like DSR with capacity mod)
   const { detachTrajectory } = useTrajectoryDetach(
     studyData,
     dispatch,

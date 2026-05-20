@@ -862,6 +862,10 @@ export const getPathFromTrajectoryType = (
       return '\\\\RES\\technicalParameters';
     case TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION:
       return '\\\\RES\\technicalParameters';
+    case TRAJECTORY_TYPE.HYDRO_SERIES:
+      return '\\\\hydro\\series';
+    case TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS:
+      return '\\\\hydro\\technical_parameters';
     default:
       return null;
   }
@@ -1050,3 +1054,31 @@ export const isEmptyRow = (
   hypothesis === t('thermal.@specific') ||
   ((type === TRAJECTORY_TYPE.STS || type === TRAJECTORY_TYPE.HYDRO_SERIES || type === TRAJECTORY_TYPE.HYDRO_PSP) &&
     rowDepth === 0);
+
+export const getItemsMenu = (
+  trajectoryType: TRAJECTORY_TYPE,
+  t: TFunction<'translation', undefined>,
+  defaultAreas: { name: string }[],
+) => {
+  if (trajectoryType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
+    return [
+      { name: TRAJECTORY_TYPE.THERMAL_CAPACITY, label: t('misc.@installedPower') },
+      { name: TRAJECTORY_TYPE.THERMAL_PARAMETER, label: t('thermal.@parameters') },
+    ];
+  } else if (trajectoryType === TRAJECTORY_TYPE.HYDRO_SERIES) {
+    return [{ name: TRAJECTORY_TYPE.HYDRO_SERIES, label: t('hydro.@capacity') }];
+  } else {
+    const itemsTab = [
+      { name: trajectoryType, label: t('misc.@installedPower') },
+      {
+        name: trajectoryType === TRAJECTORY_TYPE.RES_CAPACITY ? TRAJECTORY_TYPE.RES_LOAD : TRAJECTORY_TYPE.MISC_LOAD,
+        label: t('misc.@loadFactor'),
+      },
+    ];
+    if (trajectoryType === TRAJECTORY_TYPE.RES_CAPACITY) {
+      defaultAreas.length > 0 &&
+        itemsTab.push({ name: TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION, label: t('res.@distribution') });
+    }
+    return itemsTab;
+  }
+};
