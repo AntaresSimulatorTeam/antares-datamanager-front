@@ -857,6 +857,40 @@ describe('uploadTrajectory', () => {
     });
   });
 
+  it('should import HYDRO Series trajectory into data base', async () => {
+    await uploadTrajectory(TRAJECTORY_TYPE.HYDRO_SERIES, 'PEMMEDB25', '2030-2031', 87, 'AT', onProgress, false);
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/trajectory/hydro-series?area=AT&trajectoryToUse=PEMMEDB25&horizon=2030-2031&studyId=87&isCivilYear=false',
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
+
+  it('should import HYDRO Technical Parameters trajectory into data base', async () => {
+    await uploadTrajectory(
+      TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS,
+      'PEMMEDB25',
+      '2030-2031',
+      87,
+      'AT',
+      onProgress,
+      false,
+    );
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/trajectory/hydro-technical-parameters?area=AT&trajectoryToUse=PEMMEDB25&horizon=2030-2031&studyId=87&isCivilYear=false',
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
+
   it('should import RES Technology distribution trajectory without technology into data base', async () => {
     await uploadTrajectory(
       TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION,
