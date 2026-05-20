@@ -13,6 +13,7 @@ import {
   getDefaultLabel,
   getDeletionModalMessage,
   getHypothesis,
+  getItemsMenu,
   getPathFromTrajectoryType,
   getQueryParamAreaValue,
   getRowDataSelected,
@@ -1316,7 +1317,7 @@ describe('shouldDeleteCapacityModulation', () => {
       makeRow({ hasTS: true }), // dernière ligne OK
     ] as HypothesisRowData[];
 
-    // Après suppression de l’index 0 → il reste 1 seule trajectoire
+    // Après suppression de l'index 0 → il reste 1 seule trajectoire
     expect(shouldDeleteCapacityModulation(rows, 0)).toBe(true);
   });
 
@@ -1526,11 +1527,84 @@ describe('isEmptyRow', () => {
     expect(result).toBe(true);
   });
 
-  it('retourne false si aucune condition n’est remplie', () => {
+  it("retourne false si aucune condition n'est remplie", () => {
     mockTMock.mockReturnValue('OTHER');
 
     const result = isEmptyRow(TRAJECTORY_TYPE.STS, 'foo', 2, mockT);
 
     expect(result).toBe(false);
+  });
+});
+
+describe('getItemsMenu', () => {
+  const t = (key: string) => `translated:${key}`;
+
+  describe('THERMAL_CAPACITY', () => {
+    it('retourne 2 items : THERMAL_CAPACITY et THERMAL_PARAMETER', () => {
+      const result = getItemsMenu(TRAJECTORY_TYPE.THERMAL_CAPACITY, t as TFunction<'translation', undefined>, []);
+
+      expect(result).toHaveLength(2);
+      expect(result[0]).toEqual({
+        name: TRAJECTORY_TYPE.THERMAL_CAPACITY,
+        label: 'translated:misc.@installedPower',
+      });
+      expect(result[1]).toEqual({
+        name: TRAJECTORY_TYPE.THERMAL_PARAMETER,
+        label: 'translated:thermal.@parameters',
+      });
+    });
+  });
+
+  describe('HYDRO_SERIES', () => {
+    it('retourne 1 item : HYDRO_SERIES', () => {
+      const result = getItemsMenu(TRAJECTORY_TYPE.HYDRO_SERIES, t as TFunction<'translation', undefined>, []);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toEqual({
+        name: TRAJECTORY_TYPE.HYDRO_SERIES,
+        label: 'translated:hydro.@capacity',
+      });
+    });
+  });
+
+  describe('RES_CAPACITY', () => {
+    it('retourne 3 items quand defaultAreas est non vide', () => {
+      const result = getItemsMenu(TRAJECTORY_TYPE.RES_CAPACITY, t as TFunction<'translation', undefined>, [
+        { name: 'FR' },
+      ]);
+
+      expect(result).toHaveLength(3);
+      expect(result[0]).toEqual({ name: TRAJECTORY_TYPE.RES_CAPACITY, label: 'translated:misc.@installedPower' });
+      expect(result[1]).toEqual({ name: TRAJECTORY_TYPE.RES_LOAD, label: 'translated:misc.@loadFactor' });
+      expect(result[2]).toEqual({ name: TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION, label: 'translated:res.@distribution' });
+    });
+
+    it('retourne 2 items quand defaultAreas est vide', () => {
+      const result = getItemsMenu(TRAJECTORY_TYPE.RES_CAPACITY, t as TFunction<'translation', undefined>, []);
+
+      expect(result).toHaveLength(2);
+      expect(result[0]).toEqual({ name: TRAJECTORY_TYPE.RES_CAPACITY, label: 'translated:misc.@installedPower' });
+      expect(result[1]).toEqual({ name: TRAJECTORY_TYPE.RES_LOAD, label: 'translated:misc.@loadFactor' });
+    });
+  });
+
+  describe('MISC_CAPACITY', () => {
+    it('retourne 2 items : MISC_CAPACITY et MISC_LOAD', () => {
+      const result = getItemsMenu(TRAJECTORY_TYPE.MISC_CAPACITY, t as TFunction<'translation', undefined>, []);
+
+      expect(result).toHaveLength(2);
+      expect(result[0]).toEqual({ name: TRAJECTORY_TYPE.MISC_CAPACITY, label: 'translated:misc.@installedPower' });
+      expect(result[1]).toEqual({ name: TRAJECTORY_TYPE.MISC_LOAD, label: 'translated:misc.@loadFactor' });
+    });
+  });
+
+  describe('autres types (cas par défaut)', () => {
+    it('retourne 2 items avec le type en premier et MISC_LOAD en second', () => {
+      const result = getItemsMenu(TRAJECTORY_TYPE.LOAD, t as TFunction<'translation', undefined>, []);
+
+      expect(result).toHaveLength(2);
+      expect(result[0]).toEqual({ name: TRAJECTORY_TYPE.LOAD, label: 'translated:misc.@installedPower' });
+      expect(result[1]).toEqual({ name: TRAJECTORY_TYPE.MISC_LOAD, label: 'translated:misc.@loadFactor' });
+    });
   });
 });
