@@ -83,9 +83,13 @@ export interface TrajectoryLinkData {
   summerHcDirectMw: number | null;
   summerHcIndirectMw: number | null;
   flowbasedPerimeter: string | null;
+  hvdcMwDirect: number | null;
+  hvdcMwIndirect: number | null;
+  hvdcNbDirect: number | null;
+  hvdcNbIndirect: number | null;
+  hvdcFoRateDirect: number | null;
+  hvdcFoRateIndirect: number | null;
   hvdc: string | null;
-  specificTs: string | null;
-  forcedOutageHvac: string | null;
   hurdleCost: number | null;
 }
 
@@ -100,9 +104,13 @@ export const TrajectoryLinkDataScheme = {
   summerHcDirectMw: 'number',
   summerHcIndirectMw: 'number',
   flowbasedPerimeter: 'string',
+  hvdcMwDirect: 'number',
+  hvdcMwIndirect: 'number',
+  hvdcNbDirect: 'number',
+  hvdcNbIndirect: 'number',
+  hvdcFoRateDirect: 'number',
+  hvdcFoRateIndirect: 'number',
   hvdc: 'string',
-  specificTs: 'string',
-  forcedOutageHvac: 'string',
   hurdleCost: 'number',
 } as const;
 
