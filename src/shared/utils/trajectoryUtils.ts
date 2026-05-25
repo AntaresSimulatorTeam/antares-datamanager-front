@@ -362,10 +362,9 @@ export const convertIntoHypothesisRowWithTechnologies = (
 
   return Array.from(allAreas).map((area) => {
     const entries = groupedByArea[area] ?? [];
-    let parentEntry;
+    let parentEntry = null;
     let techEntries;
     if (isHydroType) {
-      parentEntry = null;
       techEntries = entries.filter((e) => e.trajectoryName.length > 0 && e.type === trajectoryType);
     } else {
       parentEntry = entries.find((e) => !e.technology || e.technology.trim() === '') ?? null;

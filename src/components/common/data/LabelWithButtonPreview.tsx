@@ -25,7 +25,7 @@ export const LabelWithButtonPreview = ({
 }: LabelWithButtonPreviewProps) => {
   const { t } = useTranslation();
 
-  const colorLabel = `${status === TRAJECTORY_SELECTION_STATUS.OK ? 'text-primary-800' : isReadOnly ? 'text-gray-600' : status === TRAJECTORY_SELECTION_STATUS.ERROR ? 'text-error-800' : 'text-gray-900'}`;
+  const colorLabel = `${isReadOnly ? 'text-gray-600' : status === TRAJECTORY_SELECTION_STATUS.OK ? 'text-primary-800' : status === TRAJECTORY_SELECTION_STATUS.ERROR ? 'text-error-800' : 'text-gray-900'}`;
   return (
     <div className={`${alignment ?? undefined} flex items-center justify-between gap-2`}>
       <span className={colorLabel}>{`${value} ${extraValue ?? ''}`}</span>

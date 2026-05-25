@@ -35,14 +35,14 @@ const getExpandableHypothesisTableHeaders = ({
     header: columnHeader || t('studyDetails.@areas'),
     size: type === TRAJECTORY_TYPE.STS ? 200 : 233,
     cell: ({ getValue, row, table }) => {
-      const { status, isDefault, hypothesis } = row.original;
+      const { status, isDefault, hypothesis, trajectory } = row.original;
       const subRowListName = getSubRowsList(row);
       const subRowListWithArea = getSubRowListWithArea(subRowListName, t, type);
       const isTechnology = list?.length ? list?.includes(hypothesis) : false;
-      const informationMessage = type ? getInformationMessage(table.getRowCount(), type, row.id) : null;
+      const informationMessage = type ? getInformationMessage(table.getRowCount(), type, row.id, trajectory) : null;
 
       return (
-        <div className="flex gap-1 py-1">
+        <div className="flex items-center gap-1 py-1">
           {row.getCanExpand() && (
             <IconButton
               appearance="outlined"
@@ -159,7 +159,12 @@ const getExpandableHypothesisTableHeaders = ({
     cell: ({ row, table: { options } }) => {
       const { status, isDefault, hypothesis, isDeletable } = row.original;
       const hasNoInput = (type === TRAJECTORY_TYPE.STS || type === TRAJECTORY_TYPE.HYDRO_SERIES) && row.depth === 0;
-      if (hypothesis === t('thermal.@specific') || (hasNoInput && isDefault)) return null;
+      if (
+        hypothesis === t('thermal.@specific') ||
+        (hasNoInput && isDefault) ||
+        (hasNoInput && !isDefault && isStudyGenerated)
+      )
+        return null;
       if (hasNoInput && !isDefault) {
         return (
           <div className={`${isDeletable ? 'pointer-events-auto visible' : 'pointer-events-none invisible'}`}>
@@ -173,28 +178,29 @@ const getExpandableHypothesisTableHeaders = ({
             />
           </div>
         );
-      }
-      const shouldShowProgressBar = progress > 0 && fileStatus === 'loading' && idSelected === row.id;
+      } else {
+        const shouldShowProgressBar = progress > 0 && fileStatus === 'loading' && idSelected === row.id;
 
-      return shouldShowProgressBar ? (
-        <ProgressBar statusFile={fileStatus} progressValue={progress} />
-      ) : (
-        <div className="flex items-center gap-1">
-          <CellWithStatus status={status} />
-          {options?.meta?.removeRow && !isDefault && !isStudyGenerated && (
-            <div className={`${isDeletable ? 'pointer-events-auto visible' : 'pointer-events-none invisible'}`}>
-              <IconButton
-                appearance="outlined"
-                aria-label="icon button aria label"
-                name="delete"
-                onClick={() => void options?.meta?.removeRow?.(hypothesis, row.id)}
-                size="s"
-                variant="transparent"
-              />
-            </div>
-          )}
-        </div>
-      );
+        return shouldShowProgressBar ? (
+          <ProgressBar statusFile={fileStatus} progressValue={progress} />
+        ) : (
+          <div className="flex items-center gap-1">
+            <CellWithStatus status={status} />
+            {options?.meta?.removeRow && !isDefault && !isStudyGenerated && (
+              <div className={`${isDeletable ? 'pointer-events-auto visible' : 'pointer-events-none invisible'}`}>
+                <IconButton
+                  appearance="outlined"
+                  aria-label="icon button aria label"
+                  name="delete"
+                  onClick={() => void options?.meta?.removeRow?.(hypothesis, row.id)}
+                  size="s"
+                  variant="transparent"
+                />
+              </div>
+            )}
+          </div>
+        );
+      }
     },
   }),
 ];

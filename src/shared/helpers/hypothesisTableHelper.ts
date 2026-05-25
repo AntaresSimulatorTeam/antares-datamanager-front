@@ -139,7 +139,8 @@ export const findSpecificTrajectoryToDelete = (
 export const getInformationMessage = (
   nbRows: number,
   type: TRAJECTORY_TYPE,
-  rowId?: string,
+  rowId: string,
+  trajectory: DbTrajectory | null,
 ): { messageKey: string; id: string } | null => {
   switch (type) {
     case TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER:
@@ -147,7 +148,10 @@ export const getInformationMessage = (
     case TRAJECTORY_TYPE.DSR:
       return { messageKey: 'dsr.@capacityModulationMessage', id: String(Math.max(nbRows - 1, 0)) };
     case TRAJECTORY_TYPE.HYDRO_SERIES:
-      return rowId?.split('.')[1] === '1' ? { messageKey: 'hydro.@informationMessage', id: rowId } : null;
+      return (!trajectory && rowId?.split('.')[1] === '1') ||
+        trajectory?.type === TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS
+        ? { messageKey: 'hydro.@informationMessage', id: rowId }
+        : null;
     default:
       return null;
   }
@@ -155,7 +159,7 @@ export const getInformationMessage = (
 
 export interface ComputeDsrResult {
   data: HypothesisRowData[];
-  readOnlyPatch: ReadOnlyObject; // uniquement les clés à mettre à jour
+  readOnlyPatch: ReadOnlyObject;
 }
 
 /**
