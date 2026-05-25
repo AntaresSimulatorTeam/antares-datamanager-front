@@ -501,11 +501,11 @@ describe('findSpecificTrajectoryToDelete', () => {
 
 describe('getInformationMessage', () => {
   it('retourne null si le type est undefined', () => {
-    expect(getInformationMessage(3, undefined as unknown as TRAJECTORY_TYPE)).toBeNull();
+    expect(getInformationMessage(3, undefined as unknown as TRAJECTORY_TYPE, '0', null)).toBeNull();
   });
 
   it('retourne le message thermal avec index = 1', () => {
-    const result = getInformationMessage(5, TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER);
+    const result = getInformationMessage(5, TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, '0', null);
 
     expect(result).toEqual({
       messageKey: 'thermal.@paramModulationMessage',
@@ -514,7 +514,7 @@ describe('getInformationMessage', () => {
   });
 
   it('retourne le message DSR avec index = nbRows - 1', () => {
-    const result = getInformationMessage(4, TRAJECTORY_TYPE.DSR);
+    const result = getInformationMessage(4, TRAJECTORY_TYPE.DSR, '0', null);
 
     expect(result).toEqual({
       messageKey: 'dsr.@capacityModulationMessage',
@@ -523,35 +523,48 @@ describe('getInformationMessage', () => {
   });
 
   it('retourne un index minimum de 0 pour DSR si nbRows <= 1', () => {
-    expect(getInformationMessage(1, TRAJECTORY_TYPE.DSR)).toEqual({
+    expect(getInformationMessage(1, TRAJECTORY_TYPE.DSR, '0', null)).toEqual({
       messageKey: 'dsr.@capacityModulationMessage',
       id: '0',
     });
 
-    expect(getInformationMessage(0, TRAJECTORY_TYPE.DSR)).toEqual({
+    expect(getInformationMessage(0, TRAJECTORY_TYPE.DSR, '0', null)).toEqual({
       messageKey: 'dsr.@capacityModulationMessage',
       id: '0',
     });
   });
 
   it('retourne le message HYDRO_SERIES avec id "1"', () => {
-    const result = getInformationMessage(4, TRAJECTORY_TYPE.HYDRO_SERIES, '1');
+    const result = getInformationMessage(4, TRAJECTORY_TYPE.HYDRO_SERIES, '1', null);
 
     expect(result).toBeNull();
   });
 
   it('retourne le message HYDRO_SERIES avec id "1.0"', () => {
-    const result = getInformationMessage(4, TRAJECTORY_TYPE.HYDRO_SERIES, '1.0');
+    const result = getInformationMessage(4, TRAJECTORY_TYPE.HYDRO_SERIES, '1.0', null);
 
     expect(result).toBeNull();
   });
 
   it('retourne le message HYDRO_SERIES avec id "1.1"', () => {
-    const result = getInformationMessage(4, TRAJECTORY_TYPE.HYDRO_SERIES, '1.1');
+    const result = getInformationMessage(4, TRAJECTORY_TYPE.HYDRO_SERIES, '1.1', null);
 
     expect(result).toEqual({
       messageKey: 'hydro.@informationMessage',
       id: '1.1',
+    });
+  });
+
+  it('retourne le message HYDRO_SERIES pour une subRow avec une trajectoire de type HYDRO_TECHNICAL_PARAMETERS"', () => {
+    const technicalParametersTrajectory = {
+      type: TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS,
+      trajectoryName: 'BP_23',
+    } as DbTrajectory;
+    const result = getInformationMessage(4, TRAJECTORY_TYPE.HYDRO_SERIES, '0.1', technicalParametersTrajectory);
+
+    expect(result).toEqual({
+      messageKey: 'hydro.@informationMessage',
+      id: '0.1',
     });
   });
 });
