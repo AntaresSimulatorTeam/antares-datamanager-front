@@ -27,7 +27,7 @@ export const TrajectoryDataVisualisation = ({ trajectoryData, onClose }: Traject
       : 'battery-charging-full';
 
   return (
-    <RdsModal size="medium">
+    <RdsModal size="large">
       <RdsModal.Title onClose={onClose} customIcon={<Icon name={icon} color="primary" />}>
         {`${title}: ${trajectory.trajectoryName}`}
       </RdsModal.Title>
