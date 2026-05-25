@@ -79,6 +79,7 @@ export const useFetchHypothesisTrajectories = (
     async (id: number, trajTypes: TRAJECTORY_TYPE[]) => {
       try {
         const isStudyGenerated = studyContextStatus === StudyStatus.GENERATED || studyStatus === StudyStatus.GENERATED;
+        const defaultAreaListNotInList = getDefaultAreaNotIncludedInAreaList(defaultAreas ?? [], areas);
 
         // 1) Lancer toutes les requêtes en parallèle
         const results: FetchResult[] = await Promise.all(
@@ -98,6 +99,7 @@ export const useFetchHypothesisTrajectories = (
             const labelTechnologies = technologies
               ? technologies.map((technology: TechnologyType) => technology.label)
               : [];
+
             const rows = buildHypothesisRows({
               trajType,
               trajectories: shouldSkipFetch ? contextTrajectories : trajectories,
@@ -108,8 +110,6 @@ export const useFetchHypothesisTrajectories = (
               t,
               dsrCmResult,
             });
-
-            const defaultAreaListNotInList = getDefaultAreaNotIncludedInAreaList(defaultAreas ?? [], areas);
 
             const readOnlyMap = buildReadOnlyMap({
               rows,
@@ -142,6 +142,7 @@ export const useFetchHypothesisTrajectories = (
         });
 
         let hydroRows: HypothesisRowData[] = [];
+        let hydroReadOnlyMap: ReadOnlyObject = {};
         if (isTrajectoryHydroType(trajectoryTypes[0])) {
           hydroRows = buildHypothesisRows({
             trajType: TRAJECTORY_TYPE.HYDRO_SERIES,
@@ -153,6 +154,13 @@ export const useFetchHypothesisTrajectories = (
             t,
             dsrCmResult: [],
             allResults: results,
+          });
+
+          hydroReadOnlyMap = buildReadOnlyMap({
+            rows: hydroRows,
+            trajType: trajectoryTypes[0],
+            isStudyGenerated,
+            defaultAreaListNotInList,
           });
         }
 
@@ -172,7 +180,11 @@ export const useFetchHypothesisTrajectories = (
         setReadOnlyRow((prev) => {
           const next = { ...prev };
           results.forEach(({ trajType, readOnlyMap }) => {
-            next[trajType] = readOnlyMap;
+            if (isTrajectoryHydroType(trajType)) {
+              next[trajType] = hydroReadOnlyMap;
+            } else {
+              next[trajType] = readOnlyMap;
+            }
           });
           return next as Record<TRAJECTORY_TYPE, ReadOnlyObject>;
         });
