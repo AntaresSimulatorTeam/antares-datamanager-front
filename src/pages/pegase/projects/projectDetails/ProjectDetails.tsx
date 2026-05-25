@@ -7,9 +7,7 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import StudyTableDisplay from '@/pages/pegase/home/components/StudyTableDisplay';
-import SearchBar from '@/pages/pegase/home/components/SearchBar';
 import { useTranslation } from 'react-i18next';
-import { RdsChip, RdsDivider } from 'rte-design-system-react';
 import DetailsContent from '@/components/banner/DetailsContent.tsx';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { ProjectCreationModal } from '@common/modal/ProjectCreationModal.tsx';
@@ -17,11 +15,12 @@ import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { useGetProjectDetails } from '@/hooks/useGetProjectDetails.ts';
 import { PegaseBreadcrumbItemType } from '@/shared/types';
 import { PegaseBreadcrumb } from '@common/layout/PegaseBreadcrumb/PegaseBreadcrumb.tsx';
+import { Chip, Divider, Searchbar } from '@design-system-rte/react';
 
 const ProjectDetails = () => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState<string | undefined>('');
-  const [activeChip, setActiveChip] = useState<boolean | null>(false);
+  const [activeChip, setActiveChip] = useState<boolean>(false);
   const [reFetchProject, setReFetchProject] = useState(0);
   const { user } = useUser();
   const { isModalOpen, toggleModal } = useNewStudyModal();
@@ -67,19 +66,20 @@ const ProjectDetails = () => {
       <div className="px-3 pt-3">
         <PegaseBreadcrumb items={headerItems}></PegaseBreadcrumb>
       </div>
-      <RdsDivider />
+      <Divider />
       <div className="flex flex-col gap-4 px-3 pb-3">
         <DetailsContent content={projectDetails} onClickButton={toggleModal} tagsList={projectDetails.tags} />
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-4">
-            <SearchBar
+            <Searchbar
               onSearch={(value?: string) => setSearchTerm(value)}
-              placeholder={t('home.@search_placeholder_study')}
+              label={t('home.@search_placeholder_study')}
             />
-            <RdsChip
+            <Chip
+              id="chip-project-details"
               label={t('home.@my_studies')}
               onClick={handleChipClick}
-              status={activeChip ? 'secondary' : 'primary'}
+              selected={activeChip}
             />
           </div>
           <StudyTableDisplay searchStudy={searchTerm} projectInfo={projectDetails} />

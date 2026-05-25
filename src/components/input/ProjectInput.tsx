@@ -38,18 +38,15 @@ const ProjectInput: React.FC<ProjectManagerProps> = ({ value, onChange, required
 
   return (
     <div className="flex flex-col items-start justify-start">
-      <div className="my-0.25 flex items-center justify-start p-0.5 text-button-s">
-        <div className="text-gray-700">{t('page.@project')}</div>
-        {required && <div className={'text-error-600'}>*</div>}
-      </div>
       <SelectAndSearchableInput
+        label={t('page.@project')}
         onSelect={(valueSelected: SelectOption) => void onSelect(valueSelected)}
         setSearchTerm={async (valueSearch?: string) => await loadProjects(valueSearch)}
-        defaultPlaceHolder={value?.label ?? t('studyDetails.@select_project')}
         isSearchable={true}
         options={projects}
         errorMessage={errorMessage}
         defaultValue={value?.label}
+        required={required}
       />
     </div>
   );

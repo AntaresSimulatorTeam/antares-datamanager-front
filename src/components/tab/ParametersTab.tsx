@@ -30,7 +30,7 @@ import { addRow, handleFetchTrajectoriesFS, handleTrajectorySearch } from '@/sha
 import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach';
-import { CheckBoxListWithSearchBar } from '@/components/list/CheckBoxListWithSearchBar.tsx';
+import { CheckBoxList } from '@/components/list/CheckBoxList.tsx';
 import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow.ts';
 import { getCheckedValues, shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
@@ -141,7 +141,7 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
 
   return (
     <div className="flex h-full min-h-0 w-full gap-6 xl:gap-7 2xl:gap-8">
-      <CheckBoxListWithSearchBar
+      <CheckBoxList
         checkedValues={checkedValues}
         options={areasOptions}
         handleSelectionChange={handleSelectionChange}

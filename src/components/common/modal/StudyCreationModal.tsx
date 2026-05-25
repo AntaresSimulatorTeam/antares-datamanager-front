@@ -15,8 +15,7 @@ import { useUser } from '@/store/contexts/UserContext.tsx';
 import { notifyToast } from '@/shared/notification/notification';
 import { validateMaxLength } from '@/shared/utils/validateMaxTextLength';
 import { MAX_KEYWORD_LENGTH, MAX_KEYWORD_NUMBER, MAX_STUDY_NAME_LENGTH } from '@/shared/const/studyConfig';
-import StdInputText from '@/components/forms/stdInputText/StdInputText.tsx';
-import { Button } from '@design-system-rte/react';
+import { Button, TextInput } from '@design-system-rte/react';
 
 interface StudyCreationModalProps {
   isOpen?: boolean;
@@ -112,16 +111,15 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
       <RdsModal.Content>
         <div className="flex w-full flex-col gap-4 self-stretch">
           <div className="flex w-1/2 flex-col items-start justify-start">
-            <StdInputText
+            <TextInput
+              id="text-input-study-create-name"
               label={t('modal.@input_name')}
               value={studyName}
               onChange={handleStudyNameChange}
-              variant="outlined"
-              placeHolder={t('studyModal.@study_creation_placeholder')}
               required
               maxLength={MAX_STUDY_NAME_LENGTH}
               error={!!studyErrorMessage}
-              helperText={studyErrorMessage}
+              assistiveTextLabel={studyErrorMessage}
             />
           </div>
           <HorizonInput

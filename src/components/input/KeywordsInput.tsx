@@ -8,11 +8,8 @@ import { Dispatch, SetStateAction, useState } from 'react';
 import { fetchSuggestedKeywords } from '@/shared/services/studyService.ts';
 import { clsx } from 'clsx';
 import { useTranslation } from 'react-i18next';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
-import StdInputText from '@/components/forms/stdInputText/StdInputText.tsx';
-import { ERROR_CLASSES, HELPER_CLASSES } from '@/components/forms/stdInputText/textClassBuilder.ts';
 import { validateMaxLength } from '@/shared/utils/validateMaxTextLength.ts';
-import { Button, IconButton } from '@design-system-rte/react';
+import { Button, IconButton, TextInput } from '@design-system-rte/react';
 
 interface KeywordsInputProps {
   keywords: string[];
@@ -114,16 +111,23 @@ const KeywordsInput = ({
 
   return (
     <div className={clsx(width ?? 'w-full', 'flex min-h-22 flex-col items-start justify-start gap-1')}>
-      <div className="inline-flex items-end justify-start gap-2">
-        <div className="relative flex w-full flex-col items-start">
-          <StdInputText
+      <div className="inline-flex items-end gap-1">
+        <div className="relative flex w-full flex-col items-start gap-2">
+          <TextInput
+            id="text-input-keywords"
             label={t('home.@keywords')}
-            value={keywordInput}
-            onChange={handleKeywordChange}
-            placeHolder={t('')}
-            variant="outlined"
-            maxLength={maxNbCharacters}
+            aria-required
+            assistiveAppearance="error"
+            autoComplete="off"
             error={!!errorMessage}
+            labelPosition="top"
+            rightIconAction="clean"
+            onChange={(value: string) => void handleKeywordChange(value)}
+            required
+            value={keywordInput}
+            assistiveTextLabel={errorMessage}
+            maxLength={maxNbCharacters}
+            showCounter
           />
           {/* Suggested Keywords Dropdown */}
           {keywordInput && !errorMessage && suggestedKeywords.length > 0 && (
@@ -149,7 +153,6 @@ const KeywordsInput = ({
           )}
         </div>
       </div>
-      <span className={clsx(HELPER_CLASSES, !!errorMessage && ERROR_CLASSES.text)}>{errorMessage}</span>
 
       {/* Keywords Display and Clear All Button */}
       <div className="flex flex-wrap gap-2">
@@ -163,12 +166,7 @@ const KeywordsInput = ({
 
       {/* Clear All Keywords Button */}
       {keywords?.length > 0 && (
-        <Button
-          label={t('projectModal.@keyword_button_clear')}
-          icon={StdIconId.InkEraser}
-          onClick={clearAllKeywords}
-          variant="text"
-        />
+        <Button label={t('projectModal.@keyword_button_clear')} onClick={clearAllKeywords} variant="text" />
       )}
     </div>
   );

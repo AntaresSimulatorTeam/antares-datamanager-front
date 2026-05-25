@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { RdsModal } from 'rte-design-system-react';
 import { useTranslation } from 'react-i18next';
 import KeywordsInput from '@/components/input/KeywordsInput.tsx';
@@ -17,8 +17,7 @@ import { validateMaxLength } from '@/shared/utils/validateMaxTextLength';
 import { MAX_STUDY_NAME_LENGTH } from '@/shared/const/studyConfig';
 import { hasArrayChanged } from '@/shared/utils/arrayUtils.ts';
 import ProjectInput from '@/components/input/ProjectInput.tsx';
-import StdInputText from '@/components/forms/stdInputText/StdInputText.tsx';
-import { Button } from '@design-system-rte/react';
+import { Button, TextInput } from '@design-system-rte/react';
 
 interface StudyCreationModalProps {
   isOpen?: boolean;
@@ -38,7 +37,10 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
   const { user } = useUser();
   const baseStudyName = study.name.substring(0, study.name.lastIndexOf('_'));
   const [studyName, setStudyName] = useState<string>(baseStudyName);
-  const [project, setProject] = useState<SelectOption>({ id: Number(study.projectId), label: study.project });
+  const [project, setProject] = useState<SelectOption>({
+    id: Number(study.projectId),
+    label: study.project,
+  });
   const [keywords, setKeywords] = useState<string[]>(study?.keywords || []);
   const [horizon, setHorizon] = useState<string>(() => {
     const rawHorizon = study?.horizon || '';
@@ -56,7 +58,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
     setHorizonErrorMessage('');
   };
 
-  const updateStudyHandler = async () => {
+  const updateStudyHandler = useCallback(async () => {
     resetErrorMessage();
     const studyData = {
       ...study,
@@ -85,7 +87,18 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
         setHorizonErrorMessage(errorMessages);
       }
     }
-  };
+  }, [
+    horizon,
+    isDuplicateMode,
+    keywords,
+    onClose,
+    project?.id,
+    project.label,
+    setReloadStudies,
+    study,
+    studyName,
+    user?.profile.sub,
+  ]);
 
   useEffect(() => {
     const validateForm = () => {
@@ -113,30 +126,19 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
         {isDuplicateMode ? t('home.@duplicate_study') : t('studyModal.@update_study')}
       </RdsModal.Title>
       <RdsModal.Content>
-        <div className="flex flex-col gap-4 self-stretch">
-          <div className="flex justify-between gap-2">
-            <div className="w-1/2">
-              <div className="my-0.25 flex items-center justify-start p-0.5 text-button-s">
-                <div className="text-gray-700">{t('modal.@input_name')}</div>
-                <div className={'text-error-600'}>*</div>
-              </div>
-              <StdInputText
-                value={studyName}
-                onChange={handleStudyNameChange}
-                variant="outlined"
-                placeHolder={t('studyModal.@study_creation_placeholder')}
-                required
-                maxLength={75}
-              />
-              <div
-                className={`text-error-500 ${studyErrorMessage ? 'opacity-100' : 'opacity-0'} flex h-2 justify-start text-left text-body-s leading-4`}
-              >
-                {studyErrorMessage ?? ''}
-              </div>
-            </div>
-            <div className="w-1/2">
-              <ProjectInput value={project} onChange={setProject} required />
-            </div>
+        <div className="flex flex-col gap-4">
+          <div className="flex justify-between">
+            <TextInput
+              id="text-input-study-modify-name"
+              value={studyName}
+              label={t('modal.@input_name')}
+              onChange={handleStudyNameChange}
+              required
+              maxLength={75}
+              error={!!studyErrorMessage}
+              assistiveTextLabel={studyErrorMessage}
+            />
+            <ProjectInput required={true} value={project} onChange={setProject} />
           </div>
           <HorizonInput
             horizon={horizon}

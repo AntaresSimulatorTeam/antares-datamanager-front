@@ -20,7 +20,7 @@ export function addSortColumn(
       ...column,
       header: (
         <div
-          className={`flex items-center ${isSortable ? 'cursor-pointer' : ''} header-container group`}
+          className={`flex items-center ${isSortable ? 'cursor-pointer' : ''} header-container group gap-1`}
           onMouseEnter={() => isSortable && handleHeaderHover(true)}
           onMouseLeave={() => isSortable && handleHeaderHover(false)}
           onClick={() => {
@@ -35,13 +35,13 @@ export function addSortColumn(
             <div>
               {sortBy[column.accessorKey as string] && sortedColumn === column.accessorKey ? (
                 sortBy[column.accessorKey as string] === 'asc' ? (
-                  <Icon name="arrow-alt-up" />
+                  <Icon size={14} name="arrow-alt-up" />
                 ) : (
-                  <Icon name="arrow-alt-down" />
+                  <Icon size={14} name="arrow-alt-down" />
                 )
               ) : (
                 <span className={`${isHeaderHovered ? 'opacity-100' : 'opacity-0'} transition-opacity duration-100`}>
-                  <Icon name="arrow-alt-up" />
+                  <Icon size={14} name="arrow-alt-up" />
                 </span>
               )}
             </div>
