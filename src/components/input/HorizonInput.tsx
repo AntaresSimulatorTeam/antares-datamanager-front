@@ -69,9 +69,10 @@ const HorizonInput: React.FC<YearInputProps> = ({
     }
   };
 
-  const handleBlur = () => {
-    validate(horizon);
-  };
+  const hasError = !!customErrorMessage || !!errorMessage;
+
+  const getAssistiveTextLabel = (): string =>
+    customErrorMessage || errorMessage || t('horizonInput.@assistiveTextForYear');
 
   return (
     <TextInput
@@ -80,12 +81,12 @@ const HorizonInput: React.FC<YearInputProps> = ({
       value={horizon}
       placeholder={disabled && horizon ? horizon : ''}
       onChange={handleInputChange}
-      onBlur={handleBlur}
+      onBlur={() => validate(horizon)}
       required={required}
       maxLength={4}
       disabled={disabled}
-      error={!!customErrorMessage || !!errorMessage}
-      assistiveTextLabel={customErrorMessage ? customErrorMessage : errorMessage ? errorMessage : 'Format: YYYY'}
+      error={hasError}
+      assistiveTextLabel={getAssistiveTextLabel()}
       assistiveAppearance={customErrorMessage || errorMessage ? 'error' : 'description'}
     />
   );

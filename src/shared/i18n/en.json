@@ -17,6 +17,9 @@
     "selectAnsSearchInput": {
       "@emptyList": "No result found"
     },
+    "horizonInput": {
+      "@assistiveTextForYear": "Format: YYYY"
+    },
     "spinner": {
       "label": "Loading ..."
     }

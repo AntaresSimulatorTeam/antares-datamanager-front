@@ -6,7 +6,6 @@ interface CheckBoxListProps {
   checkedValues: string[];
   handleSelectionChange: (value: string, isChecked: boolean) => Promise<void> | void;
   options: CheckBoxData[];
-  disabled: boolean;
 }
 
 export const CheckBoxList = ({ checkedValues, handleSelectionChange, options }: CheckBoxListProps) => {
