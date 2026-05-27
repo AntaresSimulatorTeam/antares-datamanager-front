@@ -110,7 +110,7 @@ const SelectAndSearchableInput = ({
             size="s"
             variant="text"
             onClick={(e) => void handleClickOnKeyboard(e)}
-            disabled={!isSelectEnable}
+            disabled={!isSelectEnable || isInputDisabled}
           />
         )}
       </div>

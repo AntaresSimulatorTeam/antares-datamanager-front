@@ -25,7 +25,7 @@ export const SelectInputWithButton = ({
       <SelectAndSearchableInput
         onSelect={(value: SelectOption) => void onSelect(value)}
         setSearchTerm={async (value?: string) => await onSearch(value)}
-        defaultPlaceHolder={placeHolder ?? t('studyDetails.@select_trajectory')}
+        defaultPlaceHolder={(placeHolder ?? isDisabled) ? '' : t('studyDetails.@select_trajectory')}
         isSearchable={true}
         isInputDisabled={isDisabled}
       />
