@@ -145,7 +145,6 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         checkedValues={checkedValues}
         options={areasOptions}
         handleSelectionChange={handleSelectionChange}
-        dividerPosition={defaultAreas.length}
         disabled={isStudyGenerated}
       />
       <div className="flex w-full flex-col gap-6">

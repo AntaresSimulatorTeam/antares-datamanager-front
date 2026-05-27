@@ -1,17 +1,19 @@
 import { useTranslation } from 'react-i18next';
 import { CheckBoxData } from '@/shared/types';
 import { Checkbox, Divider } from '@design-system-rte/react';
+import { useMemo } from 'react';
 
 interface CheckBoxListProps {
   checkedValues: string[];
   handleSelectionChange: (value: string, isChecked: boolean) => Promise<void> | void;
   options: CheckBoxData[];
+  disabled?: boolean;
 }
 
-export const CheckBoxList = ({ checkedValues, handleSelectionChange, options }: CheckBoxListProps) => {
+export const CheckBoxList = ({ disabled, checkedValues, handleSelectionChange, options }: CheckBoxListProps) => {
   const { t } = useTranslation();
-  const optionsDefault = options.filter((option) => option.isDefault);
-  const optionsNotDefault = options.filter((option) => !option.isDefault);
+  const optionsDefault = useMemo(() => options.filter((option) => option.isDefault), [options]);
+  const optionsNotDefault = useMemo(() => options.filter((option) => !option.isDefault), [options]);
 
   return (
     <div className="flex max-h-[45vh] w-1/5 flex-none shrink flex-col gap-1 self-start rounded border border-gray-400 px-3 py-2 text-left">
@@ -37,6 +39,7 @@ export const CheckBoxList = ({ checkedValues, handleSelectionChange, options }: 
             label={area.name}
             value={area.name}
             checked={checkedValues.includes(area.name)}
+            disabled={disabled}
             onClick={() => void handleSelectionChange(area.name, !checkedValues.includes(area.name))}
           />
         ))}

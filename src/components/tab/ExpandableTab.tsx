@@ -191,7 +191,6 @@ const ExpandableTab = ({
         checkedValues={checkedValues}
         options={areasOptions}
         handleSelectionChange={handleSelectionChange}
-        dividerPosition={defaultAreas.length}
         disabled={studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED}
       />
       <PegaseHypothesisTable
