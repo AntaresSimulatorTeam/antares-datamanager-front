@@ -73,6 +73,7 @@ const ProjectDetails = () => {
           <div className="flex items-center gap-4">
             <Searchbar
               onSearch={(value?: string) => setSearchTerm(value)}
+              onChange={(value?: string) => setSearchTerm(value)}
               label={t('home.@search_placeholder_study')}
             />
             <Chip

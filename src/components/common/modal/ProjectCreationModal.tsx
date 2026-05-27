@@ -21,6 +21,7 @@ import {
   MAX_PROJECT_NAME_LENGTH,
 } from '@/shared/const/studyConfig.ts';
 import { Button, Textarea, TextInput } from '@design-system-rte/react';
+import { FieldInFormation } from '@common/base/FieldInFormation.tsx';
 
 interface ProjectCreationModalProps {
   onClose: () => void;
@@ -83,15 +84,8 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
         {projectInfo ? t('home.@update_project') : t('home.@new_project')}
       </RdsModal.Title>
       <RdsModal.Content>
-        <div className="flex w-8/12 flex-col items-start gap-3">
-          <div className={'text-body-s text-gray-600'}>
-            <span>
-              {t('modal.@requiredAsterisk')}
-              {' ('}
-            </span>
-            <span className={'text-error-700'}> {'*'}</span>
-            <span> {')'}</span>
-          </div>
+        <div className="flex flex-col items-start gap-4">
+          <FieldInFormation />
           <TextInput
             aria-required
             assistiveAppearance="error"
@@ -116,7 +110,7 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
             value={name}
             assistiveTextLabel={nameError ?? ''}
           />
-          <div className="flex w-full">
+          <div className="flex w-8/12">
             <Textarea
               label={t('modal.@input_description')}
               value={description}

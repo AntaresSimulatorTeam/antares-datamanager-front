@@ -35,7 +35,7 @@ const HomePageContent = () => {
     <div className="flex w-full flex-1 flex-col justify-start gap-4">
       <StdHeading title={t('home.@study_table_title')} />
       <div className="flex items-center gap-4">
-        <Searchbar onSearch={searchStudy} label={t('home.@search_placeholder_study')} />
+        <Searchbar onChange={searchStudy} onSearch={searchStudy} label={t('home.@search_placeholder_study')} />
         <Chip id="chip-home-page" label={t('home.@my_studies')} onClick={handleChipClick} selected={activeChip} />
       </div>
       <StudyTableDisplay searchStudy={searchTerm} />

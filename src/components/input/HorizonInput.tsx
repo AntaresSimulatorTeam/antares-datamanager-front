@@ -72,7 +72,7 @@ const HorizonInput: React.FC<YearInputProps> = ({
   const hasError = !!customErrorMessage || !!errorMessage;
 
   const getAssistiveTextLabel = (): string =>
-    customErrorMessage || errorMessage || t('horizonInput.@assistiveTextForYear');
+    customErrorMessage || errorMessage || t('components.horizonInput.@assistiveTextForYear');
 
   return (
     <TextInput

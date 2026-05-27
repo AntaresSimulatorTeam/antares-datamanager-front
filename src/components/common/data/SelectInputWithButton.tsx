@@ -1,7 +1,7 @@
-import SelectAndSearchableInput from '@/components/input/SelectAndSearchableInput.tsx';
 import { useTranslation } from 'react-i18next';
 import { SelectOption } from '@/shared/types';
 import { Button } from '@design-system-rte/react';
+import SelectAndSearchableInput from '@/components/input/SelectAndSearchableInput.tsx';
 
 interface SelectInputWithButtonProps {
   onSelect: (value: SelectOption) => void;

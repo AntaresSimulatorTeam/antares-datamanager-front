@@ -29,6 +29,7 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
           disabled={!row.getCanSelect()}
           checked={row.getIsSelected()}
           name={`radio-${row.original.id}`}
+          onChange={() => {}}
         />
       </div>
     ),

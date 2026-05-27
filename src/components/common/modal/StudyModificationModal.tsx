@@ -18,6 +18,7 @@ import { MAX_STUDY_NAME_LENGTH } from '@/shared/const/studyConfig';
 import { hasArrayChanged } from '@/shared/utils/arrayUtils.ts';
 import ProjectInput from '@/components/input/ProjectInput.tsx';
 import { Button, TextInput } from '@design-system-rte/react';
+import { FieldInFormation } from '@common/base/FieldInFormation.tsx';
 
 interface StudyCreationModalProps {
   isOpen?: boolean;
@@ -126,8 +127,9 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
         {isDuplicateMode ? t('home.@duplicate_study') : t('studyModal.@update_study')}
       </RdsModal.Title>
       <RdsModal.Content>
-        <div className="flex flex-col gap-4">
-          <div className="flex justify-between">
+        <div className="flex flex-col items-start gap-4">
+          <FieldInFormation />
+          <div className="flex justify-between gap-2">
             <TextInput
               id="text-input-study-modify-name"
               value={studyName}
