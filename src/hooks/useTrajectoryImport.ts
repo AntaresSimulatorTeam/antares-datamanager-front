@@ -71,7 +71,7 @@ export const useTrajectoryImport = (
         }
       } catch (error) {
         setFileStatus('error');
-        if (isBusinessError(error) && value.id) {
+        if (isBusinessError(error)) {
           const message = t('studyDetails.@notificationAlert', {
             studyName: study?.name,
             trajectoryName: value.label,

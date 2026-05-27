@@ -39,18 +39,21 @@ import { TrajectorySearchParams } from '@/shared/types/HypothesisTable.ts';
 export const handleTrajectoryError = (
   type: TRAJECTORY_TYPE,
   rowIndex: number[],
-  trajectory: { id: number; label: string },
+  trajectory: { id?: number; label: string },
   hypothesis: string,
   userName: string,
   setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
   alert: { message: string; content: string },
 ) => {
-  setData((prev) =>
-    setNestedData(prev, rowIndex, {
-      trajectory: buildErrorTrajectory(type, trajectory.id, trajectory.label, userName, hypothesis),
-      status: TRAJECTORY_SELECTION_STATUS.ERROR,
-    }),
-  );
+  const trajectoryId = trajectory?.id;
+  if (trajectoryId != null) {
+    setData((prev) =>
+      setNestedData(prev, rowIndex, {
+        trajectory: buildErrorTrajectory(type, trajectoryId, trajectory.label, userName, hypothesis),
+        status: TRAJECTORY_SELECTION_STATUS.ERROR,
+      }),
+    );
+  }
 
   notifyAlert({
     icon: 'close',
