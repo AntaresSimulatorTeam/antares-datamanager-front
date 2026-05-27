@@ -77,6 +77,7 @@ export const useTrajectoryImport = (
             trajectoryName: value.label,
             trajectoryType: subArea ?? hypothesis,
           });
+
           handleTrajectoryError(
             typeToUse,
             indexArray,
