@@ -16,11 +16,10 @@ export const CheckBoxList = ({ disabled, checkedValues, handleSelectionChange, o
   const optionsNotDefault = useMemo(() => options.filter((option) => !option.isDefault), [options]);
 
   return (
-    <div className="flex max-h-[45vh] w-1/5 flex-none shrink flex-col gap-1 self-start rounded border border-gray-400 px-3 py-2 text-left">
+    <div className="flex max-h-[45vh] w-1/5 flex-none shrink flex-col gap-1 self-start rounded border border-gray-400 p-2 text-left">
       {optionsDefault?.map((area, index) => (
         <Checkbox
           key={`${index}-${area.name}`}
-          description={t('studyDetails.@checkBoxDefault')}
           id={area.name}
           label={area.name}
           value={area.name}
@@ -30,6 +29,7 @@ export const CheckBoxList = ({ disabled, checkedValues, handleSelectionChange, o
           showLabel
         />
       ))}
+      <span className="ml-3 text-body-xs text-gray-400">{t('studyDetails.@checkBoxDefault')}</span>
       <Divider />
       <div className="[&_label]::text-body-s relative min-h-0 overflow-y-auto">
         {optionsNotDefault?.map((area, index) => (
