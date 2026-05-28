@@ -11,7 +11,7 @@ import { CellWithStatus } from '@common/data/CellWithStatus.tsx';
 import { LabelWithButtonPreview } from '@common/data/LabelWithButtonPreview.tsx';
 import { LabelWithDeleteButton } from '@common/data/LabelWithDeleteButton.tsx';
 import { SelectInputWithButton } from '@common/data/SelectInputWithButton.tsx';
-import { ProgressBar } from '@/components/forms/ProgressBar.tsx';
+import { ProgressBar } from '@/components/input/ProgressBar.tsx';
 import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { IconButton } from '@design-system-rte/react';
 

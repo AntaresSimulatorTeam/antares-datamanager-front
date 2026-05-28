@@ -6,12 +6,10 @@
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import SearchBar from '@/pages/pegase/home/components/SearchBar';
 import PegaseCard from '@/components/pegase/pegaseCard/PegaseCard';
 import StudiesPagination from '@/pages/pegase/home/components/StudiesPagination';
 import { useDropdownOptions } from '@/hooks/useDropdownOptions';
 import { useProjectNavigation } from '@/hooks/useProjectNavigation';
-import { RdsChip } from 'rte-design-system-react';
 import { useFetchProjectList } from '@/hooks/useFetchProjectList';
 import { useHandlePinnedProjectList } from '@/hooks/useHandlePinnedProjectList.ts';
 import { useDeleteProject } from '@/hooks/useDeleteProject.ts';
@@ -22,13 +20,14 @@ import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { ProjectCreationModal } from '@common/modal/ProjectCreationModal.tsx';
 import { StdDropdownOption } from '@common/layout/stdDropdown/StdDropdown.tsx';
 import { PegaseCardContent } from '@/components/pegase/pegaseCard/pegaseCardContent/PegaseCardContent.tsx';
+import { Chip, Searchbar } from '@design-system-rte/react';
 
 const ProjectContent = () => {
   const { t } = useTranslation();
   const intervalSize = 9;
   const { user } = useUser();
   const [searchTerm, setSearchTerm] = useState<string | undefined>();
-  const [activeChip, setActiveChip] = useState<boolean | null>(false);
+  const [activeChip, setActiveChip] = useState<boolean>(false);
   const [current, setCurrent] = useState(0);
   const { projects, pinnedProjects } = useProject();
   const { count, refetch } = useFetchProjectList(current, intervalSize, searchTerm, projects.length);
@@ -66,21 +65,19 @@ const ProjectContent = () => {
   return (
     <div className="m-0 flex w-full flex-1 flex-col gap-3">
       <div className="flex items-center gap-4">
-        <SearchBar
+        <Searchbar
           onSearch={(value?: string) => setSearchTerm(value)}
-          placeholder={t('home.@search_placeholder_project')}
+          onChange={(value?: string) => setSearchTerm(value)}
+          label={t('home.@search_placeholder_project')}
         />
-        <RdsChip
-          label={t('home.@my_projects')}
-          onClick={handleChipClick}
-          status={activeChip ? 'secondary' : 'primary'}
-        />
+        <Chip id="chip-project-page" label={t('home.@my_projects')} onClick={handleChipClick} selected={activeChip} />
       </div>
       <div
         className="grid w-full gap-3"
         style={{
           gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
           margin: 0,
+          padding: 0,
         }}
       >
         {(projects.length > intervalSize ? projects.splice(0, 9) : projects || []).map((project) => {

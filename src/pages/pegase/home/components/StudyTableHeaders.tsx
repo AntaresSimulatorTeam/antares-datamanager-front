@@ -8,10 +8,9 @@ import StdAvatar from '@/components/common/layout/stdAvatar/StdAvatar';
 import { StudyDTO } from '@/shared/types/Study.type.ts';
 import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter';
 import { createColumnHelper } from '@tanstack/react-table';
-import StdRadioButton from '@/components/forms/stdRadioButton/StdRadioButton.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { avatarCase, sentenceCase } from '@/shared/utils/textUtils.ts';
-import { Icon } from '@design-system-rte/react';
+import { Icon, RadioButton } from '@design-system-rte/react';
 import StdTagList from '@common/base/StdTagList/StdTagList.tsx';
 
 const columnHelper = createColumnHelper<StudyDTO>();
@@ -23,12 +22,14 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
     size: 50,
     cell: ({ row }) => (
       <div className={`${row.getIsSelected() ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
-        <StdRadioButton
+        <RadioButton
+          groupName="study-table-radio-group"
           value={row.original.id.toString()}
           label=""
           disabled={!row.getCanSelect()}
           checked={row.getIsSelected()}
           name={`radio-${row.original.id}`}
+          onChange={() => {}}
         />
       </div>
     ),

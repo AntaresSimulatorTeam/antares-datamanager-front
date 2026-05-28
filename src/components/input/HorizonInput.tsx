@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import StdInputText from '@/components/forms/stdInputText/StdInputText.tsx';
+import { TextInput } from '@design-system-rte/react';
 
 interface YearInputProps {
   horizon: string;
@@ -69,28 +69,26 @@ const HorizonInput: React.FC<YearInputProps> = ({
     }
   };
 
-  const handleBlur = () => {
-    validate(horizon);
-  };
+  const hasError = !!customErrorMessage || !!errorMessage;
+
+  const getAssistiveTextLabel = (): string =>
+    customErrorMessage || errorMessage || t('components.horizonInput.@assistiveTextForYear');
 
   return (
-    <div className="flex items-center gap-2">
-      <div className="flex w-1/2 flex-col">
-        <StdInputText
-          label={t('home.@horizon')}
-          value={horizon}
-          onChange={handleInputChange}
-          onBlur={handleBlur}
-          placeHolder={t('horizonInput.@horizonPlaceholder')}
-          variant="outlined"
-          required={required}
-          maxLength={4}
-          disabled={disabled}
-          error={!!customErrorMessage || !!errorMessage}
-          helperText={customErrorMessage || errorMessage}
-        />
-      </div>
-    </div>
+    <TextInput
+      id="text-input-horizon"
+      label={t('home.@horizon')}
+      value={horizon}
+      placeholder={disabled && horizon ? horizon : ''}
+      onChange={handleInputChange}
+      onBlur={() => validate(horizon)}
+      required={required}
+      maxLength={4}
+      disabled={disabled}
+      error={hasError}
+      assistiveTextLabel={getAssistiveTextLabel()}
+      assistiveAppearance={customErrorMessage || errorMessage ? 'error' : 'description'}
+    />
   );
 };
 

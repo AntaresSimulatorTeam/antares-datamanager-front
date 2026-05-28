@@ -17,6 +17,9 @@
     "selectAnsSearchInput": {
       "@emptyList": "No result found"
     },
+    "horizonInput": {
+      "@assistiveTextForYear": "Format: YYYY"
+    },
     "spinner": {
       "label": "Loading ..."
     }
@@ -79,7 +82,8 @@
     "@input_name": "Name",
     "@input_description": "Description",
     "@button_create": "Create",
-    "@button_update": "Update"
+    "@button_update": "Update",
+    "@requiredAsterisk": "Required fields are marked with an asterisk"
   },
   "projectModal": {
     "@placeholder_name_input": "Name your project...",
@@ -90,7 +94,7 @@
     "@keyword_minimum_error": "Keyword must be at least {{min}} characters",
     "@keyword_maximum_error": "Keyword must not exceed {{max}} characters",
     "@keyword_max_keys_errors": "Cannot add more than {{maxNbKey}} keywords",
-    "@keyword_button_clear": "Clear all"
+    "@keyword_button_clear": "Clear all keywords"
   },
   "studyModal": {
     "@new_study": "Create a study",
@@ -147,7 +151,8 @@
     "@viewLog": "View Log",
     "@notificationAlert": "Error: {{studyName}} - {{trajectoryName}} no parameter cannot be saved for {{trajectoryType}}",
     "@default": "Default",
-    "@hydro": "Hydro"
+    "@hydro": "Hydro",
+    "@checkBoxDefault": "Automatic area selection"
   },
   "thermal": {
     "@installedPower": "Installed Power",

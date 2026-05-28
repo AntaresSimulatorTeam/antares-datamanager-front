@@ -1,5 +1,4 @@
 import { DivDefaultAsType } from '@/components/common/base/element.type';
-import StdCheckbox from '@/components/common/forms/stdCheckbox/StdCheckbox';
 import { useStdId } from '@/hooks/useStdId';
 import { type JSX } from 'react';
 import { dropdownElementClassBuilder } from '../dropdownClassBuilder';
@@ -13,7 +12,6 @@ type StdDropDownItemOwnProps<E extends React.ElementType | undefined> = {
   disabled?: boolean;
   active?: boolean;
   onClick?: (e: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>) => void;
-  onCheckedChange?: (checked?: boolean) => void;
   icon?: string;
   extraClasses?: string;
   withCheckbox?: boolean;
@@ -32,7 +30,6 @@ const StdDropdownItem = <E extends React.ElementType>({
   disabled = false,
   active = false,
   onClick,
-  onCheckedChange,
   icon,
   extraClasses,
   withCheckbox = false,
@@ -62,11 +59,6 @@ const StdDropdownItem = <E extends React.ElementType>({
       onBlur={onBlur}
       {...otherProps}
     >
-      {withCheckbox && (
-        <span className="pl-0.5" onClick={(e) => e.stopPropagation()} role="none">
-          <StdCheckbox checked={active} onChange={onCheckedChange} />
-        </span>
-      )}
       {icon && <Icon name={icon} size={ICON_SIZE} />}
       {label}
     </Element>

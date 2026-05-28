@@ -17,6 +17,9 @@
     "selectAnsSearchInput": {
       "@emptyList": "Aucun résultat"
     },
+    "horizonInput": {
+      "@assistiveTextForYear": "Format: YYYY"
+    },
     "spinner": {
       "label": "En chargement ..."
     }
@@ -90,7 +93,7 @@
     "@keyword_minimum_error": "Le mot-clé doit avoir à minimum {{min}} lettres",
     "@keyword_maximum_error": "Le mot-clé ne doit pas dépasser {{max}} lettres",
     "@keyword_max_keys_errors": "Il n'est pas possible d'ajouter plus que {{maxNbKey}} mot-clés",
-    "@keyword_button_clear": "Supprimer tout"
+    "@keyword_button_clear": "Supprimer tous les mot-clés"
   },
   "studyModal": {
     "@new_study": "Créer une étude",
@@ -146,7 +149,8 @@
     "@viewLog": "View Log",
     "@notificationAlert": "Erreur: {{studyName}} - {{trajectoryName}} aucun paramètre n'a pas être enregistré pour {{trajectoryType}}",
     "@default": "Par défaut",
-    "@hydro": "Hydro"
+    "@hydro": "Hydro",
+    "@checkBoxDefault": "Automatic area selection"
   },
   "thermal": {
     "@installedPower": "Capacités installées",

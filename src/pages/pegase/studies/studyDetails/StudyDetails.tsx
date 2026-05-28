@@ -6,7 +6,6 @@
 
 import { ReactNode, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { RdsDivider } from 'rte-design-system-react';
 import StudyNavigationMenu from '@/components/menu/StudyNavigationMenu.tsx';
 import { HypothesisTab, PegaseBreadcrumbItemType, StudyDTO } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
@@ -23,7 +22,7 @@ import StudyModificationModal from '@common/modal/StudyModificationModal.tsx';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { useProjectNavigation } from '@/hooks/useProjectNavigation.ts';
 import { PegaseBreadcrumb } from '@common/layout/PegaseBreadcrumb/PegaseBreadcrumb.tsx';
-import { Button, Loader } from '@design-system-rte/react';
+import { Button, Divider, Loader } from '@design-system-rte/react';
 
 const StudyDetails = () => {
   const [activeContent, setActiveContent] = useState<ReactNode>(null);
@@ -94,7 +93,7 @@ const StudyDetails = () => {
       <div className="px-3 pt-3">
         <PegaseBreadcrumb items={headerItems} />
       </div>
-      <RdsDivider />
+      <Divider />
       <div className="flex flex-1 flex-col gap-2 overflow-hidden px-3 pb-3">
         <DetailsContent content={studyData} onClickButton={toggleModal} tagsList={studyData?.keywords} />
 

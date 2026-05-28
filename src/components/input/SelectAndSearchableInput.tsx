@@ -6,11 +6,9 @@
 
 import { MouseEvent, useCallback, useRef, useState } from 'react';
 import { SelectOption } from '@/shared/types';
-import StdInputText from '@/components/forms/stdInputText/StdInputText.tsx';
-import { IconButton } from '@design-system-rte/react';
+import { IconButton, TextInput } from '@design-system-rte/react';
 
 interface ProjectManagerProps {
-  defaultPlaceHolder: string;
   onSelect: (value: SelectOption) => void;
   setSearchTerm?: (value?: string) => Promise<SelectOption[] | undefined>;
   isSearchable?: boolean;
@@ -20,10 +18,11 @@ interface ProjectManagerProps {
   required?: boolean;
   errorMessage?: string;
   defaultValue?: string;
+  label?: string;
+  defaultPlaceHolder?: string;
 }
 
 const SelectAndSearchableInput = ({
-  defaultPlaceHolder,
   onSelect,
   setSearchTerm,
   isSearchable = false,
@@ -33,15 +32,17 @@ const SelectAndSearchableInput = ({
   required = false,
   errorMessage,
   defaultValue,
+  label,
+  defaultPlaceHolder,
 }: ProjectManagerProps) => {
   const [defaultOptions] = useState<SelectOption[] | undefined>(options);
   const [optionsSelection, setOptionsSelection] = useState<SelectOption[] | undefined>(options ?? []);
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [isSelectEnable, setIsSelectEnable] = useState<boolean>(true);
-  const [placeHolder] = useState<string>(defaultPlaceHolder);
   const [valueInput, setValueInput] = useState<string>(defaultValue ?? '');
   const dropdownList = useRef<HTMLDivElement | null>(null);
   const selectInputClass = isInputDisabled ? `bg-gray-200 border-opacity-0 cursor-not-allowed pointer-events-none` : '';
+  const classNameIcon = `absolute right-0 ${label ? 'top-4' : 'top-0.5'} z-50`;
 
   const handleInputChange = useCallback(
     async (value: string) => {
@@ -102,18 +103,20 @@ const SelectAndSearchableInput = ({
 
   return (
     <div className={`relative ${selectInputClass}`}>
-      <div className="absolute right-0 top-0.5">
-        {isSelectEnable && (
+      <div className={classNameIcon}>
+        {isSelectEnable && !valueInput && (
           <IconButton
             name={isDropdownOpen ? 'arrow-chevron-down' : 'arrow-chevron-right'}
             size="s"
             variant="text"
             onClick={(e) => void handleClickOnKeyboard(e)}
-            disabled={!isSelectEnable}
+            disabled={!isSelectEnable || isInputDisabled}
           />
         )}
       </div>
-      <StdInputText
+      <TextInput
+        id="text-input-select"
+        label={label ?? ''}
         onChange={(e) => {
           if (isSearchable) {
             void handleInputChange(e);
@@ -123,16 +126,16 @@ const SelectAndSearchableInput = ({
             setIsDropdownOpen(false);
           }
         }}
-        placeHolder={placeHolder}
-        variant="outlined"
         value={valueInput}
         disabled={isInputDisabled}
         required={required}
+        rightIconAction="clean"
+        placeholder={defaultPlaceHolder}
       />
       {errorMessage && <div className="text-red-500 mt-2">{errorMessage}</div>}
       {isDropdownOpen && !!optionsSelection?.length && (
         <div
-          className="absolute left-0 top-4 z-50 max-h-32 w-full overflow-y-auto rounded border border-gray-300 bg-gray-w shadow-2 outline-none"
+          className={`absolute left-0 ${label ? 'top-8' : 'top-4'} z-50 max-h-32 w-full overflow-y-auto rounded border border-gray-300 bg-gray-w shadow-2 outline-none`}
           onMouseDown={(e) => e.preventDefault()}
           ref={dropdownList}
           tabIndex={0}

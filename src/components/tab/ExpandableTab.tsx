@@ -30,7 +30,7 @@ import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow
 import { useTrajectorySearchHandler } from '@/hooks/useTrajectorySearchHandler.ts';
 import { getTypeToImport, shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
-import { CheckBoxListWithSearchBar } from '@/components/list/CheckBoxListWithSearchBar.tsx';
+import { CheckBoxList } from '@/components/list/CheckBoxList.tsx';
 import { useTranslation } from 'react-i18next';
 import { TrajectoryDataVisualisation } from '@common/modal/TrajectoryDataVisualisation.tsx';
 import { useTrajectoryFetchFromFSHandler } from '@/hooks/useTrajectoryFetchFromFSHandler.ts';
@@ -187,11 +187,10 @@ const ExpandableTab = ({
 
   return (
     <div className="flex h-fit w-full gap-6 xl:gap-7 2xl:gap-8">
-      <CheckBoxListWithSearchBar
+      <CheckBoxList
         checkedValues={checkedValues}
         options={areasOptions}
         handleSelectionChange={handleSelectionChange}
-        dividerPosition={defaultAreas.length}
         disabled={studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED}
       />
       <PegaseHypothesisTable

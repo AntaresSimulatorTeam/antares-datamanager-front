@@ -5,7 +5,7 @@
  */
 
 import { RdsModal } from 'rte-design-system-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import KeywordsInput from '@/components/input/KeywordsInput.tsx';
 import { createProject, updateProject } from '@/shared/services/projectService';
@@ -13,8 +13,6 @@ import { notifyToast } from '@/shared/notification/notification.tsx';
 import { PROJECT_ACTION } from '@/shared/enum/project.ts';
 import { ProjectActionType, ProjectResponse } from '@/shared/types/Project.type.ts';
 import { useProjectDispatch } from '@/store/contexts/ProjectContext.tsx';
-import StdInputText from '@/components/forms/stdInputText/StdInputText.tsx';
-import StdInputTextArea from '@common/forms/stdInputTextArea/StdInputTextArea.tsx';
 import { validateMaxLength } from '@/shared/utils/validateMaxTextLength.ts';
 import {
   MAX_KEYWORD_LENGTH,
@@ -22,7 +20,8 @@ import {
   MAX_PROJECT_DESCRIPTION_LENGTH,
   MAX_PROJECT_NAME_LENGTH,
 } from '@/shared/const/studyConfig.ts';
-import { Button } from '@design-system-rte/react';
+import { Button, Textarea, TextInput } from '@design-system-rte/react';
+import { FieldInFormation } from '@common/base/FieldInFormation.tsx';
 
 interface ProjectCreationModalProps {
   onClose: () => void;
@@ -36,12 +35,7 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
   const [keywords, setKeywords] = useState<string[]>(projectInfo?.tags ?? []);
   const [isFormValid, setIsFormValid] = useState(false);
   const [nameError, setNameError] = useState<string | null>(null);
-  const [descriptionError, setDescriptionError] = useState<string | null>(null);
   const dispatch = useProjectDispatch();
-
-  useEffect(() => {
-    setIsFormValid(name.length > 0 && !nameError && !descriptionError);
-  }, [name.length, nameError, descriptionError]);
 
   const handleCreateProject = async () => {
     try {
@@ -90,44 +84,48 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
         {projectInfo ? t('home.@update_project') : t('home.@new_project')}
       </RdsModal.Title>
       <RdsModal.Content>
-        <div className="flex w-8/12 flex-col items-start gap-3">
-          <StdInputText
+        <div className="flex flex-col items-start gap-4">
+          <FieldInFormation />
+          <TextInput
+            aria-required
+            assistiveAppearance="error"
+            autoComplete="off"
+            error={!!nameError}
+            id="text-input-default"
             label={t('modal.@input_name')}
-            value={name}
-            onChange={(text: string) => {
-              if (validateMaxLength(text, MAX_PROJECT_NAME_LENGTH)) {
-                setName(text || '');
+            labelPosition="top"
+            rightIconAction="clean"
+            onChange={(value: string) => {
+              if (validateMaxLength(value, MAX_PROJECT_NAME_LENGTH)) {
                 setNameError(null);
-              } else if (text?.length === MAX_PROJECT_NAME_LENGTH + 1) {
-                setName(text || '');
+                setName(value);
+                setIsFormValid(true);
+              } else if (value?.length === MAX_PROJECT_NAME_LENGTH + 1) {
                 setNameError(t('modal.@number_characters_exceeds'));
+                setIsFormValid(false);
+                setName('');
               }
             }}
-            variant="outlined"
-            placeHolder={t('projectModal.@placeholder_name_input')}
             required
-            maxLength={MAX_PROJECT_NAME_LENGTH}
-            autoFocus={true}
-            error={!!nameError}
-            helperText={nameError ?? ''}
+            value={name}
+            assistiveTextLabel={nameError ?? ''}
           />
-          <div className="flex w-full [&_textarea]:min-h-[300px] [&_textarea]:resize-none">
-            <StdInputTextArea
+          <div className="flex w-8/12">
+            <Textarea
               label={t('modal.@input_description')}
               value={description}
-              onChange={(text) => {
+              onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
+                const text = event.target.value;
                 if (validateMaxLength(text, MAX_PROJECT_DESCRIPTION_LENGTH)) {
                   setDescription(text || '');
-                  setDescriptionError(null);
+                  !nameError && setIsFormValid(true);
                 } else if (text?.length === MAX_PROJECT_DESCRIPTION_LENGTH + 1) {
                   setDescription(text || '');
-                  setDescriptionError(t('modal.@number_characters_exceeds'));
+                  setIsFormValid(false);
                 }
               }}
-              maxLength={MAX_PROJECT_DESCRIPTION_LENGTH}
-              placeholder={t('projectModal.@placeholder_description_input')}
-              error={!!descriptionError}
-              helperText={descriptionError ?? ''}
+              showCounter={true}
+              rows={3}
             />
           </div>
           <KeywordsInput

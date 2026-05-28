@@ -5,17 +5,16 @@
  */
 
 import { useState } from 'react';
-import SearchBar from './SearchBar';
 import StudyTableDisplay from './StudyTableDisplay';
 import { useTranslation } from 'react-i18next';
-import { RdsChip } from 'rte-design-system-react';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import StdHeading from '@common/layout/stdHeading/StdHeading.tsx';
+import { Chip, Searchbar } from '@design-system-rte/react';
 
 const HomePageContent = () => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState<string | undefined>();
-  const [activeChip, setActiveChip] = useState<boolean | null>(false);
+  const [activeChip, setActiveChip] = useState<boolean>(false);
   const { user } = useUser();
 
   const searchStudy = (value?: string | undefined) => {
@@ -36,12 +35,8 @@ const HomePageContent = () => {
     <div className="flex w-full flex-1 flex-col justify-start gap-4">
       <StdHeading title={t('home.@study_table_title')} />
       <div className="flex items-center gap-4">
-        <SearchBar onSearch={searchStudy} placeholder={t('home.@search_placeholder_study')} />
-        <RdsChip
-          label={t('home.@my_studies')}
-          onClick={handleChipClick}
-          status={activeChip ? 'secondary' : 'primary'}
-        />
+        <Searchbar onChange={searchStudy} onSearch={searchStudy} label={t('home.@search_placeholder_study')} />
+        <Chip id="chip-home-page" label={t('home.@my_studies')} onClick={handleChipClick} selected={activeChip} />
       </div>
       <StudyTableDisplay searchStudy={searchTerm} />
     </div>

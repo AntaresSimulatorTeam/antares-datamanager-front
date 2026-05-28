@@ -5,6 +5,6 @@
  */
 
 export interface SelectOption {
-  id: number;
+  id?: number;
   label: string;
 }
