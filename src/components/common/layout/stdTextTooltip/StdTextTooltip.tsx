@@ -15,6 +15,7 @@ export type StdTextTooltipProps = {
   setShow?: Dispatch<SetStateAction<boolean>>;
   disableArrow?: boolean;
   id?: string;
+  tooltipClassName?: string;
 };
 
 const StdTextTooltip = ({
@@ -28,6 +29,7 @@ const StdTextTooltip = ({
   disableArrow,
   children,
   id,
+  tooltipClassName,
 }: PropsWithChildren<StdTextTooltipProps>) => (
   <StdFloatingWrapper
     show={show}
@@ -42,7 +44,7 @@ const StdTextTooltip = ({
     <Trigger>{children}</Trigger>
     {enabled ? (
       <Element>
-        <StdTooltip id={id}>{text}</StdTooltip>
+        <StdTooltip id={id} className={tooltipClassName}>{text}</StdTooltip>
       </Element>
     ) : (
       <></>
