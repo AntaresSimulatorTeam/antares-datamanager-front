@@ -202,7 +202,11 @@ const typeNameContains = (value: string, typeName: string): boolean => {
 
 export const findTechnologyMatch = (entries: DbTrajectory[], option: string) =>
   entries.find((entry) => {
-    if (entry.type === TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION) {
+    if (
+      entry.type === TRAJECTORY_TYPE.RES_CAPACITY ||
+      entry.type === TRAJECTORY_TYPE.RES_LOAD ||
+      entry.type === TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION
+    ) {
       return normalizeTechnology(entry.technology) === snakeCaseUnderscore(option);
     }
     if (isTrajectoryHydroType(entry.type)) {
