@@ -4,25 +4,24 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, ReactNode, SetStateAction, useCallback, useEffect, useState } from 'react';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useTranslation } from 'react-i18next';
 import { useStudy } from '@/store/contexts/StudyContext.tsx';
-import { HypothesisTab, StudyDTO, WarningTrajectoryType } from '@/shared/types';
-import StdAvatar from '@common/layout/stdAvatar/StdAvatar.tsx';
+import { StudyDTO } from '@/shared/types';
 import { getStudyMenu } from '@/shared/utils/trajectoryUtils.ts';
 import { useFetchAreas } from '@/hooks/useFetchAreas.ts';
-import { countWarning } from '@/shared/utils/warningUtils.ts';
 import { getNbMessagesFromTrajectoryType } from '@/shared/services/trajectoryService.ts';
-import StdTabItem from '@common/layout/stdTabs/StdTabItem.tsx';
 import { AreaLinkTab } from '@/components/tab/AreaLinkTab.tsx';
 import { TabMenu } from '@/components/menu/TabMenu.tsx';
 import ExpandableTab from '@/components/tab/ExpandableTab.tsx';
+import { Tab } from '@design-system-rte/react';
+import { TabItemProps } from '@design-system-rte/core/components/tab/tab.interface';
 
 type StudyNavigationMenuProps = {
   onRenderActiveComponent?: (content: ReactNode | null) => void;
-  setActiveTab: Dispatch<SetStateAction<HypothesisTab>>;
-  activeTab: HypothesisTab;
+  setActiveTab: Dispatch<SetStateAction<TabItemProps>>;
+  activeTab: TabItemProps;
   setErrorMessage: Dispatch<SetStateAction<string>>;
   studyData: StudyDTO;
 };
@@ -36,23 +35,24 @@ const StudyNavigationMenu = ({
 }: StudyNavigationMenuProps) => {
   const { t } = useTranslation();
   const studyState = useStudy();
-  const [tabs, setTabs] = useState<HypothesisTab[]>(
+  const [tabs, setTabs] = useState<TabItemProps[]>(
     getStudyMenu(t, !!studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0]),
   );
-  const [warningTrajectory, setWarningTrajectory] = useState<WarningTrajectoryType>();
+
   const { areaDefault, trajectoryAreas } = useFetchAreas(studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0]);
 
   useEffect(() => {
     setTabs((prev) =>
       prev.map((tab) => ({
         ...tab,
-        isDisabled: tab.name !== TRAJECTORY_TYPE.AREA && !studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0],
+        disabled:
+          tab.id != (TRAJECTORY_TYPE.AREA as string) && !studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0],
       })),
     );
   }, [studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories]);
 
-  useEffect(() => {
-    const renderActiveComponent = (type: TRAJECTORY_TYPE): ReactNode | null => {
+  const renderActiveComponent = useCallback(
+    (type: TRAJECTORY_TYPE): ReactNode | null => {
       switch (type) {
         case TRAJECTORY_TYPE.LOAD:
         case TRAJECTORY_TYPE.DSR:
@@ -74,26 +74,55 @@ const StudyNavigationMenu = ({
         default:
           return <AreaLinkTab setErrorMessage={setErrorMessage} studyData={studyData} />;
       }
-    };
+    },
+    [areaDefault, setErrorMessage, studyData, trajectoryAreas],
+  );
+
+  useEffect(() => {
     const countNbWarningMessages = async (id: number) => {
       try {
         const result = await getNbMessagesFromTrajectoryType(id);
-        setWarningTrajectory(result);
+        setTabs((prev) =>
+          prev.map((tab) => {
+            let nbWarning = result?.[tab.id as TRAJECTORY_TYPE] || 0;
+            if (TRAJECTORY_TYPE.AREA === (tab.id as TRAJECTORY_TYPE)) {
+              nbWarning += result.LINK || 0;
+            }
+            const count = { badgeCount: 0 };
+            if (activeTab.id !== tab.id && nbWarning > 0) {
+              count.badgeCount = nbWarning;
+              return {
+                ...tab,
+                ...(activeTab.id !== tab.id && nbWarning > 0 && count),
+              };
+            } else if (activeTab.id === tab.id) {
+              delete tab.badgeCount;
+              return {
+                ...tab,
+              };
+            } else {
+              return tab;
+            }
+          }),
+        );
       } catch {
         // silent handler
       }
     };
+
+    void countNbWarningMessages(studyData?.id);
     if (onRenderActiveComponent) {
-      if (!activeTab.isDisabled) {
+      if (!activeTab.disabled) {
         setErrorMessage('');
-        onRenderActiveComponent(renderActiveComponent(activeTab.name));
+        onRenderActiveComponent(renderActiveComponent(activeTab.id as TRAJECTORY_TYPE));
       }
     }
-    void countNbWarningMessages(studyData?.id);
   }, [
-    activeTab,
+    activeTab.disabled,
+    activeTab.id,
     areaDefault,
     onRenderActiveComponent,
+    renderActiveComponent,
     setErrorMessage,
     studyData,
     studyData?.id,
@@ -102,33 +131,21 @@ const StudyNavigationMenu = ({
   ]);
 
   return (
-    <div className="flex space-x-4 p-4">
-      {tabs.map((tab) => {
-        const nbWarning = warningTrajectory ? countWarning(warningTrajectory, tab.name) : 0;
-        return (
-          <div className="flex items-center space-x-2" key={tab.name}>
-            <StdTabItem
-              key={tab.name}
-              name={tab.name}
-              label={tab.label}
-              active={activeTab.name === tab.name}
-              disabled={tab.isDisabled}
-              onClick={() => !tab.isDisabled && setActiveTab(tab)}
-              icon={tab.icon}
-            />
-            {nbWarning > 0 && activeTab.name !== tab.name && (
-              <StdAvatar
-                initials={`${nbWarning}`}
-                size="es"
-                backgroundColor="orange"
-                fullname=""
-                textColor="white"
-                hasToolTip={false}
-              />
-            )}
-          </div>
-        );
-      })}
+    <div className="pb-4">
+      <Tab
+        onChange={(id) => {
+          const tabId = tabs.find((tab) => tab.id === id);
+          if (tabId) {
+            setActiveTab(tabId);
+          }
+        }}
+        direction="horizontal"
+        alignment="start"
+        overflowType="dropdown"
+        selectedTabId={activeTab.id}
+        inverted={false}
+        options={tabs}
+      />
     </div>
   );
 };

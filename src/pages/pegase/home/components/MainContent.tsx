@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { Suspense } from 'react';
+import { Suspense, useMemo } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import PegaseStar from '@/components/pegase/star/PegaseStar';
 import ProjectDetails from '@/pages/pegase/projects/projectDetails/ProjectDetails';
@@ -14,27 +14,25 @@ import { UserSettingsContext } from '@/store/contexts/UserSettingsContext';
 import { THEME_COLOR } from '@/shared/types';
 import ThemeHandler from '@common/handler/ThemeHandler';
 import { PegaseAlertContainer, PegaseToastContainer } from '@/shared/notification/containers';
-import { navBarConfig } from '@/shared/const/navBarConfig';
 import { StudyProvider } from '@/store/contexts/StudyProvider';
-import StdNavbar from '@common/layout/stdNavbar/StdNavbar.tsx';
 import { translateMenuItemLabel } from '@/shared/utils/textUtils.ts';
 import { useTranslation } from 'react-i18next';
-import { PEGASE_NAVBAR_ID } from '@/shared/constants.ts';
+import { AppSideNav } from '@common/layout/AppSideNav.tsx';
+
+const INITIAL_USER_SETTINGS = { theme: THEME_COLOR.LIGHT };
 
 const MainContent = () => {
   const { t } = useTranslation();
+  const topItems = useMemo(() => translateMenuItemLabel(menuTopData, t), [t]);
+  const bottomItems = useMemo(() => translateMenuItemLabel(menuBottomData, t), [t]);
+
   return (
     <div className="flex h-screen w-screen dark:bg-gray-900 dark:text-gray-200">
-      <UserSettingsContext.Provider initialState={{ theme: THEME_COLOR.LIGHT }}>
+      <UserSettingsContext.Provider initialState={INITIAL_USER_SETTINGS}>
         <ThemeHandler />
         <PegaseToastContainer />
         <PegaseAlertContainer />
-        <StdNavbar
-          id={PEGASE_NAVBAR_ID}
-          topItems={translateMenuItemLabel(menuTopData, t)}
-          bottomItems={translateMenuItemLabel(menuBottomData, t)}
-          config={navBarConfig}
-        />
+        <AppSideNav topItems={topItems} bottomItems={bottomItems} />
         <div className="flex h-full w-full min-w-0 flex-col">
           <PegaseStar />
           <Suspense>
@@ -48,8 +46,8 @@ const MainContent = () => {
                 }
               />
               <Route path="/project/:id" element={<ProjectDetails />} />
-              {Object.entries([...menuBottomData, ...menuTopData]).map(([key, route]) => (
-                <Route key={key} path={route.path} Component={route.component} />
+              {Object.entries([...bottomItems, ...topItems]).map(([key, route]) => (
+                <Route key={key} path={route.link} Component={route.component} />
               ))}
             </Routes>
           </Suspense>

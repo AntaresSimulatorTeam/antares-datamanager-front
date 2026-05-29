@@ -7,11 +7,10 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import StudyNavigationMenu from '@/components/menu/StudyNavigationMenu.tsx';
-import { HypothesisTab, PegaseBreadcrumbItemType, StudyDTO } from '@/shared/types';
+import { PegaseBreadcrumbItemType, StudyDTO } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { generateStudy, getStudyById } from '@/shared/services/studyService.ts';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { DetailsContent } from '@/components/banner/DetailsContent.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
@@ -23,6 +22,7 @@ import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { useProjectNavigation } from '@/hooks/useProjectNavigation.ts';
 import { PegaseBreadcrumb } from '@common/layout/PegaseBreadcrumb/PegaseBreadcrumb.tsx';
 import { Button, Divider, Loader } from '@design-system-rte/react';
+import { TabItemProps } from '@design-system-rte/core/components/tab/tab.interface';
 
 const StudyDetails = () => {
   const [activeContent, setActiveContent] = useState<ReactNode>(null);
@@ -32,14 +32,15 @@ const StudyDetails = () => {
   const dispatch = useStudyDispatch();
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const [isGenerating, setIsGenerating] = useState(false);
-  const [activeTab, setActiveTab] = useState<HypothesisTab>({
-    name: TRAJECTORY_TYPE.AREA,
+  const [activeTab, setActiveTab] = useState<TabItemProps>({
+    id: TRAJECTORY_TYPE.AREA,
+    panelId: TRAJECTORY_TYPE.AREA,
     label: t('studyDetails.@areas_links'),
-    icon: StdIconId.LinkedServices,
-    isDisabled: false,
+    icon: 'share',
+    disabled: false,
   });
   const [errorMessage, setErrorMessage] = useState<string>('');
-  const { warningMessages } = useFetchWarningMessages(id ? Number(id) : null, activeTab.name);
+  const { warningMessages } = useFetchWarningMessages(id ? Number(id) : null, activeTab.id as TRAJECTORY_TYPE);
   const [reloadStudy, setReloadStudy] = useState(0);
   const [studyData, setStudyData] = useState<StudyDTO | null>(null);
   const { navigateToProject } = useProjectNavigation();

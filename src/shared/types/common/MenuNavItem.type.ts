@@ -4,15 +4,13 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { ComponentType, ElementType } from 'react';
-import { AnchorDefaultAsType } from '@/shared/types';
+import { ComponentType } from 'react';
 
-export type MenuNavItem<E extends ElementType = typeof AnchorDefaultAsType> = {
+export type MenuNavItem = {
   key: string;
   label: string;
-  path: string;
+  link: string;
   icon: string;
   id: string;
-  as?: E;
   component: ComponentType;
 };
