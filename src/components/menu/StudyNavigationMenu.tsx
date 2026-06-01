@@ -4,55 +4,58 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, ReactNode, SetStateAction, useCallback, useEffect, useState } from 'react';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useTranslation } from 'react-i18next';
 import { useStudy } from '@/store/contexts/StudyContext.tsx';
-import { HypothesisTab, StudyDTO, WarningTrajectoryType } from '@/shared/types';
-import StdAvatar from '@common/layout/stdAvatar/StdAvatar.tsx';
+import { StudyDTO } from '@/shared/types';
 import { getStudyMenu } from '@/shared/utils/trajectoryUtils.ts';
 import { useFetchAreas } from '@/hooks/useFetchAreas.ts';
-import { countWarning } from '@/shared/utils/warningUtils.ts';
-import { getNbMessagesFromTrajectoryType } from '@/shared/services/trajectoryService.ts';
-import StdTabItem from '@common/layout/stdTabs/StdTabItem.tsx';
 import { AreaLinkTab } from '@/components/tab/AreaLinkTab.tsx';
 import { TabMenu } from '@/components/menu/TabMenu.tsx';
 import ExpandableTab from '@/components/tab/ExpandableTab.tsx';
+import { Tab } from '@design-system-rte/react';
+import { TabItemProps } from '@design-system-rte/core/components/tab/tab.interface';
+import { ContainerWithExpander } from '@/components/banner/ContainerWithExpander.tsx';
+import { useFetchWarningMessages } from '@/hooks/useFetchWarningMessages.ts';
 
 type StudyNavigationMenuProps = {
-  onRenderActiveComponent?: (content: ReactNode | null) => void;
-  setActiveTab: Dispatch<SetStateAction<HypothesisTab>>;
-  activeTab: HypothesisTab;
   setErrorMessage: Dispatch<SetStateAction<string>>;
   studyData: StudyDTO;
 };
 
-const StudyNavigationMenu = ({
-  onRenderActiveComponent,
-  setActiveTab,
-  activeTab,
-  setErrorMessage,
-  studyData,
-}: StudyNavigationMenuProps) => {
+const StudyNavigationMenu = ({ setErrorMessage, studyData }: StudyNavigationMenuProps) => {
   const { t } = useTranslation();
   const studyState = useStudy();
-  const [tabs, setTabs] = useState<HypothesisTab[]>(
+  const [tabs, setTabs] = useState<TabItemProps[]>(
     getStudyMenu(t, !!studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0]),
   );
-  const [warningTrajectory, setWarningTrajectory] = useState<WarningTrajectoryType>();
+  const [activeTab, setActiveTab] = useState<TabItemProps>({
+    id: TRAJECTORY_TYPE.AREA,
+    panelId: TRAJECTORY_TYPE.AREA,
+    label: t('studyDetails.@areas_links'),
+    icon: 'share',
+    disabled: false,
+  });
+
   const { areaDefault, trajectoryAreas } = useFetchAreas(studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0]);
+  const { warningMessages } = useFetchWarningMessages(
+    studyData.id ? Number(studyData.id) : null,
+    activeTab.id as TRAJECTORY_TYPE,
+  );
 
   useEffect(() => {
     setTabs((prev) =>
       prev.map((tab) => ({
         ...tab,
-        isDisabled: tab.name !== TRAJECTORY_TYPE.AREA && !studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0],
+        disabled:
+          tab.id != (TRAJECTORY_TYPE.AREA as string) && !studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0],
       })),
     );
   }, [studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories]);
 
-  useEffect(() => {
-    const renderActiveComponent = (type: TRAJECTORY_TYPE): ReactNode | null => {
+  const renderActiveComponent = useCallback(
+    (type: TRAJECTORY_TYPE): ReactNode | null => {
       switch (type) {
         case TRAJECTORY_TYPE.LOAD:
         case TRAJECTORY_TYPE.DSR:
@@ -74,26 +77,46 @@ const StudyNavigationMenu = ({
         default:
           return <AreaLinkTab setErrorMessage={setErrorMessage} studyData={studyData} />;
       }
-    };
-    const countNbWarningMessages = async (id: number) => {
-      try {
-        const result = await getNbMessagesFromTrajectoryType(id);
-        setWarningTrajectory(result);
-      } catch {
-        // silent handler
-      }
-    };
-    if (onRenderActiveComponent) {
-      if (!activeTab.isDisabled) {
-        setErrorMessage('');
-        onRenderActiveComponent(renderActiveComponent(activeTab.name));
-      }
+    },
+    [areaDefault, setErrorMessage, studyData, trajectoryAreas],
+  );
+
+  useEffect(() => {
+    setTabs((prev) =>
+      prev.map((tab) => {
+        let nbWarning =
+          warningMessages?.filter((message) => message.trajectoryType === (tab.id as TRAJECTORY_TYPE)).length || 0;
+        if (TRAJECTORY_TYPE.AREA === (tab.id as TRAJECTORY_TYPE)) {
+          nbWarning +=
+            warningMessages?.filter((message) => message.trajectoryType === TRAJECTORY_TYPE.LINK)?.length || 0;
+        }
+        const count = { badgeCount: 0 };
+        if (activeTab.id !== tab.id && nbWarning > 0) {
+          count.badgeCount = nbWarning;
+          return {
+            ...tab,
+            ...(activeTab.id !== tab.id && nbWarning > 0 && count),
+          };
+        } else if (activeTab.id === tab.id) {
+          delete tab.badgeCount;
+          return {
+            ...tab,
+          };
+        } else {
+          return tab;
+        }
+      }),
+    );
+
+    if (!activeTab.disabled) {
+      setErrorMessage('');
+      renderActiveComponent(activeTab.id as TRAJECTORY_TYPE);
     }
-    void countNbWarningMessages(studyData?.id);
   }, [
-    activeTab,
+    activeTab.disabled,
+    activeTab.id,
     areaDefault,
-    onRenderActiveComponent,
+    renderActiveComponent,
     setErrorMessage,
     studyData,
     studyData?.id,
@@ -102,33 +125,23 @@ const StudyNavigationMenu = ({
   ]);
 
   return (
-    <div className="flex space-x-4 p-4">
-      {tabs.map((tab) => {
-        const nbWarning = warningTrajectory ? countWarning(warningTrajectory, tab.name) : 0;
-        return (
-          <div className="flex items-center space-x-2" key={tab.name}>
-            <StdTabItem
-              key={tab.name}
-              name={tab.name}
-              label={tab.label}
-              active={activeTab.name === tab.name}
-              disabled={tab.isDisabled}
-              onClick={() => !tab.isDisabled && setActiveTab(tab)}
-              icon={tab.icon}
-            />
-            {nbWarning > 0 && activeTab.name !== tab.name && (
-              <StdAvatar
-                initials={`${nbWarning}`}
-                size="es"
-                backgroundColor="orange"
-                fullname=""
-                textColor="white"
-                hasToolTip={false}
-              />
-            )}
-          </div>
-        );
-      })}
+    <div className="flex w-full flex-col gap-4">
+      <Tab
+        onChange={(id) => {
+          const tabId = tabs.find((tab) => tab.id === id);
+          if (tabId) {
+            setActiveTab(tabId);
+          }
+        }}
+        direction="horizontal"
+        alignment="start"
+        overflowType="dropdown"
+        selectedTabId={activeTab.id}
+        inverted={false}
+        options={tabs}
+      />
+      <ContainerWithExpander content={warningMessages} placeholder={t('studyDetails.@noWarnings')} />
+      {renderActiveComponent(activeTab.id as TRAJECTORY_TYPE)}
     </div>
   );
 };

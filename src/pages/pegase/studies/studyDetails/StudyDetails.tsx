@@ -4,56 +4,39 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { ReactNode, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import StudyNavigationMenu from '@/components/menu/StudyNavigationMenu.tsx';
-import { HypothesisTab, PegaseBreadcrumbItemType, StudyDTO } from '@/shared/types';
+import { StudyDTO } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { generateStudy, getStudyById } from '@/shared/services/studyService.ts';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { DetailsContent } from '@/components/banner/DetailsContent.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
-import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { ContainerWithExpander } from '@/components/banner/ContainerWithExpander.tsx';
-import { useFetchWarningMessages } from '@/hooks/useFetchWarningMessages.ts';
 import StudyModificationModal from '@common/modal/StudyModificationModal.tsx';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
-import { useProjectNavigation } from '@/hooks/useProjectNavigation.ts';
-import { PegaseBreadcrumb } from '@common/layout/PegaseBreadcrumb/PegaseBreadcrumb.tsx';
-import { Button, Divider, Loader } from '@design-system-rte/react';
+import { Breadcrumbs, Button, Divider, Loader } from '@design-system-rte/react';
+import { BreadcrumbItemProps } from '@design-system-rte/core/components/breadcrumbs/breadcrumbs.interface';
 
 const StudyDetails = () => {
-  const [activeContent, setActiveContent] = useState<ReactNode>(null);
   const { id } = useParams();
   const { t } = useTranslation();
   const studyState = useStudy();
   const dispatch = useStudyDispatch();
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const [isGenerating, setIsGenerating] = useState(false);
-  const [activeTab, setActiveTab] = useState<HypothesisTab>({
-    name: TRAJECTORY_TYPE.AREA,
-    label: t('studyDetails.@areas_links'),
-    icon: StdIconId.LinkedServices,
-    isDisabled: false,
-  });
   const [errorMessage, setErrorMessage] = useState<string>('');
-  const { warningMessages } = useFetchWarningMessages(id ? Number(id) : null, activeTab.name);
   const [reloadStudy, setReloadStudy] = useState(0);
   const [studyData, setStudyData] = useState<StudyDTO | null>(null);
-  const { navigateToProject } = useProjectNavigation();
-  const headerItems: PegaseBreadcrumbItemType[] = [
+  const headerItems: BreadcrumbItemProps[] = [
     {
-      key: 'item-0',
       label: studyData?.project ?? '',
-      data: { id: studyData?.projectId ?? '', name: studyData?.project ?? '' },
-      onClickItem: navigateToProject,
+      link: `/project/${studyData?.projectId}`,
     },
     {
-      key: 'item-1',
       label: studyData?.name ?? '',
-      data: null,
+      link: '',
     },
   ];
 
@@ -89,29 +72,13 @@ const StudyDetails = () => {
       <p>{t('studyDetails.@loading')}</p>
     </div>
   ) : (
-    <div className="flex h-full flex-col gap-4">
-      <div className="px-3 pt-3">
-        <PegaseBreadcrumb items={headerItems} />
-      </div>
+    <div className="flex h-full flex-col items-start gap-4 overflow-hidden p-3">
+      <Breadcrumbs items={headerItems} />
       <Divider />
-      <div className="flex flex-1 flex-col gap-2 overflow-hidden px-3 pb-3">
+      <div className="flex w-full flex-1 flex-col gap-2">
         <DetailsContent content={studyData} onClickButton={toggleModal} tagsList={studyData?.keywords} />
-
-        <div className="flex flex-1 flex-col overflow-hidden">
-          <StudyNavigationMenu
-            onRenderActiveComponent={setActiveContent}
-            setActiveTab={setActiveTab}
-            activeTab={activeTab}
-            setErrorMessage={setErrorMessage}
-            studyData={studyData}
-          />
-
-          <div className="flex flex-1 flex-col gap-4 overflow-y-auto pb-10">
-            <ContainerWithExpander content={warningMessages} placeholder={t('studyDetails.@noWarnings')} />
-
-            <div className="w-full pb-2">{activeContent}</div>
-          </div>
-
+        <div className="flex flex-1 flex-col">
+          <StudyNavigationMenu setErrorMessage={setErrorMessage} studyData={studyData} />
           <div className="fixed bottom-0 right-0 w-full border-t bg-gray-w px-1 py-1.5">
             <div className="flex h-fit w-full items-center justify-end">
               {!studyState.AREA?.trajectories?.length && !errorMessage && (
