@@ -46,12 +46,12 @@ import {
   mockRowDataTrajectoryC,
 } from '@/mocks/data/tests/trajectory.mock.ts';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
-import { DbTrajectory, HypothesisRowData, HypothesisTab } from '@/shared/types';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
+import { DbTrajectory, HypothesisRowData } from '@/shared/types';
 import { Row } from '@tanstack/react-table';
 import { ThermalOptions } from '@/mocks/data/list/names.ts';
 import { TFunction } from 'i18next';
 import * as textUtils from '@/shared/utils/textUtils.ts';
+import { TabItemProps } from '@design-system-rte/core/components/tab/tab.interface';
 
 describe('getStatus', () => {
   it("should return an ERROR selection status for 'error' status", () => {
@@ -328,37 +328,41 @@ describe('getStudyMenu', () => {
   const mockTranslate = (value: string) => `translated:${value}`;
 
   it('should return correct tab structure when area is not linked', () => {
-    const result: HypothesisTab[] = getStudyMenu(mockTranslate, false);
+    const result: TabItemProps[] = getStudyMenu(mockTranslate, false);
 
     expect(result.length).toBe(8);
 
     expect(result[0]).toEqual({
-      name: TRAJECTORY_TYPE.AREA,
+      id: TRAJECTORY_TYPE.AREA,
+      panelId: TRAJECTORY_TYPE.AREA,
       label: 'translated:studyDetails.@areas_links',
-      icon: StdIconId.LinkedServices,
-      isDisabled: false,
+      icon: 'share',
+      disabled: false,
+      badgeContent: 'number',
+      badgeType: 'brand',
+      showBadge: true,
     });
 
-    expect(result[1].isDisabled).toBe(false);
-    expect(result[2].isDisabled).toBe(false);
-    expect(result[3].isDisabled).toBe(true);
+    expect(result[1].disabled).toBe(false);
+    expect(result[2].disabled).toBe(false);
+    expect(result[3].disabled).toBe(true);
   });
 
   it('should disable LOAD and THERMAL_CAPACITY when area is linked', () => {
     const result = getStudyMenu(mockTranslate, true);
 
-    expect(result[1].name).toBe(TRAJECTORY_TYPE.LOAD);
-    expect(result[1].isDisabled).toBe(true);
+    expect(result[1].id).toBe(TRAJECTORY_TYPE.LOAD);
+    expect(result[1].disabled).toBe(true);
 
-    expect(result[2].name).toBe(TRAJECTORY_TYPE.THERMAL_CAPACITY);
-    expect(result[2].isDisabled).toBe(true);
+    expect(result[2].id).toBe(TRAJECTORY_TYPE.THERMAL_CAPACITY);
+    expect(result[2].disabled).toBe(true);
   });
 
   it('should apply translation function to labels', () => {
     const result = getStudyMenu(mockTranslate, false);
 
     for (const tab of result) {
-      expect(tab.label.startsWith('translated:')).toBe(true);
+      if (tab?.label) expect(tab?.label.startsWith('translated:')).toBe(true);
     }
   });
 });
@@ -1589,12 +1593,14 @@ describe('getItemsMenu', () => {
 
       expect(result).toHaveLength(2);
       expect(result[0]).toEqual({
-        name: TRAJECTORY_TYPE.THERMAL_CAPACITY,
+        id: TRAJECTORY_TYPE.THERMAL_CAPACITY,
         label: 'translated:misc.@installedPower',
+        panelId: TRAJECTORY_TYPE.THERMAL_CAPACITY,
       });
       expect(result[1]).toEqual({
-        name: TRAJECTORY_TYPE.THERMAL_PARAMETER,
+        id: TRAJECTORY_TYPE.THERMAL_PARAMETER,
         label: 'translated:thermal.@parameters',
+        panelId: TRAJECTORY_TYPE.THERMAL_PARAMETER,
       });
     });
   });
@@ -1605,8 +1611,9 @@ describe('getItemsMenu', () => {
 
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
-        name: TRAJECTORY_TYPE.HYDRO_SERIES,
+        id: TRAJECTORY_TYPE.HYDRO_SERIES,
         label: 'translated:hydro.@capacity',
+        panelId: TRAJECTORY_TYPE.HYDRO_SERIES,
       });
     });
   });
@@ -1618,11 +1625,20 @@ describe('getItemsMenu', () => {
       ]);
 
       expect(result).toHaveLength(3);
-      expect(result[0]).toEqual({ name: TRAJECTORY_TYPE.RES_CAPACITY, label: 'translated:misc.@installedPower' });
-      expect(result[1]).toEqual({ name: TRAJECTORY_TYPE.RES_LOAD, label: 'translated:misc.@loadFactor' });
+      expect(result[0]).toEqual({
+        id: TRAJECTORY_TYPE.RES_CAPACITY,
+        label: 'translated:misc.@installedPower',
+        panelId: TRAJECTORY_TYPE.RES_CAPACITY,
+      });
+      expect(result[1]).toEqual({
+        id: TRAJECTORY_TYPE.RES_LOAD,
+        label: 'translated:misc.@loadFactor',
+        panelId: TRAJECTORY_TYPE.RES_LOAD,
+      });
       expect(result[2]).toEqual({
-        name: TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION,
+        id: TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION,
         label: 'translated:res.@distribution',
+        panelId: TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION,
       });
     });
 
@@ -1630,8 +1646,16 @@ describe('getItemsMenu', () => {
       const result = getItemsMenu(TRAJECTORY_TYPE.RES_CAPACITY, t as TFunction<'translation', undefined>, []);
 
       expect(result).toHaveLength(2);
-      expect(result[0]).toEqual({ name: TRAJECTORY_TYPE.RES_CAPACITY, label: 'translated:misc.@installedPower' });
-      expect(result[1]).toEqual({ name: TRAJECTORY_TYPE.RES_LOAD, label: 'translated:misc.@loadFactor' });
+      expect(result[0]).toEqual({
+        id: TRAJECTORY_TYPE.RES_CAPACITY,
+        label: 'translated:misc.@installedPower',
+        panelId: TRAJECTORY_TYPE.RES_CAPACITY,
+      });
+      expect(result[1]).toEqual({
+        id: TRAJECTORY_TYPE.RES_LOAD,
+        label: 'translated:misc.@loadFactor',
+        panelId: TRAJECTORY_TYPE.RES_LOAD,
+      });
     });
   });
 
@@ -1640,8 +1664,16 @@ describe('getItemsMenu', () => {
       const result = getItemsMenu(TRAJECTORY_TYPE.MISC_CAPACITY, t as TFunction<'translation', undefined>, []);
 
       expect(result).toHaveLength(2);
-      expect(result[0]).toEqual({ name: TRAJECTORY_TYPE.MISC_CAPACITY, label: 'translated:misc.@installedPower' });
-      expect(result[1]).toEqual({ name: TRAJECTORY_TYPE.MISC_LOAD, label: 'translated:misc.@loadFactor' });
+      expect(result[0]).toEqual({
+        id: TRAJECTORY_TYPE.MISC_CAPACITY,
+        label: 'translated:misc.@installedPower',
+        panelId: TRAJECTORY_TYPE.MISC_CAPACITY,
+      });
+      expect(result[1]).toEqual({
+        id: TRAJECTORY_TYPE.MISC_LOAD,
+        label: 'translated:misc.@loadFactor',
+        panelId: TRAJECTORY_TYPE.MISC_LOAD,
+      });
     });
   });
 
@@ -1650,8 +1682,16 @@ describe('getItemsMenu', () => {
       const result = getItemsMenu(TRAJECTORY_TYPE.LOAD, t as TFunction<'translation', undefined>, []);
 
       expect(result).toHaveLength(2);
-      expect(result[0]).toEqual({ name: TRAJECTORY_TYPE.LOAD, label: 'translated:misc.@installedPower' });
-      expect(result[1]).toEqual({ name: TRAJECTORY_TYPE.MISC_LOAD, label: 'translated:misc.@loadFactor' });
+      expect(result[0]).toEqual({
+        id: TRAJECTORY_TYPE.LOAD,
+        label: 'translated:misc.@installedPower',
+        panelId: TRAJECTORY_TYPE.LOAD,
+      });
+      expect(result[1]).toEqual({
+        id: TRAJECTORY_TYPE.MISC_LOAD,
+        label: 'translated:misc.@loadFactor',
+        panelId: TRAJECTORY_TYPE.MISC_LOAD,
+      });
     });
   });
 });

@@ -5,7 +5,7 @@
  */
 
 import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import StudyTableDisplay from '@/pages/pegase/home/components/StudyTableDisplay';
 import { useTranslation } from 'react-i18next';
 import DetailsContent from '@/components/banner/DetailsContent.tsx';
@@ -13,9 +13,8 @@ import { useUser } from '@/store/contexts/UserContext.tsx';
 import { ProjectCreationModal } from '@common/modal/ProjectCreationModal.tsx';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { useGetProjectDetails } from '@/hooks/useGetProjectDetails.ts';
-import { PegaseBreadcrumbItemType } from '@/shared/types';
-import { PegaseBreadcrumb } from '@common/layout/PegaseBreadcrumb/PegaseBreadcrumb.tsx';
-import { Chip, Divider, Searchbar } from '@design-system-rte/react';
+import { Breadcrumbs, Chip, Divider, Searchbar } from '@design-system-rte/react';
+import { BreadcrumbItemProps } from '@design-system-rte/core/components/breadcrumbs/breadcrumbs.interface';
 
 const ProjectDetails = () => {
   const { t } = useTranslation();
@@ -26,19 +25,15 @@ const ProjectDetails = () => {
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const { id } = useParams();
   const { projectDetails } = useGetProjectDetails(id ?? null, reFetchProject);
-  const navigate = useNavigate();
 
-  const headerItems: PegaseBreadcrumbItemType[] = [
+  const headerItems: BreadcrumbItemProps[] = [
     {
-      key: 'item-0',
       label: 'Project',
-      data: { id: '/projects' },
-      onClickItem: navigate,
+      link: '/projects',
     },
     {
-      key: 'item-1',
       label: projectDetails?.name ?? '',
-      data: { id: projectDetails?.id ?? '', name: projectDetails?.name ?? '' },
+      link: `/project/'${projectDetails?.id}`,
     },
   ];
 
@@ -62,30 +57,19 @@ const ProjectDetails = () => {
       <p>{t('projectDetails.@loading')}</p>
     </div>
   ) : (
-    <div className="flex flex-col gap-4">
-      <div className="px-3 pt-3">
-        <PegaseBreadcrumb items={headerItems}></PegaseBreadcrumb>
-      </div>
+    <div className="flex flex-col items-start gap-4 p-3">
+      <Breadcrumbs items={headerItems} />
       <Divider />
-      <div className="flex flex-col gap-4 px-3 pb-3">
-        <DetailsContent content={projectDetails} onClickButton={toggleModal} tagsList={projectDetails.tags} />
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-4">
-            <Searchbar
-              onSearch={(value?: string) => setSearchTerm(value)}
-              onChange={(value?: string) => setSearchTerm(value)}
-              label={t('home.@search_placeholder_study')}
-            />
-            <Chip
-              id="chip-project-details"
-              label={t('home.@my_studies')}
-              onClick={handleChipClick}
-              selected={activeChip}
-            />
-          </div>
-          <StudyTableDisplay searchStudy={searchTerm} projectInfo={projectDetails} />
-        </div>
+      <DetailsContent content={projectDetails} onClickButton={toggleModal} tagsList={projectDetails.tags} />
+      <div className="flex items-center gap-4">
+        <Searchbar
+          onSearch={(value?: string) => setSearchTerm(value)}
+          onChange={(value?: string) => setSearchTerm(value)}
+          label={t('home.@search_placeholder_study')}
+        />
+        <Chip id="chip-project-details" label={t('home.@my_studies')} onClick={handleChipClick} selected={activeChip} />
       </div>
+      <StudyTableDisplay searchStudy={searchTerm} projectInfo={projectDetails} />
       {isModalOpen && <ProjectCreationModal onClose={onCloseModal} projectInfo={projectDetails} />}
     </div>
   );

@@ -21,7 +21,7 @@ export const DetailsContent = ({ content, onClickButton, tagsList }: DetailsCont
   const { t } = useTranslation();
 
   return (
-    <header className="group flex flex-col gap-1 rounded border border-gray-500 bg-gray-100 p-2">
+    <header className="group flex w-full flex-col gap-1 rounded border border-gray-500 bg-gray-100 p-2">
       {(content as ProjectInfo)?.description && (
         <div className="whitespace-normal break-words text-left text-gray-900">
           {(content as ProjectInfo).description}
