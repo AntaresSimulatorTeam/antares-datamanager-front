@@ -56,7 +56,7 @@ export const TRAJECTORY_HYDRO_SERIES = `${BACK_END_BASE_URL}/v1/trajectory/hydro
 export const TRAJECTORY_HYDRO_TECHNICAL_PARAMETERS = `${BACK_END_BASE_URL}/v1/trajectory/hydro-technical-parameters`;
 //ABOUT
 export const BACK_END_ACTUATOR_ENDPOINT = `${BACK_END_BASE_URL}/actuator/info`;
-export const GENERATOR_ACTUATOR_ENDPOINT = `${GENERATOR_BASE_URL}/app-info`;
+export const GENERATOR_ACTUATOR_ENDPOINT = `${GENERATOR_BASE_URL}:8094/app-info`;
 
 // DEFAULT CONFIG
 export const DEFAULT_CONFIG_AREAS = `${BACK_END_BASE_URL}/v1/default_config/load`;
