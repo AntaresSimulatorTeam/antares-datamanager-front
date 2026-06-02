@@ -125,7 +125,7 @@ const StudyNavigationMenu = ({ setErrorMessage, studyData }: StudyNavigationMenu
   ]);
 
   return (
-    <div className="flex w-full flex-col gap-4">
+    <div className="flex w-full flex-1 min-h-0 flex-col gap-4">
       <Tab
         onChange={(id) => {
           const tabId = tabs.find((tab) => tab.id === id);
@@ -141,7 +141,9 @@ const StudyNavigationMenu = ({ setErrorMessage, studyData }: StudyNavigationMenu
         options={tabs}
       />
       <ContainerWithExpander content={warningMessages} placeholder={t('studyDetails.@noWarnings')} />
-      {renderActiveComponent(activeTab.id as TRAJECTORY_TYPE)}
+      <div className="flex min-h-0 flex-1">
+        {renderActiveComponent(activeTab.id as TRAJECTORY_TYPE)}
+      </div>
     </div>
   );
 };

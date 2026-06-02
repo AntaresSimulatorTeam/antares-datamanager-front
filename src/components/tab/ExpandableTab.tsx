@@ -186,14 +186,14 @@ const ExpandableTab = ({
   );
 
   return (
-    <div className="flex min-h-0 w-full gap-6 xl:gap-7 2xl:gap-8">
+    <div className="flex min-h-0 w-full gap-6 pb-6 xl:gap-7 2xl:gap-8">
       <CheckBoxList
         checkedValues={checkedValues}
         options={areasOptions}
         handleSelectionChange={handleSelectionChange}
         disabled={studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED}
       />
-      <div className="flex h-4/5 w-full overflow-y-auto">
+      <div className="flex min-h-0 flex-1 overflow-y-auto">
         <PegaseHypothesisTable
           id="thermal-table"
           data={data}

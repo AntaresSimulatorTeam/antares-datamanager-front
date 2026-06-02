@@ -140,14 +140,14 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   );
 
   return (
-    <div className="flex h-full min-h-0 w-full gap-6 xl:gap-7 2xl:gap-8">
+    <div className="flex min-h-0 w-full gap-6 pb-6 xl:gap-7 2xl:gap-8">
       <CheckBoxList
         checkedValues={checkedValues}
         options={areasOptions}
         handleSelectionChange={handleSelectionChange}
         disabled={isStudyGenerated}
       />
-      <div className="flex w-full flex-col gap-6">
+      <div className="flex min-h-0 w-full flex-1 flex-col gap-4 overflow-y-auto">
         <PegaseHypothesisTable
           id="technical-parameters-table"
           data={technicalData}
@@ -232,61 +232,61 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
           }}
           type={TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER}
         />
-        <div className="flex h-fit w-full">
-          <PegaseHypothesisTable
-            id="economics-parameters-table"
-            data={data}
-            getTableHeaders={getEditableHypothesisTableHeaders}
-            columnHeader={t('thermal.@parametersEconomic')}
-            fileStatus={fileStatus}
-            isStudyGenerated={isStudyGenerated}
-            idSelected={rowIdSelected}
-            isReadOnlyEnable={true}
-            readOnly={readOnlyParam}
-            progress={isTechnicalParametersType(selectedTrajectoryType) ? 0 : progress}
-            handleSearch={async (fileNameContains: string, rowId: string) => {
-              const index = Number(rowId.split('.').map(Number)[0]);
-              const type =
-                index === 0
-                  ? TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER
-                  : TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER;
-              setSelectedTrajectoryType(type);
-              return await handleTrajectorySearch(type, setDbTrajectories, studyData?.horizon, {
-                fileNameContains,
-              });
-            }}
-            handleImport={async (rowId: string) => {
-              const index = Number(rowId.split('.').map(Number)[0]);
-              const type =
-                index === 0
-                  ? TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER
-                  : TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER;
-              setSelectedTrajectoryType(type);
-              await handleFetchTrajectoriesFS(type, rowId, setOptionsFS, setRowIdSelected, toggleModal);
-            }}
-            updateData={async (rowId: string, value: unknown, status: RowStatus) => {
-              const indexArray = rowId.split('.').map(Number);
-              const type =
-                indexArray[0] === 0
-                  ? TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER
-                  : TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER;
-              setSelectedTrajectoryType(type);
-              if (status === 'empty' || status === 'emptyError') {
-                const current = data[indexArray[0]]?.trajectory ?? null;
-                if (current) {
-                  void detachTrajectory(type, indexArray, setData, data, status, data[indexArray[0]]?.hypothesis);
-                }
+        {/*<div className="flex min-h-0 w-full">*/}
+        <PegaseHypothesisTable
+          id="economics-parameters-table"
+          data={data}
+          getTableHeaders={getEditableHypothesisTableHeaders}
+          columnHeader={t('thermal.@parametersEconomic')}
+          fileStatus={fileStatus}
+          isStudyGenerated={isStudyGenerated}
+          idSelected={rowIdSelected}
+          isReadOnlyEnable={true}
+          readOnly={readOnlyParam}
+          progress={isTechnicalParametersType(selectedTrajectoryType) ? 0 : progress}
+          handleSearch={async (fileNameContains: string, rowId: string) => {
+            const index = Number(rowId.split('.').map(Number)[0]);
+            const type =
+              index === 0
+                ? TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER
+                : TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER;
+            setSelectedTrajectoryType(type);
+            return await handleTrajectorySearch(type, setDbTrajectories, studyData?.horizon, {
+              fileNameContains,
+            });
+          }}
+          handleImport={async (rowId: string) => {
+            const index = Number(rowId.split('.').map(Number)[0]);
+            const type =
+              index === 0
+                ? TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER
+                : TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER;
+            setSelectedTrajectoryType(type);
+            await handleFetchTrajectoriesFS(type, rowId, setOptionsFS, setRowIdSelected, toggleModal);
+          }}
+          updateData={async (rowId: string, value: unknown, status: RowStatus) => {
+            const indexArray = rowId.split('.').map(Number);
+            const type =
+              indexArray[0] === 0
+                ? TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER
+                : TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER;
+            setSelectedTrajectoryType(type);
+            if (status === 'empty' || status === 'emptyError') {
+              const current = data[indexArray[0]]?.trajectory ?? null;
+              if (current) {
+                void detachTrajectory(type, indexArray, setData, data, status, data[indexArray[0]]?.hypothesis);
               }
+            }
 
-              if (status === 'success') {
-                const dbTrajectory = dbTrajectories.find((traj) => traj.id === value) ?? null;
-                if (dbTrajectory) {
-                  await attachTrajectory(type, indexArray, status, dbTrajectory, setData);
-                }
+            if (status === 'success') {
+              const dbTrajectory = dbTrajectories.find((traj) => traj.id === value) ?? null;
+              if (dbTrajectory) {
+                await attachTrajectory(type, indexArray, status, dbTrajectory, setData);
               }
-            }}
-          />
-        </div>
+            }
+          }}
+        />
+        {/*</div>*/}
       </div>
       {isModalOpen && (
         <ImportTrajectoryModal
