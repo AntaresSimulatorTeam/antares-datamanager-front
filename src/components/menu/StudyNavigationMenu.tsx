@@ -37,6 +37,7 @@ const StudyNavigationMenu = ({ setErrorMessage, studyData }: StudyNavigationMenu
     icon: 'share',
     disabled: false,
   });
+  const [activeContent, setActiveContent] = useState<ReactNode>(null);
 
   const { areaDefault, trajectoryAreas } = useFetchAreas(studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0]);
   const { warningMessages } = useFetchWarningMessages(
@@ -82,6 +83,13 @@ const StudyNavigationMenu = ({ setErrorMessage, studyData }: StudyNavigationMenu
   );
 
   useEffect(() => {
+    if (!activeTab.disabled) {
+      setErrorMessage('');
+      setActiveContent(renderActiveComponent(activeTab.id as TRAJECTORY_TYPE));
+    }
+  }, []);
+
+  useEffect(() => {
     setTabs((prev) =>
       prev.map((tab) => {
         let nbWarning =
@@ -107,30 +115,19 @@ const StudyNavigationMenu = ({ setErrorMessage, studyData }: StudyNavigationMenu
         }
       }),
     );
-
-    if (!activeTab.disabled) {
-      setErrorMessage('');
-      renderActiveComponent(activeTab.id as TRAJECTORY_TYPE);
-    }
-  }, [
-    activeTab.disabled,
-    activeTab.id,
-    areaDefault,
-    renderActiveComponent,
-    setErrorMessage,
-    studyData,
-    studyData?.id,
-    studyState,
-    trajectoryAreas,
-  ]);
+  }, [activeTab.id, warningMessages]);
 
   return (
-    <div className="flex w-full flex-1 min-h-0 flex-col gap-4">
+    <div className="flex min-h-0 w-full flex-1 flex-col gap-4">
       <Tab
         onChange={(id) => {
           const tabId = tabs.find((tab) => tab.id === id);
           if (tabId) {
             setActiveTab(tabId);
+            if (!tabId.disabled) {
+              setErrorMessage('');
+              setActiveContent(renderActiveComponent(tabId.id as TRAJECTORY_TYPE));
+            }
           }
         }}
         direction="horizontal"
@@ -141,9 +138,7 @@ const StudyNavigationMenu = ({ setErrorMessage, studyData }: StudyNavigationMenu
         options={tabs}
       />
       <ContainerWithExpander content={warningMessages} placeholder={t('studyDetails.@noWarnings')} />
-      <div className="flex min-h-0 flex-1">
-        {renderActiveComponent(activeTab.id as TRAJECTORY_TYPE)}
-      </div>
+      <div className="flex min-h-0 flex-1">{activeContent}</div>
     </div>
   );
 };
