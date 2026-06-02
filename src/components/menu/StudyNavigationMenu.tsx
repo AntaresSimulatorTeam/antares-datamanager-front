@@ -46,11 +46,11 @@ const StudyNavigationMenu = ({ setErrorMessage, studyData }: StudyNavigationMenu
   );
 
   useEffect(() => {
+    const hasAreaTrajectory = !!studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0];
     setTabs((prev) =>
       prev.map((tab) => ({
         ...tab,
-        disabled:
-          tab.id != (TRAJECTORY_TYPE.AREA as string) && !studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0],
+        disabled: tab.id !== (TRAJECTORY_TYPE.AREA as string) && !hasAreaTrajectory,
       })),
     );
   }, [studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories]);
@@ -93,26 +93,19 @@ const StudyNavigationMenu = ({ setErrorMessage, studyData }: StudyNavigationMenu
     setTabs((prev) =>
       prev.map((tab) => {
         let nbWarning =
-          warningMessages?.filter((message) => message.trajectoryType === (tab.id as TRAJECTORY_TYPE)).length || 0;
-        if (TRAJECTORY_TYPE.AREA === (tab.id as TRAJECTORY_TYPE)) {
-          nbWarning +=
-            warningMessages?.filter((message) => message.trajectoryType === TRAJECTORY_TYPE.LINK)?.length || 0;
+          warningMessages?.filter((message) => message.trajectoryType === (tab.id as TRAJECTORY_TYPE)).length ?? 0;
+        if ((tab.id as TRAJECTORY_TYPE) === TRAJECTORY_TYPE.AREA) {
+          nbWarning += warningMessages?.filter((message) => message.trajectoryType === TRAJECTORY_TYPE.LINK)?.length ?? 0;
         }
-        const count = { badgeCount: 0 };
-        if (activeTab.id !== tab.id && nbWarning > 0) {
-          count.badgeCount = nbWarning;
-          return {
-            ...tab,
-            ...(activeTab.id !== tab.id && nbWarning > 0 && count),
-          };
-        } else if (activeTab.id === tab.id) {
-          delete tab.badgeCount;
-          return {
-            ...tab,
-          };
-        } else {
-          return tab;
+
+        if (activeTab.id === tab.id) {
+          const { badgeCount: _removed, ...rest } = tab;
+          return rest;
         }
+        if (nbWarning > 0) {
+          return { ...tab, badgeCount: nbWarning };
+        }
+        return tab;
       }),
     );
   }, [activeTab.id, warningMessages]);
