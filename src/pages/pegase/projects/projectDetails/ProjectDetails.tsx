@@ -5,7 +5,7 @@
  */
 
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import StudyTableDisplay from '@/pages/pegase/home/components/StudyTableDisplay';
 import { useTranslation } from 'react-i18next';
 import DetailsContent from '@/components/banner/DetailsContent.tsx';
@@ -13,8 +13,9 @@ import { useUser } from '@/store/contexts/UserContext.tsx';
 import { ProjectCreationModal } from '@common/modal/ProjectCreationModal.tsx';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { useGetProjectDetails } from '@/hooks/useGetProjectDetails.ts';
-import { Breadcrumbs, Chip, Divider, Searchbar } from '@design-system-rte/react';
-import { BreadcrumbItemProps } from '@design-system-rte/core/components/breadcrumbs/breadcrumbs.interface';
+import { PegaseBreadcrumbItemType } from '@/shared/types';
+import { Chip, Divider, Searchbar } from '@design-system-rte/react';
+import { PegaseBreadcrumb } from '@common/layout/PegaseBreadcrumb/PegaseBreadcrumb.tsx';
 
 const ProjectDetails = () => {
   const { t } = useTranslation();
@@ -25,15 +26,19 @@ const ProjectDetails = () => {
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const { id } = useParams();
   const { projectDetails } = useGetProjectDetails(id ?? null, reFetchProject);
+  const navigate = useNavigate();
 
-  const headerItems: BreadcrumbItemProps[] = [
+  const headerItems: PegaseBreadcrumbItemType[] = [
     {
+      key: 'item-0',
       label: 'Project',
-      link: '/projects',
+      data: { id: '/projects' },
+      onClickItem: navigate,
     },
     {
+      key: 'item-1',
       label: projectDetails?.name ?? '',
-      link: `/project/'${projectDetails?.id}`,
+      data: { id: projectDetails?.id ?? '', name: projectDetails?.name ?? '' },
     },
   ];
 
@@ -58,7 +63,7 @@ const ProjectDetails = () => {
     </div>
   ) : (
     <div className="flex flex-col items-start gap-4 p-3">
-      <Breadcrumbs items={headerItems} />
+      <PegaseBreadcrumb items={headerItems}></PegaseBreadcrumb>
       <Divider />
       <DetailsContent content={projectDetails} onClickButton={toggleModal} tagsList={projectDetails.tags} />
       <div className="flex items-center gap-4">

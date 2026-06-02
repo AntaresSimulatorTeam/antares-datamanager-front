@@ -7,7 +7,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import StudyNavigationMenu from '@/components/menu/StudyNavigationMenu.tsx';
-import { StudyDTO } from '@/shared/types';
+import { PegaseBreadcrumbItemType, StudyDTO } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { generateStudy, getStudyById } from '@/shared/services/studyService.ts';
@@ -16,8 +16,9 @@ import { DetailsContent } from '@/components/banner/DetailsContent.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import StudyModificationModal from '@common/modal/StudyModificationModal.tsx';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
-import { Breadcrumbs, Button, Divider, Loader } from '@design-system-rte/react';
-import { BreadcrumbItemProps } from '@design-system-rte/core/components/breadcrumbs/breadcrumbs.interface';
+import { Button, Divider, Loader } from '@design-system-rte/react';
+import { PegaseBreadcrumb } from '@common/layout/PegaseBreadcrumb/PegaseBreadcrumb.tsx';
+import { useProjectNavigation } from '@/hooks/useProjectNavigation.ts';
 
 const StudyDetails = () => {
   const { id } = useParams();
@@ -29,14 +30,18 @@ const StudyDetails = () => {
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [reloadStudy, setReloadStudy] = useState(0);
   const [studyData, setStudyData] = useState<StudyDTO | null>(null);
-  const headerItems: BreadcrumbItemProps[] = [
+  const { navigateToProject } = useProjectNavigation();
+  const headerItems: PegaseBreadcrumbItemType[] = [
     {
+      key: 'item-0',
       label: studyData?.project ?? '',
-      link: `/project/${studyData?.projectId}`,
+      data: { id: studyData?.projectId ?? '', name: studyData?.project ?? '' },
+      onClickItem: navigateToProject,
     },
     {
+      key: 'item-1',
       label: studyData?.name ?? '',
-      link: '',
+      data: null,
     },
   ];
 
@@ -72,12 +77,12 @@ const StudyDetails = () => {
       <p>{t('studyDetails.@loading')}</p>
     </div>
   ) : (
-    <div className="flex h-full flex-col items-start gap-4 overflow-hidden p-3">
-      <Breadcrumbs items={headerItems} />
+    <div className="flex min-h-0 flex-1 flex-col items-start gap-4 overflow-hidden p-3">
+      <PegaseBreadcrumb items={headerItems}></PegaseBreadcrumb>
       <Divider />
-      <div className="flex w-full flex-1 flex-col gap-2">
+      <div className="flex min-h-0 w-full flex-1 flex-col gap-2">
         <DetailsContent content={studyData} onClickButton={toggleModal} tagsList={studyData?.keywords} />
-        <div className="flex flex-1 flex-col">
+        <div className="flex min-h-0 flex-1 flex-col">
           <StudyNavigationMenu setErrorMessage={setErrorMessage} studyData={studyData} />
           <div className="fixed bottom-0 right-0 w-full border-t bg-gray-w px-1 py-1.5">
             <div className="flex h-fit w-full items-center justify-end">

@@ -120,7 +120,7 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData, types }: TabProps 
   );
 
   return (
-    <div className="flex h-fit w-full flex-col gap-6">
+    <div className="flex min-h-0 w-full flex-col gap-6">
       <PegaseHypothesisTable
         id="zonal-distribution-table"
         columnHeader={t('res.@zonalDistribution')}
