@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { StudyState, WarningMessage } from '@/shared/types';
+import { DataWarningMessage, StudyState, WarningMessage } from '@/shared/types';
 import { fetchWarningMessagesFromType } from '@/shared/services/warningService.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
@@ -8,12 +8,16 @@ import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 
 export const useFetchWarningMessages = (studyId: number | null, type: TRAJECTORY_TYPE) => {
-  const [warningMessages, setWarningMessages] = useState<WarningMessage[]>([]);
+  const [warningMessages, setWarningMessages] = useState<DataWarningMessage[]>([]);
   const studyState = useStudy();
   const dispatch = useStudyDispatch();
 
   useEffect(() => {
-    const fetchWarningMessages = async (id: number, trajectoryType: TRAJECTORY_TYPE, state: Partial<StudyState>) => {
+    const fetchWarningMessages = async (
+      id: number,
+      trajectoryType: TRAJECTORY_TYPE,
+      state: Partial<StudyState>,
+    ): Promise<void> => {
       const isNotGenerated = state.studyStatus !== StudyStatus.GENERATED;
       const hasWarningMessage =
         type !== TRAJECTORY_TYPE.STS &&

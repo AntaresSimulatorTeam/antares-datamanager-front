@@ -14,8 +14,8 @@ import { ProjectCreationModal } from '@common/modal/ProjectCreationModal.tsx';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { useGetProjectDetails } from '@/hooks/useGetProjectDetails.ts';
 import { PegaseBreadcrumbItemType } from '@/shared/types';
-import { PegaseBreadcrumb } from '@common/layout/PegaseBreadcrumb/PegaseBreadcrumb.tsx';
 import { Chip, Divider, Searchbar } from '@design-system-rte/react';
+import { PegaseBreadcrumb } from '@common/layout/PegaseBreadcrumb/PegaseBreadcrumb.tsx';
 
 const ProjectDetails = () => {
   const { t } = useTranslation();
@@ -62,30 +62,19 @@ const ProjectDetails = () => {
       <p>{t('projectDetails.@loading')}</p>
     </div>
   ) : (
-    <div className="flex flex-col gap-4">
-      <div className="px-3 pt-3">
-        <PegaseBreadcrumb items={headerItems}></PegaseBreadcrumb>
-      </div>
+    <div className="flex flex-col items-start gap-4 p-3">
+      <PegaseBreadcrumb items={headerItems}></PegaseBreadcrumb>
       <Divider />
-      <div className="flex flex-col gap-4 px-3 pb-3">
-        <DetailsContent content={projectDetails} onClickButton={toggleModal} tagsList={projectDetails.tags} />
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-4">
-            <Searchbar
-              onSearch={(value?: string) => setSearchTerm(value)}
-              onChange={(value?: string) => setSearchTerm(value)}
-              label={t('home.@search_placeholder_study')}
-            />
-            <Chip
-              id="chip-project-details"
-              label={t('home.@my_studies')}
-              onClick={handleChipClick}
-              selected={activeChip}
-            />
-          </div>
-          <StudyTableDisplay searchStudy={searchTerm} projectInfo={projectDetails} />
-        </div>
+      <DetailsContent content={projectDetails} onClickButton={toggleModal} tagsList={projectDetails.tags} />
+      <div className="flex items-center gap-4">
+        <Searchbar
+          onSearch={(value?: string) => setSearchTerm(value)}
+          onChange={(value?: string) => setSearchTerm(value)}
+          label={t('home.@search_placeholder_study')}
+        />
+        <Chip id="chip-project-details" label={t('home.@my_studies')} onClick={handleChipClick} selected={activeChip} />
       </div>
+      <StudyTableDisplay searchStudy={searchTerm} projectInfo={projectDetails} />
       {isModalOpen && <ProjectCreationModal onClose={onCloseModal} projectInfo={projectDetails} />}
     </div>
   );
