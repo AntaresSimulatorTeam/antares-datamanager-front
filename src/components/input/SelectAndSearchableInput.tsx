@@ -122,7 +122,7 @@ const SelectAndSearchableInput = ({
           flexDirection: 'column',
           minWidth: width,
         }}
-        className="[&_[class^='_container']]:!w-[400px]"
+        className={`[&_[data-label-position][data-error]]:!w-[${width ?? '350px'}]`}
       >
         <TextInput
           id="text-input-select"
