@@ -18,6 +18,7 @@ interface KeywordsInputProps {
   maxNbCharacters?: number;
   minNbCharacters?: number;
   width?: string;
+  required?: boolean;
 }
 
 const KeywordsInput = ({
@@ -27,6 +28,7 @@ const KeywordsInput = ({
   maxNbCharacters,
   minNbCharacters,
   width,
+  required = false,
 }: KeywordsInputProps) => {
   const { t } = useTranslation();
   const [keywordInput, setKeywordInput] = useState<string>('');
@@ -123,11 +125,11 @@ const KeywordsInput = ({
             labelPosition="top"
             rightIconAction="clean"
             onChange={(value: string) => void handleKeywordChange(value)}
-            required
             value={keywordInput}
             assistiveTextLabel={errorMessage}
             maxLength={maxNbCharacters}
             showCounter
+            required={required}
           />
           {/* Suggested Keywords Dropdown */}
           {keywordInput && !errorMessage && suggestedKeywords.length > 0 && (

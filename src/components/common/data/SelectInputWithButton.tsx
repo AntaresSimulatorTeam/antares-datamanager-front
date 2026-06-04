@@ -32,8 +32,10 @@ export const SelectInputWithButton = ({
       <span>{t('studyDetails.@or')}</span>
       <Button
         label={t('studyDetails.@import_file')}
+        icon="upload"
+        iconPosition="left"
         onClick={() => void onClickButton?.()}
-        variant="secondary"
+        variant="primary"
         disabled={isDisabled}
       />
     </div>
