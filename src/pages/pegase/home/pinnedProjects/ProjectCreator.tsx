@@ -15,7 +15,7 @@ export const ProjectCreator = () => {
 
   return (
     <div className="flex items-center justify-center border border-dashed border-primary-700 p-4">
-      <Button label={t('home.@buttonNewProject')} variant="secondary" onClick={toggleModal} />
+      <Button icon="add" label={t('home.@buttonNewProject')} size="s" variant="secondary" onClick={toggleModal} />
       {isModalOpen && <ProjectCreationModal onClose={toggleModal} />}
     </div>
   );
