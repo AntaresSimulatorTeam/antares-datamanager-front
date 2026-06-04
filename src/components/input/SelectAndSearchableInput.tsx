@@ -116,25 +116,34 @@ const SelectAndSearchableInput = ({
           />
         )}
       </div>
-      <TextInput
-        id="text-input-select"
-        label={label ?? ''}
-        onChange={(e) => {
-          if (isSearchable) {
-            void handleInputChange(e);
-          } else {
-            resetField?.();
-            setValueInput('');
-            setIsDropdownOpen(false);
-          }
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          minWidth: width,
         }}
-        value={valueInput}
-        disabled={isInputDisabled}
-        required={required}
-        rightIconAction="clean"
-        placeholder={defaultPlaceHolder}
-        style={{ minWidth: width }}
-      />
+        className="[&_[class^='_container']]:!w-[400px]"
+      >
+        <TextInput
+          id="text-input-select"
+          label={label ?? ''}
+          onChange={(e) => {
+            if (isSearchable) {
+              void handleInputChange(e);
+            } else {
+              resetField?.();
+              setValueInput('');
+              setIsDropdownOpen(false);
+            }
+          }}
+          value={valueInput}
+          disabled={isInputDisabled}
+          required={required}
+          rightIconAction="clean"
+          placeholder={defaultPlaceHolder}
+          style={{ minWidth: width }}
+        />
+      </div>
       {errorMessage && <div className="text-red-500 mt-2">{errorMessage}</div>}
       {isDropdownOpen && !!optionsSelection?.length && (
         <div

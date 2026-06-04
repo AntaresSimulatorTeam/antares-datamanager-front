@@ -4,27 +4,31 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { fetchProjectsFromPartialName } from '@/shared/services/projectService.ts';
-import SelectAndSearchableInput from '@/components/input/SelectAndSearchableInput.tsx';
-import { SelectOption } from '@/shared/types';
+import { SelectDSOption } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
+import { Select } from '@design-system-rte/react';
 
 interface ProjectManagerProps {
-  value: SelectOption;
-  onChange: (value: SelectOption) => void;
+  valueSelected: SelectDSOption;
+  onChange: (value: SelectDSOption) => void;
   required?: boolean;
 }
 
-const ProjectInput: React.FC<ProjectManagerProps> = ({ value, onChange, required = false }) => {
+const ProjectInput: React.FC<ProjectManagerProps> = ({ valueSelected, onChange, required = false }) => {
   const { t } = useTranslation();
-  const [projects, setProjects] = useState<SelectOption[]>([]);
-  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [projects, setProjects] = useState<SelectDSOption[]>([]);
+  const [_errorMessage, setErrorMessage] = useState<string>('');
 
   const loadProjects = async (valueLabel?: string) => {
     try {
       const projectList = await fetchProjectsFromPartialName(valueLabel ?? '');
-      const projectOptions = projectList.map((project) => ({ id: Number(project.id), label: project.name }));
+      const projectOptions = projectList.map((project) => ({
+        id: Number(project.id),
+        label: project.name,
+        value: project.name,
+      }));
       setProjects(projectOptions);
       return projectOptions;
     } catch (error) {
@@ -32,20 +36,31 @@ const ProjectInput: React.FC<ProjectManagerProps> = ({ value, onChange, required
     }
   };
 
-  const onSelect = (project: SelectOption) => {
-    onChange(project);
-  };
+  useEffect(() => {
+    void loadProjects();
+  }, []);
 
   return (
-    <div className="flex flex-col items-start justify-start">
-      <SelectAndSearchableInput
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px',
+        width: '280px',
+      }}
+    >
+      <Select
+        id="project-select"
+        value={valueSelected?.value ?? ''}
+        onChange={(value: string) => {
+          const selectedProject = projects.find((projectOption) => projectOption.value === value);
+          if (selectedProject) {
+            void onChange(selectedProject);
+          }
+        }}
         label={t('page.@project')}
-        onSelect={(valueSelected: SelectOption) => void onSelect(valueSelected)}
-        setSearchTerm={async (valueSearch?: string) => await loadProjects(valueSearch)}
-        isSearchable={true}
         options={projects}
-        errorMessage={errorMessage}
-        defaultValue={value?.label}
+        multiple={false}
         required={required}
       />
     </div>
