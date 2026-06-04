@@ -10,3 +10,7 @@
   font-weight: 400;
   font-style: normal;
 }
+
+.select-input-wrapper [data-label-position] {
+    width: 350px !important;
+}

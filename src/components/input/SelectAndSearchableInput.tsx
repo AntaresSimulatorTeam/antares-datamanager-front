@@ -116,14 +116,7 @@ const SelectAndSearchableInput = ({
           />
         )}
       </div>
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          minWidth: width,
-        }}
-        className={`[&_[data-label-position][data-error]]:!w-[${width ?? '300px'}]`}
-      >
+      <div className="select-input-wrapper" style={{ display: 'flex', flexDirection: 'column', minWidth: width ?? '' }}>
         <TextInput
           id="text-input-select"
           label={label ?? ''}
@@ -141,7 +134,6 @@ const SelectAndSearchableInput = ({
           required={required}
           rightIconAction="clean"
           placeholder={defaultPlaceHolder}
-          style={{ minWidth: width }}
         />
       </div>
       {errorMessage && <div className="text-red-500 mt-2">{errorMessage}</div>}

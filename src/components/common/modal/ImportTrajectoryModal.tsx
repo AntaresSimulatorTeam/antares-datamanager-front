@@ -63,7 +63,7 @@ export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, hypoth
         )}
         <div className="flex h-full flex-col">
           <div className="absolute z-10">
-            <div className="w-[400px]">
+            <div className="w-[350px]">
               <SelectAndSearchableInput
                 options={options}
                 defaultPlaceHolder={
@@ -74,7 +74,7 @@ export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, hypoth
                 setSearchTerm={handleSearchTerm}
                 resetField={resetField}
                 isInputDisabled={!options?.length}
-                width="400px"
+                width="350px"
               />
             </div>
             {trajectoryType === TRAJECTORY_TYPE.STS && (
