@@ -20,6 +20,7 @@ interface ProjectManagerProps {
   defaultValue?: string;
   label?: string;
   defaultPlaceHolder?: string;
+  width?: string;
 }
 
 const SelectAndSearchableInput = ({
@@ -34,6 +35,7 @@ const SelectAndSearchableInput = ({
   defaultValue,
   label,
   defaultPlaceHolder,
+  width,
 }: ProjectManagerProps) => {
   const [defaultOptions] = useState<SelectOption[] | undefined>(options);
   const [optionsSelection, setOptionsSelection] = useState<SelectOption[] | undefined>(options ?? []);
@@ -131,6 +133,7 @@ const SelectAndSearchableInput = ({
         required={required}
         rightIconAction="clean"
         placeholder={defaultPlaceHolder}
+        style={{ minWidth: width }}
       />
       {errorMessage && <div className="text-red-500 mt-2">{errorMessage}</div>}
       {isDropdownOpen && !!optionsSelection?.length && (
