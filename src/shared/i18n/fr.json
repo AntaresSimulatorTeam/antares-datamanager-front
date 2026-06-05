@@ -142,6 +142,7 @@
     "@warningButtonTooltip": "You cannot reset this warning",
     "@preview": "Prévisualisation",
     "@generate": "Générer",
+    "@generating": "Génération en cours...",
     "@add_trajectories_message": "Ajouter une trajectoire avec des zones",
     "@error_link_trajectory_message": "Please select another LINK trajectory or delete it",
     "@search_area": "Search area",

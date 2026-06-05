@@ -74,7 +74,9 @@ const StudyNavigationMenu = ({ setErrorMessage, studyData }: StudyNavigationMenu
         case TRAJECTORY_TYPE.MISC_CAPACITY:
         case TRAJECTORY_TYPE.RES_CAPACITY:
         case TRAJECTORY_TYPE.HYDRO_SERIES:
-          return <TabMenu key={type} type={type} defaultAreas={areaDefault} areas={trajectoryAreas} studyData={studyData} />;
+          return (
+            <TabMenu key={type} type={type} defaultAreas={areaDefault} areas={trajectoryAreas} studyData={studyData} />
+          );
         default:
           return <AreaLinkTab setErrorMessage={setErrorMessage} studyData={studyData} />;
       }
@@ -95,7 +97,8 @@ const StudyNavigationMenu = ({ setErrorMessage, studyData }: StudyNavigationMenu
         let nbWarning =
           warningMessages?.filter((message) => message.trajectoryType === (tab.id as TRAJECTORY_TYPE)).length ?? 0;
         if ((tab.id as TRAJECTORY_TYPE) === TRAJECTORY_TYPE.AREA) {
-          nbWarning += warningMessages?.filter((message) => message.trajectoryType === TRAJECTORY_TYPE.LINK)?.length ?? 0;
+          nbWarning +=
+            warningMessages?.filter((message) => message.trajectoryType === TRAJECTORY_TYPE.LINK)?.length ?? 0;
         }
 
         if (activeTab.id === tab.id) {
@@ -111,7 +114,7 @@ const StudyNavigationMenu = ({ setErrorMessage, studyData }: StudyNavigationMenu
   }, [activeTab.id, warningMessages]);
 
   return (
-    <div className="flex min-h-0 w-full flex-1 flex-col gap-4">
+    <div className="flex min-h-0 flex-1 flex-col gap-4">
       <Tab
         onChange={(id) => {
           const tabId = tabs.find((tab) => tab.id === id);
@@ -130,8 +133,10 @@ const StudyNavigationMenu = ({ setErrorMessage, studyData }: StudyNavigationMenu
         inverted={false}
         options={tabs}
       />
-      <ContainerWithExpander content={warningMessages} placeholder={t('studyDetails.@noWarnings')} />
-      <div className="flex min-h-0 flex-1">{activeContent}</div>
+      <div className="flex flex-1 flex-col gap-4 overflow-y-auto">
+        <ContainerWithExpander content={warningMessages} placeholder={t('studyDetails.@noWarnings')} />
+        {activeContent}
+      </div>
     </div>
   );
 };

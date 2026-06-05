@@ -616,7 +616,7 @@ export const getStudyMenu = (t: (value: string) => string, isTrajectoryAreaLinke
     id: TRAJECTORY_TYPE.DSR,
     panelId: TRAJECTORY_TYPE.DSR,
     label: t('studyDetails.@dsr'),
-    icon: 'fire',
+    icon: 'eraser',
     disabled: true,
     badgeType: 'brand',
     badgeContent: 'number',
