@@ -130,7 +130,7 @@ export const updateStudy = async (studyData: StudyDTO, studyId: number): Promise
 
 /**
  * Duplicate a study
- * Throws error if duplication fails, displays success toast if successful
+ * Displays error notification if duplication fails
  *
  * @param {Omit<StudyDTO, 'id' | 'status' | 'creationDate' | 'projectId'>} studyData - Partial study data
  * @return {Promise<void>}
@@ -148,7 +148,14 @@ export const duplicateStudy = async (
       body: JSON.stringify(studyData),
     });
   } catch (error: unknown) {
-    throw new Error((error as BackendError).antaresErrorMessage);
+    const errorMessage = (error as BackendError).antaresErrorMessage;
+    notifyAlert({
+      icon: 'close',
+      message: errorMessage,
+      type: 'error',
+      filledIcon: true,
+    });
+    throw new Error(errorMessage);
   }
 };
 
