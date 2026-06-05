@@ -43,7 +43,7 @@ const SelectAndSearchableInput = ({
   const [valueInput, setValueInput] = useState<string>(defaultValue ?? '');
   const dropdownList = useRef<HTMLDivElement | null>(null);
   const selectInputClass = isInputDisabled ? `bg-gray-200 border-opacity-0 cursor-not-allowed pointer-events-none` : '';
-  const classNameIcon = `absolute right-1 top-1.5 z-50`;
+  const classNameIcon = `absolute right-1 top-0.5 z-50`;
 
   const handleInputChange = useCallback(
     async (value: string) => {
@@ -136,7 +136,7 @@ const SelectAndSearchableInput = ({
       {errorMessage && <div className="text-red-500 mt-2">{errorMessage}</div>}
       {isDropdownOpen && !!optionsSelection?.length && (
         <div
-          className={`absolute left-0 ${label ? 'top-4' : 'top-6'} z-50 max-h-32 w-full overflow-y-auto rounded border border-gray-300 bg-gray-w shadow-2 outline-none`}
+          className={`absolute left-0 top-4 z-50 max-h-32 w-full overflow-y-auto rounded border border-gray-300 bg-gray-w shadow-2 outline-none`}
           onMouseDown={(e) => e.preventDefault()}
           ref={dropdownList}
           tabIndex={0}

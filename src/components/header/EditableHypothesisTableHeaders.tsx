@@ -68,7 +68,7 @@ const getEditableHypothesisTableHeaders = ({
           />
         </div>
       ) : (
-        <div className="flex w-full items-center justify-start gap-2">
+        <div className="flex w-full items-center justify-start gap-2 py-0.5">
           <SelectInputWithButton
             onSelect={(value: SelectOption) => {
               setErrorInfo({ index: row.index, message: '' });

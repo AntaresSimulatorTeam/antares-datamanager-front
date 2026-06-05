@@ -69,7 +69,7 @@ const StdInputText = ({
   };
 
   return (
-    <div className="inline-flex w-full flex-col items-start justify-start py-1">
+    <div className="inline-flex w-full flex-col items-start justify-start">
       {label && (
         <div className={labelClasses}>
           <label htmlFor={id}>

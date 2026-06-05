@@ -37,8 +37,6 @@ const StudyNavigationMenu = ({ setErrorMessage, studyData }: StudyNavigationMenu
     icon: 'share',
     disabled: false,
   });
-  const [activeContent, setActiveContent] = useState<ReactNode>(null);
-
   const { areaDefault, trajectoryAreas } = useFetchAreas(studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0]);
   const { warningMessages } = useFetchWarningMessages(
     studyData.id ? Number(studyData.id) : null,
@@ -85,10 +83,7 @@ const StudyNavigationMenu = ({ setErrorMessage, studyData }: StudyNavigationMenu
   );
 
   useEffect(() => {
-    if (!activeTab.disabled) {
-      setErrorMessage('');
-      setActiveContent(renderActiveComponent(activeTab.id as TRAJECTORY_TYPE));
-    }
+    if (!activeTab.disabled) setErrorMessage('');
   }, []);
 
   useEffect(() => {
@@ -120,10 +115,7 @@ const StudyNavigationMenu = ({ setErrorMessage, studyData }: StudyNavigationMenu
           const tabId = tabs.find((tab) => tab.id === id);
           if (tabId) {
             setActiveTab(tabId);
-            if (!tabId.disabled) {
-              setErrorMessage('');
-              setActiveContent(renderActiveComponent(tabId.id as TRAJECTORY_TYPE));
-            }
+            if (!tabId.disabled) setErrorMessage('');
           }
         }}
         direction="horizontal"
@@ -135,7 +127,7 @@ const StudyNavigationMenu = ({ setErrorMessage, studyData }: StudyNavigationMenu
       />
       <div className="flex flex-1 flex-col gap-4 overflow-y-auto">
         <ContainerWithExpander content={warningMessages} placeholder={t('studyDetails.@noWarnings')} />
-        {activeContent}
+        {!activeTab.disabled && renderActiveComponent(activeTab.id as TRAJECTORY_TYPE)}
       </div>
     </div>
   );
