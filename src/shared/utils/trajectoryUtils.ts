@@ -246,7 +246,6 @@ const buildSubRows = (
   defaultAreas?: { name: string }[],
 ): HypothesisRowData[] =>
   options.map((option) => {
-    console.log('================= entries', entries);
     const matchedTech = findTechnologyMatch(entries, option);
     return buildRow({
       hypothesis: option,
