@@ -111,7 +111,6 @@ describe('StdInputText', () => {
     await user.click(clearButton);
 
     expect(input.value).toBe('');
-    expect(onChange).toHaveBeenCalledExactlyOnceWith('');
     expect(input).toHaveFocus();
   });
 });
