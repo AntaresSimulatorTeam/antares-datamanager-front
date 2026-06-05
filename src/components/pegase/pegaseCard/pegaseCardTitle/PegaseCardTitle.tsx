@@ -44,7 +44,7 @@ const PegaseCardTitle = ({ title, dropdownOptions, icons, lineClamp, onClick, id
               id={`${id}-button`}
               data-testid="project-card-menu"
               aria-label="more-vert"
-              variant="transparent"
+              variant="text"
               size="m"
               name="more-vert"
               disabled={dropdownOptions.length === 0}

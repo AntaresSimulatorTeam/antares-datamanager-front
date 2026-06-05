@@ -8,3 +8,9 @@ export interface SelectOption {
   id?: number;
   label: string;
 }
+
+export interface SelectDSOption {
+  id?: number;
+  label: string;
+  value: string;
+}

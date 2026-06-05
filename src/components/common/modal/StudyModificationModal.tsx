@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import KeywordsInput from '@/components/input/KeywordsInput.tsx';
 import HorizonInput from '@/components/input/HorizonInput';
 import { duplicateStudy, updateStudy } from '@/shared/services/studyService';
-import { SelectOption, StudyDTO } from '@/shared/types';
+import { SelectDSOption, StudyDTO } from '@/shared/types';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { notifyToast } from '@/shared/notification/notification';
 import { validateMaxLength } from '@/shared/utils/validateMaxTextLength';
@@ -38,9 +38,10 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
   const { user } = useUser();
   const baseStudyName = study.name.substring(0, study.name.lastIndexOf('_'));
   const [studyName, setStudyName] = useState<string>(baseStudyName);
-  const [project, setProject] = useState<SelectOption>({
+  const [project, setProject] = useState<SelectDSOption>({
     id: Number(study.projectId),
     label: study.project,
+    value: study.project,
   });
   const [keywords, setKeywords] = useState<string[]>(study?.keywords || []);
   const [horizon, setHorizon] = useState<string>(() => {
@@ -108,7 +109,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
       const keywordsChanged = hasArrayChanged(study.keywords, keywords);
 
       isDuplicateMode
-        ? setIsFormValid(isHorizonValid || studyNameChanged)
+        ? setIsFormValid(isHorizonValid || !!project?.value || studyNameChanged)
         : setIsFormValid(studyNameChanged || projectNameChanged || keywordsChanged);
     };
     validateForm();
@@ -129,7 +130,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
       <RdsModal.Content>
         <div className="flex flex-col items-start gap-4">
           <FieldInFormation />
-          <div className="flex justify-between gap-2">
+          <div className="flex w-full items-center justify-start gap-4">
             <TextInput
               id="text-input-study-modify-name"
               value={studyName}
@@ -140,7 +141,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
               error={!!studyErrorMessage}
               assistiveTextLabel={studyErrorMessage}
             />
-            <ProjectInput required={true} value={project} onChange={setProject} />
+            <ProjectInput required={true} valueSelected={project} onChange={setProject} />
           </div>
           <HorizonInput
             horizon={horizon}
