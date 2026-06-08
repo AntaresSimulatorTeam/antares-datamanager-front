@@ -4,13 +4,9 @@
 @tailwind components;
 @tailwind utilities;
 
-/*:root {*/
-/*  text-align: center;*/
-/*  font-family: 'Nunito Sans Variable', system-ui, sans-serif;*/
-/*  font-weight: 400;*/
-/*  font-style: normal;*/
-/*}*/
-
-.text-input-select [data-label-position] {
-    width: 350px !important;
+:root {
+  text-align: center;
+  font-family: 'Nunito Sans Variable', system-ui, sans-serif;
+  font-weight: 400;
+  font-style: normal;
 }

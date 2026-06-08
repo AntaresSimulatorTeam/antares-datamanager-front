@@ -106,7 +106,7 @@ describe('useFetchWarningMessages', () => {
       expect(result.current.warningMessages?.data).toHaveLength(0);
     });
   });
-  
+
   it('does not fetch warning messages for DSR type', async () => {
     const { result } = renderHook(() => useFetchWarningMessages(123, TRAJECTORY_TYPE.DSR));
 
