@@ -21,7 +21,7 @@ export const SelectInputWithButton = ({
   const { t } = useTranslation();
 
   return (
-    <div className="flex w-fit items-center justify-start gap-2 py-0.25">
+    <div className="flex w-[400px] items-center justify-start gap-2">
       <SelectAndSearchableInput
         onSelect={(value: SelectOption) => void onSelect(value)}
         setSearchTerm={async (value?: string) => await onSearch(value)}

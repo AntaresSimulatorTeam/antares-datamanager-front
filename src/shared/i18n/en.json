@@ -66,7 +66,8 @@
     "@close": "Close",
     "@created": "Created",
     "@by": "By",
-    "@new_study": "Create a study"
+    "@new_study": "Create a study",
+    "@fetch_failed": "Failed to fetch projects"
   },
   "pinnedProject": {
     "@pinSuccess": "Project pinned successfully",
@@ -144,6 +145,7 @@
     "@warningButtonTooltip": "You cannot reset this warning",
     "@preview": "View",
     "@generate": "Generate",
+    "@generating": "Generating...",
     "@add_trajectories_message": "Please add Areas trajectories first",
     "@error_link_trajectory_message": "Please select another LINK trajectory or delete it",
     "@search_area": "Search area",

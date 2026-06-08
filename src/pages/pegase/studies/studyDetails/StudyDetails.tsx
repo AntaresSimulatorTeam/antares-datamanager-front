@@ -80,9 +80,9 @@ const StudyDetails = () => {
     <div className="flex min-h-0 flex-1 flex-col items-start gap-4 overflow-hidden p-3">
       <PegaseBreadcrumb items={headerItems}></PegaseBreadcrumb>
       <Divider />
-      <div className="flex min-h-0 w-full flex-1 flex-col gap-2">
+      <div className="flex min-h-0 w-full flex-1 flex-col gap-2 overflow-hidden pb-3">
         <DetailsContent content={studyData} onClickButton={toggleModal} tagsList={studyData?.keywords} />
-        <div className="flex min-h-0 flex-1 flex-col">
+        <div className="flex flex-1 flex-col overflow-hidden">
           <StudyNavigationMenu setErrorMessage={setErrorMessage} studyData={studyData} />
           <div className="fixed bottom-0 right-0 w-full border-t bg-gray-w px-1 py-1.5">
             <div className="flex h-fit w-full items-center justify-end">
@@ -91,7 +91,13 @@ const StudyDetails = () => {
               )}
               {errorMessage && <div className="mr-1 text-error-600">{errorMessage}</div>}
               {isGenerating ? (
-                <Loader appearance="brand" label="Generating..." labelPosition="right" showLabel size="medium" />
+                <Loader
+                  appearance="brand"
+                  label={t('studyDetails.@generating')}
+                  labelPosition="right"
+                  showLabel
+                  size="medium"
+                />
               ) : (
                 <Button
                   label={t('studyDetails.@generate')}

@@ -147,7 +147,7 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
         handleSelectionChange={handleSelectionChange}
         disabled={isStudyGenerated}
       />
-      <div className="flex min-h-0 w-full flex-1 flex-col gap-4 overflow-y-auto">
+      <div className="flex w-full flex-col gap-6">
         <PegaseHypothesisTable
           id="technical-parameters-table"
           data={technicalData}
@@ -232,7 +232,6 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
           }}
           type={TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER}
         />
-        {/*<div className="flex min-h-0 w-full">*/}
         <PegaseHypothesisTable
           id="economics-parameters-table"
           data={data}
@@ -286,7 +285,6 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
             }
           }}
         />
-        {/*</div>*/}
       </div>
       {isModalOpen && (
         <ImportTrajectoryModal
