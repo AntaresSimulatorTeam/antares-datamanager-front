@@ -1,4 +1,4 @@
-import { DbTrajectory, HypothesisRowData, isTrajectoryHydroType, RowStatus } from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, isTrajectoryHydroType, RowStatus, StdTabItemProps } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { FileInputStatus } from 'rte-design-system-react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
@@ -27,7 +27,7 @@ import {
   TRAJECTORY_THERMAL_MODULATION_PARAMETER_IMPORT,
   TRAJECTORY_THERMAL_SPECIFIC_PARAMETER_IMPORT,
 } from '@/shared/const/apiEndPoint.ts';
-import { TabItemProps } from '@design-system-rte/core/components/tab/tab.interface';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 /**
  * Get trajectory status from row status
@@ -572,88 +572,64 @@ export const addNestedRow = (
  * Return all tabs available for a study configuration
  * @param {TFunction<'translation', undefined>} t - Translation function
  * @param {boolean} isTrajectoryAreaLinked - Flag to indicate if an AREA trajectory is linked to the study
- * @return {TabItemProps[]} - Array of tab data model
+ * @return {StdTabItemProps[]} - Array of tab data model
  */
-export const getStudyMenu = (t: (value: string) => string, isTrajectoryAreaLinked: boolean): TabItemProps[] => [
+export const getStudyMenu = (t: (value: string) => string, isTrajectoryAreaLinked: boolean): StdTabItemProps[] => [
   {
     id: TRAJECTORY_TYPE.AREA,
     panelId: TRAJECTORY_TYPE.AREA,
     label: t('studyDetails.@areas_links'),
-    icon: 'share',
+    icon: StdIconId.LinkedServices, //'share',
     disabled: false,
-    badgeType: 'brand',
-    badgeContent: 'number',
-    showBadge: true,
   },
   {
     id: TRAJECTORY_TYPE.LOAD,
     panelId: TRAJECTORY_TYPE.LOAD,
     label: t('studyDetails.@load'),
-    icon: 'monitoring',
+    icon: StdIconId.Monitoring, //'monitoring',
     disabled: isTrajectoryAreaLinked,
-    badgeType: 'brand',
-    badgeContent: 'number',
-    showBadge: true,
   },
   {
     id: TRAJECTORY_TYPE.THERMAL_CAPACITY,
     panelId: TRAJECTORY_TYPE.THERMAL_CAPACITY,
     label: t('studyDetails.@thermal'),
-    icon: 'fire',
+    icon: StdIconId.LocalFireDepartment, //'fire',
     disabled: isTrajectoryAreaLinked,
-    badgeType: 'brand',
-    badgeContent: 'number',
-    showBadge: true,
   },
   {
     id: TRAJECTORY_TYPE.STS,
     panelId: TRAJECTORY_TYPE.STS,
     label: t('studyDetails.@sts'),
-    icon: 'battery-charging-full',
+    icon: StdIconId.BatteryChargingFull, //'battery-charging-full',
     disabled: true,
-    badgeType: 'brand',
-    badgeContent: 'number',
-    showBadge: true,
   },
   {
     id: TRAJECTORY_TYPE.DSR,
     panelId: TRAJECTORY_TYPE.DSR,
     label: t('studyDetails.@dsr'),
-    icon: 'eraser',
+    icon: StdIconId.InkEraser, //'eraser',
     disabled: true,
-    badgeType: 'brand',
-    badgeContent: 'number',
-    showBadge: true,
   },
   {
     id: TRAJECTORY_TYPE.MISC_CAPACITY,
     panelId: TRAJECTORY_TYPE.MISC_CAPACITY,
     label: t('studyDetails.@misc'),
-    icon: 'category',
+    icon: StdIconId.Category, //'category',
     disabled: true,
-    badgeType: 'brand',
-    badgeContent: 'number',
-    showBadge: true,
   },
   {
     id: TRAJECTORY_TYPE.RES_CAPACITY,
     panelId: TRAJECTORY_TYPE.RES_CAPACITY,
     label: t('studyDetails.@res'),
-    icon: 'eco',
+    icon: StdIconId.EnergySavingsLeaf, //'eco',
     disabled: true,
-    badgeType: 'brand',
-    badgeContent: 'number',
-    showBadge: true,
   },
   {
     id: TRAJECTORY_TYPE.HYDRO_SERIES,
     panelId: TRAJECTORY_TYPE.HYDRO_SERIES,
     label: t('studyDetails.@hydro'),
-    icon: 'water',
+    icon: StdIconId.Water, //'water',
     disabled: true,
-    badgeType: 'brand',
-    badgeContent: 'number',
-    showBadge: true,
   },
 ];
 

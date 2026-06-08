@@ -37,12 +37,15 @@ describe('useFetchWarningMessages', () => {
     const { result } = renderHook(() => useFetchWarningMessages(123, TRAJECTORY_TYPE.AREA));
 
     await waitFor(() => {
-      expect(result.current.warningMessages.length).toBeGreaterThan(0);
+      expect(result.current.warningMessages?.data?.length).toBeGreaterThan(0);
       expect(fetchWarningMessagesFromType).toHaveBeenCalledTimes(2);
       expect(fetchWarningMessagesFromType).toHaveBeenCalledWith(TRAJECTORY_TYPE.AREA, 123);
       expect(fetchWarningMessagesFromType).toHaveBeenCalledWith(TRAJECTORY_TYPE.LINK, 123);
       expect(buildDataWarningMessage).toHaveBeenCalled();
-      expect(result.current.warningMessages).toEqual([...mockBuiltMessages, ...mockBuiltMessages]);
+      expect(result.current.warningMessages).toEqual({
+        type: TRAJECTORY_TYPE.AREA,
+        data: [...mockBuiltMessages, ...mockBuiltMessages],
+      });
     });
   });
 
@@ -56,11 +59,11 @@ describe('useFetchWarningMessages', () => {
     const { result } = renderHook(() => useFetchWarningMessages(123, TRAJECTORY_TYPE.LOAD));
 
     await waitFor(() => {
-      expect(result.current.warningMessages.length).toBeGreaterThan(0);
+      expect(result.current.warningMessages?.data?.length).toBeGreaterThan(0);
       expect(fetchWarningMessagesFromType).toHaveBeenCalledTimes(1);
       expect(fetchWarningMessagesFromType).toHaveBeenCalledWith(TRAJECTORY_TYPE.LOAD, 123);
       expect(buildDataWarningMessage).toHaveBeenCalled();
-      expect(result.current.warningMessages).toEqual(mockBuiltMessages);
+      expect(result.current.warningMessages).toEqual({ type: TRAJECTORY_TYPE.LOAD, data: mockBuiltMessages });
     });
   });
 
@@ -74,7 +77,7 @@ describe('useFetchWarningMessages', () => {
     const { result } = renderHook(() => useFetchWarningMessages(123, TRAJECTORY_TYPE.THERMAL_CAPACITY));
 
     await waitFor(() => {
-      expect(result.current.warningMessages.length).toBeGreaterThan(0);
+      expect(result.current.warningMessages?.data?.length).toBeGreaterThan(0);
       expect(fetchWarningMessagesFromType).toHaveBeenCalledTimes(4);
       expect(fetchWarningMessagesFromType).toHaveBeenCalledWith(
         TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
@@ -89,7 +92,10 @@ describe('useFetchWarningMessages', () => {
         123,
       );
       expect(buildDataWarningMessage).toHaveBeenCalled();
-      expect(result.current.warningMessages).toEqual(mockBuiltMessages);
+      expect(result.current.warningMessages).toEqual({
+        type: TRAJECTORY_TYPE.THERMAL_CAPACITY,
+        data: mockBuiltMessages,
+      });
     });
   });
 
@@ -97,16 +103,15 @@ describe('useFetchWarningMessages', () => {
     const { result } = renderHook(() => useFetchWarningMessages(123, TRAJECTORY_TYPE.STS));
 
     await waitFor(() => {
-      expect(result.current.warningMessages).toHaveLength(0);
+      expect(result.current.warningMessages?.data).toHaveLength(0);
     });
   });
-
-  // TODO remove when control
+  
   it('does not fetch warning messages for DSR type', async () => {
     const { result } = renderHook(() => useFetchWarningMessages(123, TRAJECTORY_TYPE.DSR));
 
     await waitFor(() => {
-      expect(result.current.warningMessages).toHaveLength(0);
+      expect(result.current.warningMessages?.data).toHaveLength(0);
     });
   });
 });

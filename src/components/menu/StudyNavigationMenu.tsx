@@ -8,16 +8,19 @@ import { Dispatch, ReactNode, SetStateAction, useCallback, useEffect, useState }
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useTranslation } from 'react-i18next';
 import { useStudy } from '@/store/contexts/StudyContext.tsx';
-import { StudyDTO } from '@/shared/types';
+import { StdTabItemProps, StudyDTO, WarningTrajectoryType } from '@/shared/types';
 import { getStudyMenu } from '@/shared/utils/trajectoryUtils.ts';
 import { useFetchAreas } from '@/hooks/useFetchAreas.ts';
 import { AreaLinkTab } from '@/components/tab/AreaLinkTab.tsx';
 import { TabMenu } from '@/components/menu/TabMenu.tsx';
 import ExpandableTab from '@/components/tab/ExpandableTab.tsx';
-import { Tab } from '@design-system-rte/react';
-import { TabItemProps } from '@design-system-rte/core/components/tab/tab.interface';
 import { ContainerWithExpander } from '@/components/banner/ContainerWithExpander.tsx';
 import { useFetchWarningMessages } from '@/hooks/useFetchWarningMessages.ts';
+import StdTabItem from '@common/layout/stdTabs/StdTabItem.tsx';
+import StdAvatar from '@common/layout/stdAvatar/StdAvatar.tsx';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
+import { getNbMessagesFromTrajectoryType } from '@/shared/services/trajectoryService.ts';
+import { countWarning } from '@/shared/utils/warningUtils.ts';
 
 type StudyNavigationMenuProps = {
   setErrorMessage: Dispatch<SetStateAction<string>>;
@@ -27,31 +30,41 @@ type StudyNavigationMenuProps = {
 const StudyNavigationMenu = ({ setErrorMessage, studyData }: StudyNavigationMenuProps) => {
   const { t } = useTranslation();
   const studyState = useStudy();
-  const [tabs, setTabs] = useState<TabItemProps[]>(
+  const [tabs, setTabs] = useState<StdTabItemProps[]>(
     getStudyMenu(t, !!studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0]),
   );
-  const [activeTab, setActiveTab] = useState<TabItemProps>({
+  const [activeTab, setActiveTab] = useState<StdTabItemProps>({
     id: TRAJECTORY_TYPE.AREA,
     panelId: TRAJECTORY_TYPE.AREA,
     label: t('studyDetails.@areas_links'),
-    icon: 'share',
+    icon: StdIconId.LinkedServices,
     disabled: false,
   });
   const { areaDefault, trajectoryAreas } = useFetchAreas(studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0]);
-  const { warningMessages } = useFetchWarningMessages(
-    studyData.id ? Number(studyData.id) : null,
-    activeTab.id as TRAJECTORY_TYPE,
-  );
+  const { warningMessages } = useFetchWarningMessages(studyData.id ? Number(studyData.id) : null, activeTab?.id);
+  const [warningTrajectory, setWarningTrajectory] = useState<WarningTrajectoryType>();
 
   useEffect(() => {
     const hasAreaTrajectory = !!studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0];
     setTabs((prev) =>
       prev.map((tab) => ({
         ...tab,
-        disabled: tab.id !== (TRAJECTORY_TYPE.AREA as string) && !hasAreaTrajectory,
+        disabled: tab.id !== TRAJECTORY_TYPE.AREA && !hasAreaTrajectory,
       })),
     );
   }, [studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories]);
+
+  useEffect(() => {
+    const countNbWarningMessages = async (id: number) => {
+      try {
+        const result = await getNbMessagesFromTrajectoryType(id);
+        setWarningTrajectory(result);
+      } catch {
+        // silent handler;
+      }
+    };
+    void countNbWarningMessages(studyData?.id);
+  }, [activeTab.id]);
 
   const renderActiveComponent = useCallback(
     (type: TRAJECTORY_TYPE): ReactNode | null => {
@@ -82,52 +95,41 @@ const StudyNavigationMenu = ({ setErrorMessage, studyData }: StudyNavigationMenu
     [areaDefault, setErrorMessage, studyData, trajectoryAreas],
   );
 
-  useEffect(() => {
-    if (!activeTab.disabled) setErrorMessage('');
-  }, []);
-
-  useEffect(() => {
-    setTabs((prev) =>
-      prev.map((tab) => {
-        let nbWarning =
-          warningMessages?.filter((message) => message.trajectoryType === (tab.id as TRAJECTORY_TYPE)).length ?? 0;
-        if ((tab.id as TRAJECTORY_TYPE) === TRAJECTORY_TYPE.AREA) {
-          nbWarning +=
-            warningMessages?.filter((message) => message.trajectoryType === TRAJECTORY_TYPE.LINK)?.length ?? 0;
-        }
-
-        if (activeTab.id === tab.id) {
-          const { badgeCount: _removed, ...rest } = tab;
-          return rest;
-        }
-        if (nbWarning > 0) {
-          return { ...tab, badgeCount: nbWarning };
-        }
-        return tab;
-      }),
-    );
-  }, [activeTab.id, warningMessages]);
-
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
-      <Tab
-        onChange={(id) => {
-          const tabId = tabs.find((tab) => tab.id === id);
-          if (tabId) {
-            setActiveTab(tabId);
-            if (!tabId.disabled) setErrorMessage('');
-          }
-        }}
-        direction="horizontal"
-        alignment="start"
-        overflowType="dropdown"
-        selectedTabId={activeTab.id}
-        inverted={false}
-        options={tabs}
-      />
+      <div className="flex space-x-2">
+        {tabs.map((tab) => {
+          const nbWarning = warningTrajectory ? countWarning(warningTrajectory, tab.id) : 0;
+          return (
+            <div className="flex items-center space-x-2" key={tab.label}>
+              {tab.label && (
+                <StdTabItem
+                  key={tab.label}
+                  name={tab.label}
+                  label={tab.label}
+                  active={activeTab?.label === tab.label}
+                  disabled={tab.disabled}
+                  onClick={() => !tab.disabled && setActiveTab(tab)}
+                  icon={tab.icon}
+                />
+              )}
+              {nbWarning > 0 && activeTab.id !== tab.id && (
+                <StdAvatar
+                  initials={`${nbWarning}`}
+                  size="es"
+                  backgroundColor="orange"
+                  fullname=""
+                  textColor="white"
+                  hasToolTip={false}
+                />
+              )}
+            </div>
+          );
+        })}
+      </div>
       <div className="flex flex-1 flex-col gap-4 overflow-y-auto">
-        <ContainerWithExpander content={warningMessages} placeholder={t('studyDetails.@noWarnings')} />
-        {!activeTab.disabled && renderActiveComponent(activeTab.id as TRAJECTORY_TYPE)}
+        <ContainerWithExpander content={warningMessages?.data ?? []} placeholder={t('studyDetails.@noWarnings')} />
+        {!activeTab?.disabled && renderActiveComponent(activeTab?.id)}
       </div>
     </div>
   );

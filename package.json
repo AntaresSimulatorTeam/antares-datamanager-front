@@ -17,7 +17,7 @@
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@design-system-rte/react": "^1.9.1-rc1",
+    "@design-system-rte/react": "^1.10.0",
     "@floating-ui/react": "^0.26.28",
     "@fontsource-variable/nunito-sans": "^5.2.7",
     "@tanstack/react-table": "^8.20.5",
