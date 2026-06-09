@@ -74,9 +74,3 @@ export const validateName = (name: string, setNameError: Dispatch<SetStateAction
 };
 
 export const getStudyName = (studyName: string): string => studyName.substring(0, studyName.lastIndexOf('_'));
-
-export const convertToOneYearHorizon = (rawHorizon: string) => {
-  const years = rawHorizon.match(/\d{4}/g)?.map(Number) || [];
-  const maxYear = years.length ? Math.max(...years) : '';
-  return maxYear.toString();
-};
