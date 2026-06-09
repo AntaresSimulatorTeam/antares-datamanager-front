@@ -154,7 +154,7 @@ const KeywordsInput = ({
       </div>
 
       {/* Keywords Display and Clear All Button */}
-      <div className="flex flex-col items-start justify-start gap-1">
+      <div className="flex flex-col items-start gap-1">
         <div className="flex flex-wrap gap-2">
           {keywords.map((keyword, index) => (
             <div key={index} className="flex items-center gap-2 rounded bg-gray-200 px-1">
@@ -163,8 +163,6 @@ const KeywordsInput = ({
             </div>
           ))}
         </div>
-
-        {/* Clear All Keywords Button */}
         {keywords?.length > 0 && (
           <Button size="s" label={t('projectModal.@keyword_button_clear')} onClick={clearAllKeywords} variant="text" />
         )}

@@ -20,7 +20,7 @@ import {
 import SelectInput from '@/components/input/SelectInput.tsx';
 import { Button, TextInput } from '@design-system-rte/react';
 import { FieldInFormation } from '@common/base/FieldInFormation.tsx';
-import { getStudyName, validateFormInputs, validateHorizon } from '@/shared/utils/validateFormInput.ts';
+import { validateFormInputs, validateHorizon } from '@/shared/utils/validateFormInput.ts';
 import { useFetchProjectOptions } from '@/hooks/useFetchProjectOptions.ts';
 import { useStudyModification } from '@/hooks/useStudyModification.ts';
 
@@ -41,7 +41,9 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
   const { t } = useTranslation();
   const { user } = useUser();
   const { projects } = useFetchProjectOptions();
-  const [studyName, setStudyName] = useState<string>(getStudyName(study.name));
+
+  const baseStudyName = study.name.substring(0, study.name.lastIndexOf('_'));
+  const [studyName, setStudyName] = useState<string>(baseStudyName);
   const [studyNameError, setStudyNameError] = useState<string>('');
   const [project, setProject] = useState<SelectDSOption>({
     id: Number(study.projectId),
@@ -67,9 +69,9 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
       onClose();
     },
     (message) => {
-      if (message?.includes(t('studyDetails.@duplicateModalStudyError'))) {
+      if (message?.includes('study')) {
         setStudyNameError(message);
-      } else if (message?.includes('Horizon must be')) {
+      } else if (message?.includes('horizon')) {
         setHorizonError(message);
       }
     },

@@ -19,7 +19,7 @@ import {
 } from '@/shared/const/studyConfig';
 import { Button, TextInput } from '@design-system-rte/react';
 import { FieldInFormation } from '@common/base/FieldInFormation.tsx';
-import { validateHorizon, validateNameAndHorizonInputs } from '@/shared/utils/validateFormInput.ts';
+import { validateHorizon } from '@/shared/utils/validateFormInput.ts';
 import { useStudyCreation } from '@/hooks/useStudyCreation.ts';
 
 interface StudyCreationModalProps {
@@ -63,6 +63,18 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
     },
     (message) => setNameError(message),
   );
+
+  const validFormInputs = () => {
+    // Name
+    let isNameValid = true;
+    if (studyName?.length === 0 || !studyName?.trim()) {
+      setNameError(t('studyModal.@requiredStudy'));
+      isNameValid = false;
+    }
+    // Horizon
+    const isHorizonValid = validateHorizon(setHorizonError, t, horizon, true);
+    return isNameValid && isHorizonValid;
+  };
 
   return (
     <RdsModal size="small">
@@ -119,7 +131,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
           icon="add"
           label={t('modal.@button_create')}
           onClick={() => {
-            if (validateNameAndHorizonInputs(studyName, horizon, setNameError, setHorizonError, t)) {
+            if (validFormInputs()) {
               const studyData = {
                 id: study?.id,
                 name: studyName,

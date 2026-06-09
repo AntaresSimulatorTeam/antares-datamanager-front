@@ -19,7 +19,6 @@ import {
 import { Button, Textarea, TextInput } from '@design-system-rte/react';
 import { FieldInFormation } from '@common/base/FieldInFormation.tsx';
 import { useProjectCreation } from '@/hooks/useProjectCreation.ts';
-import { validateName } from '@/shared/utils/validateFormInput.ts';
 
 interface ProjectCreationModalProps {
   onClose: () => void;
@@ -28,9 +27,9 @@ interface ProjectCreationModalProps {
 
 export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationModalProps) => {
   const { t } = useTranslation();
-  const [name, setName] = useState(projectInfo?.name ?? '');
-  const [nameError, setNameError] = useState('');
-  const [description, setDescription] = useState(projectInfo?.description ?? '');
+  const [name, setName] = useState<string>(projectInfo?.name ?? '');
+  const [nameError, setNameError] = useState<string | null>(null);
+  const [description, setDescription] = useState<string>(projectInfo?.description ?? '');
   const [keywords, setKeywords] = useState<string[]>(projectInfo?.tags ?? []);
 
   const resetFields = () => {
@@ -55,6 +54,14 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
     },
     (message) => setNameError(message),
   );
+
+  const validateFormInputs = () => {
+    if (name?.length === 0 || !name?.trim()) {
+      setNameError(t('projectModal.@requiredProject'));
+      return false;
+    }
+    return true;
+  };
 
   return (
     <RdsModal size="small">
@@ -107,7 +114,7 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
           icon={projectInfo ? 'edit' : 'add'}
           label={projectInfo ? t('modal.@button_update') : t('modal.@button_create')}
           onClick={() => {
-            if (validateName(name, setNameError, t('projectModal.@requiredProject'))) {
+            if (validateFormInputs()) {
               const projectData = {
                 name,
                 tags: keywords,
