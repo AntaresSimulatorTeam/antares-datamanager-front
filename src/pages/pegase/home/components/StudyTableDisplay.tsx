@@ -140,7 +140,7 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
             </>
           ) : (
             projectInfo?.id && (
-              <Button label={t('studyModal.@new_study')} onClick={() => setIsModalStudyCreation(true)} />
+              <Button size="s" label={t('studyModal.@new_study')} onClick={() => setIsModalStudyCreation(true)} />
             )
           )}
         </div>

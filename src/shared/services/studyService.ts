@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { BackendError, DbTrajectory, PaginatedResponse, StudyDTO } from '@/shared/types';
+import { BackendError, DbTrajectory, PaginatedResponse, StudyDataCreation, StudyDTO } from '@/shared/types';
 import { STUDY_GENERATE_ENDPOINT, STUDY_SEARCH_ENDPOINT, TRAJECTORY_ENDPOINT } from '@/shared/const/apiEndPoint';
 import { STUDY_ENDPOINT, STUDY_KEYWORDS_SEARCH_ENDPOINT } from '@/shared/const/apiEndPoint.ts';
 import { notifyAlert, notifyToast } from '@/shared/notification/notification.tsx';
@@ -87,11 +87,7 @@ export const fetchSuggestedKeywords = async (partialName: string): Promise<strin
  * @return {Promise<void>}
  * @throws {BackendError} Throws an error if the update fails on the server-side.
  */
-export const saveStudy = async (
-  studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate' | 'projectId' | 'generationDate' | 'hvdc'> & {
-    id: number | undefined;
-  },
-): Promise<void> => {
+export const saveStudy = async (studyData: StudyDataCreation): Promise<void> => {
   try {
     await AuthService.authFetch(`${STUDY_ENDPOINT}`, {
       method: 'POST',
@@ -101,7 +97,7 @@ export const saveStudy = async (
       body: JSON.stringify(studyData),
     });
   } catch (error: unknown) {
-    throw new Error((error as BackendError).antaresErrorMessage);
+    throw new Error(`${(error as BackendError)?.antaresErrorMessage}`);
   }
 };
 
@@ -136,9 +132,7 @@ export const updateStudy = async (studyData: Partial<StudyDTO>, studyId: number)
  * @return {Promise<void>}
  * @throws {BackendError} Throws an error if the update fails on the server-side.
  */
-export const duplicateStudy = async (
-  studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate' | 'projectId' | 'generationDate' | 'hvdc'>,
-): Promise<void> => {
+export const duplicateStudy = async (studyData: StudyDataCreation): Promise<void> => {
   try {
     await AuthService.authFetch(`${STUDY_ENDPOINT}/duplicate`, {
       method: 'POST',

@@ -5,3 +5,4 @@ export const MAX_PROJECT_NAME_LENGTH = 40;
 export const MAX_PROJECT_DESCRIPTION_LENGTH = 500;
 export const MAX_KEYWORD_LENGTH = 15;
 export const MAX_KEYWORD_NUMBER = 6;
+export const MAX_HORIZON_NUMBER = 4;

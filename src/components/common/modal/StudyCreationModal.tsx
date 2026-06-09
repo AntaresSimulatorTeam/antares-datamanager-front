@@ -4,19 +4,23 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { RdsModal } from 'rte-design-system-react';
 import { useTranslation } from 'react-i18next';
 import KeywordsInput from '@/components/input/KeywordsInput.tsx';
-import HorizonInput from '@/components/input/HorizonInput';
-import { saveStudy } from '@/shared/services/studyService';
 import { StudyDTO } from '@/shared/types';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { notifyToast } from '@/shared/notification/notification';
-import { validateMaxLength } from '@/shared/utils/validateMaxTextLength';
-import { MAX_KEYWORD_LENGTH, MAX_KEYWORD_NUMBER, MAX_STUDY_NAME_LENGTH } from '@/shared/const/studyConfig';
+import {
+  MAX_HORIZON_NUMBER,
+  MAX_KEYWORD_LENGTH,
+  MAX_KEYWORD_NUMBER,
+  MAX_STUDY_NAME_LENGTH,
+} from '@/shared/const/studyConfig';
 import { Button, TextInput } from '@design-system-rte/react';
 import { FieldInFormation } from '@common/base/FieldInFormation.tsx';
+import { validateHorizon } from '@/shared/utils/validateFormInput.ts';
+import { useStudyCreation } from '@/hooks/useStudyCreation.ts';
 
 interface StudyCreationModalProps {
   isOpen?: boolean;
@@ -33,77 +37,43 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
   projectInfoName,
 }) => {
   const { t } = useTranslation();
-  const [studyName, setStudyName] = useState<string>('');
-  const [keywords, setKeywords] = useState<string[]>([]);
-  const [horizon, setHorizon] = useState<string>('');
   const [trajectoryIds] = useState<number[]>([]);
-  const [isFormValid, setIsFormValid] = useState(false);
   const { user } = useUser();
-  const [isHorizonValid, setIsHorizonValid] = useState(false);
-  const [studyErrorMessage, setStudyErrorMessage] = useState<string>('');
+  const [studyName, setStudyName] = useState<string>('');
+  const [nameError, setNameError] = useState<string>('');
+  const [horizon, setHorizon] = useState<string>('');
+  const [horizonError, setHorizonError] = useState<string>('');
+  const [keywords, setKeywords] = useState<string[]>([]);
 
-  const saveStudyHandler = async () => {
-    setStudyErrorMessage('');
-    const studyData = {
-      id: study?.id,
-      name: studyName,
-      createdBy: user?.profile.sub,
-      keywords,
-      project: projectInfoName,
-      horizon,
-      trajectoryIds,
-      studyId: study?.id,
-    };
+  const resetFields = () => {
+    setStudyName('');
+    setHorizon('');
+    setKeywords([]);
+  };
 
-    try {
-      await saveStudy(studyData);
-      setReloadStudies((prev) => prev + 1); // Trigger reload after successful save
-      setStudyName('');
-      setHorizon('');
-      setKeywords([]);
+  const { confirmCreation } = useStudyCreation(
+    () => {
+      setReloadStudies((prev) => prev + 1);
+      resetFields();
       notifyToast({
         type: 'success',
         message: 'Study created successfully',
       });
       onClose();
-    } catch (error) {
-      const errorMessages = (error as Error)?.message;
-      if (errorMessages?.includes('study')) {
-        setStudyErrorMessage(errorMessages);
-        setIsFormValid(false);
-      } else {
-        notifyToast({
-          type: 'error',
-          message: (error as Error)?.message ?? 'An error occurred while saving the study',
-        });
-        onClose();
-      }
+    },
+    (message) => setNameError(message),
+  );
+
+  const validFormInputs = () => {
+    // Name
+    let isNameValid = true;
+    if (studyName?.length === 0 || !studyName?.trim()) {
+      setNameError(t('studyModal.@requiredStudy'));
+      isNameValid = false;
     }
-  };
-
-  useEffect(() => {
-    studyName && horizon && isHorizonValid ? setIsFormValid(true) : setIsFormValid(false);
-  }, [studyName, horizon, isHorizonValid]);
-
-  const handleStudyNameChange = (value: string) => {
-    if (validateMaxLength(value, MAX_STUDY_NAME_LENGTH)) {
-      setStudyName(value || '');
-      setStudyErrorMessage('');
-    } else if (value?.length === MAX_STUDY_NAME_LENGTH + 1) {
-      setStudyName(value || '');
-      setStudyErrorMessage(t('modal.@number_characters_exceeds'));
-      setIsFormValid(false);
-    }
-  };
-
-  const handleHorizonChange = (value: string) => {
-    setHorizon(value);
-    setStudyErrorMessage('');
-  };
-
-  const handleHorizonValidityChange = (valid: boolean) => {
-    setIsHorizonValid(valid);
-    setStudyErrorMessage('');
+    // Horizon
+    const isHorizonValid = validateHorizon(setHorizonError, t, horizon, true);
+    return isNameValid && isHorizonValid;
   };
 
   return (
@@ -111,34 +81,48 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
       <RdsModal.Title onClose={onClose}>{t('studyModal.@new_study')}</RdsModal.Title>
       <RdsModal.Content>
         <div className="flex w-full flex-col gap-4 self-stretch">
-          <div className="flex flex-col items-start gap-4">
+          <div className="flex flex-col items-start justify-start gap-4">
             <FieldInFormation />
-            <div className="flex w-1/2 flex-col items-start gap-4">
-              <TextInput
-                id="text-input-study-create-name"
-                label={t('modal.@input_name')}
-                value={studyName}
-                onChange={handleStudyNameChange}
-                required
-                maxLength={MAX_STUDY_NAME_LENGTH}
-                error={!!studyErrorMessage}
-                assistiveTextLabel={studyErrorMessage}
-              />
-              <HorizonInput
-                horizon={horizon}
-                onChange={handleHorizonChange}
-                onValidChange={handleHorizonValidityChange}
-                required
-              />
-              <KeywordsInput
-                keywords={keywords}
-                setKeywords={setKeywords}
-                maxNbKeywords={MAX_KEYWORD_NUMBER}
-                maxNbCharacters={MAX_KEYWORD_LENGTH}
-                minNbCharacters={1}
-              />
-            </div>
+            <TextInput
+              id="text-input-study-create-name"
+              label={t('modal.@input_name')}
+              value={studyName}
+              onChange={(value: string) => {
+                nameError && setNameError('');
+                setStudyName(value ?? '');
+              }}
+              required
+              maxLength={MAX_STUDY_NAME_LENGTH}
+              showCounter={true}
+              error={!!nameError}
+              assistiveTextLabel={nameError}
+              assistiveAppearance="error"
+              rightIconAction="clean"
+            />
           </div>
+          <TextInput
+            id="text-input-horizon"
+            label={t('home.@horizon')}
+            value={horizon}
+            required
+            onChange={(value: string) => {
+              horizonError && setHorizonError('');
+              setHorizon(value ?? '');
+            }}
+            onBlur={() => validateHorizon(setHorizonError, t, horizon, false)}
+            maxLength={MAX_HORIZON_NUMBER}
+            showCounter={true}
+            error={!!horizonError}
+            assistiveTextLabel={horizonError || t('components.horizonInput.@assistiveTextForYear')}
+            assistiveAppearance={horizonError ? 'error' : 'description'}
+          />
+          <KeywordsInput
+            keywords={keywords}
+            setKeywords={setKeywords}
+            maxNbKeywords={MAX_KEYWORD_NUMBER}
+            maxNbCharacters={MAX_KEYWORD_LENGTH}
+            minNbCharacters={1}
+          />
         </div>
       </RdsModal.Content>
       <RdsModal.Footer>
@@ -146,9 +130,22 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
         <Button
           icon="add"
           label={t('modal.@button_create')}
-          onClick={() => void saveStudyHandler()}
+          onClick={() => {
+            if (validFormInputs()) {
+              const studyData = {
+                id: study?.id,
+                name: studyName,
+                createdBy: user?.profile.sub,
+                keywords,
+                project: projectInfoName,
+                horizon,
+                trajectoryIds,
+                studyId: study?.id,
+              };
+              void confirmCreation(studyData);
+            }
+          }}
           variant="primary"
-          disabled={!isFormValid}
         />
       </RdsModal.Footer>
     </RdsModal>

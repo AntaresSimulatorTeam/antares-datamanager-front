@@ -7,7 +7,7 @@
 import { PROJECT_ACTION } from '@/shared/enum/project.ts';
 
 export interface ProjectResponse {
-  id: string;
+  id: number;
   name: string;
   description: string;
   createdBy: string;
@@ -48,6 +48,4 @@ export interface ProjectState {
   pinnedProjects: ProjectInfo[];
 }
 
-export interface LocationProject {
-  projectId: string;
-}
+export type ProjectDataCreation = Pick<ProjectInfo, 'name' | 'description' | 'tags'>;

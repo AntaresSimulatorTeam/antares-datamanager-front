@@ -4,156 +4,78 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { RdsModal } from 'rte-design-system-react';
 import { useTranslation } from 'react-i18next';
 import KeywordsInput from '@/components/input/KeywordsInput.tsx';
-import HorizonInput from '@/components/input/HorizonInput';
-import { duplicateStudy, updateStudy } from '@/shared/services/studyService';
 import { SelectDSOption, StudyDTO } from '@/shared/types';
 import { useUser } from '@/store/contexts/UserContext.tsx';
-import { notifyAlert, notifyToast } from '@/shared/notification/notification';
-import { validateMaxLength } from '@/shared/utils/validateMaxTextLength';
-import { MAX_STUDY_NAME_LENGTH } from '@/shared/const/studyConfig';
-import { hasArrayChanged } from '@/shared/utils/arrayUtils.ts';
-import { Button, Select, TextInput } from '@design-system-rte/react';
+import { notifyToast } from '@/shared/notification/notification';
+import {
+  MAX_HORIZON_NUMBER,
+  MAX_KEYWORD_LENGTH,
+  MAX_KEYWORD_NUMBER,
+  MAX_STUDY_NAME_LENGTH,
+} from '@/shared/const/studyConfig';
+import SelectInput from '@/components/input/SelectInput.tsx';
+import { Button, TextInput } from '@design-system-rte/react';
 import { FieldInFormation } from '@common/base/FieldInFormation.tsx';
-import { convertToOneYearHorizon } from '@/shared/utils/textUtils.ts';
-import { fetchProjectsFromPartialName } from '@/shared/services/projectService.ts';
+import { validateFormInputs, validateHorizon } from '@/shared/utils/validateFormInput.ts';
+import { useFetchProjectOptions } from '@/hooks/useFetchProjectOptions.ts';
+import { useStudyModification } from '@/hooks/useStudyModification.ts';
 
 interface StudyCreationModalProps {
   isOpen?: boolean;
   onClose: () => void;
   study: StudyDTO;
   setReloadStudies?: React.Dispatch<React.SetStateAction<number>>;
-  isDuplicateMode?: boolean;
+  isDuplicateMode: boolean;
 }
 
 const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
   onClose,
   study,
   setReloadStudies,
-  isDuplicateMode,
+  isDuplicateMode = false,
 }) => {
   const { t } = useTranslation();
   const { user } = useUser();
+  const { projects } = useFetchProjectOptions();
+
   const baseStudyName = study.name.substring(0, study.name.lastIndexOf('_'));
   const [studyName, setStudyName] = useState<string>(baseStudyName);
+  const [studyNameError, setStudyNameError] = useState<string>('');
   const [project, setProject] = useState<SelectDSOption>({
     id: Number(study.projectId),
     label: study.project,
     value: study.project,
   });
-  const [projects, setProjects] = useState<SelectDSOption[]>([]);
+  const [horizon, setHorizon] = useState<string>(() => {
+    const rawHorizon = study?.horizon || '';
+    const years = rawHorizon.match(/\d{4}/g)?.map(Number) || [];
+    const maxYear = years.length ? Math.max(...years) : '';
+    return maxYear.toString();
+  });
+  const [horizonError, setHorizonError] = useState<string>('');
   const [keywords, setKeywords] = useState<string[]>(study?.keywords || []);
-  const [horizon, setHorizon] = useState<string>(() => convertToOneYearHorizon(study.horizon));
-  const [isFormValid, setIsFormValid] = useState(false);
-  const [isHorizonValid, setIsHorizonValid] = useState(true);
-  const [studyErrorMessage, setStudyErrorMessage] = useState<string>('');
-  const [horizonErrorMessage, setHorizonErrorMessage] = useState<string>('');
 
-  const resetErrorMessage = () => {
-    setStudyErrorMessage('');
-    setHorizonErrorMessage('');
-  };
-
-  const updateStudyHandler = useCallback(async () => {
-    resetErrorMessage();
-    const studyData = {
-      ...study,
-      createdBy: user?.profile.sub,
-      name: studyName,
-      keywords,
-      project: project.label,
-      projectId: project?.id?.toString() || '',
-      horizon,
-    };
-
-    try {
-      if (isDuplicateMode) {
-        await duplicateStudy(studyData);
-      } else {
-        await updateStudy(studyData, study.id);
-      }
+  const { confirmUpdate } = useStudyModification(
+    () => {
       setReloadStudies?.((prev) => prev + 1);
       notifyToast({
         type: 'success',
         message: `Study ${isDuplicateMode ? 'duplicated' : 'updated'} successfully`,
       });
       onClose();
-    } catch (error) {
-      const errorMessage = (error as Error)?.message;
-      if (errorMessage?.includes(t('studyDetails.@duplicateModalStudyError'))) {
-        setStudyErrorMessage(errorMessage);
-        setIsFormValid(false);
-      } else if (errorMessage?.includes('Horizon must be')) {
-        setHorizonErrorMessage(errorMessage);
-      } else {
-        notifyAlert({
-          icon: 'close',
-          message: errorMessage,
-          type: 'error',
-          filledIcon: true,
-        });
+    },
+    (message) => {
+      if (message?.includes(t('studyDetails.@duplicateModalStudyError'))) {
+        setStudyNameError(message);
+      } else if (message?.includes('Horizon must be')) {
+        setHorizonError(message);
       }
-    }
-  }, [
-    horizon,
-    isDuplicateMode,
-    keywords,
-    onClose,
-    project?.id,
-    project.label,
-    setReloadStudies,
-    study,
-    studyName,
-    user?.profile.sub,
-  ]);
-
-  useEffect(() => {
-    const loadProjects = async (valueLabel?: string) => {
-      try {
-        const projectList = await fetchProjectsFromPartialName(valueLabel ?? '');
-        const projectOptions = projectList.map(({ name, id }) => ({
-          id: Number(id),
-          label: name,
-          value: name,
-        }));
-        setProjects(projectOptions);
-      } catch (error) {
-        notifyAlert({
-          icon: 'check',
-          message: t('project.@fetch_failed'),
-          content: (error as Error).message,
-          type: 'error',
-          filledIcon: true,
-        });
-      }
-    };
-    void loadProjects();
-  }, [t]);
-
-  useEffect(() => {
-    const validateForm = () => {
-      const studyNameChanged = studyName.length > 0 && studyName.trim() !== baseStudyName.trim();
-      const projectNameChanged = study.project.trim() !== project?.label.trim();
-      const keywordsChanged = hasArrayChanged(study.keywords, keywords);
-      const horizonChanged = isHorizonValid && convertToOneYearHorizon(study.horizon) !== horizon;
-      if (isDuplicateMode) {
-        setIsFormValid(horizonChanged || studyNameChanged);
-      } else {
-        setIsFormValid(studyNameChanged || projectNameChanged || keywordsChanged);
-      }
-    };
-    validateForm();
-  }, [study, studyName, project, horizon, keywords, isHorizonValid, isDuplicateMode, baseStudyName]);
-
-  const handleStudyNameChange = (value: string) => {
-    resetErrorMessage();
-    if (validateMaxLength(value, MAX_STUDY_NAME_LENGTH)) {
-      setStudyName(value || '');
-    }
-  };
+    },
+  );
 
   return (
     <RdsModal size="small">
@@ -163,59 +85,46 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
       <RdsModal.Content>
         <div className="flex w-full flex-col items-start justify-start space-y-2">
           <FieldInFormation />
-          <div className="flex w-full flex-col items-start justify-start space-y-4">
-            <div className="flex w-full items-start justify-start space-x-4">
-              <div className="w-1/2">
-                <TextInput
-                  id="text-input-study-modify-name"
-                  value={studyName}
-                  label={t('modal.@input_name')}
-                  onChange={handleStudyNameChange}
-                  required
-                  maxLength={75}
-                  error={!!studyErrorMessage}
-                  assistiveTextLabel={studyErrorMessage}
-                  assistiveAppearance={studyErrorMessage ? 'error' : 'description'}
-                  rightIconAction="clean"
-                  onRightIconClick={() => setStudyName('')}
-                />
-              </div>
-              <div className="w-1/2">
-                <Select
-                  id="project-select"
-                  value={project?.value ?? ''}
-                  onChange={(value: string) => {
-                    const selectedProject = projects.find((projectOption) => projectOption.value === value);
-                    if (selectedProject) {
-                      setProject(selectedProject);
-                    }
-                  }}
-                  label={t('page.@project')}
-                  options={projects}
-                  multiple={false}
-                  required={true}
-                  width={280}
-                />
-              </div>
-            </div>
-            <div className="w-1/2">
-              <HorizonInput
-                horizon={horizon}
-                onChange={setHorizon}
-                onValidChange={setIsHorizonValid}
-                required
-                disabled={!isDuplicateMode}
-                customErrorMessage={isDuplicateMode && horizonErrorMessage ? horizonErrorMessage : ''}
-              />
-            </div>
-            <KeywordsInput
-              keywords={keywords}
-              setKeywords={setKeywords}
-              maxNbKeywords={6}
-              maxNbCharacters={15}
-              minNbCharacters={1}
+          <div className="flex w-full items-center justify-start gap-4">
+            <TextInput
+              id="text-input-study-modify-name"
+              value={studyName}
+              label={t('modal.@input_name')}
+              onChange={(value: string) => {
+                studyNameError && setStudyNameError('');
+                setStudyName(value ?? '');
+              }}
+              required
+              maxLength={MAX_STUDY_NAME_LENGTH}
+              error={!!studyNameError}
+              assistiveTextLabel={studyNameError}
             />
+            <SelectInput options={projects} required={true} valueSelected={project} onChange={setProject} />
           </div>
+          <TextInput
+            id="text-input-horizon"
+            label={t('home.@horizon')}
+            value={horizon}
+            required
+            onChange={(value: string) => {
+              horizonError && setHorizonError('');
+              setHorizon(value ?? '');
+            }}
+            onBlur={() => validateHorizon(setHorizonError, t, horizon, false)}
+            maxLength={MAX_HORIZON_NUMBER}
+            error={!!horizonError}
+            assistiveTextLabel={horizonError || t('components.horizonInput.@assistiveTextForYear')}
+            assistiveAppearance={horizonError ? 'error' : 'description'}
+            disabled={!isDuplicateMode}
+            placeholder={!isDuplicateMode ? horizon : ''}
+          />
+          <KeywordsInput
+            keywords={keywords}
+            setKeywords={setKeywords}
+            maxNbKeywords={MAX_KEYWORD_NUMBER}
+            maxNbCharacters={MAX_KEYWORD_LENGTH}
+            minNbCharacters={1}
+          />
         </div>
       </RdsModal.Content>
       <RdsModal.Footer>
@@ -223,9 +132,33 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
         <Button
           icon={isDuplicateMode ? 'copy' : 'edit'}
           label={isDuplicateMode ? t('study.@duplicate') : t('modal.@button_update')}
-          onClick={() => void updateStudyHandler()}
+          onClick={() => {
+            if (
+              validateFormInputs(
+                isDuplicateMode,
+                study,
+                studyName,
+                project.value,
+                keywords,
+                horizon,
+                setHorizonError,
+                t,
+              )
+            ) {
+              const studyData = {
+                ...study,
+                createdBy: user?.profile.sub,
+                name: studyName,
+                keywords,
+                project: project.label,
+                projectId: project?.id?.toString() || '',
+                horizon,
+              };
+
+              void confirmUpdate(study.id, studyData, isDuplicateMode);
+            }
+          }}
           variant="primary"
-          disabled={!isFormValid}
         />
       </RdsModal.Footer>
     </RdsModal>

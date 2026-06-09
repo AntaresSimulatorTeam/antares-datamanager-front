@@ -5,15 +5,11 @@
  */
 
 import { RdsModal } from 'rte-design-system-react';
-import { useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import KeywordsInput from '@/components/input/KeywordsInput.tsx';
-import { createProject, updateProject } from '@/shared/services/projectService';
 import { notifyToast } from '@/shared/notification/notification.tsx';
-import { PROJECT_ACTION } from '@/shared/enum/project.ts';
-import { ProjectActionType, ProjectResponse } from '@/shared/types/Project.type.ts';
-import { useProjectDispatch } from '@/store/contexts/ProjectContext.tsx';
-import { validateMaxLength } from '@/shared/utils/validateMaxTextLength.ts';
+import { ProjectResponse } from '@/shared/types/Project.type.ts';
 import {
   MAX_KEYWORD_LENGTH,
   MAX_KEYWORD_NUMBER,
@@ -22,6 +18,7 @@ import {
 } from '@/shared/const/studyConfig.ts';
 import { Button, Textarea, TextInput } from '@design-system-rte/react';
 import { FieldInFormation } from '@common/base/FieldInFormation.tsx';
+import { useProjectCreation } from '@/hooks/useProjectCreation.ts';
 
 interface ProjectCreationModalProps {
   onClose: () => void;
@@ -31,51 +28,39 @@ interface ProjectCreationModalProps {
 export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationModalProps) => {
   const { t } = useTranslation();
   const [name, setName] = useState<string>(projectInfo?.name ?? '');
+  const [nameError, setNameError] = useState<string | null>(null);
   const [description, setDescription] = useState<string>(projectInfo?.description ?? '');
   const [keywords, setKeywords] = useState<string[]>(projectInfo?.tags ?? []);
-  const [isFormValid, setIsFormValid] = useState(false);
-  const [nameError, setNameError] = useState<string | null>(null);
-  const dispatch = useProjectDispatch();
 
-  const handleCreateProject = async () => {
-    try {
-      const projectData = {
-        name,
-        tags: keywords,
-        description,
-      };
+  const resetFields = () => {
+    setName('');
+    setDescription('');
+    setKeywords([]);
+  };
 
-      const newProject = projectInfo
-        ? await updateProject(Number(projectInfo.id), projectData)
-        : await createProject(projectData);
+  const resetNameField = () => {
+    setName('');
+    setNameError('');
+  };
 
-      if (newProject) {
-        dispatch?.({
-          type: projectInfo ? PROJECT_ACTION.UPDATE_PROJECT : PROJECT_ACTION.ADD_PROJECT,
-          payload: newProject,
-        } as ProjectActionType);
-      }
+  const { confirmCreation } = useProjectCreation(
+    () => {
       notifyToast({
         type: 'success',
         message: 'Successful project save',
       });
-      setName('');
-      setDescription('');
-      setKeywords([]);
+      resetFields();
       onClose();
-    } catch (error: unknown) {
-      const errorMessages = (error as Error)?.message;
-      if (errorMessages?.includes('already exists')) {
-        setNameError(errorMessages);
-        setIsFormValid(false);
-      } else {
-        notifyToast({
-          type: 'error',
-          message: `${errorMessages ?? 'An error occurred'}`,
-        });
-        onClose();
-      }
+    },
+    (message) => setNameError(message),
+  );
+
+  const validateFormInputs = () => {
+    if (name?.length === 0 || !name?.trim()) {
+      setNameError(t('projectModal.@requiredProject'));
+      return false;
     }
+    return true;
   };
 
   return (
@@ -84,48 +69,34 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
         {projectInfo ? t('home.@update_project') : t('home.@new_project')}
       </RdsModal.Title>
       <RdsModal.Content>
-        <div className="flex flex-col items-start gap-4">
+        <div className="flex flex-col items-start gap-3">
           <FieldInFormation />
-          <div className="flex w-1/2 flex-col items-start gap-4">
-            <TextInput
-              aria-required
-              assistiveAppearance="error"
-              autoComplete="off"
-              error={!!nameError}
-              id="text-input-default"
-              label={t('modal.@input_name')}
-              labelPosition="top"
-              rightIconAction="clean"
-              onChange={(value: string) => {
-                if (validateMaxLength(value, MAX_PROJECT_NAME_LENGTH)) {
-                  setNameError(null);
-                  setName(value);
-                  setIsFormValid(true);
-                } else if (value?.length === MAX_PROJECT_NAME_LENGTH + 1) {
-                  setNameError(t('modal.@number_characters_exceeds'));
-                  setIsFormValid(false);
-                  setName('');
-                }
-              }}
-              required
-              value={name}
-              assistiveTextLabel={nameError ?? ''}
-            />
+          <TextInput
+            id="text-input-default"
+            label={t('modal.@input_name')}
+            required
+            value={name}
+            onChange={(value: string) => {
+              nameError && setNameError('');
+              setName(value ?? '');
+            }}
+            assistiveAppearance="error"
+            error={!!nameError?.length}
+            assistiveTextLabel={nameError ?? ''}
+            maxLength={MAX_PROJECT_NAME_LENGTH}
+            showCounter={true}
+            rightIconAction="clean"
+            onRightIconClick={resetNameField}
+          />
+          <div className="flex w-8/12">
             <Textarea
               label={t('modal.@input_description')}
               value={description}
-              onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
-                const text = event.target.value;
-                if (validateMaxLength(text, MAX_PROJECT_DESCRIPTION_LENGTH)) {
-                  setDescription(text || '');
-                  !nameError && setIsFormValid(true);
-                } else if (text?.length === MAX_PROJECT_DESCRIPTION_LENGTH + 1) {
-                  setDescription(text || '');
-                  setIsFormValid(false);
-                }
-              }}
+              onChange={(event: ChangeEvent<HTMLTextAreaElement>) => setDescription(event.target.value || '')}
+              maxLength={MAX_PROJECT_DESCRIPTION_LENGTH}
               showCounter={true}
               rows={3}
+              resizeable={false}
             />
             <KeywordsInput
               keywords={keywords}
@@ -142,10 +113,18 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
         <Button
           icon={projectInfo ? 'edit' : 'add'}
           label={projectInfo ? t('modal.@button_update') : t('modal.@button_create')}
-          onClick={() => void handleCreateProject()}
+          onClick={() => {
+            if (validateFormInputs()) {
+              const projectData = {
+                name,
+                tags: keywords,
+                description,
+              };
+              void confirmCreation(projectData, projectInfo?.id);
+            }
+          }}
           variant="primary"
           color="primary"
-          disabled={!isFormValid}
         />
       </RdsModal.Footer>
     </RdsModal>

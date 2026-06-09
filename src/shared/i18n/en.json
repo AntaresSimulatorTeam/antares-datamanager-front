@@ -95,12 +95,14 @@
     "@keyword_minimum_error": "Keyword must be at least {{min}} characters",
     "@keyword_maximum_error": "Keyword must not exceed {{max}} characters",
     "@keyword_max_keys_errors": "Cannot add more than {{maxNbKey}} keywords",
-    "@keyword_button_clear": "Clear all keywords"
+    "@keyword_button_clear": "Clear all keywords",
+    "@requiredProject": "Project name is required"
   },
   "studyModal": {
     "@new_study": "Create a study",
     "@update_study": "Update study",
-    "@study_creation_placeholder": "Name your study..."
+    "@study_creation_placeholder": "Name your study...",
+    "@requiredStudy": "Study name is required"
   },
   "study": {
     "@open": "Open",
