@@ -2,7 +2,6 @@ import { Dispatch, SetStateAction } from 'react';
 import { TFunction } from 'i18next';
 import { hasArrayChanged } from '@/shared/utils/arrayUtils.ts';
 import { StudyDTO } from '@/shared/types';
-import { getStudyName, validateHorizon, validateName } from '@/shared/utils/textUtils.ts';
 
 /**
  * Validate a string with a maxLength parameter
@@ -15,17 +14,47 @@ export const validateMaxLength = (text: string, maxLength: number): boolean => {
   return trimmedText.length <= maxLength;
 };
 
-export const validateNameAndHorizonInputs = (
-  name: string,
-  horizon: string,
-  setNameError: Dispatch<SetStateAction<string>>,
-  setHorizonError: Dispatch<SetStateAction<string>>,
+export const validateHorizon = (
+  setErrorMessage: Dispatch<SetStateAction<string>>,
   t: TFunction<'translation', undefined>,
-) => {
-  const isNameValid = validateName(name, setNameError, t('studyModal.@requiredStudy'));
-  const isHorizonValid = validateHorizon(setHorizonError, t, horizon, true);
-  return isNameValid && isHorizonValid;
+  value?: string,
+  requiredField?: boolean,
+  onChangeValidate?: (isValid: boolean) => void,
+): boolean => {
+  if (!value || value.trim() === '') {
+    if (requiredField) {
+      setErrorMessage(t('horizonInput.@requiredHorizon'));
+      onChangeValidate?.(false);
+      return false;
+    } else {
+      setErrorMessage('');
+      onChangeValidate?.(true);
+      return true;
+    }
+  }
+
+  const trimmedValue = value.trim();
+
+  if (!/^\d{4}$/.test(trimmedValue)) {
+    setErrorMessage(t('horizonInput.@validYearError'));
+    onChangeValidate?.(false);
+    return false;
+  }
+
+  const numeric = Number(trimmedValue);
+
+  if (Number.isNaN(numeric) || numeric < 2000 || numeric > 9999) {
+    setErrorMessage(t('horizonInput.@validYearError'));
+    onChangeValidate?.(false);
+    return false;
+  }
+
+  setErrorMessage('');
+  onChangeValidate?.(true);
+  return true;
 };
+
+export const getStudyName = (studyName: string): string => studyName.substring(0, studyName.lastIndexOf('_'));
 
 export const validateFormInputs = (
   isDuplication: boolean,

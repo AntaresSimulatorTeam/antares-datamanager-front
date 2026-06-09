@@ -20,17 +20,16 @@ import {
 import SelectInput from '@/components/input/SelectInput.tsx';
 import { Button, TextInput } from '@design-system-rte/react';
 import { FieldInFormation } from '@common/base/FieldInFormation.tsx';
-import { validateFormInputs } from '@/shared/utils/validateFormInput.ts';
+import { validateFormInputs, validateHorizon } from '@/shared/utils/validateFormInput.ts';
 import { useFetchProjectOptions } from '@/hooks/useFetchProjectOptions.ts';
 import { useStudyModification } from '@/hooks/useStudyModification.ts';
-import { getStudyName, validateHorizon } from '@/shared/utils/textUtils.ts';
 
 interface StudyCreationModalProps {
   isOpen?: boolean;
   onClose: () => void;
   study: StudyDTO;
   setReloadStudies?: React.Dispatch<React.SetStateAction<number>>;
-  isDuplicateMode?: boolean;
+  isDuplicateMode: boolean;
 }
 
 const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
@@ -43,7 +42,8 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
   const { user } = useUser();
   const { projects } = useFetchProjectOptions();
 
-  const [studyName, setStudyName] = useState<string>(getStudyName(study.name));
+  const baseStudyName = study.name.substring(0, study.name.lastIndexOf('_'));
+  const [studyName, setStudyName] = useState<string>(baseStudyName);
   const [studyNameError, setStudyNameError] = useState<string>('');
   const [project, setProject] = useState<SelectDSOption>({
     id: Number(study.projectId),
@@ -86,44 +86,38 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
         <div className="flex w-full flex-col items-start justify-start space-y-2">
           <FieldInFormation />
           <div className="flex w-full items-center justify-start gap-4">
-            <div className="flex w-1/2">
-              <TextInput
-                id="text-input-study-modify-name"
-                value={studyName}
-                label={t('modal.@input_name')}
-                onChange={(value: string) => {
-                  studyNameError && setStudyNameError('');
-                  setStudyName(value ?? '');
-                }}
-                required
-                maxLength={MAX_STUDY_NAME_LENGTH}
-                error={!!studyNameError}
-                assistiveTextLabel={studyNameError}
-              />
-            </div>
-            <div className="flex w-1/2">
-              <SelectInput options={projects} required={true} valueSelected={project} onChange={setProject} />
-            </div>
-          </div>
-          <div className="flex w-1/2">
             <TextInput
-              id="text-input-horizon"
-              label={t('home.@horizon')}
-              value={horizon}
-              required
+              id="text-input-study-modify-name"
+              value={studyName}
+              label={t('modal.@input_name')}
               onChange={(value: string) => {
-                horizonError && setHorizonError('');
-                setHorizon(value ?? '');
+                studyNameError && setStudyNameError('');
+                setStudyName(value ?? '');
               }}
-              onBlur={() => validateHorizon(setHorizonError, t, horizon, false)}
-              maxLength={MAX_HORIZON_NUMBER}
-              error={!!horizonError}
-              assistiveTextLabel={horizonError || t('components.horizonInput.@assistiveTextForYear')}
-              assistiveAppearance={horizonError ? 'error' : 'description'}
-              disabled={!isDuplicateMode}
-              placeholder={!isDuplicateMode ? horizon : ''}
+              required
+              maxLength={MAX_STUDY_NAME_LENGTH}
+              error={!!studyNameError}
+              assistiveTextLabel={studyNameError}
             />
+            <SelectInput options={projects} required={true} valueSelected={project} onChange={setProject} />
           </div>
+          <TextInput
+            id="text-input-horizon"
+            label={t('home.@horizon')}
+            value={horizon}
+            required
+            onChange={(value: string) => {
+              horizonError && setHorizonError('');
+              setHorizon(value ?? '');
+            }}
+            onBlur={() => validateHorizon(setHorizonError, t, horizon, false)}
+            maxLength={MAX_HORIZON_NUMBER}
+            error={!!horizonError}
+            assistiveTextLabel={horizonError || t('components.horizonInput.@assistiveTextForYear')}
+            assistiveAppearance={horizonError ? 'error' : 'description'}
+            disabled={!isDuplicateMode}
+            placeholder={!isDuplicateMode ? horizon : ''}
+          />
           <KeywordsInput
             keywords={keywords}
             setKeywords={setKeywords}
