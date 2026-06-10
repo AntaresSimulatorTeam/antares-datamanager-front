@@ -186,35 +186,33 @@ const ExpandableTab = ({
   );
 
   return (
-    <div className="flex min-h-0 w-full gap-6 pb-6 xl:gap-7 2xl:gap-8">
+    <div className="flex h-fit w-full gap-6 pb-4 xl:gap-7 2xl:gap-8">
       <CheckBoxList
         checkedValues={checkedValues}
         options={areasOptions}
         handleSelectionChange={handleSelectionChange}
         disabled={studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED}
       />
-      <div className="flex min-h-0 flex-1 overflow-y-auto">
-        <PegaseHypothesisTable
-          id="thermal-table"
-          data={data}
-          getTableHeaders={getExpandableHypothesisTableHeaders}
-          fileStatus={fileStatus}
-          isStudyGenerated={
-            studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED
-          }
-          readOnly={readOnly}
-          progress={progress}
-          idSelected={rowIdSelected}
-          type={tabType}
-          list={technologiesLabel}
-          handleSearch={handleSearch}
-          handleImport={async (rowId: string) => await handleFetchFromFS(tabType, data, rowId)}
-          isReadOnlyEnable={true}
-          updateData={handleHypothesisTableUpdate}
-          removeRow={removeTableRow}
-          handleViewData={tabType === TRAJECTORY_TYPE.STS ? handleViewData : undefined}
-        />
-      </div>
+      <PegaseHypothesisTable
+        id="thermal-table"
+        data={data}
+        getTableHeaders={getExpandableHypothesisTableHeaders}
+        fileStatus={fileStatus}
+        isStudyGenerated={
+          studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED
+        }
+        readOnly={readOnly}
+        progress={progress}
+        idSelected={rowIdSelected}
+        type={tabType}
+        list={technologiesLabel}
+        handleSearch={handleSearch}
+        handleImport={async (rowId: string) => await handleFetchFromFS(tabType, data, rowId)}
+        isReadOnlyEnable={true}
+        updateData={handleHypothesisTableUpdate}
+        removeRow={removeTableRow}
+        handleViewData={tabType === TRAJECTORY_TYPE.STS ? handleViewData : undefined}
+      />
       {isModalOpen && (
         <ImportTrajectoryModal
           options={optionsFS}

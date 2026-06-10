@@ -9,6 +9,7 @@ import { fetchProjectsFromPartialName } from '@/shared/services/projectService.t
 import { SelectDSOption } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 import { Select } from '@design-system-rte/react';
+import { notifyAlert } from '@/shared/notification/notification.tsx';
 
 interface ProjectManagerProps {
   valueSelected: SelectDSOption;
@@ -19,7 +20,6 @@ interface ProjectManagerProps {
 const ProjectInput: React.FC<ProjectManagerProps> = ({ valueSelected, onChange, required = false }) => {
   const { t } = useTranslation();
   const [projects, setProjects] = useState<SelectDSOption[]>([]);
-  const [_errorMessage, setErrorMessage] = useState<string>('');
 
   const loadProjects = async (valueLabel?: string) => {
     try {
@@ -32,7 +32,13 @@ const ProjectInput: React.FC<ProjectManagerProps> = ({ valueSelected, onChange, 
       setProjects(projectOptions);
       return projectOptions;
     } catch (error) {
-      setErrorMessage((error as Error).message || 'Failed to fetch projects');
+      notifyAlert({
+        icon: 'check',
+        message: t('project.@fetch_failed'),
+        content: (error as Error).message,
+        type: 'error',
+        filledIcon: true,
+      });
     }
   };
 
@@ -55,7 +61,7 @@ const ProjectInput: React.FC<ProjectManagerProps> = ({ valueSelected, onChange, 
         onChange={(value: string) => {
           const selectedProject = projects.find((projectOption) => projectOption.value === value);
           if (selectedProject) {
-            void onChange(selectedProject);
+            onChange(selectedProject);
           }
         }}
         label={t('page.@project')}

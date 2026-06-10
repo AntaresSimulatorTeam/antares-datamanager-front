@@ -336,11 +336,8 @@ describe('getStudyMenu', () => {
       id: TRAJECTORY_TYPE.AREA,
       panelId: TRAJECTORY_TYPE.AREA,
       label: 'translated:studyDetails.@areas_links',
-      icon: 'share',
+      icon: 'linked_services',
       disabled: false,
-      badgeContent: 'number',
-      badgeType: 'brand',
-      showBadge: true,
     });
 
     expect(result[1].disabled).toBe(false);

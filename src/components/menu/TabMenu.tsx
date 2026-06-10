@@ -17,11 +17,19 @@ export const TabMenu = ({ defaultAreas, areas, studyData, type }: MenuProps) => 
   const renderActiveComponent = useCallback(
     (tab: TRAJECTORY_TYPE) => {
       if (tab === TRAJECTORY_TYPE.THERMAL_PARAMETER)
-        return <ParametersTab defaultAreas={defaultAreas} areas={areas} studyData={studyData} />;
+        return (
+          <ParametersTab
+            key={`${tab}-parameters-tab`}
+            defaultAreas={defaultAreas}
+            areas={areas}
+            studyData={studyData}
+          />
+        );
 
       if (tab === TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION)
         return (
           <ResDistributionTab
+            key={`${tab}-distribution-tab`}
             defaultAreas={defaultAreas}
             areas={areas}
             studyData={studyData}
@@ -31,6 +39,7 @@ export const TabMenu = ({ defaultAreas, areas, studyData, type }: MenuProps) => 
 
       return (
         <ExpandableTab
+          key={`${tab}-expandable-tab`}
           tabType={tab}
           defaultAreas={defaultAreas}
           areas={areas}
@@ -47,9 +56,7 @@ export const TabMenu = ({ defaultAreas, areas, studyData, type }: MenuProps) => 
       <Tab
         onChange={(id) => {
           const tabId = tabs.find((tab) => tab.id === (id as TRAJECTORY_TYPE));
-          if (tabId) {
-            setActiveTab(tabId.id);
-          }
+          if (tabId) setActiveTab(tabId.id);
         }}
         direction="horizontal"
         alignment="start"

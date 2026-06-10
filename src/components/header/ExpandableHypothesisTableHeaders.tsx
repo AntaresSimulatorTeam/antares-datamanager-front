@@ -92,7 +92,7 @@ const getExpandableHypothesisTableHeaders = ({
       const { trajectory, status, hypothesis } = row.original;
       if (type && isEmptyRow(type, hypothesis, row.depth, t)) return null;
       return trajectory?.trajectoryName && status !== TRAJECTORY_SELECTION_STATUS.MISSING ? (
-        <div className="flex w-full items-center gap-2">
+        <div className="flex w-full items-center gap-2 py-1">
           <LabelWithDeleteButton
             label={trajectory.trajectoryName}
             isDeletable={!isStudyGenerated}
@@ -107,7 +107,7 @@ const getExpandableHypothesisTableHeaders = ({
           />
         </div>
       ) : (
-        <div className="flex w-full items-center justify-start gap-2">
+        <div className="flex w-full items-center justify-start gap-2 py-0.5">
           <SelectInputWithButton
             onSelect={(value: SelectOption) => {
               setErrorInfo({ index: row.index, message: '' });

@@ -8,7 +8,9 @@ import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 
 export const useFetchWarningMessages = (studyId: number | null, type: TRAJECTORY_TYPE) => {
-  const [warningMessages, setWarningMessages] = useState<DataWarningMessage[]>([]);
+  const [warningMessages, setWarningMessages] = useState<
+    { type: TRAJECTORY_TYPE; data: DataWarningMessage[] } | undefined
+  >();
   const studyState = useStudy();
   const dispatch = useStudyDispatch();
 
@@ -30,6 +32,7 @@ export const useFetchWarningMessages = (studyId: number | null, type: TRAJECTORY
         ? await fetchWarningMessagesFromType(trajectoryType, id)
         : [];
       try {
+        let dataWarningMessages: DataWarningMessage[] = [];
         if (trajectoryType === TRAJECTORY_TYPE.AREA) {
           const dataWarningMessageArea = buildDataWarningMessage(
             warningMessagesFromType,
@@ -46,7 +49,7 @@ export const useFetchWarningMessages = (studyId: number | null, type: TRAJECTORY
             id,
             studyState.discardWarningMessage ?? null,
           );
-          setWarningMessages([...dataWarningMessageArea, ...dataWarningMessageLink]);
+          dataWarningMessages = [...dataWarningMessageArea, ...dataWarningMessageLink];
         } else if (trajectoryType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
           const warningParameters: WarningMessage[] = (
             await Promise.all(
@@ -57,28 +60,26 @@ export const useFetchWarningMessages = (studyId: number | null, type: TRAJECTORY
               ].map(async (thermalType: TRAJECTORY_TYPE) => await fetchWarningMessagesFromType(thermalType, id)),
             )
           ).flat();
-          setWarningMessages(
-            buildDataWarningMessage(
-              warningMessagesFromType.concat(warningParameters),
-              trajectoryType,
-              isNotGenerated,
-              id,
-              studyState.discardWarningMessage ?? null,
-            ),
+          dataWarningMessages = buildDataWarningMessage(
+            warningMessagesFromType.concat(warningParameters),
+            trajectoryType,
+            isNotGenerated,
+            id,
+            studyState.discardWarningMessage ?? null,
           );
         } else {
-          warningMessagesFromType.length > 0
-            ? setWarningMessages(
-                buildDataWarningMessage(
+          dataWarningMessages =
+            warningMessagesFromType.length > 0
+              ? buildDataWarningMessage(
                   warningMessagesFromType,
                   trajectoryType,
                   isNotGenerated,
                   id,
                   studyState.discardWarningMessage ?? null,
-                ),
-              )
-            : setWarningMessages([]);
+                )
+              : [];
         }
+        setWarningMessages({ type: trajectoryType, data: dataWarningMessages });
       } finally {
         dispatch?.({ type: STUDY_ACTION.SKIP_MESSAGE, payload: { discardActionTriggered: false } });
       }

@@ -9,6 +9,7 @@ import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { WarningMessage } from '@/shared/types';
+import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 export interface StudyDTO {
   id: number;
@@ -71,4 +72,13 @@ export type StudyActionType =
 
 export interface LocationStudy {
   study: StudyDTO;
+}
+
+export interface StdTabItemProps {
+  id: TRAJECTORY_TYPE;
+  panelId: string;
+  label?: string;
+  isSelected?: boolean;
+  icon: StdIconId;
+  disabled?: boolean;
 }

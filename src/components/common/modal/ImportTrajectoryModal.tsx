@@ -74,7 +74,6 @@ export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, hypoth
                 setSearchTerm={handleSearchTerm}
                 resetField={resetField}
                 isInputDisabled={!options?.length}
-                width="400px"
               />
             </div>
             {trajectoryType === TRAJECTORY_TYPE.STS && (

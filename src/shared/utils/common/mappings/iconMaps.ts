@@ -70,6 +70,7 @@ export enum StdIconId {
   Login = 'login',
   Logout = 'logout',
   ManageAccounts = 'manage-accounts',
+  Monitoring = 'monitoring',
   MoreHoriz = 'more-horiz',
   MoreVert = 'more-vert',
   NewReleases = 'new-releases',

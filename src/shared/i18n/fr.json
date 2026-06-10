@@ -66,7 +66,8 @@
     "@close": "Fermer",
     "@created": "Crée le",
     "@by": "Par",
-    "@new_study": "Créer une étude"
+    "@new_study": "Créer une étude",
+    "@fetch_failed": "Failed to fetch projects"
   },
   "pinnedProject": {
     "@pinSuccess": "Project pinned successfully",
@@ -142,6 +143,7 @@
     "@warningButtonTooltip": "You cannot reset this warning",
     "@preview": "Prévisualisation",
     "@generate": "Générer",
+    "@generating": "Génération en cours...",
     "@add_trajectories_message": "Ajouter une trajectoire avec des zones",
     "@error_link_trajectory_message": "Please select another LINK trajectory or delete it",
     "@search_area": "Search area",
