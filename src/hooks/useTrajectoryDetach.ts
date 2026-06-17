@@ -51,11 +51,10 @@ export const useTrajectoryDetach = (
           if (trajectoryToDelete.type === TRAJECTORY_TYPE.AREA) {
             dispatch?.({ type: STUDY_ACTION.RESET_STUDY_STATE });
           } else {
-            trajectoryToDelete &&
-              dispatch?.({
-                type: STUDY_ACTION.UPDATE_TRAJECTORY,
-                payload: { trajectory: trajectoryToDelete, status },
-              });
+            dispatch?.({
+              type: STUDY_ACTION.UPDATE_TRAJECTORY,
+              payload: { trajectory: trajectoryToDelete, status },
+            });
           }
         }
 
