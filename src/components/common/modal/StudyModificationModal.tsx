@@ -20,16 +20,17 @@ import {
 import SelectInput from '@/components/input/SelectInput.tsx';
 import { Button, TextInput } from '@design-system-rte/react';
 import { FieldInFormation } from '@common/base/FieldInFormation.tsx';
-import { getStudyName, validateFormInputs, validateHorizon } from '@/shared/utils/validateFormInput.ts';
+import { validateFormInputs } from '@/shared/utils/validateFormInput.ts';
 import { useFetchProjectOptions } from '@/hooks/useFetchProjectOptions.ts';
 import { useStudyModification } from '@/hooks/useStudyModification.ts';
+import { getStudyName, validateHorizon } from '@/shared/utils/textUtils.ts';
 
 interface StudyCreationModalProps {
   isOpen?: boolean;
   onClose: () => void;
   study: StudyDTO;
   setReloadStudies?: React.Dispatch<React.SetStateAction<number>>;
-  isDuplicateMode: boolean;
+  isDuplicateMode?: boolean;
 }
 
 const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
