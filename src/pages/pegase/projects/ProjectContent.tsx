@@ -64,13 +64,17 @@ const ProjectContent = () => {
 
   return (
     <div className="m-0 flex w-full flex-1 flex-col gap-3">
-      <div className="flex items-center gap-4">
-        <Searchbar
-          onSearch={(value?: string) => setSearchTerm(value)}
-          onChange={(value?: string) => setSearchTerm(value)}
-          label={t('home.@search_placeholder_project')}
-        />
-        <Chip id="chip-project-page" label={t('home.@my_projects')} onClick={handleChipClick} selected={activeChip} />
+      <div className="flex w-1/3 items-center gap-4">
+        <div className="flex w-3/4">
+          <Searchbar
+            onSearch={(value?: string) => setSearchTerm(value)}
+            onChange={(value?: string) => setSearchTerm(value)}
+            label={t('home.@search_placeholder_project')}
+          />
+        </div>
+        <div className="flex w-1/4">
+          <Chip id="chip-project-page" label={t('home.@my_projects')} onClick={handleChipClick} selected={activeChip} />
+        </div>
       </div>
       <div
         className="grid w-full gap-3"
