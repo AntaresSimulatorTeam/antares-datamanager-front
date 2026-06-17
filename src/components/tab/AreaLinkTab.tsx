@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { useTranslation } from 'react-i18next';
@@ -29,11 +29,10 @@ import { useTrajectoryFetchFromFSHandler } from '@/hooks/useTrajectoryFetchFromF
 import { useHypothesisTableUpdateHandler } from '@/hooks/useHypothesisTableUpdateHandler.ts';
 
 interface AreaLinkTabProps {
-  setErrorMessage: Dispatch<SetStateAction<string>>;
   studyData: StudyDTO;
 }
 
-export const AreaLinkTab = ({ setErrorMessage, studyData }: AreaLinkTabProps) => {
+export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
   const studyState = useStudy();
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const dispatch = useStudyDispatch();
@@ -81,10 +80,9 @@ export const AreaLinkTab = ({ setErrorMessage, studyData }: AreaLinkTabProps) =>
   });
 
   useEffect(() => {
-    setErrorMessage('');
     hypothesisTrajectories && setData(hypothesisTrajectories);
     readOnlyRow && setReadOnly(readOnlyRow);
-  }, [hypothesisTrajectories, readOnlyRow, setErrorMessage, studyData?.id]);
+  }, [hypothesisTrajectories, readOnlyRow, studyData?.id]);
 
   useEffect(() => {
     if (studyState.studyStatus === StudyStatus.GENERATED) {
@@ -106,8 +104,7 @@ export const AreaLinkTab = ({ setErrorMessage, studyData }: AreaLinkTabProps) =>
 
     setReadOnly({ '0': false, '1': true });
     setIsDeletionModalOpen(false);
-    setErrorMessage(t('studyDetails.@add_trajectories_message'));
-  }, [dispatch, studyData.id, t, setErrorMessage]);
+  }, [dispatch, studyData.id, t]);
 
   return (
     <div className="flex h-fit w-full">
