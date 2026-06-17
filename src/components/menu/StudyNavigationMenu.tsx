@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { Dispatch, ReactNode, SetStateAction, useCallback, useEffect, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useState } from 'react';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useTranslation } from 'react-i18next';
 import { useStudy } from '@/store/contexts/StudyContext.tsx';
@@ -23,11 +23,10 @@ import { getNbMessagesFromTrajectoryType } from '@/shared/services/trajectorySer
 import { countWarning } from '@/shared/utils/warningUtils.ts';
 
 type StudyNavigationMenuProps = {
-  setErrorMessage: Dispatch<SetStateAction<string>>;
   studyData: StudyDTO;
 };
 
-const StudyNavigationMenu = ({ setErrorMessage, studyData }: StudyNavigationMenuProps) => {
+const StudyNavigationMenu = ({ studyData }: StudyNavigationMenuProps) => {
   const { t } = useTranslation();
   const studyState = useStudy();
   const [tabs, setTabs] = useState<StdTabItemProps[]>(
@@ -64,7 +63,7 @@ const StudyNavigationMenu = ({ setErrorMessage, studyData }: StudyNavigationMenu
       }
     };
     void countNbWarningMessages(studyData?.id);
-  }, [activeTab.id]);
+  }, [activeTab.id, studyData?.id]);
 
   const renderActiveComponent = useCallback(
     (type: TRAJECTORY_TYPE): ReactNode | null => {
@@ -89,10 +88,10 @@ const StudyNavigationMenu = ({ setErrorMessage, studyData }: StudyNavigationMenu
             <TabMenu key={type} type={type} defaultAreas={areaDefault} areas={trajectoryAreas} studyData={studyData} />
           );
         default:
-          return <AreaLinkTab setErrorMessage={setErrorMessage} studyData={studyData} />;
+          return <AreaLinkTab studyData={studyData} />;
       }
     },
-    [areaDefault, setErrorMessage, studyData, trajectoryAreas],
+    [areaDefault, studyData, trajectoryAreas],
   );
 
   return (

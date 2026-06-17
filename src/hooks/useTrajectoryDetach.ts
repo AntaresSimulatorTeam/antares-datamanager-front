@@ -47,11 +47,16 @@ export const useTrajectoryDetach = (
         }
 
         // 3. Mise à jour du store
-        trajectoryToDelete &&
-          dispatch?.({
-            type: STUDY_ACTION.UPDATE_TRAJECTORY,
-            payload: { trajectory: trajectoryToDelete, status },
-          });
+        if (trajectoryToDelete) {
+          if (trajectoryToDelete.type === TRAJECTORY_TYPE.AREA) {
+            dispatch?.({ type: STUDY_ACTION.RESET_STUDY_STATE });
+          } else {
+            dispatch?.({
+              type: STUDY_ACTION.UPDATE_TRAJECTORY,
+              payload: { trajectory: trajectoryToDelete, status },
+            });
+          }
+        }
 
         // 4. Mise à jour du tableau (factorisée)
         const { newData, newReadOnly } = await updateTableAfterCellDetach({
