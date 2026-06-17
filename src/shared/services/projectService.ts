@@ -14,7 +14,7 @@ import { BackendError, PaginatedResponse, ProjectInfo, ProjectResponse } from '@
  * @param {string} projectId
  * @return {Promise<void>}
  */
-export const deleteProjectById = async (projectId: string): Promise<void> => {
+export const deleteProjectById = async (projectId: number): Promise<void> => {
   try {
     await AuthService.authFetch(`${PROJECT_ENDPOINT}/${projectId}`, {
       method: 'DELETE',

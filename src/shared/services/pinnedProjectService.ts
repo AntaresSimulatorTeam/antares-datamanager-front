@@ -41,7 +41,7 @@ export const fetchPinnedProjects = async (userId: string | undefined): Promise<P
  * @return {Promise<ProjectInfo>} - Object that describes a project
  */
 
-export const pinProject = async (projectId: string, userId: string | undefined): Promise<ProjectInfo> => {
+export const pinProject = async (projectId: number, userId: string | undefined): Promise<ProjectInfo> => {
   const apiUrl = `${PROJECT_PIN_ENDPOINT}?userId=${userId ?? DEFAULT_USER}&projectId=${projectId}`;
   try {
     const response = await AuthService.authFetch(apiUrl, {
