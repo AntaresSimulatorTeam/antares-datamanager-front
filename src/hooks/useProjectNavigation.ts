@@ -14,7 +14,7 @@ export const useProjectNavigation = () => {
   const location = useLocation();
 
   const navigateToProject = useCallback(
-    async (id: number) => {
+    async (id: number | string) => {
       try {
         await navigate(`/project/${encodeURIComponent(id)}`, {
           state: { projectId: id },

@@ -74,7 +74,7 @@ export const useHandlePinnedProjectList = () => {
    *
    * @param {string} projectId - Project id
    */
-  const handleUnpinProject = useCallback(async (projectId: string) => {
+  const handleUnpinProject = useCallback(async (projectId: number) => {
     const toastId = uuidv4();
 
     try {

@@ -15,7 +15,7 @@ import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
  * Retrieve a list of studies from a term
  *
  * @param {string} searchTerm - Search term (ex: a user name)
- * @param {string} projectId - Project id related to a study
+ * @param {number} projectId - Project id related to a study
  * @param {number} currentPage - Current page number
  * @param {number} intervalSize - Number of items per page
  * @param {{ [key: string]: 'asc' | 'desc' })} sortBy - Object that describes the sorting type (ascending or descending) of a column
@@ -25,7 +25,7 @@ import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
  */
 export const fetchSearchStudies = async (
   searchTerm: string = '',
-  projectId: string = '',
+  projectId?: number,
   currentPage: number = 0,
   intervalSize: number = 0,
   sortBy?: { [key: string]: 'asc' | 'desc' },
@@ -39,7 +39,7 @@ export const fetchSearchStudies = async (
     const queryString = new URLSearchParams({
       page: currentPage != null ? (currentPage + 1).toString() : '',
       size: intervalSize.toString(),
-      projectId: projectId.toString(),
+      ...(projectId && { projectId: projectId?.toString() }),
       search: searchTerm.toString(),
       sortColumn: entries?.[0] ? entries[0].toString() : '',
       sortDirection: entries?.[1] ? entries[1].toString() : '',

@@ -19,8 +19,9 @@ import {
 } from '@/shared/const/studyConfig';
 import { Button, TextInput } from '@design-system-rte/react';
 import { FieldInFormation } from '@common/base/FieldInFormation.tsx';
-import { validateHorizon, validateNameAndHorizonInputs } from '@/shared/utils/validateFormInput.ts';
+import { validateNameAndHorizonInputs } from '@/shared/utils/validateFormInput.ts';
 import { useStudyCreation } from '@/hooks/useStudyCreation.ts';
+import { validateHorizon } from '@/shared/utils/textUtils.ts';
 
 interface StudyCreationModalProps {
   isOpen?: boolean;

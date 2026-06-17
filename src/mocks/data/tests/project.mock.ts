@@ -1,7 +1,7 @@
 import { ProjectInfo } from '@/shared/types';
 
 export const mockProjectInfo: ProjectInfo = {
-  id: '123',
+  id: 123,
   name: 'Project Name',
   description: 'Project Description',
   createdBy: 'User A',
@@ -13,22 +13,9 @@ export const mockProjectInfo: ProjectInfo = {
   pinned: false,
 };
 
-export const mockPinnedProjectInfo: ProjectInfo = {
-  id: '123',
-  name: 'Project Name',
-  description: 'Project Description',
-  createdBy: 'User A',
-  creationDate: '2024-01-01' as unknown as Date,
-  tags: ['tag1', 'tag2'],
-  path: '',
-  studies: [],
-  archived: false,
-  pinned: true,
-};
-
 export const mockProjectInfoArray: ProjectInfo[] = [
   {
-    id: '123',
+    id: 123,
     name: 'Bilan prévisionnel 2023',
     description: 'Project Description',
     createdBy: 'User A',
@@ -40,7 +27,7 @@ export const mockProjectInfoArray: ProjectInfo[] = [
     pinned: false,
   },
   {
-    id: '125',
+    id: 125,
     name: 'Bilan prévisionnel 2019',
     description: 'Project Description',
     createdBy: 'User B',
@@ -56,7 +43,7 @@ export const mockProjectInfoArray: ProjectInfo[] = [
 export const projectData = { name: 'Bilan prévisionnel 2050', description: '', tags: ['tag1'] };
 
 export const mockProjectCreation = {
-  id: '107',
+  id: 107,
   name: projectData.name,
   createdBy: 'pegase',
   creationDate: '2025-01-30T10:32:10.631003175' as unknown as Date,

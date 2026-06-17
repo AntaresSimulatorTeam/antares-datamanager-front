@@ -19,7 +19,7 @@ import {
 import { Button, Textarea, TextInput } from '@design-system-rte/react';
 import { FieldInFormation } from '@common/base/FieldInFormation.tsx';
 import { useProjectCreation } from '@/hooks/useProjectCreation.ts';
-import { validateName } from '@/shared/utils/validateFormInput.ts';
+import { validateName } from '@/shared/utils/textUtils.ts';
 
 interface ProjectCreationModalProps {
   onClose: () => void;

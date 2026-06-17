@@ -18,7 +18,7 @@ vi.mock('@/envVariables', () => ({
 }));
 vi.mock('@/shared/services/authService');
 
-const projectId = 'test-project-id';
+const projectId = 123;
 const userId = 'testUser';
 
 describe('pinProject', () => {
@@ -44,7 +44,7 @@ describe('pinProject', () => {
     const response = await pinProject(projectId, userId);
 
     expect(AuthService.authFetch).toHaveBeenCalledWith(
-      'https://mockapi.com/v1/project/pin?userId=testUser&projectId=test-project-id',
+      `https://mockapi.com/v1/project/pin?userId=testUser&projectId=${projectId}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -62,7 +62,7 @@ describe('pinProject', () => {
     await pinProject(projectId, undefined);
 
     expect(AuthService.authFetch).toHaveBeenCalledWith(
-      `https://mockapi.com/v1/project/pin?userId=${DEFAULT_USER}&projectId=test-project-id`,
+      `https://mockapi.com/v1/project/pin?userId=${DEFAULT_USER}&projectId=${projectId}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

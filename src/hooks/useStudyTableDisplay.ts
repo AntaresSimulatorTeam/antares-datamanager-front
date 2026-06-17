@@ -44,11 +44,11 @@ export const useStudyTableDisplay = ({
   }, []);
 
   useEffect(() => {
-    const fetchStudyList = async () => {
+    const fetchStudyList = async (projectId?: number) => {
       try {
         const { content, totalElements } = await fetchSearchStudies(
           searchTerm,
-          projectInfo?.id,
+          projectId,
           currentPage,
           intervalSize,
           sortBy,
@@ -59,7 +59,8 @@ export const useStudyTableDisplay = ({
         setErrorValue(error as Error);
       }
     };
-    void fetchStudyList();
+
+    void fetchStudyList(projectInfo?.id);
   }, [currentPage, searchTerm, projectInfo, sortBy, reloadStudies]);
 
   return { rows, count, intervalSize, currentPage, setPage: setCurrentPage, error: errorValue };

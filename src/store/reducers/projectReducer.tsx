@@ -20,7 +20,7 @@ export const updateProject = (currentState: ProjectState, payload: ProjectInfo) 
   );
   return { projects: updateProjects, pinnedProjects: updatePinnedProjects };
 };
-export const removeProject = (currentState: ProjectState, payload: string) => {
+export const removeProject = (currentState: ProjectState, payload: number) => {
   const { pinnedProjects, projects } = currentState;
   return {
     projects: [...projects.filter((p) => p.id !== payload)],
@@ -33,7 +33,7 @@ export const addPinnedProject = (currentState: ProjectState, payload: ProjectInf
   payload.pinned = true;
   return { projects, pinnedProjects: [...pinnedProjects, payload] };
 };
-export const unpinPinnedProject = (currentState: ProjectState, payload: string) => {
+export const unpinPinnedProject = (currentState: ProjectState, payload: number) => {
   const { pinnedProjects, projects } = currentState;
   return { projects, pinnedProjects: [...pinnedProjects.filter((p) => p.id !== payload)] };
 };

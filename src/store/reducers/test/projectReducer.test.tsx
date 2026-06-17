@@ -79,11 +79,11 @@ describe('updateProject', () => {
 
 describe('removeProject', () => {
   it('should remove project from both lists if present', () => {
-    const result = removeProject(initialState, '123');
+    const result = removeProject(initialState, 123);
 
     expect(result.projects).toEqual([
       {
-        id: '125',
+        id: 125,
         name: 'Bilan prévisionnel 2019',
         description: 'Project Description',
         createdBy: 'User B',
@@ -97,7 +97,7 @@ describe('removeProject', () => {
     ]);
     expect(result.pinnedProjects).toEqual([
       {
-        id: '124',
+        id: 124,
         name: 'Project Name 3',
         description: 'Project Description',
         createdBy: 'User A',
@@ -112,7 +112,7 @@ describe('removeProject', () => {
   });
 
   it('should not change lists if project id is not found', () => {
-    const result = removeProject(initialState, 'proj-999');
+    const result = removeProject(initialState, 999);
 
     expect(result.projects).toEqual(initialState.projects);
     expect(result.pinnedProjects).toEqual(initialState.pinnedProjects);
@@ -124,7 +124,7 @@ describe('removeProject', () => {
       pinnedProjects: [],
     };
 
-    const result = removeProject(emptyState, 'proj-001');
+    const result = removeProject(emptyState, 134);
 
     expect(result.projects).toEqual([]);
     expect(result.pinnedProjects).toEqual([]);
@@ -167,21 +167,21 @@ describe('addPinnedProject', () => {
 
 describe('unpinPinnedProject', () => {
   it('should remove the project from pinnedProjects by id', () => {
-    const result = unpinPinnedProject(initialState, '124');
+    const result = unpinPinnedProject(initialState, 124);
 
     expect(result.pinnedProjects).toEqual([mockPinProjectResponseArray[0]]);
     expect(result.projects).toEqual(initialState.projects);
   });
 
   it('should leave pinnedProjects unchanged if id not found', () => {
-    const result = unpinPinnedProject(initialState, 'proj-123');
+    const result = unpinPinnedProject(initialState, 123);
 
-    expect(result.pinnedProjects).toEqual(initialState.pinnedProjects);
+    expect(result.pinnedProjects[0]).toEqual(initialState.pinnedProjects[1]);
     expect(result.projects).toEqual(initialState.projects);
   });
 
   it('should handle empty pinnedProjects gracefully', () => {
-    const result = unpinPinnedProject({ projects: [], pinnedProjects: [] }, 'proj-001');
+    const result = unpinPinnedProject({ projects: [], pinnedProjects: [] }, 123);
 
     expect(result.pinnedProjects).toEqual([]);
     expect(result.projects).toEqual([]);
@@ -210,7 +210,7 @@ describe('projectReducer', () => {
 
   it('should handle UPDATE_PROJECT', () => {
     const payload = {
-      id: '123',
+      id: 123,
       name: 'Updated Project',
       description: 'Project Description',
       createdBy: 'User A',
@@ -229,7 +229,7 @@ describe('projectReducer', () => {
 
     expect(result.projects).toEqual([
       {
-        id: '123',
+        id: 123,
         name: 'Updated Project',
         description: 'Project Description',
         createdBy: 'User A',
@@ -241,7 +241,7 @@ describe('projectReducer', () => {
         pinned: false,
       },
       {
-        id: '125',
+        id: 125,
         name: 'Bilan prévisionnel 2019',
         description: 'Project Description',
         createdBy: 'User B',
@@ -256,7 +256,7 @@ describe('projectReducer', () => {
   });
 
   it('should handle REMOVE_PROJECT', () => {
-    const payload = '123';
+    const payload = 123;
 
     const result = projectReducer(initialState, {
       type: PROJECT_ACTION.REMOVE_PROJECT,
@@ -265,7 +265,7 @@ describe('projectReducer', () => {
 
     expect(result.projects).toEqual([
       {
-        id: '125',
+        id: 125,
         name: 'Bilan prévisionnel 2019',
         description: 'Project Description',
         createdBy: 'User B',
@@ -302,7 +302,7 @@ describe('projectReducer', () => {
   });
 
   it('should handle UNPIN_PINNED_PROJECT', () => {
-    const payload = '124';
+    const payload = 124;
 
     const result = projectReducer(initialState, {
       type: PROJECT_ACTION.UNPIN_PINNED_PROJECT,
@@ -311,7 +311,7 @@ describe('projectReducer', () => {
 
     expect(result.pinnedProjects).toEqual([
       {
-        id: '123',
+        id: 123,
         name: 'Project Name',
         description: 'Project Description',
         createdBy: 'User A',

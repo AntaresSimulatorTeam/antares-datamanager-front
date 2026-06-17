@@ -59,10 +59,10 @@ export const pinProject = async (projectId: number, userId: string | undefined):
 /**
  * Remove pinned project from the pinned project list
  *
- * @param {string} projectId
+ * @param {number} projectId
  * @param {string | undefined} userId
  */
-export const unpinProject = async (projectId: string, userId: string | undefined): Promise<void> => {
+export const unpinProject = async (projectId: number, userId: string | undefined): Promise<void> => {
   const apiUrl = `${PROJECT_UNPIN_ENDPOINT}?userId=${userId ?? DEFAULT_USER}&projectId=${projectId}`;
 
   try {
