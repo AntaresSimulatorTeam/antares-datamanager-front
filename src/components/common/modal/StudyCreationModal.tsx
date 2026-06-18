@@ -72,6 +72,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
         <div className="flex w-full flex-col gap-4 self-stretch">
           <div className="flex flex-col items-start justify-start gap-4">
             <FieldInFormation />
+            <div className="flex w-1/2 flex-col items-start gap-4">
             <TextInput
               id="text-input-study-create-name"
               label={t('modal.@input_name')}
@@ -88,7 +89,6 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
               assistiveAppearance="error"
               rightIconAction="clean"
             />
-          </div>
           <TextInput
             id="text-input-horizon"
             label={t('home.@horizon')}
@@ -112,6 +112,8 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
             maxNbCharacters={MAX_KEYWORD_LENGTH}
             minNbCharacters={1}
           />
+            </div>
+          </div>
         </div>
       </RdsModal.Content>
       <RdsModal.Footer>
