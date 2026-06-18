@@ -113,30 +113,32 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
         <div className="flex w-full flex-col gap-4 self-stretch">
           <div className="flex flex-col items-start gap-4">
             <FieldInFormation />
-            <TextInput
-              id="text-input-study-create-name"
-              label={t('modal.@input_name')}
-              value={studyName}
-              onChange={handleStudyNameChange}
-              required
-              maxLength={MAX_STUDY_NAME_LENGTH}
-              error={!!studyErrorMessage}
-              assistiveTextLabel={studyErrorMessage}
-            />
+            <div className="flex w-1/2 flex-col items-start gap-4">
+              <TextInput
+                id="text-input-study-create-name"
+                label={t('modal.@input_name')}
+                value={studyName}
+                onChange={handleStudyNameChange}
+                required
+                maxLength={MAX_STUDY_NAME_LENGTH}
+                error={!!studyErrorMessage}
+                assistiveTextLabel={studyErrorMessage}
+              />
+              <HorizonInput
+                horizon={horizon}
+                onChange={handleHorizonChange}
+                onValidChange={handleHorizonValidityChange}
+                required
+              />
+              <KeywordsInput
+                keywords={keywords}
+                setKeywords={setKeywords}
+                maxNbKeywords={MAX_KEYWORD_NUMBER}
+                maxNbCharacters={MAX_KEYWORD_LENGTH}
+                minNbCharacters={1}
+              />
+            </div>
           </div>
-          <HorizonInput
-            horizon={horizon}
-            onChange={handleHorizonChange}
-            onValidChange={handleHorizonValidityChange}
-            required
-          />
-          <KeywordsInput
-            keywords={keywords}
-            setKeywords={setKeywords}
-            maxNbKeywords={MAX_KEYWORD_NUMBER}
-            maxNbCharacters={MAX_KEYWORD_LENGTH}
-            minNbCharacters={1}
-          />
         </div>
       </RdsModal.Content>
       <RdsModal.Footer>
