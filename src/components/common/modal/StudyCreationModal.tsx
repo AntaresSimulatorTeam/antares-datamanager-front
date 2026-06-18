@@ -89,7 +89,6 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
               assistiveAppearance="error"
               rightIconAction="clean"
             />
-          </div>
           <TextInput
             id="text-input-horizon"
             label={t('home.@horizon')}

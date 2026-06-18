@@ -85,38 +85,44 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
         <div className="flex w-full flex-col items-start justify-start space-y-2">
           <FieldInFormation />
           <div className="flex w-full items-center justify-start gap-4">
-            <TextInput
-              id="text-input-study-modify-name"
-              value={studyName}
-              label={t('modal.@input_name')}
-              onChange={(value: string) => {
-                studyNameError && setStudyNameError('');
-                setStudyName(value ?? '');
-              }}
-              required
-              maxLength={MAX_STUDY_NAME_LENGTH}
-              error={!!studyNameError}
-              assistiveTextLabel={studyNameError}
-            />
-            <SelectInput options={projects} required={true} valueSelected={project} onChange={setProject} />
+            <div className="flex w-1/2">
+              <TextInput
+                id="text-input-study-modify-name"
+                value={studyName}
+                label={t('modal.@input_name')}
+                onChange={(value: string) => {
+                  studyNameError && setStudyNameError('');
+                  setStudyName(value ?? '');
+                }}
+                required
+                maxLength={MAX_STUDY_NAME_LENGTH}
+                error={!!studyNameError}
+                assistiveTextLabel={studyNameError}
+              />
+            </div>
+            <div className="flex w-1/2">
+              <SelectInput options={projects} required={true} valueSelected={project} onChange={setProject} />
+            </div>
           </div>
-          <TextInput
-            id="text-input-horizon"
-            label={t('home.@horizon')}
-            value={horizon}
-            required
-            onChange={(value: string) => {
-              horizonError && setHorizonError('');
-              setHorizon(value ?? '');
-            }}
-            onBlur={() => validateHorizon(setHorizonError, t, horizon, false)}
-            maxLength={MAX_HORIZON_NUMBER}
-            error={!!horizonError}
-            assistiveTextLabel={horizonError || t('components.horizonInput.@assistiveTextForYear')}
-            assistiveAppearance={horizonError ? 'error' : 'description'}
-            disabled={!isDuplicateMode}
-            placeholder={!isDuplicateMode ? horizon : ''}
-          />
+          <div className="flex w-1/2">
+            <TextInput
+              id="text-input-horizon"
+              label={t('home.@horizon')}
+              value={horizon}
+              required
+              onChange={(value: string) => {
+                horizonError && setHorizonError('');
+                setHorizon(value ?? '');
+              }}
+              onBlur={() => validateHorizon(setHorizonError, t, horizon, false)}
+              maxLength={MAX_HORIZON_NUMBER}
+              error={!!horizonError}
+              assistiveTextLabel={horizonError || t('components.horizonInput.@assistiveTextForYear')}
+              assistiveAppearance={horizonError ? 'error' : 'description'}
+              disabled={!isDuplicateMode}
+              placeholder={!isDuplicateMode ? horizon : ''}
+            />
+          </div>
           <KeywordsInput
             keywords={keywords}
             setKeywords={setKeywords}
