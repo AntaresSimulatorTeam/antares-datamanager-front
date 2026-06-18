@@ -131,26 +131,32 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
         <div className="flex flex-col items-start gap-4">
           <FieldInFormation />
           <div className="flex w-full items-center justify-start gap-4">
-            <TextInput
-              id="text-input-study-modify-name"
-              value={studyName}
-              label={t('modal.@input_name')}
-              onChange={handleStudyNameChange}
-              required
-              maxLength={75}
-              error={!!studyErrorMessage}
-              assistiveTextLabel={studyErrorMessage}
-            />
-            <ProjectInput required={true} valueSelected={project} onChange={setProject} />
+            <div className="flex w-1/2">
+              <TextInput
+                id="text-input-study-modify-name"
+                value={studyName}
+                label={t('modal.@input_name')}
+                onChange={handleStudyNameChange}
+                required
+                maxLength={75}
+                error={!!studyErrorMessage}
+                assistiveTextLabel={studyErrorMessage}
+              />
+            </div>
+            <div className="flex w-1/2">
+              <ProjectInput required={true} valueSelected={project} onChange={setProject} />
+            </div>
           </div>
-          <HorizonInput
-            horizon={horizon}
-            onChange={setHorizon}
-            onValidChange={setIsHorizonValid}
-            required
-            disabled={!isDuplicateMode}
-            customErrorMessage={isDuplicateMode && horizonErrorMessage ? horizonErrorMessage : ''}
-          />
+          <div className="flex w-1/2">
+            <HorizonInput
+              horizon={horizon}
+              onChange={setHorizon}
+              onValidChange={setIsHorizonValid}
+              required
+              disabled={!isDuplicateMode}
+              customErrorMessage={isDuplicateMode && horizonErrorMessage ? horizonErrorMessage : ''}
+            />
+          </div>
           <KeywordsInput
             keywords={keywords}
             setKeywords={setKeywords}
