@@ -42,6 +42,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
   const { t } = useTranslation();
   const { user } = useUser();
   const { projects } = useFetchProjectOptions();
+
   const [studyName, setStudyName] = useState<string>(getStudyName(study.name));
   const [studyNameError, setStudyNameError] = useState<string>('');
   const [project, setProject] = useState<SelectDSOption>({
