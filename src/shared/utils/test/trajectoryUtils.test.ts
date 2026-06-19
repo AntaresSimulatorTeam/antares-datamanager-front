@@ -679,6 +679,16 @@ describe('getPathFromTrajectoryType', () => {
     );
   });
 
+  it('should return technical path for HYDRO_PSP_SERIES type', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.HYDRO_PSP_SERIES)).toBe('\\\\PSP_virtual\\series');
+  });
+
+  it('should return technical path for HYDRO_PSP_TECHNICAL_PARAMETERS type', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS)).toBe(
+      '\\\\PSP_virtual\\technical_parameters',
+    );
+  });
+
   it('should return technical path for unknown type', () => {
     expect(getPathFromTrajectoryType('UNKNOWN_TYPE' as TRAJECTORY_TYPE)).toBeNull();
   });
@@ -1568,6 +1578,14 @@ describe('isEmptyRow', () => {
     mockTMock.mockReturnValue('OTHER');
 
     const result = isEmptyRow(TRAJECTORY_TYPE.HYDRO_SERIES, 'foo', 0, mockT);
+
+    expect(result).toBe(true);
+  });
+
+  it('retourne true si type est HYDRO_PSP_SERIES et rowDepth = 0', () => {
+    mockTMock.mockReturnValue('OTHER');
+
+    const result = isEmptyRow(TRAJECTORY_TYPE.HYDRO_PSP_SERIES, 'foo', 0, mockT);
 
     expect(result).toBe(true);
   });
