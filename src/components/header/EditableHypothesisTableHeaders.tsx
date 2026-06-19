@@ -13,7 +13,7 @@ import { LabelWithDeleteButton } from '@common/data/LabelWithDeleteButton.tsx';
 import { SelectInputWithButton } from '@common/data/SelectInputWithButton.tsx';
 import { ProgressBar } from '@/components/input/ProgressBar.tsx';
 import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
-import { IconButton } from '@design-system-rte/react';
+import { IconButton, Switch } from '@design-system-rte/react';
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
 
@@ -26,6 +26,7 @@ const getEditableHypothesisTableHeaders = ({
   fileStatus,
   idSelected,
   columnHeader,
+  type,
 }: TableHeadersGetterProps) => [
   columnHelper.accessor('hypothesis', {
     header: columnHeader || t('studyDetails.@areas'),
@@ -96,6 +97,34 @@ const getEditableHypothesisTableHeaders = ({
       );
     },
   }),
+
+  ...(type === TRAJECTORY_TYPE.AREA
+    ? [
+        columnHelper.accessor('hvdc', {
+          header: '',
+          size: 50,
+          cell: ({ row, table: { options } }) => {
+            const { hvdc, trajectory, status } = row.original;
+            if (hvdc == null) return null;
+            return (
+              <Switch
+                appearance="brand"
+                label={t('link.@toggle_hvdc')}
+                onChange={() => void options?.meta?.activate?.()}
+                checked={hvdc}
+                showIcon
+                showLabel
+                disabled={
+                  status === TRAJECTORY_SELECTION_STATUS.ERROR ||
+                  (!trajectory?.trajectoryName && status === TRAJECTORY_SELECTION_STATUS.MISSING)
+                }
+                readOnly={isStudyGenerated}
+              />
+            );
+          },
+        }),
+      ]
+    : []),
 
   columnHelper.accessor('status', {
     header: t('home.@status'),

@@ -39,15 +39,17 @@ export const useFetchFixHypothesisTrajectories = (
       });
 
       // Hypothesis rows
-      const trajectoryResult = configs.map((cfg, idx) => ({
+      const dataTable: { hvdc?: boolean; label: string; result: DbTrajectory[] }[] = configs.map((cfg, idx) => ({
         label: t(cfg.labelKey),
         result: results[idx],
+        ...(cfg?.hvdc != null && { hvdc: cfg.hvdc }),
       }));
 
-      const dataTrajectories = trajectoryResult.map(({ label, result }) => ({
-        hypothesis: label,
-        trajectory: result?.[0],
-        status: result.length > 0 ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+      const dataTrajectories = dataTable.map((data) => ({
+        hypothesis: data?.label,
+        trajectory: data?.result?.[0],
+        status: data?.result.length > 0 ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+        ...(data.hvdc != null && { hvdc: data.hvdc }),
       }));
       setHypothesisTrajectories(dataTrajectories);
 

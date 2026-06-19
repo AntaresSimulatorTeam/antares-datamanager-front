@@ -154,6 +154,9 @@
     "@hydro": "Hydro",
     "@checkBoxDefault": "Automatic area selection"
   },
+  "link": {
+    "@toggle_hvdc": "HVDC"
+  },
   "thermal": {
     "@installedPower": "Capacités installées",
     "@installedPowerInformation": "Technology filled in",

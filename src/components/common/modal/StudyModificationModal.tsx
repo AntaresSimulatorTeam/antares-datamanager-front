@@ -19,6 +19,7 @@ import { hasArrayChanged } from '@/shared/utils/arrayUtils.ts';
 import ProjectInput from '@/components/input/ProjectInput.tsx';
 import { Button, TextInput } from '@design-system-rte/react';
 import { FieldInFormation } from '@common/base/FieldInFormation.tsx';
+import { convertToOneYearHorizon } from '@/shared/utils/textUtils.ts';
 
 interface StudyCreationModalProps {
   isOpen?: boolean;
@@ -44,12 +45,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
     value: study.project,
   });
   const [keywords, setKeywords] = useState<string[]>(study?.keywords || []);
-  const [horizon, setHorizon] = useState<string>(() => {
-    const rawHorizon = study?.horizon || '';
-    const years = rawHorizon.match(/\d{4}/g)?.map(Number) || [];
-    const maxYear = years.length ? Math.max(...years) : '';
-    return maxYear.toString();
-  });
+  const [horizon, setHorizon] = useState<string>(() => convertToOneYearHorizon(study.horizon));
   const [isFormValid, setIsFormValid] = useState(false);
   const [isHorizonValid, setIsHorizonValid] = useState(false);
   const [studyErrorMessage, setStudyErrorMessage] = useState<string>('');

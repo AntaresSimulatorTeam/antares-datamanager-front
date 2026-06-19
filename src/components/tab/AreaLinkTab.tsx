@@ -27,6 +27,8 @@ import { useFetchFixHypothesisTrajectories } from '@/hooks/useFetchFixHypothesis
 import { useTrajectorySearchHandler } from '@/hooks/useTrajectorySearchHandler.ts';
 import { useTrajectoryFetchFromFSHandler } from '@/hooks/useTrajectoryFetchFromFSHandler.ts';
 import { useHypothesisTableUpdateHandler } from '@/hooks/useHypothesisTableUpdateHandler.ts';
+import { updateStudy } from '@/shared/services/studyService.ts';
+import { convertToOneYearHorizon } from '@/shared/utils/textUtils.ts';
 
 interface AreaLinkTabProps {
   studyData: StudyDTO;
@@ -51,7 +53,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
 
   const configs = [
     { type: TRAJECTORY_TYPE.AREA, labelKey: t('studyDetails.@areas') },
-    { type: TRAJECTORY_TYPE.LINK, labelKey: t('studyDetails.@links') },
+    { type: TRAJECTORY_TYPE.LINK, labelKey: t('studyDetails.@links'), hvdc: studyData.hvdc },
   ];
   const options = { withReadOnlyRow: true, isStudyGenerated };
   const { hypothesisTrajectories, readOnlyRow } = useFetchFixHypothesisTrajectories(configs, options, studyData?.id);
@@ -128,6 +130,13 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
           if (trajectory) {
             void handleViewTrajectory(trajectory, setTrajectoryData, setIsViewModalOpen, t);
           }
+        }}
+        type={TRAJECTORY_TYPE.AREA}
+        activate={() => {
+          void updateStudy(
+            { ...studyData, horizon: convertToOneYearHorizon(studyData.horizon), hvdc: !studyData.hvdc },
+            studyData.id,
+          );
         }}
       />
       {isModalOpen && (

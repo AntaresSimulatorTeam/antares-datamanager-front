@@ -23,6 +23,7 @@ export interface StudyDTO {
   status: StudyStatus;
   horizon: string;
   trajectoryIds: number[];
+  hvdc: boolean;
 }
 
 export interface PaginatedResponse<T> {
