@@ -22,3 +22,9 @@ export const snakeCaseUnderscore = (str: string) => str?.trim().toLowerCase().re
 export const snakeCase = (str: string) => str?.trim().toLowerCase().replace(/\s+/g, ' ') ?? '';
 
 export const normalizeTechnology = (s: string | undefined | null) => s?.trim().toLowerCase();
+
+export const convertToOneYearHorizon = (rawHorizon: string) => {
+  const years = rawHorizon.match(/\d{4}/g)?.map(Number) || [];
+  const maxYear = years.length ? Math.max(...years) : '';
+  return maxYear.toString();
+};
