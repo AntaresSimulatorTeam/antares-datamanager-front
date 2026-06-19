@@ -21,16 +21,6 @@ export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, hypoth
   const [trajectorySelected, setTrajectorySelected] = useState<SelectOption | null>(null);
   const path = getPathFromTrajectoryType(trajectoryType, hypothesis);
 
-  const handleSelectOption = (value: SelectOption | null) => {
-    if (value) {
-      setTrajectorySelected(value);
-    }
-  };
-
-  const resetField = () => {
-    setTrajectorySelected(null);
-  };
-
   const handleSearchTerm = useCallback(
     async (searchTerm?: string) => {
       if (!searchTerm && !options?.length) return;
@@ -69,10 +59,10 @@ export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, hypoth
                 defaultPlaceHolder={
                   options?.length ? t('studyDetails.@select_trajectory') : t('studyDetails.@select_no_trajectory')
                 }
-                onSelect={handleSelectOption}
+                onSelect={setTrajectorySelected}
                 isSearchable={true}
                 setSearchTerm={handleSearchTerm}
-                resetField={resetField}
+                resetField={() => setTrajectorySelected(null)}
                 isInputDisabled={!options?.length}
               />
             </div>

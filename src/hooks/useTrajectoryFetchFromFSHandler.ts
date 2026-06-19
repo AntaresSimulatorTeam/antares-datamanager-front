@@ -35,6 +35,15 @@ export const useTrajectoryFetchFromFSHandler = ({
       if (type === TRAJECTORY_TYPE.STS) {
         areaToUse = data[indexArray[0]]?.subRows?.[indexArray[1]]?.hypothesis ?? '';
       }
+      if (type === TRAJECTORY_TYPE.HYDRO_SERIES) {
+        typeToUse = indexArray[1] === 0 ? TRAJECTORY_TYPE.HYDRO_SERIES : TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS;
+        areaToUse = '';
+      }
+      if (type === TRAJECTORY_TYPE.HYDRO_PSP_SERIES) {
+        typeToUse =
+          indexArray[1] === 0 ? TRAJECTORY_TYPE.HYDRO_PSP_SERIES : TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS;
+        areaToUse = '';
+      }
       await handleFetchTrajectoriesFS(
         typeToUse,
         rowId,

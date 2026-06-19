@@ -1606,7 +1606,7 @@ describe('getItemsMenu', () => {
     it('retourne 1 item : HYDRO_SERIES', () => {
       const result = getItemsMenu(TRAJECTORY_TYPE.HYDRO_SERIES, t as TFunction<'translation', undefined>, []);
 
-      expect(result).toHaveLength(1);
+      expect(result).toHaveLength(2);
       expect(result[0]).toEqual({
         id: TRAJECTORY_TYPE.HYDRO_SERIES,
         label: 'translated:hydro.@capacity',

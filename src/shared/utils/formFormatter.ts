@@ -20,7 +20,9 @@ export const isRepositoryTrajectory = (type: TRAJECTORY_TYPE, isDefaultArea = fa
   (type === TRAJECTORY_TYPE.RES_CAPACITY && isDefaultArea) ||
   type === TRAJECTORY_TYPE.RES_LOAD ||
   type === TRAJECTORY_TYPE.HYDRO_SERIES ||
-  type === TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS;
+  type === TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS ||
+  type === TRAJECTORY_TYPE.HYDRO_PSP_SERIES ||
+  type === TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS;
 
 export const convertToFSSelectionOptionType = (options: FsTrajectory[], isDefaultArea = false): SelectOption[] =>
   options.map((option, indexTrajectory) => ({
