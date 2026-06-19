@@ -24,7 +24,7 @@ interface PegaseHypothesisTableProps extends TableHeadersProps {
   removeRow?: (value: string, rowId?: string) => void | Promise<void>;
   updateData?: (rowId: string, value: unknown, status: RowStatus) => void | Promise<void>;
   handleViewData?: (rowId: string) => void | Promise<void> | undefined;
-  activate?: () => void;
+  activate?: () => void | Promise<void> | undefined;
   list?: string[];
 }
 
@@ -101,7 +101,7 @@ export const PegaseHypothesisTable = ({
         removeRow={(value: string, rowId?: string) => void removeRow?.(value, rowId)}
         updateData={(rowId: string, value: unknown, status: RowStatus) => void updateData?.(rowId, value, status)}
         viewData={handleViewData ? (rowId: string) => void handleViewData?.(rowId) : undefined}
-        activate={activate ? () => void activate() : undefined}
+        activate={activate ? () => void activate?.() : undefined}
       />
     </div>
   );
