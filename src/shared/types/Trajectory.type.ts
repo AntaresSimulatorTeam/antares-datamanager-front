@@ -111,7 +111,6 @@ export const TrajectoryLinkDataScheme = {
   hvdcNbIndirect: 'number',
   hvdcFoRateDirect: 'number',
   hvdcFoRateIndirect: 'number',
-  hvdc: 'string',
   hurdleCost: 'number',
 } as const;
 

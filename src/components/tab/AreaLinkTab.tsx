@@ -28,7 +28,6 @@ import { useTrajectorySearchHandler } from '@/hooks/useTrajectorySearchHandler.t
 import { useTrajectoryFetchFromFSHandler } from '@/hooks/useTrajectoryFetchFromFSHandler.ts';
 import { useHypothesisTableUpdateHandler } from '@/hooks/useHypothesisTableUpdateHandler.ts';
 import { updateStudy } from '@/shared/services/studyService.ts';
-import { convertToOneYearHorizon } from '@/shared/utils/textUtils.ts';
 
 interface AreaLinkTabProps {
   studyData: StudyDTO;
@@ -97,6 +96,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
 
   const handleConfirmedAreaDeletion = useCallback(async () => {
     await unlinkAllTrajectoriesFromStudy(studyData.id);
+    void updateStudy({ hvdc: false }, studyData.id);
 
     dispatch?.({ type: STUDY_ACTION.RESET_STUDY_STATE });
     setData([
@@ -105,9 +105,10 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
         hypothesis: t('studyDetails.@links'),
         trajectory: null,
         status: TRAJECTORY_SELECTION_STATUS.MISSING,
-        hvdc: studyData.hvdc,
+        hvdc: false,
       },
     ]);
+    dispatch?.({ type: STUDY_ACTION.SET_STUDY_HVDC, payload: false });
 
     setReadOnly({ '0': false, '1': true });
     setIsDeletionModalOpen(false);
@@ -138,10 +139,8 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
         }}
         type={TRAJECTORY_TYPE.AREA}
         activate={() => {
-          void updateStudy(
-            { ...studyData, horizon: convertToOneYearHorizon(studyData.horizon), hvdc: !studyData.hvdc },
-            studyData.id,
-          );
+          void updateStudy({ hvdc: !studyState.hvdc }, studyData.id);
+          dispatch?.({ type: STUDY_ACTION.SET_STUDY_HVDC, payload: !studyState.hvdc });
         }}
       />
       {isModalOpen && (
