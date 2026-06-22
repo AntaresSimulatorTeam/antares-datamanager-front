@@ -111,7 +111,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
 
     setReadOnly({ '0': false, '1': true });
     setIsDeletionModalOpen(false);
-  }, [dispatch, studyData.hvdc, studyData.id, t]);
+  }, [dispatch, studyData.id, t]);
 
   return (
     <div className="flex h-fit w-full">

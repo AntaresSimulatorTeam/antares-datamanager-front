@@ -141,9 +141,9 @@ export const clearByType = (prevState: Partial<StudyState>, payload: TRAJECTORY_
   return prevState;
 };
 
-export const updateHvdcOption = (prevState: Partial<StudyState>, payload?: boolean): Partial<StudyState> => ({
+export const updateHvdcOption = (prevState: Partial<StudyState>, payload: boolean): Partial<StudyState> => ({
   ...prevState,
-  hvdc: payload ?? !prevState.hvdc,
+  hvdc: payload,
 });
 
 export const studyReducer = (prevState: Partial<StudyState>, action?: StudyActionType): Partial<StudyState> => {
