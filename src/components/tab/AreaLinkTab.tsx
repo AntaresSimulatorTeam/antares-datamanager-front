@@ -98,7 +98,6 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
     await unlinkAllTrajectoriesFromStudy(studyData.id);
     void updateStudy({ hvdc: false }, studyData.id);
 
-    dispatch?.({ type: STUDY_ACTION.RESET_STUDY_STATE });
     setData([
       { hypothesis: t('studyDetails.@areas'), trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING },
       {

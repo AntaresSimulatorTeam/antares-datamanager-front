@@ -46,20 +46,16 @@ export const useTrajectoryDetach = (
         if (trajectoryToDelete && trajectoryIds?.length > 0 && status === 'empty') {
           await performBackendDeletion(trajectoryIds);
           if (trajectoryToDelete.type === TRAJECTORY_TYPE.LINK) {
-            await updateStudy({hvdc: false}, study.id);
+            await updateStudy({ hvdc: false }, study.id);
           }
         }
 
         // 3. Mise à jour du store
         if (trajectoryToDelete) {
-          if (trajectoryToDelete.type === TRAJECTORY_TYPE.AREA) {
-            dispatch?.({ type: STUDY_ACTION.RESET_STUDY_STATE });
-          } else {
-            dispatch?.({
-              type: STUDY_ACTION.UPDATE_TRAJECTORY,
-              payload: { trajectory: trajectoryToDelete, status },
-            });
-          }
+          dispatch?.({
+            type: STUDY_ACTION.UPDATE_TRAJECTORY,
+            payload: { trajectory: trajectoryToDelete, status },
+          });
         }
 
         // 4. Mise à jour du tableau (factorisée)
