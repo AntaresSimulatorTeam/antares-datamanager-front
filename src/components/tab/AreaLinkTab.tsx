@@ -101,12 +101,17 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
     dispatch?.({ type: STUDY_ACTION.RESET_STUDY_STATE });
     setData([
       { hypothesis: t('studyDetails.@areas'), trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING },
-      { hypothesis: t('studyDetails.@links'), trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING },
+      {
+        hypothesis: t('studyDetails.@links'),
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+        hvdc: studyData.hvdc,
+      },
     ]);
 
     setReadOnly({ '0': false, '1': true });
     setIsDeletionModalOpen(false);
-  }, [dispatch, studyData.id, t]);
+  }, [dispatch, studyData.hvdc, studyData.id, t]);
 
   return (
     <div className="flex h-fit w-full">

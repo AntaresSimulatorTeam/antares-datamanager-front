@@ -91,7 +91,7 @@ export const useTrajectoryDetach = (
               dispatch?.({
                 type: STUDY_ACTION.CLEAR_TRAJECTORY_BY_TYPE,
                 payload: [TRAJECTORY_TYPE.LINK],
-              } as StudyActionType);
+              });
             }
             setData((prev) =>
               prev.map((item, index) => {
