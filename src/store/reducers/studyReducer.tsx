@@ -94,6 +94,7 @@ export const updateTrajectory = (
 
     return {
       ...prevState,
+      hvdc: trajectoryType === TRAJECTORY_TYPE.LINK && status === 'empty' ? false : prevState.hvdc,
       [trajectoryType]: newStudyState,
       ...(isMultipleUpdate && {
         [TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]: {
@@ -140,6 +141,11 @@ export const clearByType = (prevState: Partial<StudyState>, payload: TRAJECTORY_
   return prevState;
 };
 
+export const updateHvdcOption = (prevState: Partial<StudyState>, payload: boolean): Partial<StudyState> => ({
+  ...prevState,
+  hvdc: payload,
+});
+
 export const studyReducer = (prevState: Partial<StudyState>, action?: StudyActionType): Partial<StudyState> => {
   if (action) {
     switch (action.type) {
@@ -157,6 +163,8 @@ export const studyReducer = (prevState: Partial<StudyState>, action?: StudyActio
         return { ...clearByType(prevState, action.payload) };
       case STUDY_ACTION.RESET_STUDY_STATE:
         return { studyStatus: StudyStatus.IN_PROGRESS };
+      case STUDY_ACTION.SET_STUDY_HVDC:
+        return { ...updateHvdcOption(prevState, action.payload) };
       default:
         return prevState;
     }

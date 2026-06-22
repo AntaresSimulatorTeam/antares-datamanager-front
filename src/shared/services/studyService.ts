@@ -114,7 +114,7 @@ export const saveStudy = async (
  * @returns {Promise<void>} A promise that resolves when the update operation is completed.
  * @throws {BackendError} Throws an error if the update fails on the server-side.
  */
-export const updateStudy = async (studyData: StudyDTO, studyId: number): Promise<void> => {
+export const updateStudy = async (studyData: Partial<StudyDTO>, studyId: number): Promise<void> => {
   try {
     await AuthService.authFetch(`${STUDY_ENDPOINT}/${studyId}`, {
       method: 'PUT',

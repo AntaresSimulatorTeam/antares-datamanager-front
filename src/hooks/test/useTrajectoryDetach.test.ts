@@ -7,6 +7,7 @@ import * as hypothesisTableHelper from '@/shared/helpers/hypothesisTableHelper.t
 import { DbTrajectory, HypothesisRowData, StudyDTO } from '@/shared/types';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import * as hypothesisTableService from '@/shared/services/hypothesisTableService.ts';
+import * as studyService from '@/shared/services/studyService';
 
 vi.mock('@/hooks/useTrajectoryDeletionLogic', () => ({
   useTrajectoryDeletionLogic: vi.fn(),
@@ -23,6 +24,8 @@ vi.mock('@/shared/notification/notification', () => ({
 vi.mock('@/shared/services/hypothesisTableService.ts', () => ({
   handleTrajectoryError: vi.fn(),
 }));
+
+vi.mock('@/shared/services/studyService');
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -74,7 +77,7 @@ describe('useTrajectoryDetach', () => {
   // --------------------------------------------------------------------
   //  TEST 1 : Détachement OK
   // --------------------------------------------------------------------
-  it('détache correctement une trajectoire dont le type est autre que type AREA', async () => {
+  it('détache correctement une trajectoire dont le type est DSR', async () => {
     vi.mocked(useTrajectoryDeletionLogic).mockReturnValue({
       computeDeletion: vi.fn().mockReturnValue({
         trajectoryIds: [10],
@@ -129,16 +132,17 @@ describe('useTrajectoryDetach', () => {
     expect(mockSetReadOnly).toHaveBeenCalled();
   });
 
-  it('détache correctement une trajectoire dont le type est autre que type AREA', async () => {
+  it('détache correctement une trajectoire dont le type est AREA', async () => {
+    const trajectoryToDelete = {
+      id: 10,
+      area: 'AREA_X',
+      trajectoryName: 'Traj X',
+      type: TRAJECTORY_TYPE.AREA,
+    };
     vi.mocked(useTrajectoryDeletionLogic).mockReturnValue({
       computeDeletion: vi.fn().mockReturnValue({
         trajectoryIds: [10],
-        trajectoryToDelete: {
-          id: 10,
-          area: 'AREA_X',
-          trajectoryName: 'Traj X',
-          type: TRAJECTORY_TYPE.AREA,
-        },
+        trajectoryToDelete,
         additionalTrajectory: null,
       }),
       performBackendDeletion: vi.fn().mockResolvedValue(undefined),
@@ -163,7 +167,56 @@ describe('useTrajectoryDetach', () => {
     expect(useTrajectoryDeletionLogic(study).performBackendDeletion).toHaveBeenCalledWith([10]);
 
     // dispatch appelé
-    expect(mockDispatch).toHaveBeenCalledWith({ type: STUDY_ACTION.RESET_STUDY_STATE });
+    expect(mockDispatch).toHaveBeenCalledWith({
+      type: STUDY_ACTION.UPDATE_TRAJECTORY,
+      payload: { trajectory: trajectoryToDelete, status: 'empty' },
+    });
+
+    // updateTableAfterCellDetach appelé
+    expect(hypothesisTableHelper.updateTableAfterCellDetach).toHaveBeenCalled();
+
+    // setData mis à jour
+    expect(mockSetData).toHaveBeenCalledWith([{ hypothesis: 'H1' }]);
+
+    // setReadOnly mis à jour
+    expect(mockSetReadOnly).toHaveBeenCalled();
+  });
+
+  it('détache correctement une trajectoire dont le type est LINK', async () => {
+    vi.mocked(useTrajectoryDeletionLogic).mockReturnValue({
+      computeDeletion: vi.fn().mockReturnValue({
+        trajectoryIds: [10],
+        trajectoryToDelete: {
+          id: 10,
+          area: 'LINK_X',
+          trajectoryName: 'Traj X',
+          type: TRAJECTORY_TYPE.LINK,
+        },
+        additionalTrajectory: null,
+      }),
+      performBackendDeletion: vi.fn().mockResolvedValue(undefined),
+    });
+    const mockUpdateSTudy = vi.mocked(studyService.updateStudy);
+    const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch, mockSetReadOnly));
+
+    await act(async () => {
+      await result.current.detachTrajectory(TRAJECTORY_TYPE.LINK, [0], mockSetData, sampleData, 'empty', 'H1');
+    });
+
+    // computeDeletion appelé
+    expect(useTrajectoryDeletionLogic(study).computeDeletion).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.LINK,
+      sampleData,
+      null,
+      [0],
+      'H1',
+      'empty',
+    );
+
+    // performBackendDeletion appelé
+    expect(useTrajectoryDeletionLogic(study).performBackendDeletion).toHaveBeenCalledWith([10]);
+
+    expect(mockUpdateSTudy).toHaveBeenCalledWith({ hvdc: false }, 1);
 
     // updateTableAfterCellDetach appelé
     expect(hypothesisTableHelper.updateTableAfterCellDetach).toHaveBeenCalled();

@@ -65,6 +65,7 @@ const StudyDetails = () => {
     const fetchStudyData = async (studyId: number) => {
       const studyUpdated = await getStudyById(studyId);
       setStudyData(studyUpdated);
+      dispatch?.({ type: STUDY_ACTION.SET_STUDY_HVDC, payload: studyUpdated.hvdc });
     };
     if (id != null) {
       void fetchStudyData(Number(id));
