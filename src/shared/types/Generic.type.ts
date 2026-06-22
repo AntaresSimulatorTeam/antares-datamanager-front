@@ -108,7 +108,15 @@ export const isTrajectoryResType = (value: unknown): value is TrajectoryWithSubR
   ].includes(value as TrajectoryWithSubRowsType);
 
 export const isTrajectoryHydroType = (value: unknown): value is TrajectoryWithSubRowsType =>
-  [TRAJECTORY_TYPE.HYDRO_SERIES, TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS].includes(
+  [
+    TRAJECTORY_TYPE.HYDRO_SERIES,
+    TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS,
+    TRAJECTORY_TYPE.HYDRO_PSP_SERIES,
+    TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS,
+  ].includes(value as TrajectoryWithSubRowsType);
+
+export const isTrajectoryHydroPSPType = (value: unknown): value is TrajectoryWithSubRowsType =>
+  [TRAJECTORY_TYPE.HYDRO_PSP_SERIES, TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS].includes(
     value as TrajectoryWithSubRowsType,
   );
 

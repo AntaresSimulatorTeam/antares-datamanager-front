@@ -3,6 +3,7 @@ import {
   DbTrajectory,
   FetchResult,
   HypothesisRowData,
+  isTrajectoryHydroPSPType,
   isTrajectoryHydroType,
   TechnologyType,
   TrajectoryAreaData,
@@ -143,9 +144,12 @@ export const useFetchHypothesisTrajectories = (
 
         let hydroRows: HypothesisRowData[] = [];
         let hydroReadOnlyMap: ReadOnlyObject = {};
+        const hydroTypeToSet = isTrajectoryHydroPSPType(trajectoryTypes[0])
+          ? TRAJECTORY_TYPE.HYDRO_PSP_SERIES
+          : TRAJECTORY_TYPE.HYDRO_SERIES;
         if (isTrajectoryHydroType(trajectoryTypes[0])) {
           hydroRows = buildHypothesisRows({
-            trajType: TRAJECTORY_TYPE.HYDRO_SERIES,
+            trajType: hydroTypeToSet,
             trajectories: [],
             defaultAreas,
             areas,
@@ -169,7 +173,7 @@ export const useFetchHypothesisTrajectories = (
           const next = { ...prev };
           results.forEach(({ trajType, rows }) => {
             if (isTrajectoryHydroType(trajType)) {
-              next[TRAJECTORY_TYPE.HYDRO_SERIES] = hydroRows;
+              next[hydroTypeToSet] = hydroRows;
             } else {
               next[trajType] = rows;
             }

@@ -228,4 +228,38 @@ describe('useTrajectorySearchHandler', () => {
       },
     );
   });
+
+  it('should switch type for last index when type is HYDRO_PSP_SERIES', async () => {
+    const setDbTrajectories = vi.fn();
+
+    const data = [
+      { hypothesis: 'Area A', subRows: [{ hypothesis: 'Series', subRows: [] as HypothesisRowData[] }] },
+    ] as HypothesisRowData[];
+
+    const studyData = { horizon: 2030 } as unknown as StudyDTO;
+
+    const { result } = renderHook(() =>
+      useTrajectorySearchHandler({
+        data,
+        type: TRAJECTORY_TYPE.HYDRO_PSP_SERIES,
+        studyData,
+        setDbTrajectories,
+      }),
+    );
+
+    vi.mocked(hypothesisTableService.handleTrajectorySearch).mockResolvedValue([]);
+
+    await result.current.handleSearch('xyz', '0.1');
+
+    expect(hypothesisTableService.handleTrajectorySearch).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS,
+      setDbTrajectories,
+      2030,
+      {
+        area: 'Area A',
+        technology: undefined,
+        fileNameContains: 'xyz',
+      },
+    );
+  });
 });

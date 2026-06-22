@@ -42,8 +42,12 @@ export const useTrajectorySearchHandler = ({
         typeToUse = TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS;
       }
 
+      if (type === TRAJECTORY_TYPE.HYDRO_PSP_SERIES && indexArray.length === 2 && subIndex === 1) {
+        typeToUse = TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS;
+      }
+
       let technology =
-        subIndex === undefined || type === TRAJECTORY_TYPE.HYDRO_SERIES
+        subIndex === undefined || type === TRAJECTORY_TYPE.HYDRO_SERIES || type === TRAJECTORY_TYPE.HYDRO_PSP_SERIES
           ? undefined
           : data[rowIndex]?.subRows?.[subIndex]?.hypothesis;
       const option = technologies ? technologies.find((opt) => opt.label === technology) : null;

@@ -15,6 +15,7 @@ import {
   getInformationMessage,
   getReadOnlyForGeneratedStudy,
   getSpecificTrajectories,
+  getTypeToImport,
   shouldOpenDeletionModal,
   updateTableAfterCellDetach,
   updateTableAfterRowDeletion,
@@ -1457,5 +1458,35 @@ describe('updateTableAfterCellDetach', () => {
         newData: ['updated'],
       });
     });
+  });
+});
+
+describe('getTypeToImport', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('return DSR type when index table is not the last one', () => {
+    const data = [{ hypothesis: 'H1' }, { hypothesis: 'H2' }, { hypothesis: 'H3' }] as HypothesisRowData[];
+    const result = getTypeToImport(TRAJECTORY_TYPE.DSR, '1', data);
+    expect(result).toEqual(TRAJECTORY_TYPE.DSR);
+  });
+
+  it('return DSR_CAPACITY_MODULATION type when index table is the last one', () => {
+    const data = [{ hypothesis: 'H1' }, { hypothesis: 'H2' }, { hypothesis: 'H3' }] as HypothesisRowData[];
+    const result = getTypeToImport(TRAJECTORY_TYPE.DSR, '2', data);
+    expect(result).toEqual(TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION);
+  });
+
+  it('return HYDRO_TECHNICAL_PARAMETERS type when index table is the last one', () => {
+    const data = [{ hypothesis: 'H1' }, { hypothesis: 'H2' }] as HypothesisRowData[];
+    const result = getTypeToImport(TRAJECTORY_TYPE.HYDRO_SERIES, '0.1', data);
+    expect(result).toEqual(TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS);
+  });
+
+  it('return HYDRO_PSP_TECHNICAL_PARAMETERS type when index table is the last one', () => {
+    const data = [{ hypothesis: 'H1' }, { hypothesis: 'H2' }] as HypothesisRowData[];
+    const result = getTypeToImport(TRAJECTORY_TYPE.HYDRO_PSP_SERIES, '0.1', data);
+    expect(result).toEqual(TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS);
   });
 });
