@@ -66,7 +66,7 @@ const ProjectDetails = () => {
       <PegaseBreadcrumb items={headerItems}></PegaseBreadcrumb>
       <Divider />
       <DetailsContent content={projectDetails} onClickButton={toggleModal} tagsList={projectDetails.tags} />
-      <div className="flex w-1/3 items-center gap-4">
+      <div className="flex w-2/5 items-center gap-4">
         <div className="flex w-3/4">
           <Searchbar
             onSearch={(value?: string) => setSearchTerm(value)}
