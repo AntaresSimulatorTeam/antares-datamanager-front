@@ -222,6 +222,7 @@
     "@confirmDeletionMessage": "This action will delete the associated trajectories. Please confirm you wish to proceed.",
     "@confirmDeletionCapacityMessage": "This action will delete the trajectory associated with “capacity modulation”. Please confirm you wish to proceed.",
     "@confirmMultipleDeletionParamMessage": "This action will delete the associated trajectories with “Param modulation”. Please confirm you wish to proceed.",
+    "@confirmDeleteHydroMessage": "You have entered at least one compliant trajectory. This action will delete the associated trajectories. Please confirm you wish to proceed.",
     "@confirm": "Confirm",
     "@cancel": "Cancel"
   },

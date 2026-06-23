@@ -73,6 +73,7 @@ export const shouldOpenDeletionModal = (
     case TRAJECTORY_TYPE.RES_CAPACITY:
     case TRAJECTORY_TYPE.RES_LOAD:
     case TRAJECTORY_TYPE.HYDRO_SERIES:
+    case TRAJECTORY_TYPE.HYDRO_PSP_SERIES:
       return subRowsWithTrajectory.length > 0;
     case TRAJECTORY_TYPE.THERMAL_CAPACITY:
       return isRowTrajectoryValid && subRowsWithTrajectory.length > 0;

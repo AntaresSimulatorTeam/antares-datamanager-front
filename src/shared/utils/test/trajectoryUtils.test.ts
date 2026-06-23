@@ -1491,7 +1491,7 @@ describe('getDeletionModalMessage', () => {
     ] as unknown as HypothesisRowData[];
     const result = getDeletionModalMessage(TRAJECTORY_TYPE.HYDRO_SERIES, 0, data);
 
-    expect(result).toBe('trajectoryDeletionModal.@confirmDeleteMessage');
+    expect(result).toBe('trajectoryDeletionModal.@confirmDeleteHydroMessage');
   });
 
   // --- 6. Cas par défaut (autre type)

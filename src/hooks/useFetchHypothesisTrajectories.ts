@@ -185,7 +185,7 @@ export const useFetchHypothesisTrajectories = (
           const next = { ...prev };
           results.forEach(({ trajType, readOnlyMap }) => {
             if (isTrajectoryHydroType(trajType)) {
-              next[trajType] = hydroReadOnlyMap;
+              next[hydroTypeToSet] = hydroReadOnlyMap;
             } else {
               next[trajType] = readOnlyMap;
             }
@@ -214,7 +214,12 @@ export const useFetchHypothesisTrajectories = (
         setDropDownListOptions(
           results.reduce<Record<TRAJECTORY_TYPE, string[]>>(
             (acc, r) => {
-              acc[r.trajType] = r.list.checkedValues;
+              const key = isTrajectoryHydroType(r.trajType) ? hydroTypeToSet : r.trajType;
+
+              const previous = acc[key] ?? [];
+              const current = r.list.checkedValues;
+
+              acc[key] = [...new Set([...previous, ...current])];
               return acc;
             },
             {} as Record<TRAJECTORY_TYPE, string[]>,

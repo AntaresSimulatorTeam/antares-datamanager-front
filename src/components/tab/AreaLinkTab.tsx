@@ -52,7 +52,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
 
   const configs = [
     { type: TRAJECTORY_TYPE.AREA, labelKey: t('studyDetails.@areas') },
-    { type: TRAJECTORY_TYPE.LINK, labelKey: t('studyDetails.@links'), hvdc: studyData.hvdc },
+    { type: TRAJECTORY_TYPE.LINK, labelKey: t('studyDetails.@links'), hvdc: studyState.hvdc },
   ];
   const options = { withReadOnlyRow: true, isStudyGenerated };
   const { hypothesisTrajectories, readOnlyRow } = useFetchFixHypothesisTrajectories(configs, options, studyData?.id);

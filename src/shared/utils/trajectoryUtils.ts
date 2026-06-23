@@ -981,8 +981,8 @@ export const getDeletionModalMessage = (type: TRAJECTORY_TYPE, index: number, da
     return 'trajectoryDeletionModal.@confirmDeletionCapacityMessage';
   }
 
-  if (type === TRAJECTORY_TYPE.HYDRO_SERIES) {
-    return 'trajectoryDeletionModal.@confirmDeleteMessage';
+  if (type === TRAJECTORY_TYPE.HYDRO_SERIES || type === TRAJECTORY_TYPE.HYDRO_PSP_SERIES) {
+    return 'trajectoryDeletionModal.@confirmDeleteHydroMessage';
   }
 
   if (type === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
