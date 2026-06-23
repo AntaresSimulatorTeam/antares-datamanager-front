@@ -280,20 +280,21 @@ export const useFetchHypothesisTrajectories = (
             ),
           );
 
-        setDropDownListOptions(
-          results.reduce<Record<TRAJECTORY_TYPE, string[]>>(
-            (acc, r) => {
-              const key = isTrajectoryHydroType(r.trajType) ? hydroTypeToSet : r.trajType;
+          setDropDownListOptions(
+            results.reduce<Record<TRAJECTORY_TYPE, string[]>>(
+              (acc, r) => {
+                const key = isTrajectoryHydroType(r.trajType) ? hydroTypeToSet : r.trajType;
 
-              const previous = acc[key] ?? [];
-              const current = r.list?.checkedValues;
+                const previous = acc[key] ?? [];
+                const current = r.list?.checkedValues;
 
-              acc[key] = [...new Set([...previous, ...current])];
-              return acc;
-            },
-            {} as Record<TRAJECTORY_TYPE, string[]>,
-          ),
-        );
+                acc[key] = [...new Set([...previous, ...current])];
+                return acc;
+              },
+              {} as Record<TRAJECTORY_TYPE, string[]>,
+            ),
+          );
+        }
       } catch (error) {
         console.error('fetchAreas error', error);
       }
