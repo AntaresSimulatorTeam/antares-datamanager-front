@@ -977,12 +977,12 @@ describe('useFetchHypothesisTrajectories', () => {
       expect(frRow?.trajectory).toBeNull();
 
       // La subrow 'Series' provient du fetch HYDRO_SERIES
-      const seriesSubRow = frRow?.subRows?.find((sr) => sr.hypothesis === 'Series');
+      const seriesSubRow = frRow?.subRows?.find((sr) => sr.hypothesis === 'hydro.@series');
       expect(seriesSubRow?.trajectory).toEqual(hydroSeriesTrajectory);
       expect(seriesSubRow?.status).toBe(TRAJECTORY_SELECTION_STATUS.OK);
 
       // La subrow 'Technical parameters' provient du fetch HYDRO_TECHNICAL_PARAMETERS
-      const techParamsSubRow = frRow?.subRows?.find((sr) => sr.hypothesis === 'Technical parameters');
+      const techParamsSubRow = frRow?.subRows?.find((sr) => sr.hypothesis === 'thermal.@parametersTechnical');
       expect(techParamsSubRow?.trajectory).toEqual(hydroTechParamsTrajectory);
       expect(techParamsSubRow?.status).toBe(TRAJECTORY_SELECTION_STATUS.OK);
     });

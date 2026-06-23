@@ -3,6 +3,7 @@ import {
   FetchResult,
   HypothesisRowData,
   isTrajectoryHydroType,
+  isTrajectoryNuclearType,
   isTrajectoryResType,
   isTrajectorySubrowsType,
   TrajectoryAreaData,
@@ -12,7 +13,6 @@ import {
   convertIntoHypothesisRowWithTechnologies,
   filterRow,
   generateReadOnlyIndexMap,
-  mergeRows,
   removeDuplicate,
   removeDuplicateByTechnology,
   retrieveReadOnlyArea,
@@ -253,7 +253,11 @@ export const fetchAndNormalizeTrajectories = async ({
     technologies = HydroSubRows;
   }
 
-  const defaultEmpty = buildDefaultEmptyTrajectoryList(trajType, result, defaultAreas);
+  let defaultEmpty: DbTrajectory[] = [];
+  if (!isTrajectoryNuclearType(trajType)) {
+    defaultEmpty = buildDefaultEmptyTrajectoryList(trajType, result, defaultAreas);
+  }
+
   const all = [...(result || []), ...emptyAreaSelected, ...(defaultEmpty || [])];
 
   const trajectories = isTrajectorySubrowsType(trajType) ? removeDuplicateByTechnology(all) : removeDuplicate(all);
@@ -283,7 +287,6 @@ export const buildHypothesisRows = ({
   isStudyGenerated,
   t,
   dsrCmResult,
-  allResults,
 }: {
   trajType: TRAJECTORY_TYPE;
   trajectories: DbTrajectory[];
@@ -292,15 +295,8 @@ export const buildHypothesisRows = ({
   technologies?: string[] | null;
   isStudyGenerated?: boolean;
   t: TFunction<'translation', undefined>;
-  dsrCmResult: DbTrajectory[];
-  allResults?: FetchResult[];
+  dsrCmResult?: DbTrajectory[] | null;
 }) => {
-  if (isTrajectoryHydroType(trajType) && allResults) {
-    const allHydroRows = allResults.filter((r) => isTrajectoryHydroType(r.trajType)).flatMap((r) => r.rows);
-    const merged = mergeRows(allHydroRows);
-    return sortWithFixedPosition(isStudyGenerated ? filterRow(merged) : merged);
-  }
-
   const defaultNotIncluded = getDefaultAreaNotIncludedInAreaList(defaultAreas ?? [], areas);
 
   let rows = convertIntoHypothesisRowWithTechnologies(
@@ -314,7 +310,7 @@ export const buildHypothesisRows = ({
   rows = sortWithFixedPosition(isStudyGenerated ? filterRow(rows) : rows);
 
   if (trajType === TRAJECTORY_TYPE.DSR) {
-    const hasCm = dsrCmResult.length > 0;
+    const hasCm = !!dsrCmResult?.length;
     rows.push({
       hypothesis: t('dsr.@capacityModulation'),
       trajectory: hasCm ? dsrCmResult[0] : null,
@@ -327,6 +323,102 @@ export const buildHypothesisRows = ({
 
   return rows;
 };
+
+export const buildRowsByType = ({
+  rowTypes,
+  subRowTypes,
+  trajectoriesByType,
+  t,
+}: {
+  rowTypes: TRAJECTORY_TYPE[];
+  subRowTypes: TRAJECTORY_TYPE[];
+  trajectoriesByType: FetchResult[];
+  t: TFunction<'translation', undefined>;
+}): HypothesisRowData[] => {
+  const parentRows: HypothesisRowData[] = rowTypes.map((type) => {
+    const trajectory =
+      trajectoriesByType?.find((trajectoryByType) => trajectoryByType.trajType === type)?.trajectories?.[0] ?? null;
+    return {
+      hypothesis: type === TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION ? t('thermal.@modulation') : t('thermal.@talon'),
+      trajectory,
+      status: trajectory ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+      isDefault: false,
+      isDeletable: false,
+      subRows: null,
+    };
+  });
+  const subRows: HypothesisRowData[] = subRowTypes.map((type) => {
+    const trajectory =
+      trajectoriesByType?.find((trajectoryByType) => trajectoryByType.trajType === type)?.trajectories?.[0] ?? null;
+    return {
+      hypothesis:
+        type === TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP
+          ? t('thermal.@epr')
+          : type === TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM
+            ? t('thermal.@long_term')
+            : t('thermal.@smr'),
+      trajectory,
+      status: trajectory ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+      isDefault: false,
+      isDeletable: false,
+      subRows: null,
+    };
+  });
+
+  parentRows.push({
+    hypothesis: t('thermal.@time_series'),
+    trajectory: null,
+    status: TRAJECTORY_SELECTION_STATUS.MISSING,
+    isDefault: false,
+    isDeletable: false,
+    subRows,
+  });
+  return parentRows;
+};
+
+const getHypothesisLabel = (type: TRAJECTORY_TYPE, t: TFunction<'translation', undefined>) => {
+  switch (type) {
+    case TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS:
+    case TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS:
+      return t('thermal.@parametersTechnical');
+    case TRAJECTORY_TYPE.HYDRO_SERIES:
+    case TRAJECTORY_TYPE.HYDRO_PSP_SERIES:
+    default:
+      return t('hydro.@series');
+  }
+};
+
+export const buildRowsByArea = ({
+  areas,
+  subRowTypes,
+  trajectoriesByType,
+  t,
+}: {
+  areas: string[];
+  subRowTypes: TRAJECTORY_TYPE[];
+  trajectoriesByType: FetchResult[];
+  t: TFunction<'translation', undefined>;
+}): HypothesisRowData[] =>
+  areas.map((area) => ({
+    hypothesis: area,
+    trajectory: null,
+    status: TRAJECTORY_SELECTION_STATUS.MISSING,
+    isDefault: false,
+    isDeletable: false,
+    subRows: subRowTypes.map((type) => {
+      const trajectory =
+        trajectoriesByType?.find((trajectoryByType) => trajectoryByType.trajType === type)?.trajectories?.[0] ?? null;
+      const hypothesisLabel = getHypothesisLabel(type, t);
+      return {
+        hypothesis: hypothesisLabel,
+        trajectory,
+        status: trajectory?.trajectoryName ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+        isDefault: false,
+        isDeletable: false,
+        subRows: null,
+      };
+    }),
+  }));
 
 export const buildReadOnlyMap = ({
   rows,

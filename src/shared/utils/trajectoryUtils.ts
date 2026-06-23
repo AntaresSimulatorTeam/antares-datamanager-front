@@ -1085,6 +1085,7 @@ export const isEmptyRow = (
   t: TFunction<'translation', undefined>,
 ) =>
   hypothesis === t('thermal.@specific') ||
+  hypothesis === t('thermal.@time_series') ||
   ((type === TRAJECTORY_TYPE.STS ||
     type === TRAJECTORY_TYPE.HYDRO_SERIES ||
     type === TRAJECTORY_TYPE.HYDRO_PSP_SERIES) &&
@@ -1106,6 +1107,11 @@ export const getItemsMenu = (
         id: TRAJECTORY_TYPE.THERMAL_PARAMETER,
         panelId: TRAJECTORY_TYPE.THERMAL_PARAMETER,
         label: t('thermal.@parameters'),
+      },
+      {
+        id: TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION,
+        panelId: TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION,
+        label: t('thermal.@nuclearFR'),
       },
     ];
   } else if (trajectoryType === TRAJECTORY_TYPE.HYDRO_SERIES) {

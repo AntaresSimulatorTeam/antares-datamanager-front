@@ -1606,7 +1606,7 @@ describe('getItemsMenu', () => {
     it('retourne 2 items : THERMAL_CAPACITY et THERMAL_PARAMETER', () => {
       const result = getItemsMenu(TRAJECTORY_TYPE.THERMAL_CAPACITY, t as TFunction<'translation', undefined>, []);
 
-      expect(result).toHaveLength(2);
+      expect(result).toHaveLength(3);
       expect(result[0]).toEqual({
         id: TRAJECTORY_TYPE.THERMAL_CAPACITY,
         label: 'translated:misc.@installedPower',
@@ -1616,6 +1616,11 @@ describe('getItemsMenu', () => {
         id: TRAJECTORY_TYPE.THERMAL_PARAMETER,
         label: 'translated:thermal.@parameters',
         panelId: TRAJECTORY_TYPE.THERMAL_PARAMETER,
+      });
+      expect(result[2]).toEqual({
+        id: TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION,
+        label: 'translated:thermal.@nuclearFR',
+        panelId: TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION,
       });
     });
   });
