@@ -64,7 +64,7 @@ const ProjectContent = () => {
 
   return (
     <div className="m-0 flex w-full flex-1 flex-col gap-3">
-      <div className="flex w-1/3 items-center gap-4">
+      <div className="flex w-2/5 items-center gap-4">
         <div className="flex w-3/4">
           <Searchbar
             onSearch={(value?: string) => setSearchTerm(value)}
