@@ -108,6 +108,10 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
       },
     ]);
     dispatch?.({ type: STUDY_ACTION.SET_STUDY_HVDC, payload: false });
+    dispatch?.({
+      type: STUDY_ACTION.CLEAR_TRAJECTORY_BY_TYPE,
+      payload: [TRAJECTORY_TYPE.AREA],
+    });
 
     setReadOnly({ '0': false, '1': true });
     setIsDeletionModalOpen(false);
