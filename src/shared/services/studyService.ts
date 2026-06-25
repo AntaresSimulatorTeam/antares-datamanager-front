@@ -149,13 +149,16 @@ export const duplicateStudy = async (
     });
   } catch (error: unknown) {
     const errorMessage = (error as BackendError).antaresErrorMessage;
-    notifyAlert({
-      icon: 'close',
-      message: errorMessage,
-      type: 'error',
-      filledIcon: true,
-    });
-    throw new Error(errorMessage);
+    if (errorMessage?.includes('study')) {
+      throw new Error(errorMessage);
+    } else {
+      notifyAlert({
+        icon: 'close',
+        message: errorMessage,
+        type: 'error',
+        filledIcon: true,
+      });
+    }
   }
 };
 

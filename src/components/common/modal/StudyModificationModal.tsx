@@ -16,7 +16,7 @@ import { notifyAlert, notifyToast } from '@/shared/notification/notification';
 import { validateMaxLength } from '@/shared/utils/validateMaxTextLength';
 import { MAX_STUDY_NAME_LENGTH } from '@/shared/const/studyConfig';
 import { hasArrayChanged } from '@/shared/utils/arrayUtils.ts';
-import { Button, Select, TextInput } from '@design-system-rte/react';
+import { Button, Loader, Select, TextInput } from '@design-system-rte/react';
 import { FieldInFormation } from '@common/base/FieldInFormation.tsx';
 import { convertToOneYearHorizon } from '@/shared/utils/textUtils.ts';
 import { fetchProjectsFromPartialName } from '@/shared/services/projectService.ts';
@@ -48,9 +48,10 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
   const [keywords, setKeywords] = useState<string[]>(study?.keywords || []);
   const [horizon, setHorizon] = useState<string>(() => convertToOneYearHorizon(study.horizon));
   const [isFormValid, setIsFormValid] = useState(false);
-  const [isHorizonValid, setIsHorizonValid] = useState(false);
+  const [isHorizonValid, setIsHorizonValid] = useState(true);
   const [studyErrorMessage, setStudyErrorMessage] = useState<string>('');
   const [horizonErrorMessage, setHorizonErrorMessage] = useState<string>('');
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const resetErrorMessage = () => {
     setStudyErrorMessage('');
@@ -70,6 +71,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
     };
 
     try {
+      setIsProcessing(true);
       isDuplicateMode ? await duplicateStudy(studyData) : await updateStudy(studyData, study.id);
       setReloadStudies?.((prev) => prev + 1);
       notifyToast({
@@ -85,6 +87,8 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
       } else if (errorMessages?.includes('horizon')) {
         setHorizonErrorMessage(errorMessages);
       }
+    } finally {
+      setIsProcessing(false);
     }
   }, [
     horizon,
@@ -124,12 +128,11 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
 
   useEffect(() => {
     const validateForm = () => {
-      const studyNameChanged = studyName.trim() !== baseStudyName.trim();
+      const studyNameChanged = studyName.length > 0 && studyName.trim() !== baseStudyName.trim();
       const projectNameChanged = study.project.trim() !== project?.label.trim();
       const keywordsChanged = hasArrayChanged(study.keywords, keywords);
-
       isDuplicateMode
-        ? setIsFormValid(isHorizonValid || !!project?.value || studyNameChanged)
+        ? setIsFormValid(isHorizonValid && !!project?.value && studyNameChanged)
         : setIsFormValid(studyNameChanged || projectNameChanged || keywordsChanged);
     };
     validateForm();
@@ -161,6 +164,10 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
                 maxLength={75}
                 error={!!studyErrorMessage}
                 assistiveTextLabel={studyErrorMessage}
+                rightIconAction="clean"
+                onRightIconClick={() => {
+                  setStudyName('');
+                }}
               />
             </div>
             <div className="column flex w-1/2">
@@ -202,13 +209,23 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
       </RdsModal.Content>
       <RdsModal.Footer>
         <Button label={t('components.quickAccess.@cancel')} onClick={onClose} variant="text" />
-        <Button
-          icon={isDuplicateMode ? 'copy' : 'edit'}
-          label={isDuplicateMode ? t('study.@duplicate') : t('modal.@button_update')}
-          onClick={() => void updateStudyHandler()}
-          variant="primary"
-          disabled={!isFormValid}
-        />
+        {isProcessing ? (
+          <Loader
+            appearance="brand"
+            label={isDuplicateMode ? t('study.@duplicate') : t('modal.@button_update')}
+            labelPosition="right"
+            showLabel
+            size="medium"
+          />
+        ) : (
+          <Button
+            icon={isDuplicateMode ? 'copy' : 'edit'}
+            label={isDuplicateMode ? t('study.@duplicate') : t('modal.@button_update')}
+            onClick={() => void updateStudyHandler()}
+            variant="primary"
+            disabled={!isFormValid}
+          />
+        )}
       </RdsModal.Footer>
     </RdsModal>
   );
