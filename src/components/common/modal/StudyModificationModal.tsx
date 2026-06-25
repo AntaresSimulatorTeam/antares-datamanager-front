@@ -86,7 +86,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
       if (errorMessage?.includes('A study with the same name already exists for the given project.')) {
         setStudyErrorMessage(errorMessage);
         setIsFormValid(false);
-      } else if (errorMessage?.includes('horizon')) {
+      } else if (errorMessage?.includes('Horizon must be')) {
         setHorizonErrorMessage(errorMessage);
       } else {
         notifyAlert({
@@ -138,8 +138,9 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
       const studyNameChanged = studyName.length > 0 && studyName.trim() !== baseStudyName.trim();
       const projectNameChanged = study.project.trim() !== project?.label.trim();
       const keywordsChanged = hasArrayChanged(study.keywords, keywords);
+      const horizonChanged = isHorizonValid && convertToOneYearHorizon(study.horizon) !== horizon;
       if (isDuplicateMode) {
-        setIsFormValid(isHorizonValid && !!project?.value && studyNameChanged);
+        setIsFormValid((horizonChanged && !!project?.value) || (studyNameChanged && !!project?.value));
       } else {
         setIsFormValid(studyNameChanged || projectNameChanged || keywordsChanged);
       }
@@ -174,9 +175,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
                 error={!!studyErrorMessage}
                 assistiveTextLabel={studyErrorMessage}
                 rightIconAction="clean"
-                onRightIconClick={() => {
-                  setStudyName('');
-                }}
+                onRightIconClick={() => setStudyName('')}
               />
             </div>
             <div className="column flex w-1/2">
