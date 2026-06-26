@@ -38,6 +38,7 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
   const [isDuplicateMode, setIsDuplicateMode] = useState(false);
 
   const { isModalOpen, toggleModal } = useNewStudyModal();
+  const [isModalStudyCreation, setIsModalStudyCreation] = useState(false);
   const { navigateToStudy } = useStudyNavigation();
   const { rows, count, intervalSize, currentPage, setPage } = useStudyTableDisplay({
     searchTerm: searchStudy,
@@ -88,7 +89,11 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
   const handleModalClose = () => {
     setSelectedStudy(null);
     setRowSelection({});
-    toggleModal();
+    if (isModalOpen) {
+      toggleModal();
+    } else {
+      setIsModalStudyCreation(false);
+    }
     setIsDuplicateMode(false);
   };
 
@@ -134,12 +139,14 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
               />
             </>
           ) : (
-            projectInfo?.id && <Button label={t('studyModal.@new_study')} onClick={toggleModal} />
+            projectInfo?.id && (
+              <Button label={t('studyModal.@new_study')} onClick={() => setIsModalStudyCreation(true)} />
+            )
           )}
         </div>
         <StudiesPagination count={count} intervalSize={intervalSize} current={currentPage} onChange={setPage} />
       </div>
-      {isModalOpen && projectInfo?.name && (
+      {isModalStudyCreation && projectInfo?.name && (
         <StudyCreationModal
           isOpen={isModalOpen}
           onClose={handleModalClose}
