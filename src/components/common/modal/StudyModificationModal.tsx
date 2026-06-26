@@ -173,7 +173,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
                   onChange={handleStudyNameChange}
                   required
                   maxLength={75}
-                  error
+                  error={!!studyErrorMessage}
                   assistiveTextLabel={studyErrorMessage}
                   assistiveAppearance={studyErrorMessage ? 'error' : 'description'}
                   rightIconAction="clean"
