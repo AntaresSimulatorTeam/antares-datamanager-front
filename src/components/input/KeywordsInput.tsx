@@ -112,7 +112,7 @@ const KeywordsInput = ({
   };
 
   return (
-    <div className={clsx(width ?? 'w-full', 'flex min-h-22 flex-col items-start justify-start gap-4')}>
+    <div className={clsx(width ?? 'w-full', 'flex min-h-24 flex-col items-start justify-start gap-4')}>
       <div className="inline-flex items-end gap-1">
         <div className="relative flex w-full flex-col items-start gap-2">
           <TextInput

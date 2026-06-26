@@ -161,11 +161,11 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
         {isDuplicateMode ? t('home.@duplicate_study') : t('studyModal.@update_study')}
       </RdsModal.Title>
       <RdsModal.Content>
-        <div className="flex flex-col items-start justify-start gap-2">
+        <div className="flex w-full flex-col items-start justify-start space-y-2">
           <FieldInFormation />
-          <div className="flex flex-col items-start justify-start gap-6">
-            <div className="flex w-full items-start justify-start gap-4">
-              <div className="flex w-1/2 items-start justify-start">
+          <div className="flex w-full flex-col items-start justify-start space-y-4">
+            <div className="flex w-full items-start justify-start space-x-4">
+              <div className="w-1/2">
                 <TextInput
                   id="text-input-study-modify-name"
                   value={studyName}
