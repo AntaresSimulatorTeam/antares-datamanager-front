@@ -49,9 +49,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
   const [horizon, setHorizon] = useState<string>(() => convertToOneYearHorizon(study.horizon));
   const [isFormValid, setIsFormValid] = useState(false);
   const [isHorizonValid, setIsHorizonValid] = useState(true);
-  const [studyErrorMessage, setStudyErrorMessage] = useState<string>(
-    'A study with the same name already exists for the given project.',
-  );
+  const [studyErrorMessage, setStudyErrorMessage] = useState<string>('');
   const [horizonErrorMessage, setHorizonErrorMessage] = useState<string>('');
 
   const resetErrorMessage = () => {
