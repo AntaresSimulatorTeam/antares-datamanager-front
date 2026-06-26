@@ -49,7 +49,9 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
   const [horizon, setHorizon] = useState<string>(() => convertToOneYearHorizon(study.horizon));
   const [isFormValid, setIsFormValid] = useState(false);
   const [isHorizonValid, setIsHorizonValid] = useState(true);
-  const [studyErrorMessage, setStudyErrorMessage] = useState<string>('');
+  const [studyErrorMessage, setStudyErrorMessage] = useState<string>(
+    'A study with the same name already exists for the given project.',
+  );
   const [horizonErrorMessage, setHorizonErrorMessage] = useState<string>('');
 
   const resetErrorMessage = () => {
@@ -140,7 +142,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
       const keywordsChanged = hasArrayChanged(study.keywords, keywords);
       const horizonChanged = isHorizonValid && convertToOneYearHorizon(study.horizon) !== horizon;
       if (isDuplicateMode) {
-        setIsFormValid((horizonChanged && !!project?.value) || (studyNameChanged && !!project?.value));
+        setIsFormValid(horizonChanged || studyNameChanged);
       } else {
         setIsFormValid(studyNameChanged || projectNameChanged || keywordsChanged);
       }
@@ -161,58 +163,61 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
         {isDuplicateMode ? t('home.@duplicate_study') : t('studyModal.@update_study')}
       </RdsModal.Title>
       <RdsModal.Content>
-        <div className="flex flex-col items-start gap-4">
+        <div className="flex flex-col items-start justify-start gap-2">
           <FieldInFormation />
-          <div className="flex w-full items-center justify-start gap-4">
-            <div className="flex w-1/2">
-              <TextInput
-                id="text-input-study-modify-name"
-                value={studyName}
-                label={t('modal.@input_name')}
-                onChange={handleStudyNameChange}
+          <div className="flex flex-col items-start justify-start gap-6">
+            <div className="flex w-full items-start justify-start gap-4">
+              <div className="flex w-1/2 items-start justify-start">
+                <TextInput
+                  id="text-input-study-modify-name"
+                  value={studyName}
+                  label={t('modal.@input_name')}
+                  onChange={handleStudyNameChange}
+                  required
+                  maxLength={75}
+                  error
+                  assistiveTextLabel={studyErrorMessage}
+                  assistiveAppearance={studyErrorMessage ? 'error' : 'description'}
+                  rightIconAction="clean"
+                  onRightIconClick={() => setStudyName('')}
+                />
+              </div>
+              <div className="w-1/2">
+                <Select
+                  id="project-select"
+                  value={project?.value ?? ''}
+                  onChange={(value: string) => {
+                    const selectedProject = projects.find((projectOption) => projectOption.value === value);
+                    if (selectedProject) {
+                      setProject(selectedProject);
+                    }
+                  }}
+                  label={t('page.@project')}
+                  options={projects}
+                  multiple={false}
+                  required={true}
+                  width={280}
+                />
+              </div>
+            </div>
+            <div className="w-1/2">
+              <HorizonInput
+                horizon={horizon}
+                onChange={setHorizon}
+                onValidChange={setIsHorizonValid}
                 required
-                maxLength={75}
-                error={!!studyErrorMessage}
-                assistiveTextLabel={studyErrorMessage}
-                rightIconAction="clean"
-                onRightIconClick={() => setStudyName('')}
+                disabled={!isDuplicateMode}
+                customErrorMessage={isDuplicateMode && horizonErrorMessage ? horizonErrorMessage : ''}
               />
             </div>
-            <div className="column flex w-1/2">
-              <Select
-                id="project-select"
-                value={project?.value ?? ''}
-                onChange={(value: string) => {
-                  const selectedProject = projects.find((projectOption) => projectOption.value === value);
-                  if (selectedProject) {
-                    setProject(selectedProject);
-                  }
-                }}
-                label={t('page.@project')}
-                options={projects}
-                multiple={false}
-                required={true}
-                width={280}
-              />
-            </div>
-          </div>
-          <div className="flex w-1/2">
-            <HorizonInput
-              horizon={horizon}
-              onChange={setHorizon}
-              onValidChange={setIsHorizonValid}
-              required
-              disabled={!isDuplicateMode}
-              customErrorMessage={isDuplicateMode && horizonErrorMessage ? horizonErrorMessage : ''}
+            <KeywordsInput
+              keywords={keywords}
+              setKeywords={setKeywords}
+              maxNbKeywords={6}
+              maxNbCharacters={15}
+              minNbCharacters={1}
             />
           </div>
-          <KeywordsInput
-            keywords={keywords}
-            setKeywords={setKeywords}
-            maxNbKeywords={6}
-            maxNbCharacters={15}
-            minNbCharacters={1}
-          />
         </div>
       </RdsModal.Content>
       <RdsModal.Footer>
