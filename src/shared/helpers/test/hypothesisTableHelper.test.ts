@@ -12,7 +12,9 @@ import {
   fetchAndNormalizeTrajectories,
   findSpecificTrajectoryToDelete,
   getCheckedValues,
+  getHypothesisLabel,
   getInformationMessage,
+  getNuclearHypothesisLabel,
   getParamForFetchFSTrajectory,
   getReadOnlyForGeneratedStudy,
   getSpecificTrajectories,
@@ -1600,5 +1602,79 @@ describe('getParamForFetchFSTrajectory', () => {
     });
     expect(typeToUse).toEqual(TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS);
     expect(areaToUse).toEqual('');
+  });
+});
+
+describe('getNuclearHypothesisLabel', () => {
+  const mockT = vi.fn((key: string) => {
+    if (key === 'thermal.@epr') return 'EPR';
+    if (key === 'thermal.@long_term') return 'Long Term';
+    if (key === 'thermal.@smr') return 'SMR';
+    return key;
+  }) as unknown as TFunction<'translation', undefined>;
+
+  it('should return thermal.@epr for NUCLEAR_FR_TS_ERP', () => {
+    const result = getNuclearHypothesisLabel(TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP, mockT);
+
+    expect(mockT).toHaveBeenCalledWith('thermal.@epr');
+    expect(result).toBe('EPR');
+  });
+
+  it('should return thermal.@long_term for NUCLEAR_FR_TS_LONG_TERM', () => {
+    const result = getNuclearHypothesisLabel(TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM, mockT);
+
+    expect(mockT).toHaveBeenCalledWith('thermal.@long_term');
+    expect(result).toBe('Long Term');
+  });
+
+  it('should return thermal.@smr for any other type', () => {
+    const result = getNuclearHypothesisLabel('UNKNOWN_TYPE' as unknown as TRAJECTORY_TYPE, mockT);
+
+    expect(mockT).toHaveBeenCalledWith('thermal.@smr');
+    expect(result).toBe('SMR');
+  });
+});
+
+describe('getHypothesisLabel', () => {
+  const mockT = vi.fn((key: string) => {
+    if (key === 'thermal.@parametersTechnical') return 'Technical Parameters';
+    if (key === 'hydro.@series') return 'Series';
+    if (key === 'thermal.@smr') return 'SMR';
+    return key;
+  }) as unknown as TFunction<'translation', undefined>;
+
+  it('should return thermal.@parametersTechnical for HYDRO_TECHNICAL_PARAMETERS', () => {
+    const result = getHypothesisLabel(TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS, mockT);
+
+    expect(mockT).toHaveBeenCalledWith('thermal.@parametersTechnical');
+    expect(result).toBe('Technical Parameters');
+  });
+
+  it('should return thermal.@parametersTechnical for HYDRO_PSP_TECHNICAL_PARAMETERS', () => {
+    const result = getHypothesisLabel(TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS, mockT);
+
+    expect(mockT).toHaveBeenCalledWith('thermal.@parametersTechnical');
+    expect(result).toBe('Technical Parameters');
+  });
+
+  it('should return hydro.@series for HYDRO_SERIES', () => {
+    const result = getHypothesisLabel(TRAJECTORY_TYPE.HYDRO_SERIES, mockT);
+
+    expect(mockT).toHaveBeenCalledWith('hydro.@series');
+    expect(result).toBe('Series');
+  });
+
+  it('should return hydro.@series for HYDRO_PSP_SERIES', () => {
+    const result = getHypothesisLabel(TRAJECTORY_TYPE.HYDRO_PSP_SERIES, mockT);
+
+    expect(mockT).toHaveBeenCalledWith('hydro.@series');
+    expect(result).toBe('Series');
+  });
+
+  it('should return hydro.@series for any other type (default)', () => {
+    const result = getHypothesisLabel('UNKNOWN_TYPE' as unknown as TRAJECTORY_TYPE, mockT);
+
+    expect(mockT).toHaveBeenCalledWith('hydro.@series');
+    expect(result).toBe('Series');
   });
 });

@@ -326,7 +326,7 @@ export const buildHypothesisRows = ({
   return rows;
 };
 
-const getNuclearHypothesisLabel = (type: TRAJECTORY_TYPE, t: TFunction<'translation', undefined>) => {
+export const getNuclearHypothesisLabel = (type: TRAJECTORY_TYPE, t: TFunction<'translation', undefined>) => {
   switch (type) {
     case TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP:
       return t('thermal.@epr');
@@ -384,7 +384,7 @@ export const buildRowsByType = ({
   return parentRows;
 };
 
-const getHypothesisLabel = (type: TRAJECTORY_TYPE, t: TFunction<'translation', undefined>) => {
+export const getHypothesisLabel = (type: TRAJECTORY_TYPE, t: TFunction<'translation', undefined>) => {
   switch (type) {
     case TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS:
     case TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS:

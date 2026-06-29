@@ -14,6 +14,7 @@ import {
   getDeletionModalMessage,
   getHypothesis,
   getItemsMenu,
+  getModalTile,
   getPathFromTrajectoryType,
   getRowDataSelected,
   getStatus,
@@ -51,6 +52,7 @@ import { ThermalOptions } from '@/mocks/data/list/names.ts';
 import { TFunction } from 'i18next';
 import * as textUtils from '@/shared/utils/textUtils.ts';
 import { TabItemProps } from '@design-system-rte/core/components/tab/tab.interface';
+import { HypothesisType } from '@/shared/types/HypothesisTable.ts';
 
 describe('getStatus', () => {
   it("should return an ERROR selection status for 'error' status", () => {
@@ -686,6 +688,26 @@ describe('getPathFromTrajectoryType', () => {
     expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS)).toBe(
       '\\\\PSP_virtual\\technical_parameters',
     );
+  });
+
+  it('should return technical path for NUCLEAR_FR_MODULATION type', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION)).toBe('\\\\specific_nuclear\\Modulation');
+  });
+
+  it('should return technical path for NUCLEAR_FR_TALON type', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.NUCLEAR_FR_TALON)).toBe('\\\\specific_nuclear\\Talon_nuc');
+  });
+
+  it('should return technical path for NUCLEAR_FR_TS_ERP type', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP)).toBe('\\\\specific_nuclear\\TS_dispo\\EPR\\');
+  });
+
+  it('should return technical path for NUCLEAR_FR_TS_LONG_TERM type', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM)).toBe('\\\\specific_nuclear\\TS_dispo');
+  });
+
+  it('should return technical path for NUCLEAR_FR_TS_SMR type', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR)).toBe('\\\\specific_nuclear\\TS_dispo\\SMR\\');
   });
 
   it('should return technical path for unknown type', () => {
@@ -1650,5 +1672,48 @@ describe('getItemsMenu', () => {
         panelId: TRAJECTORY_TYPE.MISC_LOAD,
       });
     });
+  });
+});
+
+describe('getModalTile', () => {
+  it('should use sentenceCase(technology) when tabType is a RES type', () => {
+    const hypothesis = { area: 'Europe', technology: 'solar' };
+    const result = getModalTile(TRAJECTORY_TYPE.RES_CAPACITY, hypothesis);
+    expect(result).contain('Europe - Solar');
+  });
+
+  it('should use raw technology when tabType is not a RES type', () => {
+    const hypothesis = { area: 'Europe', technology: 'wind' };
+
+    const result = getModalTile(TRAJECTORY_TYPE.HYDRO_SERIES, hypothesis);
+    expect(result).contain('Europe - wind');
+  });
+
+  it('should replace OTHER_AREAS with OTHER_AREAS_LABEL', () => {
+    const hypothesis = { area: OTHER_AREAS, technology: 'hydro' };
+    const result = getModalTile(TRAJECTORY_TYPE.HYDRO_SERIES, hypothesis);
+
+    expect(result).toBe(`${OTHER_AREAS_LABEL} - hydro`);
+  });
+
+  it('should fallback to tabType when area is undefined', () => {
+    const hypothesis = { technology: 'wind' };
+    const result = getModalTile(TRAJECTORY_TYPE.HYDRO_SERIES, hypothesis as HypothesisType);
+
+    expect(result).toBe(`${TRAJECTORY_TYPE.HYDRO_SERIES} - wind`);
+  });
+
+  it('should return only area when technology is undefined', () => {
+    const hypothesis = { area: 'Europe' };
+
+    const result = getModalTile(TRAJECTORY_TYPE.HYDRO_SERIES, hypothesis);
+
+    expect(result).toBe('Europe');
+  });
+
+  it('should return only tabType when hypothesis is undefined', () => {
+    const result = getModalTile(TRAJECTORY_TYPE.HYDRO_SERIES);
+
+    expect(result).toBe(TRAJECTORY_TYPE.HYDRO_SERIES);
   });
 });

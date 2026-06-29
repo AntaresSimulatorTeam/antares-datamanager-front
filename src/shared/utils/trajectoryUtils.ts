@@ -922,7 +922,7 @@ export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE, hypothesis?: Hy
     case TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP:
       return '\\\\specific_nuclear\\TS_dispo\\EPR\\';
     case TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM:
-      return '\\\\specific_nuclear\\TS_dispo\\';
+      return '\\\\specific_nuclear\\TS_dispo';
     case TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR:
       return '\\\\specific_nuclear\\TS_dispo\\SMR\\';
     default:
@@ -1169,5 +1169,5 @@ export const getModalTile = (tabType: TRAJECTORY_TYPE, hypothesis?: HypothesisTy
       ? sentenceCase(hypothesis.technology)
       : hypothesis?.technology;
   const area = hypothesis?.area === OTHER_AREAS ? OTHER_AREAS_LABEL : hypothesis?.area;
-  return `${area ?? tabType} ${technology ? ' - ' : ''} ${technology ?? ''}`;
+  return `${area ?? tabType}${technology ? ' - ' : ''}${technology ?? ''}`;
 };

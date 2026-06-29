@@ -946,6 +946,111 @@ describe('uploadTrajectory', () => {
       );
     });
   });
+
+  it('should import NUCLEAR FR Modulation trajectory without technology into data base', async () => {
+    await uploadTrajectory(
+      '2030-2031',
+      87,
+      TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION,
+      'repartition_techno_PEMMEDB25',
+      'AT',
+      onProgress,
+      false,
+    );
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/trajectory/nuclear-modulation?area=FR&trajectoryToUse=repartition_techno_PEMMEDB25&horizon=2030-2031&studyId=87&isCivilYear=false',
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
+
+  it('should import NUCLEAR FR Talon trajectory without technology into data base', async () => {
+    await uploadTrajectory(
+      '2030-2031',
+      87,
+      TRAJECTORY_TYPE.NUCLEAR_FR_TALON,
+      'repartition_techno_PEMMEDB25',
+      'AT',
+      onProgress,
+      false,
+    );
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/trajectory/nuclear-talon?area=&trajectoryToUse=repartition_techno_PEMMEDB25&horizon=2030-2031&studyId=87&isCivilYear=false',
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
+
+  it('should import NUCLEAR_FR_TS_ERP trajectory without technology into data base', async () => {
+    await uploadTrajectory(
+      '2030-2031',
+      87,
+      TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP,
+      'repartition_techno_PEMMEDB25',
+      'AT',
+      onProgress,
+      false,
+    );
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/trajectory/nuclear-ts-erp?area=&trajectoryToUse=repartition_techno_PEMMEDB25&horizon=2030-2031&studyId=87&isCivilYear=false',
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
+
+  it('should import NUCLEAR_FR_TS_LONG_TERM trajectory without technology into data base', async () => {
+    await uploadTrajectory(
+      '2030-2031',
+      87,
+      TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM,
+      'repartition_techno_PEMMEDB25',
+      'AT',
+      onProgress,
+      false,
+    );
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/trajectory/nuclear-lt?area=FR&trajectoryToUse=repartition_techno_PEMMEDB25&horizon=2030-2031&studyId=87&isCivilYear=false',
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
+
+  it('should import NUCLEAR_FR_TS_SMR trajectory without technology into data base', async () => {
+    await uploadTrajectory(
+      '2030-2031',
+      87,
+      TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR,
+      'repartition_techno_PEMMEDB25',
+      'AT',
+      onProgress,
+      false,
+    );
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/trajectory/nuclear-ts-smr?area=&trajectoryToUse=repartition_techno_PEMMEDB25&horizon=2030-2031&studyId=87&isCivilYear=false',
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
 });
 
 describe('isParamModulationRequired', () => {
