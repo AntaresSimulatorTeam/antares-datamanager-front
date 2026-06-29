@@ -88,7 +88,7 @@ export const fetchSuggestedKeywords = async (partialName: string): Promise<strin
  * @throws {BackendError} Throws an error if the update fails on the server-side.
  */
 export const saveStudy = async (
-  studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate' | 'projectId' | 'generationDate'> & {
+  studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate' | 'projectId' | 'generationDate' | 'hvdc'> & {
     id: number | undefined;
   },
 ): Promise<void> => {
@@ -114,7 +114,7 @@ export const saveStudy = async (
  * @returns {Promise<void>} A promise that resolves when the update operation is completed.
  * @throws {BackendError} Throws an error if the update fails on the server-side.
  */
-export const updateStudy = async (studyData: StudyDTO, studyId: number): Promise<void> => {
+export const updateStudy = async (studyData: Partial<StudyDTO>, studyId: number): Promise<void> => {
   try {
     await AuthService.authFetch(`${STUDY_ENDPOINT}/${studyId}`, {
       method: 'PUT',
@@ -137,7 +137,7 @@ export const updateStudy = async (studyData: StudyDTO, studyId: number): Promise
  * @throws {BackendError} Throws an error if the update fails on the server-side.
  */
 export const duplicateStudy = async (
-  studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate' | 'projectId' | 'generationDate'>,
+  studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate' | 'projectId' | 'generationDate' | 'hvdc'>,
 ): Promise<void> => {
   try {
     await AuthService.authFetch(`${STUDY_ENDPOINT}/duplicate`, {

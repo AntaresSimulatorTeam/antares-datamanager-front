@@ -34,9 +34,13 @@ const HomePageContent = () => {
   return (
     <div className="flex w-full flex-1 flex-col justify-start gap-4">
       <StdHeading title={t('home.@study_table_title')} />
-      <div className="flex items-center gap-4">
-        <Searchbar onChange={searchStudy} onSearch={searchStudy} label={t('home.@search_placeholder_study')} />
-        <Chip id="chip-home-page" label={t('home.@my_studies')} onClick={handleChipClick} selected={activeChip} />
+      <div className="flex w-2/5 items-center gap-4">
+        <div className="flex w-3/4">
+          <Searchbar onChange={searchStudy} onSearch={searchStudy} label={t('home.@search_placeholder_study')} />
+        </div>
+        <div className="flex w-1/4">
+          <Chip id="chip-home-page" label={t('home.@my_studies')} onClick={handleChipClick} selected={activeChip} />
+        </div>
       </div>
       <StudyTableDisplay searchStudy={searchTerm} />
     </div>

@@ -3,6 +3,7 @@ import {
   clearByType,
   deleteTrajectory,
   studyReducer,
+  updateHvdcOption,
   updateTrajectory,
 } from '@/store/reducers/studyReducer';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory';
@@ -530,12 +531,35 @@ describe('updateTrajectory', () => {
   });
 });
 
+describe('updateHvdcOption', () => {
+  it('should return prevState proper hvdc value', () => {
+    const prevState = {
+      hvdc: false,
+    };
+
+    const result = updateHvdcOption(prevState, true);
+
+    expect(result.hvdc).toEqual(true);
+  });
+
+  it('should return prevState proper hvdc value', () => {
+    const prevState = {
+      hvdc: true,
+    };
+
+    const result = updateHvdcOption(prevState, false);
+
+    expect(result.hvdc).toEqual(false);
+  });
+});
+
 // Mock handlers to isolate reducer logic
 vi.mock('./studyReducer.tsx', () => ({
   clearByType: vi.fn(() => ({ cleared: true })),
   addTrajectories: vi.fn(() => ({ added: true })),
   deleteTrajectory: vi.fn(() => ({ deleted: true })),
   updateTrajectory: vi.fn(() => ({ updated: true })),
+  updateHvdcOption: vi.fn(() => ({ hvdcOptionUpdated: true })),
 }));
 
 describe('studyReducer', () => {
@@ -629,6 +653,17 @@ describe('studyReducer', () => {
     const result = studyReducer(mockPrevStateArea(), action);
 
     expect(result?.[TRAJECTORY_TYPE.AREA]).toBeUndefined();
+  });
+
+  it('should handles SET_STUDY_HVDC action', () => {
+    const action: StudyActionType = {
+      type: STUDY_ACTION.SET_STUDY_HVDC,
+      payload: true,
+    };
+
+    const result = studyReducer(mockPrevStateArea(), action);
+
+    expect(result?.hvdc).toBeTruthy();
   });
 
   it('should return previous state when action is undefined', () => {

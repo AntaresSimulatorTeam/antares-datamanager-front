@@ -66,13 +66,22 @@ const ProjectDetails = () => {
       <PegaseBreadcrumb items={headerItems}></PegaseBreadcrumb>
       <Divider />
       <DetailsContent content={projectDetails} onClickButton={toggleModal} tagsList={projectDetails.tags} />
-      <div className="flex items-center gap-4">
-        <Searchbar
-          onSearch={(value?: string) => setSearchTerm(value)}
-          onChange={(value?: string) => setSearchTerm(value)}
-          label={t('home.@search_placeholder_study')}
-        />
-        <Chip id="chip-project-details" label={t('home.@my_studies')} onClick={handleChipClick} selected={activeChip} />
+      <div className="flex w-2/5 items-center gap-4">
+        <div className="flex w-3/4">
+          <Searchbar
+            onSearch={(value?: string) => setSearchTerm(value)}
+            onChange={(value?: string) => setSearchTerm(value)}
+            label={t('home.@search_placeholder_study')}
+          />
+        </div>
+        <div className="flex w-1/4">
+          <Chip
+            id="chip-project-details"
+            label={t('home.@my_studies')}
+            onClick={handleChipClick}
+            selected={activeChip}
+          />
+        </div>
       </div>
       <StudyTableDisplay searchStudy={searchTerm} projectInfo={projectDetails} />
       {isModalOpen && <ProjectCreationModal onClose={onCloseModal} projectInfo={projectDetails} />}

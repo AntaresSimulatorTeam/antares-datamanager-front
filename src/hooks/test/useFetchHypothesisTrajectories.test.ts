@@ -991,105 +991,169 @@ describe('useFetchHypothesisTrajectories', () => {
     expect(result.current.hypothesisTrajectories?.[TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS]).toBeUndefined();
   });
 
-  describe('effect re-triggering (trajectoryTypesKey + studyContextStatus)', () => {
-    it('should not re-fetch when trajectoryTypes has a new reference but same content', async () => {
-      mockUseStudy.mockReturnValue({} as StudyState);
-      vi.mocked(studyService.getStudyTrajectories).mockResolvedValue([]);
+  it('should build merged rows for HYDRO_PSP_SERIES combining trajectories from both hydro sub-types', async () => {
+    const areas = [{ areaName: 'FR' }] as TrajectoryAreaData[];
 
-      const { rerender } = renderHook(
-        ({ types }: { types: TRAJECTORY_TYPE[] }) =>
-          useFetchHypothesisTrajectories([], types, [], 5, StudyStatus.IN_PROGRESS),
-        { initialProps: { types: [TRAJECTORY_TYPE.LOAD] } },
-      );
+    const hydroPSPSeriesTrajectory: DbTrajectory = {
+      id: 10,
+      trajectoryName: 'hydro_series_FR',
+      type: TRAJECTORY_TYPE.HYDRO_PSP_SERIES,
+      area: 'FR',
+      technology: '',
+      version: 1,
+      userName: 'test',
+      creationDate: '2024-01-01' as unknown as Date,
+      hasTimeSeries: false,
+    };
 
-      await waitFor(() => expect(studyService.getStudyTrajectories).toHaveBeenCalledTimes(1));
+    const hydroPSPTechParamsTrajectory: DbTrajectory = {
+      id: 11,
+      trajectoryName: 'hydro_tech_params_FR',
+      type: TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS,
+      area: 'FR',
+      technology: '',
+      version: 1,
+      userName: 'test',
+      creationDate: '2024-01-01' as unknown as Date,
+      hasTimeSeries: false,
+    };
 
-      rerender({ types: [TRAJECTORY_TYPE.LOAD] }); // nouvelle référence, même contenu
+    mockUseStudy.mockReturnValue({
+      [TRAJECTORY_TYPE.HYDRO_PSP_SERIES]: { trajectories: [], warningMessages: [] },
+      [TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS]: { trajectories: [], warningMessages: [] },
+    } as Partial<StudyState>);
 
-      await waitFor(() => expect(studyService.getStudyTrajectories).toHaveBeenCalledTimes(1));
+    vi.mocked(studyService.getStudyTrajectories).mockImplementation((_, type) => {
+      if (type === TRAJECTORY_TYPE.HYDRO_PSP_SERIES) return Promise.resolve([hydroPSPSeriesTrajectory]);
+      if (type === TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS)
+        return Promise.resolve([hydroPSPTechParamsTrajectory]);
+      return Promise.resolve([]);
     });
 
-    it('should re-fetch when trajectoryTypes content changes', async () => {
-      // DSR utilise fetchTrajectoriesFromTypes (pas getStudyTrajectories) — on utilise MISC_LOAD
-      // qui emprunte le même chemin que LOAD et appelle bien getStudyTrajectories
-      mockUseStudy.mockReturnValue({} as StudyState);
-      vi.mocked(studyService.getStudyTrajectories).mockResolvedValue([]);
+    vi.mocked(trajectoryUtils.buildDefaultEmptyTrajectoryList).mockReturnValue([]);
 
-      const { rerender } = renderHook(
-        ({ types }: { types: TRAJECTORY_TYPE[] }) =>
-          useFetchHypothesisTrajectories([], types, [], 5, StudyStatus.IN_PROGRESS),
-        { initialProps: { types: [TRAJECTORY_TYPE.LOAD] } },
-      );
+    const { result } = renderHook(() =>
+      useFetchHypothesisTrajectories(
+        areas,
+        [TRAJECTORY_TYPE.HYDRO_PSP_SERIES, TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS],
+        [],
+        5,
+        StudyStatus.IN_PROGRESS,
+      ),
+    );
 
-      await waitFor(() =>
-        expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.LOAD),
-      );
+    await waitFor(() => {
+      expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.HYDRO_PSP_SERIES);
+      expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS);
 
-      rerender({ types: [TRAJECTORY_TYPE.MISC_LOAD] });
+      const hydroRows = result.current.hypothesisTrajectories?.[TRAJECTORY_TYPE.HYDRO_PSP_SERIES];
+      expect(hydroRows).toBeDefined();
 
-      await waitFor(() =>
-        expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.MISC_LOAD),
-      );
-      expect(studyService.getStudyTrajectories).toHaveBeenCalledTimes(2);
+      const frRow = hydroRows?.find((r) => r.hypothesis === 'FR');
+      expect(frRow).toBeDefined();
+      expect(frRow?.trajectory).toBeNull();
+
+      // La subrow 'Series' provient du fetch HYDRO_SERIES
+      const seriesSubRow = frRow?.subRows?.find((sr) => sr.hypothesis === 'Series');
+      expect(seriesSubRow?.trajectory).toEqual(hydroPSPSeriesTrajectory);
+      expect(seriesSubRow?.status).toBe(TRAJECTORY_SELECTION_STATUS.OK);
+
+      // La subrow 'Technical parameters' provient du fetch HYDRO_TECHNICAL_PARAMETERS
+      const techParamsSubRow = frRow?.subRows?.find((sr) => sr.hypothesis === 'Technical parameters');
+      expect(techParamsSubRow?.trajectory).toEqual(hydroPSPTechParamsTrajectory);
+      expect(techParamsSubRow?.status).toBe(TRAJECTORY_SELECTION_STATUS.OK);
     });
 
-    it('should re-fetch when studyContextStatus changes', async () => {
-      mockUseStudy.mockReturnValue({} as StudyState);
-      vi.mocked(studyService.getStudyTrajectories).mockResolvedValue([]);
+    // Les rows HYDRO_TECHNICAL_PARAMETERS ne sont pas stockées séparément
+    expect(result.current.hypothesisTrajectories?.[TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS]).toBeUndefined();
+  });
 
-      const { rerender } = renderHook(
-        ({ contextStatus }: { contextStatus: StudyStatus }) =>
-          useFetchHypothesisTrajectories(
-            [],
-            [TRAJECTORY_TYPE.LOAD],
-            [],
-            5,
-            StudyStatus.IN_PROGRESS,
-            contextStatus,
-          ),
-        { initialProps: { contextStatus: StudyStatus.IN_PROGRESS } },
-      );
+  it('should not re-fetch when trajectoryTypes has a new reference but same content', async () => {
+    mockUseStudy.mockReturnValue({} as StudyState);
+    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue([]);
 
-      await waitFor(() => expect(studyService.getStudyTrajectories).toHaveBeenCalledTimes(1));
+    const { rerender } = renderHook(
+      ({ types }: { types: TRAJECTORY_TYPE[] }) =>
+        useFetchHypothesisTrajectories([], types, [], 5, StudyStatus.IN_PROGRESS),
+      { initialProps: { types: [TRAJECTORY_TYPE.LOAD] } },
+    );
 
-      rerender({ contextStatus: StudyStatus.GENERATED });
+    await waitFor(() => expect(studyService.getStudyTrajectories).toHaveBeenCalledTimes(1));
 
-      await waitFor(() => expect(studyService.getStudyTrajectories).toHaveBeenCalledTimes(2));
-    });
+    rerender({ types: [TRAJECTORY_TYPE.LOAD] }); // nouvelle référence, même contenu
 
-    it('should not re-fetch when studyId stays the same and types do not change', async () => {
-      mockUseStudy.mockReturnValue({} as StudyState);
-      vi.mocked(studyService.getStudyTrajectories).mockResolvedValue([]);
+    await waitFor(() => expect(studyService.getStudyTrajectories).toHaveBeenCalledTimes(1));
+  });
 
-      const { rerender } = renderHook(
-        ({ studyId }: { studyId: number }) =>
-          useFetchHypothesisTrajectories([], [TRAJECTORY_TYPE.LOAD], [], studyId, StudyStatus.IN_PROGRESS),
-        { initialProps: { studyId: 5 } },
-      );
+  it('should re-fetch when trajectoryTypes content changes', async () => {
+    // DSR utilise fetchTrajectoriesFromTypes (pas getStudyTrajectories) — on utilise MISC_LOAD
+    // qui emprunte le même chemin que LOAD et appelle bien getStudyTrajectories
+    mockUseStudy.mockReturnValue({} as StudyState);
+    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue([]);
 
-      await waitFor(() => expect(studyService.getStudyTrajectories).toHaveBeenCalledTimes(1));
+    const { rerender } = renderHook(
+      ({ types }: { types: TRAJECTORY_TYPE[] }) =>
+        useFetchHypothesisTrajectories([], types, [], 5, StudyStatus.IN_PROGRESS),
+      { initialProps: { types: [TRAJECTORY_TYPE.LOAD] } },
+    );
 
-      rerender({ studyId: 5 }); // même studyId
+    await waitFor(() => expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.LOAD));
 
-      await waitFor(() => expect(studyService.getStudyTrajectories).toHaveBeenCalledTimes(1));
-    });
+    rerender({ types: [TRAJECTORY_TYPE.MISC_LOAD] });
 
-    it('should re-fetch when studyId changes', async () => {
-      mockUseStudy.mockReturnValue({} as StudyState);
-      vi.mocked(studyService.getStudyTrajectories).mockResolvedValue([]);
+    await waitFor(() => expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.MISC_LOAD));
+    expect(studyService.getStudyTrajectories).toHaveBeenCalledTimes(2);
+  });
 
-      const { rerender } = renderHook(
-        ({ studyId }: { studyId: number }) =>
-          useFetchHypothesisTrajectories([], [TRAJECTORY_TYPE.LOAD], [], studyId, StudyStatus.IN_PROGRESS),
-        { initialProps: { studyId: 5 } },
-      );
+  it('should re-fetch when studyContextStatus changes', async () => {
+    mockUseStudy.mockReturnValue({} as StudyState);
+    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue([]);
 
-      await waitFor(() => expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.LOAD));
+    const { rerender } = renderHook(
+      ({ contextStatus }: { contextStatus: StudyStatus }) =>
+        useFetchHypothesisTrajectories([], [TRAJECTORY_TYPE.LOAD], [], 5, StudyStatus.IN_PROGRESS, contextStatus),
+      { initialProps: { contextStatus: StudyStatus.IN_PROGRESS } },
+    );
 
-      rerender({ studyId: 99 });
+    await waitFor(() => expect(studyService.getStudyTrajectories).toHaveBeenCalledTimes(1));
 
-      await waitFor(() => expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(99, TRAJECTORY_TYPE.LOAD));
-      expect(studyService.getStudyTrajectories).toHaveBeenCalledTimes(2);
-    });
+    rerender({ contextStatus: StudyStatus.GENERATED });
+
+    await waitFor(() => expect(studyService.getStudyTrajectories).toHaveBeenCalledTimes(2));
+  });
+
+  it('should not re-fetch when studyId stays the same and types do not change', async () => {
+    mockUseStudy.mockReturnValue({} as StudyState);
+    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue([]);
+
+    const { rerender } = renderHook(
+      ({ studyId }: { studyId: number }) =>
+        useFetchHypothesisTrajectories([], [TRAJECTORY_TYPE.LOAD], [], studyId, StudyStatus.IN_PROGRESS),
+      { initialProps: { studyId: 5 } },
+    );
+
+    await waitFor(() => expect(studyService.getStudyTrajectories).toHaveBeenCalledTimes(1));
+
+    rerender({ studyId: 5 }); // même studyId
+
+    await waitFor(() => expect(studyService.getStudyTrajectories).toHaveBeenCalledTimes(1));
+  });
+
+  it('should re-fetch when studyId changes', async () => {
+    mockUseStudy.mockReturnValue({} as StudyState);
+    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue([]);
+
+    const { rerender } = renderHook(
+      ({ studyId }: { studyId: number }) =>
+        useFetchHypothesisTrajectories([], [TRAJECTORY_TYPE.LOAD], [], studyId, StudyStatus.IN_PROGRESS),
+      { initialProps: { studyId: 5 } },
+    );
+
+    await waitFor(() => expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.LOAD));
+
+    rerender({ studyId: 99 });
+
+    await waitFor(() => expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(99, TRAJECTORY_TYPE.LOAD));
+    expect(studyService.getStudyTrajectories).toHaveBeenCalledTimes(2);
   });
 });

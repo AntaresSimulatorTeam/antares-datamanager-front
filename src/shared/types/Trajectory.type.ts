@@ -38,6 +38,7 @@ export type HypothesisRowData = {
   subRows?: HypothesisRowData[] | null;
   isDeletable?: boolean;
   timeSeries?: string;
+  hvdc?: boolean;
 };
 
 export type RowStatus = FileInputStatus | 'warning' | 'emptyError';
@@ -110,7 +111,6 @@ export const TrajectoryLinkDataScheme = {
   hvdcNbIndirect: 'number',
   hvdcFoRateDirect: 'number',
   hvdcFoRateIndirect: 'number',
-  hvdc: 'string',
   hurdleCost: 'number',
 } as const;
 

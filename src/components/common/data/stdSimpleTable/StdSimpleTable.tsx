@@ -24,7 +24,8 @@ export type StdSimpleTableProps<TData> = {
   removeRow?: (value: string, rowId?: string) => void | Promise<void>;
   viewData?: (rowId: string) => void | Promise<void>;
   search?: (value: string, rowId: string) => Promise<SelectOption[] | undefined> | undefined;
-  importData?: (rowId: string, index?: number) => Promise<void>;
+  importData?: (rowId: string) => Promise<void>;
+  activate?: () => void | Promise<void>;
 } & Omit<TableCoreProps<TData>, 'table'> &
   Omit<TableOptions<TData>, 'getCoreRowModel'>;
 
@@ -49,6 +50,7 @@ const StdSimpleTable = <TData,>({
   importData,
   viewData,
   search,
+  activate,
   ...tableOptions
 }: StdSimpleTableProps<TData>) => {
   const table = useReactTable<TData>({
@@ -61,7 +63,7 @@ const StdSimpleTable = <TData,>({
     enableRowSelection,
     enableMultiRowSelection,
     enableReadOnly,
-    meta: { removeRow, updateData, importData, search, viewData },
+    meta: { removeRow, updateData, importData, search, viewData, activate },
     ...tableOptions,
   });
 

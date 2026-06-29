@@ -12,13 +12,14 @@ import HorizonInput from '@/components/input/HorizonInput';
 import { duplicateStudy, updateStudy } from '@/shared/services/studyService';
 import { SelectDSOption, StudyDTO } from '@/shared/types';
 import { useUser } from '@/store/contexts/UserContext.tsx';
-import { notifyToast } from '@/shared/notification/notification';
+import { notifyAlert, notifyToast } from '@/shared/notification/notification';
 import { validateMaxLength } from '@/shared/utils/validateMaxTextLength';
 import { MAX_STUDY_NAME_LENGTH } from '@/shared/const/studyConfig';
 import { hasArrayChanged } from '@/shared/utils/arrayUtils.ts';
-import ProjectInput from '@/components/input/ProjectInput.tsx';
-import { Button, TextInput } from '@design-system-rte/react';
+import { Button, Select, TextInput } from '@design-system-rte/react';
 import { FieldInFormation } from '@common/base/FieldInFormation.tsx';
+import { convertToOneYearHorizon } from '@/shared/utils/textUtils.ts';
+import { fetchProjectsFromPartialName } from '@/shared/services/projectService.ts';
 
 interface StudyCreationModalProps {
   isOpen?: boolean;
@@ -43,13 +44,9 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
     label: study.project,
     value: study.project,
   });
+  const [projects, setProjects] = useState<SelectDSOption[]>([]);
   const [keywords, setKeywords] = useState<string[]>(study?.keywords || []);
-  const [horizon, setHorizon] = useState<string>(() => {
-    const rawHorizon = study?.horizon || '';
-    const years = rawHorizon.match(/\d{4}/g)?.map(Number) || [];
-    const maxYear = years.length ? Math.max(...years) : '';
-    return maxYear.toString();
-  });
+  const [horizon, setHorizon] = useState<string>(() => convertToOneYearHorizon(study.horizon));
   const [isFormValid, setIsFormValid] = useState(false);
   const [isHorizonValid, setIsHorizonValid] = useState(false);
   const [studyErrorMessage, setStudyErrorMessage] = useState<string>('');
@@ -103,6 +100,29 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
   ]);
 
   useEffect(() => {
+    const loadProjects = async (valueLabel?: string) => {
+      try {
+        const projectList = await fetchProjectsFromPartialName(valueLabel ?? '');
+        const projectOptions = projectList.map(({ name, id }) => ({
+          id: Number(id),
+          label: name,
+          value: name,
+        }));
+        setProjects(projectOptions);
+      } catch (error) {
+        notifyAlert({
+          icon: 'check',
+          message: t('project.@fetch_failed'),
+          content: (error as Error).message,
+          type: 'error',
+          filledIcon: true,
+        });
+      }
+    };
+    void loadProjects();
+  }, [t]);
+
+  useEffect(() => {
     const validateForm = () => {
       const studyNameChanged = studyName.trim() !== baseStudyName.trim();
       const projectNameChanged = study.project.trim() !== project?.label.trim();
@@ -131,26 +151,46 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
         <div className="flex flex-col items-start gap-4">
           <FieldInFormation />
           <div className="flex w-full items-center justify-start gap-4">
-            <TextInput
-              id="text-input-study-modify-name"
-              value={studyName}
-              label={t('modal.@input_name')}
-              onChange={handleStudyNameChange}
-              required
-              maxLength={75}
-              error={!!studyErrorMessage}
-              assistiveTextLabel={studyErrorMessage}
-            />
-            <ProjectInput required={true} valueSelected={project} onChange={setProject} />
+            <div className="flex w-1/2">
+              <TextInput
+                id="text-input-study-modify-name"
+                value={studyName}
+                label={t('modal.@input_name')}
+                onChange={handleStudyNameChange}
+                required
+                maxLength={75}
+                error={!!studyErrorMessage}
+                assistiveTextLabel={studyErrorMessage}
+              />
+            </div>
+            <div className="column flex w-1/2">
+              <Select
+                id="project-select"
+                value={project?.value ?? ''}
+                onChange={(value: string) => {
+                  const selectedProject = projects.find((projectOption) => projectOption.value === value);
+                  if (selectedProject) {
+                    setProject(selectedProject);
+                  }
+                }}
+                label={t('page.@project')}
+                options={projects}
+                multiple={false}
+                required={true}
+                width={280}
+              />
+            </div>
           </div>
-          <HorizonInput
-            horizon={horizon}
-            onChange={setHorizon}
-            onValidChange={setIsHorizonValid}
-            required
-            disabled={!isDuplicateMode}
-            customErrorMessage={isDuplicateMode && horizonErrorMessage ? horizonErrorMessage : ''}
-          />
+          <div className="flex w-1/2">
+            <HorizonInput
+              horizon={horizon}
+              onChange={setHorizon}
+              onValidChange={setIsHorizonValid}
+              required
+              disabled={!isDuplicateMode}
+              customErrorMessage={isDuplicateMode && horizonErrorMessage ? horizonErrorMessage : ''}
+            />
+          </div>
           <KeywordsInput
             keywords={keywords}
             setKeywords={setKeywords}

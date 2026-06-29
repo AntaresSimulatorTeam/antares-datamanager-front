@@ -73,6 +73,7 @@ export const shouldOpenDeletionModal = (
     case TRAJECTORY_TYPE.RES_CAPACITY:
     case TRAJECTORY_TYPE.RES_LOAD:
     case TRAJECTORY_TYPE.HYDRO_SERIES:
+    case TRAJECTORY_TYPE.HYDRO_PSP_SERIES:
       return subRowsWithTrajectory.length > 0;
     case TRAJECTORY_TYPE.THERMAL_CAPACITY:
       return isRowTrajectoryValid && subRowsWithTrajectory.length > 0;
@@ -147,9 +148,11 @@ export const getInformationMessage = (
       return { messageKey: 'thermal.@paramModulationMessage', id: '1' };
     case TRAJECTORY_TYPE.DSR:
       return { messageKey: 'dsr.@capacityModulationMessage', id: String(Math.max(nbRows - 1, 0)) };
+    case TRAJECTORY_TYPE.HYDRO_PSP_SERIES:
     case TRAJECTORY_TYPE.HYDRO_SERIES:
       return (!trajectory && rowId?.split('.')[1] === '1') ||
-        trajectory?.type === TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS
+        trajectory?.type === TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS ||
+        trajectory?.type === TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS
         ? { messageKey: 'hydro.@informationMessage', id: rowId }
         : null;
     default:
@@ -517,6 +520,9 @@ export const getTypeToImport = (type: TRAJECTORY_TYPE, id: string, data: Hypothe
   }
   if (type === TRAJECTORY_TYPE.HYDRO_SERIES && indexArray.length === 2 && indexArray[1] === 1) {
     typeToUse = TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS;
+  }
+  if (type === TRAJECTORY_TYPE.HYDRO_PSP_SERIES && indexArray.length === 2 && indexArray[1] === 1) {
+    typeToUse = TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS;
   }
   return typeToUse;
 };

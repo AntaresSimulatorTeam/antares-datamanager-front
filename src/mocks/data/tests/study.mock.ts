@@ -13,6 +13,7 @@ export const mockStudy: StudyDTO = {
   status: StudyStatus.IN_PROGRESS,
   horizon: '2030-2031',
   trajectoryIds: [1, 7],
+  hvdc: false,
 };
 
 export const mockStudyResponse: PaginatedResponse<StudyDTO> = {
@@ -29,6 +30,7 @@ export const mockStudyResponse: PaginatedResponse<StudyDTO> = {
       status: StudyStatus.IN_PROGRESS,
       horizon: '2030-2031',
       trajectoryIds: [1, 7],
+      hvdc: false,
     },
   ],
   totalElements: 1,

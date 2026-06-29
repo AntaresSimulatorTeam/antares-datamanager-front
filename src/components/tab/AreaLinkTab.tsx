@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { useTranslation } from 'react-i18next';
@@ -27,13 +27,13 @@ import { useFetchFixHypothesisTrajectories } from '@/hooks/useFetchFixHypothesis
 import { useTrajectorySearchHandler } from '@/hooks/useTrajectorySearchHandler.ts';
 import { useTrajectoryFetchFromFSHandler } from '@/hooks/useTrajectoryFetchFromFSHandler.ts';
 import { useHypothesisTableUpdateHandler } from '@/hooks/useHypothesisTableUpdateHandler.ts';
+import { updateStudy } from '@/shared/services/studyService.ts';
 
 interface AreaLinkTabProps {
-  setErrorMessage: Dispatch<SetStateAction<string>>;
   studyData: StudyDTO;
 }
 
-export const AreaLinkTab = ({ setErrorMessage, studyData }: AreaLinkTabProps) => {
+export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
   const studyState = useStudy();
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const dispatch = useStudyDispatch();
@@ -52,7 +52,7 @@ export const AreaLinkTab = ({ setErrorMessage, studyData }: AreaLinkTabProps) =>
 
   const configs = [
     { type: TRAJECTORY_TYPE.AREA, labelKey: t('studyDetails.@areas') },
-    { type: TRAJECTORY_TYPE.LINK, labelKey: t('studyDetails.@links') },
+    { type: TRAJECTORY_TYPE.LINK, labelKey: t('studyDetails.@links'), hvdc: studyState.hvdc },
   ];
   const options = { withReadOnlyRow: true, isStudyGenerated };
   const { hypothesisTrajectories, readOnlyRow } = useFetchFixHypothesisTrajectories(configs, options, studyData?.id);
@@ -81,10 +81,9 @@ export const AreaLinkTab = ({ setErrorMessage, studyData }: AreaLinkTabProps) =>
   });
 
   useEffect(() => {
-    setErrorMessage('');
     hypothesisTrajectories && setData(hypothesisTrajectories);
     readOnlyRow && setReadOnly(readOnlyRow);
-  }, [hypothesisTrajectories, readOnlyRow, setErrorMessage, studyData?.id]);
+  }, [hypothesisTrajectories, readOnlyRow, studyData?.id]);
 
   useEffect(() => {
     if (studyState.studyStatus === StudyStatus.GENERATED) {
@@ -97,17 +96,22 @@ export const AreaLinkTab = ({ setErrorMessage, studyData }: AreaLinkTabProps) =>
 
   const handleConfirmedAreaDeletion = useCallback(async () => {
     await unlinkAllTrajectoriesFromStudy(studyData.id);
+    void updateStudy({ hvdc: false }, studyData.id);
 
-    dispatch?.({ type: STUDY_ACTION.RESET_STUDY_STATE });
     setData([
       { hypothesis: t('studyDetails.@areas'), trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING },
-      { hypothesis: t('studyDetails.@links'), trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING },
+      {
+        hypothesis: t('studyDetails.@links'),
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+        hvdc: false,
+      },
     ]);
+    dispatch?.({ type: STUDY_ACTION.SET_STUDY_HVDC, payload: false });
 
     setReadOnly({ '0': false, '1': true });
     setIsDeletionModalOpen(false);
-    setErrorMessage(t('studyDetails.@add_trajectories_message'));
-  }, [dispatch, studyData.id, t, setErrorMessage]);
+  }, [dispatch, studyData.id, t]);
 
   return (
     <div className="flex h-fit w-full">
@@ -131,6 +135,11 @@ export const AreaLinkTab = ({ setErrorMessage, studyData }: AreaLinkTabProps) =>
           if (trajectory) {
             void handleViewTrajectory(trajectory, setTrajectoryData, setIsViewModalOpen, t);
           }
+        }}
+        type={TRAJECTORY_TYPE.AREA}
+        activate={() => {
+          void updateStudy({ hvdc: !studyState.hvdc }, studyData.id);
+          dispatch?.({ type: STUDY_ACTION.SET_STUDY_HVDC, payload: !studyState.hvdc });
         }}
       />
       {isModalOpen && (

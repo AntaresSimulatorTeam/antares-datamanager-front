@@ -679,6 +679,16 @@ describe('getPathFromTrajectoryType', () => {
     );
   });
 
+  it('should return technical path for HYDRO_PSP_SERIES type', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.HYDRO_PSP_SERIES)).toBe('\\\\PSP_virtual\\series');
+  });
+
+  it('should return technical path for HYDRO_PSP_TECHNICAL_PARAMETERS type', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS)).toBe(
+      '\\\\PSP_virtual\\technical_parameters',
+    );
+  });
+
   it('should return technical path for unknown type', () => {
     expect(getPathFromTrajectoryType('UNKNOWN_TYPE' as TRAJECTORY_TYPE)).toBeNull();
   });
@@ -1481,7 +1491,7 @@ describe('getDeletionModalMessage', () => {
     ] as unknown as HypothesisRowData[];
     const result = getDeletionModalMessage(TRAJECTORY_TYPE.HYDRO_SERIES, 0, data);
 
-    expect(result).toBe('trajectoryDeletionModal.@confirmDeleteMessage');
+    expect(result).toBe('trajectoryDeletionModal.@confirmDeleteHydroMessage');
   });
 
   // --- 6. Cas par défaut (autre type)
@@ -1572,6 +1582,14 @@ describe('isEmptyRow', () => {
     expect(result).toBe(true);
   });
 
+  it('retourne true si type est HYDRO_PSP_SERIES et rowDepth = 0', () => {
+    mockTMock.mockReturnValue('OTHER');
+
+    const result = isEmptyRow(TRAJECTORY_TYPE.HYDRO_PSP_SERIES, 'foo', 0, mockT);
+
+    expect(result).toBe(true);
+  });
+
   it("retourne false si aucune condition n'est remplie", () => {
     mockTMock.mockReturnValue('OTHER');
 
@@ -1606,7 +1624,7 @@ describe('getItemsMenu', () => {
     it('retourne 1 item : HYDRO_SERIES', () => {
       const result = getItemsMenu(TRAJECTORY_TYPE.HYDRO_SERIES, t as TFunction<'translation', undefined>, []);
 
-      expect(result).toHaveLength(1);
+      expect(result).toHaveLength(2);
       expect(result[0]).toEqual({
         id: TRAJECTORY_TYPE.HYDRO_SERIES,
         label: 'translated:hydro.@capacity',

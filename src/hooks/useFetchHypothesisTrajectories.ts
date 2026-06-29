@@ -3,6 +3,7 @@ import {
   DbTrajectory,
   FetchResult,
   HypothesisRowData,
+  isTrajectoryHydroPSPType,
   isTrajectoryHydroType,
   TechnologyType,
   TrajectoryAreaData,
@@ -143,9 +144,12 @@ export const useFetchHypothesisTrajectories = (
 
         let hydroRows: HypothesisRowData[] = [];
         let hydroReadOnlyMap: ReadOnlyObject = {};
+        const hydroTypeToSet = isTrajectoryHydroPSPType(trajectoryTypes[0])
+          ? TRAJECTORY_TYPE.HYDRO_PSP_SERIES
+          : TRAJECTORY_TYPE.HYDRO_SERIES;
         if (isTrajectoryHydroType(trajectoryTypes[0])) {
           hydroRows = buildHypothesisRows({
-            trajType: TRAJECTORY_TYPE.HYDRO_SERIES,
+            trajType: hydroTypeToSet,
             trajectories: [],
             defaultAreas,
             areas,
@@ -169,7 +173,7 @@ export const useFetchHypothesisTrajectories = (
           const next = { ...prev };
           results.forEach(({ trajType, rows }) => {
             if (isTrajectoryHydroType(trajType)) {
-              next[TRAJECTORY_TYPE.HYDRO_SERIES] = hydroRows;
+              next[hydroTypeToSet] = hydroRows;
             } else {
               next[trajType] = rows;
             }
@@ -181,7 +185,7 @@ export const useFetchHypothesisTrajectories = (
           const next = { ...prev };
           results.forEach(({ trajType, readOnlyMap }) => {
             if (isTrajectoryHydroType(trajType)) {
-              next[trajType] = hydroReadOnlyMap;
+              next[hydroTypeToSet] = hydroReadOnlyMap;
             } else {
               next[trajType] = readOnlyMap;
             }
@@ -210,7 +214,12 @@ export const useFetchHypothesisTrajectories = (
         setDropDownListOptions(
           results.reduce<Record<TRAJECTORY_TYPE, string[]>>(
             (acc, r) => {
-              acc[r.trajType] = r.list.checkedValues;
+              const key = isTrajectoryHydroType(r.trajType) ? hydroTypeToSet : r.trajType;
+
+              const previous = acc[key] ?? [];
+              const current = r.list.checkedValues;
+
+              acc[key] = [...new Set([...previous, ...current])];
               return acc;
             },
             {} as Record<TRAJECTORY_TYPE, string[]>,

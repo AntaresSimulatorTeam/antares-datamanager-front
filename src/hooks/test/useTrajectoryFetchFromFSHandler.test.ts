@@ -44,6 +44,34 @@ describe('useTrajectoryFetchFromFSHandler', () => {
     );
   });
 
+  it('should use type when TRAJECTORY_TYPE.AREA is used', async () => {
+    const data = [
+      { hypothesis: 'Area A', subRows: [] as HypothesisRowData[] },
+      { hypothesis: 'Area B', subRows: [] },
+    ] as HypothesisRowData[];
+
+    const { result } = renderHook(() =>
+      useTrajectoryFetchFromFSHandler({
+        defaultAreas: [],
+        setOptionsFS,
+        setRowIdSelected,
+        toggleModal,
+      }),
+    );
+
+    await result.current.handleFetchFromFS(TRAJECTORY_TYPE.AREA, data, '0');
+
+    expect(hypothesisTableService.handleFetchTrajectoriesFS).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.AREA,
+      '0',
+      setOptionsFS,
+      setRowIdSelected,
+      toggleModal,
+      '',
+      false,
+    );
+  });
+
   it('should switch type when TRAJECTORY_TYPE.AREA is used', async () => {
     const data = [
       { hypothesis: 'Area A', subRows: [] as HypothesisRowData[] },
@@ -59,7 +87,7 @@ describe('useTrajectoryFetchFromFSHandler', () => {
       }),
     );
 
-    await result.current.handleFetchFromFS(TRAJECTORY_TYPE.AREA, data,'1');
+    await result.current.handleFetchFromFS(TRAJECTORY_TYPE.AREA, data, '1');
 
     expect(hypothesisTableService.handleFetchTrajectoriesFS).toHaveBeenCalledWith(
       TRAJECTORY_TYPE.LINK,
@@ -127,6 +155,118 @@ describe('useTrajectoryFetchFromFSHandler', () => {
       toggleModal,
       'Tech 2',
       false,
+    );
+  });
+
+  it('should use HYDRO_SERIES type for first index when type is HYDRO SERIES', async () => {
+    const data = [
+      { hypothesis: 'Area A', subRows: [] as HypothesisRowData[] },
+      { hypothesis: 'Area B', subRows: [] },
+    ] as HypothesisRowData[];
+
+    const { result } = renderHook(() =>
+      useTrajectoryFetchFromFSHandler({
+        defaultAreas: [{ name: 'Area A' }],
+        setOptionsFS,
+        setRowIdSelected,
+        toggleModal,
+      }),
+    );
+
+    await result.current.handleFetchFromFS(TRAJECTORY_TYPE.HYDRO_SERIES, data, '0.0');
+
+    expect(hypothesisTableService.handleFetchTrajectoriesFS).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.HYDRO_SERIES,
+      '0.0',
+      setOptionsFS,
+      setRowIdSelected,
+      toggleModal,
+      '',
+      true,
+    );
+  });
+
+  it('should use HYDRO_TECHNICAL_PARAMETERS type for last index when type is HYDRO SERIES', async () => {
+    const data = [
+      { hypothesis: 'Area A', subRows: [] as HypothesisRowData[] },
+      { hypothesis: 'Area B', subRows: [] },
+    ] as HypothesisRowData[];
+
+    const { result } = renderHook(() =>
+      useTrajectoryFetchFromFSHandler({
+        defaultAreas: [{ name: 'Area A' }],
+        setOptionsFS,
+        setRowIdSelected,
+        toggleModal,
+      }),
+    );
+
+    await result.current.handleFetchFromFS(TRAJECTORY_TYPE.HYDRO_SERIES, data, '0.1');
+
+    expect(hypothesisTableService.handleFetchTrajectoriesFS).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS,
+      '0.1',
+      setOptionsFS,
+      setRowIdSelected,
+      toggleModal,
+      '',
+      true,
+    );
+  });
+
+  it('should use HYDRO_PSP_SERIES type for first index when type is HYDRO PSP SERIES', async () => {
+    const data = [
+      { hypothesis: 'Area A', subRows: [] as HypothesisRowData[] },
+      { hypothesis: 'Area B', subRows: [] },
+    ] as HypothesisRowData[];
+
+    const { result } = renderHook(() =>
+      useTrajectoryFetchFromFSHandler({
+        defaultAreas: [{ name: 'Area A' }],
+        setOptionsFS,
+        setRowIdSelected,
+        toggleModal,
+      }),
+    );
+
+    await result.current.handleFetchFromFS(TRAJECTORY_TYPE.HYDRO_PSP_SERIES, data, '0.0');
+
+    expect(hypothesisTableService.handleFetchTrajectoriesFS).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.HYDRO_PSP_SERIES,
+      '0.0',
+      setOptionsFS,
+      setRowIdSelected,
+      toggleModal,
+      '',
+      true,
+    );
+  });
+
+  it('should use HYDRO_PSP_TECHNICAL_PARAMETERS type for last index when type is HYDRO PSP SERIES', async () => {
+    const data = [
+      { hypothesis: 'Area A', subRows: [] as HypothesisRowData[] },
+      { hypothesis: 'Area B', subRows: [] },
+    ] as HypothesisRowData[];
+
+    const { result } = renderHook(() =>
+      useTrajectoryFetchFromFSHandler({
+        defaultAreas: [{ name: 'Area A' }],
+        setOptionsFS,
+        setRowIdSelected,
+        toggleModal,
+      }),
+    );
+
+    await result.current.handleFetchFromFS(TRAJECTORY_TYPE.HYDRO_PSP_SERIES, data, '0.1');
+
+    expect(hypothesisTableService.handleFetchTrajectoriesFS).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS,
+      '0.1',
+      setOptionsFS,
+      setRowIdSelected,
+      toggleModal,
+      '',
+      true,
     );
   });
 });

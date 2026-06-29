@@ -86,31 +86,31 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
       <RdsModal.Content>
         <div className="flex flex-col items-start gap-4">
           <FieldInFormation />
-          <TextInput
-            aria-required
-            assistiveAppearance="error"
-            autoComplete="off"
-            error={!!nameError}
-            id="text-input-default"
-            label={t('modal.@input_name')}
-            labelPosition="top"
-            rightIconAction="clean"
-            onChange={(value: string) => {
-              if (validateMaxLength(value, MAX_PROJECT_NAME_LENGTH)) {
-                setNameError(null);
-                setName(value);
-                setIsFormValid(true);
-              } else if (value?.length === MAX_PROJECT_NAME_LENGTH + 1) {
-                setNameError(t('modal.@number_characters_exceeds'));
-                setIsFormValid(false);
-                setName('');
-              }
-            }}
-            required
-            value={name}
-            assistiveTextLabel={nameError ?? ''}
-          />
-          <div className="flex w-8/12">
+          <div className="flex w-1/2 flex-col items-start gap-4">
+            <TextInput
+              aria-required
+              assistiveAppearance="error"
+              autoComplete="off"
+              error={!!nameError}
+              id="text-input-default"
+              label={t('modal.@input_name')}
+              labelPosition="top"
+              rightIconAction="clean"
+              onChange={(value: string) => {
+                if (validateMaxLength(value, MAX_PROJECT_NAME_LENGTH)) {
+                  setNameError(null);
+                  setName(value);
+                  setIsFormValid(true);
+                } else if (value?.length === MAX_PROJECT_NAME_LENGTH + 1) {
+                  setNameError(t('modal.@number_characters_exceeds'));
+                  setIsFormValid(false);
+                  setName('');
+                }
+              }}
+              required
+              value={name}
+              assistiveTextLabel={nameError ?? ''}
+            />
             <Textarea
               label={t('modal.@input_description')}
               value={description}
@@ -127,14 +127,14 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
               showCounter={true}
               rows={3}
             />
+            <KeywordsInput
+              keywords={keywords}
+              setKeywords={setKeywords}
+              maxNbKeywords={MAX_KEYWORD_NUMBER}
+              maxNbCharacters={MAX_KEYWORD_LENGTH}
+              minNbCharacters={1}
+            />
           </div>
-          <KeywordsInput
-            keywords={keywords}
-            setKeywords={setKeywords}
-            maxNbKeywords={MAX_KEYWORD_NUMBER}
-            maxNbCharacters={MAX_KEYWORD_LENGTH}
-            minNbCharacters={1}
-          />
         </div>
       </RdsModal.Content>
       <RdsModal.Footer>

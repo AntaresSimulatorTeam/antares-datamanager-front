@@ -891,6 +891,10 @@ export const getPathFromTrajectoryType = (
       return '\\\\hydro\\series';
     case TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS:
       return '\\\\hydro\\technical_parameters';
+    case TRAJECTORY_TYPE.HYDRO_PSP_SERIES:
+      return '\\\\PSP_virtual\\series';
+    case TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS:
+      return '\\\\PSP_virtual\\technical_parameters';
     default:
       return null;
   }
@@ -977,8 +981,8 @@ export const getDeletionModalMessage = (type: TRAJECTORY_TYPE, index: number, da
     return 'trajectoryDeletionModal.@confirmDeletionCapacityMessage';
   }
 
-  if (type === TRAJECTORY_TYPE.HYDRO_SERIES) {
-    return 'trajectoryDeletionModal.@confirmDeleteMessage';
+  if (type === TRAJECTORY_TYPE.HYDRO_SERIES || type === TRAJECTORY_TYPE.HYDRO_PSP_SERIES) {
+    return 'trajectoryDeletionModal.@confirmDeleteHydroMessage';
   }
 
   if (type === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
@@ -1062,8 +1066,12 @@ export const getUrlApiUploadTrajectory = (
       return `${TRAJECTORY_RES_ZONAL_DISTRIBUTION}?area=${area}&technology=${subArea ?? ''}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
     case TRAJECTORY_TYPE.HYDRO_SERIES:
       return `${TRAJECTORY_HYDRO_SERIES}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
+    case TRAJECTORY_TYPE.HYDRO_PSP_SERIES:
+      return `${TRAJECTORY_HYDRO_SERIES}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}&isPsp=true`;
     case TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS:
       return `${TRAJECTORY_HYDRO_TECHNICAL_PARAMETERS}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
+    case TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS:
+      return `${TRAJECTORY_HYDRO_TECHNICAL_PARAMETERS}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}&isPsp=true`;
 
     default:
       return `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
@@ -1077,7 +1085,9 @@ export const isEmptyRow = (
   t: TFunction<'translation', undefined>,
 ) =>
   hypothesis === t('thermal.@specific') ||
-  ((type === TRAJECTORY_TYPE.STS || type === TRAJECTORY_TYPE.HYDRO_SERIES || type === TRAJECTORY_TYPE.HYDRO_PSP) &&
+  ((type === TRAJECTORY_TYPE.STS ||
+    type === TRAJECTORY_TYPE.HYDRO_SERIES ||
+    type === TRAJECTORY_TYPE.HYDRO_PSP_SERIES) &&
     rowDepth === 0);
 
 export const getItemsMenu = (
@@ -1099,7 +1109,14 @@ export const getItemsMenu = (
       },
     ];
   } else if (trajectoryType === TRAJECTORY_TYPE.HYDRO_SERIES) {
-    return [{ id: TRAJECTORY_TYPE.HYDRO_SERIES, panelId: TRAJECTORY_TYPE.HYDRO_SERIES, label: t('hydro.@capacity') }];
+    return [
+      { id: TRAJECTORY_TYPE.HYDRO_SERIES, panelId: TRAJECTORY_TYPE.HYDRO_SERIES, label: t('hydro.@capacity') },
+      {
+        id: TRAJECTORY_TYPE.HYDRO_PSP_SERIES,
+        panelId: TRAJECTORY_TYPE.HYDRO_PSP_SERIES,
+        label: t('hydro.@psp_virtual'),
+      },
+    ];
   } else {
     const itemsTab = [
       { id: trajectoryType, panelId: trajectoryType, label: t('misc.@installedPower') },

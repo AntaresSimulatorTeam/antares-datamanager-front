@@ -23,6 +23,7 @@ export interface StudyDTO {
   status: StudyStatus;
   horizon: string;
   trajectoryIds: number[];
+  hvdc: boolean;
 }
 
 export interface PaginatedResponse<T> {
@@ -46,6 +47,7 @@ export type StudyState = StudyTrajectoriesData & {
   studyStatus?: StudyStatus;
   discardActionTriggered?: boolean;
   discardWarningMessage?: (id: number) => Promise<void>;
+  hvdc?: boolean;
 };
 
 export type StudyActionType =
@@ -68,7 +70,8 @@ export type StudyActionType =
       type: STUDY_ACTION.SKIP_MESSAGE;
       payload: { discardActionTriggered: boolean };
     }
-  | { type: STUDY_ACTION.RESET_STUDY_STATE };
+  | { type: STUDY_ACTION.RESET_STUDY_STATE }
+  | { type: STUDY_ACTION.SET_STUDY_HVDC; payload: boolean };
 
 export interface LocationStudy {
   study: StudyDTO;
