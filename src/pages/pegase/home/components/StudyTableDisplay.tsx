@@ -146,7 +146,7 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
         </div>
         <StudiesPagination count={count} intervalSize={intervalSize} current={currentPage} onChange={setPage} />
       </div>
-      {isModalStudyCreation && projectInfo?.name && (
+      {isModalStudyCreation && !isDuplicateMode && projectInfo?.name && (
         <StudyCreationModal
           isOpen={isModalOpen}
           onClose={handleModalClose}

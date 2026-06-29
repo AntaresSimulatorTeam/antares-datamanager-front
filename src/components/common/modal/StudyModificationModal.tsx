@@ -83,7 +83,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
       onClose();
     } catch (error) {
       const errorMessage = (error as Error)?.message;
-      if (errorMessage?.includes('A study with the same name already exists for the given project.')) {
+      if (errorMessage?.includes(t('studyDetails.@duplicateModalStudyError'))) {
         setStudyErrorMessage(errorMessage);
         setIsFormValid(false);
       } else if (errorMessage?.includes('Horizon must be')) {
