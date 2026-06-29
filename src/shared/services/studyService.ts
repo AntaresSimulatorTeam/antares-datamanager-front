@@ -148,14 +148,7 @@ export const duplicateStudy = async (
       body: JSON.stringify(studyData),
     });
   } catch (error: unknown) {
-    const errorMessage = (error as BackendError).antaresErrorMessage;
-    notifyAlert({
-      icon: 'close',
-      message: errorMessage,
-      type: 'error',
-      filledIcon: true,
-    });
-    throw new Error(errorMessage);
+    throw new Error((error as BackendError).antaresErrorMessage);
   }
 };
 

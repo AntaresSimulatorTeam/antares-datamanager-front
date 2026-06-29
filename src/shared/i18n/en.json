@@ -154,7 +154,8 @@
     "@notificationAlert": "Error: {{studyName}} - {{trajectoryName}} no parameter cannot be saved for {{trajectoryType}}",
     "@default": "Default",
     "@hydro": "Hydro",
-    "@checkBoxDefault": "Automatic area selection"
+    "@checkBoxDefault": "Automatic area selection",
+    "@duplicateModalStudyError": "A study with the same name already exists for the given project."
   },
   "link": {
     "@toggle_hvdc": "HVDC"

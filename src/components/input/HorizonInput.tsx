@@ -88,6 +88,8 @@ const HorizonInput: React.FC<YearInputProps> = ({
       error={hasError}
       assistiveTextLabel={getAssistiveTextLabel()}
       assistiveAppearance={customErrorMessage || errorMessage ? 'error' : 'description'}
+      rightIconAction="clean"
+      onRightIconClick={() => onChange('')}
     />
   );
 };
