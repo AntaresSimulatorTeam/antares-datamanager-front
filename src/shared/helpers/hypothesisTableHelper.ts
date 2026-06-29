@@ -663,22 +663,17 @@ export const getParamForFetchFSTrajectory = (
     if (indexArray.length === 2) {
       if (indexArray[1] === 0) {
         typeToUse = TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP;
-        areaToUse = '';
       }
       if (indexArray[1] === 1) {
         typeToUse = TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM;
-        areaToUse = '';
       }
       if (indexArray[1] === 2) {
         typeToUse = TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR;
-        areaToUse = '';
       }
     } else if (indexArray[0] === 1) {
       typeToUse = TRAJECTORY_TYPE.NUCLEAR_FR_TALON;
-      areaToUse = '';
-    } else {
-      areaToUse = '';
     }
+    areaToUse = '';
   }
   return { typeToUse, areaToUse, isDefaultArea };
 };
