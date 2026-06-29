@@ -1606,44 +1606,56 @@ describe('getParamForFetchFSTrajectory', () => {
 });
 
 describe('getNuclearHypothesisLabel', () => {
-  const mockT = vi.fn((key: string) => {
-    if (key === 'thermal.@epr') return 'EPR';
-    if (key === 'thermal.@long_term') return 'Long Term';
-    if (key === 'thermal.@smr') return 'SMR';
-    return key;
-  }) as unknown as TFunction<'translation', undefined>;
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
   it('should return thermal.@epr for NUCLEAR_FR_TS_ERP', () => {
-    const result = getNuclearHypothesisLabel(TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP, mockT);
+    const mockTranslate = vi.fn((key: string) => {
+      if (key === 'thermal.@epr') return 'EPR';
+      return key;
+    }) as unknown as TFunction<'translation', undefined>;
+    const result = getNuclearHypothesisLabel(TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP, mockTranslate);
 
-    expect(mockT).toHaveBeenCalledWith('thermal.@epr');
+    expect(mockTranslate).toHaveBeenCalledWith('thermal.@epr');
     expect(result).toBe('EPR');
   });
 
   it('should return thermal.@long_term for NUCLEAR_FR_TS_LONG_TERM', () => {
-    const result = getNuclearHypothesisLabel(TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM, mockT);
+    const mockTranslate = vi.fn((key: string) => {
+      if (key === 'thermal.@long_term') return 'Long Term';
+      return key;
+    }) as unknown as TFunction<'translation', undefined>;
+    const result = getNuclearHypothesisLabel(TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM, mockTranslate);
 
-    expect(mockT).toHaveBeenCalledWith('thermal.@long_term');
+    expect(mockTranslate).toHaveBeenCalledWith('thermal.@long_term');
     expect(result).toBe('Long Term');
   });
 
   it('should return thermal.@smr for any other type', () => {
-    const result = getNuclearHypothesisLabel('UNKNOWN_TYPE' as unknown as TRAJECTORY_TYPE, mockT);
+    const mockTranslate = vi.fn((key: string) => {
+      if (key === 'thermal.@smr') return 'SMR';
+      return key;
+    }) as unknown as TFunction<'translation', undefined>;
+    const result = getNuclearHypothesisLabel(TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR, mockTranslate);
 
-    expect(mockT).toHaveBeenCalledWith('thermal.@smr');
+    expect(mockTranslate).toHaveBeenCalledWith('thermal.@smr');
     expect(result).toBe('SMR');
   });
 });
 
 describe('getHypothesisLabel', () => {
-  const mockT = vi.fn((key: string) => {
-    if (key === 'thermal.@parametersTechnical') return 'Technical Parameters';
-    if (key === 'hydro.@series') return 'Series';
-    if (key === 'thermal.@smr') return 'SMR';
-    return key;
-  }) as unknown as TFunction<'translation', undefined>;
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
   it('should return thermal.@parametersTechnical for HYDRO_TECHNICAL_PARAMETERS', () => {
+    const mockT = vi.fn((key: string) => {
+      if (key === 'thermal.@parametersTechnical') return 'Technical Parameters';
+      if (key === 'hydro.@series') return 'Series';
+      if (key === 'thermal.@smr') return 'SMR';
+      return key;
+    }) as unknown as TFunction<'translation', undefined>;
     const result = getHypothesisLabel(TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS, mockT);
 
     expect(mockT).toHaveBeenCalledWith('thermal.@parametersTechnical');
@@ -1651,6 +1663,12 @@ describe('getHypothesisLabel', () => {
   });
 
   it('should return thermal.@parametersTechnical for HYDRO_PSP_TECHNICAL_PARAMETERS', () => {
+    const mockT = vi.fn((key: string) => {
+      if (key === 'thermal.@parametersTechnical') return 'Technical Parameters';
+      if (key === 'hydro.@series') return 'Series';
+      if (key === 'thermal.@smr') return 'SMR';
+      return key;
+    }) as unknown as TFunction<'translation', undefined>;
     const result = getHypothesisLabel(TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS, mockT);
 
     expect(mockT).toHaveBeenCalledWith('thermal.@parametersTechnical');
@@ -1658,6 +1676,12 @@ describe('getHypothesisLabel', () => {
   });
 
   it('should return hydro.@series for HYDRO_SERIES', () => {
+    const mockT = vi.fn((key: string) => {
+      if (key === 'thermal.@parametersTechnical') return 'Technical Parameters';
+      if (key === 'hydro.@series') return 'Series';
+      if (key === 'thermal.@smr') return 'SMR';
+      return key;
+    }) as unknown as TFunction<'translation', undefined>;
     const result = getHypothesisLabel(TRAJECTORY_TYPE.HYDRO_SERIES, mockT);
 
     expect(mockT).toHaveBeenCalledWith('hydro.@series');
@@ -1665,6 +1689,12 @@ describe('getHypothesisLabel', () => {
   });
 
   it('should return hydro.@series for HYDRO_PSP_SERIES', () => {
+    const mockT = vi.fn((key: string) => {
+      if (key === 'thermal.@parametersTechnical') return 'Technical Parameters';
+      if (key === 'hydro.@series') return 'Series';
+      if (key === 'thermal.@smr') return 'SMR';
+      return key;
+    }) as unknown as TFunction<'translation', undefined>;
     const result = getHypothesisLabel(TRAJECTORY_TYPE.HYDRO_PSP_SERIES, mockT);
 
     expect(mockT).toHaveBeenCalledWith('hydro.@series');
@@ -1672,6 +1702,12 @@ describe('getHypothesisLabel', () => {
   });
 
   it('should return hydro.@series for any other type (default)', () => {
+    const mockT = vi.fn((key: string) => {
+      if (key === 'thermal.@parametersTechnical') return 'Technical Parameters';
+      if (key === 'hydro.@series') return 'Series';
+      if (key === 'thermal.@smr') return 'SMR';
+      return key;
+    }) as unknown as TFunction<'translation', undefined>;
     const result = getHypothesisLabel('UNKNOWN_TYPE' as unknown as TRAJECTORY_TYPE, mockT);
 
     expect(mockT).toHaveBeenCalledWith('hydro.@series');
