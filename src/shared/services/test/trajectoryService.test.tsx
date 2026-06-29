@@ -502,7 +502,7 @@ describe('uploadTrajectory', () => {
   });
 
   it('should import AREA trajectory into data base', async () => {
-    await uploadTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026', 2, 'FR', onProgress);
+    await uploadTrajectory('2025-2026', 2, TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', 'FR', onProgress);
 
     await waitFor(() => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
@@ -515,7 +515,7 @@ describe('uploadTrajectory', () => {
   });
 
   it('should import LOAD trajectory into data base', async () => {
-    await uploadTrajectory(TRAJECTORY_TYPE.LOAD, 'area_BP_23_v6', '2025-2026', 2, 'FR', onProgress);
+    await uploadTrajectory('2025-2026', 2, TRAJECTORY_TYPE.LOAD, 'area_BP_23_v6', 'FR', onProgress);
 
     await waitFor(() => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
@@ -528,7 +528,7 @@ describe('uploadTrajectory', () => {
   });
 
   it('should import THERMAL_CAPACITY trajectory without technology into data base', async () => {
-    await uploadTrajectory(TRAJECTORY_TYPE.THERMAL_CAPACITY, 'area_BP_23_v6', '2025-2026', 2, 'FR', onProgress, true);
+    await uploadTrajectory('2025-2026', 2, TRAJECTORY_TYPE.THERMAL_CAPACITY, 'area_BP_23_v6', 'FR', onProgress, true);
 
     await waitFor(() => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
@@ -542,10 +542,10 @@ describe('uploadTrajectory', () => {
 
   it('should import THERMAL_CAPACITY trajectory with technology into data base', async () => {
     await uploadTrajectory(
-      TRAJECTORY_TYPE.THERMAL_CAPACITY,
-      'area_BP_23_v6',
       '2025-2026',
       2,
+      TRAJECTORY_TYPE.THERMAL_CAPACITY,
+      'area_BP_23_v6',
       'FR',
       onProgress,
       true,
@@ -564,10 +564,10 @@ describe('uploadTrajectory', () => {
 
   it('should import TRAJECTORY_THERMAL_COMMON_PARAMETER_IMPORT trajectory into data base', async () => {
     await uploadTrajectory(
-      TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER,
-      'common_param_BP_23_v6',
       '2025-2026',
       2,
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER,
+      'common_param_BP_23_v6',
       'FR',
       onProgress,
     );
@@ -584,10 +584,10 @@ describe('uploadTrajectory', () => {
 
   it('should import THERMAL_TECHNICAL_SPECIFIC_PARAMETER trajectory into data base', async () => {
     await uploadTrajectory(
-      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
-      'specific_param_BP_23',
       '2030-2031',
       25,
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+      'specific_param_BP_23',
       'Specific',
       onProgress,
       false,
@@ -606,10 +606,10 @@ describe('uploadTrajectory', () => {
 
   it('should import TRAJECTORY_THERMAL_MODULATION_PARAMETER_IMPORT trajectory into data base', async () => {
     await uploadTrajectory(
-      TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER,
-      'param',
       '2030-2031',
       25,
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER,
+      'param',
       'Specific',
       onProgress,
       false,
@@ -628,10 +628,10 @@ describe('uploadTrajectory', () => {
 
   it('should import THERMAL_ECONOMIC_COST_PARAMETER trajectory into data base', async () => {
     await uploadTrajectory(
-      TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER,
-      'costs',
       '2030-2031',
       25,
+      TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER,
+      'costs',
       undefined,
       onProgress,
     );
@@ -648,10 +648,10 @@ describe('uploadTrajectory', () => {
 
   it('should import THERMAL_ECONOMIC_PARAMETER trajectory into data base', async () => {
     await uploadTrajectory(
-      TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER,
-      'economic',
       '2030-2031',
       30,
+      TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER,
+      'economic',
       undefined,
       onProgress,
     );
@@ -667,7 +667,7 @@ describe('uploadTrajectory', () => {
   });
 
   it('should import DSR trajectory into data base', async () => {
-    await uploadTrajectory(TRAJECTORY_TYPE.DSR, 'param', '2030-2031', 25, 'FR', onProgress, false);
+    await uploadTrajectory('2030-2031', 25, TRAJECTORY_TYPE.DSR, 'param', 'FR', onProgress, false);
 
     await waitFor(() => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
@@ -680,7 +680,7 @@ describe('uploadTrajectory', () => {
   });
 
   it('should import DSR_CAPACITY_MODULATION trajectory into data base', async () => {
-    await uploadTrajectory(TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION, 'param', '2030-2031', 25, '', onProgress);
+    await uploadTrajectory('2030-2031', 25, TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION, 'param', '', onProgress);
 
     await waitFor(() => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
@@ -698,16 +698,16 @@ describe('uploadTrajectory', () => {
     });
 
     await expect(async () =>
-      uploadTrajectory(TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', '2025-2026', 2, 'FR', onProgress),
+      uploadTrajectory('2025-2026', 2, TRAJECTORY_TYPE.AREA, 'area_BP_23_v6', 'FR', onProgress),
     ).rejects.toThrowError('Failed to upload trajectory area_BP_23_v6');
   });
 
   it('should import STS trajectory into data base', async () => {
     await uploadTrajectory(
-      TRAJECTORY_TYPE.STS,
-      'cluster_battery_PEMMEDB25',
       '2030-2031',
       87,
+      TRAJECTORY_TYPE.STS,
+      'cluster_battery_PEMMEDB25',
       'AT',
       onProgress,
       false,
@@ -726,10 +726,10 @@ describe('uploadTrajectory', () => {
 
   it('should import MISC Installed power trajectory into data base', async () => {
     await uploadTrajectory(
-      TRAJECTORY_TYPE.MISC_CAPACITY,
-      'cluster_battery_PEMMEDB25',
       '2030-2031',
       87,
+      TRAJECTORY_TYPE.MISC_CAPACITY,
+      'cluster_battery_PEMMEDB25',
       'AT',
       onProgress,
     );
@@ -745,7 +745,7 @@ describe('uploadTrajectory', () => {
   });
 
   it('should import MISC Load factor trajectory into data base', async () => {
-    await uploadTrajectory(TRAJECTORY_TYPE.MISC_LOAD, 'cluster_battery_PEMMEDB25', '2030-2031', 87, 'AT', onProgress);
+    await uploadTrajectory('2030-2031', 87, TRAJECTORY_TYPE.MISC_LOAD, 'cluster_battery_PEMMEDB25', 'AT', onProgress);
 
     await waitFor(() => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
@@ -758,7 +758,7 @@ describe('uploadTrajectory', () => {
   });
 
   it('should import RES CAPACITY Installed power trajectory into data base', async () => {
-    await uploadTrajectory(TRAJECTORY_TYPE.RES_CAPACITY, 'installedRES_PEMMEDB25', '2030-2031', 87, 'AT', onProgress);
+    await uploadTrajectory('2030-2031', 87, TRAJECTORY_TYPE.RES_CAPACITY, 'installedRES_PEMMEDB25', 'AT', onProgress);
 
     await waitFor(() => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
@@ -772,10 +772,10 @@ describe('uploadTrajectory', () => {
 
   it('should import RES CAPACITY Installed power trajectory into data base', async () => {
     await uploadTrajectory(
-      TRAJECTORY_TYPE.RES_CAPACITY,
-      'installedRES_PEMMEDB25',
       '2030-2031',
       87,
+      TRAJECTORY_TYPE.RES_CAPACITY,
+      'installedRES_PEMMEDB25',
       'AT',
       onProgress,
       false,
@@ -794,10 +794,10 @@ describe('uploadTrajectory', () => {
 
   it('should import RES Load factor trajectory into data base', async () => {
     await uploadTrajectory(
-      TRAJECTORY_TYPE.RES_LOAD,
-      'PEMMEDB25',
       '2030-2031',
       87,
+      TRAJECTORY_TYPE.RES_LOAD,
+      'PEMMEDB25',
       'AT',
       onProgress,
       false,
@@ -816,10 +816,10 @@ describe('uploadTrajectory', () => {
 
   it('should import RES Zonal distribution trajectory into data base', async () => {
     await uploadTrajectory(
-      TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION,
-      'repartition_zonal_PEMMEDB25',
       '2030-2031',
       87,
+      TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION,
+      'repartition_zonal_PEMMEDB25',
       'AT',
       onProgress,
       false,
@@ -837,10 +837,10 @@ describe('uploadTrajectory', () => {
 
   it('should import RES Technology distribution trajectory with technology into data base', async () => {
     await uploadTrajectory(
-      TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION,
-      'repartition_techno_PEMMEDB25',
       '2030-2031',
       87,
+      TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION,
+      'repartition_techno_PEMMEDB25',
       'AT',
       onProgress,
       false,
@@ -858,7 +858,7 @@ describe('uploadTrajectory', () => {
   });
 
   it('should import HYDRO Series trajectory into data base', async () => {
-    await uploadTrajectory(TRAJECTORY_TYPE.HYDRO_SERIES, 'PEMMEDB25', '2030-2031', 87, 'AT', onProgress, false);
+    await uploadTrajectory('2030-2031', 87, TRAJECTORY_TYPE.HYDRO_SERIES, 'PEMMEDB25', 'AT', onProgress, false);
 
     await waitFor(() => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
@@ -872,10 +872,11 @@ describe('uploadTrajectory', () => {
 
   it('should import HYDRO Technical Parameters trajectory into data base', async () => {
     await uploadTrajectory(
-      TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS,
-      'PEMMEDB25',
       '2030-2031',
       87,
+      TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS,
+      'PEMMEDB25',
+
       'AT',
       onProgress,
       false,
@@ -892,7 +893,7 @@ describe('uploadTrajectory', () => {
   });
 
   it('should import HYDRO_PSP_SERIES Technical Parameters trajectory into data base', async () => {
-    await uploadTrajectory(TRAJECTORY_TYPE.HYDRO_PSP_SERIES, 'PEMMEDB25', '2030-2031', 87, 'AT', onProgress, false);
+    await uploadTrajectory('2030-2031', 87, TRAJECTORY_TYPE.HYDRO_PSP_SERIES, 'PEMMEDB25', 'AT', onProgress, false);
 
     await waitFor(() => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
@@ -906,10 +907,10 @@ describe('uploadTrajectory', () => {
 
   it('should import HYDRO_PSP_TECHNICAL_PARAMETERS Technical Parameters trajectory into data base', async () => {
     await uploadTrajectory(
-      TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS,
-      'PEMMEDB25',
       '2030-2031',
       87,
+      TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS,
+      'PEMMEDB25',
       'AT',
       onProgress,
       false,
@@ -927,10 +928,10 @@ describe('uploadTrajectory', () => {
 
   it('should import RES Technology distribution trajectory without technology into data base', async () => {
     await uploadTrajectory(
-      TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION,
-      'repartition_techno_PEMMEDB25',
       '2030-2031',
       87,
+      TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION,
+      'repartition_techno_PEMMEDB25',
       'AT',
       onProgress,
       false,

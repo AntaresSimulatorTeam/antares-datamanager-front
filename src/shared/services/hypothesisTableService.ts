@@ -2,7 +2,6 @@ import {
   buildEmptyTrajectory,
   buildErrorTrajectory,
   buildRowWithSubRows,
-  getQueryParamAreaValue,
   setNestedData,
 } from '@/shared/utils/trajectoryUtils.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
@@ -22,11 +21,10 @@ import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
 import {
   fetchTrajectoriesFromDB,
-  fetchTrajectoriesFromFS,
   getStudyTrajectoriesWithWarnings,
   getTrajectoryDataByTypeAndId,
 } from '@/shared/services/trajectoryService.ts';
-import { convertToFSSelectionOptionType, convertToSelectionOptionType } from '@/shared/utils/formFormatter.ts';
+import { convertToSelectionOptionType } from '@/shared/utils/formFormatter.ts';
 import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { generateTrajectoryViewHeader } from '@/components/header/TrajectoryViewHeader.tsx';
 import { TFunction } from 'i18next';
@@ -62,41 +60,6 @@ export const handleTrajectoryError = (
     type: 'error',
     filledIcon: true,
   });
-};
-
-/**
- * Handles the process of fetching trajectories from a data source and updating related state.
- *
- * @async
- * @function handleFetchTrajectoriesFS
- * @param {TRAJECTORY_TYPE} type - The type of trajectory to fetch. Determines the context or criteria for the query.
- * @param {string} rowId - The unique identifier for the row being processed or selected.
- * @param {Dispatch<SetStateAction<SelectOption[] | undefined>>} setOptionsFS - State dispatcher for updating the options available after fetching trajectories.
- * @param {Dispatch<SetStateAction<string>>} setRowIdSelected - State dispatcher for updating the selected row ID after processing.
- * @param {Function} toggleModal - A function to toggle the visibility of a modal, typically used to display or hide UI elements during or after the process.
- * @param {string} hypothesis - An optional parameter representing a hypothesis that determines additional query parameters.
- * @param isDefaultArea
- * @returns {Promise<void>} Resolves to no value upon successful completion of the operation.
- * @throws Will silently handle errors during data fetching or processing without throwing or exposing exceptions.
- */
-export const handleFetchTrajectoriesFS = async (
-  type: TRAJECTORY_TYPE,
-  rowId: string,
-  setOptionsFS: Dispatch<SetStateAction<SelectOption[] | undefined>>,
-  setRowIdSelected: Dispatch<SetStateAction<string>>,
-  toggleModal: () => void,
-  hypothesis?: string,
-  isDefaultArea = false,
-): Promise<void> => {
-  try {
-    const area = getQueryParamAreaValue(type, hypothesis);
-    const results = area ? await fetchTrajectoriesFromFS(type, area) : await fetchTrajectoriesFromFS(type);
-    setOptionsFS(convertToFSSelectionOptionType(results, isDefaultArea));
-    setRowIdSelected(rowId);
-    toggleModal();
-  } catch {
-    // Silent handler
-  }
 };
 
 /**

@@ -34,6 +34,7 @@ import {
   NUCLEAR_FR_TIME_NON_SERIES_TYPES,
   NUCLEAR_FR_TIME_SERIES_TYPES,
 } from '@/shared/const/trajectoryTypes.ts';
+import { HydroSubRows } from '@/mocks/data/list/names.ts';
 
 export const useFetchHypothesisTrajectories = (
   areas: TrajectoryAreaData[],
@@ -125,71 +126,69 @@ export const useFetchHypothesisTrajectories = (
 
         // Cas nucléaire ou hydro : pas de list/checkedValues
         let results: HypothesisTableResults[] = [];
-        if (isTrajectoryNuclearType(trajTypes[0]) || isTrajectoryHydroType(trajTypes[0])) {
-          if (isTrajectoryNuclearType(trajTypes[0])) {
-            const nuclearRows = buildRowsByType({
-              rowTypes: NUCLEAR_FR_TIME_NON_SERIES_TYPES,
-              subRowTypes: NUCLEAR_FR_TIME_SERIES_TYPES,
-              trajectoriesByType: rawResults,
-              t,
-            });
+        if (isTrajectoryNuclearType(trajTypes[0])) {
+          const nuclearRows = buildRowsByType({
+            rowTypes: NUCLEAR_FR_TIME_NON_SERIES_TYPES,
+            subRowTypes: NUCLEAR_FR_TIME_SERIES_TYPES,
+            trajectoriesByType: rawResults,
+            t,
+          });
 
-            results = rawResults.flatMap((result) => {
-              if (result.trajType === TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION) {
-                return {
-                  ...result,
-                  rows: nuclearRows,
-                  readOnlyMap: {},
-                };
-              } else {
-                return [];
-              }
-            });
-          }
+          results = rawResults.flatMap((result) => {
+            if (result.trajType === TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION) {
+              return {
+                ...result,
+                rows: nuclearRows,
+                readOnlyMap: {},
+              };
+            } else {
+              return [];
+            }
+          });
+        } else if (isTrajectoryHydroType(trajTypes[0])) {
+          const effectiveTrajectories = rawResults.flatMap((result) =>
+            result.shouldSkipFetch ? result.contextTrajectories : result.trajectories,
+          );
+          const areasWithTrajectory = effectiveTrajectories.flatMap((traj) => (traj.area?.length > 0 ? traj : []));
+          const hydroTypes = hydroTypeToSet === TRAJECTORY_TYPE.HYDRO_SERIES ? HYDRO_TYPES : HYDRO_PSP_TYPES;
 
-          if (isTrajectoryHydroType(trajTypes[0])) {
-            const effectiveTrajectories = rawResults.flatMap((result) =>
-              result.shouldSkipFetch ? result.contextTrajectories : result.trajectories,
-            );
-            const areasWithTrajectory = effectiveTrajectories.flatMap((traj) => (traj.area?.length > 0 ? traj : []));
-            const hydroTypes = hydroTypeToSet === TRAJECTORY_TYPE.HYDRO_SERIES ? HYDRO_TYPES : HYDRO_PSP_TYPES;
-            const allHydroRows = hydroTypes.flatMap((type) =>
-              buildHypothesisRows({
-                trajType: type,
-                trajectories: effectiveTrajectories,
-                defaultAreas,
-                areas,
-                technologies: [t('hydro.@series'), t('thermal.@parametersTechnical')],
-                isStudyGenerated,
-                t,
-              }),
-            );
-            const hydroRows = sortWithFixedPosition(isStudyGenerated ? filterRow(allHydroRows) : allHydroRows);
-            const hydroReadOnlyMap = buildReadOnlyMap({
-              rows: allHydroRows,
-              trajType: trajectoryTypes[0],
+          const allHydroRows = hydroTypes.flatMap((type) =>
+            buildHypothesisRows({
+              trajType: type,
+              trajectories: effectiveTrajectories,
+              defaultAreas,
+              areas,
+              technologies: HydroSubRows.map((row) => row.label),
               isStudyGenerated,
-              defaultAreaListNotInList,
-            });
+              t,
+            }),
+          );
 
-            const { areaOptions, checkedValues } = buildCheckListBox(areasWithTrajectory, areas, defaultAreas);
+          const hydroRows = sortWithFixedPosition(isStudyGenerated ? filterRow(allHydroRows) : allHydroRows);
+          const hydroReadOnlyMap = buildReadOnlyMap({
+            rows: allHydroRows,
+            trajType: trajectoryTypes[0],
+            isStudyGenerated,
+            defaultAreaListNotInList,
+          });
 
-            results = rawResults.flatMap((result) => {
-              if (result.trajType === hydroTypeToSet) {
-                return {
-                  ...result,
-                  rows: mergeRows(hydroRows),
-                  readOnlyMap: hydroReadOnlyMap,
-                  list: {
-                    areaOptions,
-                    checkedValues,
-                  },
-                };
-              } else {
-                return [];
-              }
-            });
-          }
+          const { areaOptions, checkedValues } = buildCheckListBox(areasWithTrajectory, areas, defaultAreas);
+
+          results = rawResults.flatMap((result) => {
+            if (result.trajType === hydroTypeToSet) {
+              return {
+                ...result,
+                rows: mergeRows(hydroRows),
+                readOnlyMap: hydroReadOnlyMap,
+                list: {
+                  areaOptions,
+                  checkedValues,
+                },
+              };
+            } else {
+              return [];
+            }
+          });
         } else {
           // --- 2) CONSTRUCTION DES ROWS, LIST, READONLYMAP ---
           results = rawResults.map((res) => {
@@ -286,7 +285,7 @@ export const useFetchHypothesisTrajectories = (
                 const key = isTrajectoryHydroType(r.trajType) ? hydroTypeToSet : r.trajType;
 
                 const previous = acc[key] ?? [];
-                const current = r.list?.checkedValues;
+                const current = r.list?.checkedValues ?? [];
 
                 acc[key] = [...new Set([...previous, ...current])];
                 return acc;

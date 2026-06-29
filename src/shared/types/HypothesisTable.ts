@@ -23,3 +23,5 @@ export type RowToDeleteProps = {
   value?: string;
   operation?: TableOperationRow;
 };
+
+export type HypothesisType = { area: string; technology?: string; isDefault?: boolean };

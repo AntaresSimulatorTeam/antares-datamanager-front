@@ -14,20 +14,21 @@ import { DbTrajectory, HypothesisRowData, SelectOption, StudyDTO, TrajectoryView
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
-import { filterRow } from '@/shared/utils/trajectoryUtils.ts';
+import { filterRow, getAreaTrajectoryName } from '@/shared/utils/trajectoryUtils.ts';
 import { TrajectoryDataVisualisation } from '@common/modal/TrajectoryDataVisualisation.tsx';
 import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 import { handleViewTrajectory } from '@/shared/services/hypothesisTableService.ts';
-import { getReadOnlyForGeneratedStudy } from '@/shared/helpers/hypothesisTableHelper.ts';
+import { getParamForFetchFSTrajectory, getReadOnlyForGeneratedStudy } from '@/shared/helpers/hypothesisTableHelper.ts';
 import getEditableHypothesisTableHeaders from '@/components/header/EditableHypothesisTableHeaders.tsx';
 import { useFetchFixHypothesisTrajectories } from '@/hooks/useFetchFixHypothesisTrajectories.ts';
 import { useTrajectorySearchHandler } from '@/hooks/useTrajectorySearchHandler.ts';
 import { useTrajectoryFetchFromFSHandler } from '@/hooks/useTrajectoryFetchFromFSHandler.ts';
 import { useHypothesisTableUpdateHandler } from '@/hooks/useHypothesisTableUpdateHandler.ts';
 import { updateStudy } from '@/shared/services/studyService.ts';
+import { HypothesisType } from '@/shared/types/HypothesisTable.ts';
 
 interface AreaLinkTabProps {
   studyData: StudyDTO;
@@ -63,12 +64,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
     studyData,
     setDbTrajectories,
   });
-  const { handleFetchFromFS } = useTrajectoryFetchFromFSHandler({
-    defaultAreas: [],
-    setOptionsFS,
-    setRowIdSelected,
-    toggleModal,
-  });
+  const { handleFetchFromFS } = useTrajectoryFetchFromFSHandler();
   const { handleHypothesisTableUpdate } = useHypothesisTableUpdateHandler({
     studyData,
     data,
@@ -132,7 +128,19 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
         idSelected={String(rowIdSelected)}
         handleSearch={handleSearch}
         updateData={handleHypothesisTableUpdate}
-        handleImport={async (rowId: string) => await handleFetchFromFS(TRAJECTORY_TYPE.AREA, data, rowId)}
+        handleImport={async (rowId: string) => {
+          const hypothesis = getAreaTrajectoryName(rowId, data);
+          const { typeToUse, areaToUse, isDefaultArea } = getParamForFetchFSTrajectory(
+            TRAJECTORY_TYPE.AREA,
+            rowId.split('.').map(Number),
+            data.length,
+            hypothesis,
+          );
+          const results = await handleFetchFromFS({ typeToUse, areaToUse, isDefaultArea });
+          setOptionsFS(results);
+          setRowIdSelected(rowId);
+          toggleModal();
+        }}
         handleViewData={(rowId: string) => {
           const index = Number(rowId);
           const trajectory = data[index].trajectory;
@@ -149,19 +157,19 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
       {isModalOpen && (
         <ImportTrajectoryModal
           options={optionsFS}
-          onClose={async (value?: SelectOption) => {
+          onClose={async (
+            typeToUse?: TRAJECTORY_TYPE,
+            value?: SelectOption,
+            hypothesis?: HypothesisType,
+            indexArray?: number[],
+          ) => {
             toggleModal();
-            if (value != null) {
-              await importTrajectory(
-                rowIdSelected === '0' ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
-                value,
-                rowIdSelected,
-                data,
-                setData,
-              );
-            }
+            await importTrajectory(setData, value, typeToUse, indexArray, hypothesis);
           }}
-          trajectoryType={rowIdSelected === '0' ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK}
+          tabType={TRAJECTORY_TYPE.AREA}
+          hypothesis={getAreaTrajectoryName(rowIdSelected, data)}
+          indexArray={rowIdSelected?.split('.').map(Number)}
+          rowsNb={data.length}
         />
       )}
       {isViewModalOpen && trajectoryData && (

@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { DbTrajectory, HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
@@ -13,21 +13,19 @@ import {
   findSpecificTrajectoryToDelete,
   getCheckedValues,
   getInformationMessage,
+  getParamForFetchFSTrajectory,
   getReadOnlyForGeneratedStudy,
   getSpecificTrajectories,
-  getTypeToImport,
   shouldOpenDeletionModal,
   updateTableAfterCellDetach,
   updateTableAfterRowDeletion,
 } from '@/shared/helpers/hypothesisTableHelper.ts';
 import * as trajectoryUtils from '@/shared/utils/trajectoryUtils.ts';
-import { setNestedData } from '@/shared/utils/trajectoryUtils.ts';
 import * as hypothesisTableService from '@/shared/services/hypothesisTableService.ts';
 import * as studyService from '@/shared/services/studyService.ts';
 import * as defaultConfigService from '@/shared/services/defaultConfigService.ts';
 import * as sortUtils from '@/shared/utils/sortUtils.ts';
 
-import { generateReadOnlyIndexMap, retrieveReadOnlyArea } from '../../utils/trajectoryUtils';
 import { TFunction } from 'i18next';
 import { isParamModulationRequired } from '@/shared/services/trajectoryService.ts';
 import { ThermalOptionsResults } from '@/mocks/data/list/names.ts';
@@ -36,7 +34,7 @@ vi.mock('@/shared/services/trajectoryService');
 vi.mock('@/shared/services/hypothesisTableService');
 vi.mock('@/shared/services/defaultConfigService');
 vi.mock('@/shared/services/studyService');
-vi.mock('@/shared/utils/trajectoryUtils.ts');
+vi.mock('@/shared/utils/trajectoryUtils');
 vi.mock('@/shared/utils/sortUtils.ts');
 
 describe('getReadOnlyForGeneratedStudy', () => {
@@ -901,7 +899,7 @@ describe('buildPayload', () => {
 });
 
 describe('buildReadOnlyMap', () => {
-  beforeEach(() => {
+  afterEach(() => {
     vi.clearAllMocks();
   });
 
@@ -923,7 +921,7 @@ describe('buildReadOnlyMap', () => {
     });
 
     expect(result).toEqual({ 0: true, 1: true });
-    expect(generateReadOnlyIndexMap).toHaveBeenCalledWith(rows);
+    expect(trajectoryUtils.generateReadOnlyIndexMap).toHaveBeenCalledWith(rows);
   });
 
   it('should use retrieveReadOnlyArea when study is not generated', () => {
@@ -937,7 +935,7 @@ describe('buildReadOnlyMap', () => {
     });
 
     expect(result).toEqual({ 0: false, 1: true });
-    expect(retrieveReadOnlyArea).toHaveBeenCalledWith(rows, defaultAreaListNotInList);
+    expect(trajectoryUtils.retrieveReadOnlyArea).toHaveBeenCalledWith(rows, defaultAreaListNotInList);
   });
 
   it('should add DSR-specific readonly rule', () => {
@@ -998,7 +996,7 @@ describe('buildReadOnlyMap', () => {
 });
 
 describe('buildHypothesisRows', () => {
-  beforeEach(() => {
+  afterEach(() => {
     vi.clearAllMocks();
   });
 
@@ -1074,16 +1072,16 @@ describe('buildHypothesisRows', () => {
   });
 });
 
-vi.mock('@/shared/services/trajectoryService.ts', () => ({
-  isParamModulationRequired: vi.fn(),
-}));
-
-vi.mock('@/shared/utils/sortUtils', () => ({
-  sortWithFixedPosition: vi.fn(),
-}));
+// vi.mock('@/shared/services/trajectoryService.ts', () => ({
+//   isParamModulationRequired: vi.fn(),
+// }));
+//
+// vi.mock('@/shared/utils/sortUtils', () => ({
+//   sortWithFixedPosition: vi.fn(),
+// }));
 
 describe('updateTableAfterRowDeletion', () => {
-  beforeEach(() => {
+  afterEach(() => {
     vi.clearAllMocks();
   });
 
@@ -1228,7 +1226,7 @@ describe('updateTableAfterRowDeletion', () => {
 });
 
 describe('updateTableAfterCellDetach', () => {
-  beforeEach(() => {
+  afterEach(() => {
     vi.clearAllMocks();
   });
 
@@ -1236,6 +1234,10 @@ describe('updateTableAfterCellDetach', () => {
   // THERMAL
   // ---------------------------------------------------------------------------
   describe('THERMAL_TECHNICAL_SPECIFIC_PARAMETER', () => {
+    afterEach(() => {
+      vi.clearAllMocks();
+    });
+
     it('détache la cellule + remet la modulation à MISSING si additionalTrajectory est une modulation', async () => {
       const data = [{ hypothesis: 'H1' }, { hypothesis: 'H2' }, { hypothesis: 'H3' }] as HypothesisRowData[];
 
@@ -1252,7 +1254,7 @@ describe('updateTableAfterCellDetach', () => {
 
       const baseData = [{ ...data[0] }, { ...data[1], ...empty }, data[2]];
 
-      vi.mocked(setNestedData).mockReturnValue(['updated'] as unknown as HypothesisRowData[]);
+      vi.mocked(trajectoryUtils.setNestedData).mockReturnValue(['updated'] as unknown as HypothesisRowData[]);
       vi.mocked(isParamModulationRequired).mockResolvedValue(false);
 
       const result = await updateTableAfterCellDetach({
@@ -1264,7 +1266,7 @@ describe('updateTableAfterCellDetach', () => {
         horizon: '2030',
       });
 
-      expect(setNestedData).toHaveBeenCalledWith(baseData, indexArray, empty);
+      expect(trajectoryUtils.setNestedData).toHaveBeenCalledWith(baseData, indexArray, empty);
 
       expect(result).toEqual({
         newData: ['updated'],
@@ -1284,7 +1286,7 @@ describe('updateTableAfterCellDetach', () => {
         status: TRAJECTORY_SELECTION_STATUS.MISSING,
       };
 
-      vi.mocked(setNestedData).mockReturnValue(['updated'] as unknown as HypothesisRowData[]);
+      vi.mocked(trajectoryUtils.setNestedData).mockReturnValue(['updated'] as unknown as HypothesisRowData[]);
       vi.mocked(isParamModulationRequired).mockResolvedValue(true);
 
       const result = await updateTableAfterCellDetach({
@@ -1296,7 +1298,7 @@ describe('updateTableAfterCellDetach', () => {
         horizon: '2030',
       });
 
-      expect(setNestedData).toHaveBeenCalledWith(data, indexArray, empty);
+      expect(trajectoryUtils.setNestedData).toHaveBeenCalledWith(data, indexArray, empty);
 
       expect(result).toEqual({
         newData: ['updated'],
@@ -1322,7 +1324,7 @@ describe('updateTableAfterCellDetach', () => {
       const updated = ['updated'] as unknown as HypothesisRowData[];
       const sortedSpecific = ['sorted'] as unknown as HypothesisRowData[];
 
-      vi.mocked(setNestedData).mockReturnValue(updated);
+      vi.mocked(trajectoryUtils.setNestedData).mockReturnValue(updated);
       vi.mocked(sortUtils.sortWithFixedPosition).mockReturnValue(sortedSpecific);
 
       const result = await updateTableAfterCellDetach({
@@ -1334,7 +1336,7 @@ describe('updateTableAfterCellDetach', () => {
         horizon: '2030',
       });
 
-      expect(setNestedData).toHaveBeenCalledWith(data, indexArray, empty);
+      expect(trajectoryUtils.setNestedData).toHaveBeenCalledWith(data, indexArray, empty);
       expect(sortUtils.sortWithFixedPosition).toHaveBeenCalledWith(updated.slice(0, -1));
 
       expect(result).toEqual({
@@ -1441,7 +1443,7 @@ describe('updateTableAfterCellDetach', () => {
         status: TRAJECTORY_SELECTION_STATUS.MISSING,
       };
 
-      vi.mocked(setNestedData).mockReturnValue(['updated'] as unknown as HypothesisRowData[]);
+      vi.mocked(trajectoryUtils.setNestedData).mockReturnValue(['updated'] as unknown as HypothesisRowData[]);
 
       const result = await updateTableAfterCellDetach({
         type: TRAJECTORY_TYPE.STS,
@@ -1452,7 +1454,7 @@ describe('updateTableAfterCellDetach', () => {
         horizon: '2030',
       });
 
-      expect(setNestedData).toHaveBeenCalledWith(data, indexArray, empty);
+      expect(trajectoryUtils.setNestedData).toHaveBeenCalledWith(data, indexArray, empty);
 
       expect(result).toEqual({
         newData: ['updated'],
@@ -1461,32 +1463,142 @@ describe('updateTableAfterCellDetach', () => {
   });
 });
 
-describe('getTypeToImport', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
+describe('getParamForFetchFSTrajectory', () => {
+  afterEach(() => {
+    vi.resetAllMocks();
+  });
+
+  it('return AREA type when index table is not the last one', () => {
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.AREA, [0], 2, {
+      area: 'H2',
+      isDefault: false,
+    });
+    expect(typeToUse).toEqual(TRAJECTORY_TYPE.AREA);
+    expect(areaToUse).toEqual('');
+  });
+
+  it('return LINK type when index table is the last one', () => {
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.AREA, [1], 2, {
+      area: 'H2',
+      isDefault: false,
+    });
+    expect(typeToUse).toEqual(TRAJECTORY_TYPE.LINK);
+    expect(areaToUse).toEqual('');
+  });
+
+  it('return LOAD type when LOAD is called', () => {
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.LOAD, [1], 2, {
+      area: 'H2',
+      isDefault: false,
+    });
+    expect(typeToUse).toEqual(TRAJECTORY_TYPE.LOAD);
+    expect(areaToUse).toEqual('H2');
+  });
+
+  it('return THERMAL_CAPACITY type when THERMAL_CAPACITY is called', () => {
+    const { typeToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.THERMAL_CAPACITY, [1], 2, {
+      area: 'H2',
+      technology: 'CCGT',
+      isDefault: false,
+    });
+    expect(typeToUse).toEqual(TRAJECTORY_TYPE.THERMAL_CAPACITY);
+  });
+
+  it('return THERMAL_TECHNICAL_SPECIFIC_PARAMETER type when THERMAL_TECHNICAL_SPECIFIC_PARAMETER is called', () => {
+    const { typeToUse } = getParamForFetchFSTrajectory(
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+      [0, 1],
+      2,
+      {
+        area: 'H2',
+        technology: 'CCGT',
+        isDefault: false,
+      },
+    );
+    expect(typeToUse).toEqual(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER);
+  });
+
+  it('return THERMAL_TECHNICAL_MODULATION_PARAMETER type when THERMAL_TECHNICAL_SPECIFIC_PARAMETER is called for the second line', () => {
+    getParamForFetchFSTrajectory(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, [1], 3, {
+      area: 'H2',
+      technology: 'CCGT',
+      isDefault: false,
+    });
+    expect(trajectoryUtils.getTrajectoryTypeByIndex).toHaveBeenCalledWith(1);
+  });
+
+  it('return THERMAL_TECHNICAL_COMMON_PARAMETER type when THERMAL_TECHNICAL_COMMON_PARAMETER is called', () => {
+    getParamForFetchFSTrajectory(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, [2], 3, {
+      area: 'H2',
+      technology: 'CCGT',
+      isDefault: false,
+    });
+    expect(trajectoryUtils.getTrajectoryTypeByIndex).toHaveBeenCalledWith(2);
+  });
+
+  it('return THERMAL_ECONOMIC_COST_PARAMETER type when THERMAL_ECONOMIC_COST_PARAMETER is called', () => {
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(
+      TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER,
+      [0],
+      2,
+      {
+        area: 'H2',
+        technology: 'CCGT',
+        isDefault: false,
+      },
+    );
+    expect(typeToUse).toEqual(TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER);
+    expect(areaToUse).toEqual('');
+  });
+
+  it('return THERMAL_ECONOMIC_PARAMETER type when THERMAL_ECONOMIC_PARAMETER is called', () => {
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(
+      TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER,
+      [1],
+      2,
+      {
+        area: 'H2',
+        technology: 'CCGT',
+        isDefault: false,
+      },
+    );
+    expect(typeToUse).toEqual(TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER);
+    expect(areaToUse).toEqual('');
   });
 
   it('return DSR type when index table is not the last one', () => {
-    const data = [{ hypothesis: 'H1' }, { hypothesis: 'H2' }, { hypothesis: 'H3' }] as HypothesisRowData[];
-    const result = getTypeToImport(TRAJECTORY_TYPE.DSR, '1', data);
-    expect(result).toEqual(TRAJECTORY_TYPE.DSR);
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.DSR, [1], 3, {
+      area: 'H2',
+      isDefault: false,
+    });
+    expect(typeToUse).toEqual(TRAJECTORY_TYPE.DSR);
+    expect(areaToUse).toEqual('');
   });
 
   it('return DSR_CAPACITY_MODULATION type when index table is the last one', () => {
-    const data = [{ hypothesis: 'H1' }, { hypothesis: 'H2' }, { hypothesis: 'H3' }] as HypothesisRowData[];
-    const result = getTypeToImport(TRAJECTORY_TYPE.DSR, '2', data);
-    expect(result).toEqual(TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION);
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.DSR, [2], 3, {
+      area: 'H2',
+      isDefault: false,
+    });
+    expect(typeToUse).toEqual(TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION);
+    expect(areaToUse).toEqual('');
   });
 
   it('return HYDRO_TECHNICAL_PARAMETERS type when index table is the last one', () => {
-    const data = [{ hypothesis: 'H1' }, { hypothesis: 'H2' }] as HypothesisRowData[];
-    const result = getTypeToImport(TRAJECTORY_TYPE.HYDRO_SERIES, '0.1', data);
-    expect(result).toEqual(TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS);
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.HYDRO_SERIES, [0, 1], 2, {
+      area: 'H2',
+      isDefault: false,
+    });
+    expect(typeToUse).toEqual(TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS);
+    expect(areaToUse).toEqual('');
   });
 
   it('return HYDRO_PSP_TECHNICAL_PARAMETERS type when index table is the last one', () => {
-    const data = [{ hypothesis: 'H1' }, { hypothesis: 'H2' }] as HypothesisRowData[];
-    const result = getTypeToImport(TRAJECTORY_TYPE.HYDRO_PSP_SERIES, '0.1', data);
-    expect(result).toEqual(TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS);
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.HYDRO_PSP_SERIES, [0, 1], 2, {
+      area: 'H2',
+      isDefault: false,
+    });
+    expect(typeToUse).toEqual(TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS);
+    expect(areaToUse).toEqual('');
   });
 });

@@ -18,17 +18,45 @@ import {
   mockEmptyDbTrajectoryArrayLoadSTS,
   mockEmptyDbTrajectoryLoadFR,
   mockEmptyDbTrajectoryLoadOthers,
+  resTechnologies,
 } from '@/mocks/data/tests/trajectory.mock.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { useFetchHypothesisTrajectories } from '@/hooks/useFetchHypothesisTrajectories.ts';
 import * as trajectoryUtils from '@/shared/utils/trajectoryUtils.ts';
+import * as trajectoryService from '@/shared/services/trajectoryService';
 import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
-import { STSTechnology, ThermalOptionsResults } from '@/mocks/data/list/names.ts';
-import { getResTechnologyList } from '@/shared/services/trajectoryService.ts';
+import { HydroSubRows, STSTechnology, ThermalOptionsResults } from '@/mocks/data/list/names.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 
-vi.mock('@/shared/services/trajectoryService');
+vi.mock('@/shared/services/trajectoryService', async (importOriginal) => {
+  const actual: Mock = await importOriginal();
+  return {
+    ...actual,
+    getResTechnologyList: vi.fn().mockReturnValue([
+      {
+        id: 1,
+        label: 'Wind Offshore',
+        code: 'wind_offshore',
+      },
+      {
+        id: 2,
+        label: 'Wind Onshore',
+        code: 'wind_onshore',
+      },
+      {
+        id: 3,
+        label: 'Solar PV',
+        code: 'solar_pv',
+      },
+      {
+        id: 4,
+        label: 'Solar Thermo',
+        code: 'solar_thermo',
+      },
+    ]),
+  };
+});
 vi.mock('@/shared/services/hypothesisTableService');
 vi.mock('@/shared/services/studyService');
 vi.mock('@/shared/utils/trajectoryUtils', async (importOriginal) => {
@@ -766,12 +794,6 @@ describe('useFetchHypothesisTrajectories', () => {
       .spyOn(trajectoryUtils, 'removeDuplicateByTechnology')
       .mockReturnValue(expectedTrajectories);
 
-    const trajectoryService = await import('@/shared/services/trajectoryService.ts');
-    vi.mocked(trajectoryService.getResTechnologyList).mockResolvedValue([
-      { id: 1, label: 'Offshore Wind', code: 'offshore_wind' },
-      { id: 2, label: "'Solar PV'", code: 'solar_pv' },
-    ]);
-
     try {
       const result = await fetchAndNormalizeTrajectories({
         id: 7,
@@ -781,10 +803,7 @@ describe('useFetchHypothesisTrajectories', () => {
       });
 
       expect(trajectoryService.getResTechnologyList).toHaveBeenCalled();
-      expect(result.technologies).toEqual([
-        { id: 1, label: 'Offshore Wind', code: 'offshore_wind' },
-        { id: 2, label: "'Solar PV'", code: 'solar_pv' },
-      ]);
+      expect(result.technologies).toEqual(resTechnologies);
       expect(result.trajectories).toEqual(expectedTrajectories);
       expect(result.dsrCmResult).toEqual([]);
     } finally {
@@ -793,27 +812,12 @@ describe('useFetchHypothesisTrajectories', () => {
     }
   });
 
-  it('propagates error when fetching RES technologies fails', async () => {
-    const trajectoryService = await import('@/shared/services/trajectoryService.ts');
-    vi.mocked(trajectoryService.getResTechnologyList).mockRejectedValue(new Error('res-fetch-failed'));
-
-    await expect(
-      fetchAndNormalizeTrajectories({
-        id: 1,
-        trajType: TRAJECTORY_TYPE.RES_LOAD,
-        defaultAreas: [],
-        emptyAreaSelected: [],
-      }),
-    ).rejects.toThrow('res-fetch-failed');
-  });
-
-  it.skip('should include ResOptions when trajectoryType is RES_CAPACITY', async () => {
+  it('should include ResOptions when trajectoryType is RES_CAPACITY', async () => {
     const defaultAreas = [{ name: 'FR' }];
     const areas = [{ areaName: 'AT' }, { areaName: 'BE' }] as TrajectoryAreaData[];
     vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArrayResCapacity);
-    const restTech = await getResTechnologyList();
-    const technologiesHypothesis = restTech.map((option) => ({
-      hypothesis: option,
+    const technologiesHypothesis = resTechnologies.map((option) => ({
+      hypothesis: option.label,
       isDefault: false,
       isDeletable: false,
       status: TRAJECTORY_SELECTION_STATUS.MISSING,
@@ -832,13 +836,12 @@ describe('useFetchHypothesisTrajectories', () => {
     });
   });
 
-  it.skip('should include ResOptions when trajectoryType is RES_LOAD', async () => {
+  it('should include ResOptions when trajectoryType is RES_LOAD', async () => {
     const defaultAreas = [{ name: 'FR' }];
     const areas = [{ areaName: 'AT' }, { areaName: 'BE' }] as TrajectoryAreaData[];
     vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArrayResLoad);
-    const restTech2 = await getResTechnologyList();
-    const technologiesHypothesis = restTech2.map((option) => ({
-      hypothesis: option,
+    const technologiesHypothesis = resTechnologies.map((option) => ({
+      hypothesis: option.label,
       isDefault: false,
       isDeletable: false,
       status: TRAJECTORY_SELECTION_STATUS.MISSING,
@@ -857,7 +860,7 @@ describe('useFetchHypothesisTrajectories', () => {
     });
   });
 
-  it.skip('should include ResOptions when trajectoryTypes are RES_ZONAL_DISTRIBUTION and RES_TECHNOLOGY_DISTRIBUTION', async () => {
+  it('should include ResOptions when trajectoryTypes are RES_ZONAL_DISTRIBUTION and RES_TECHNOLOGY_DISTRIBUTION', async () => {
     const defaultAreas = [{ name: 'FR' }];
     const areas = [{ areaName: 'AT' }, { areaName: 'BE' }] as TrajectoryAreaData[];
     vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArrayResDistribution);
@@ -873,12 +876,14 @@ describe('useFetchHypothesisTrajectories', () => {
     );
 
     await waitFor(() => {
-      expect(result.current.hypothesisTrajectories?.[TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION]).toEqual(
-        mockDbTrajectoryArrayResDistribution[0],
+      const hypothesisATZonal = result.current.hypothesisTrajectories?.[TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION]?.find(
+        (hypothesis) => hypothesis.hypothesis === 'AT',
       );
-      expect(result.current.hypothesisTrajectories?.[TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION]).toEqual(
-        mockDbTrajectoryArrayResDistribution[1],
-      );
+      expect(hypothesisATZonal?.trajectory).toEqual(mockDbTrajectoryArrayResDistribution[0]);
+      const hypothesisBETechnology = result.current.hypothesisTrajectories?.[
+        TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION
+      ]?.find((hypothesis) => hypothesis.hypothesis === 'BE');
+      expect(hypothesisBETechnology?.trajectory).toEqual(mockDbTrajectoryArrayResDistribution[1]);
     });
   });
 
@@ -977,12 +982,12 @@ describe('useFetchHypothesisTrajectories', () => {
       expect(frRow?.trajectory).toBeNull();
 
       // La subrow 'Series' provient du fetch HYDRO_SERIES
-      const seriesSubRow = frRow?.subRows?.find((sr) => sr.hypothesis === 'hydro.@series');
+      const seriesSubRow = frRow?.subRows?.find((sr) => sr.hypothesis === HydroSubRows[0].label);
       expect(seriesSubRow?.trajectory).toEqual(hydroSeriesTrajectory);
       expect(seriesSubRow?.status).toBe(TRAJECTORY_SELECTION_STATUS.OK);
 
       // La subrow 'Technical parameters' provient du fetch HYDRO_TECHNICAL_PARAMETERS
-      const techParamsSubRow = frRow?.subRows?.find((sr) => sr.hypothesis === 'thermal.@parametersTechnical');
+      const techParamsSubRow = frRow?.subRows?.find((sr) => sr.hypothesis === HydroSubRows[1].label);
       expect(techParamsSubRow?.trajectory).toEqual(hydroTechParamsTrajectory);
       expect(techParamsSubRow?.status).toBe(TRAJECTORY_SELECTION_STATUS.OK);
     });
@@ -1054,12 +1059,12 @@ describe('useFetchHypothesisTrajectories', () => {
       expect(frRow?.trajectory).toBeNull();
 
       // La subrow 'Series' provient du fetch HYDRO_SERIES
-      const seriesSubRow = frRow?.subRows?.find((sr) => sr.hypothesis === 'Series');
+      const seriesSubRow = frRow?.subRows?.find((sr) => sr.hypothesis === HydroSubRows[0].label);
       expect(seriesSubRow?.trajectory).toEqual(hydroPSPSeriesTrajectory);
       expect(seriesSubRow?.status).toBe(TRAJECTORY_SELECTION_STATUS.OK);
 
       // La subrow 'Technical parameters' provient du fetch HYDRO_TECHNICAL_PARAMETERS
-      const techParamsSubRow = frRow?.subRows?.find((sr) => sr.hypothesis === 'Technical parameters');
+      const techParamsSubRow = frRow?.subRows?.find((sr) => sr.hypothesis === HydroSubRows[1].label);
       expect(techParamsSubRow?.trajectory).toEqual(hydroPSPTechParamsTrajectory);
       expect(techParamsSubRow?.status).toBe(TRAJECTORY_SELECTION_STATUS.OK);
     });

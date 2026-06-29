@@ -28,13 +28,13 @@ import { addRow, handleViewTrajectory } from '@/shared/services/hypothesisTableS
 import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow.ts';
 import { useTrajectorySearchHandler } from '@/hooks/useTrajectorySearchHandler.ts';
-import { getTypeToImport, shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
+import { getParamForFetchFSTrajectory, shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
 import { CheckBoxList } from '@/components/list/CheckBoxList.tsx';
 import { useTranslation } from 'react-i18next';
 import { TrajectoryDataVisualisation } from '@common/modal/TrajectoryDataVisualisation.tsx';
 import { useTrajectoryFetchFromFSHandler } from '@/hooks/useTrajectoryFetchFromFSHandler.ts';
-import { RowToDeleteProps } from '@/shared/types/HypothesisTable.ts';
+import { HypothesisType, RowToDeleteProps } from '@/shared/types/HypothesisTable.ts';
 import { useHypothesisTableUpdateHandler } from '@/hooks/useHypothesisTableUpdateHandler.ts';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
 
@@ -80,12 +80,8 @@ const ExpandableTab = ({
     setDbTrajectories,
     technologies,
   });
-  const { handleFetchFromFS } = useTrajectoryFetchFromFSHandler({
-    defaultAreas,
-    setOptionsFS,
-    setRowIdSelected,
-    toggleModal,
-  });
+  const { handleFetchFromFS } = useTrajectoryFetchFromFSHandler();
+
   const { handleHypothesisTableUpdate } = useHypothesisTableUpdateHandler({
     studyData,
     data,
@@ -164,16 +160,6 @@ const ExpandableTab = ({
     [data, removeRow, tabType],
   );
 
-  const handleCloseImportModal = useCallback(
-    async (value?: SelectOption) => {
-      toggleModal();
-      if (value != null) {
-        await importTrajectory(tabType, value, rowIdSelected, data, setData, technologies);
-      }
-    },
-    [data, importTrajectory, rowIdSelected, technologies, toggleModal, tabType],
-  );
-
   const handleViewData = useCallback(
     (rowId: string) => {
       const indexArray = rowId.split('.').map(Number);
@@ -210,7 +196,19 @@ const ExpandableTab = ({
         type={tabType}
         list={technologiesLabel}
         handleSearch={handleSearch}
-        handleImport={async (rowId: string) => await handleFetchFromFS(tabType, data, rowId)}
+        handleImport={async (rowId: string) => {
+          const hypothesis = getAreaTrajectoryName(rowId, data, technologies);
+          const { typeToUse, areaToUse, isDefaultArea } = getParamForFetchFSTrajectory(
+            tabType,
+            rowId.split('.').map(Number),
+            data.length,
+            hypothesis,
+          );
+          const results = await handleFetchFromFS({ typeToUse, areaToUse, isDefaultArea });
+          setOptionsFS(results);
+          setRowIdSelected(rowId);
+          toggleModal();
+        }}
         isReadOnlyEnable={true}
         updateData={handleHypothesisTableUpdate}
         removeRow={removeTableRow}
@@ -219,9 +217,19 @@ const ExpandableTab = ({
       {isModalOpen && (
         <ImportTrajectoryModal
           options={optionsFS}
-          onClose={handleCloseImportModal}
-          trajectoryType={getTypeToImport(tabType, rowIdSelected, data)}
-          hypothesis={getAreaTrajectoryName(rowIdSelected, data)}
+          onClose={async (
+            typeToUse?: TRAJECTORY_TYPE,
+            value?: SelectOption,
+            hypothesis?: HypothesisType,
+            indexArray?: number[],
+          ) => {
+            toggleModal();
+            await importTrajectory(setData, value, typeToUse, indexArray, hypothesis);
+          }}
+          tabType={tabType}
+          hypothesis={getAreaTrajectoryName(rowIdSelected, data, technologies)}
+          indexArray={rowIdSelected?.split('.').map(Number)}
+          rowsNb={data.length}
         />
       )}
       {isViewModalOpen && trajectoryData && (

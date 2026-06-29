@@ -13,6 +13,7 @@ import {
   convertIntoHypothesisRowWithTechnologies,
   filterRow,
   generateReadOnlyIndexMap,
+  getTrajectoryTypeByIndex,
   removeDuplicate,
   removeDuplicateByTechnology,
   retrieveReadOnlyArea,
@@ -28,6 +29,7 @@ import { HydroSubRows, STSTechnology } from '@/mocks/data/list/names.ts';
 import { TFunction } from 'i18next';
 import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
 import { getResTechnologyList, isParamModulationRequired } from '@/shared/services/trajectoryService.ts';
+import { HypothesisType } from '@/shared/types/HypothesisTable.ts';
 
 /**
  * Retrieve read only row of a study generated
@@ -324,6 +326,17 @@ export const buildHypothesisRows = ({
   return rows;
 };
 
+const getNuclearHypothesisLabel = (type: TRAJECTORY_TYPE, t: TFunction<'translation', undefined>) => {
+  switch (type) {
+    case TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP:
+      return t('thermal.@epr');
+    case TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM:
+      return t('thermal.@long_term');
+    default:
+      return t('thermal.@smr');
+  }
+};
+
 export const buildRowsByType = ({
   rowTypes,
   subRowTypes,
@@ -351,12 +364,7 @@ export const buildRowsByType = ({
     const trajectory =
       trajectoriesByType?.find((trajectoryByType) => trajectoryByType.trajType === type)?.trajectories?.[0] ?? null;
     return {
-      hypothesis:
-        type === TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP
-          ? t('thermal.@epr')
-          : type === TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM
-            ? t('thermal.@long_term')
-            : t('thermal.@smr'),
+      hypothesis: getNuclearHypothesisLabel(type, t),
       trajectory,
       status: trajectory ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
       isDefault: false,
@@ -604,17 +612,73 @@ export const updateTableAfterCellDetach = async ({
   return { newData };
 };
 
-export const getTypeToImport = (type: TRAJECTORY_TYPE, id: string, data: HypothesisRowData[]) => {
+export const getParamForFetchFSTrajectory = (
+  type: TRAJECTORY_TYPE,
+  indexArray: number[],
+  rowsNb: number,
+  hypothesis?: HypothesisType,
+) => {
   let typeToUse = type;
-  const indexArray = id.split('.').map(Number);
-  if (type === TRAJECTORY_TYPE.DSR && indexArray[0] === Math.max(data.length - 1, 0)) {
-    typeToUse = TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION;
+  let areaToUse = hypothesis?.area;
+  let isDefaultArea = hypothesis?.isDefault ?? false;
+  const isLastIndex = indexArray[0] === Math.max(rowsNb - 1, 0);
+
+  if (type === TRAJECTORY_TYPE.AREA) {
+    typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK;
+    areaToUse = '';
   }
-  if (type === TRAJECTORY_TYPE.HYDRO_SERIES && indexArray.length === 2 && indexArray[1] === 1) {
-    typeToUse = TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS;
+  if (type === TRAJECTORY_TYPE.DSR) {
+    if (isLastIndex) {
+      typeToUse = TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION;
+    }
+    areaToUse = '';
+    isDefaultArea = false;
   }
-  if (type === TRAJECTORY_TYPE.HYDRO_PSP_SERIES && indexArray.length === 2 && indexArray[1] === 1) {
-    typeToUse = TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS;
+  if (type === TRAJECTORY_TYPE.STS && hypothesis?.technology) {
+    areaToUse = hypothesis?.technology;
   }
-  return typeToUse;
+  if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
+    if (indexArray[0] === 0 && hypothesis?.technology) {
+      areaToUse = hypothesis?.technology;
+    } else {
+      typeToUse = getTrajectoryTypeByIndex(indexArray[0]);
+      areaToUse = '';
+    }
+  }
+  if (type === TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER) {
+    if (indexArray[0] === 1) {
+      typeToUse = TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER;
+    }
+    areaToUse = '';
+  }
+  if (type === TRAJECTORY_TYPE.HYDRO_SERIES) {
+    typeToUse = indexArray[1] === 0 ? TRAJECTORY_TYPE.HYDRO_SERIES : TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS;
+    areaToUse = '';
+  }
+  if (type === TRAJECTORY_TYPE.HYDRO_PSP_SERIES) {
+    typeToUse = indexArray[1] === 0 ? TRAJECTORY_TYPE.HYDRO_PSP_SERIES : TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS;
+    areaToUse = '';
+  }
+  if (type === TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION) {
+    if (indexArray.length === 2) {
+      if (indexArray[1] === 0) {
+        typeToUse = TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP;
+        areaToUse = '';
+      }
+      if (indexArray[1] === 1) {
+        typeToUse = TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM;
+        areaToUse = '';
+      }
+      if (indexArray[1] === 2) {
+        typeToUse = TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR;
+        areaToUse = '';
+      }
+    } else if (indexArray[0] === 1) {
+      typeToUse = TRAJECTORY_TYPE.NUCLEAR_FR_TALON;
+      areaToUse = '';
+    } else {
+      areaToUse = '';
+    }
+  }
+  return { typeToUse, areaToUse, isDefaultArea };
 };

@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { DbTrajectory, FsTrajectory, SelectOption } from '@/shared/types';
+import { DbTrajectory, FsTrajectory, isTrajectoryHydroType, SelectOption } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 
 export const convertToSelectionOptionType = (trajectories: DbTrajectory[]): SelectOption[] =>
@@ -19,10 +19,9 @@ export const isRepositoryTrajectory = (type: TRAJECTORY_TYPE, isDefaultArea = fa
   type === TRAJECTORY_TYPE.MISC_LOAD ||
   (type === TRAJECTORY_TYPE.RES_CAPACITY && isDefaultArea) ||
   type === TRAJECTORY_TYPE.RES_LOAD ||
-  type === TRAJECTORY_TYPE.HYDRO_SERIES ||
-  type === TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS ||
-  type === TRAJECTORY_TYPE.HYDRO_PSP_SERIES ||
-  type === TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS;
+  isTrajectoryHydroType(type) ||
+  type === TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION ||
+  type === TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM;
 
 export const convertToFSSelectionOptionType = (options: FsTrajectory[], isDefaultArea = false): SelectOption[] =>
   options.map((option, indexTrajectory) => ({
