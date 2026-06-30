@@ -74,7 +74,7 @@ const ExpandableTab = ({
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch, setReadOnly);
   const { removeRow } = useHypothesisTableRemoveRow(studyData, dispatch, setData, setCheckedValues, setReadOnly);
   const { handleSearch } = useTrajectorySearchHandler({
-    studyData,
+    studyHorizon: studyData.horizon,
     setDbTrajectories,
   });
   const { handleFetchFromFS } = useTrajectoryFetchFromFSHandler();

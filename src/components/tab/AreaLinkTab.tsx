@@ -59,7 +59,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
   const { hypothesisTrajectories, readOnlyRow } = useFetchFixHypothesisTrajectories(configs, options, studyData?.id);
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch, setReadOnly);
   const { handleSearch } = useTrajectorySearchHandler({
-    studyData,
+    studyHorizon: studyData.horizon,
     setDbTrajectories,
   });
   const { handleFetchFromFS } = useTrajectoryFetchFromFSHandler();

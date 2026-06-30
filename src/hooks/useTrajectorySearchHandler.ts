@@ -1,16 +1,16 @@
 import { Dispatch, SetStateAction, useCallback } from 'react';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { DbTrajectory, SelectOption, StudyDTO } from '@/shared/types';
+import { DbTrajectory, SelectOption } from '@/shared/types';
 import { handleTrajectorySearch } from '@/shared/services/hypothesisTableService.ts';
 import { getFetchParams } from '@/shared/utils/trajectoryUtils.ts';
 import { SearchParams } from '@/shared/types/HypothesisTable.ts';
 
 interface UseTrajectorySearchHandlerArgs {
-  studyData: StudyDTO;
+  studyHorizon: string;
   setDbTrajectories: Dispatch<SetStateAction<DbTrajectory[]>>;
 }
 
-export const useTrajectorySearchHandler = ({ studyData, setDbTrajectories }: UseTrajectorySearchHandlerArgs) => {
+export const useTrajectorySearchHandler = ({ studyHorizon, setDbTrajectories }: UseTrajectorySearchHandlerArgs) => {
   const handleSearch = useCallback(
     async (
       tabType: TRAJECTORY_TYPE,
@@ -19,13 +19,13 @@ export const useTrajectorySearchHandler = ({ studyData, setDbTrajectories }: Use
     ): Promise<SelectOption[] | undefined> => {
       const { typeToUse, areaToUse, technology } = getFetchParams(tabType, indexArray, options);
 
-      return await handleTrajectorySearch(typeToUse, setDbTrajectories, studyData.horizon, {
+      return await handleTrajectorySearch(typeToUse, setDbTrajectories, studyHorizon, {
         ...(areaToUse && { area: areaToUse }),
         ...(technology && { technology }),
         ...(options?.fileNameContains && { fileNameContains: options.fileNameContains }),
       });
     },
-    [studyData.horizon, setDbTrajectories],
+    [studyHorizon, setDbTrajectories],
   );
 
   return { handleSearch };

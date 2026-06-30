@@ -149,9 +149,10 @@ describe('useTrajectoryFetchFromFSHandler', () => {
       typeToUse: TRAJECTORY_TYPE.HYDRO_SERIES,
       areaToUse: '',
       isDefaultArea: false,
+      searchTerm: 'BP',
     });
 
-    expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith(TRAJECTORY_TYPE.HYDRO_SERIES);
+    expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith(TRAJECTORY_TYPE.HYDRO_SERIES, 'BP');
   });
 
   it('should use HYDRO_TECHNICAL_PARAMETERS type for last index when type is HYDRO SERIES', async () => {
