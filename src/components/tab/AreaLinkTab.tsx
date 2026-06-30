@@ -59,8 +59,6 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
   const { hypothesisTrajectories, readOnlyRow } = useFetchFixHypothesisTrajectories(configs, options, studyData?.id);
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch, setReadOnly);
   const { handleSearch } = useTrajectorySearchHandler({
-    data,
-    type: TRAJECTORY_TYPE.AREA,
     studyData,
     setDbTrajectories,
   });
@@ -126,7 +124,10 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
         isReadOnlyEnable={true}
         progress={progress}
         idSelected={String(rowIdSelected)}
-        handleSearch={handleSearch}
+        handleSearch={async (fileNameContains: string, rowId: string) => {
+          const indexArray = rowId.split('.').map(Number);
+          return await handleSearch(TRAJECTORY_TYPE.AREA, indexArray, { fileNameContains });
+        }}
         updateData={handleHypothesisTableUpdate}
         handleImport={async (rowId: string) => {
           const hypothesis = getAreaTrajectoryName(rowId, data);

@@ -74,11 +74,8 @@ const ExpandableTab = ({
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch, setReadOnly);
   const { removeRow } = useHypothesisTableRemoveRow(studyData, dispatch, setData, setCheckedValues, setReadOnly);
   const { handleSearch } = useTrajectorySearchHandler({
-    data,
-    type: tabType,
     studyData,
     setDbTrajectories,
-    technologies,
   });
   const { handleFetchFromFS } = useTrajectoryFetchFromFSHandler();
 
@@ -195,7 +192,18 @@ const ExpandableTab = ({
         idSelected={rowIdSelected}
         type={tabType}
         list={technologiesLabel}
-        handleSearch={handleSearch}
+        handleSearch={async (fileNameContains: string, rowId: string) => {
+          const indexArray = rowId.split('.').map(Number);
+          const rowIndex = indexArray?.[0];
+          const subIndex = indexArray?.[1];
+          return await handleSearch(tabType, indexArray, {
+            area: data[rowIndex]?.hypothesis,
+            technology: data[rowIndex]?.subRows?.[subIndex]?.hypothesis,
+            isLastIndex: rowIndex === Math.max(data.length - 1, 0),
+            technologies,
+            fileNameContains,
+          });
+        }}
         handleImport={async (rowId: string) => {
           const hypothesis = getAreaTrajectoryName(rowId, data, technologies);
           const { typeToUse, areaToUse, isDefaultArea } = getParamForFetchFSTrajectory(

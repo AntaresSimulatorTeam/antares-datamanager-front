@@ -1607,6 +1607,10 @@ describe('getParamForFetchFSTrajectory', () => {
   });
 
   it('return NUCLEAR_FR_MODULATION type when index table is the last one', () => {
+    vi.mocked(trajectoryUtils.getFetchParams).mockReturnValue({
+      typeToUse: TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION,
+      areaToUse: '',
+    });
     const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION, [0], 3, {
       area: 'H2',
       isDefault: false,
@@ -1616,6 +1620,10 @@ describe('getParamForFetchFSTrajectory', () => {
   });
 
   it('return NUCLEAR_FR_TALON type when index table is the last one', () => {
+    vi.mocked(trajectoryUtils.getFetchParams).mockReturnValue({
+      typeToUse: TRAJECTORY_TYPE.NUCLEAR_FR_TALON,
+      areaToUse: '',
+    });
     const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION, [1], 3, {
       area: 'H2',
       isDefault: false,
@@ -1625,6 +1633,10 @@ describe('getParamForFetchFSTrajectory', () => {
   });
 
   it('return NUCLEAR_FR_TS_ERP type when index table is the last one', () => {
+    vi.mocked(trajectoryUtils.getFetchParams).mockReturnValue({
+      typeToUse: TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP,
+      areaToUse: '',
+    });
     const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION, [2, 0], 3, {
       area: 'H2',
       isDefault: false,
@@ -1634,6 +1646,10 @@ describe('getParamForFetchFSTrajectory', () => {
   });
 
   it('return NUCLEAR_FR_TS_LONG_TERM type when index table is the last one', () => {
+    vi.mocked(trajectoryUtils.getFetchParams).mockReturnValue({
+      typeToUse: TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM,
+      areaToUse: '',
+    });
     const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION, [2, 1], 3, {
       area: 'H2',
       isDefault: false,
@@ -1643,6 +1659,10 @@ describe('getParamForFetchFSTrajectory', () => {
   });
 
   it('return NUCLEAR_FR_TS_SMR type when index table is the last one', () => {
+    vi.mocked(trajectoryUtils.getFetchParams).mockReturnValue({
+      typeToUse: TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR,
+      areaToUse: '',
+    });
     const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION, [2, 2], 3, {
       area: 'H2',
       isDefault: false,

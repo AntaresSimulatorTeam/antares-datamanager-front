@@ -41,7 +41,7 @@ import {
   TRAJECTORY_THERMAL_SPECIFIC_PARAMETER_IMPORT,
 } from '@/shared/const/apiEndPoint.ts';
 import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
-import { HypothesisType } from '@/shared/types/HypothesisTable.ts';
+import { HypothesisType, SearchParams } from '@/shared/types/HypothesisTable.ts';
 
 /**
  * Get trajectory status from row status
@@ -811,25 +811,15 @@ export const getSubRowListWithArea = (
     type === TRAJECTORY_TYPE.THERMAL_CAPACITY ||
     type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER ||
     type === TRAJECTORY_TYPE.STS ||
-    type === TRAJECTORY_TYPE.RES_CAPACITY ||
-    type === TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION ||
-    type === TRAJECTORY_TYPE.RES_LOAD
+    isTrajectoryResType(type)
   ) {
-    let prefix: string = '';
-    if (
-      type === TRAJECTORY_TYPE.THERMAL_CAPACITY ||
-      type === TRAJECTORY_TYPE.STS ||
-      type === TRAJECTORY_TYPE.RES_CAPACITY ||
-      type === TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION ||
-      type === TRAJECTORY_TYPE.RES_LOAD
-    ) {
-      prefix = t('thermal.@installedPowerInformation');
-    }
-    if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
-      prefix = t('thermal.@specificInformation');
-    }
+    const prefix =
+      type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER
+        ? t('thermal.@specificInformation')
+        : t('thermal.@installedPowerInformation');
+    const subRowsListLabel = isTrajectoryResType(type) ? subRowsList.map((item) => sentenceCase(item)) : subRowsList;
     return {
-      message: `${prefix}: ${subRowsList.join(', ')}`,
+      message: `${prefix}: ${subRowsListLabel.join(', ')}`,
       messageNb: subRowsList.length,
     };
   } else {
@@ -1170,4 +1160,68 @@ export const getModalTile = (tabType: TRAJECTORY_TYPE, hypothesis?: HypothesisTy
       : hypothesis?.technology;
   const area = hypothesis?.area === OTHER_AREAS ? OTHER_AREAS_LABEL : hypothesis?.area;
   return `${area ?? tabType}${technology ? ' - ' : ''}${technology ?? ''}`;
+};
+
+export const getFetchParams = (
+  type: TRAJECTORY_TYPE,
+  indexArray: number[],
+  options?: SearchParams,
+): { typeToUse: TRAJECTORY_TYPE; areaToUse: string; technology?: string } => {
+  let typeToUse = type;
+  let areaToUse = options?.area ?? '';
+  let technology: string =
+    (options?.technologies || []).find((opt) => opt.label === options?.technology)?.code ??
+    (options?.technology as string);
+
+  if (type === TRAJECTORY_TYPE.AREA) {
+    typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK;
+    areaToUse = '';
+  }
+  if (type === TRAJECTORY_TYPE.DSR) {
+    if (options?.isLastIndex) {
+      typeToUse = TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION;
+      areaToUse = '';
+    } else {
+      areaToUse = options?.area ?? '';
+    }
+  }
+
+  if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
+    if (indexArray[0] === 0 && options?.technology) {
+      areaToUse = options?.technology;
+    } else {
+      typeToUse = getTrajectoryTypeByIndex(indexArray[0]);
+    }
+  }
+  if (type === TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER) {
+    if (indexArray[0] === 1) {
+      typeToUse = TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER;
+    }
+  }
+  if (type === TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION) {
+    if (indexArray.length === 2) {
+      if (indexArray[1] === 0) {
+        typeToUse = TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP;
+      }
+      if (indexArray[1] === 1) {
+        typeToUse = TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM;
+      }
+      if (indexArray[1] === 2) {
+        typeToUse = TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR;
+      }
+    } else if (indexArray[0] === 1) {
+      typeToUse = TRAJECTORY_TYPE.NUCLEAR_FR_TALON;
+    }
+    technology = '';
+    areaToUse = '';
+  }
+  if (type === TRAJECTORY_TYPE.HYDRO_SERIES) {
+    typeToUse = indexArray[1] === 0 ? TRAJECTORY_TYPE.HYDRO_SERIES : TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS;
+    technology = '';
+  }
+  if (type === TRAJECTORY_TYPE.HYDRO_PSP_SERIES) {
+    typeToUse = indexArray[1] === 0 ? TRAJECTORY_TYPE.HYDRO_PSP_SERIES : TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS;
+    technology = '';
+  }
+  return { typeToUse, areaToUse, technology };
 };
