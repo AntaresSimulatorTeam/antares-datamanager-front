@@ -1,12 +1,14 @@
 import { describe, expect, it, vi } from 'vitest';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
-import { DbTrajectory, HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
+import { DbTrajectory, FetchResult, HypothesisRowData, TrajectoryAreaData } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { mockDbTrajectory } from '@/mocks/data/tests/trajectory.mock.ts';
 import {
   buildHypothesisRows,
   buildPayload,
   buildReadOnlyMap,
+  buildRowsByArea,
+  buildRowsByType,
   collectTrajectoriesRecursively,
   computeDsrDataAndReadOnly,
   fetchAndNormalizeTrajectories,
@@ -1735,9 +1737,7 @@ describe('getHypothesisLabel', () => {
 
   it('should return hydro.@series for HYDRO_PSP_SERIES', () => {
     const mockT = vi.fn((key: string) => {
-      if (key === 'thermal.@parametersTechnical') return 'Technical Parameters';
       if (key === 'hydro.@series') return 'Series';
-      if (key === 'thermal.@smr') return 'SMR';
       return key;
     }) as unknown as TFunction<'translation', undefined>;
     const result = getHypothesisLabel(TRAJECTORY_TYPE.HYDRO_PSP_SERIES, mockT);
@@ -1748,14 +1748,243 @@ describe('getHypothesisLabel', () => {
 
   it('should return hydro.@series for any other type (default)', () => {
     const mockT = vi.fn((key: string) => {
-      if (key === 'thermal.@parametersTechnical') return 'Technical Parameters';
       if (key === 'hydro.@series') return 'Series';
-      if (key === 'thermal.@smr') return 'SMR';
       return key;
     }) as unknown as TFunction<'translation', undefined>;
     const result = getHypothesisLabel('UNKNOWN_TYPE' as unknown as TRAJECTORY_TYPE, mockT);
 
     expect(mockT).toHaveBeenCalledWith('hydro.@series');
     expect(result).toBe('Series');
+  });
+});
+
+describe('buildRowsByArea', () => {
+  it('should build rows with missing status when no trajectory exists', () => {
+    const areas = ['Area 1'];
+    const subRowTypes = [TRAJECTORY_TYPE.HYDRO_SERIES, TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS];
+
+    const trajectoriesByType = [] as unknown as FetchResult[]; // aucun résultat
+
+    const t = vi.fn((key: string) => {
+      if (key === 'thermal.@parametersTechnical') return 'Technical Parameters';
+      if (key === 'hydro.@series') return 'Series';
+      return key;
+    }) as unknown as TFunction<'translation', undefined>;
+
+    const result = buildRowsByArea({
+      areas,
+      subRowTypes,
+      trajectoriesByType,
+      t,
+    });
+
+    expect(result).toHaveLength(1);
+    const row = result[0];
+
+    expect(row.hypothesis).toBe('Area 1');
+    expect(row.status).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
+    expect(row.subRows).toHaveLength(2);
+
+    row.subRows?.forEach((subRow, index) => {
+      expect(subRow.hypothesis).toBe(index === 0 ? 'Series' : 'Technical Parameters');
+      expect(subRow.trajectory).toBeNull();
+      expect(subRow.status).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
+    });
+  });
+
+  it('should assign trajectory when matching type exists', () => {
+    const areas = ['Area X'];
+    const subRowTypes = [TRAJECTORY_TYPE.HYDRO_SERIES];
+
+    const trajectoriesByType = [
+      {
+        trajType: TRAJECTORY_TYPE.HYDRO_SERIES,
+        trajectories: [{ trajectoryName: 'Trajectory A1' }],
+      },
+    ] as unknown as FetchResult[];
+
+    const t = vi.fn((key: string) => key as unknown as string) as unknown as TFunction<'translation', undefined>;
+
+    const result = buildRowsByArea({
+      areas,
+      subRowTypes,
+      trajectoriesByType,
+      t,
+    });
+
+    const subRow = result[0].subRows?.[0];
+
+    expect(subRow?.trajectory).toEqual({ trajectoryName: 'Trajectory A1' });
+    expect(subRow?.status).toBe(TRAJECTORY_SELECTION_STATUS.OK);
+  });
+
+  it('should set status MISSING when trajectory exists but has no name', () => {
+    const areas = ['Area Z'];
+    const subRowTypes = [TRAJECTORY_TYPE.HYDRO_SERIES];
+
+    const trajectoriesByType = [
+      {
+        trajType: TRAJECTORY_TYPE.HYDRO_SERIES,
+        trajectories: [
+          { trajectoryName: '' }, // pas de nom → MISSING
+        ],
+      },
+    ] as unknown as FetchResult[];
+
+    const t = vi.fn((key: string) => key as unknown as string) as unknown as TFunction<'translation', undefined>;
+
+    const result = buildRowsByArea({
+      areas,
+      subRowTypes,
+      trajectoriesByType,
+      t,
+    });
+
+    const subRow = result[0].subRows?.[0];
+
+    expect(subRow?.status).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
+  });
+});
+
+vi.mock('@/utils/getNuclearHypothesisLabel', () => ({
+  getNuclearHypothesisLabel: vi.fn((type) => `label-${type}`),
+}));
+
+describe('buildRowsByType', () => {
+  it('should build parent rows with correct hypothesis labels', () => {
+    const rowTypes = [TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION, TRAJECTORY_TYPE.NUCLEAR_FR_TALON];
+
+    const subRowTypes = [] as TRAJECTORY_TYPE[];
+
+    const trajectoriesByType = [] as unknown as FetchResult[];
+
+    const t = vi.fn((key: string) => {
+      if (key === 'thermal.@epr') return 'modulation';
+      if (key === 'thermal.@talon') return 'talon';
+      return key;
+    }) as unknown as TFunction<'translation', undefined>;
+
+    const result = buildRowsByType({
+      rowTypes,
+      subRowTypes,
+      trajectoriesByType,
+      t,
+    });
+
+    expect(result).toHaveLength(3); // 2 parents + 1 time_series row
+
+    expect(result[0].hypothesis).toBe('thermal.@modulation');
+    expect(result[1].hypothesis).toBe('talon');
+  });
+
+  it('should assign trajectory and status OK when trajectory exists', () => {
+    const rowTypes = [TRAJECTORY_TYPE.NUCLEAR_FR_TALON];
+    const subRowTypes = [] as TRAJECTORY_TYPE[];
+
+    const trajectoriesByType = [
+      {
+        trajType: TRAJECTORY_TYPE.NUCLEAR_FR_TALON,
+        trajectories: [{ trajectoryName: 'Talon Traj' }],
+      },
+    ] as unknown as FetchResult[];
+
+    const t = vi.fn((key: string) => {
+      if (key === 'thermal.@epr') return 'modulation';
+      if (key === 'thermal.@talon') return 'talon';
+      return key;
+    }) as unknown as TFunction<'translation', undefined>;
+
+    const result = buildRowsByType({
+      rowTypes,
+      subRowTypes,
+      trajectoriesByType,
+      t,
+    });
+
+    const parent = result[0];
+
+    expect(parent.trajectory).toEqual({ trajectoryName: 'Talon Traj' });
+    expect(parent.status).toBe(TRAJECTORY_SELECTION_STATUS.OK);
+  });
+
+  it('should set status MISSING when no trajectory exists', () => {
+    const rowTypes = [TRAJECTORY_TYPE.NUCLEAR_FR_TALON];
+    const subRowTypes = [] as TRAJECTORY_TYPE[];
+
+    const trajectoriesByType = [] as unknown as FetchResult[]; // aucun résultat
+
+    const t = vi.fn((key: string) => {
+      if (key === 'thermal.@epr') return 'modulation';
+      if (key === 'thermal.@talon') return 'talon';
+      return key;
+    }) as unknown as TFunction<'translation', undefined>;
+
+    const result = buildRowsByType({
+      rowTypes,
+      subRowTypes,
+      trajectoriesByType,
+      t,
+    });
+
+    expect(result[0].trajectory).toBeNull();
+    expect(result[0].status).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
+  });
+
+  it('should build subRows correctly with labels and statuses', () => {
+    const rowTypes = [] as TRAJECTORY_TYPE[];
+    const subRowTypes = [TRAJECTORY_TYPE.NUCLEAR_FR_TALON];
+
+    const trajectoriesByType = [
+      {
+        trajType: TRAJECTORY_TYPE.NUCLEAR_FR_TALON,
+        trajectories: [{ trajectoryName: 'Sub Traj' }],
+      },
+    ] as unknown as FetchResult[];
+
+    const t = vi.fn((key: string) => {
+      if (key === 'thermal.@epr') return 'modulation';
+      if (key === 'thermal.@talon') return 'talon';
+      return key;
+    }) as unknown as TFunction<'translation', undefined>;
+
+    const result = buildRowsByType({
+      rowTypes,
+      subRowTypes,
+      trajectoriesByType,
+      t,
+    });
+
+    const timeSeriesRow = result[result.length - 1];
+    const subRow = timeSeriesRow.subRows![0];
+
+    expect(subRow.trajectory).toEqual({ trajectoryName: 'Sub Traj' });
+    expect(subRow.status).toBe(TRAJECTORY_SELECTION_STATUS.OK);
+  });
+
+  it('should add a final time_series parent row with missing status', () => {
+    const rowTypes = [] as TRAJECTORY_TYPE[];
+    const subRowTypes = [] as TRAJECTORY_TYPE[];
+
+    const trajectoriesByType = [] as unknown as FetchResult[];
+
+    const t = vi.fn((key: string) => {
+      if (key === 'thermal.@epr') return 'modulation';
+      if (key === 'thermal.@talon') return 'talon';
+      return key;
+    }) as unknown as TFunction<'translation', undefined>;
+
+    const result = buildRowsByType({
+      rowTypes,
+      subRowTypes,
+      trajectoriesByType,
+      t,
+    });
+
+    const lastRow = result[result.length - 1];
+
+    expect(lastRow.hypothesis).toBe('thermal.@time_series');
+    expect(lastRow.trajectory).toBeNull();
+    expect(lastRow.status).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
+    expect(lastRow.subRows).toEqual([]);
   });
 });
