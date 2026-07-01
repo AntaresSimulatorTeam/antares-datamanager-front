@@ -4,6 +4,7 @@ import StdAvatar from '@common/layout/stdAvatar/StdAvatar.tsx';
 import { avatarCase } from '@/shared/utils/textUtils.ts';
 import { ProjectInfo } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
+import { useUserDisplay } from '@/shared/hooks/useUserDisplay';
 
 export type PegaseCardContentProps = {
   project: ProjectInfo;
@@ -11,6 +12,8 @@ export type PegaseCardContentProps = {
 
 export const PegaseCardContent = ({ project }: PegaseCardContentProps) => {
   const { t } = useTranslation();
+  const { fullname } = useUserDisplay(project.createdBy);
+
   return (
     <div className="flex flex-col items-start justify-between">
       <div className="flex items-center gap-1">
@@ -29,11 +32,11 @@ export const PegaseCardContent = ({ project }: PegaseCardContentProps) => {
         <StdAvatar
           size="es"
           backgroundColor="green"
-          fullname={project.createdBy}
-          initials={avatarCase(project.createdBy)}
+          fullname={fullname}
+          initials={avatarCase(fullname)}
           textColor="primary"
         />
-        <span className="text-body-xs font-light text-gray-600">{project.createdBy}</span>
+        <span className="text-body-xs font-light text-gray-600">{fullname}</span>
       </div>
     </div>
   );

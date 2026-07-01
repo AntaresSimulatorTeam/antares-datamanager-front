@@ -19,7 +19,8 @@ export const splitUserList = (users: UserInfo[]) => {
 };
 
 export const getInitials = (user: UserInfo) => {
-  const [firstName, lastName = ''] = user.fullname.split(' ');
+  const firstName = user.firstName || '';
+  const lastName = user.lastName || '';
   return lastName.charAt(0) + firstName.charAt(0);
 };
 
@@ -40,8 +41,9 @@ export const getUserFullname = (users: UserInfo | UserInfo[]) => {
 //assign a random color from COLORS
 export const getColor = (users: UserInfo | UserInfo[]) => {
   if (!Array.isArray(users)) {
+    const nameString = `${users.firstName} ${users.lastName}`;
     return AVATAR_COLORS[
-      users.fullname.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % AVATAR_COLORS.length
+      nameString.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % AVATAR_COLORS.length
     ];
   }
   return AVATAR_COLORS[users.length % AVATAR_COLORS.length];

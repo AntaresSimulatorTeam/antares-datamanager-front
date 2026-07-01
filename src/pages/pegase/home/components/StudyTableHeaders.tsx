@@ -12,6 +12,7 @@ import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { avatarCase, sentenceCase } from '@/shared/utils/textUtils.ts';
 import { Icon, RadioButton } from '@design-system-rte/react';
 import StdTagList from '@common/base/StdTagList/StdTagList.tsx';
+import UserDisplayCell from '@/components/common/layout/UserDisplayCell';
 
 const columnHelper = createColumnHelper<StudyDTO>();
 
@@ -67,9 +68,7 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
   columnHelper.accessor('createdBy', {
     header: t('home.@user_name'),
     size: 50,
-    cell: ({ getValue }) => (
-      <StdAvatar size="es" backgroundColor="gray" fullname={getValue() ?? ''} initials={avatarCase(getValue() ?? '')} />
-    ),
+    cell: ({ getValue }) => <UserDisplayCell nni={getValue() ?? ''} />,
   }),
 
   columnHelper.accessor('keywords', {
