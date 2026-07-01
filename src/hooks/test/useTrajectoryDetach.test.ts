@@ -168,8 +168,8 @@ describe('useTrajectoryDetach', () => {
 
     // dispatch appelé
     expect(mockDispatch).toHaveBeenCalledWith({
-      type: STUDY_ACTION.UPDATE_TRAJECTORY,
-      payload: { trajectory: trajectoryToDelete, status: 'empty' },
+      type: STUDY_ACTION.CLEAR_TRAJECTORY_BY_TYPE,
+      payload: [TRAJECTORY_TYPE.AREA],
     });
 
     // updateTableAfterCellDetach appelé

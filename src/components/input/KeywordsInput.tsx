@@ -112,7 +112,7 @@ const KeywordsInput = ({
   };
 
   return (
-    <div className={clsx(width ?? 'w-full', 'flex min-h-22 flex-col items-start justify-start gap-1')}>
+    <div className={clsx(width ?? 'w-full', 'flex min-h-24 flex-col items-start justify-start gap-4')}>
       <div className="inline-flex items-end gap-1">
         <div className="relative flex w-full flex-col items-start gap-2">
           <TextInput
@@ -157,19 +157,21 @@ const KeywordsInput = ({
       </div>
 
       {/* Keywords Display and Clear All Button */}
-      <div className="flex flex-wrap gap-2">
-        {keywords.map((keyword, index) => (
-          <div key={index} className="flex items-center gap-2 rounded bg-gray-200 px-1">
-            <span>{keyword}</span>
-            <IconButton name="close" onClick={() => handleRemoveKeyword(index)} size="s" variant="text" />
-          </div>
-        ))}
-      </div>
+      <div className="flex flex-col items-start justify-start gap-1">
+        <div className="flex flex-wrap gap-2">
+          {keywords.map((keyword, index) => (
+            <div key={index} className="flex items-center gap-2 rounded bg-gray-200 px-1">
+              <span>{keyword}</span>
+              <IconButton name="close" onClick={() => handleRemoveKeyword(index)} size="s" variant="text" />
+            </div>
+          ))}
+        </div>
 
-      {/* Clear All Keywords Button */}
-      {keywords?.length > 0 && (
-        <Button label={t('projectModal.@keyword_button_clear')} onClick={clearAllKeywords} variant="text" />
-      )}
+        {/* Clear All Keywords Button */}
+        {keywords?.length > 0 && (
+          <Button label={t('projectModal.@keyword_button_clear')} onClick={clearAllKeywords} variant="text" />
+        )}
+      </div>
     </div>
   );
 };

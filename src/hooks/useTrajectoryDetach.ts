@@ -52,10 +52,17 @@ export const useTrajectoryDetach = (
 
         // 3. Mise à jour du store
         if (trajectoryToDelete) {
-          dispatch?.({
-            type: STUDY_ACTION.UPDATE_TRAJECTORY,
-            payload: { trajectory: trajectoryToDelete, status },
-          });
+          if (trajectoryToDelete.type === TRAJECTORY_TYPE.AREA) {
+            dispatch?.({
+              type: STUDY_ACTION.CLEAR_TRAJECTORY_BY_TYPE,
+              payload: [TRAJECTORY_TYPE.AREA],
+            });
+          } else {
+            dispatch?.({
+              type: STUDY_ACTION.UPDATE_TRAJECTORY,
+              payload: { trajectory: trajectoryToDelete, status },
+            });
+          }
         }
 
         // 4. Mise à jour du tableau (factorisée)

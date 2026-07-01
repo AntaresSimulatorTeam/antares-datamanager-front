@@ -70,7 +70,7 @@ const StudyDetails = () => {
     if (id != null) {
       void fetchStudyData(Number(id));
     }
-  }, [reloadStudy, id]);
+  }, [reloadStudy, id, dispatch]);
 
   return !studyData ? (
     <div className="flex h-screen items-center justify-center">
