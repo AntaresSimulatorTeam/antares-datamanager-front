@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import UserDisplayCell from '@/components/common/layout/UserDisplayCell';
 import * as useUserDisplayHook from '@/shared/hooks/useUserDisplay';

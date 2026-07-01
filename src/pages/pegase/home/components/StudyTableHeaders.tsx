@@ -4,12 +4,11 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import StdAvatar from '@/components/common/layout/stdAvatar/StdAvatar';
 import { StudyDTO } from '@/shared/types/Study.type.ts';
 import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter';
 import { createColumnHelper } from '@tanstack/react-table';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
-import { avatarCase, sentenceCase } from '@/shared/utils/textUtils.ts';
+import { sentenceCase } from '@/shared/utils/textUtils.ts';
 import { Icon, RadioButton } from '@design-system-rte/react';
 import StdTagList from '@common/base/StdTagList/StdTagList.tsx';
 import UserDisplayCell from '@/components/common/layout/UserDisplayCell';

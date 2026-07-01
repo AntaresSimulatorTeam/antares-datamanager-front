@@ -34,7 +34,6 @@ export const UserDisplayCell = ({ nni }: UserDisplayCellProps) => {
       backgroundColor="gray"
       fullname={displayName}
       initials={avatarCase(displayName)}
-      title={error ? `Error: ${error}` : displayName}
     />
   );
 };
