@@ -1,90 +1,65 @@
 import { describe, expect, it, vi } from 'vitest';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useTrajectorySearchHandler } from '@/hooks/useTrajectorySearchHandler.ts';
-import { HypothesisRowData, SelectOption, StudyDTO } from '@/shared/types';
 import * as hypothesisTableService from '@/shared/services/hypothesisTableService.ts';
-import { renderHook } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 
 vi.mock('@/shared/services/hypothesisTableService', () => ({
   handleTrajectorySearch: vi.fn(),
 }));
 
 describe('useTrajectorySearchHandler', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('should call handleTrajectorySearch with correct parameters for a normal type', async () => {
     const setDbTrajectories = vi.fn();
 
-    const data = [
-      {
-        hypothesis: 'Area A',
-        subRows: [{ hypothesis: 'Tech 1' }, { hypothesis: 'Tech 2' }],
-      },
-      {
-        hypothesis: 'Area B',
-        subRows: [],
-      },
-    ] as HypothesisRowData[];
-
-    const studyData = { horizon: 2030 } as unknown as StudyDTO;
-
     const { result } = renderHook(() =>
       useTrajectorySearchHandler({
-        data,
-        type: TRAJECTORY_TYPE.STS,
-        studyData,
+        studyHorizon: '2030',
         setDbTrajectories,
       }),
     );
 
-    // Mock retour du service
-    const mockResult = [{ label: 'X', value: 'X' }] as unknown as SelectOption[];
-    vi.mocked(hypothesisTableService.handleTrajectorySearch).mockResolvedValue(mockResult);
+    const searchParams = { area: 'FR', technology: 'Tech 2', fileNameContains: 'file' };
 
-    const resultData = await result.current.handleSearch('file', '0.1');
+    await act(async () => {
+      await result.current.handleSearch(TRAJECTORY_TYPE.STS, [0, 1], searchParams);
+    });
 
     expect(hypothesisTableService.handleTrajectorySearch).toHaveBeenCalledWith(
       TRAJECTORY_TYPE.STS,
       setDbTrajectories,
-      2030,
+      '2030',
       {
-        area: 'Area A',
+        area: 'FR',
         technology: 'Tech 2',
         fileNameContains: 'file',
       },
     );
-
-    expect(resultData).toEqual(mockResult);
   });
 
   it('should switch type when TRAJECTORY_TYPE.AREA is used', async () => {
     const setDbTrajectories = vi.fn();
 
-    const data = [
-      { hypothesis: 'Area A', subRows: [] as HypothesisRowData[] },
-      { hypothesis: 'Area B', subRows: [] as HypothesisRowData[] },
-    ] as HypothesisRowData[];
-
-    const studyData = { horizon: 2030 } as unknown as StudyDTO;
-
     const { result } = renderHook(() =>
       useTrajectorySearchHandler({
-        data,
-        type: TRAJECTORY_TYPE.AREA,
-        studyData,
+        studyHorizon: '2030',
         setDbTrajectories,
       }),
     );
 
-    vi.mocked(hypothesisTableService.handleTrajectorySearch).mockResolvedValue([]);
-
-    await result.current.handleSearch('abc', '0');
+    await act(async () => {
+      await result.current.handleSearch(TRAJECTORY_TYPE.AREA, [0], { fileNameContains: 'abc' });
+    });
 
     expect(hypothesisTableService.handleTrajectorySearch).toHaveBeenCalledWith(
       TRAJECTORY_TYPE.AREA,
       setDbTrajectories,
-      2030,
+      '2030',
       {
-        area: '',
-        technology: undefined,
         fileNameContains: 'abc',
       },
     );
@@ -93,68 +68,49 @@ describe('useTrajectorySearchHandler', () => {
   it('should switch type when TRAJECTORY_TYPE.AREA is used', async () => {
     const setDbTrajectories = vi.fn();
 
-    const data = [
-      { hypothesis: 'Area A', subRows: [] as HypothesisRowData[] },
-      { hypothesis: 'Area B', subRows: [] as HypothesisRowData[] },
-    ] as HypothesisRowData[];
-
-    const studyData = { horizon: 2030 } as unknown as StudyDTO;
-
     const { result } = renderHook(() =>
       useTrajectorySearchHandler({
-        data,
-        type: TRAJECTORY_TYPE.AREA,
-        studyData,
+        studyHorizon: '2030',
         setDbTrajectories,
       }),
     );
 
-    vi.mocked(hypothesisTableService.handleTrajectorySearch).mockResolvedValue([]);
-
-    await result.current.handleSearch('abc', '1');
+    await act(async () => {
+      await result.current.handleSearch(TRAJECTORY_TYPE.AREA, [1], { fileNameContains: 'abc' });
+    });
 
     expect(hypothesisTableService.handleTrajectorySearch).toHaveBeenCalledWith(
       TRAJECTORY_TYPE.LINK,
       setDbTrajectories,
-      2030,
-      {
-        area: '',
-        technology: undefined,
-        fileNameContains: 'abc',
-      },
+      '2030',
+      { fileNameContains: 'abc' },
     );
   });
 
   it('should switch type for last index when type is DSR', async () => {
     const setDbTrajectories = vi.fn();
 
-    const data = [
-      { hypothesis: 'Area A', subRows: [] as HypothesisRowData[] },
-      { hypothesis: 'Area B', subRows: [] as HypothesisRowData[] },
-    ] as HypothesisRowData[];
-
-    const studyData = { horizon: 2030 } as unknown as StudyDTO;
-
     const { result } = renderHook(() =>
       useTrajectorySearchHandler({
-        data,
-        type: TRAJECTORY_TYPE.DSR,
-        studyData,
+        studyHorizon: '2030',
         setDbTrajectories,
       }),
     );
 
-    vi.mocked(hypothesisTableService.handleTrajectorySearch).mockResolvedValue([]);
-
-    await result.current.handleSearch('xyz', '0');
+    await act(async () => {
+      await result.current.handleSearch(TRAJECTORY_TYPE.DSR, [1], {
+        area: 'Area A',
+        fileNameContains: 'xyz',
+        isLastIndex: false,
+      });
+    });
 
     expect(hypothesisTableService.handleTrajectorySearch).toHaveBeenCalledWith(
       TRAJECTORY_TYPE.DSR,
       setDbTrajectories,
-      2030,
+      '2030',
       {
         area: 'Area A',
-        technology: undefined,
         fileNameContains: 'xyz',
       },
     );
@@ -163,101 +119,283 @@ describe('useTrajectorySearchHandler', () => {
   it('should switch type for last index when type is DSR', async () => {
     const setDbTrajectories = vi.fn();
 
-    const data = [
-      { hypothesis: 'Area A', subRows: [] as HypothesisRowData[] },
-      { hypothesis: 'Area B', subRows: [] as HypothesisRowData[] },
-    ] as HypothesisRowData[];
-
-    const studyData = { horizon: 2030 } as unknown as StudyDTO;
-
     const { result } = renderHook(() =>
       useTrajectorySearchHandler({
-        data,
-        type: TRAJECTORY_TYPE.DSR,
-        studyData,
+        studyHorizon: '2030',
         setDbTrajectories,
       }),
     );
 
-    vi.mocked(hypothesisTableService.handleTrajectorySearch).mockResolvedValue([]);
-
-    await result.current.handleSearch('xyz', '1');
+    await act(async () => {
+      await result.current.handleSearch(TRAJECTORY_TYPE.DSR, [1], {
+        area: 'Area A',
+        fileNameContains: 'BP',
+        isLastIndex: true,
+      });
+    });
 
     expect(hypothesisTableService.handleTrajectorySearch).toHaveBeenCalledWith(
       TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION,
       setDbTrajectories,
-      2030,
+      '2030',
       {
-        area: '',
-        technology: undefined,
+        fileNameContains: 'BP',
+      },
+    );
+  });
+
+  it('should not switch type for first index when type is HYDRO_SERIES', async () => {
+    const setDbTrajectories = vi.fn();
+
+    const { result } = renderHook(() =>
+      useTrajectorySearchHandler({
+        studyHorizon: '2030',
+        setDbTrajectories,
+      }),
+    );
+
+    await act(async () => {
+      await result.current.handleSearch(TRAJECTORY_TYPE.HYDRO_SERIES, [0, 0], {
+        area: 'Area A',
+        fileNameContains: 'xyz',
+        isLastIndex: false,
+      });
+    });
+
+    expect(hypothesisTableService.handleTrajectorySearch).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.HYDRO_SERIES,
+      setDbTrajectories,
+      '2030',
+      {
+        area: 'Area A',
         fileNameContains: 'xyz',
       },
     );
   });
 
-  it('should switch type for last index when type is HYDRO_SERIES', async () => {
+  it('should switch into HYDRO_TECHNICAL_PARAMETERS type for last index when type is HYDRO_SERIES', async () => {
     const setDbTrajectories = vi.fn();
-
-    const data = [
-      { hypothesis: 'Area A', subRows: [{ hypothesis: 'Series', subRows: [] as HypothesisRowData[] }] },
-    ] as HypothesisRowData[];
-
-    const studyData = { horizon: 2030 } as unknown as StudyDTO;
+    vi.mocked(hypothesisTableService.handleTrajectorySearch).mockResolvedValue([]);
 
     const { result } = renderHook(() =>
       useTrajectorySearchHandler({
-        data,
-        type: TRAJECTORY_TYPE.HYDRO_SERIES,
-        studyData,
+        studyHorizon: '2030',
         setDbTrajectories,
       }),
     );
 
-    vi.mocked(hypothesisTableService.handleTrajectorySearch).mockResolvedValue([]);
-
-    await result.current.handleSearch('xyz', '0.1');
+    await waitFor(async () => {
+      await result.current.handleSearch(TRAJECTORY_TYPE.HYDRO_SERIES, [0, 1], {
+        area: 'Area A',
+        fileNameContains: 'xyz',
+        isLastIndex: false,
+      });
+    });
 
     expect(hypothesisTableService.handleTrajectorySearch).toHaveBeenCalledWith(
       TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS,
       setDbTrajectories,
-      2030,
+      '2030',
       {
         area: 'Area A',
-        technology: undefined,
         fileNameContains: 'xyz',
       },
     );
   });
 
-  it('should switch type for last index when type is HYDRO_PSP_SERIES', async () => {
+  it('should not switch type for first index when type is HYDRO_PSP_SERIES', async () => {
     const setDbTrajectories = vi.fn();
-
-    const data = [
-      { hypothesis: 'Area A', subRows: [{ hypothesis: 'Series', subRows: [] as HypothesisRowData[] }] },
-    ] as HypothesisRowData[];
-
-    const studyData = { horizon: 2030 } as unknown as StudyDTO;
 
     const { result } = renderHook(() =>
       useTrajectorySearchHandler({
-        data,
-        type: TRAJECTORY_TYPE.HYDRO_PSP_SERIES,
-        studyData,
+        studyHorizon: '2030',
         setDbTrajectories,
       }),
     );
 
-    vi.mocked(hypothesisTableService.handleTrajectorySearch).mockResolvedValue([]);
+    await act(async () => {
+      await result.current.handleSearch(TRAJECTORY_TYPE.HYDRO_PSP_SERIES, [0, 0], {
+        area: 'Area A',
+        fileNameContains: 'xyz',
+        isLastIndex: false,
+      });
+    });
 
-    await result.current.handleSearch('xyz', '0.1');
+    expect(hypothesisTableService.handleTrajectorySearch).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.HYDRO_PSP_SERIES,
+      setDbTrajectories,
+      '2030',
+      {
+        area: 'Area A',
+        fileNameContains: 'xyz',
+      },
+    );
+  });
+
+  it('should switch into HYDRO_PSP_TECHNICAL_PARAMETERS type for last index when type is HYDRO_PSP_SERIES', async () => {
+    const setDbTrajectories = vi.fn();
+
+    const { result } = renderHook(() =>
+      useTrajectorySearchHandler({
+        studyHorizon: '2030',
+        setDbTrajectories,
+      }),
+    );
+
+    await act(async () => {
+      await result.current.handleSearch(TRAJECTORY_TYPE.HYDRO_PSP_SERIES, [0, 1], {
+        area: 'Area A',
+        fileNameContains: 'xyz',
+        isLastIndex: false,
+      });
+    });
 
     expect(hypothesisTableService.handleTrajectorySearch).toHaveBeenCalledWith(
       TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS,
       setDbTrajectories,
-      2030,
+      '2030',
       {
         area: 'Area A',
-        technology: undefined,
+        fileNameContains: 'xyz',
+      },
+    );
+  });
+
+  it('should switch type for last index when type is NUCLEAR_FR_MODULATION', async () => {
+    const setDbTrajectories = vi.fn();
+
+    const { result } = renderHook(() =>
+      useTrajectorySearchHandler({
+        studyHorizon: '2030',
+        setDbTrajectories,
+      }),
+    );
+
+    await act(async () => {
+      await result.current.handleSearch(TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION, [0], {
+        area: 'Area A',
+        fileNameContains: 'xyz',
+        isLastIndex: false,
+      });
+    });
+
+    expect(hypothesisTableService.handleTrajectorySearch).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION,
+      setDbTrajectories,
+      '2030',
+      {
+        fileNameContains: 'xyz',
+      },
+    );
+  });
+
+  it('should switch type for last index when type is NUCLEAR_FR_TALON', async () => {
+    const setDbTrajectories = vi.fn();
+
+    const { result } = renderHook(() =>
+      useTrajectorySearchHandler({
+        studyHorizon: '2030',
+        setDbTrajectories,
+      }),
+    );
+
+    await act(async () => {
+      await result.current.handleSearch(TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION, [1], {
+        area: 'Area A',
+        fileNameContains: 'xyz',
+        isLastIndex: false,
+      });
+    });
+
+    expect(hypothesisTableService.handleTrajectorySearch).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.NUCLEAR_FR_TALON,
+      setDbTrajectories,
+      '2030',
+      {
+        fileNameContains: 'xyz',
+      },
+    );
+  });
+
+  it('should switch into NUCLEAR_FR_TS_ERP type for first index when type is NUCLEAR_FR_MODULATION', async () => {
+    const setDbTrajectories = vi.fn();
+
+    const { result } = renderHook(() =>
+      useTrajectorySearchHandler({
+        studyHorizon: '2030',
+        setDbTrajectories,
+      }),
+    );
+
+    await act(async () => {
+      await result.current.handleSearch(TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION, [2, 0], {
+        area: 'Area A',
+        fileNameContains: 'xyz',
+        isLastIndex: false,
+      });
+    });
+
+    expect(hypothesisTableService.handleTrajectorySearch).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP,
+      setDbTrajectories,
+      '2030',
+      {
+        fileNameContains: 'xyz',
+      },
+    );
+  });
+
+  it('should switch into NUCLEAR_FR_TS_LONG_TERM type for second index when type is NUCLEAR_FR_MODULATION', async () => {
+    const setDbTrajectories = vi.fn();
+
+    const { result } = renderHook(() =>
+      useTrajectorySearchHandler({
+        studyHorizon: '2030',
+        setDbTrajectories,
+      }),
+    );
+
+    await act(async () => {
+      await result.current.handleSearch(TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION, [2, 1], {
+        area: 'Area A',
+        fileNameContains: 'xyz',
+        isLastIndex: false,
+      });
+    });
+
+    expect(hypothesisTableService.handleTrajectorySearch).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM,
+      setDbTrajectories,
+      '2030',
+      {
+        fileNameContains: 'xyz',
+      },
+    );
+  });
+
+  it('should switch into NUCLEAR_FR_TS_SMR type for last index when type is NUCLEAR_FR_MODULATION', async () => {
+    const setDbTrajectories = vi.fn();
+
+    const { result } = renderHook(() =>
+      useTrajectorySearchHandler({
+        studyHorizon: '2030',
+        setDbTrajectories,
+      }),
+    );
+
+    await act(async () => {
+      await result.current.handleSearch(TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION, [2, 2], {
+        area: 'Area A',
+        fileNameContains: 'xyz',
+        isLastIndex: false,
+      });
+    });
+
+    expect(hypothesisTableService.handleTrajectorySearch).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR,
+      setDbTrajectories,
+      '2030',
+      {
         fileNameContains: 'xyz',
       },
     );

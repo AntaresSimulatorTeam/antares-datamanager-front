@@ -1,51 +1,48 @@
 import { RdsModal } from 'rte-design-system-react';
 import SelectAndSearchableInput from '@/components/input/SelectAndSearchableInput.tsx';
 import { useTranslation } from 'react-i18next';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import { SelectOption } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { fetchTrajectoriesFromFS } from '@/shared/services/trajectoryService.ts';
-import { convertToFSSelectionOptionType } from '@/shared/utils/formFormatter.ts';
-import { getPathFromTrajectoryType, getQueryParamAreaValue } from '@/shared/utils/trajectoryUtils.ts';
+import { getModalTile, getPathFromTrajectoryType } from '@/shared/utils/trajectoryUtils.ts';
 import { Button, Icon } from '@design-system-rte/react';
+import { useTrajectoryFetchFromFSHandler } from '@/hooks/useTrajectoryFetchFromFSHandler.ts';
+import { getParamForFetchFSTrajectory } from '@/shared/helpers/hypothesisTableHelper.ts';
+import { HypothesisType } from '@/shared/types/HypothesisTable.ts';
 
 interface ImportTrajectoryModalProps {
   options: SelectOption[] | undefined;
-  onClose: (value?: SelectOption) => Promise<void>;
-  trajectoryType: TRAJECTORY_TYPE;
-  hypothesis?: { area: string; technology?: string; isDefault: boolean };
+  onClose: (
+    typeToUse?: TRAJECTORY_TYPE,
+    value?: SelectOption,
+    hypothesis?: HypothesisType,
+    indexArray?: number[],
+  ) => Promise<void>;
+  tabType: TRAJECTORY_TYPE;
+  hypothesis?: HypothesisType;
+  indexArray: number[];
+  rowsNb: number;
 }
 
-export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, hypothesis }: ImportTrajectoryModalProps) => {
+export const ImportTrajectoryModal = ({
+  options,
+  onClose,
+  tabType,
+  hypothesis,
+  indexArray,
+  rowsNb,
+}: ImportTrajectoryModalProps) => {
   const { t } = useTranslation();
   const [trajectorySelected, setTrajectorySelected] = useState<SelectOption | null>(null);
-  const path = getPathFromTrajectoryType(trajectoryType, hypothesis);
-
-  const handleSearchTerm = useCallback(
-    async (searchTerm?: string) => {
-      if (!searchTerm && !options?.length) return;
-      try {
-        const isTechnologyTrajectory =
-          trajectoryType === TRAJECTORY_TYPE.STS ||
-          trajectoryType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER;
-        const searchHypothesis = isTechnologyTrajectory ? hypothesis?.technology : hypothesis?.area;
-        const results = await fetchTrajectoriesFromFS(
-          trajectoryType,
-          getQueryParamAreaValue(trajectoryType, searchHypothesis),
-          searchTerm,
-        );
-        return convertToFSSelectionOptionType(results, hypothesis?.isDefault);
-      } catch (error) {
-        // silent handler
-      }
-    },
-    [options, hypothesis, trajectoryType],
-  );
+  const [optionsFS, setOptionsFS] = useState<SelectOption[] | undefined>(options);
+  const { typeToUse, areaToUse, isDefaultArea } = getParamForFetchFSTrajectory(tabType, indexArray, rowsNb, hypothesis);
+  const path = getPathFromTrajectoryType(typeToUse, hypothesis);
+  const { handleFetchFromFS } = useTrajectoryFetchFromFSHandler();
 
   return (
     <RdsModal size="small">
       <RdsModal.Title onClose={() => void onClose()} icon="Upload">
-        {`${t('studyDetails.@import_from_file_system')} ${hypothesis?.area ?? trajectoryType} ${hypothesis?.technology ? ' - ' : ''} ${hypothesis?.technology ?? ''}`}
+        {`${t('studyDetails.@import_from_file_system')} ${getModalTile(tabType, hypothesis)}`}
       </RdsModal.Title>
       <RdsModal.Content>
         {path && (
@@ -55,18 +52,22 @@ export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, hypoth
           <div className="absolute z-10">
             <div className="w-[400px]">
               <SelectAndSearchableInput
-                options={options}
+                options={optionsFS}
                 defaultPlaceHolder={
                   options?.length ? t('studyDetails.@select_trajectory') : t('studyDetails.@select_no_trajectory')
                 }
                 onSelect={setTrajectorySelected}
                 isSearchable={true}
-                setSearchTerm={handleSearchTerm}
+                setSearchTerm={async (value?: string) => {
+                  const results = await handleFetchFromFS({ typeToUse, areaToUse, isDefaultArea, searchTerm: value });
+                  setOptionsFS(results);
+                  return results;
+                }}
                 resetField={() => setTrajectorySelected(null)}
                 isInputDisabled={!options?.length}
               />
             </div>
-            {trajectoryType === TRAJECTORY_TYPE.STS && (
+            {tabType === TRAJECTORY_TYPE.STS && (
               <div className="mt-1 flex items-center gap-1 text-body-s text-gray-600">
                 <Icon name="info" size={15} />
                 <span>{t('trajectoryImportModal.@timeSeries')}</span>
@@ -80,7 +81,7 @@ export const ImportTrajectoryModal = ({ options, onClose, trajectoryType, hypoth
               label={t('studyDetails.@import')}
               onClick={() => {
                 if (trajectorySelected) {
-                  void onClose(trajectorySelected);
+                  void onClose(typeToUse, trajectorySelected, hypothesis, indexArray);
                 }
               }}
               variant="primary"

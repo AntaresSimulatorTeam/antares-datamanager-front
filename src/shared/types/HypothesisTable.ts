@@ -1,5 +1,6 @@
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { TableOperationRow } from '@/shared/types/Generic.type.ts';
+import { TechnologyType } from '@/shared/types/Trajectory.type.ts';
 
 export type HypothesisConfig = { type: TRAJECTORY_TYPE; labelKey: string; hvdc?: boolean };
 
@@ -15,7 +16,7 @@ export type DsrUpdateResult<T> = {
 export interface TrajectorySearchParams {
   area?: string;
   technology?: string;
-  fileNameContains: string;
+  fileNameContains?: string;
 }
 
 export type RowToDeleteProps = {
@@ -23,3 +24,13 @@ export type RowToDeleteProps = {
   value?: string;
   operation?: TableOperationRow;
 };
+
+export type HypothesisType = { area: string; technology?: string; isDefault?: boolean };
+
+export interface SearchParams {
+  area?: string;
+  technology?: string;
+  isLastIndex?: boolean;
+  technologies?: TechnologyType[];
+  fileNameContains?: string;
+}

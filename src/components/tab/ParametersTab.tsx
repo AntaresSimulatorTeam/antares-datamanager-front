@@ -26,16 +26,22 @@ import {
   shouldDeleteParamModulation,
 } from '@/shared/utils/trajectoryUtils.ts';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
-import { addRow, handleFetchTrajectoriesFS, handleTrajectorySearch } from '@/shared/services/hypothesisTableService.ts';
+import { addRow, handleTrajectorySearch } from '@/shared/services/hypothesisTableService.ts';
 import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach';
 import { CheckBoxList } from '@/components/list/CheckBoxList.tsx';
 import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow.ts';
-import { getCheckedValues, shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
+import {
+  getCheckedValues,
+  getParamForFetchFSTrajectory,
+  shouldOpenDeletionModal,
+} from '@/shared/helpers/hypothesisTableHelper.ts';
 import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
 import { useFetchHypothesisParametersTrajectories } from '@/hooks/useFetchHypothesisParametersTrajectories.ts';
 import { useFetchFixHypothesisTrajectories } from '@/hooks/useFetchFixHypothesisTrajectories.ts';
+import { useTrajectoryFetchFromFSHandler } from '@/hooks/useTrajectoryFetchFromFSHandler.ts';
+import { HypothesisType } from '@/shared/types/HypothesisTable.ts';
 
 export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const { t } = useTranslation();
@@ -73,7 +79,7 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   ];
   const options = { withReadOnlyRow: false, isStudyGenerated };
   const { hypothesisTrajectories: economicData } = useFetchFixHypothesisTrajectories(configs, options, studyData?.id);
-
+  const { handleFetchFromFS } = useTrajectoryFetchFromFSHandler();
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch, setReadOnly);
   const { attachTrajectory } = useTrajectoryAttach(studyData, studyState, dispatch, setReadOnly);
   const { removeRow } = useHypothesisTableRemoveRow(
@@ -139,6 +145,68 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
     [technicalData, dispatch, removeRow],
   );
 
+  const handleFetchTrajectoriesFromFS = useCallback(
+    async (rowId: string, tableData: HypothesisRowData[], type: TRAJECTORY_TYPE) => {
+      const hypothesis = getAreaTrajectoryName(rowId, tableData);
+      const { typeToUse, areaToUse, isDefaultArea } = getParamForFetchFSTrajectory(
+        type,
+        rowId.split('.').map(Number),
+        data.length,
+        hypothesis,
+      );
+      const results = await handleFetchFromFS({ typeToUse, areaToUse, isDefaultArea });
+      setOptionsFS(results);
+      setSelectedTrajectoryType(type);
+      setRowIdSelected(rowId);
+      toggleModal();
+    },
+    [data.length, handleFetchFromFS, toggleModal],
+  );
+
+  const handleHypothesisTableUpdate = useCallback(
+    async (rowId: string, value: unknown, status: RowStatus) => {
+      const [topIndex, subIndex] = rowId.split('.').map(Number);
+      if (status === 'empty' || status === 'emptyError') {
+        const row = subIndex == null ? technicalData[topIndex] : technicalData[topIndex]?.subRows?.[subIndex];
+        const current = row?.trajectory ?? null;
+        if (current) {
+          if (
+            topIndex === 0 &&
+            row?.trajectory &&
+            row?.status === TRAJECTORY_SELECTION_STATUS.OK &&
+            shouldDeleteParamModulation(0, technicalData)
+          ) {
+            setRowToDelete({ index: topIndex, subIndex, value: row?.hypothesis, operation: 'empty' });
+            setIsDeletionModalOpen(true);
+          } else {
+            await detachTrajectory(
+              getTrajectoryTypeByIndex(topIndex),
+              [topIndex, subIndex].filter((n) => n !== undefined),
+              setTechnicalData,
+              technicalData,
+              status,
+              technicalData[topIndex]?.subRows?.[subIndex]?.hypothesis ?? '',
+            );
+          }
+        }
+      }
+
+      if (status === 'success') {
+        const dbTrajectory = dbTrajectories.find((traj) => traj.id === value) ?? null;
+        if (dbTrajectory) {
+          await attachTrajectory(
+            getTrajectoryTypeByIndex(topIndex),
+            [topIndex, subIndex].filter((n) => n !== undefined),
+            status,
+            dbTrajectory,
+            setTechnicalData,
+          );
+        }
+      }
+    },
+    [attachTrajectory, dbTrajectories, detachTrajectory, technicalData],
+  );
+
   return (
     <div className="flex min-h-0 w-full gap-6 pb-6 xl:gap-7 2xl:gap-8">
       <CheckBoxList
@@ -172,53 +240,14 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
               },
             );
           }}
-          handleImport={async (rowId: string) => {
-            const indexArray = rowId.split('.').map(Number);
-            const type = getTrajectoryTypeByIndex(indexArray[0]);
-            setSelectedTrajectoryType(type);
-            const area = technicalData[indexArray[0]]?.subRows?.[indexArray[1]]?.hypothesis;
-            await handleFetchTrajectoriesFS(type, rowId, setOptionsFS, setRowIdSelected, toggleModal, area);
-          }}
-          updateData={async (rowId: string, value: unknown, status: RowStatus) => {
-            const [topIndex, subIndex] = rowId.split('.').map(Number);
-            if (status === 'empty' || status === 'emptyError') {
-              const row = subIndex == null ? technicalData[topIndex] : technicalData[topIndex]?.subRows?.[subIndex];
-              const current = row?.trajectory ?? null;
-              if (current) {
-                if (
-                  topIndex === 0 &&
-                  row?.trajectory &&
-                  row?.status === TRAJECTORY_SELECTION_STATUS.OK &&
-                  shouldDeleteParamModulation(0, technicalData)
-                ) {
-                  setRowToDelete({ index: topIndex, subIndex, value: row?.hypothesis, operation: 'empty' });
-                  setIsDeletionModalOpen(true);
-                } else {
-                  await detachTrajectory(
-                    getTrajectoryTypeByIndex(topIndex),
-                    [topIndex, subIndex].filter((n) => n !== undefined),
-                    setTechnicalData,
-                    technicalData,
-                    status,
-                    technicalData[topIndex]?.subRows?.[subIndex]?.hypothesis ?? '',
-                  );
-                }
-              }
-            }
-
-            if (status === 'success') {
-              const dbTrajectory = dbTrajectories.find((traj) => traj.id === value) ?? null;
-              if (dbTrajectory) {
-                await attachTrajectory(
-                  getTrajectoryTypeByIndex(topIndex),
-                  [topIndex, subIndex].filter((n) => n !== undefined),
-                  status,
-                  dbTrajectory,
-                  setTechnicalData,
-                );
-              }
-            }
-          }}
+          handleImport={async (rowId: string) =>
+            await handleFetchTrajectoriesFromFS(
+              rowId,
+              technicalData,
+              TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+            )
+          }
+          updateData={handleHypothesisTableUpdate}
           isReadOnlyEnable={true}
           removeRow={async (value: string, _rowId?: string) => {
             if (
@@ -254,15 +283,9 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
               fileNameContains,
             });
           }}
-          handleImport={async (rowId: string) => {
-            const index = Number(rowId.split('.').map(Number)[0]);
-            const type =
-              index === 0
-                ? TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER
-                : TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER;
-            setSelectedTrajectoryType(type);
-            await handleFetchTrajectoriesFS(type, rowId, setOptionsFS, setRowIdSelected, toggleModal);
-          }}
+          handleImport={async (rowId: string) =>
+            await handleFetchTrajectoriesFromFS(rowId, technicalData, TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER)
+          }
           updateData={async (rowId: string, value: unknown, status: RowStatus) => {
             const indexArray = rowId.split('.').map(Number);
             const type =
@@ -289,20 +312,26 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
       {isModalOpen && (
         <ImportTrajectoryModal
           options={optionsFS}
-          onClose={async (value?: SelectOption) => {
+          onClose={async (
+            typeToUse?: TRAJECTORY_TYPE,
+            value?: SelectOption,
+            hypothesis?: HypothesisType,
+            indexArray?: number[],
+          ) => {
             toggleModal();
             if (value != null) {
-              const isTechnicalParamType = isTechnicalParametersType(selectedTrajectoryType);
-              const dataTable = isTechnicalParamType ? technicalData : data;
+              const isTechnicalParamType = typeToUse ? isTechnicalParametersType(typeToUse) : false;
               const setDataTable = isTechnicalParamType ? setTechnicalData : setData;
-              await importTrajectory(selectedTrajectoryType, value, rowIdSelected, dataTable, setDataTable);
+              await importTrajectory(setDataTable, value, typeToUse, indexArray, hypothesis);
             }
           }}
-          trajectoryType={selectedTrajectoryType ?? getTrajectoryTypeByIndex(Number(rowIdSelected))}
+          tabType={selectedTrajectoryType ?? getTrajectoryTypeByIndex(Number(rowIdSelected))}
           hypothesis={getAreaTrajectoryName(
             rowIdSelected,
             isTechnicalParametersType(selectedTrajectoryType) ? technicalData : data,
           )}
+          indexArray={rowIdSelected?.split('.').map(Number)}
+          rowsNb={data.length}
         />
       )}
       {isDeletionModalOpen && (
