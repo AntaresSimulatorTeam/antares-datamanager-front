@@ -4,9 +4,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import StdAvatar from '@/components/common/layout/stdAvatar/StdAvatar';
+import StdAvatar from '@common/layout/stdAvatar/StdAvatar.tsx';
 import { StudyDTO } from '@/shared/types/Study.type.ts';
-import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter';
+import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter.ts';
 import { createColumnHelper } from '@tanstack/react-table';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { avatarCase, sentenceCase } from '@/shared/utils/textUtils.ts';

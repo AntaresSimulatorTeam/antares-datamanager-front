@@ -7,7 +7,6 @@
 import { useEffect, useState } from 'react';
 import { ProjectInfo, StudyDTO } from '@/shared/types';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type';
-import getStudyTableHeaders from './StudyTableHeaders';
 import { addSortColumn } from './StudyTableUtils';
 import StudiesPagination from './StudiesPagination';
 import { RowSelectionState } from '@tanstack/react-table';
@@ -20,6 +19,7 @@ import { useNewStudyModal } from '@/hooks/useNewStudyModal';
 import StudyCreationModal from '@common/modal/StudyCreationModal';
 import StudyModificationModal from '@common/modal/StudyModificationModal.tsx';
 import { Button } from '@design-system-rte/react';
+import getStudyTableHeaders from '@/components/header/StudyTableHeaders.tsx';
 
 interface StudyTableDisplayProps {
   searchStudy: string | undefined;

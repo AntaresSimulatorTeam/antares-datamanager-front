@@ -62,26 +62,26 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
         {projectInfo ? t('home.@update_project') : t('home.@new_project')}
       </RdsModal.Title>
       <RdsModal.Content>
-        <div className="flex flex-col items-start gap-3">
+        <div className="flex flex-col items-start gap-4">
           <FieldInFormation />
-          <TextInput
-            id="text-input-default"
-            label={t('modal.@input_name')}
-            required
-            value={name}
-            onChange={(value: string) => {
-              nameError && setNameError('');
-              setName(value ?? '');
-            }}
-            assistiveAppearance="error"
-            error={!!nameError?.length}
-            assistiveTextLabel={nameError ?? ''}
-            maxLength={MAX_PROJECT_NAME_LENGTH}
-            showCounter={true}
-            rightIconAction="clean"
-            onRightIconClick={resetNameField}
-          />
-          <div className="flex w-8/12">
+          <div className="flex w-1/2 flex-col items-start gap-4">
+            <TextInput
+              id="text-input-default"
+              label={t('modal.@input_name')}
+              required
+              value={name}
+              onChange={(value: string) => {
+                nameError && setNameError('');
+                setName(value ?? '');
+              }}
+              assistiveAppearance="error"
+              error={!!nameError?.length}
+              assistiveTextLabel={nameError ?? ''}
+              maxLength={MAX_PROJECT_NAME_LENGTH}
+              showCounter={true}
+              rightIconAction="clean"
+              onRightIconClick={resetNameField}
+            />
             <Textarea
               label={t('modal.@input_description')}
               value={description}

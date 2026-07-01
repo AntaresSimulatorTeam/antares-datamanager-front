@@ -69,9 +69,9 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
       onClose();
     },
     (message) => {
-      if (message?.includes('study')) {
+      if (message?.includes(t('studyDetails.@duplicateModalStudyError'))) {
         setStudyNameError(message);
-      } else if (message?.includes('horizon')) {
+      } else if (message?.includes(t('horizonInput.@validYearError'))) {
         setHorizonError(message);
       }
     },
@@ -83,54 +83,59 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
         {isDuplicateMode ? t('home.@duplicate_study') : t('studyModal.@update_study')}
       </RdsModal.Title>
       <RdsModal.Content>
-        <div className="flex w-full flex-col items-start justify-start space-y-2">
-          <FieldInFormation />
-          <div className="flex w-full items-center justify-start gap-4">
-            <div className="flex w-1/2">
+        <div className="flex w-full flex-col gap-4 self-stretch">
+          <div className="flex flex-col items-start justify-start gap-4">
+            <FieldInFormation />
+            <div className="flex w-full items-center justify-start gap-4">
+              <div className="flex w-1/2">
+                <TextInput
+                  id="text-input-study-modify-name"
+                  value={studyName}
+                  label={t('modal.@input_name')}
+                  onChange={(value: string) => {
+                    studyNameError && setStudyNameError('');
+                    setStudyName(value ?? '');
+                  }}
+                  required
+                  maxLength={MAX_STUDY_NAME_LENGTH}
+                  showCounter={true}
+                  error={!!studyNameError}
+                  assistiveTextLabel={studyNameError}
+                  assistiveAppearance={studyNameError ? 'error' : 'description'}
+                />
+              </div>
+              <div className="flex w-1/2">
+                <SelectInput options={projects} required={true} valueSelected={project} onChange={setProject} />
+              </div>
+            </div>
+            <div className="flex w-1/4">
               <TextInput
-                id="text-input-study-modify-name"
-                value={studyName}
-                label={t('modal.@input_name')}
-                onChange={(value: string) => {
-                  studyNameError && setStudyNameError('');
-                  setStudyName(value ?? '');
-                }}
+                id="text-input-horizon"
+                label={t('home.@horizon')}
+                value={horizon}
                 required
-                maxLength={MAX_STUDY_NAME_LENGTH}
-                error={!!studyNameError}
-                assistiveTextLabel={studyNameError}
+                onChange={(value: string) => {
+                  horizonError && setHorizonError('');
+                  setHorizon(value ?? '');
+                }}
+                onBlur={() => validateHorizon(setHorizonError, t, horizon, false)}
+                maxLength={MAX_HORIZON_NUMBER}
+                showCounter={true}
+                error={!!horizonError}
+                assistiveTextLabel={horizonError || t('components.horizonInput.@assistiveTextForYear')}
+                assistiveAppearance={horizonError ? 'error' : 'description'}
+                disabled={!isDuplicateMode}
+                placeholder={!isDuplicateMode ? horizon : ''}
               />
             </div>
-            <div className="flex w-1/2">
-              <SelectInput options={projects} required={true} valueSelected={project} onChange={setProject} />
-            </div>
-          </div>
-          <div className="flex w-1/2">
-            <TextInput
-              id="text-input-horizon"
-              label={t('home.@horizon')}
-              value={horizon}
-              required
-              onChange={(value: string) => {
-                horizonError && setHorizonError('');
-                setHorizon(value ?? '');
-              }}
-              onBlur={() => validateHorizon(setHorizonError, t, horizon, false)}
-              maxLength={MAX_HORIZON_NUMBER}
-              error={!!horizonError}
-              assistiveTextLabel={horizonError || t('components.horizonInput.@assistiveTextForYear')}
-              assistiveAppearance={horizonError ? 'error' : 'description'}
-              disabled={!isDuplicateMode}
-              placeholder={!isDuplicateMode ? horizon : ''}
+            <KeywordsInput
+              keywords={keywords}
+              setKeywords={setKeywords}
+              maxNbKeywords={MAX_KEYWORD_NUMBER}
+              maxNbCharacters={MAX_KEYWORD_LENGTH}
+              minNbCharacters={1}
             />
           </div>
-          <KeywordsInput
-            keywords={keywords}
-            setKeywords={setKeywords}
-            maxNbKeywords={MAX_KEYWORD_NUMBER}
-            maxNbCharacters={MAX_KEYWORD_LENGTH}
-            minNbCharacters={1}
-          />
         </div>
       </RdsModal.Content>
       <RdsModal.Footer>

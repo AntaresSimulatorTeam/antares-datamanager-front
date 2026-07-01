@@ -73,46 +73,48 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
           <div className="flex flex-col items-start justify-start gap-4">
             <FieldInFormation />
             <div className="flex w-1/2 flex-col items-start gap-4">
-            <TextInput
-              id="text-input-study-create-name"
-              label={t('modal.@input_name')}
-              value={studyName}
-              onChange={(value: string) => {
-                nameError && setNameError('');
-                setStudyName(value ?? '');
-              }}
-              required
-              maxLength={MAX_STUDY_NAME_LENGTH}
-              showCounter={true}
-              error={!!nameError}
-              assistiveTextLabel={nameError}
-              assistiveAppearance="error"
-              rightIconAction="clean"
-            />
-          <TextInput
-            id="text-input-horizon"
-            label={t('home.@horizon')}
-            value={horizon}
-            required
-            onChange={(value: string) => {
-              horizonError && setHorizonError('');
-              setHorizon(value ?? '');
-            }}
-            onBlur={() => validateHorizon(setHorizonError, t, horizon, false)}
-            maxLength={MAX_HORIZON_NUMBER}
-            showCounter={true}
-            error={!!horizonError}
-            assistiveTextLabel={horizonError || t('components.horizonInput.@assistiveTextForYear')}
-            assistiveAppearance={horizonError ? 'error' : 'description'}
-          />
-          <KeywordsInput
-            keywords={keywords}
-            setKeywords={setKeywords}
-            maxNbKeywords={MAX_KEYWORD_NUMBER}
-            maxNbCharacters={MAX_KEYWORD_LENGTH}
-            minNbCharacters={1}
-          />
+              <TextInput
+                id="text-input-study-create-name"
+                label={t('modal.@input_name')}
+                value={studyName}
+                onChange={(value: string) => {
+                  nameError && setNameError('');
+                  setStudyName(value ?? '');
+                }}
+                required
+                maxLength={MAX_STUDY_NAME_LENGTH}
+                showCounter={true}
+                error={!!nameError}
+                assistiveTextLabel={nameError}
+                assistiveAppearance="error"
+                rightIconAction="clean"
+              />
+              <div className="flex w-1/2">
+                <TextInput
+                  id="text-input-horizon"
+                  label={t('home.@horizon')}
+                  value={horizon}
+                  required
+                  onChange={(value: string) => {
+                    horizonError && setHorizonError('');
+                    setHorizon(value ?? '');
+                  }}
+                  onBlur={() => validateHorizon(setHorizonError, t, horizon, false)}
+                  maxLength={MAX_HORIZON_NUMBER}
+                  showCounter={true}
+                  error={!!horizonError}
+                  assistiveTextLabel={horizonError || t('components.horizonInput.@assistiveTextForYear')}
+                  assistiveAppearance={horizonError ? 'error' : 'description'}
+                />
+              </div>
             </div>
+            <KeywordsInput
+              keywords={keywords}
+              setKeywords={setKeywords}
+              maxNbKeywords={MAX_KEYWORD_NUMBER}
+              maxNbCharacters={MAX_KEYWORD_LENGTH}
+              minNbCharacters={1}
+            />
           </div>
         </div>
       </RdsModal.Content>
