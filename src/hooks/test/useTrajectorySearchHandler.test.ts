@@ -144,7 +144,7 @@ describe('useTrajectorySearchHandler', () => {
     );
   });
 
-  it('should switch type for last index when type is HYDRO_SERIES', async () => {
+  it('should not switch type for first index when type is HYDRO_SERIES', async () => {
     const setDbTrajectories = vi.fn();
 
     const { result } = renderHook(() =>
@@ -173,7 +173,7 @@ describe('useTrajectorySearchHandler', () => {
     );
   });
 
-  it('should switch type for last index when type is HYDRO_SERIES', async () => {
+  it('should switch into HYDRO_TECHNICAL_PARAMETERS type for last index when type is HYDRO_SERIES', async () => {
     const setDbTrajectories = vi.fn();
     vi.mocked(hypothesisTableService.handleTrajectorySearch).mockResolvedValue([]);
 
@@ -203,7 +203,7 @@ describe('useTrajectorySearchHandler', () => {
     );
   });
 
-  it('should switch type for last index when type is HYDRO_PSP_SERIES', async () => {
+  it('should not switch type for first index when type is HYDRO_PSP_SERIES', async () => {
     const setDbTrajectories = vi.fn();
 
     const { result } = renderHook(() =>
@@ -232,7 +232,7 @@ describe('useTrajectorySearchHandler', () => {
     );
   });
 
-  it('should switch type for last index when type is HYDRO_PSP_SERIES', async () => {
+  it('should switch into HYDRO_PSP_TECHNICAL_PARAMETERS type for last index when type is HYDRO_PSP_SERIES', async () => {
     const setDbTrajectories = vi.fn();
 
     const { result } = renderHook(() =>
@@ -317,7 +317,7 @@ describe('useTrajectorySearchHandler', () => {
     );
   });
 
-  it('should switch type for last index when type is NUCLEAR_FR_TS_ERP', async () => {
+  it('should switch into NUCLEAR_FR_TS_ERP type for first index when type is NUCLEAR_FR_MODULATION', async () => {
     const setDbTrajectories = vi.fn();
 
     const { result } = renderHook(() =>
@@ -345,7 +345,7 @@ describe('useTrajectorySearchHandler', () => {
     );
   });
 
-  it('should switch type for last index when type is NUCLEAR_FR_TS_LONG_TERM', async () => {
+  it('should switch into NUCLEAR_FR_TS_LONG_TERM type for second index when type is NUCLEAR_FR_MODULATION', async () => {
     const setDbTrajectories = vi.fn();
 
     const { result } = renderHook(() =>
@@ -373,7 +373,7 @@ describe('useTrajectorySearchHandler', () => {
     );
   });
 
-  it('should switch type for last index when type is NUCLEAR_FR_TS_LONG_TERM', async () => {
+  it('should switch into NUCLEAR_FR_TS_SMR type for last index when type is NUCLEAR_FR_MODULATION', async () => {
     const setDbTrajectories = vi.fn();
 
     const { result } = renderHook(() =>
