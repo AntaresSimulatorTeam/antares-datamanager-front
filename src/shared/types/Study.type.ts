@@ -86,6 +86,9 @@ export interface StdTabItemProps {
   disabled?: boolean;
 }
 
-export type StudyDataCreation = Omit<StudyDTO, 'id' | 'status' | 'creationDate' | 'projectId' | 'generationDate'> & {
+export type StudyDataCreation = Omit<
+  StudyDTO,
+  'id' | 'status' | 'creationDate' | 'projectId' | 'generationDate' | 'hvdc'
+> & {
   id: number | undefined;
 };
