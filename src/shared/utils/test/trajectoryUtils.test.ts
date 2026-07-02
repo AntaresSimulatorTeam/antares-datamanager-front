@@ -14,8 +14,8 @@ import {
   getDeletionModalMessage,
   getHypothesis,
   getItemsMenu,
+  getModalTile,
   getPathFromTrajectoryType,
-  getQueryParamAreaValue,
   getRowDataSelected,
   getStatus,
   getStudyMenu,
@@ -52,6 +52,7 @@ import { ThermalOptions } from '@/mocks/data/list/names.ts';
 import { TFunction } from 'i18next';
 import * as textUtils from '@/shared/utils/textUtils.ts';
 import { TabItemProps } from '@design-system-rte/core/components/tab/tab.interface';
+import { HypothesisType } from '@/shared/types/HypothesisTable.ts';
 
 describe('getStatus', () => {
   it("should return an ERROR selection status for 'error' status", () => {
@@ -336,8 +337,11 @@ describe('getStudyMenu', () => {
       id: TRAJECTORY_TYPE.AREA,
       panelId: TRAJECTORY_TYPE.AREA,
       label: 'translated:studyDetails.@areas_links',
-      icon: 'linked_services',
+      icon: 'share',
       disabled: false,
+      badgeContent: "number",
+      badgeType: 'brand',
+      showBadge: true,
     });
 
     expect(result[1].disabled).toBe(false);
@@ -689,6 +693,26 @@ describe('getPathFromTrajectoryType', () => {
     );
   });
 
+  it('should return technical path for NUCLEAR_FR_MODULATION type', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION)).toBe('\\\\specific_nuclear\\Modulation');
+  });
+
+  it('should return technical path for NUCLEAR_FR_TALON type', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.NUCLEAR_FR_TALON)).toBe('\\\\specific_nuclear\\Talon_nuc');
+  });
+
+  it('should return technical path for NUCLEAR_FR_TS_ERP type', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP)).toBe('\\\\specific_nuclear\\TS_dispo\\EPR\\');
+  });
+
+  it('should return technical path for NUCLEAR_FR_TS_LONG_TERM type', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM)).toBe('\\\\specific_nuclear\\TS_dispo');
+  });
+
+  it('should return technical path for NUCLEAR_FR_TS_SMR type', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR)).toBe('\\\\specific_nuclear\\TS_dispo\\SMR\\');
+  });
+
   it('should return technical path for unknown type', () => {
     expect(getPathFromTrajectoryType('UNKNOWN_TYPE' as TRAJECTORY_TYPE)).toBeNull();
   });
@@ -708,68 +732,6 @@ describe('getDefaultLabel', () => {
   it('should return name when name is OTHER_AREAS even if isDefault is true', () => {
     const result = getDefaultLabel(OTHER_AREAS);
     expect(result).toBe(OTHER_AREAS_LABEL);
-  });
-});
-
-describe('getQueryParamAreaValue', () => {
-  it('retourne undefined si hypothesis est undefined', () => {
-    expect(getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD)).toBeUndefined();
-  });
-
-  it('retourne area si hypothesis.area est défini et différent de OTHER_AREAS_LABEL', () => {
-    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD, 'FR');
-    expect(result).toBe('FR');
-  });
-
-  it('remplace OTHER_AREAS_LABEL par OTHER_AREAS', () => {
-    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.LOAD, OTHER_AREAS_LABEL);
-    expect(result).toBe(OTHER_AREAS);
-  });
-
-  // --- THERMAL_CAPACITY ---
-  it('THERMAL_CAPACITY : retourne FR si hypothesis.area = FR', () => {
-    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.THERMAL_CAPACITY, 'FR');
-    expect(result).toBe('FR');
-  });
-
-  // --- STS & THERMAL_TECHNICAL_SPECIFIC_PARAMETER ---
-  it('STS : retourne hypothesis.technology', () => {
-    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.STS, 'HP');
-    expect(result).toBe('HP');
-  });
-
-  it('THERMAL_TECHNICAL_SPECIFIC_PARAMETER : retourne hypothesis.technology', () => {
-    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, 'BOILER');
-    expect(result).toBe('BOILER');
-  });
-
-  it('STS : retourne undefined si technology est undefined', () => {
-    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.STS);
-    expect(result).toBeUndefined();
-  });
-
-  // --- THERMAL_TECHNICAL_MODULATION_PARAMETER ---
-  it('THERMAL_TECHNICAL_MODULATION_PARAMETER : retourne toujours undefined', () => {
-    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER, 'param');
-    expect(result).toBeUndefined();
-  });
-
-  // --- THERMAL_TECHNICAL_COMMON_PARAMETER ---
-  it('THERMAL_TECHNICAL_COMMON_PARAMETER : retourne toujours undefined', () => {
-    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER, 'common');
-    expect(result).toBeUndefined();
-  });
-
-  // --- THERMAL_ECONOMIC_COST_PARAMETER ---
-  it('THERMAL_ECONOMIC_COST_PARAMETER : retourne toujours undefined', () => {
-    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER, 'cost');
-    expect(result).toBeUndefined();
-  });
-
-  // --- THERMAL_ECONOMIC_PARAMETER ---
-  it('THERMAL_ECONOMIC_PARAMETER : retourne toujours undefined', () => {
-    const result = getQueryParamAreaValue(TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER, 'economic');
-    expect(result).toBeUndefined();
   });
 });
 
@@ -1606,7 +1568,7 @@ describe('getItemsMenu', () => {
     it('retourne 2 items : THERMAL_CAPACITY et THERMAL_PARAMETER', () => {
       const result = getItemsMenu(TRAJECTORY_TYPE.THERMAL_CAPACITY, t as TFunction<'translation', undefined>, []);
 
-      expect(result).toHaveLength(2);
+      expect(result).toHaveLength(3);
       expect(result[0]).toEqual({
         id: TRAJECTORY_TYPE.THERMAL_CAPACITY,
         label: 'translated:misc.@installedPower',
@@ -1616,6 +1578,11 @@ describe('getItemsMenu', () => {
         id: TRAJECTORY_TYPE.THERMAL_PARAMETER,
         label: 'translated:thermal.@parameters',
         panelId: TRAJECTORY_TYPE.THERMAL_PARAMETER,
+      });
+      expect(result[2]).toEqual({
+        id: TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION,
+        label: 'translated:thermal.@nuclearFR',
+        panelId: TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION,
       });
     });
   });
@@ -1708,5 +1675,48 @@ describe('getItemsMenu', () => {
         panelId: TRAJECTORY_TYPE.MISC_LOAD,
       });
     });
+  });
+});
+
+describe('getModalTile', () => {
+  it('should use sentenceCase(technology) when tabType is a RES type', () => {
+    const hypothesis = { area: 'Europe', technology: 'solar' };
+    const result = getModalTile(TRAJECTORY_TYPE.RES_CAPACITY, hypothesis);
+    expect(result).contain('Europe - Solar');
+  });
+
+  it('should use raw technology when tabType is not a RES type', () => {
+    const hypothesis = { area: 'Europe', technology: 'wind' };
+
+    const result = getModalTile(TRAJECTORY_TYPE.HYDRO_SERIES, hypothesis);
+    expect(result).contain('Europe - wind');
+  });
+
+  it('should replace OTHER_AREAS with OTHER_AREAS_LABEL', () => {
+    const hypothesis = { area: OTHER_AREAS, technology: 'hydro' };
+    const result = getModalTile(TRAJECTORY_TYPE.HYDRO_SERIES, hypothesis);
+
+    expect(result).toBe(`${OTHER_AREAS_LABEL} - hydro`);
+  });
+
+  it('should fallback to tabType when area is undefined', () => {
+    const hypothesis = { technology: 'wind' };
+    const result = getModalTile(TRAJECTORY_TYPE.HYDRO_SERIES, hypothesis as HypothesisType);
+
+    expect(result).toBe(`${TRAJECTORY_TYPE.HYDRO_SERIES} - wind`);
+  });
+
+  it('should return only area when technology is undefined', () => {
+    const hypothesis = { area: 'Europe' };
+
+    const result = getModalTile(TRAJECTORY_TYPE.HYDRO_SERIES, hypothesis);
+
+    expect(result).toBe('Europe');
+  });
+
+  it('should return only tabType when hypothesis is undefined', () => {
+    const result = getModalTile(TRAJECTORY_TYPE.HYDRO_SERIES);
+
+    expect(result).toBe(TRAJECTORY_TYPE.HYDRO_SERIES);
   });
 });

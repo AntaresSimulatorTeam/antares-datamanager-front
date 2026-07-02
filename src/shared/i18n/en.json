@@ -172,7 +172,14 @@
     "@parametersEconomic": "Economic Parameters",
     "@costs": "Cost",
     "@economics": "Economic",
-    "@paramModulationMessage": "At least one \"Specific\" trajectory must be defined in order to complete the \"Param modulation\" trajectory."
+    "@paramModulationMessage": "At least one \"Specific\" trajectory must be defined in order to complete the \"Param modulation\" trajectory.",
+    "@nuclearFR": "Nuclear FR",
+    "@modulation": "Modulation",
+    "@talon": "Talon",
+    "@time_series": "Time Series",
+    "@epr": "EPR",
+    "@long_term": "Long Term (LT)",
+    "@smr": "SMR"
   },
   "dsr": {
     "@capacityModulation": "Capacity Modulation",

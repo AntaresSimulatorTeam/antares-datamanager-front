@@ -1,10 +1,10 @@
 import StdTagList from '@common/base/StdTagList/StdTagList.tsx';
 import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter.ts';
-import StdAvatar from '@common/layout/stdAvatar/StdAvatar.tsx';
 import { avatarCase } from '@/shared/utils/textUtils.ts';
 import { ProjectInfo } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 import { useUserDisplay } from '@/shared/hooks/useUserDisplay';
+import StdAvatar from '@common/layout/stdAvatar/StdAvatar.tsx';
 
 export type PegaseCardContentProps = {
   project: ProjectInfo;

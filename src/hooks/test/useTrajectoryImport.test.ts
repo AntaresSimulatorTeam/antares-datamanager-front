@@ -2,10 +2,10 @@ import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { uploadTrajectory } from '@/shared/services/trajectoryService.ts';
 import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
-import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory';
-import { HypothesisRowData, StudyDTO, UserState } from '@/shared/types';
+import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory';
+import { StudyDTO, UserState } from '@/shared/types';
 import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.ts';
-import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
+import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
 
@@ -50,13 +50,6 @@ describe('useTrajectoryImport', () => {
 
   const value = { id: 12, label: 'Trajectory A' };
 
-  const data = [
-    {
-      hypothesis: 'Solar',
-      subRows: [{ hypothesis: 'Tech A' }],
-    },
-  ] as HypothesisRowData[];
-
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -68,18 +61,21 @@ describe('useTrajectoryImport', () => {
     const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch, mockSetReadOnly));
 
     await act(async () => {
-      await result.current.importTrajectory(TRAJECTORY_TYPE.AREA, value, '0.0', data, mockSetData);
+      await result.current.importTrajectory(mockSetData, value, TRAJECTORY_TYPE.AREA, [0, 0], {
+        area: 'FR',
+        technology: 'Solar',
+      });
     });
 
     expect(uploadTrajectory).toHaveBeenCalledWith(
-      TRAJECTORY_TYPE.AREA,
-      'Trajectory A',
       2030,
       'study-001',
-      'Solar',
+      TRAJECTORY_TYPE.AREA,
+      'Trajectory A',
+      'FR',
       expect.any(Function),
       false,
-      'Tech A',
+      'Solar',
     );
 
     expect(result.current.fileStatus).toBe('success');
@@ -93,18 +89,21 @@ describe('useTrajectoryImport', () => {
     const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch, mockSetReadOnly));
 
     await act(async () => {
-      await result.current.importTrajectory(TRAJECTORY_TYPE.LINK, value, '0.0', data, mockSetData);
+      await result.current.importTrajectory(mockSetData, value, TRAJECTORY_TYPE.LINK, [0, 0], {
+        area: 'FR',
+        technology: 'Solar',
+      });
     });
 
     expect(uploadTrajectory).toHaveBeenCalledWith(
-      TRAJECTORY_TYPE.LINK,
-      'Trajectory A',
       2030,
       'study-001',
-      'Solar',
+      TRAJECTORY_TYPE.LINK,
+      'Trajectory A',
+      'FR',
       expect.any(Function),
       false,
-      'Tech A',
+      'Solar',
     );
 
     expect(mockSetReadOnly).not.toHaveBeenCalled();
@@ -117,18 +116,21 @@ describe('useTrajectoryImport', () => {
     const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch));
 
     await act(async () => {
-      await result.current.importTrajectory(TRAJECTORY_TYPE.LOAD, value, '0.0', data, mockSetData);
+      await result.current.importTrajectory(mockSetData, value, TRAJECTORY_TYPE.LOAD, [0, 0], {
+        area: 'FR',
+        technology: 'Solar',
+      });
     });
 
     expect(uploadTrajectory).toHaveBeenCalledWith(
-      TRAJECTORY_TYPE.LOAD,
-      'Trajectory A',
       2030,
       'study-001',
-      'Solar',
+      TRAJECTORY_TYPE.LOAD,
+      'Trajectory A',
+      'FR',
       expect.any(Function),
       false,
-      'Tech A',
+      'Solar',
     );
 
     expect(result.current.fileStatus).toBe('success');
@@ -142,20 +144,21 @@ describe('useTrajectoryImport', () => {
     const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch));
 
     await act(async () => {
-      await result.current.importTrajectory(TRAJECTORY_TYPE.STS, value, '0.0', data, mockSetData, [
-        { id: 1, label: 'Solar', code: 'solar' },
-      ]);
+      await result.current.importTrajectory(mockSetData, value, TRAJECTORY_TYPE.STS, [0, 0], {
+        area: 'FR',
+        technology: 'battery',
+      });
     });
 
     expect(uploadTrajectory).toHaveBeenCalledWith(
-      TRAJECTORY_TYPE.STS,
-      'Trajectory A',
       2030,
       'study-001',
-      'Solar',
+      TRAJECTORY_TYPE.STS,
+      'Trajectory A',
+      'FR',
       expect.any(Function),
       false,
-      'Tech A',
+      'battery',
     );
 
     expect(result.current.fileStatus).toBe('success');
@@ -169,18 +172,21 @@ describe('useTrajectoryImport', () => {
     const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch));
 
     await act(async () => {
-      await result.current.importTrajectory(TRAJECTORY_TYPE.STS, value, '0.0', data, mockSetData);
+      await result.current.importTrajectory(mockSetData, value, TRAJECTORY_TYPE.STS, [0, 0], {
+        area: 'FR',
+        technology: 'battery',
+      });
     });
 
     expect(uploadTrajectory).toHaveBeenCalledWith(
-      TRAJECTORY_TYPE.STS,
-      'Trajectory A',
       2030,
       'study-001',
-      'Solar',
+      TRAJECTORY_TYPE.STS,
+      'Trajectory A',
+      'FR',
       expect.any(Function),
       false,
-      'Tech A',
+      'battery',
     );
 
     expect(result.current.fileStatus).toBe('success');
@@ -198,7 +204,10 @@ describe('useTrajectoryImport', () => {
     const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch));
 
     await act(async () => {
-      await result.current.importTrajectory(TRAJECTORY_TYPE.LOAD, value, '0', data, mockSetData);
+      await result.current.importTrajectory(mockSetData, value, TRAJECTORY_TYPE.LOAD, [0], {
+        area: 'FR',
+        technology: 'battery',
+      });
     });
 
     expect(result.current.fileStatus).toBe('error');
@@ -206,13 +215,13 @@ describe('useTrajectoryImport', () => {
       TRAJECTORY_TYPE.LOAD,
       [0],
       { id: 12, label: 'Trajectory A' },
-      'Solar',
+      'battery',
       'user-123',
       mockSetData,
-      expect.objectContaining({
+      {
         message: 'studyDetails.@notificationAlert',
         content: 'upload failed',
-      }),
+      },
     );
   });
   it('should handle error and call handleTrajectoryError with no user name', async () => {
@@ -228,7 +237,10 @@ describe('useTrajectoryImport', () => {
     const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch));
 
     await act(async () => {
-      await result.current.importTrajectory(TRAJECTORY_TYPE.LOAD, value, '0', data, mockSetData);
+      await result.current.importTrajectory(mockSetData, value, TRAJECTORY_TYPE.LOAD, [0], {
+        area: 'FR',
+        technology: 'battery',
+      });
     });
 
     expect(result.current.fileStatus).toBe('error');
@@ -236,13 +248,13 @@ describe('useTrajectoryImport', () => {
       TRAJECTORY_TYPE.LOAD,
       [0],
       { id: 12, label: 'Trajectory A' },
-      'Solar',
+      'battery',
       '',
       mockSetData,
-      expect.objectContaining({
+      {
         message: 'studyDetails.@notificationAlert',
         content: 'upload failed',
-      }),
+      },
     );
   });
 
@@ -257,75 +269,80 @@ describe('useTrajectoryImport', () => {
     const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch));
 
     await act(async () => {
-      await result.current.importTrajectory(TRAJECTORY_TYPE.LOAD, value, '0', data, mockSetData);
+      await result.current.importTrajectory(mockSetData, value, TRAJECTORY_TYPE.LOAD, [0], {
+        area: 'FR',
+        technology: 'battery',
+      });
     });
 
     expect(handleTrajectoryError).not.toHaveBeenCalled();
   });
 
   it('should use OTHER_AREAS when hypothesis is OTHER_AREAS_LABEL', async () => {
-    const dataWithOther = [{ hypothesis: OTHER_AREAS_LABEL }] as HypothesisRowData[];
     (uploadTrajectory as Mock).mockResolvedValue({ id: 102 });
 
     const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch));
 
     await act(async () => {
-      await result.current.importTrajectory(TRAJECTORY_TYPE.LOAD, value, '0', dataWithOther, mockSetData);
+      await result.current.importTrajectory(mockSetData, value, TRAJECTORY_TYPE.LOAD, [0], {
+        area: OTHER_AREAS,
+        technology: 'battery',
+      });
     });
 
     expect(uploadTrajectory).toHaveBeenCalledWith(
-      TRAJECTORY_TYPE.LOAD,
-      'Trajectory A',
       2030,
       'study-001',
+      TRAJECTORY_TYPE.LOAD,
+      'Trajectory A',
       OTHER_AREAS,
       expect.any(Function),
       false,
-      undefined,
+      'battery',
     );
   });
 
   it('should use OTHER_AREAS when hypothesis is OTHER_AREAS_LABEL', async () => {
-    const dataWithOther = [{ hypothesis: OTHER_AREAS_LABEL }, { hypothesis: 'Capacity' }] as HypothesisRowData[];
     (uploadTrajectory as Mock).mockResolvedValue({ id: 102 });
 
     const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch));
 
     await act(async () => {
-      await result.current.importTrajectory(TRAJECTORY_TYPE.DSR, value, '0', dataWithOther, mockSetData);
+      await result.current.importTrajectory(mockSetData, value, TRAJECTORY_TYPE.DSR, [0], {
+        area: OTHER_AREAS,
+        technology: 'battery',
+      });
     });
 
     expect(uploadTrajectory).toHaveBeenCalledWith(
-      TRAJECTORY_TYPE.DSR,
-      'Trajectory A',
       2030,
       'study-001',
+      TRAJECTORY_TYPE.DSR,
+      'Trajectory A',
       OTHER_AREAS,
       expect.any(Function),
       false,
-      undefined,
+      'battery',
     );
   });
 
   it('should use set read only when trajectory type is DSR', async () => {
-    const dataWithOther = [
-      { hypothesis: 'AT', status: TRAJECTORY_SELECTION_STATUS.OK },
-      { hypothesis: 'Capacity' },
-    ] as HypothesisRowData[];
     (uploadTrajectory as Mock).mockResolvedValue({ id: 102, hasTimeSeries: true });
 
     const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch, mockSetReadOnly));
 
     await act(async () => {
-      await result.current.importTrajectory(TRAJECTORY_TYPE.DSR, value, '0', dataWithOther, mockSetData);
+      await result.current.importTrajectory(mockSetData, value, TRAJECTORY_TYPE.DSR, [0], {
+        area: OTHER_AREAS,
+      });
     });
 
     expect(uploadTrajectory).toHaveBeenCalledWith(
-      TRAJECTORY_TYPE.DSR,
-      'Trajectory A',
       2030,
       'study-001',
-      'AT',
+      TRAJECTORY_TYPE.DSR,
+      'Trajectory A',
+      OTHER_AREAS,
       expect.any(Function),
       false,
       undefined,
