@@ -1,10 +1,9 @@
-import StdAvatar from '@common/layout/stdAvatar/StdAvatar.tsx';
 import { VirtualizerList } from '@/components/list/VirtualizerList.tsx';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CardWithIconTitle } from '@common/layout/CardWithIconTitle.tsx';
 import { convertDataToItem } from '@/shared/utils/warningUtils.ts';
-import { IconButton } from '@design-system-rte/react';
+import { Icon, IconButton } from '@design-system-rte/react';
 
 interface Props<T> {
   content: T[];
@@ -36,17 +35,8 @@ export const ContainerWithExpander = <T,>({ content, placeholder }: Props<T>) =>
         />
       </div>
       <div className="flex h-full w-full flex-col items-center">
-        <div className="flex w-full items-center gap-4 px-2 sm:gap-2 sm:p-1">
-          {content?.length > 0 && (
-            <StdAvatar
-              initials={`${content?.length ?? '0'}`}
-              size="es"
-              backgroundColor={content?.length === 0 ? 'gray' : 'orange'}
-              fullname=""
-              textColor="white"
-              hasToolTip={false}
-            />
-          )}
+        <div className="flex w-full items-center gap-2 px-2 sm:gap-1 sm:p-1">
+          <Icon name="warning"></Icon>
           <span className="text-body-m">{t('studyDetails.@warnings')}</span>
         </div>
         {isOpen && content.length > 0 && (
