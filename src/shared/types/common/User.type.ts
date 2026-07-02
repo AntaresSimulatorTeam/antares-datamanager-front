@@ -8,6 +8,8 @@ import { User } from 'oidc-client-ts';
 export interface UserInfo {
   id: string;
   nni: string;
+  firstName: string;
+  lastName: string;
   fullname: string;
   email: string;
   isAdmin?: boolean;

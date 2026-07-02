@@ -70,3 +70,6 @@ export const DEFAULT_CONFIG_INSTALLED_POWER_TECHNOLOGY = `${BACK_END_BASE_URL}/v
 
 // WARNING
 export const WARNING_MESSAGES = `${BACK_END_BASE_URL}/v1/warnings`;
+
+// USER
+export const USER_LIST_ENDPOINT = `${BACK_END_BASE_URL}/v1/user/list`;

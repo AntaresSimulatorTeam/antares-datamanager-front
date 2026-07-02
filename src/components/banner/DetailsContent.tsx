@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { Button, Icon } from '@design-system-rte/react';
 import StdTagList from '@common/base/StdTagList/StdTagList.tsx';
+import { useUserDisplay } from '@/shared/hooks/useUserDisplay';
 
 type DetailsContentProps = {
   content: StudyDTO | ProjectInfo;
@@ -19,6 +20,7 @@ type DetailsContentProps = {
 
 export const DetailsContent = ({ content, onClickButton, tagsList }: DetailsContentProps) => {
   const { t } = useTranslation();
+  const { fullname } = useUserDisplay(content?.createdBy ?? '');
 
   return (
     <header className="group flex w-full flex-col gap-1 rounded border border-gray-500 bg-gray-100 p-2">
@@ -50,7 +52,7 @@ export const DetailsContent = ({ content, onClickButton, tagsList }: DetailsCont
           <div>|</div>
           <div className="flex items-center gap-1">
             <Icon name="user" />
-            {t('studyDetails.@bannerCreatedBy', { createdBy: content?.createdBy ?? '' })}
+            {t('studyDetails.@bannerCreatedBy', { createdBy: fullname ?? '' })}
           </div>
           {tagsList?.length != null && tagsList.length > 0 && (
             <div className="flex min-w-32 items-center gap-1">
