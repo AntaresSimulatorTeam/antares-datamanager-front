@@ -18,7 +18,9 @@ import {
   MAX_KEYWORD_LENGTH,
   MAX_KEYWORD_NUMBER,
   MAX_PROJECT_DESCRIPTION_LENGTH,
+  MAX_PROJECT_DESCRIPTION_ROWS_NB,
   MAX_PROJECT_NAME_LENGTH,
+  MIN_KEYWORD_LENGTH,
 } from '@/shared/const/studyConfig.ts';
 import { Button, Textarea, TextInput } from '@design-system-rte/react';
 import { FieldInFormation } from '@common/base/FieldInFormation.tsx';
@@ -107,6 +109,8 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
                   setName('');
                 }
               }}
+              maxLength={MAX_PROJECT_NAME_LENGTH}
+              showCounter={true}
               required
               value={name}
               assistiveTextLabel={nameError ?? ''}
@@ -124,15 +128,16 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
                   setIsFormValid(false);
                 }
               }}
+              maxLength={MAX_PROJECT_DESCRIPTION_LENGTH}
               showCounter={true}
-              rows={3}
+              rows={MAX_PROJECT_DESCRIPTION_ROWS_NB}
             />
             <KeywordsInput
               keywords={keywords}
               setKeywords={setKeywords}
               maxNbKeywords={MAX_KEYWORD_NUMBER}
               maxNbCharacters={MAX_KEYWORD_LENGTH}
-              minNbCharacters={1}
+              minNbCharacters={MIN_KEYWORD_LENGTH}
             />
           </div>
         </div>
