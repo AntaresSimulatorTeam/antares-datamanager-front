@@ -49,14 +49,13 @@ export const fetchAppInfo = async () => {
     let generatorData: Partial<AppInfo> = {};
     try {
       generatorData = await fetchGeneratorBackendInfo();
-      console.log(generatorData);
     } catch (e) {
       // ignore generator fetch errors
     }
 
     return (Object.entries(backEndData) as Entries<typeof backEndData>)?.map(([key, value]) => ({
       info: key,
-      front: frontInfos[key as keyof typeof frontInfos],
+      front: frontInfos[key],
       back: value,
       generator: (generatorData as any)[key] ?? key,
     }));

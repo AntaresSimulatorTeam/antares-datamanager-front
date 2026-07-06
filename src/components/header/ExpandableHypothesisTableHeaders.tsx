@@ -159,10 +159,12 @@ const getExpandableHypothesisTableHeaders = ({
     cell: ({ row, table: { options } }) => {
       const { status, isDefault, hypothesis, isDeletable } = row.original;
       const hasNoInput =
-        (type === TRAJECTORY_TYPE.STS ||
-          type === TRAJECTORY_TYPE.HYDRO_SERIES ||
-          type === TRAJECTORY_TYPE.HYDRO_PSP_SERIES) &&
-        row.depth === 0;
+        (type &&
+          (type === TRAJECTORY_TYPE.STS ||
+            type === TRAJECTORY_TYPE.HYDRO_SERIES ||
+            type === TRAJECTORY_TYPE.HYDRO_PSP_SERIES) &&
+          row.depth === 0) ||
+        (type === TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION && row.id === '2');
       if (
         hypothesis === t('thermal.@specific') ||
         (hasNoInput && isDefault) ||

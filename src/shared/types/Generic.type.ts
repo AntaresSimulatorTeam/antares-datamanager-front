@@ -11,7 +11,12 @@ import { Dispatch, SetStateAction } from 'react';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { TFunction } from 'i18next';
 import { StudyDTO } from '@/shared/types/Study.type.ts';
-import { HYDRO_PSP_TYPES, HYDRO_TYPES, NUCLEAR_FR_MODULATION_TYPES } from '@/shared/const/trajectoryTypes.ts';
+import {
+  HYDRO_PSP_TYPES,
+  HYDRO_TYPES,
+  NUCLEAR_FR_MODULATION_TYPES,
+  NUCLEAR_FR_TIME_SERIES_TYPES,
+} from '@/shared/const/trajectoryTypes.ts';
 
 export type Entries<T> = {
   [K in keyof T]: [K, T[K]];
@@ -119,12 +124,7 @@ export const isTrajectoryHydroPSPType = (value: unknown): value is TrajectoryWit
 
 export const isTrajectoryNuclearType = (value: TRAJECTORY_TYPE) => NUCLEAR_FR_MODULATION_TYPES.includes(value);
 
-export const isTrajectoryNuclearTSType = (value: TRAJECTORY_TYPE) =>
-  [
-    TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP,
-    TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR,
-    TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM,
-  ].includes(value);
+export const isTrajectoryNuclearTSType = (value: TRAJECTORY_TYPE) => NUCLEAR_FR_TIME_SERIES_TYPES.includes(value);
 
 export type TableOperationRow = 'empty' | 'remove';
 
