@@ -2,6 +2,7 @@ import {
   DbTrajectory,
   HypothesisRowData,
   isTrajectoryHydroType,
+  isTrajectoryNuclearType,
   isTrajectoryResType,
   RowStatus,
   TechnologyType,
@@ -1182,7 +1183,7 @@ export const getModalTile = (tabType: TRAJECTORY_TYPE, hypothesis?: HypothesisTy
       ? sentenceCase(hypothesis.technology)
       : hypothesis?.technology;
   const area = hypothesis?.area === OTHER_AREAS ? OTHER_AREAS_LABEL : hypothesis?.area;
-  return `${area ?? tabType}${technology ? ' - ' : ''}${technology ?? ''}`;
+  return `${area ?? tabType}${technology ? ' - ' : ''}${technology ?? ''}${isTrajectoryNuclearType(tabType) ? ' - FR' : ''}`;
 };
 
 export const getFetchParams = (
