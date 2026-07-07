@@ -1098,13 +1098,13 @@ export const getUrlApiUploadTrajectory = (
     case TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION:
       return `${TRAJECTORY_NUCLEAR_FR_MODULATION}?area=FR&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
     case TRAJECTORY_TYPE.NUCLEAR_FR_TALON:
-      return `${TRAJECTORY_NUCLEAR_FR_TALON}?area=&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
+      return `${TRAJECTORY_NUCLEAR_FR_TALON}?area=FR&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
     case TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP:
-      return `${TRAJECTORY_NUCLEAR_TS_EPR}?area=&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
+      return `${TRAJECTORY_NUCLEAR_TS_EPR}?area=FR&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
     case TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM:
       return `${TRAJECTORY_NUCLEAR_TS_LT}?area=FR&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
     case TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR:
-      return `${TRAJECTORY_NUCLEAR_TS_SMR}?area=&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
+      return `${TRAJECTORY_NUCLEAR_TS_SMR}?area=FR&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
 
     default:
       return `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;

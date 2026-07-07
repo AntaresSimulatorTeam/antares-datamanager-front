@@ -982,7 +982,7 @@ describe('uploadTrajectory', () => {
     await waitFor(() => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
       expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
-        'https://mockapi.com/v1/trajectory/nuclear-talon?area=&trajectoryToUse=repartition_techno_PEMMEDB25&horizon=2030-2031&studyId=87&isCivilYear=false',
+        'https://mockapi.com/v1/trajectory/nuclear-talon?area=FR&trajectoryToUse=repartition_techno_PEMMEDB25&horizon=2030-2031&studyId=87&isCivilYear=false',
         requestOptions,
         onProgress,
       );
@@ -1003,7 +1003,7 @@ describe('uploadTrajectory', () => {
     await waitFor(() => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
       expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
-        'https://mockapi.com/v1/trajectory/nuclear-ts-erp?area=&trajectoryToUse=repartition_techno_PEMMEDB25&horizon=2030-2031&studyId=87&isCivilYear=false',
+        'https://mockapi.com/v1/trajectory/nuclear-ts-erp?area=FR&trajectoryToUse=repartition_techno_PEMMEDB25&horizon=2030-2031&studyId=87&isCivilYear=false',
         requestOptions,
         onProgress,
       );
@@ -1045,7 +1045,7 @@ describe('uploadTrajectory', () => {
     await waitFor(() => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
       expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
-        'https://mockapi.com/v1/trajectory/nuclear-ts-smr?area=&trajectoryToUse=repartition_techno_PEMMEDB25&horizon=2030-2031&studyId=87&isCivilYear=false',
+        'https://mockapi.com/v1/trajectory/nuclear-ts-smr?area=FR&trajectoryToUse=repartition_techno_PEMMEDB25&horizon=2030-2031&studyId=87&isCivilYear=false',
         requestOptions,
         onProgress,
       );
