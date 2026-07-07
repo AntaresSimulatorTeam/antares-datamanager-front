@@ -12,7 +12,7 @@ import { StdDropdownOption } from '@common/layout/stdDropdown/StdDropdown.tsx';
 
 const TEST_TITLE = 'Card Title';
 const TEST_CHILDREN = <div role="article"></div>;
-const TEST_ID = 'card-triple-action-id';
+const TEST_ID = 123;
 const TEST_DROPDOWN_DROPDOWN = [
   { key: 'op1', label: 'Option 1', value: 'op1', onItemClick: noop },
   { key: 'op2', label: 'Option 2', value: 'op2', onItemClick: noop },

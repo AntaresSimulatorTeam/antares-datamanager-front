@@ -34,7 +34,7 @@ vi.mock('@/envVariables', () => ({
 }));
 vi.mock('@/shared/services/authService');
 
-const projectId = '123';
+const projectId = 123;
 
 describe('deleteProjectById', () => {
   beforeEach(() => {
@@ -47,7 +47,7 @@ describe('deleteProjectById', () => {
 
   afterEach(() => {
     vi.unstubAllGlobals();
-    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('should delete a pinned project from pinned project list', async () => {
@@ -78,7 +78,7 @@ describe('deleteProjectById', () => {
 
 describe('fetchProjectDetails', () => {
   afterEach(() => {
-    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('should fetch project details', async () => {
@@ -117,7 +117,7 @@ describe('fetchProjectsFromPartialName', () => {
   });
 
   afterEach(() => {
-    vi.clearAllMocks();
+    vi.restoreAllMocks();
     vi.unstubAllGlobals();
   });
 
@@ -170,7 +170,7 @@ describe('fetchProjectFromSearchTerm', () => {
   });
 
   afterEach(() => {
-    vi.clearAllMocks();
+    vi.restoreAllMocks();
     vi.unstubAllGlobals();
   });
 
@@ -226,7 +226,7 @@ describe('createProject', () => {
   });
 
   afterEach(() => {
-    vi.clearAllMocks();
+    vi.restoreAllMocks();
     vi.unstubAllGlobals();
   });
 
@@ -272,7 +272,7 @@ describe('updateProject', () => {
   });
 
   afterEach(() => {
-    vi.clearAllMocks();
+    vi.restoreAllMocks();
     vi.unstubAllGlobals();
   });
 

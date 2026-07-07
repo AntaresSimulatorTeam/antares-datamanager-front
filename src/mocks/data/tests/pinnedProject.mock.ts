@@ -2,7 +2,7 @@ import { ProjectInfo } from '@/shared/types';
 
 export const mockProjectsApiResponse: ProjectInfo[] = [
   {
-    id: '1',
+    id: 1,
     name: 'Bilan previsionnel 2027',
     createdBy: 'MOUAD Paris test',
     creationDate: '2024-07-25T10:09:41' as unknown as Date,
@@ -13,7 +13,7 @@ export const mockProjectsApiResponse: ProjectInfo[] = [
     path: '',
   },
   {
-    id: '2',
+    id: 2,
     name: 'Bilan previsionnel 2023',
     createdBy: 'Taher benjelloun amine',
     creationDate: '2024-07-25T10:09:41' as unknown as Date,
@@ -24,7 +24,7 @@ export const mockProjectsApiResponse: ProjectInfo[] = [
     path: '',
   },
   {
-    id: '3',
+    id: 3,
     name: 'Bilan previsionnel 2025',
     createdBy: 'zayd guillaume pegase',
     creationDate: '2024-07-25T10:09:41' as unknown as Date,
@@ -37,7 +37,7 @@ export const mockProjectsApiResponse: ProjectInfo[] = [
 ];
 
 export const mockPinProjectResponse: ProjectInfo = {
-  id: '3',
+  id: 3,
   name: 'Bilan previsionnel 2025',
   createdBy: 'zayd guillaume pegase',
   creationDate: '2024-07-25T10:09:41' as unknown as Date,
@@ -50,7 +50,7 @@ export const mockPinProjectResponse: ProjectInfo = {
 
 export const mockPinProjectResponseArray = [
   {
-    id: '123',
+    id: 123,
     name: 'Project Name',
     description: 'Project Description',
     createdBy: 'User A',
@@ -62,7 +62,7 @@ export const mockPinProjectResponseArray = [
     studies: [1, 2],
   },
   {
-    id: '124',
+    id: 124,
     name: 'Project Name 3',
     description: 'Project Description',
     createdBy: 'User A',
@@ -76,7 +76,7 @@ export const mockPinProjectResponseArray = [
 ];
 
 export const mockResponse = {
-  id: '123',
+  id: 123,
   name: 'Project Name',
   description: 'Project Description',
   createdBy: 'User A',

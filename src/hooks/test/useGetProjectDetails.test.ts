@@ -15,7 +15,7 @@ vi.mock('@/shared/services/projectService', async (importOriginal) => {
 vi.mock('@/shared/notification/notification');
 
 const mockProject = {
-  id: '123',
+  id: 123,
   name: 'Test Project',
   description: 'A test project',
   createdBy: 'user1',
@@ -31,10 +31,10 @@ describe('useGetProjectDetails', () => {
   it('fetches and sets project details correctly', async () => {
     vi.mocked(projectService.fetchProjectDetails, { partial: true }).mockResolvedValue(mockProject);
 
-    const { result } = renderHook(() => useGetProjectDetails('123', 0));
+    const { result } = renderHook(() => useGetProjectDetails(123, 0));
 
     await waitFor(() => {
-      expect(projectService.fetchProjectDetails).toHaveBeenCalledWith('123');
+      expect(projectService.fetchProjectDetails).toHaveBeenCalledWith(123);
       expect(result.current.projectDetails.name).toBe('Test Project');
       expect(result.current.projectDetails.description).toBe('A test project');
       expect(result.current.projectDetails.createdBy).toBe('user1');
@@ -46,7 +46,7 @@ describe('useGetProjectDetails', () => {
   it('shows error toast on fetch failure', async () => {
     (projectService.fetchProjectDetails as unknown as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('fail'));
 
-    renderHook(() => useGetProjectDetails('123', 0));
+    renderHook(() => useGetProjectDetails(123, 0));
 
     await waitFor(() => {
       expect(notifyToast).toHaveBeenCalledWith({

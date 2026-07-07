@@ -50,7 +50,7 @@ describe('fetchSearchStudies', () => {
       json: async () => Promise.resolve(mockStudyResponse),
     });
 
-    const result = await fetchSearchStudies('test', '124', 3, 10, { column: 'asc' });
+    const result = await fetchSearchStudies('test', 124, 3, 10, { column: 'asc' });
 
     await waitFor(() => {
       expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
@@ -68,7 +68,7 @@ describe('fetchSearchStudies', () => {
       type: ERROR_MESSAGE_TYPE.BUSINESS,
     });
 
-    await expect(async () => fetchSearchStudies('test', '124', 3, 10, { column: 'asc' })).rejects.toThrowError(
+    await expect(async () => fetchSearchStudies('test', 124, 3, 10, { column: 'asc' })).rejects.toThrowError(
       'Failed to fetch user studies',
     );
   });

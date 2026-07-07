@@ -31,15 +31,19 @@ describe('useStudyTableDisplay', () => {
     });
 
     const { result } = renderHook(() =>
-      useStudyTableDisplay({ searchTerm: 'test', sortBy: { status: 'desc' }, reloadStudies: 1 }),
+      useStudyTableDisplay({
+        searchTerm: 'test',
+        sortBy: { status: 'desc' },
+        reloadStudies: 1,
+      }),
     );
     await waitFor(() => {
       expect(result.current.rows).toHaveLength(2);
       expect(result.current.rows).toEqual(mockStudyResponse2.content);
       expect(result.current.count).toEqual(2);
-      //expect(global.fetch).toHaveBeenCalledTimes(1); TODO: ANT-2719
+      //expect(global.fetch).toHaveBeenCalledTimes(1); ANT-2719
       expect(global.fetch).toHaveBeenCalledWith(
-        'https://mockapi.com/v1/study/search?page=1&size=12&projectId=&search=test&sortColumn=status&sortDirection=desc',
+        'https://mockapi.com/v1/study/search?page=1&size=12&search=test&sortColumn=status&sortDirection=desc',
         {},
       );
     });
@@ -48,9 +52,9 @@ describe('useStudyTableDisplay', () => {
       renderHook(() => useStudyTableDisplay({ searchTerm: 'mouad', sortBy: { project: 'asc' }, reloadStudies: 1 }));
     });
 
-    //expect(global.fetch).toHaveBeenCalledTimes(1);  TODO: ANT-2719
+    //expect(global.fetch).toHaveBeenCalledTimes(1);  ANT-2719
     expect(global.fetch).toHaveBeenCalledWith(
-      'https://mockapi.com/v1/study/search?page=1&size=12&projectId=&search=mouad&sortColumn=project&sortDirection=asc',
+      'https://mockapi.com/v1/study/search?page=1&size=12&search=mouad&sortColumn=project&sortDirection=asc',
       {},
     );
   });
@@ -86,7 +90,7 @@ describe('useStudyTableDisplay', () => {
     const { result } = renderHook(() =>
       useStudyTableDisplay({
         searchTerm: 'study1',
-        projectInfo: { id: 'projectId' } as ProjectInfo,
+        projectInfo: { id: 134 } as ProjectInfo,
         sortBy: { status: 'desc' },
         reloadStudies: 3,
       }),

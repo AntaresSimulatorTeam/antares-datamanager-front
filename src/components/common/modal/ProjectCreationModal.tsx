@@ -8,11 +8,8 @@ import { RdsModal } from 'rte-design-system-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import KeywordsInput from '@/components/input/KeywordsInput.tsx';
-import { createProject, updateProject } from '@/shared/services/projectService';
 import { notifyToast } from '@/shared/notification/notification.tsx';
-import { PROJECT_ACTION } from '@/shared/enum/project.ts';
-import { ProjectActionType, ProjectResponse } from '@/shared/types/Project.type.ts';
-import { useProjectDispatch } from '@/store/contexts/ProjectContext.tsx';
+import { ProjectResponse } from '@/shared/types/Project.type.ts';
 import { validateMaxLength } from '@/shared/utils/validateMaxTextLength.ts';
 import {
   MAX_KEYWORD_LENGTH,
@@ -24,6 +21,7 @@ import {
 } from '@/shared/const/studyConfig.ts';
 import { Button, Textarea, TextInput } from '@design-system-rte/react';
 import { FieldInFormation } from '@common/base/FieldInFormation.tsx';
+import { useProjectCreation } from '@/hooks/useProjectCreation.ts';
 
 interface ProjectCreationModalProps {
   onClose: () => void;
@@ -37,48 +35,29 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
   const [keywords, setKeywords] = useState<string[]>(projectInfo?.tags ?? []);
   const [isFormValid, setIsFormValid] = useState(false);
   const [nameError, setNameError] = useState<string | null>(null);
-  const dispatch = useProjectDispatch();
 
-  const handleCreateProject = async () => {
-    try {
-      const projectData = {
-        name,
-        tags: keywords,
-        description,
-      };
+  const resetFields = () => {
+    setName('');
+    setDescription('');
+    setKeywords([]);
+  };
 
-      const newProject = projectInfo
-        ? await updateProject(Number(projectInfo.id), projectData)
-        : await createProject(projectData);
+  const resetNameField = () => {
+    setName('');
+    setNameError('');
+  };
 
-      if (newProject) {
-        dispatch?.({
-          type: projectInfo ? PROJECT_ACTION.UPDATE_PROJECT : PROJECT_ACTION.ADD_PROJECT,
-          payload: newProject,
-        } as ProjectActionType);
-      }
+  const { confirmCreation } = useProjectCreation(
+    () => {
       notifyToast({
         type: 'success',
         message: 'Successful project save',
       });
-      setName('');
-      setDescription('');
-      setKeywords([]);
+      resetFields();
       onClose();
-    } catch (error: unknown) {
-      const errorMessages = (error as Error)?.message;
-      if (errorMessages?.includes('already exists')) {
-        setNameError(errorMessages);
-        setIsFormValid(false);
-      } else {
-        notifyToast({
-          type: 'error',
-          message: `${errorMessages ?? 'An error occurred'}`,
-        });
-        onClose();
-      }
-    }
-  };
+    },
+    (message) => setNameError(message),
+  );
 
   return (
     <RdsModal size="small">
@@ -91,13 +70,11 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
           <div className="flex w-1/2 flex-col items-start gap-4">
             <TextInput
               aria-required
-              assistiveAppearance="error"
-              autoComplete="off"
-              error={!!nameError}
               id="text-input-default"
               label={t('modal.@input_name')}
               labelPosition="top"
               rightIconAction="clean"
+              onRightIconClick={resetNameField}
               onChange={(value: string) => {
                 if (validateMaxLength(value, MAX_PROJECT_NAME_LENGTH)) {
                   setNameError(null);
@@ -114,6 +91,8 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
               required
               value={name}
               assistiveTextLabel={nameError ?? ''}
+              assistiveAppearance="error"
+              error={!!nameError?.length}
             />
             <Textarea
               label={t('modal.@input_description')}
@@ -131,6 +110,7 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
               maxLength={MAX_PROJECT_DESCRIPTION_LENGTH}
               showCounter={true}
               rows={MAX_PROJECT_DESCRIPTION_ROWS_NB}
+              resizeable={false}
             />
             <KeywordsInput
               keywords={keywords}
@@ -147,7 +127,16 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
         <Button
           icon={projectInfo ? 'edit' : 'add'}
           label={projectInfo ? t('modal.@button_update') : t('modal.@button_create')}
-          onClick={() => void handleCreateProject()}
+          onClick={() => {
+            if (projectInfo?.id != null) {
+              const projectData = {
+                name,
+                tags: keywords,
+                description,
+              };
+              void confirmCreation(projectData, projectInfo.id);
+            }
+          }}
           variant="primary"
           color="primary"
           disabled={!isFormValid}

@@ -7,7 +7,7 @@
 import { PROJECT_ACTION } from '@/shared/enum/project.ts';
 
 export interface ProjectResponse {
-  id: string;
+  id: number;
   name: string;
   description: string;
   createdBy: string;
@@ -28,11 +28,11 @@ export type ProjectActionType =
   | { type: PROJECT_ACTION.UPDATE_PROJECT; payload: ProjectInfo }
   | {
       type: PROJECT_ACTION.REMOVE_PROJECT;
-      payload: string;
+      payload: number;
     }
   | {
       type: PROJECT_ACTION.UNPIN_PINNED_PROJECT;
-      payload: string;
+      payload: number;
     }
   | {
       type: PROJECT_ACTION.INIT_PINNED_PROJECT_LIST;
@@ -48,6 +48,4 @@ export interface ProjectState {
   pinnedProjects: ProjectInfo[];
 }
 
-export interface LocationProject {
-  projectId: string;
-}
+export type ProjectDataCreation = Pick<ProjectInfo, 'name' | 'description' | 'tags'>;
