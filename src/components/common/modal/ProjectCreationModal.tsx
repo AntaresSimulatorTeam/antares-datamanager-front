@@ -5,7 +5,7 @@
  */
 
 import { RdsModal } from 'rte-design-system-react';
-import { useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import KeywordsInput from '@/components/input/KeywordsInput.tsx';
 import { notifyToast } from '@/shared/notification/notification.tsx';
@@ -59,6 +59,12 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
     (message) => setNameError(message),
   );
 
+  useEffect(() => {
+    if (keywords.length > 0) {
+      setIsFormValid(true);
+    }
+  }, [keywords.length]);
+
   return (
     <RdsModal size="small">
       <RdsModal.Title onClose={onClose}>
@@ -97,7 +103,7 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
             <Textarea
               label={t('modal.@input_description')}
               value={description}
-              onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
+              onChange={(event: ChangeEvent<HTMLTextAreaElement>) => {
                 const text = event.target.value;
                 if (validateMaxLength(text, MAX_PROJECT_DESCRIPTION_LENGTH)) {
                   setDescription(text || '');
@@ -128,14 +134,12 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
           icon={projectInfo ? 'edit' : 'add'}
           label={projectInfo ? t('modal.@button_update') : t('modal.@button_create')}
           onClick={() => {
-            if (projectInfo?.id != null) {
-              const projectData = {
-                name,
-                tags: keywords,
-                description,
-              };
-              void confirmCreation(projectData, projectInfo.id);
-            }
+            const projectData = {
+              name,
+              tags: keywords,
+              description,
+            };
+            void confirmCreation(projectData, projectInfo?.id);
           }}
           variant="primary"
           color="primary"
