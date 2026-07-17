@@ -563,3 +563,26 @@ export const mockEmptyDbTrajectoryLoadFR: DbTrajectory = {
   technology: '',
   hasTimeSeries: false,
 };
+
+export const resTechnologies = [
+  {
+    id: 1,
+    label: 'Wind Offshore',
+    code: 'wind_offshore',
+  },
+  {
+    id: 2,
+    label: 'Wind Onshore',
+    code: 'wind_onshore',
+  },
+  {
+    id: 3,
+    label: 'Solar PV',
+    code: 'solar_pv',
+  },
+  {
+    id: 4,
+    label: 'Solar Thermo',
+    code: 'solar_thermo',
+  },
+];

@@ -3,8 +3,10 @@ import {
   DbTrajectory,
   FetchResult,
   HypothesisRowData,
+  HypothesisTableResults,
   isTrajectoryHydroPSPType,
   isTrajectoryHydroType,
+  isTrajectoryNuclearType,
   TechnologyType,
   TrajectoryAreaData,
 } from '@/shared/types';
@@ -17,12 +19,22 @@ import {
   buildHypothesisRows,
   buildPayload,
   buildReadOnlyMap,
+  buildRowsByType,
   fetchAndNormalizeTrajectories,
 } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { buildCheckListBox, getDefaultAreaNotIncludedInAreaList } from '@/shared/utils/hypothesisTableUtils.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
+import { filterRow, mergeRows } from '@/shared/utils/trajectoryUtils.ts';
+import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
+import {
+  HYDRO_PSP_TYPES,
+  HYDRO_TYPES,
+  NUCLEAR_FR_TIME_NON_SERIES_TYPES,
+  NUCLEAR_FR_TIME_SERIES_TYPES,
+} from '@/shared/const/trajectoryTypes.ts';
+import { HydroSubRows } from '@/mocks/data/list/names.ts';
 
 export const useFetchHypothesisTrajectories = (
   areas: TrajectoryAreaData[],
@@ -83,8 +95,9 @@ export const useFetchHypothesisTrajectories = (
         const defaultAreaListNotInList = getDefaultAreaNotIncludedInAreaList(defaultAreas ?? [], areas);
 
         // 1) Lancer toutes les requêtes en parallèle
-        const results: FetchResult[] = await Promise.all(
-          trajTypes.map(async (trajType: TRAJECTORY_TYPE): Promise<FetchResult> => {
+        // --- 1) FETCH + NORMALISATION ---
+        const rawResults: FetchResult[] = await Promise.all(
+          trajTypes.map(async (trajType: TRAJECTORY_TYPE) => {
             const contextTrajectories = studyStateRef.current?.[trajType]?.trajectories ?? [];
 
             const shouldSkipFetch = studyStatus === StudyStatus.GENERATED && contextTrajectories.length > 0;
@@ -96,17 +109,101 @@ export const useFetchHypothesisTrajectories = (
               emptyAreaSelected: emptyAreaSelected?.[trajType] ?? [],
             });
 
-            const list = buildCheckListBox(trajectories, areas, defaultAreas);
-            const labelTechnologies = technologies
-              ? technologies.map((technology: TechnologyType) => technology.label)
-              : [];
+            return {
+              trajType,
+              trajectories,
+              dsrCmResult,
+              technologies,
+              shouldSkipFetch,
+              contextTrajectories,
+            };
+          }),
+        );
+
+        const hydroTypeToSet = isTrajectoryHydroPSPType(trajectoryTypes[0])
+          ? TRAJECTORY_TYPE.HYDRO_PSP_SERIES
+          : TRAJECTORY_TYPE.HYDRO_SERIES;
+
+        // Cas nucléaire ou hydro : pas de list/checkedValues
+        let results: HypothesisTableResults[] = [];
+        if (isTrajectoryNuclearType(trajTypes[0])) {
+          const nuclearRows = buildRowsByType({
+            rowTypes: NUCLEAR_FR_TIME_NON_SERIES_TYPES,
+            subRowTypes: NUCLEAR_FR_TIME_SERIES_TYPES,
+            trajectoriesByType: rawResults,
+            t,
+          });
+
+          results = rawResults.flatMap((result) => {
+            if (result.trajType === TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION) {
+              return {
+                ...result,
+                rows: nuclearRows,
+                readOnlyMap: {},
+              };
+            } else {
+              return [];
+            }
+          });
+        } else if (isTrajectoryHydroType(trajTypes[0])) {
+          const effectiveTrajectories = rawResults.flatMap((result) =>
+            result.shouldSkipFetch ? result.contextTrajectories : result.trajectories,
+          );
+          const areasWithTrajectory = effectiveTrajectories.flatMap((traj) => (traj.area?.length > 0 ? traj : []));
+          const hydroTypes = hydroTypeToSet === TRAJECTORY_TYPE.HYDRO_SERIES ? HYDRO_TYPES : HYDRO_PSP_TYPES;
+
+          const allHydroRows = hydroTypes.flatMap((type) =>
+            buildHypothesisRows({
+              trajType: type,
+              trajectories: effectiveTrajectories,
+              defaultAreas,
+              areas,
+              technologies: HydroSubRows.map((row) => row.label),
+              isStudyGenerated,
+              t,
+            }),
+          );
+
+          const hydroRows = sortWithFixedPosition(isStudyGenerated ? filterRow(allHydroRows) : allHydroRows);
+          const hydroReadOnlyMap = buildReadOnlyMap({
+            rows: allHydroRows,
+            trajType: trajectoryTypes[0],
+            isStudyGenerated,
+            defaultAreaListNotInList,
+          });
+
+          const { areaOptions, checkedValues } = buildCheckListBox(areasWithTrajectory, areas, defaultAreas);
+
+          results = rawResults.flatMap((result) => {
+            if (result.trajType === hydroTypeToSet) {
+              return {
+                ...result,
+                rows: mergeRows(hydroRows),
+                readOnlyMap: hydroReadOnlyMap,
+                list: {
+                  areaOptions,
+                  checkedValues,
+                },
+              };
+            } else {
+              return [];
+            }
+          });
+        } else {
+          // --- 2) CONSTRUCTION DES ROWS, LIST, READONLYMAP ---
+          results = rawResults.map((res) => {
+            const { trajType, trajectories, dsrCmResult, technologies, shouldSkipFetch, contextTrajectories } = res;
+
+            const effectiveTrajectories = shouldSkipFetch ? contextTrajectories : trajectories;
+            const areasWithTrajectory = effectiveTrajectories.flatMap((traj) => (traj.area?.length > 0 ? traj : []));
+            const list = buildCheckListBox(areasWithTrajectory, areas, defaultAreas);
 
             const rows = buildHypothesisRows({
               trajType,
-              trajectories: shouldSkipFetch ? contextTrajectories : trajectories,
+              trajectories: effectiveTrajectories,
               defaultAreas,
               areas,
-              technologies: labelTechnologies,
+              technologies: technologies?.map((technology) => technology.label) ?? [],
               isStudyGenerated,
               t,
               dsrCmResult,
@@ -120,17 +217,13 @@ export const useFetchHypothesisTrajectories = (
             });
 
             return {
-              trajType,
-              trajectories,
-              dsrCmResult,
-              technologies,
-              rows,
+              ...res,
               list,
+              rows,
               readOnlyMap,
-              shouldSkipFetch,
             };
-          }),
-        );
+          });
+        }
 
         // 2) Mise à jour du store Redux
         results.forEach(({ trajType, trajectories, dsrCmResult, shouldSkipFetch }) => {
@@ -142,38 +235,12 @@ export const useFetchHypothesisTrajectories = (
           }
         });
 
-        let hydroRows: HypothesisRowData[] = [];
-        let hydroReadOnlyMap: ReadOnlyObject = {};
-        const hydroTypeToSet = isTrajectoryHydroPSPType(trajectoryTypes[0])
-          ? TRAJECTORY_TYPE.HYDRO_PSP_SERIES
-          : TRAJECTORY_TYPE.HYDRO_SERIES;
-        if (isTrajectoryHydroType(trajectoryTypes[0])) {
-          hydroRows = buildHypothesisRows({
-            trajType: hydroTypeToSet,
-            trajectories: [],
-            defaultAreas,
-            areas,
-            technologies: [],
-            isStudyGenerated,
-            t,
-            dsrCmResult: [],
-            allResults: results,
-          });
-
-          hydroReadOnlyMap = buildReadOnlyMap({
-            rows: hydroRows,
-            trajType: trajectoryTypes[0],
-            isStudyGenerated,
-            defaultAreaListNotInList,
-          });
-        }
-
         // 3) Mise à jour des states React (1 seul setState par state)
         setHypothesisTrajectories((prev) => {
           const next = { ...prev };
           results.forEach(({ trajType, rows }) => {
             if (isTrajectoryHydroType(trajType)) {
-              next[hydroTypeToSet] = hydroRows;
+              next[hydroTypeToSet] = rows;
             } else {
               next[trajType] = rows;
             }
@@ -185,7 +252,7 @@ export const useFetchHypothesisTrajectories = (
           const next = { ...prev };
           results.forEach(({ trajType, readOnlyMap }) => {
             if (isTrajectoryHydroType(trajType)) {
-              next[hydroTypeToSet] = hydroReadOnlyMap;
+              next[hydroTypeToSet] = readOnlyMap;
             } else {
               next[trajType] = readOnlyMap;
             }
@@ -201,30 +268,32 @@ export const useFetchHypothesisTrajectories = (
           return next as Record<TRAJECTORY_TYPE, TechnologyType[]>;
         });
 
-        setAreasTrajectoryOptions(
-          results.reduce<Record<TRAJECTORY_TYPE, CheckBoxData[]>>(
-            (acc, r) => {
-              acc[r.trajType] = r.list.areaOptions;
-              return acc;
-            },
-            {} as Record<TRAJECTORY_TYPE, CheckBoxData[]>,
-          ),
-        );
+        if (!isTrajectoryNuclearType(trajTypes[0])) {
+          setAreasTrajectoryOptions(
+            results.reduce<Record<TRAJECTORY_TYPE, CheckBoxData[]>>(
+              (acc, r) => {
+                acc[r.trajType] = r.list?.areaOptions ?? [];
+                return acc;
+              },
+              {} as Record<TRAJECTORY_TYPE, CheckBoxData[]>,
+            ),
+          );
 
-        setDropDownListOptions(
-          results.reduce<Record<TRAJECTORY_TYPE, string[]>>(
-            (acc, r) => {
-              const key = isTrajectoryHydroType(r.trajType) ? hydroTypeToSet : r.trajType;
+          setDropDownListOptions(
+            results.reduce<Record<TRAJECTORY_TYPE, string[]>>(
+              (acc, r) => {
+                const key = isTrajectoryHydroType(r.trajType) ? hydroTypeToSet : r.trajType;
 
-              const previous = acc[key] ?? [];
-              const current = r.list.checkedValues;
+                const previous = acc[key] ?? [];
+                const current = r.list?.checkedValues ?? [];
 
-              acc[key] = [...new Set([...previous, ...current])];
-              return acc;
-            },
-            {} as Record<TRAJECTORY_TYPE, string[]>,
-          ),
-        );
+                acc[key] = [...new Set([...previous, ...current])];
+                return acc;
+              },
+              {} as Record<TRAJECTORY_TYPE, string[]>,
+            ),
+          );
+        }
       } catch (error) {
         console.error('fetchAreas error', error);
       }

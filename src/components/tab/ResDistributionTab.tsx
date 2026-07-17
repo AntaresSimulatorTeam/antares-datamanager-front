@@ -24,6 +24,8 @@ import { useTranslation } from 'react-i18next';
 import getEditableHypothesisTableHeaders from '@/components/header/EditableHypothesisTableHeaders.tsx';
 import { snakeCaseUnderscore } from '@/shared/utils/textUtils.ts';
 import { useTrajectoryFetchFromFSHandler } from '@/hooks/useTrajectoryFetchFromFSHandler.ts';
+import { getParamForFetchFSTrajectory } from '@/shared/helpers/hypothesisTableHelper.ts';
+import { HypothesisType } from '@/shared/types/HypothesisTable.ts';
 
 const ResDistributionTab = ({ defaultAreas, areas, studyData, types }: TabProps & { types: TRAJECTORY_TYPE[] }) => {
   const studyState = useStudy();
@@ -49,12 +51,7 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData, types }: TabProps 
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch);
   const { attachTrajectory } = useTrajectoryAttach(studyData, studyState, dispatch);
   const { detachTrajectory } = useTrajectoryDetach(studyData, dispatch);
-  const { handleFetchFromFS } = useTrajectoryFetchFromFSHandler({
-    defaultAreas,
-    setOptionsFS,
-    setRowIdSelected,
-    toggleModal,
-  });
+  const { handleFetchFromFS } = useTrajectoryFetchFromFSHandler();
 
   useEffect(() => {
     const zonalData = hypothesisTrajectories?.[TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION];
@@ -89,11 +86,21 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData, types }: TabProps 
   );
 
   const handleFetchTrajectoriesFromFS = useCallback(
-    async (rowId: string, tableType: TRAJECTORY_TYPE, tableData: HypothesisRowData[]) => {
+    async (rowId: string, tableData: HypothesisRowData[], tableType: TRAJECTORY_TYPE) => {
+      const hypothesis = getAreaTrajectoryName(rowId, tableData);
+      const { typeToUse, areaToUse, isDefaultArea } = getParamForFetchFSTrajectory(
+        tableType,
+        rowId.split('.').map(Number),
+        data.length,
+        hypothesis,
+      );
+      const results = await handleFetchFromFS({ typeToUse, areaToUse, isDefaultArea });
       setSelectedType(tableType);
-      await handleFetchFromFS(tableType, tableData, rowId);
+      setOptionsFS(results);
+      setRowIdSelected(rowId);
+      toggleModal();
     },
-    [handleFetchFromFS],
+    [data.length, handleFetchFromFS, toggleModal],
   );
 
   const handleUpdateTableData = useCallback(
@@ -137,7 +144,7 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData, types }: TabProps 
           await handleTrajectoryFromDB(TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION, data, fileNameContains, rowId)
         }
         handleImport={async (rowId: string) =>
-          await handleFetchTrajectoriesFromFS(rowId, TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION, data)
+          await handleFetchTrajectoriesFromFS(rowId, data, TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION)
         }
         isReadOnlyEnable={true}
         updateData={async (rowId: string, value: unknown, status: RowStatus) =>
@@ -167,7 +174,7 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData, types }: TabProps 
           )
         }
         handleImport={async (rowId: string) =>
-          await handleFetchTrajectoriesFromFS(rowId, TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION, technologyData)
+          await handleFetchTrajectoriesFromFS(rowId, technologyData, TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION)
         }
         isReadOnlyEnable={true}
         updateData={async (rowId: string, value: unknown, status: RowStatus) =>
@@ -177,19 +184,25 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData, types }: TabProps 
       {isModalOpen && (
         <ImportTrajectoryModal
           options={optionsFS}
-          onClose={async (value?: SelectOption) => {
+          onClose={async (
+            typeToUse?: TRAJECTORY_TYPE,
+            value?: SelectOption,
+            hypothesis?: HypothesisType,
+            indexArray?: number[],
+          ) => {
             toggleModal();
             if (value != null) {
-              const dataToUse = selectedType === TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION ? data : technologyData;
-              const setterToUse = selectedType === TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION ? setData : setTechnologyData;
-              await importTrajectory(selectedType, value, rowIdSelected, dataToUse, setterToUse);
+              const setterToUse = typeToUse === TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION ? setData : setTechnologyData;
+              await importTrajectory(setterToUse, value, typeToUse, indexArray, hypothesis);
             }
           }}
-          trajectoryType={selectedType}
+          tabType={selectedType}
           hypothesis={getAreaTrajectoryName(
             rowIdSelected,
             selectedType === TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION ? data : technologyData,
           )}
+          indexArray={rowIdSelected?.split('.').map(Number)}
+          rowsNb={data.length}
         />
       )}
     </div>

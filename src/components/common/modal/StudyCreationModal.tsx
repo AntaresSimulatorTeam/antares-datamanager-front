@@ -14,7 +14,12 @@ import { StudyDTO } from '@/shared/types';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { notifyToast } from '@/shared/notification/notification';
 import { validateMaxLength } from '@/shared/utils/validateMaxTextLength';
-import { MAX_KEYWORD_LENGTH, MAX_KEYWORD_NUMBER, MAX_STUDY_NAME_LENGTH } from '@/shared/const/studyConfig';
+import {
+  MAX_KEYWORD_LENGTH,
+  MAX_KEYWORD_NUMBER,
+  MAX_STUDY_NAME_LENGTH,
+  MIN_KEYWORD_LENGTH,
+} from '@/shared/const/studyConfig';
 import { Button, TextInput } from '@design-system-rte/react';
 import { FieldInFormation } from '@common/base/FieldInFormation.tsx';
 
@@ -121,6 +126,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
                 onChange={handleStudyNameChange}
                 required
                 maxLength={MAX_STUDY_NAME_LENGTH}
+                showCounter={true}
                 error={!!studyErrorMessage}
                 assistiveTextLabel={studyErrorMessage}
               />
@@ -135,7 +141,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
                 setKeywords={setKeywords}
                 maxNbKeywords={MAX_KEYWORD_NUMBER}
                 maxNbCharacters={MAX_KEYWORD_LENGTH}
-                minNbCharacters={1}
+                minNbCharacters={MIN_KEYWORD_LENGTH}
               />
             </div>
           </div>

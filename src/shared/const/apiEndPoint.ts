@@ -54,6 +54,12 @@ export const TRAJECTORY_RES_TECHNOLOGY_DISTRIBUTION = `${BACK_END_BASE_URL}/v1/t
 export const TRAJECTORY_RES_ZONAL_DISTRIBUTION = `${BACK_END_BASE_URL}/v1/trajectory/zonal-distribution-res`;
 export const TRAJECTORY_HYDRO_SERIES = `${BACK_END_BASE_URL}/v1/trajectory/hydro-series`;
 export const TRAJECTORY_HYDRO_TECHNICAL_PARAMETERS = `${BACK_END_BASE_URL}/v1/trajectory/hydro-technical-parameters`;
+export const TRAJECTORY_NUCLEAR_FR_MODULATION = `${BACK_END_BASE_URL}/v1/trajectory/nuclear-modulation`;
+export const TRAJECTORY_NUCLEAR_FR_TALON = `${BACK_END_BASE_URL}/v1/trajectory/nuclear-talon`;
+export const TRAJECTORY_NUCLEAR_TS_EPR = `${BACK_END_BASE_URL}/v1/trajectory/nuclear-ts-erp`;
+export const TRAJECTORY_NUCLEAR_TS_LT = `${BACK_END_BASE_URL}/v1/trajectory/nuclear-lt`;
+export const TRAJECTORY_NUCLEAR_TS_SMR = `${BACK_END_BASE_URL}/v1/trajectory/nuclear-ts-smr`;
+
 //ABOUT
 export const BACK_END_ACTUATOR_ENDPOINT = `${BACK_END_BASE_URL}/actuator/info`;
 export const GENERATOR_ACTUATOR_ENDPOINT = `${GENERATOR_BASE_URL}:8094/app-info`;
@@ -64,3 +70,6 @@ export const DEFAULT_CONFIG_INSTALLED_POWER_TECHNOLOGY = `${BACK_END_BASE_URL}/v
 
 // WARNING
 export const WARNING_MESSAGES = `${BACK_END_BASE_URL}/v1/warnings`;
+
+// USER
+export const USER_LIST_ENDPOINT = `${BACK_END_BASE_URL}/v1/user/list`;

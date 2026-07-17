@@ -13,6 +13,8 @@ export const generateFixedUser = (userIdx: number, seed = 1): UserInfo => {
   const name = LIST_NAME[(userIdx + seed) % LIST_FIRSTNAME.length];
   return {
     id: `${userIdx}`,
+    firstName,
+    lastName: name,
     fullname: `${firstName} ${name}`,
     email: `${firstName.toLocaleLowerCase()}.${name.toLocaleLowerCase()}@rte-france.com`,
     nni: `R${Math.floor((userIdx + seed) * 12738) % 99999}`,

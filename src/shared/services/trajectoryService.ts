@@ -84,21 +84,18 @@ export const getResTechnologyList = async (): Promise<TechnologyType[]> => {
 /**
  * Retrieve a list of trajectories by type and thermal capacity area from file system
  *
- * @param {TRAJECTORY_TYPE} trajectoryType - Partial name of a study
- * @param {string | undefined} hypothesis - For STS or thermal capacity trajectory type
- * @param {string | undefined} searchTerm - Autocompletion - filter trajectories by file name
  * @returns {Promise<FsTrajectory[]>} - Promise object that represents a list of trajectories
  * @throws {Error}
+ * @param args
  */
 export const fetchTrajectoriesFromFS = async (
-  trajectoryType: TRAJECTORY_TYPE,
-  hypothesis?: string,
-  searchTerm?: string,
+  ...args: [trajectoryType: TRAJECTORY_TYPE, area?: string, searchTerm?: string]
 ): Promise<FsTrajectory[]> => {
+  const [trajectoryType, area, searchTerm] = args;
   const queryString = new URLSearchParams({
     trajectoryType,
-    ...(trajectoryType !== TRAJECTORY_TYPE.STS && hypothesis && { area: hypothesis }),
-    ...(trajectoryType === TRAJECTORY_TYPE.STS && hypothesis && { technology: hypothesis }),
+    ...(trajectoryType !== TRAJECTORY_TYPE.STS && area && { area }),
+    ...(trajectoryType === TRAJECTORY_TYPE.STS && area && { technology: area }),
     ...(searchTerm && { fileNameContains: searchTerm }),
   }).toString();
 
@@ -127,16 +124,16 @@ export const fetchTrajectoriesFromFS = async (
  * @throws {Error} If the upload process fails or an invalid response is encountered.
  */
 export const uploadTrajectory = async (
-  trajectoryType: TRAJECTORY_TYPE,
-  trajectoryToUse: string,
   horizon: string,
   studyId: number,
+  trajectoryType: TRAJECTORY_TYPE,
+  trajectoryToUse?: string,
   area?: string,
   onProgress?: (progress: number) => void,
   isCivilYear: boolean = false,
   subArea?: string,
 ): Promise<DbTrajectory> => {
-  const trajectoryName = encodeURIComponent(trajectoryToUse);
+  const trajectoryName = encodeURIComponent(trajectoryToUse ?? '');
   const urlApi = getUrlApiUploadTrajectory(
     trajectoryType,
     studyId,

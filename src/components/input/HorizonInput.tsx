@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TextInput } from '@design-system-rte/react';
+import { MAX_HORIZON_LENGTH } from '@/shared/const/studyConfig.ts';
 
 interface YearInputProps {
   horizon: string;
@@ -83,7 +84,8 @@ const HorizonInput: React.FC<YearInputProps> = ({
       onChange={handleInputChange}
       onBlur={() => validate(horizon)}
       required={required}
-      maxLength={4}
+      maxLength={MAX_HORIZON_LENGTH}
+      showCounter={!disabled}
       disabled={disabled}
       error={hasError}
       assistiveTextLabel={getAssistiveTextLabel()}

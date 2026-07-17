@@ -14,7 +14,12 @@ import { SelectDSOption, StudyDTO } from '@/shared/types';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { notifyAlert, notifyToast } from '@/shared/notification/notification';
 import { validateMaxLength } from '@/shared/utils/validateMaxTextLength';
-import { MAX_STUDY_NAME_LENGTH } from '@/shared/const/studyConfig';
+import {
+  MAX_KEYWORD_LENGTH,
+  MAX_KEYWORD_NUMBER,
+  MAX_STUDY_NAME_LENGTH,
+  MIN_KEYWORD_LENGTH,
+} from '@/shared/const/studyConfig';
 import { hasArrayChanged } from '@/shared/utils/arrayUtils.ts';
 import { Button, Select, TextInput } from '@design-system-rte/react';
 import { FieldInFormation } from '@common/base/FieldInFormation.tsx';
@@ -172,7 +177,8 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
                   label={t('modal.@input_name')}
                   onChange={handleStudyNameChange}
                   required
-                  maxLength={75}
+                  maxLength={MAX_STUDY_NAME_LENGTH}
+                  showCounter={true}
                   error={!!studyErrorMessage}
                   assistiveTextLabel={studyErrorMessage}
                   assistiveAppearance={studyErrorMessage ? 'error' : 'description'}
@@ -211,9 +217,9 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
             <KeywordsInput
               keywords={keywords}
               setKeywords={setKeywords}
-              maxNbKeywords={6}
-              maxNbCharacters={15}
-              minNbCharacters={1}
+              maxNbKeywords={MAX_KEYWORD_NUMBER}
+              maxNbCharacters={MAX_KEYWORD_LENGTH}
+              minNbCharacters={MIN_KEYWORD_LENGTH}
             />
           </div>
         </div>

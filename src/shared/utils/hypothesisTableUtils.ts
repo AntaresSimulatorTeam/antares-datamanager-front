@@ -132,7 +132,7 @@ export const buildAreaOptions = (
  * Constructs a list of checked values by combining areas from a trajectory dataset
  * with a default list of areas, ensuring no duplicates exist.
  *
- * @param {DbTrajectory[]} areaWithTrajectory - Array of trajectory objects, each containing area information.
+ * @param {string[]} areaWithTrajectory - Array of area linked to a trajectory.
  * @param {{ name: string }[]} [defaultAreas] - Optional array of default area objects with a "name" property.
  * @returns {string[]} A combined list of area names, prioritizing default areas,
  *     and excluding duplicates from the trajectory areas.
