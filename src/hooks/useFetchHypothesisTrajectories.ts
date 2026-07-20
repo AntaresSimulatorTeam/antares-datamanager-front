@@ -134,12 +134,19 @@ export const useFetchHypothesisTrajectories = (
             t,
           });
 
+          const nuclearReadOnlyMap = buildReadOnlyMap({
+            rows: nuclearRows,
+            trajType: trajectoryTypes[0],
+            isStudyGenerated,
+            defaultAreaListNotInList,
+          });
+
           results = rawResults.flatMap((result) => {
             if (result.trajType === TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION) {
               return {
                 ...result,
                 rows: nuclearRows,
-                readOnlyMap: {},
+                readOnlyMap: nuclearReadOnlyMap,
               };
             } else {
               return [];
