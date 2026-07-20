@@ -74,11 +74,13 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
     useFetchHypothesisParametersTrajectories(areas, studyData, defaultAreas, isStudyGenerated);
 
   const configs = [
-    { type: TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER, labelKey: t('thermal.@costs') },
-    { type: TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER, labelKey: t('thermal.@economics') },
+    [
+      { type: TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER, labelKey: t('thermal.@costs') },
+      { type: TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER, labelKey: t('thermal.@economics') },
+    ],
   ];
   const options = { withReadOnlyRow: false, isStudyGenerated };
-  const { hypothesisTrajectories: economicData } = useFetchFixHypothesisTrajectories(configs, options, studyData?.id);
+  const { firstTableData } = useFetchFixHypothesisTrajectories(configs, options, studyData?.id);
   const { handleFetchFromFS } = useTrajectoryFetchFromFSHandler();
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch, setReadOnly);
   const { attachTrajectory } = useTrajectoryAttach(studyData, studyState, dispatch, setReadOnly);
@@ -102,11 +104,11 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
       areasTrajectoryOptions && setAreasOptions(areasTrajectoryOptions);
       dropDownListOptions && setCheckedValues(dropDownListOptions);
       hypothesisTrajectories && setTechnicalData(hypothesisTrajectories);
-      economicData && setData(economicData);
+      firstTableData && setData(firstTableData);
       setReadOnly(readOnlyRow);
     };
     setHypothesis();
-  }, [areasTrajectoryOptions, dropDownListOptions, hypothesisTrajectories, readOnlyRow, economicData]);
+  }, [areasTrajectoryOptions, dropDownListOptions, hypothesisTrajectories, readOnlyRow, firstTableData]);
 
   useEffect(() => {
     if (studyState.studyStatus === StudyStatus.GENERATED) {

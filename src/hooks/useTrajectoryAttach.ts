@@ -14,6 +14,7 @@ export const useTrajectoryAttach = (
   studyState: Partial<StudyState>,
   dispatch: Dispatch<StudyActionType> | null,
   setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
+  setSecondTableReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
 ) => {
   const { user } = useUser();
   const { t } = useTranslation();
@@ -78,7 +79,10 @@ export const useTrajectoryAttach = (
           } else {
             setData((prev) => {
               newData = setNestedData(prev, indexArray, newTrajectory);
-              type === TRAJECTORY_TYPE.AREA && setReadOnly?.({ '0': false, '1': false });
+              if (type === TRAJECTORY_TYPE.AREA) {
+                setReadOnly?.({ '0': false, '1': false });
+                setSecondTableReadOnly?.({ '0': false, '1': false });
+              }
               if (type === TRAJECTORY_TYPE.DSR) {
                 const hasTrajectoryWithTS =
                   newData.some(

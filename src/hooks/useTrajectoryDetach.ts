@@ -17,6 +17,7 @@ export const useTrajectoryDetach = (
   setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
   setIsDeletionModalOpen?: Dispatch<SetStateAction<boolean>>,
   setRowIdSelected?: Dispatch<SetStateAction<string>>,
+  setSecondTableReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
 ) => {
   const { user } = useUser();
   const { t } = useTranslation();
@@ -80,7 +81,10 @@ export const useTrajectoryDetach = (
         });
 
         setData(newData);
-        if (newReadOnly) setReadOnly?.((prev) => ({ ...prev, ...newReadOnly }));
+        if (newReadOnly) {
+          setReadOnly?.((prev) => ({ ...prev, ...newReadOnly }));
+          setSecondTableReadOnly?.({ '0': newReadOnly[1], '1': newReadOnly[1] });
+        }
       } catch (error) {
         if ((error as TrajectoryBackendError).message.includes('Confirmation required')) {
           setRowIdSelected?.(String(indexArray[0]));

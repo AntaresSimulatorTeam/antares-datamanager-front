@@ -16,6 +16,7 @@ import { Row } from '@tanstack/react-table';
 import { TFunction } from 'i18next';
 import { normalizeTechnology, sentenceCase, snakeCase, snakeCaseUnderscore } from '@/shared/utils/textUtils.ts';
 import {
+  TRAJECTORY_ADEQUACY_PATCH,
   TRAJECTORY_DSR_CAPACITY_MODULATION,
   TRAJECTORY_DSR_CLUSTER,
   TRAJECTORY_ENDPOINT,
@@ -40,7 +41,7 @@ import {
   TRAJECTORY_THERMAL_MODULATION_PARAMETER_IMPORT,
   TRAJECTORY_THERMAL_SPECIFIC_PARAMETER_IMPORT,
 } from '@/shared/const/apiEndPoint.ts';
-import { HypothesisType, SearchParams } from '@/shared/types/HypothesisTable.ts';
+import { HypothesisConfig, HypothesisType, SearchParams } from '@/shared/types/HypothesisTable.ts';
 import { TabItemProps } from '@design-system-rte/core/components/tab/tab.interface';
 
 /**
@@ -886,6 +887,17 @@ export const isTechnicalParametersType = (type: TRAJECTORY_TYPE): boolean =>
   type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER;
 
 /**
+ * Determines if the provided type is classified as a technical parameter type
+ * within the thermal trajectory category.
+ *
+ * @param {TRAJECTORY_TYPE} type - The type to evaluate.
+ * @returns {boolean} Returns true if the type matches any of the defined
+ * thermal technical parameter categories; otherwise, returns false.
+ */
+export const isSettingsParametersType = (type: TRAJECTORY_TYPE): boolean =>
+  type === TRAJECTORY_TYPE.ADEQUACY_PATCH || type === TRAJECTORY_TYPE.FLOWBASED;
+
+/**
  * Determines the file path based on the trajectory type.
  *
  * @param {TRAJECTORY_TYPE} type - The trajectory type used to select the corresponding file path.
@@ -939,6 +951,8 @@ export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE, hypothesis?: Hy
       return '\\\\specific_nuclear\\TS_dispo';
     case TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR:
       return '\\\\specific_nuclear\\TS_dispo\\SMR\\';
+    case TRAJECTORY_TYPE.ADEQUACY_PATCH:
+      return '\\\\adequacy_patch\\adqp_c\\';
     default:
       return null;
   }
@@ -1105,7 +1119,8 @@ export const getUrlApiUploadTrajectory = (
       return `${TRAJECTORY_NUCLEAR_TS_LT}?area=FR&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
     case TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR:
       return `${TRAJECTORY_NUCLEAR_TS_SMR}?area=FR&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
-
+    case TRAJECTORY_TYPE.ADEQUACY_PATCH:
+      return `${TRAJECTORY_ADEQUACY_PATCH}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
     default:
       return `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   }
@@ -1249,3 +1264,28 @@ export const getFetchParams = (
   }
   return { typeToUse, areaToUse, technology };
 };
+
+export const buildDispatchPayload = (
+  config: HypothesisConfig[],
+  results: DbTrajectory[][],
+): Record<string, { trajectories: DbTrajectory[] }> =>
+  config.reduce(
+    (acc, cfg, idx) => {
+      const trajectories = results[idx];
+
+      if (trajectories?.length) {
+        acc[cfg.type] = { trajectories };
+      }
+
+      return acc;
+    },
+    {} as Record<string, { trajectories: DbTrajectory[] }>,
+  );
+
+export const buildTableData = (config: HypothesisConfig[], results: DbTrajectory[][], t: TFunction): HypothesisRowData[] =>
+  config.map((cfg, idx) => ({
+    hypothesis: t(cfg.labelKey),
+    trajectory: results[idx]?.[0],
+    status: results[idx]?.length ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+    ...(cfg.hvdc != null && { hvdc: cfg.hvdc }),
+  }));

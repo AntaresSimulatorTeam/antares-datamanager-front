@@ -631,6 +631,10 @@ export const getParamForFetchFSTrajectory = (
     typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK;
     areaToUse = '';
   }
+  if (type === TRAJECTORY_TYPE.ADEQUACY_PATCH) {
+    typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.ADEQUACY_PATCH : TRAJECTORY_TYPE.FLOWBASED;
+    areaToUse = '';
+  }
   if (type === TRAJECTORY_TYPE.DSR) {
     if (isLastIndex) {
       typeToUse = TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION;

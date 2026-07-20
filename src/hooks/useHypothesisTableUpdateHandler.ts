@@ -10,40 +10,50 @@ import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 
 interface UseHypothesisTableUpdateHandlerArgs {
   studyData: StudyDTO;
-  data: HypothesisRowData[];
-  type: TRAJECTORY_TYPE;
-  setData: Dispatch<SetStateAction<HypothesisRowData[]>>;
   setIsDeletionModalOpen: Dispatch<SetStateAction<boolean>>;
   dbTrajectories: DbTrajectory[];
   setRowIdSelected: Dispatch<SetStateAction<string>>;
   setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>;
   setRowToDelete?: Dispatch<SetStateAction<RowToDeleteProps | null>>;
+  setSecondTableReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>;
 }
 
 export const useHypothesisTableUpdateHandler = ({
   studyData,
-  data,
-  type,
-  setData,
   setRowToDelete,
   setIsDeletionModalOpen,
   dbTrajectories,
   setRowIdSelected,
   setReadOnly,
+  setSecondTableReadOnly,
 }: UseHypothesisTableUpdateHandlerArgs) => {
   const studyState = useStudy();
   const dispatch = useStudyDispatch();
-  const { attachTrajectory } = useTrajectoryAttach(studyData, studyState, dispatch, setReadOnly);
+  const { attachTrajectory } = useTrajectoryAttach(
+    studyData,
+    studyState,
+    dispatch,
+    setReadOnly,
+    setSecondTableReadOnly,
+  );
   const { detachTrajectory } = useTrajectoryDetach(
     studyData,
     dispatch,
     setReadOnly,
     setIsDeletionModalOpen,
     setRowIdSelected,
+    setSecondTableReadOnly,
   );
 
   const handleHypothesisTableUpdate = useCallback(
-    async (rowId: string, value: unknown, status: RowStatus) => {
+    async (
+      rowId: string,
+      value: unknown,
+      status: RowStatus,
+      type: TRAJECTORY_TYPE,
+      data: HypothesisRowData[],
+      setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
+    ) => {
       const indexArray = rowId.split('.').map(Number);
       let typeToUse = type;
       const isLastIndex = indexArray[0] === Math.max(data.length - 1, 0);
@@ -77,7 +87,7 @@ export const useHypothesisTableUpdateHandler = ({
         }
       }
     },
-    [attachTrajectory, data, dbTrajectories, detachTrajectory, setData, setIsDeletionModalOpen, setRowToDelete, type],
+    [attachTrajectory, dbTrajectories, detachTrajectory, setIsDeletionModalOpen, setRowToDelete],
   );
   return { handleHypothesisTableUpdate };
 };
