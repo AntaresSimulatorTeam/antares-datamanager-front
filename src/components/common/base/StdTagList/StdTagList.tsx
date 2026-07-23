@@ -5,10 +5,8 @@ import clsx from 'clsx';
 import { memo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import StdPopover from '../../layout/stdPopover/StdPopover';
-import StdTextTooltip from '../../layout/stdTextTooltip/StdTextTooltip';
 import { tagListClassBuilder } from './tagListClassBuilder';
-import { Button, Icon } from '@design-system-rte/react';
-import StdTag from '@common/base/stdTag/StdTag.tsx';
+import { Button, Icon, Tag, Tooltip } from '@design-system-rte/react';
 
 type StdTagListProps = {
   tags: string[];
@@ -60,9 +58,9 @@ const StdTagList = ({
   return (
     <div id={id} className={clsx(TAG_LIST_CLASSES, { 'items-center': singleLine })}>
       {icon && (
-        <StdTextTooltip text={tooltipText ?? t('components.tags.@tags')}>
+        <Tooltip label={tooltipText ?? t('components.tags.@tags')}>
           <Icon name={icon} size={ICON_SIZE} color="#3b434a" />
-        </StdTextTooltip>
+        </Tooltip>
       )}
       <div className={tagListClasses} ref={containerRef} role="list">
         {tags.map((tag, idx) => (
@@ -73,7 +71,7 @@ const StdTagList = ({
             className={idx >= (tagsNumber ?? 0) ? 'hidden' : ''}
             key={tag.toLowerCase()}
           >
-            <StdTag label={tags[idx]} />
+            <Tag label={tags[idx]} tagType="decorative" color="neutral" compactSpacing={true} />
           </span>
         ))}
         {plusTagsVisible && (
@@ -102,7 +100,13 @@ const StdTagList = ({
               <StdPopover.Content>
                 <div className="flex max-w-32 flex-wrap gap-x-0.5 gap-y-1">
                   {tags.slice(tagsNumber).map((tag) => (
-                    <StdTag label={tag} key={tag.toLowerCase()} />
+                    <Tag
+                      label={tag}
+                      key={tag.toLowerCase()}
+                      tagType="decorative"
+                      color="neutral"
+                      compactSpacing={true}
+                    />
                   ))}
                 </div>
               </StdPopover.Content>
