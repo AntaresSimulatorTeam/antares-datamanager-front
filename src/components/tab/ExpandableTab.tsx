@@ -8,6 +8,7 @@ import {
   CheckBoxData,
   DbTrajectory,
   HypothesisRowData,
+  RowStatus,
   SelectOption,
   TabProps,
   TechnologyType,
@@ -81,9 +82,6 @@ const ExpandableTab = ({
 
   const { handleHypothesisTableUpdate } = useHypothesisTableUpdateHandler({
     studyData,
-    data,
-    type: tabType,
-    setData,
     setRowIdSelected,
     setIsDeletionModalOpen,
     dbTrajectories,
@@ -218,7 +216,9 @@ const ExpandableTab = ({
           toggleModal();
         }}
         isReadOnlyEnable={true}
-        updateData={handleHypothesisTableUpdate}
+        updateData={(rowId: string, value: unknown, status: RowStatus) => {
+          void handleHypothesisTableUpdate(rowId, value, status, tabType, data, setData);
+        }}
         removeRow={removeTableRow}
         handleViewData={tabType === TRAJECTORY_TYPE.STS ? handleViewData : undefined}
       />

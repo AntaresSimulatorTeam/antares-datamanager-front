@@ -201,8 +201,10 @@
     "@informationMessage": "If a \"mod\" file is included in a \"series\" folder, the \"technical parameters\" folder is required."
   },
   "settings": {
-    "@adequacyPatches": "Adequacy Patches",
-    "@flowBased": "Flowbased"
+    "@adequacyPatches": "Adequacy Patch",
+    "@flowBased": "Flowbased",
+    "@recalculate": "Recalculate",
+    "@read": "Read"
   },
   "trajectoryViewModal": {
     "@title_area": "Areas",

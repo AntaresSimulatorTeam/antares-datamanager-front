@@ -13,7 +13,7 @@ import { LabelWithDeleteButton } from '@common/data/LabelWithDeleteButton.tsx';
 import { SelectInputWithButton } from '@common/data/SelectInputWithButton.tsx';
 import { ProgressBar } from '@/components/input/ProgressBar.tsx';
 import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
-import { IconButton, Switch } from '@design-system-rte/react';
+import { IconButton, SegmentedControl, Switch } from '@design-system-rte/react';
 import { ChangeEvent } from 'react';
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
@@ -50,7 +50,7 @@ const getEditableHypothesisTableHeaders = ({
   }),
   columnHelper.accessor('trajectory', {
     header: t('studyDetails.@trajectory'),
-    size: 623,
+    size: 550,
     cell: ({ row, table }) => {
       const { trajectory, status } = row.original;
 
@@ -99,11 +99,11 @@ const getEditableHypothesisTableHeaders = ({
     },
   }),
 
-  ...(type === TRAJECTORY_TYPE.AREA || type === TRAJECTORY_TYPE.ADEQUACY_PATCH
+  ...(type === TRAJECTORY_TYPE.AREA
     ? [
         columnHelper.accessor('hvdc', {
           header: '',
-          size: 120,
+          size: 220,
           cell: ({ row, table: { options } }) => {
             if (row.index === 0 || row.original.hvdc == undefined) return null;
             const {hvdc, trajectory, status} = row.original;
@@ -121,6 +121,38 @@ const getEditableHypothesisTableHeaders = ({
                   (!trajectory?.trajectoryName && status === TRAJECTORY_SELECTION_STATUS.MISSING)
                 }
                 readOnly={isStudyGenerated}
+              />
+            );
+          },
+        }),
+      ]
+    : []),
+
+  ...(type === TRAJECTORY_TYPE.ADEQUACY_PATCH
+    ? [
+        columnHelper.accessor('read', {
+          header: '',
+          size: 120,
+          cell: ({ row, table: { options } }) => {
+            //const { read } = row.original;
+            if (row.index === 0 || row.getReadOnly()) return null;
+            return (
+              <SegmentedControl
+                appearance="brand"
+                onClick={() => void options?.meta?.activate?.()}
+                onChange={() => {}}
+                options={[
+                  {
+                    id: 'option1',
+                    label: t('settings.@read'),
+                  },
+                  {
+                    id: 'option2',
+                    label: t('settings.@recalculate'),
+                  },
+                ]}
+                selectedSegment="option1"
+                compactSpacing={true}
               />
             );
           },

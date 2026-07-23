@@ -243,6 +243,10 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
           setRowIdSelected(rowId);
           toggleModal();
         }}
+        activate={() => {
+          void updateStudy({ hvdc: !studyState.hvdc }, studyData.id);
+          dispatch?.({ type: STUDY_ACTION.SET_STUDY_HVDC, payload: !studyState.hvdc });
+        }}
         type={TRAJECTORY_TYPE.ADEQUACY_PATCH}
       />
       {isModalOpen && (
@@ -255,14 +259,16 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
             indexArray?: number[],
           ) => {
             toggleModal();
-            typeToUse && setSelectedTrajectoryType(typeToUse);
-            await importTrajectory(
-              isSettingsParametersType(selectedTrajectoryType) ? setSettingsData : setData,
-              value,
-              typeToUse,
-              indexArray,
-              hypothesis,
-            );
+            if (typeToUse) {
+              setSelectedTrajectoryType(typeToUse);
+              await importTrajectory(
+                isSettingsParametersType(typeToUse) ? setSettingsData : setData,
+                value,
+                typeToUse,
+                indexArray,
+                hypothesis,
+              );
+            }
           }}
           tabType={selectedTrajectoryType}
           hypothesis={getAreaTrajectoryName(

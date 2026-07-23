@@ -39,6 +39,7 @@ export type HypothesisRowData = {
   isDeletable?: boolean;
   timeSeries?: string;
   hvdc?: boolean;
+  read?: string;
 };
 
 export type RowStatus = FileInputStatus | 'warning' | 'emptyError';
