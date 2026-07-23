@@ -594,7 +594,7 @@ export const getStudyMenu = (t: (value: string) => string, isTrajectoryAreaLinke
     id: TRAJECTORY_TYPE.AREA,
     panelId: TRAJECTORY_TYPE.AREA,
     label: t('studyDetails.@areas_links'),
-    icon: 'share',
+    icon: 'linked-services',
     disabled: false,
     badgeType: 'brand',
     badgeContent: 'number',

@@ -15,8 +15,7 @@ import { ProgressBar } from '@/components/input/ProgressBar.tsx';
 import { getAlignment, hasLabelDefault } from '@/shared/utils/hypothesisTableUtils.ts';
 import { getSubRowListWithArea, getSubRowsList, isEmptyRow } from '@/shared/utils/trajectoryUtils.ts';
 import { getInformationMessage } from '@/shared/helpers/hypothesisTableHelper.ts';
-import { Button, Icon, IconButton } from '@design-system-rte/react';
-import StdTextTooltip from '@common/layout/stdTextTooltip/StdTextTooltip.tsx';
+import { Button, Icon, IconButton, Tooltip } from '@design-system-rte/react';
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
 const getExpandableHypothesisTableHeaders = ({
@@ -66,12 +65,12 @@ const getExpandableHypothesisTableHeaders = ({
             }
           />
           {row.getCanExpand() && subRowListWithArea && subRowListWithArea?.messageNb > 0 && (
-            <StdTextTooltip text={subRowListWithArea?.message} placement="right" offset={5}>
+            <Tooltip label={subRowListWithArea?.message} position="right">
               <div className="text-gray-600">{` | +${subRowListWithArea?.messageNb}`}</div>
-            </StdTextTooltip>
+            </Tooltip>
           )}
           {row.id === informationMessage?.id && informationMessage && (
-            <StdTextTooltip text={t(`${informationMessage.messageKey}`)} placement="right" offset={5}>
+            <Tooltip label={t(`${informationMessage.messageKey}`)} position="right">
               <Icon
                 appearance="outlined"
                 aria-label="info"
@@ -79,7 +78,7 @@ const getExpandableHypothesisTableHeaders = ({
                 name="info"
                 size={16}
               />
-            </StdTextTooltip>
+            </Tooltip>
           )}
         </div>
       );

@@ -337,9 +337,9 @@ describe('getStudyMenu', () => {
       id: TRAJECTORY_TYPE.AREA,
       panelId: TRAJECTORY_TYPE.AREA,
       label: 'translated:studyDetails.@areas_links',
-      icon: 'share',
+      icon: 'linked-services',
       disabled: false,
-      badgeContent: "number",
+      badgeContent: 'number',
       badgeType: 'brand',
       showBadge: true,
     });
