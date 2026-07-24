@@ -200,13 +200,11 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
       {isViewModalOpen && trajectoryData && (
         <TrajectoryDataVisualisation trajectoryData={trajectoryData} onClose={() => setIsViewModalOpen(false)} />
       )}
-      {isDeletionModalOpen && (
-        <AreaDeletionConfirmationModal
-          isOpen={isDeletionModalOpen}
-          onClose={() => setIsDeletionModalOpen(false)}
-          onConfirm={handleConfirmedAreaDeletion}
-        />
-      )}
+      <AreaDeletionConfirmationModal
+        isOpen={isDeletionModalOpen}
+        onClose={() => setIsDeletionModalOpen(false)}
+        onConfirm={handleConfirmedAreaDeletion}
+      />
     </div>
   );
 };
