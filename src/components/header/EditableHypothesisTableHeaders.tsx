@@ -105,17 +105,19 @@ const getEditableHypothesisTableHeaders = ({
           size: 50,
           cell: ({ row, table: { options } }) => {
             const { hvdc, trajectory, status } = row.original;
-            if (hvdc == null) return null;
+            if (row.index === 0 || hvdc == null) return null;
             return (
               <Switch
+                key={`${row.id}-${hvdc}`}
                 appearance="brand"
                 label={t('link.@toggle_hvdc')}
-                onChange={() => void options?.meta?.activate?.()}
+                onClick={() => void options?.meta?.activate?.()}
                 checked={hvdc}
                 showIcon
                 showLabel
                 disabled={
                   status === TRAJECTORY_SELECTION_STATUS.ERROR ||
+                  isStudyGenerated ||
                   (!trajectory?.trajectoryName && status === TRAJECTORY_SELECTION_STATUS.MISSING)
                 }
                 readOnly={isStudyGenerated}

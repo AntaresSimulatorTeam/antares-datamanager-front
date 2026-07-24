@@ -534,6 +534,7 @@ export interface CellDetachParams {
   indexArray: number[];
   studyId: number;
   horizon: string;
+  hvdcValue?: boolean;
 }
 
 export interface CellDetachResult {
@@ -548,6 +549,7 @@ export const updateTableAfterCellDetach = async ({
   indexArray,
   studyId,
   horizon,
+  hvdcValue,
 }: CellDetachParams): Promise<CellDetachResult> => {
   const empty = {
     trajectory: null,
@@ -590,7 +592,7 @@ export const updateTableAfterCellDetach = async ({
     };
   }
 
-  if (type === TRAJECTORY_TYPE.AREA) {
+  if (type === TRAJECTORY_TYPE.AREA || type === TRAJECTORY_TYPE.LINK) {
     const hasLinks = indexArray[0] === 0 && data[1]?.trajectory;
     const newData = data.map((item, index) =>
       index === indexArray[0] || hasLinks
@@ -598,9 +600,11 @@ export const updateTableAfterCellDetach = async ({
             ...item,
             trajectory: null,
             status: TRAJECTORY_SELECTION_STATUS.MISSING,
+            ...(hvdcValue != null && { hvdc: hvdcValue }),
           }
         : item,
     );
+
     return {
       newData,
       newReadOnly: { '0': false, '1': indexArray[0] === 0 },

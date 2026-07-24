@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { useTranslation } from 'react-i18next';
@@ -51,11 +51,20 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
     studyState.studyStatus === StudyStatus.GENERATED || studyData?.status === StudyStatus.GENERATED,
   );
 
-  const configs = [
-    { type: TRAJECTORY_TYPE.AREA, labelKey: t('studyDetails.@areas') },
-    { type: TRAJECTORY_TYPE.LINK, labelKey: t('studyDetails.@links'), hvdc: studyState.hvdc },
-  ];
-  const options = { withReadOnlyRow: true, isStudyGenerated };
+  const configs = useMemo(
+    () => [
+      { type: TRAJECTORY_TYPE.AREA, labelKey: t('studyDetails.@areas') },
+      { type: TRAJECTORY_TYPE.LINK, labelKey: t('studyDetails.@links'), hvdc: studyState.hvdc },
+    ],
+    [t, studyState.hvdc],
+  );
+  const options = useMemo(
+    () => ({
+      withReadOnlyRow: true,
+      isStudyGenerated,
+    }),
+    [isStudyGenerated],
+  );
   const { hypothesisTrajectories, readOnlyRow } = useFetchFixHypothesisTrajectories(configs, options, studyData?.id);
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch, setReadOnly);
   const { handleSearch } = useTrajectorySearchHandler({
@@ -82,11 +91,50 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
   useEffect(() => {
     if (studyState.studyStatus === StudyStatus.GENERATED) {
       setIsStudyGenerated(true);
-      setData((rows) => filterRow(rows));
-      const rows = getReadOnlyForGeneratedStudy(data);
-      setReadOnly(rows);
+      const filteredRows = filterRow(data);
+      setData(filteredRows);
+      setReadOnly(getReadOnlyForGeneratedStudy(filteredRows));
     }
   }, [studyState.studyStatus]);
+
+  const handleSelectionChange = useCallback(
+    async (fileNameContains: string, rowId: string) => {
+      const indexArray = rowId.split('.').map(Number);
+      return await handleSearch(TRAJECTORY_TYPE.AREA, indexArray, { fileNameContains });
+    },
+    [handleSearch],
+  );
+
+  const handleFetchFromFs = useCallback(async (rowId: string) => {
+    const hypothesis = getAreaTrajectoryName(rowId, data);
+    const { typeToUse, areaToUse, isDefaultArea } = getParamForFetchFSTrajectory(
+      TRAJECTORY_TYPE.AREA,
+      rowId.split('.').map(Number),
+      data.length,
+      hypothesis,
+    );
+    const results = await handleFetchFromFS({ typeToUse, areaToUse, isDefaultArea });
+    setOptionsFS(results);
+    setRowIdSelected(rowId);
+    toggleModal();
+  }, []);
+
+  const handleViewTrajectoryData = useCallback(
+    (rowId: string) => {
+      const index = Number(rowId);
+      const trajectory = data[index].trajectory;
+      if (trajectory) {
+        void handleViewTrajectory(trajectory, setTrajectoryData, setIsViewModalOpen, t);
+      }
+    },
+    [data, t],
+  );
+
+  const handleActivate = useCallback(() => {
+    void updateStudy({ hvdc: !studyState.hvdc }, studyData.id);
+    setData((prev) => prev.map((item, index) => (index === 1 ? { ...item, hvdc: !item.hvdc } : item)));
+    dispatch?.({ type: STUDY_ACTION.SET_STUDY_HVDC, payload: !studyState.hvdc });
+  }, [dispatch]);
 
   const handleConfirmedAreaDeletion = useCallback(async () => {
     await unlinkAllTrajectoriesFromStudy(studyData.id);
@@ -124,36 +172,12 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
         isReadOnlyEnable={true}
         progress={progress}
         idSelected={String(rowIdSelected)}
-        handleSearch={async (fileNameContains: string, rowId: string) => {
-          const indexArray = rowId.split('.').map(Number);
-          return await handleSearch(TRAJECTORY_TYPE.AREA, indexArray, { fileNameContains });
-        }}
+        handleSearch={handleSelectionChange}
         updateData={handleHypothesisTableUpdate}
-        handleImport={async (rowId: string) => {
-          const hypothesis = getAreaTrajectoryName(rowId, data);
-          const { typeToUse, areaToUse, isDefaultArea } = getParamForFetchFSTrajectory(
-            TRAJECTORY_TYPE.AREA,
-            rowId.split('.').map(Number),
-            data.length,
-            hypothesis,
-          );
-          const results = await handleFetchFromFS({ typeToUse, areaToUse, isDefaultArea });
-          setOptionsFS(results);
-          setRowIdSelected(rowId);
-          toggleModal();
-        }}
-        handleViewData={(rowId: string) => {
-          const index = Number(rowId);
-          const trajectory = data[index].trajectory;
-          if (trajectory) {
-            void handleViewTrajectory(trajectory, setTrajectoryData, setIsViewModalOpen, t);
-          }
-        }}
+        handleImport={handleFetchFromFs}
+        handleViewData={handleViewTrajectoryData}
+        activate={handleActivate}
         type={TRAJECTORY_TYPE.AREA}
-        activate={() => {
-          void updateStudy({ hvdc: !studyState.hvdc }, studyData.id);
-          dispatch?.({ type: STUDY_ACTION.SET_STUDY_HVDC, payload: !studyState.hvdc });
-        }}
       />
       {isModalOpen && (
         <ImportTrajectoryModal
