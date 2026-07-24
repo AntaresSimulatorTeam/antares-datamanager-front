@@ -134,8 +134,9 @@ const getEditableHypothesisTableHeaders = ({
           header: '',
           size: 120,
           cell: ({ row, table: { options } }) => {
-            //const { read } = row.original;
-            if (row.index === 0 || row.getReadOnly()) return null;
+            const { trajectory, status } = row.original; // TODO : add read props
+            const hasTrajectory = status === TRAJECTORY_SELECTION_STATUS.OK && !!trajectory?.trajectoryName?.length;
+            if (row.index === 0 || row.getReadOnly() || !hasTrajectory) return null;
             return (
               <SegmentedControl
                 appearance="brand"
