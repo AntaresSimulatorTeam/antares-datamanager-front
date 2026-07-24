@@ -91,9 +91,9 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
   useEffect(() => {
     if (studyState.studyStatus === StudyStatus.GENERATED) {
       setIsStudyGenerated(true);
-      const filteredRows = filterRow(data);
-      setData(filteredRows);
-      setReadOnly(getReadOnlyForGeneratedStudy(filteredRows));
+      setData((rows) => filterRow(rows));
+      const rows = getReadOnlyForGeneratedStudy(data);
+      setReadOnly(rows);
     }
   }, [studyState.studyStatus]);
 
