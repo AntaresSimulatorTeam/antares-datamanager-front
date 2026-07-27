@@ -54,9 +54,9 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
   const configs = useMemo(
     () => [
       { type: TRAJECTORY_TYPE.AREA, labelKey: t('studyDetails.@areas') },
-      { type: TRAJECTORY_TYPE.LINK, labelKey: t('studyDetails.@links'), hvdc: studyState.hvdc },
+      { type: TRAJECTORY_TYPE.LINK, labelKey: t('studyDetails.@links'), hasHvdcOption: true },
     ],
-    [t, studyState.hvdc],
+    [t],
   );
   const options = useMemo(
     () => ({
@@ -84,6 +84,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
   });
 
   useEffect(() => {
+    console.log('================ hypothesisTrajectories', hypothesisTrajectories);
     hypothesisTrajectories && setData(hypothesisTrajectories);
     readOnlyRow && setReadOnly(readOnlyRow);
   }, [hypothesisTrajectories, readOnlyRow, studyData?.id]);
@@ -91,7 +92,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
   useEffect(() => {
     if (studyState.studyStatus === StudyStatus.GENERATED) {
       setIsStudyGenerated(true);
-      setData((rows) => filterRow(rows));
+      setData((rows: HypothesisRowData[]) => filterRow(rows));
       const rows = getReadOnlyForGeneratedStudy(data);
       setReadOnly(rows);
     }
@@ -130,11 +131,12 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
     [data, t],
   );
 
-  const handleActivate = useCallback(() => {
-    void updateStudy({ hvdc: !studyData.hvdc }, studyData.id);
-    setData((prev) => prev.map((item, index) => (index === 1 ? { ...item, hvdc: !item.hvdc } : item)));
-    dispatch?.({ type: STUDY_ACTION.SET_STUDY_HVDC, payload: !studyData.hvdc });
-  }, [dispatch]);
+  const handleActivate = useCallback(async () => {
+    const hvdcValue = data[1]?.hvdc;
+    const study = await updateStudy({ hvdc: !hvdcValue }, studyData.id);
+    setData((prev) => prev.map((item, index) => (index === 1 ? { ...item, hvdc: !study.hvdc } : item)));
+    dispatch?.({ type: STUDY_ACTION.SET_STUDY_HVDC, payload: !study.hvdc });
+  }, [dispatch, studyData.id, data]);
 
   const handleConfirmedAreaDeletion = useCallback(async () => {
     await unlinkAllTrajectoriesFromStudy(studyData.id);

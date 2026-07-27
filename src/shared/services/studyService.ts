@@ -111,18 +111,18 @@ export const saveStudy = async (
  *
  * @param {StudyDTO} studyData - The updated study data to be sent to the server.
  * @param {number} studyId - The unique identifier of the study to be updated.
- * @returns {Promise<void>} A promise that resolves when the update operation is completed.
+ * @returns {Promise<StudyDTO>} A promise that resolves when the update operation is completed.
  * @throws {BackendError} Throws an error if the update fails on the server-side.
  */
-export const updateStudy = async (studyData: Partial<StudyDTO>, studyId: number): Promise<void> => {
+export const updateStudy = async (studyData: Partial<StudyDTO>, studyId: number): Promise<StudyDTO> => {
   try {
-    await AuthService.authFetch(`${STUDY_ENDPOINT}/${studyId}`, {
+    return (await AuthService.authFetch(`${STUDY_ENDPOINT}/${studyId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(studyData),
-    });
+    })) as unknown as StudyDTO;
   } catch (error: unknown) {
     throw new Error((error as BackendError).antaresErrorMessage);
   }
