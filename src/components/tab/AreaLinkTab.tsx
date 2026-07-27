@@ -131,9 +131,9 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
   );
 
   const handleActivate = useCallback(() => {
-    void updateStudy({ hvdc: !studyState.hvdc }, studyData.id);
+    void updateStudy({ hvdc: !studyData.hvdc }, studyData.id);
     setData((prev) => prev.map((item, index) => (index === 1 ? { ...item, hvdc: !item.hvdc } : item)));
-    dispatch?.({ type: STUDY_ACTION.SET_STUDY_HVDC, payload: !studyState.hvdc });
+    dispatch?.({ type: STUDY_ACTION.SET_STUDY_HVDC, payload: !studyData.hvdc });
   }, [dispatch]);
 
   const handleConfirmedAreaDeletion = useCallback(async () => {
