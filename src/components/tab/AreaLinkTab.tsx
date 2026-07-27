@@ -84,7 +84,6 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
   });
 
   useEffect(() => {
-    console.log('================ hypothesisTrajectories', hypothesisTrajectories);
     hypothesisTrajectories && setData(hypothesisTrajectories);
     readOnlyRow && setReadOnly(readOnlyRow);
   }, [hypothesisTrajectories, readOnlyRow, studyData?.id]);
