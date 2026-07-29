@@ -43,6 +43,7 @@ import {
 } from '@/shared/const/apiEndPoint.ts';
 import { HypothesisConfig, HypothesisType, SearchParams } from '@/shared/types/HypothesisTable.ts';
 import { TabItemProps } from '@design-system-rte/core/components/tab/tab.interface';
+import { getNuclearTrajectoryType } from '@/shared/utils/formFormatter.ts';
 
 /**
  * Get trajectory status from row status
@@ -1201,7 +1202,7 @@ export const getModalTile = (tabType: TRAJECTORY_TYPE, hypothesis?: HypothesisTy
   return `${area ?? tabType}${technology ? ' - ' : ''}${technology ?? ''}${isTrajectoryNuclearType(tabType) ? ' - FR' : ''}`;
 };
 
-export const getFetchParams = (
+export const getFetchFromDbParams = (
   type: TRAJECTORY_TYPE,
   indexArray: number[],
   options?: SearchParams,
@@ -1238,19 +1239,7 @@ export const getFetchParams = (
     }
   }
   if (type === TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION) {
-    if (indexArray.length === 2) {
-      if (indexArray[1] === 0) {
-        typeToUse = TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP;
-      }
-      if (indexArray[1] === 1) {
-        typeToUse = TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM;
-      }
-      if (indexArray[1] === 2) {
-        typeToUse = TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR;
-      }
-    } else if (indexArray[0] === 1) {
-      typeToUse = TRAJECTORY_TYPE.NUCLEAR_FR_TALON;
-    }
+    typeToUse = getNuclearTrajectoryType(indexArray);
     technology = '';
     areaToUse = '';
   }

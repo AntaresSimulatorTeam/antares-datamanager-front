@@ -30,6 +30,7 @@ import { TFunction } from 'i18next';
 import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
 import { getResTechnologyList, isParamModulationRequired } from '@/shared/services/trajectoryService.ts';
 import { HypothesisType } from '@/shared/types/HypothesisTable.ts';
+import { getNuclearTrajectoryType } from '@/shared/utils/formFormatter.ts';
 
 /**
  * Retrieve read only row of a study generated
@@ -627,7 +628,7 @@ export const getParamForFetchFSTrajectory = (
   let isDefaultArea = hypothesis?.isDefault ?? false;
   const isLastIndex = indexArray[0] === Math.max(rowsNb - 1, 0);
 
-  if (type === TRAJECTORY_TYPE.AREA) {
+  if (type === TRAJECTORY_TYPE.AREA || type === TRAJECTORY_TYPE.LINK) {
     typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK;
     areaToUse = '';
   }
@@ -668,19 +669,7 @@ export const getParamForFetchFSTrajectory = (
     areaToUse = '';
   }
   if (type === TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION) {
-    if (indexArray.length === 2) {
-      if (indexArray[1] === 0) {
-        typeToUse = TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP;
-      }
-      if (indexArray[1] === 1) {
-        typeToUse = TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM;
-      }
-      if (indexArray[1] === 2) {
-        typeToUse = TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR;
-      }
-    } else if (indexArray[0] === 1) {
-      typeToUse = TRAJECTORY_TYPE.NUCLEAR_FR_TALON;
-    }
+    typeToUse = getNuclearTrajectoryType(indexArray);
     areaToUse = '';
   }
   return { typeToUse, areaToUse, isDefaultArea };

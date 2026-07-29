@@ -132,7 +132,7 @@ const getEditableHypothesisTableHeaders = ({
     ? [
         columnHelper.accessor('read', {
           header: '',
-          size: 120,
+          size: 220,
           cell: ({ row, table: { options } }) => {
             const { trajectory, status } = row.original; // TODO : add read props
             const hasTrajectory = status === TRAJECTORY_SELECTION_STATUS.OK && !!trajectory?.trajectoryName?.length;
