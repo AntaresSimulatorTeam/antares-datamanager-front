@@ -26,6 +26,7 @@ vi.mock('react-i18next', () => ({
 }));
 
 const mockGetStudyTrajectories = vi.mocked(studyService.getStudyTrajectories);
+const mockGetStudy = vi.mocked(studyService.getStudyById);
 const mockUseStudyDispatch = vi.mocked(useStudyDispatch);
 
 describe('useFetchFixHypothesisTrajectories', () => {
@@ -398,6 +399,26 @@ describe('useFetchFixHypothesisTrajectories', () => {
           type: STUDY_ACTION.ADD_TRAJECTORIES,
           payload: {},
         });
+      });
+    });
+  });
+
+  describe('Hdvc option is set to true for Link trajectory type', () => {
+    const configs = [
+      { type: TRAJECTORY_TYPE.AREA, labelKey: 'areas' },
+      { type: TRAJECTORY_TYPE.LINK, labelKey: 'links', hasHvdcOption: true },
+    ];
+    const options = { withReadOnlyRow: true, isStudyGenerated: false };
+    it('should call getStudyById service', async () => {
+      mockGetStudyTrajectories.mockImplementation(async (_id: number, type: TRAJECTORY_TYPE) => {
+        if (type === TRAJECTORY_TYPE.AREA) return Promise.resolve([mockAreaTrajectory]);
+        return Promise.resolve([]);
+      });
+
+      renderHook(() => useFetchFixHypothesisTrajectories(configs, options, 1));
+
+      await waitFor(() => {
+        expect(mockGetStudy).toHaveBeenCalledWith(1);
       });
     });
   });
