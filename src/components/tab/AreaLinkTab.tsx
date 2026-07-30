@@ -131,11 +131,10 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
   );
 
   const handleActivate = useCallback(
-    async (hvdcValue: boolean) => {
-      console.log('====================== hvdcValue', hvdcValue);
-      const study = await updateStudy({ hvdc: !hvdcValue }, studyData.id);
-      setData((prev) => prev.map((item, index) => (index === 1 ? { ...item, hvdc: !study.hvdc } : item)));
-      dispatch?.({ type: STUDY_ACTION.SET_STUDY_HVDC, payload: !study.hvdc });
+    async (value?: boolean) => {
+      await updateStudy({ hvdc: value }, studyData.id);
+      setData((prev) => prev.map((item, index) => (index === 1 ? { ...item, hvdc: value } : item)));
+      dispatch?.({ type: STUDY_ACTION.SET_STUDY_HVDC, payload: !!value });
     },
     [dispatch, studyData.id],
   );
@@ -180,12 +179,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
         updateData={handleHypothesisTableUpdate}
         handleImport={handleFetchFromFs}
         handleViewData={handleViewTrajectoryData}
-        activate={async (hvdcValue: boolean) => {
-          console.log('====================== hvdcValue', hvdcValue);
-          const study = await updateStudy({ hvdc: !hvdcValue }, studyData.id);
-          setData((prev) => prev.map((item, index) => (index === 1 ? { ...item, hvdc: !study.hvdc } : item)));
-          dispatch?.({ type: STUDY_ACTION.SET_STUDY_HVDC, payload: !study.hvdc });
-        }}
+        activate={async (value?: boolean) => await handleActivate(value)}
         type={TRAJECTORY_TYPE.AREA}
       />
       {isModalOpen && (

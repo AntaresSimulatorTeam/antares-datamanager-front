@@ -14,6 +14,7 @@ import { SelectInputWithButton } from '@common/data/SelectInputWithButton.tsx';
 import { ProgressBar } from '@/components/input/ProgressBar.tsx';
 import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { IconButton, Switch } from '@design-system-rte/react';
+import { ChangeEvent } from 'react';
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
 
@@ -105,24 +106,19 @@ const getEditableHypothesisTableHeaders = ({
           size: 50,
           cell: ({ row, table: { options } }) => {
             if (row.index === 0 || row.original.hvdc == undefined) return null;
+            const {hvdc, trajectory, status} = row.original;
             return (
               <Switch
-                //key={`${row.id}-${row.original.hvdc}`}
                 appearance="brand"
                 label={t('link.@toggle_hvdc')}
-                onClick={() => {
-                  if (row.original.hvdc) {
-                    void options?.meta?.activate?.(row.original.hvdc);
-                  }
-                }}
-                checked={row.original.hvdc}
+                onChange={(event: ChangeEvent<HTMLInputElement>) => void options?.meta?.activate?.(event.target.checked)}
+                defaultChecked={hvdc}
                 showIcon
                 showLabel
                 disabled={
-                  row.original.status === TRAJECTORY_SELECTION_STATUS.ERROR ||
+                  status === TRAJECTORY_SELECTION_STATUS.ERROR ||
                   isStudyGenerated ||
-                  (!row.original.trajectory?.trajectoryName &&
-                    row.original.status === TRAJECTORY_SELECTION_STATUS.MISSING)
+                  (!trajectory?.trajectoryName && status === TRAJECTORY_SELECTION_STATUS.MISSING)
                 }
                 readOnly={isStudyGenerated}
               />
