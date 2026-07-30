@@ -5,7 +5,7 @@ import * as trajectoryUtils from '@/shared/utils/trajectoryUtils';
 import { useStudyDispatch } from '@/store/contexts/StudyContext';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory';
 import { STUDY_ACTION } from '@/shared/enum/study';
-import { DbTrajectory } from '@/shared/types';
+import { DbTrajectory, StudyDTO } from '@/shared/types';
 import { useFetchFixHypothesisTrajectories } from '@/hooks/useFetchFixHypothesisTrajectories.ts';
 import { HypothesisConfig, HypothesisTableOptions } from '@/shared/types/HypothesisTable.ts';
 
@@ -410,6 +410,7 @@ describe('useFetchFixHypothesisTrajectories', () => {
     ];
     const options = { withReadOnlyRow: true, isStudyGenerated: false };
     it('should call getStudyById service', async () => {
+      mockGetStudy.mockResolvedValue({hvdc: true} as StudyDTO);
       mockGetStudyTrajectories.mockImplementation(async (_id: number, type: TRAJECTORY_TYPE) => {
         if (type === TRAJECTORY_TYPE.AREA) return Promise.resolve([mockAreaTrajectory]);
         return Promise.resolve([]);
