@@ -1,4 +1,4 @@
-import { getStudyTrajectories } from '@/shared/services/studyService.ts';
+import { getStudyById, getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { useEffect, useState } from 'react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { DbTrajectory, HypothesisRowData } from '@/shared/types';
@@ -21,6 +21,12 @@ export const useFetchFixHypothesisTrajectories = (
 
   const getTrajectories = async (id: number) => {
     try {
+      let hvdcValue: boolean | undefined;
+      if (configs[1].hasHvdcOption && id != null) {
+        const studyData = await getStudyById(id);
+        hvdcValue = studyData.hvdc;
+      }
+
       const results = await Promise.all(configs.map((cfg) => getStudyTrajectories(id, cfg.type)));
 
       // Dispatch
@@ -42,7 +48,7 @@ export const useFetchFixHypothesisTrajectories = (
       const dataTable: { hvdc?: boolean; label: string; result: DbTrajectory[] }[] = configs.map((cfg, idx) => ({
         label: t(cfg.labelKey),
         result: results[idx],
-        ...(cfg?.hvdc != null && { hvdc: cfg.hvdc }),
+        ...(cfg?.hasHvdcOption && { hvdc: hvdcValue }),
       }));
 
       const dataTrajectories = dataTable.map((data) => ({
