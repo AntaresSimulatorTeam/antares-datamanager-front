@@ -702,7 +702,7 @@ describe('getPathFromTrajectoryType', () => {
   });
 
   it('should return technical path for NUCLEAR_FR_TS_ERP type', () => {
-    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP)).toBe('\\\\specific_nuclear\\TS_dispo\\EPR\\');
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP)).toBe('\\\\specific_nuclear\\TS_dispo\\EPR');
   });
 
   it('should return technical path for NUCLEAR_FR_TS_LONG_TERM type', () => {
@@ -710,7 +710,11 @@ describe('getPathFromTrajectoryType', () => {
   });
 
   it('should return technical path for NUCLEAR_FR_TS_SMR type', () => {
-    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR)).toBe('\\\\specific_nuclear\\TS_dispo\\SMR\\');
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR)).toBe('\\\\specific_nuclear\\TS_dispo\\SMR');
+  });
+
+  it('should return technical path for ADEQUACY PATCH type', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.ADEQUACY_PATCH)).toBe('\\\\adequacy_patch');
   });
 
   it('should return technical path for unknown type', () => {

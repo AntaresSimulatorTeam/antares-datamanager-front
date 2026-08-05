@@ -947,13 +947,13 @@ export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE, hypothesis?: Hy
     case TRAJECTORY_TYPE.NUCLEAR_FR_TALON:
       return '\\\\specific_nuclear\\Talon_nuc';
     case TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP:
-      return '\\\\specific_nuclear\\TS_dispo\\EPR\\';
+      return '\\\\specific_nuclear\\TS_dispo\\EPR';
     case TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM:
       return '\\\\specific_nuclear\\TS_dispo';
     case TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR:
-      return '\\\\specific_nuclear\\TS_dispo\\SMR\\';
+      return '\\\\specific_nuclear\\TS_dispo\\SMR';
     case TRAJECTORY_TYPE.ADEQUACY_PATCH:
-      return '\\\\adequacy_patch\\adqp_c\\';
+      return '\\\\adequacy_patch';
     default:
       return null;
   }
