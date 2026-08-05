@@ -78,7 +78,7 @@ describe('useFetchFixHypothesisTrajectories', () => {
         { type: TRAJECTORY_TYPE.LINK, labelKey: 'links' },
       ],
       [
-        { type: TRAJECTORY_TYPE.ADEQUACY_PATCH, labelKey: 'adequacyPatches' },
+        { type: TRAJECTORY_TYPE.ADEQUACY_PATCH, labelKey: 'adequacyPatch' },
         { type: TRAJECTORY_TYPE.FLOWBASED, labelKey: 'flowBased' },
       ],
     ];
@@ -152,7 +152,7 @@ describe('useFetchFixHypothesisTrajectories', () => {
         { type: TRAJECTORY_TYPE.LINK, labelKey: 'links' },
       ],
       [
-        { type: TRAJECTORY_TYPE.ADEQUACY_PATCH, labelKey: 'adequacyPatches' },
+        { type: TRAJECTORY_TYPE.ADEQUACY_PATCH, labelKey: 'adequacyPatch' },
         { type: TRAJECTORY_TYPE.FLOWBASED, labelKey: 'flowBased' },
       ],
     ];
@@ -387,7 +387,7 @@ describe('useFetchFixHypothesisTrajectories', () => {
         { type: TRAJECTORY_TYPE.LINK, labelKey: 'links' },
       ],
       [
-        { type: TRAJECTORY_TYPE.ADEQUACY_PATCH, labelKey: 'adequacyPatches' },
+        { type: TRAJECTORY_TYPE.ADEQUACY_PATCH, labelKey: 'adequacyPatch' },
         { type: TRAJECTORY_TYPE.FLOWBASED, labelKey: 'flowbased' },
       ],
     ];
@@ -443,10 +443,10 @@ describe('useFetchFixHypothesisTrajectories', () => {
   });
 
   describe('Hdvc option is set to true for Link trajectory type', () => {
-    const configs = [
+    const configs = [[
       { type: TRAJECTORY_TYPE.AREA, labelKey: 'areas' },
       { type: TRAJECTORY_TYPE.LINK, labelKey: 'links', hasHvdcOption: true },
-    ];
+    ]];
     const options = { withReadOnlyRow: true, isStudyGenerated: false };
     it('should call getStudyById service', async () => {
       mockGetStudy.mockResolvedValue({hvdc: true} as StudyDTO);

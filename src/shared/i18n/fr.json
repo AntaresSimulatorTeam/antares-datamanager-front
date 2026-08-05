@@ -119,6 +119,7 @@
     "@links": "Liens",
     "@link": "Lien",
     "@areas_links": "Zones & Liens",
+    "@configuration": "Configuration",
     "@load": "Consommation",
     "@thermal": "Central thermique",
     "@res": "Energie renouvelable",
@@ -190,8 +191,9 @@
     "@informationMessage": "If a \"mod\" file is included in a \"series\" folder, the \"technical parameters\" folder is required."
   },
   "settings": {
-    "@adequacyPatches": "Adequacy Patch",
+    "@adequacyPatch": "Adequacy Patch",
     "@flowBased": "Flowbased",
+    "@generalData": "General data",
     "@recalculate": "Recalculate",
     "@read": "Read"
   },

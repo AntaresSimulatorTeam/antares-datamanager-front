@@ -120,6 +120,7 @@
     "@links": "Links",
     "@link": "Link",
     "@areas_links": "Areas & Links",
+    "@configuration": "Configuration",
     "@load": "Load",
     "@thermal": "Thermal",
     "@res": "RES",
@@ -201,8 +202,9 @@
     "@informationMessage": "If a \"mod\" file is included in a \"series\" folder, the \"technical parameters\" folder is required."
   },
   "settings": {
-    "@adequacyPatches": "Adequacy Patch",
+    "@adequacyPatch": "Adequacy Patch",
     "@flowBased": "Flowbased",
+    "@generalData": "General data",
     "@recalculate": "Recalculate",
     "@read": "Read"
   },

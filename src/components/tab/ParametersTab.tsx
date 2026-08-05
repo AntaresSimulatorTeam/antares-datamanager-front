@@ -336,7 +336,6 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
           rowsNb={data.length}
         />
       )}
-      {isDeletionModalOpen && (
         <AreaDeletionConfirmationModal
           isOpen={isDeletionModalOpen}
           onClose={() => setIsDeletionModalOpen(false)}
@@ -373,7 +372,6 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
             }
           }}
         />
-      )}
     </div>
   );
 };

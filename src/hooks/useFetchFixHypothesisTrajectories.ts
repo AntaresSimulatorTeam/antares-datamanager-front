@@ -30,26 +30,30 @@ export const useFetchFixHypothesisTrajectories = (
         const studyData = await getStudyById(id);
         hvdcValue = studyData.hvdc;
       }
-      const [firstResults, secondResults] = await Promise.all([
-        fetchTrajectories(id, configs[0]),
-        fetchTrajectories(id, configs[1]),
-      ]);
+      const promises = [configs[0], configs[1]]
+        .filter(Boolean)
+        .map(config => fetchTrajectories(id, config));
 
-      const results = await Promise.all(configs.map((cfg) => getStudyTrajectories(id, cfg.type)));
+      const [firstResults, secondResults] = await Promise.all(promises);
 
       dispatch?.({
         type: STUDY_ACTION.ADD_TRAJECTORIES,
         payload: {
-          ...buildDispatchPayload(configs[0], firstResults),
-          ...buildDispatchPayload(configs[1], secondResults),
+          ...(configs[0] && buildDispatchPayload(configs[0], firstResults)),
+          ...(configs[1] && buildDispatchPayload(configs[1], secondResults)),
         },
       });
 
-      const firstData = buildTableData(configs[0], firstResults, t);
-      const secondData = buildTableData(configs[1], secondResults, t);
-
-      setFirstTableData(firstData);
-      setSecondTableData(secondData);
+      let firstData: HypothesisRowData[] = [];
+      if (configs[0]) {
+        firstData = buildTableData(configs[0], firstResults, t, {hvdc: hvdcValue});
+        firstData.length > 0 && setFirstTableData(firstData);
+      }
+      let secondData: HypothesisRowData[] = [];
+      if (configs[1]) {
+        secondData = buildTableData(configs[1], secondResults, t);
+        secondData.length > 0 && setSecondTableData(secondData);
+      }
 
       if (options.withReadOnlyRow && !options.isStudyGenerated) {
         setFirstTableReadOnlyRow({
@@ -64,8 +68,9 @@ export const useFetchFixHypothesisTrajectories = (
       } else if (options.isStudyGenerated) {
         setFirstTableReadOnlyRow(buildReadOnlyRow([...firstData.keys()]));
       }
-    } catch {
+    } catch(error) {
       // Silent handler
+      console.error(error);
     }
   };
 

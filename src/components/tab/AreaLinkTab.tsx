@@ -59,8 +59,9 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
       { type: TRAJECTORY_TYPE.AREA, labelKey: t('studyDetails.@areas') },
       { type: TRAJECTORY_TYPE.LINK, labelKey: t('studyDetails.@links'), hasHvdcOption: true },
     ],[
-      { type: TRAJECTORY_TYPE.ADEQUACY_PATCH, labelKey: t('settings.@adequacyPatches') },
+      { type: TRAJECTORY_TYPE.ADEQUACY_PATCH, labelKey: t('settings.@adequacyPatch') },
       { type: TRAJECTORY_TYPE.FLOWBASED, labelKey: t('settings.@flowBased') },
+      //{ type: TRAJECTORY_TYPE.SETTINGS, labelKey: t('settings.@generalData') },
     ]],
     [t]
   );
@@ -169,7 +170,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
     setIsDeletionModalOpen(false);
 
     setSettingsData([
-      { hypothesis: t('settings.@adequacyPatches'), trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING },
+      { hypothesis: t('settings.@adequacyPatch'), trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING },
       {
         hypothesis: t('settings.@flowBased'),
         trajectory: null,
@@ -182,7 +183,9 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
   }, [dispatch, studyData.id, t]);
 
   return (
-    <div className="flex w-full flex-col gap-6">
+    <div className="flex w-full flex-col gap-6 items-start">
+      <div className="flex w-full flex-col gap-2 items-start">
+        <div className="text-heading-xs font-medium">{t('studyDetails.@areas_links')}</div>
       <PegaseHypothesisTable
         id="area-link-table"
         columnHeader={t('studyDetails.@hypothesis')}
@@ -203,6 +206,9 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
         activate={async (value?: boolean) => await handleActivate(value)}
         type={TRAJECTORY_TYPE.AREA}
       />
+      </div>
+      <div className="flex w-full flex-col gap-2 items-start">
+        <div className="text-heading-xs font-medium">{t('studyDetails.@configuration')}</div>
       <PegaseHypothesisTable
         id="settings-table"
         columnHeader={t('studyDetails.@hypothesis')}
@@ -249,6 +255,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
         }}
         type={TRAJECTORY_TYPE.ADEQUACY_PATCH}
       />
+      </div>
       {isModalOpen && (
         <ImportTrajectoryModal
           options={optionsFS}

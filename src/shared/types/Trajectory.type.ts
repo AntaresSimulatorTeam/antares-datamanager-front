@@ -140,8 +140,6 @@ export type ThermalParamTrajectoryType =
   | TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER
   | TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER;
 
-export type DsrTrajectoryType = TRAJECTORY_TYPE.DSR | TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION;
-
 export type ParamTrajectoryState = Record<ThermalParamTrajectoryType, TrajectoryState>;
 
 export type TrajectoryWithSubRowsType = TRAJECTORY_TYPE.THERMAL_CAPACITY | TRAJECTORY_TYPE.STS;
@@ -151,3 +149,9 @@ export interface TechnologyType {
   label: string;
   code: string;
 }
+
+export type FetchTrajectoriesParams = {
+  trajectoryType: TRAJECTORY_TYPE;
+  area?: string;
+  searchTerm?: string;
+};

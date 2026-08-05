@@ -1271,10 +1271,10 @@ export const buildDispatchPayload = (
     {} as Record<string, { trajectories: DbTrajectory[] }>,
   );
 
-export const buildTableData = (config: HypothesisConfig[], results: DbTrajectory[][], t: TFunction): HypothesisRowData[] =>
+export const buildTableData = (config: HypothesisConfig[], results: DbTrajectory[][], t: TFunction, confiOptions?: {hvdc?: boolean}): HypothesisRowData[] =>
   config.map((cfg, idx) => ({
     hypothesis: t(cfg.labelKey),
     trajectory: results[idx]?.[0],
     status: results[idx]?.length ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
-    ...(cfg.hvdc != null && { hvdc: cfg.hvdc }),
+    ...(cfg.hasHvdcOption && { hvdc: confiOptions?.hvdc }),
   }));
