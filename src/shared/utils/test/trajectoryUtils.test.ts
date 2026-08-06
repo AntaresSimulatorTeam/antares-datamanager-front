@@ -1093,7 +1093,7 @@ describe('getSubRowsList', () => {
 
 describe('getSubRowListWithArea', () => {
   const mockT = vi.fn((key: string) => {
-    if (key === 'thermal.@installedPowerInformation') return 'Technology filled in';
+    if (key === 'thermal.@technologyFilledIn') return 'Technology filled in';
     if (key === 'thermal.@specificInformation') return 'Specific Info';
     return key;
   }) as unknown as TFunction<'translation', undefined>;

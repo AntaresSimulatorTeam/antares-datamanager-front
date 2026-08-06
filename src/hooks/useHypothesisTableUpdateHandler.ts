@@ -60,6 +60,13 @@ export const useHypothesisTableUpdateHandler = ({
       if (type === TRAJECTORY_TYPE.AREA) {
         typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK;
       }
+      if (type === TRAJECTORY_TYPE.ADEQUACY_PATCH) {
+        if (indexArray.length > 1) {
+          typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.SETTINGS : TRAJECTORY_TYPE.SETTINGS;// TODO: replace scenario builder
+        } else {
+          typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.ADEQUACY_PATCH : TRAJECTORY_TYPE.FLOWBASED;
+        }
+      }
       if (type === TRAJECTORY_TYPE.DSR && isLastIndex) {
         typeToUse = TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION;
       }

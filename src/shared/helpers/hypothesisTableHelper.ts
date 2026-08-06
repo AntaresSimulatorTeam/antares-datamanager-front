@@ -633,7 +633,11 @@ export const getParamForFetchFSTrajectory = (
     areaToUse = '';
   }
   if (type === TRAJECTORY_TYPE.ADEQUACY_PATCH) {
-    typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.ADEQUACY_PATCH : TRAJECTORY_TYPE.FLOWBASED;
+    if (indexArray.length > 1) {
+      typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.SETTINGS : TRAJECTORY_TYPE.SETTINGS;// TODO: replace scenario builder
+    } else {
+      typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.ADEQUACY_PATCH : TRAJECTORY_TYPE.FLOWBASED;
+    }
     areaToUse = '';
   }
   if (type === TRAJECTORY_TYPE.DSR) {

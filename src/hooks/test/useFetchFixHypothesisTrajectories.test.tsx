@@ -104,11 +104,15 @@ describe('useFetchFixHypothesisTrajectories', () => {
           hypothesis: 'areas',
           trajectory: mockAreaTrajectory,
           status: TRAJECTORY_SELECTION_STATUS.OK,
+          isDefault: false,
+          isDeletable: false
         });
         expect(result.current.firstTableData[1]).toEqual({
           hypothesis: 'links',
           trajectory: mockLinkTrajectory,
           status: TRAJECTORY_SELECTION_STATUS.OK,
+          isDefault: false,
+          isDeletable: false
         });
       });
     });

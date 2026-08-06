@@ -160,7 +160,7 @@
   },
   "thermal": {
     "@installedPower": "Capacités installées",
-    "@installedPowerInformation": "Technology filled in",
+    "@technologyFilledIn": "Technologie renseignée",
     "@parameters": "Paramètres",
     "@parametersTechnical": "Paramètres techniques",
     "@specific": "Spécifique",
@@ -171,7 +171,8 @@
     "@costs": "Coûts",
     "@economics": "Économique",
     "@paramModulationMessage": "Au moins une trajectoire \"Specific\" doit être renseignée afin de pouvoir renseigner une trajectoire \"Param modulation\".",
-    "@nuclearFR": "Nucléaire FR"
+    "@nuclearFR": "Nucléaire FR",
+    "@timeSeriesInformation": "Time Series filled in"
   },
   "dsr": {
     "@capacityModulation": "Capacity Modulation",
@@ -191,9 +192,12 @@
     "@informationMessage": "If a \"mod\" file is included in a \"series\" folder, the \"technical parameters\" folder is required."
   },
   "settings": {
+    "@title": "Settings",
+    "@settingsInformation": "Settings filled in",
     "@adequacyPatch": "Adequacy Patch",
     "@flowBased": "Flowbased",
     "@generalData": "General data",
+    "@scenarioBuilder": "Scenario builder",
     "@recalculate": "Recalculate",
     "@read": "Read"
   },

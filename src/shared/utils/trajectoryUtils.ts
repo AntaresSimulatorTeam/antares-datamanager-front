@@ -2,6 +2,7 @@ import {
   DbTrajectory,
   HypothesisRowData,
   isTrajectoryHydroType,
+  isTrajectoryNuclearTSType,
   isTrajectoryNuclearType,
   isTrajectoryResType,
   RowStatus,
@@ -33,6 +34,7 @@ import {
   TRAJECTORY_RES_LOAD_FACTOR,
   TRAJECTORY_RES_TECHNOLOGY_DISTRIBUTION,
   TRAJECTORY_RES_ZONAL_DISTRIBUTION,
+  TRAJECTORY_SETTINGS,
   TRAJECTORY_STS,
   TRAJECTORY_THERMAL_COMMON_PARAMETER_IMPORT,
   TRAJECTORY_THERMAL_COSTS_PARAMETER_IMPORT,
@@ -813,8 +815,11 @@ export const getSubRowsList = (row: Row<HypothesisRowData>): string[] =>
         if (current.status === TRAJECTORY_SELECTION_STATUS.OK && current?.trajectory?.technology) {
           acc.push(current.trajectory.technology);
           return acc;
-        } else if (current.status === TRAJECTORY_SELECTION_STATUS.OK && current?.trajectory?.area) {
+        } else if (current.status === TRAJECTORY_SELECTION_STATUS.OK && current?.trajectory?.area && !isTrajectoryNuclearTSType(current?.trajectory?.type)) {
           acc.push(current?.trajectory?.area);
+          return acc;
+        } else if (current.status === TRAJECTORY_SELECTION_STATUS.OK && current?.hypothesis) {
+          acc.push(current?.hypothesis);
           return acc;
         } else {
           return acc;
@@ -837,12 +842,13 @@ export const getSubRowListWithArea = (
     type === TRAJECTORY_TYPE.THERMAL_CAPACITY ||
     type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER ||
     type === TRAJECTORY_TYPE.STS ||
+    type === TRAJECTORY_TYPE.ADEQUACY_PATCH ||
+    type === TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION ||
     isTrajectoryResType(type)
   ) {
     const prefix =
       type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER
-        ? t('thermal.@specificInformation')
-        : t('thermal.@installedPowerInformation');
+        ? t('thermal.@specificInformation') : type === TRAJECTORY_TYPE.ADEQUACY_PATCH ? t('settings.@settingsInformation') : type === TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION ? t('thermal.@timeSeriesInformation') : t('thermal.@technologyFilledIn');
     const subRowsListLabel = isTrajectoryResType(type) ? subRowsList.map((item) => sentenceCase(item)) : subRowsList;
     return {
       message: `${prefix}: ${subRowsListLabel.join(', ')}`,
@@ -954,6 +960,10 @@ export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE, hypothesis?: Hy
       return '\\\\specific_nuclear\\TS_dispo\\SMR';
     case TRAJECTORY_TYPE.ADEQUACY_PATCH:
       return '\\\\adequacy_patch';
+    case TRAJECTORY_TYPE.FLOWBASED:
+      return '\\\\flowbased';
+    case TRAJECTORY_TYPE.SETTINGS:
+      return '\\\\settings\\general_data';
     default:
       return null;
   }
@@ -1122,6 +1132,8 @@ export const getUrlApiUploadTrajectory = (
       return `${TRAJECTORY_NUCLEAR_TS_SMR}?area=FR&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
     case TRAJECTORY_TYPE.ADEQUACY_PATCH:
       return `${TRAJECTORY_ADEQUACY_PATCH}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
+    case TRAJECTORY_TYPE.SETTINGS:
+      return `${TRAJECTORY_SETTINGS}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
     default:
       return `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   }
@@ -1135,6 +1147,7 @@ export const isEmptyRow = (
 ) =>
   hypothesis === t('thermal.@specific') ||
   hypothesis === t('thermal.@time_series') ||
+  hypothesis === t('settings.@title') ||
   ((type === TRAJECTORY_TYPE.STS ||
     type === TRAJECTORY_TYPE.HYDRO_SERIES ||
     type === TRAJECTORY_TYPE.HYDRO_PSP_SERIES) &&
@@ -1217,6 +1230,14 @@ export const getFetchFromDbParams = (
     typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK;
     areaToUse = '';
   }
+  if (type === TRAJECTORY_TYPE.ADEQUACY_PATCH) {
+    if (indexArray.length > 1) {
+      typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.SETTINGS : TRAJECTORY_TYPE.SETTINGS;// TODO: replace scenario builder
+    } else {
+      typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.ADEQUACY_PATCH : TRAJECTORY_TYPE.FLOWBASED;
+    }
+    areaToUse = '';
+  }
   if (type === TRAJECTORY_TYPE.DSR) {
     if (options?.isLastIndex) {
       typeToUse = TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION;
@@ -1271,10 +1292,13 @@ export const buildDispatchPayload = (
     {} as Record<string, { trajectories: DbTrajectory[] }>,
   );
 
-export const buildTableData = (config: HypothesisConfig[], results: DbTrajectory[][], t: TFunction, confiOptions?: {hvdc?: boolean}): HypothesisRowData[] =>
+export const buildTableData = (config: HypothesisConfig[], t: TFunction, results?: DbTrajectory[][], configOptions?: {hvdc?: boolean}): HypothesisRowData[] =>
   config.map((cfg, idx) => ({
     hypothesis: t(cfg.labelKey),
-    trajectory: results[idx]?.[0],
-    status: results[idx]?.length ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
-    ...(cfg.hasHvdcOption && { hvdc: confiOptions?.hvdc }),
+    trajectory: !cfg.subRows?.length && results?.[idx]?.[0] ? results?.[idx]?.[0] : null,
+    status: (!cfg.subRows?.length && results?.[idx]?.length) ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+    isDeletable: false,
+    isDefault: false,
+    ...(cfg.hasHvdcOption && { hvdc: configOptions?.hvdc }),
+    ...((!!cfg.subRows?.length) && {subRows : buildTableData(cfg.subRows, t, results?.[idx] ? [results[idx]] : [])})
   }));

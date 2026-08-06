@@ -22,7 +22,8 @@ export const isRepositoryTrajectory = (type: TRAJECTORY_TYPE, isDefaultArea = fa
   isTrajectoryHydroType(type) ||
   type === TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION ||
   type === TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM ||
-  type === TRAJECTORY_TYPE.ADEQUACY_PATCH;
+  type === TRAJECTORY_TYPE.ADEQUACY_PATCH ||
+  type === TRAJECTORY_TYPE.FLOWBASED;
 
 export const convertToFSSelectionOptionType = (options: FsTrajectory[], isDefaultArea = false): SelectOption[] =>
   options.map((option, indexTrajectory) => ({

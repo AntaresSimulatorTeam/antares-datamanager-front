@@ -13,7 +13,7 @@ import { LabelWithDeleteButton } from '@common/data/LabelWithDeleteButton.tsx';
 import { SelectInputWithButton } from '@common/data/SelectInputWithButton.tsx';
 import { ProgressBar } from '@/components/input/ProgressBar.tsx';
 import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
-import { IconButton, SegmentedControl, Switch } from '@design-system-rte/react';
+import { IconButton, Switch } from '@design-system-rte/react';
 import { ChangeEvent } from 'react';
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
@@ -50,7 +50,7 @@ const getEditableHypothesisTableHeaders = ({
   }),
   columnHelper.accessor('trajectory', {
     header: t('studyDetails.@trajectory'),
-    size: 550,
+    size: type === TRAJECTORY_TYPE.STS ? 520 : 623,
     cell: ({ row, table }) => {
       const { trajectory, status } = row.original;
 
@@ -121,39 +121,6 @@ const getEditableHypothesisTableHeaders = ({
                   (!trajectory?.trajectoryName && status === TRAJECTORY_SELECTION_STATUS.MISSING)
                 }
                 readOnly={isStudyGenerated}
-              />
-            );
-          },
-        }),
-      ]
-    : []),
-
-  ...(type === TRAJECTORY_TYPE.ADEQUACY_PATCH
-    ? [
-        columnHelper.accessor('read', {
-          header: '',
-          size: 220,
-          cell: ({ row, table: { options } }) => {
-            const { trajectory, status } = row.original; // TODO : add read props
-            const hasTrajectory = status === TRAJECTORY_SELECTION_STATUS.OK && !!trajectory?.trajectoryName?.length;
-            if (row.index === 0 || row.getReadOnly() || !hasTrajectory) return null;
-            return (
-              <SegmentedControl
-                appearance="brand"
-                onClick={() => void options?.meta?.activate?.()}
-                onChange={() => {}}
-                options={[
-                  {
-                    id: 'option1',
-                    label: t('settings.@read'),
-                  },
-                  {
-                    id: 'option2',
-                    label: t('settings.@recalculate'),
-                  },
-                ]}
-                selectedSegment="option1"
-                compactSpacing={true}
               />
             );
           },

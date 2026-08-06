@@ -9,12 +9,17 @@ import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { useTranslation } from 'react-i18next';
 import { unlinkAllTrajectoriesFromStudy } from '@/shared/services/trajectoryService.ts';
-import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { DbTrajectory, HypothesisRowData, RowStatus, SelectOption, StudyDTO, TrajectoryViewData } from '@/shared/types';
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
-import { filterRow, getAreaTrajectoryName, isSettingsParametersType } from '@/shared/utils/trajectoryUtils.ts';
+import {
+  buildTableData,
+  filterRow,
+  getAreaTrajectoryName,
+  isSettingsParametersType,
+} from '@/shared/utils/trajectoryUtils.ts';
 import { TrajectoryDataVisualisation } from '@common/modal/TrajectoryDataVisualisation.tsx';
 import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
@@ -29,6 +34,7 @@ import { useTrajectoryFetchFromFSHandler } from '@/hooks/useTrajectoryFetchFromF
 import { useHypothesisTableUpdateHandler } from '@/hooks/useHypothesisTableUpdateHandler.ts';
 import { updateStudy } from '@/shared/services/studyService.ts';
 import { HypothesisType } from '@/shared/types/HypothesisTable.ts';
+import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
 
 interface AreaLinkTabProps {
   studyData: StudyDTO;
@@ -61,7 +67,10 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
     ],[
       { type: TRAJECTORY_TYPE.ADEQUACY_PATCH, labelKey: t('settings.@adequacyPatch') },
       { type: TRAJECTORY_TYPE.FLOWBASED, labelKey: t('settings.@flowBased') },
-      //{ type: TRAJECTORY_TYPE.SETTINGS, labelKey: t('settings.@generalData') },
+      { type: TRAJECTORY_TYPE.SETTINGS, labelKey: t('settings.@title'), subRows: [
+        { type: TRAJECTORY_TYPE.SETTINGS, labelKey: t('settings.@generalData') },
+        { type: TRAJECTORY_TYPE.SETTINGS, labelKey: t('settings.@scenarioBuilder') }]
+      },
     ]],
     [t]
   );
@@ -106,21 +115,22 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
   }, [studyState.studyStatus]);
 
   const handleSelectionChange = useCallback(
-    async (fileNameContains: string, rowId: string) => {
+    async (fileNameContains: string, rowId: string, type: TRAJECTORY_TYPE) => {
       const indexArray = rowId.split('.').map(Number);
-      return await handleSearch(TRAJECTORY_TYPE.AREA, indexArray, { fileNameContains });
+      return await handleSearch(type, indexArray, { fileNameContains });
     },
     [handleSearch],
   );
 
-  const handleFetchFromFs = useCallback(async (rowId: string) => {
+  const handleFetchTrajectoryFromFs = useCallback(async (rowId: string, type: TRAJECTORY_TYPE) => {
     const hypothesis = getAreaTrajectoryName(rowId, data);
     const { typeToUse, areaToUse, isDefaultArea } = getParamForFetchFSTrajectory(
-      TRAJECTORY_TYPE.AREA,
+      type,
       rowId.split('.').map(Number),
       data.length,
       hypothesis,
     );
+    setSelectedTrajectoryType(typeToUse);
     const results = await handleFetchFromFS({ typeToUse, areaToUse, isDefaultArea });
     setOptionsFS(results);
     setRowIdSelected(rowId);
@@ -151,36 +161,19 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
     await unlinkAllTrajectoriesFromStudy(studyData.id);
     void updateStudy({ hvdc: false }, studyData.id);
 
-    setData([
-      { hypothesis: t('studyDetails.@areas'), trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING },
-      {
-        hypothesis: t('studyDetails.@links'),
-        trajectory: null,
-        status: TRAJECTORY_SELECTION_STATUS.MISSING,
-        hvdc: false,
-      },
-    ]);
+    setData(buildTableData(configs[0], t, [], {hvdc: false}));
     dispatch?.({ type: STUDY_ACTION.SET_STUDY_HVDC, payload: false });
     dispatch?.({
       type: STUDY_ACTION.CLEAR_TRAJECTORY_BY_TYPE,
       payload: [TRAJECTORY_TYPE.AREA],
     });
-
     setReadOnly({ '0': false, '1': true });
-    setIsDeletionModalOpen(false);
 
-    setSettingsData([
-      { hypothesis: t('settings.@adequacyPatch'), trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING },
-      {
-        hypothesis: t('settings.@flowBased'),
-        trajectory: null,
-        status: TRAJECTORY_SELECTION_STATUS.MISSING,
-      },
-    ]);
+    setSettingsData(buildTableData(configs[1], t));
+    setReadOnlySettings({ '0': true, '1': true, '2.0': false, '2.1': false });
 
-    setReadOnlySettings({ '0': true, '1': true });
     setIsDeletionModalOpen(false);
-  }, [dispatch, studyData.id, t]);
+  }, [configs, dispatch, studyData.id, t]);
 
   return (
     <div className="flex w-full flex-col gap-6 items-start">
@@ -197,11 +190,11 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
         isReadOnlyEnable={true}
         progress={isSettingsParametersType(selectedTrajectoryType) ? 0 : progress}
         idSelected={String(rowIdSelected)}
-        handleSearch={handleSelectionChange}
+        handleSearch={async (fileNameContains: string, rowId: string) => await handleSelectionChange(fileNameContains, rowId, TRAJECTORY_TYPE.AREA)}
         updateData={(rowId: string, value: unknown, status: RowStatus) => {
           void handleHypothesisTableUpdate(rowId, value, status, TRAJECTORY_TYPE.AREA, data, setData);
         }}
-        handleImport={handleFetchFromFs}
+        handleImport={async (rowId: string) => await handleFetchTrajectoryFromFs(rowId, TRAJECTORY_TYPE.AREA)}
         handleViewData={handleViewTrajectoryData}
         activate={async (value?: boolean) => await handleActivate(value)}
         type={TRAJECTORY_TYPE.AREA}
@@ -213,7 +206,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
         id="settings-table"
         columnHeader={t('studyDetails.@hypothesis')}
         data={settingsData}
-        getTableHeaders={getEditableHypothesisTableHeaders}
+        getTableHeaders={getExpandableHypothesisTableHeaders}
         fileStatus={fileStatus}
         isStudyGenerated={isStudyGenerated}
         readOnly={readOnlySettings}
@@ -221,9 +214,8 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
         progress={isSettingsParametersType(selectedTrajectoryType) ? progress : 0}
         idSelected={String(rowIdSelected)}
         handleSearch={async (fileNameContains: string, rowId: string) => {
-          const indexArray = rowId.split('.').map(Number);
           setSelectedTrajectoryType(TRAJECTORY_TYPE.ADEQUACY_PATCH);
-          return await handleSearch(TRAJECTORY_TYPE.ADEQUACY_PATCH, indexArray, { fileNameContains });
+          return await handleSelectionChange(fileNameContains, rowId, TRAJECTORY_TYPE.ADEQUACY_PATCH)
         }}
         updateData={(rowId: string, value: unknown, status: RowStatus) => {
           void handleHypothesisTableUpdate(
@@ -235,20 +227,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
             setSettingsData,
           );
         }}
-        handleImport={async (rowId: string) => {
-          const hypothesis = getAreaTrajectoryName(rowId, data);
-          const { typeToUse, areaToUse, isDefaultArea } = getParamForFetchFSTrajectory(
-            TRAJECTORY_TYPE.ADEQUACY_PATCH,
-            rowId.split('.').map(Number),
-            data.length,
-            hypothesis,
-          );
-          setSelectedTrajectoryType(typeToUse);
-          const results = await handleFetchFromFS({ typeToUse, areaToUse, isDefaultArea });
-          setOptionsFS(results);
-          setRowIdSelected(rowId);
-          toggleModal();
-        }}
+        handleImport={async (rowId: string) => await handleFetchTrajectoryFromFs(rowId, TRAJECTORY_TYPE.ADEQUACY_PATCH)}
         activate={() => {
           void updateStudy({ hvdc: !studyState.hvdc }, studyData.id);
           dispatch?.({ type: STUDY_ACTION.SET_STUDY_HVDC, payload: !studyState.hvdc });

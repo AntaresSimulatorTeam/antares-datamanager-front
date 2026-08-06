@@ -60,6 +60,7 @@ export const TRAJECTORY_NUCLEAR_TS_EPR = `${BACK_END_BASE_URL}/v1/trajectory/nuc
 export const TRAJECTORY_NUCLEAR_TS_LT = `${BACK_END_BASE_URL}/v1/trajectory/nuclear-lt`;
 export const TRAJECTORY_NUCLEAR_TS_SMR = `${BACK_END_BASE_URL}/v1/trajectory/nuclear-ts-smr`;
 export const TRAJECTORY_ADEQUACY_PATCH = `${BACK_END_BASE_URL}/v1/trajectory/adequacy-patch`;
+export const TRAJECTORY_SETTINGS = `${BACK_END_BASE_URL}/v1/trajectory/settings`;
 
 //ABOUT
 export const BACK_END_ACTUATOR_ENDPOINT = `${BACK_END_BASE_URL}/actuator/info`;

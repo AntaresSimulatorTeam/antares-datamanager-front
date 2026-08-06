@@ -46,12 +46,12 @@ export const useFetchFixHypothesisTrajectories = (
 
       let firstData: HypothesisRowData[] = [];
       if (configs[0]) {
-        firstData = buildTableData(configs[0], firstResults, t, {hvdc: hvdcValue});
+        firstData = buildTableData(configs[0], t, firstResults, {hvdc: hvdcValue});
         firstData.length > 0 && setFirstTableData(firstData);
       }
       let secondData: HypothesisRowData[] = [];
       if (configs[1]) {
-        secondData = buildTableData(configs[1], secondResults, t);
+        secondData = buildTableData(configs[1], t, secondResults);
         secondData.length > 0 && setSecondTableData(secondData);
       }
 
@@ -60,13 +60,19 @@ export const useFetchFixHypothesisTrajectories = (
           0: false,
           1: !firstResults[0]?.length || (!firstResults[1]?.length && options.isStudyGenerated),
         });
-
-        setSecondTableReadOnlyRow({
-          0: !firstResults[0]?.length || (!!secondResults[0]?.length && options.isStudyGenerated),
-          1: !firstResults[0]?.length || (!!secondResults[1]?.length && options.isStudyGenerated),
-        });
+        if (configs[1]) {
+          setSecondTableReadOnlyRow({
+            0: !firstResults[0]?.length || (!!secondResults[0]?.length && options.isStudyGenerated),
+            1: !firstResults[0]?.length || (!!secondResults[1]?.length && options.isStudyGenerated),
+            '2.0': false,
+            '2.1': false,
+          });
+        }
       } else if (options.isStudyGenerated) {
         setFirstTableReadOnlyRow(buildReadOnlyRow([...firstData.keys()]));
+        if (configs[1]) {
+          setSecondTableReadOnlyRow(buildReadOnlyRow([...secondData.keys()]));
+        }
       }
     } catch(error) {
       // Silent handler
