@@ -1607,7 +1607,7 @@ describe('getParamForFetchFSTrajectory', () => {
   });
 
   it('return NUCLEAR_FR_MODULATION type when index table is the last one', () => {
-    vi.mocked(trajectoryUtils.getFetchParams).mockReturnValue({
+    vi.mocked(trajectoryUtils.getFetchFromDbParams).mockReturnValue({
       typeToUse: TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION,
       areaToUse: '',
     });
@@ -1620,7 +1620,7 @@ describe('getParamForFetchFSTrajectory', () => {
   });
 
   it('return NUCLEAR_FR_TALON type when index table is the last one', () => {
-    vi.mocked(trajectoryUtils.getFetchParams).mockReturnValue({
+    vi.mocked(trajectoryUtils.getFetchFromDbParams).mockReturnValue({
       typeToUse: TRAJECTORY_TYPE.NUCLEAR_FR_TALON,
       areaToUse: '',
     });
@@ -1633,7 +1633,7 @@ describe('getParamForFetchFSTrajectory', () => {
   });
 
   it('return NUCLEAR_FR_TS_ERP type when index table is the last one', () => {
-    vi.mocked(trajectoryUtils.getFetchParams).mockReturnValue({
+    vi.mocked(trajectoryUtils.getFetchFromDbParams).mockReturnValue({
       typeToUse: TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP,
       areaToUse: '',
     });
@@ -1646,7 +1646,7 @@ describe('getParamForFetchFSTrajectory', () => {
   });
 
   it('return NUCLEAR_FR_TS_LONG_TERM type when index table is the last one', () => {
-    vi.mocked(trajectoryUtils.getFetchParams).mockReturnValue({
+    vi.mocked(trajectoryUtils.getFetchFromDbParams).mockReturnValue({
       typeToUse: TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM,
       areaToUse: '',
     });
@@ -1659,7 +1659,7 @@ describe('getParamForFetchFSTrajectory', () => {
   });
 
   it('return NUCLEAR_FR_TS_SMR type when index table is the last one', () => {
-    vi.mocked(trajectoryUtils.getFetchParams).mockReturnValue({
+    vi.mocked(trajectoryUtils.getFetchFromDbParams).mockReturnValue({
       typeToUse: TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR,
       areaToUse: '',
     });

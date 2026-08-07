@@ -24,7 +24,7 @@ export const CheckBoxList = ({ disabled, checkedValues, handleSelectionChange, o
           label={area.name}
           value={area.name}
           disabled={area.isDefault}
-          onClick={() => void handleSelectionChange(area.name, !checkedValues.includes(area.name))}
+          onChange={() => void handleSelectionChange(area.name, !checkedValues.includes(area.name))}
           checked={area.isDefault}
           showLabel
         />
@@ -40,7 +40,7 @@ export const CheckBoxList = ({ disabled, checkedValues, handleSelectionChange, o
             value={area.name}
             checked={checkedValues.includes(area.name)}
             disabled={disabled}
-            onClick={() => void handleSelectionChange(area.name, !checkedValues.includes(area.name))}
+            onChange={() => void handleSelectionChange(area.name, !checkedValues.includes(area.name))}
           />
         ))}
       </div>

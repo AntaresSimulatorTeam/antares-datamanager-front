@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction, useCallback } from 'react';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { DbTrajectory, SelectOption } from '@/shared/types';
 import { handleTrajectorySearch } from '@/shared/services/hypothesisTableService.ts';
-import { getFetchParams } from '@/shared/utils/trajectoryUtils.ts';
+import { getFetchFromDbParams } from '@/shared/utils/trajectoryUtils.ts';
 import { SearchParams } from '@/shared/types/HypothesisTable.ts';
 
 interface UseTrajectorySearchHandlerArgs {
@@ -17,7 +17,7 @@ export const useTrajectorySearchHandler = ({ studyHorizon, setDbTrajectories }: 
       indexArray: number[],
       options?: SearchParams,
     ): Promise<SelectOption[] | undefined> => {
-      const { typeToUse, areaToUse, technology } = getFetchParams(tabType, indexArray, options);
+      const { typeToUse, areaToUse, technology } = getFetchFromDbParams(tabType, indexArray, options);
 
       return await handleTrajectorySearch(typeToUse, setDbTrajectories, studyHorizon, {
         ...(areaToUse && { area: areaToUse }),

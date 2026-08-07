@@ -8,6 +8,7 @@ import {
   CheckBoxData,
   DbTrajectory,
   HypothesisRowData,
+  RowStatus,
   SelectOption,
   TabProps,
   TechnologyType,
@@ -81,9 +82,6 @@ const ExpandableTab = ({
 
   const { handleHypothesisTableUpdate } = useHypothesisTableUpdateHandler({
     studyData,
-    data,
-    type: tabType,
-    setData,
     setRowIdSelected,
     setIsDeletionModalOpen,
     dbTrajectories,
@@ -168,6 +166,33 @@ const ExpandableTab = ({
     [data, t],
   );
 
+  const handleTrajectorySearch = useCallback(async (fileNameContains: string, rowId: string) => {
+    const indexArray = rowId.split('.').map(Number);
+    const rowIndex = indexArray?.[0];
+    const subIndex = indexArray?.[1];
+    return await handleSearch(tabType, indexArray, {
+      area: data[rowIndex]?.hypothesis,
+      technology: data[rowIndex]?.subRows?.[subIndex]?.hypothesis,
+      isLastIndex: rowIndex === Math.max(data.length - 1, 0),
+      technologies,
+      fileNameContains,
+    });
+  }, [data, handleSearch, tabType, technologies]);
+
+  const handleTrajectoryFetchFromFS = useCallback(async (rowId: string) => {
+    const hypothesis = getAreaTrajectoryName(rowId, data, technologies);
+    const { typeToUse, areaToUse, isDefaultArea } = getParamForFetchFSTrajectory(
+      tabType,
+      rowId.split('.').map(Number),
+      data.length,
+      hypothesis,
+    );
+    const results = await handleFetchFromFS({ typeToUse, areaToUse, isDefaultArea });
+    setOptionsFS(results);
+    setRowIdSelected(rowId);
+    toggleModal();
+  }, [data, handleFetchFromFS, tabType, technologies, toggleModal]);
+
   return (
     <div className="flex h-fit w-full gap-6 pb-4 xl:gap-7 2xl:gap-8">
       {!!areasOptions?.length && (
@@ -192,33 +217,12 @@ const ExpandableTab = ({
         idSelected={rowIdSelected}
         type={tabType}
         list={technologiesLabel}
-        handleSearch={async (fileNameContains: string, rowId: string) => {
-          const indexArray = rowId.split('.').map(Number);
-          const rowIndex = indexArray?.[0];
-          const subIndex = indexArray?.[1];
-          return await handleSearch(tabType, indexArray, {
-            area: data[rowIndex]?.hypothesis,
-            technology: data[rowIndex]?.subRows?.[subIndex]?.hypothesis,
-            isLastIndex: rowIndex === Math.max(data.length - 1, 0),
-            technologies,
-            fileNameContains,
-          });
-        }}
-        handleImport={async (rowId: string) => {
-          const hypothesis = getAreaTrajectoryName(rowId, data, technologies);
-          const { typeToUse, areaToUse, isDefaultArea } = getParamForFetchFSTrajectory(
-            tabType,
-            rowId.split('.').map(Number),
-            data.length,
-            hypothesis,
-          );
-          const results = await handleFetchFromFS({ typeToUse, areaToUse, isDefaultArea });
-          setOptionsFS(results);
-          setRowIdSelected(rowId);
-          toggleModal();
-        }}
+        handleSearch={handleTrajectorySearch}
+        handleImport={handleTrajectoryFetchFromFS}
         isReadOnlyEnable={true}
-        updateData={handleHypothesisTableUpdate}
+        updateData={(rowId: string, value: unknown, status: RowStatus) => {
+          void handleHypothesisTableUpdate(rowId, value, status, tabType, data, setData);
+        }}
         removeRow={removeTableRow}
         handleViewData={tabType === TRAJECTORY_TYPE.STS ? handleViewData : undefined}
       />
@@ -243,14 +247,12 @@ const ExpandableTab = ({
       {isViewModalOpen && trajectoryData && (
         <TrajectoryDataVisualisation trajectoryData={trajectoryData} onClose={() => setIsViewModalOpen(false)} />
       )}
-      {isDeletionModalOpen && (
         <AreaDeletionConfirmationModal
           isOpen={isDeletionModalOpen}
           onClose={() => setIsDeletionModalOpen(false)}
           onConfirm={async () => {
             if (!rowToDelete?.value) return;
             const { value, index, operation } = rowToDelete;
-            // if the operation is a cell detach and not a row deletion
             if (operation === 'empty') {
               await detachTrajectory(tabType, [index], setData, data, 'empty', value);
             } else {
@@ -264,7 +266,6 @@ const ExpandableTab = ({
               : t(`${getDeletionModalMessage(tabType, rowToDelete.index, data)}`)
           }
         />
-      )}
     </div>
   );
 };

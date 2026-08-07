@@ -120,6 +120,7 @@
     "@links": "Links",
     "@link": "Link",
     "@areas_links": "Areas & Links",
+    "@configuration": "Configuration",
     "@load": "Load",
     "@thermal": "Thermal",
     "@res": "RES",
@@ -162,7 +163,7 @@
   },
   "thermal": {
     "@installedPower": "Installed Power",
-    "@installedPowerInformation": "Technology filled in",
+    "@technologyFilledIn": "Technology filled in",
     "@parameters": "Parameters",
     "@parametersTechnical": "Technical Parameters",
     "@specific": "Specific",
@@ -177,6 +178,7 @@
     "@modulation": "Modulation",
     "@talon": "Talon",
     "@time_series": "Time Series",
+    "@timeSeriesInformation": "Time Series filled in",
     "@epr": "EPR",
     "@long_term": "Long Term (LT)",
     "@smr": "SMR"
@@ -199,6 +201,16 @@
     "@psp_virtual": "PSP virtual",
     "@series": "Series",
     "@informationMessage": "If a \"mod\" file is included in a \"series\" folder, the \"technical parameters\" folder is required."
+  },
+  "settings": {
+    "@title": "Settings",
+    "@settingsInformation": "Settings filled in",
+    "@adequacyPatch": "Adequacy Patch",
+    "@flowBased": "Flowbased",
+    "@generalData": "General data",
+    "@scenarioBuilder": "Scenario builder",
+    "@recalculate": "Recalculate",
+    "@read": "Read"
   },
   "trajectoryViewModal": {
     "@title_area": "Areas",

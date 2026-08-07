@@ -35,7 +35,7 @@ const getEditableHypothesisTableHeaders = ({
     cell: ({ getValue, row, table: { options } }) => {
       const { trajectory, status, isDefault } = row.original;
       return (
-        <div className="w-2/5">
+        <div className="w-4/5">
           <LabelWithButtonPreview
             value={getValue()}
             extraValue={isDefault && getValue() !== OTHER_AREAS_LABEL ? `(${t('studyDetails.@default')})` : ''}
@@ -50,12 +50,12 @@ const getEditableHypothesisTableHeaders = ({
   }),
   columnHelper.accessor('trajectory', {
     header: t('studyDetails.@trajectory'),
-    size: 623,
+    size: type === TRAJECTORY_TYPE.STS ? 520 : 623,
     cell: ({ row, table }) => {
       const { trajectory, status } = row.original;
 
       return trajectory?.trajectoryName && status !== TRAJECTORY_SELECTION_STATUS.MISSING ? (
-        <div className="flex w-full items-center gap-2 py-1">
+        <div className="flex w-full items-center justify-start gap-2 py-1">
           <LabelWithDeleteButton
             label={trajectory.trajectoryName}
             isDeletable={!isStudyGenerated}
@@ -103,7 +103,7 @@ const getEditableHypothesisTableHeaders = ({
     ? [
         columnHelper.accessor('hvdc', {
           header: '',
-          size: 50,
+          size: 220,
           cell: ({ row, table: { options } }) => {
             if (row.index === 0 || row.original.hvdc == undefined) return null;
             const {hvdc, trajectory, status} = row.original;

@@ -195,7 +195,7 @@ describe('fetchTrajectoriesFromFS', () => {
       json: async () => Promise.resolve(mockFsTrajectoryAreaArray),
     });
 
-    const result = await fetchTrajectoriesFromFS(TRAJECTORY_TYPE.AREA);
+    const result = await fetchTrajectoriesFromFS({trajectoryType: TRAJECTORY_TYPE.AREA});
 
     await waitFor(() => {
       expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
@@ -210,7 +210,7 @@ describe('fetchTrajectoriesFromFS', () => {
       json: async () => Promise.resolve(mockFsTrajectorySTSArray),
     });
 
-    await fetchTrajectoriesFromFS(TRAJECTORY_TYPE.STS, 'battery');
+    await fetchTrajectoriesFromFS({trajectoryType: TRAJECTORY_TYPE.STS, area: 'battery'});
 
     await waitFor(() => {
       expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
@@ -227,7 +227,7 @@ describe('fetchTrajectoriesFromFS', () => {
       type: ERROR_MESSAGE_TYPE.BUSINESS,
     });
 
-    await expect(async () => fetchTrajectoriesFromFS(TRAJECTORY_TYPE.AREA)).rejects.toThrowError(
+    await expect(async () => fetchTrajectoriesFromFS({trajectoryType: TRAJECTORY_TYPE.AREA})).rejects.toThrowError(
       'Failed to fetch trajectories from file system',
     );
   });

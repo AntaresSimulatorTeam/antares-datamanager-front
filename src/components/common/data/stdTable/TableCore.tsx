@@ -21,7 +21,7 @@ declare module '@tanstack/react-table' {
     search?: (value: string, rowId: string) => Promise<SelectOption[] | undefined> | undefined;
     importData?: (rowId: string) => Promise<void>;
     viewData?: (rowId: string) => void | Promise<void>;
-    activate?: (value?: boolean) => void | Promise<void>;
+    activate?: (value?: string | boolean) => void | Promise<void>;
   }
 }
 

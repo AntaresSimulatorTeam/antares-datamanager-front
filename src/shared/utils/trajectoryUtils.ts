@@ -2,6 +2,7 @@ import {
   DbTrajectory,
   HypothesisRowData,
   isTrajectoryHydroType,
+  isTrajectoryNuclearTSType,
   isTrajectoryNuclearType,
   isTrajectoryResType,
   RowStatus,
@@ -16,6 +17,7 @@ import { Row } from '@tanstack/react-table';
 import { TFunction } from 'i18next';
 import { normalizeTechnology, sentenceCase, snakeCase, snakeCaseUnderscore } from '@/shared/utils/textUtils.ts';
 import {
+  TRAJECTORY_ADEQUACY_PATCH,
   TRAJECTORY_DSR_CAPACITY_MODULATION,
   TRAJECTORY_DSR_CLUSTER,
   TRAJECTORY_ENDPOINT,
@@ -32,6 +34,7 @@ import {
   TRAJECTORY_RES_LOAD_FACTOR,
   TRAJECTORY_RES_TECHNOLOGY_DISTRIBUTION,
   TRAJECTORY_RES_ZONAL_DISTRIBUTION,
+  TRAJECTORY_SETTINGS,
   TRAJECTORY_STS,
   TRAJECTORY_THERMAL_COMMON_PARAMETER_IMPORT,
   TRAJECTORY_THERMAL_COSTS_PARAMETER_IMPORT,
@@ -40,8 +43,9 @@ import {
   TRAJECTORY_THERMAL_MODULATION_PARAMETER_IMPORT,
   TRAJECTORY_THERMAL_SPECIFIC_PARAMETER_IMPORT,
 } from '@/shared/const/apiEndPoint.ts';
-import { HypothesisType, SearchParams } from '@/shared/types/HypothesisTable.ts';
+import { HypothesisConfig, HypothesisType, SearchParams } from '@/shared/types/HypothesisTable.ts';
 import { TabItemProps } from '@design-system-rte/core/components/tab/tab.interface';
+import { getNuclearTrajectoryType } from '@/shared/utils/formFormatter.ts';
 
 /**
  * Get trajectory status from row status
@@ -811,14 +815,30 @@ export const getSubRowsList = (row: Row<HypothesisRowData>): string[] =>
         if (current.status === TRAJECTORY_SELECTION_STATUS.OK && current?.trajectory?.technology) {
           acc.push(current.trajectory.technology);
           return acc;
-        } else if (current.status === TRAJECTORY_SELECTION_STATUS.OK && current?.trajectory?.area) {
+        } else if (current.status === TRAJECTORY_SELECTION_STATUS.OK && current?.trajectory?.area && !isTrajectoryNuclearTSType(current?.trajectory?.type)) {
           acc.push(current?.trajectory?.area);
+          return acc;
+        } else if (current.status === TRAJECTORY_SELECTION_STATUS.OK && current?.hypothesis) {
+          acc.push(current?.hypothesis);
           return acc;
         } else {
           return acc;
         }
       }, [])
     : [];
+
+export const getMessageFromType = (type: TRAJECTORY_TYPE, t: TFunction) => {
+  switch (type) {
+    case TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER:
+     return t('thermal.@specificInformation');
+    case TRAJECTORY_TYPE.ADEQUACY_PATCH :
+      return t('settings.@settingsInformation');
+    case TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION:
+      return t('thermal.@timeSeriesInformation');
+    default:
+      return t('thermal.@technologyFilledIn');
+  }
+}
 
 /**
  * Provide information message about number and subrow name linked to a trajectory
@@ -835,12 +855,12 @@ export const getSubRowListWithArea = (
     type === TRAJECTORY_TYPE.THERMAL_CAPACITY ||
     type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER ||
     type === TRAJECTORY_TYPE.STS ||
+    type === TRAJECTORY_TYPE.ADEQUACY_PATCH ||
+    type === TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION ||
     isTrajectoryResType(type)
   ) {
-    const prefix =
-      type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER
-        ? t('thermal.@specificInformation')
-        : t('thermal.@installedPowerInformation');
+    const prefix = getMessageFromType(type, t);
+
     const subRowsListLabel = isTrajectoryResType(type) ? subRowsList.map((item) => sentenceCase(item)) : subRowsList;
     return {
       message: `${prefix}: ${subRowsListLabel.join(', ')}`,
@@ -886,6 +906,17 @@ export const isTechnicalParametersType = (type: TRAJECTORY_TYPE): boolean =>
   type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER;
 
 /**
+ * Determines if the provided type is classified as a technical parameter type
+ * within the thermal trajectory category.
+ *
+ * @param {TRAJECTORY_TYPE} type - The type to evaluate.
+ * @returns {boolean} Returns true if the type matches any of the defined
+ * thermal technical parameter categories; otherwise, returns false.
+ */
+export const isSettingsParametersType = (type: TRAJECTORY_TYPE): boolean =>
+  type === TRAJECTORY_TYPE.ADEQUACY_PATCH || type === TRAJECTORY_TYPE.FLOWBASED || type === TRAJECTORY_TYPE.SETTINGS;
+
+/**
  * Determines the file path based on the trajectory type.
  *
  * @param {TRAJECTORY_TYPE} type - The trajectory type used to select the corresponding file path.
@@ -895,50 +926,60 @@ export const isTechnicalParametersType = (type: TRAJECTORY_TYPE): boolean =>
 export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE, hypothesis?: HypothesisType): string | null => {
   switch (type) {
     case TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER:
-      return '\\\\thermal\\economic parameters\\economic';
+      return String.raw`\\thermal\\economic parameters\\economic`;
     case TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER:
-      return '\\\\thermal\\economic parameters\\costs';
+      return String.raw`\\thermal\\economic parameters\\costs`;
     case TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER:
-      return '\\\\thermal\\technical parameters\\param_modulation';
+      return String.raw`\\thermal\\technical parameters\\param_modulation`;
     case TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER:
     case TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER:
-      return '\\\\thermal\\technical parameters';
+      return String.raw`\\thermal\\technical parameters`;
     case TRAJECTORY_TYPE.STS:
-      return hypothesis?.technology ? `\\\\STS\\${hypothesis?.technology}\\clusters` : '\\\\STS\\clusters';
+      return hypothesis?.technology ? String.raw`\\STS\\${hypothesis?.technology}\\clusters` : String.raw`\\STS\\clusters`;
     case TRAJECTORY_TYPE.DSR:
-      return '\\\\DSR\\cluster';
+      return String.raw`\\DSR\\cluster`;
     case TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION:
-      return '\\\\DSR\\capacity modulation';
+      return String.raw`\\DSR\\capacity modulation`;
     case TRAJECTORY_TYPE.MISC_CAPACITY:
-      return '\\\\MISC\\installed power';
+      return String.raw`\\MISC\\installed power`;
     case TRAJECTORY_TYPE.MISC_LOAD:
-      return '\\\\MISC\\load factor';
+      return String.raw`\\MISC\\load factor`;
     case TRAJECTORY_TYPE.RES_CAPACITY:
-      return `\\\\RES\\installed power${hypothesis?.isDefault && hypothesis?.area != OTHER_AREAS_LABEL ? `\\${hypothesis?.area}` : ''}`;
+      return String.raw`\\RES\\installed power${
+        hypothesis?.isDefault && hypothesis?.area !== OTHER_AREAS_LABEL
+          ? String.raw`\\${hypothesis.area}`
+          : ''
+      }`;
     case TRAJECTORY_TYPE.RES_LOAD:
-      return '\\\\RES\\load factor';
+      return String.raw`\\RES\\load factor`;
     case TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION:
-      return '\\\\RES\\technicalParameters';
+      return String.raw`\\RES\\technicalParameters`;
     case TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION:
-      return '\\\\RES\\technicalParameters';
+      return String.raw`\\RES\\technicalParameters`;
     case TRAJECTORY_TYPE.HYDRO_SERIES:
-      return '\\\\hydro\\series';
+      return String.raw`\\hydro\\series`;
     case TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS:
-      return '\\\\hydro\\technical_parameters';
+      return String.raw`\\hydro\\technical_parameters`;
     case TRAJECTORY_TYPE.HYDRO_PSP_SERIES:
-      return '\\\\PSP_virtual\\series';
+      return String.raw`\\PSP_virtual\\series`;
     case TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS:
-      return '\\\\PSP_virtual\\technical_parameters';
+      return String.raw`\\PSP_virtual\\technical_parameters`;
     case TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION:
-      return '\\\\specific_nuclear\\Modulation';
+      return String.raw`\\specific_nuclear\\Modulation`;
     case TRAJECTORY_TYPE.NUCLEAR_FR_TALON:
-      return '\\\\specific_nuclear\\Talon_nuc';
+      return String.raw`\\specific_nuclear\\Talon_nuc`;
     case TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP:
-      return '\\\\specific_nuclear\\TS_dispo\\EPR\\';
+      return String.raw`\\specific_nuclear\\TS_dispo\\EPR`;
     case TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM:
-      return '\\\\specific_nuclear\\TS_dispo';
+      return String.raw`\\specific_nuclear\\TS_dispo`;
     case TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR:
-      return '\\\\specific_nuclear\\TS_dispo\\SMR\\';
+      return String.raw`\\specific_nuclear\\TS_dispo\\SMR`;
+    case TRAJECTORY_TYPE.ADEQUACY_PATCH:
+      return String.raw`\\adequacy_patch`;
+    case TRAJECTORY_TYPE.FLOWBASED:
+      return String.raw`\\flowbased`;
+    case TRAJECTORY_TYPE.SETTINGS:
+      return String.raw`\\settings\\general_data`;
     default:
       return null;
   }
@@ -1105,7 +1146,10 @@ export const getUrlApiUploadTrajectory = (
       return `${TRAJECTORY_NUCLEAR_TS_LT}?area=FR&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
     case TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR:
       return `${TRAJECTORY_NUCLEAR_TS_SMR}?area=FR&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
-
+    case TRAJECTORY_TYPE.ADEQUACY_PATCH:
+      return `${TRAJECTORY_ADEQUACY_PATCH}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
+    case TRAJECTORY_TYPE.SETTINGS:
+      return `${TRAJECTORY_SETTINGS}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
     default:
       return `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   }
@@ -1119,6 +1163,7 @@ export const isEmptyRow = (
 ) =>
   hypothesis === t('thermal.@specific') ||
   hypothesis === t('thermal.@time_series') ||
+  hypothesis === t('settings.@title') ||
   ((type === TRAJECTORY_TYPE.STS ||
     type === TRAJECTORY_TYPE.HYDRO_SERIES ||
     type === TRAJECTORY_TYPE.HYDRO_PSP_SERIES) &&
@@ -1186,7 +1231,7 @@ export const getModalTile = (tabType: TRAJECTORY_TYPE, hypothesis?: HypothesisTy
   return `${area ?? tabType}${technology ? ' - ' : ''}${technology ?? ''}${isTrajectoryNuclearType(tabType) ? ' - FR' : ''}`;
 };
 
-export const getFetchParams = (
+export const getFetchFromDbParams = (
   type: TRAJECTORY_TYPE,
   indexArray: number[],
   options?: SearchParams,
@@ -1199,6 +1244,14 @@ export const getFetchParams = (
 
   if (type === TRAJECTORY_TYPE.AREA) {
     typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK;
+    areaToUse = '';
+  }
+  if (type === TRAJECTORY_TYPE.ADEQUACY_PATCH) {
+    if (indexArray.length > 1) {
+      typeToUse = indexArray[1] === 0 ? TRAJECTORY_TYPE.SETTINGS : TRAJECTORY_TYPE.SETTINGS_SCENARIO_BUILDER;// TODO: replace scenario builder
+    } else {
+      typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.ADEQUACY_PATCH : TRAJECTORY_TYPE.FLOWBASED;
+    }
     areaToUse = '';
   }
   if (type === TRAJECTORY_TYPE.DSR) {
@@ -1223,19 +1276,7 @@ export const getFetchParams = (
     }
   }
   if (type === TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION) {
-    if (indexArray.length === 2) {
-      if (indexArray[1] === 0) {
-        typeToUse = TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP;
-      }
-      if (indexArray[1] === 1) {
-        typeToUse = TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM;
-      }
-      if (indexArray[1] === 2) {
-        typeToUse = TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR;
-      }
-    } else if (indexArray[0] === 1) {
-      typeToUse = TRAJECTORY_TYPE.NUCLEAR_FR_TALON;
-    }
+    typeToUse = getNuclearTrajectoryType(indexArray);
     technology = '';
     areaToUse = '';
   }
@@ -1249,3 +1290,31 @@ export const getFetchParams = (
   }
   return { typeToUse, areaToUse, technology };
 };
+
+export const buildDispatchPayload = (
+  config: HypothesisConfig[],
+  results: DbTrajectory[][],
+): Record<string, { trajectories: DbTrajectory[] }> =>
+  config.reduce(
+    (acc, cfg, idx) => {
+      const trajectories = results[idx];
+
+      if (trajectories?.length) {
+        acc[cfg.type] = { trajectories };
+      }
+
+      return acc;
+    },
+    {} as Record<string, { trajectories: DbTrajectory[] }>,
+  );
+
+export const buildTableData = (config: HypothesisConfig[], t: TFunction, results?: DbTrajectory[][], configOptions?: {hvdc?: boolean}): HypothesisRowData[] =>
+  config.map((cfg, idx) => ({
+    hypothesis: t(cfg.labelKey),
+    trajectory: !cfg.subRows?.length && results?.[idx]?.[0] ? results?.[idx]?.[0] : null,
+    status: (!cfg.subRows?.length && results?.[idx]?.length) ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+    isDeletable: false,
+    isDefault: false,
+    ...(cfg.hasHvdcOption && { hvdc: configOptions?.hvdc }),
+    ...((!!cfg.subRows?.length) && {subRows : buildTableData(cfg.subRows, t, results?.[idx] ? [results[idx]] : [])})
+  }));

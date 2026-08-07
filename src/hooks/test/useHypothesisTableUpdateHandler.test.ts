@@ -55,9 +55,6 @@ describe('useHypothesisTableUpdateHandler', () => {
     const { result } = renderHook(() =>
       useHypothesisTableUpdateHandler({
         studyData,
-        data,
-        type: TRAJECTORY_TYPE.LOAD,
-        setData,
         setRowToDelete,
         setIsDeletionModalOpen,
         dbTrajectories: [],
@@ -66,7 +63,7 @@ describe('useHypothesisTableUpdateHandler', () => {
       }),
     );
 
-    await result.current.handleHypothesisTableUpdate('0', null, 'empty');
+    await result.current.handleHypothesisTableUpdate('0', null, 'empty', TRAJECTORY_TYPE.LOAD, data, setData);
 
     expect(mockDetach).toHaveBeenCalledWith(TRAJECTORY_TYPE.LOAD, [0], setData, data, 'empty', 'Area A');
   });
@@ -80,9 +77,6 @@ describe('useHypothesisTableUpdateHandler', () => {
     const { result } = renderHook(() =>
       useHypothesisTableUpdateHandler({
         studyData,
-        data,
-        type: TRAJECTORY_TYPE.DSR,
-        setData,
         setRowToDelete,
         setIsDeletionModalOpen,
         dbTrajectories: [],
@@ -91,7 +85,7 @@ describe('useHypothesisTableUpdateHandler', () => {
       }),
     );
 
-    await result.current.handleHypothesisTableUpdate('1', null, 'empty');
+    await result.current.handleHypothesisTableUpdate('1', null, 'empty', TRAJECTORY_TYPE.DSR, data, setData);
 
     expect(setRowToDelete).toHaveBeenCalledWith({
       index: 1,
@@ -113,9 +107,6 @@ describe('useHypothesisTableUpdateHandler', () => {
     const { result } = renderHook(() =>
       useHypothesisTableUpdateHandler({
         studyData,
-        data,
-        type: TRAJECTORY_TYPE.LOAD,
-        setData,
         setRowToDelete,
         setIsDeletionModalOpen,
         dbTrajectories,
@@ -124,7 +115,7 @@ describe('useHypothesisTableUpdateHandler', () => {
       }),
     );
 
-    await result.current.handleHypothesisTableUpdate('0', 42, 'success');
+    await result.current.handleHypothesisTableUpdate('0', 42, 'success', TRAJECTORY_TYPE.LOAD, data, setData);
 
     expect(mockAttach).toHaveBeenCalledWith(TRAJECTORY_TYPE.LOAD, [0], 'success', dbTrajectories[0], setData);
   });
@@ -139,9 +130,6 @@ describe('useHypothesisTableUpdateHandler', () => {
       const { result } = renderHook(() =>
         useHypothesisTableUpdateHandler({
           studyData,
-          data,
-          type: TRAJECTORY_TYPE.AREA,
-          setData,
           setRowToDelete,
           setIsDeletionModalOpen,
           dbTrajectories: [],
@@ -150,7 +138,7 @@ describe('useHypothesisTableUpdateHandler', () => {
         }),
       );
 
-      await result.current.handleHypothesisTableUpdate('0', null, 'empty');
+      await result.current.handleHypothesisTableUpdate('0', null, 'empty', TRAJECTORY_TYPE.AREA, data, setData);
 
       expect(mockDetach).toHaveBeenCalledWith(TRAJECTORY_TYPE.AREA, [0], setData, data, 'empty', 'Area A');
     });
@@ -162,9 +150,6 @@ describe('useHypothesisTableUpdateHandler', () => {
       const { result } = renderHook(() =>
         useHypothesisTableUpdateHandler({
           studyData,
-          data,
-          type: TRAJECTORY_TYPE.AREA,
-          setData,
           setRowToDelete,
           setIsDeletionModalOpen,
           dbTrajectories,
@@ -173,7 +158,7 @@ describe('useHypothesisTableUpdateHandler', () => {
         }),
       );
 
-      await result.current.handleHypothesisTableUpdate('0', 10, 'success');
+      await result.current.handleHypothesisTableUpdate('0', 10, 'success', TRAJECTORY_TYPE.AREA, data, setData);
 
       expect(mockAttach).toHaveBeenCalledWith(TRAJECTORY_TYPE.AREA, [0], 'success', dbTrajectories[0], setData);
     });
@@ -187,9 +172,6 @@ describe('useHypothesisTableUpdateHandler', () => {
       const { result } = renderHook(() =>
         useHypothesisTableUpdateHandler({
           studyData,
-          data,
-          type: TRAJECTORY_TYPE.AREA,
-          setData,
           setRowToDelete,
           setIsDeletionModalOpen,
           dbTrajectories: [],
@@ -198,7 +180,7 @@ describe('useHypothesisTableUpdateHandler', () => {
         }),
       );
 
-      await result.current.handleHypothesisTableUpdate('1', null, 'empty');
+      await result.current.handleHypothesisTableUpdate('1', null, 'empty', TRAJECTORY_TYPE.AREA, data, setData);
 
       expect(mockDetach).toHaveBeenCalledWith(TRAJECTORY_TYPE.LINK, [1], setData, data, 'empty', 'Link B');
     });
@@ -210,9 +192,6 @@ describe('useHypothesisTableUpdateHandler', () => {
       const { result } = renderHook(() =>
         useHypothesisTableUpdateHandler({
           studyData,
-          data,
-          type: TRAJECTORY_TYPE.AREA,
-          setData,
           setRowToDelete,
           setIsDeletionModalOpen,
           dbTrajectories,
@@ -221,7 +200,7 @@ describe('useHypothesisTableUpdateHandler', () => {
         }),
       );
 
-      await result.current.handleHypothesisTableUpdate('1', 20, 'success');
+      await result.current.handleHypothesisTableUpdate('1', 20, 'success', TRAJECTORY_TYPE.AREA, data, setData);
 
       expect(mockAttach).toHaveBeenCalledWith(TRAJECTORY_TYPE.LINK, [1], 'success', dbTrajectories[0], setData);
     });
@@ -237,9 +216,6 @@ describe('useHypothesisTableUpdateHandler', () => {
       const { result } = renderHook(() =>
         useHypothesisTableUpdateHandler({
           studyData,
-          data,
-          type: TRAJECTORY_TYPE.HYDRO_SERIES,
-          setData,
           setRowToDelete,
           setIsDeletionModalOpen,
           dbTrajectories: [],
@@ -248,7 +224,14 @@ describe('useHypothesisTableUpdateHandler', () => {
         }),
       );
 
-      await result.current.handleHypothesisTableUpdate('0.1', null, 'empty');
+      await result.current.handleHypothesisTableUpdate(
+        '0.1',
+        null,
+        'empty',
+        TRAJECTORY_TYPE.HYDRO_SERIES,
+        data,
+        setData,
+      );
 
       expect(mockDetach).toHaveBeenCalledWith(
         TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS,
@@ -267,9 +250,6 @@ describe('useHypothesisTableUpdateHandler', () => {
       const { result } = renderHook(() =>
         useHypothesisTableUpdateHandler({
           studyData,
-          data,
-          type: TRAJECTORY_TYPE.HYDRO_SERIES,
-          setData,
           setRowToDelete,
           setIsDeletionModalOpen,
           dbTrajectories,
@@ -278,7 +258,14 @@ describe('useHypothesisTableUpdateHandler', () => {
         }),
       );
 
-      await result.current.handleHypothesisTableUpdate('0.1', 30, 'success');
+      await result.current.handleHypothesisTableUpdate(
+        '0.1',
+        30,
+        'success',
+        TRAJECTORY_TYPE.HYDRO_SERIES,
+        data,
+        setData,
+      );
 
       expect(mockAttach).toHaveBeenCalledWith(
         TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS,
@@ -298,9 +285,6 @@ describe('useHypothesisTableUpdateHandler', () => {
       const { result } = renderHook(() =>
         useHypothesisTableUpdateHandler({
           studyData,
-          data,
-          type: TRAJECTORY_TYPE.HYDRO_SERIES,
-          setData,
           setRowToDelete,
           setIsDeletionModalOpen,
           dbTrajectories: [],
@@ -309,7 +293,14 @@ describe('useHypothesisTableUpdateHandler', () => {
         }),
       );
 
-      await result.current.handleHypothesisTableUpdate('0.0', null, 'empty');
+      await result.current.handleHypothesisTableUpdate(
+        '0.0',
+        null,
+        'empty',
+        TRAJECTORY_TYPE.HYDRO_SERIES,
+        data,
+        setData,
+      );
 
       expect(mockDetach).toHaveBeenCalledWith(TRAJECTORY_TYPE.HYDRO_SERIES, [0, 0], setData, data, 'empty', 'Hydro A');
     });
