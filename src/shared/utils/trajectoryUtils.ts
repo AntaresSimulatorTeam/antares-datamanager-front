@@ -945,7 +945,11 @@ export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE, hypothesis?: Hy
     case TRAJECTORY_TYPE.MISC_LOAD:
       return String.raw`\\MISC\\load factor`;
     case TRAJECTORY_TYPE.RES_CAPACITY:
-      return String.raw`\\RES\\installed power${hypothesis?.isDefault && hypothesis?.area != OTHER_AREAS_LABEL ? String.raw`\\${hypothesis?.area}` : ''}`;
+      return String.raw`\\RES\\installed power${
+        hypothesis?.isDefault && hypothesis?.area !== OTHER_AREAS_LABEL
+          ? String.raw`\\${hypothesis.area}`
+          : ''
+      }`;
     case TRAJECTORY_TYPE.RES_LOAD:
       return String.raw`\\RES\\load factor`;
     case TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION:
