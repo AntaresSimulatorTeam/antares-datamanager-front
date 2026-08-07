@@ -15,8 +15,8 @@ import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import {
+  buildReadOnlyRow,
   buildTableData,
-  filterRow,
   getAreaTrajectoryName,
   isSettingsParametersType,
 } from '@/shared/utils/trajectoryUtils.ts';
@@ -26,7 +26,7 @@ import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 import { handleViewTrajectory } from '@/shared/services/hypothesisTableService.ts';
-import { getParamForFetchFSTrajectory, getReadOnlyForGeneratedStudy } from '@/shared/helpers/hypothesisTableHelper.ts';
+import { getParamForFetchFSTrajectory } from '@/shared/helpers/hypothesisTableHelper.ts';
 import getEditableHypothesisTableHeaders from '@/components/header/EditableHypothesisTableHeaders.tsx';
 import { useFetchFixHypothesisTrajectories } from '@/hooks/useFetchFixHypothesisTrajectories.ts';
 import { useTrajectorySearchHandler } from '@/hooks/useTrajectorySearchHandler.ts';
@@ -69,7 +69,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
       { type: TRAJECTORY_TYPE.FLOWBASED, labelKey: t('settings.@flowBased') },
       { type: TRAJECTORY_TYPE.SETTINGS, labelKey: t('settings.@title'), subRows: [
         { type: TRAJECTORY_TYPE.SETTINGS, labelKey: t('settings.@generalData') },
-        { type: TRAJECTORY_TYPE.SETTINGS, labelKey: t('settings.@scenarioBuilder') }]
+        { type: TRAJECTORY_TYPE.SETTINGS_SCENARIO_BUILDER, labelKey: t('settings.@scenarioBuilder') }]
       },
     ]],
     [t]
@@ -77,12 +77,11 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
   const options = useMemo(
     () => ({
       withReadOnlyRow: true,
-      isStudyGenerated,
     }),
-    [isStudyGenerated],
+    [],
   );
   const { firstTableData, firstTableReadOnlyRow, secondTableData, secondTableReadOnlyRow } =
-    useFetchFixHypothesisTrajectories(configs, options, studyData?.id);
+    useFetchFixHypothesisTrajectories(configs, options, isStudyGenerated, studyData?.id);
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch, setReadOnly);
   const { handleSearch } = useTrajectorySearchHandler({
     studyHorizon: studyData.horizon,
@@ -108,9 +107,10 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
   useEffect(() => {
     if (studyState.studyStatus === StudyStatus.GENERATED) {
       setIsStudyGenerated(true);
-      setData((rows: HypothesisRowData[]) => filterRow(rows));
-      const rows = getReadOnlyForGeneratedStudy(data);
-      setReadOnly(rows);
+      setReadOnly(buildReadOnlyRow([0, 1]));
+      if (configs[1]) {
+        setReadOnlySettings(buildReadOnlyRow([0, 1, 2.0, 2.1]));
+      }
     }
   }, [studyState.studyStatus]);
 
@@ -196,7 +196,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
         }}
         handleImport={async (rowId: string) => await handleFetchTrajectoryFromFs(rowId, TRAJECTORY_TYPE.AREA)}
         handleViewData={handleViewTrajectoryData}
-        activate={async (value?: boolean) => await handleActivate(value)}
+        activate={async (value?: boolean | string) => await handleActivate(value as boolean)}
         type={TRAJECTORY_TYPE.AREA}
       />
       </div>
@@ -228,10 +228,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
           );
         }}
         handleImport={async (rowId: string) => await handleFetchTrajectoryFromFs(rowId, TRAJECTORY_TYPE.ADEQUACY_PATCH)}
-        activate={() => {
-          void updateStudy({ hvdc: !studyState.hvdc }, studyData.id);
-          dispatch?.({ type: STUDY_ACTION.SET_STUDY_HVDC, payload: !studyState.hvdc });
-        }}
+        activate={() => {}}
         type={TRAJECTORY_TYPE.ADEQUACY_PATCH}
       />
       </div>

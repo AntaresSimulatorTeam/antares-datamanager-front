@@ -11,6 +11,7 @@ import { STUDY_ACTION } from '@/shared/enum/study.ts';
 export const useFetchFixHypothesisTrajectories = (
   configs: HypothesisConfig[][],
   options: HypothesisTableOptions,
+  isStudyGenerated: boolean,
   studyId?: number,
 ) => {
   const [firstTableData, setFirstTableData] = useState<HypothesisRowData[]>([]);
@@ -55,23 +56,23 @@ export const useFetchFixHypothesisTrajectories = (
         secondData.length > 0 && setSecondTableData(secondData);
       }
 
-      if (options.withReadOnlyRow && !options.isStudyGenerated) {
+      if (options.withReadOnlyRow && !isStudyGenerated) {
         setFirstTableReadOnlyRow({
           0: false,
-          1: !firstResults[0]?.length || (!firstResults[1]?.length && options.isStudyGenerated),
+          1: !firstResults[0]?.length,
         });
         if (configs[1]) {
           setSecondTableReadOnlyRow({
-            0: !firstResults[0]?.length || (!!secondResults[0]?.length && options.isStudyGenerated),
-            1: !firstResults[0]?.length || (!!secondResults[1]?.length && options.isStudyGenerated),
+            0: !firstResults[0]?.length || (!!secondResults[0]?.length),
+            1: !firstResults[0]?.length || (!!secondResults[1]?.length),
             '2.0': false,
             '2.1': false,
           });
         }
-      } else if (options.isStudyGenerated) {
-        setFirstTableReadOnlyRow(buildReadOnlyRow([...firstData.keys()]));
+      } else if (isStudyGenerated) {
+        setFirstTableReadOnlyRow(buildReadOnlyRow([0, 1]));
         if (configs[1]) {
-          setSecondTableReadOnlyRow(buildReadOnlyRow([...secondData.keys()]));
+          setSecondTableReadOnlyRow(buildReadOnlyRow([0, 1, 2.0, 2.1]));
         }
       }
     } catch(error) {
@@ -86,7 +87,7 @@ export const useFetchFixHypothesisTrajectories = (
     }
   }, [studyId]);
 
-  return options.withReadOnlyRow || options.isStudyGenerated
+  return options.withReadOnlyRow || isStudyGenerated
     ? { firstTableData, firstTableReadOnlyRow, secondTableData, secondTableReadOnlyRow }
-    : { firstTableData };
+    : { firstTableData, secondTableData };
 };

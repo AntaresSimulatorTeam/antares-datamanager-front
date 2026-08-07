@@ -164,8 +164,7 @@ const getExpandableHypothesisTableHeaders = ({
           return (
             <SegmentedControl
               appearance="brand"
-              onClick={() => void options?.meta?.activate?.()}
-              onChange={() => {}}
+              onChange={(value: string) => void options?.meta?.activate?.(value)}
               options={[
                 {
                   id: 'option1',

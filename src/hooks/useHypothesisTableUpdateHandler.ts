@@ -62,7 +62,7 @@ export const useHypothesisTableUpdateHandler = ({
       }
       if (type === TRAJECTORY_TYPE.ADEQUACY_PATCH) {
         if (indexArray.length > 1) {
-          typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.SETTINGS : TRAJECTORY_TYPE.SETTINGS;// TODO: replace scenario builder
+          typeToUse = indexArray[1] === 0 ? TRAJECTORY_TYPE.SETTINGS : TRAJECTORY_TYPE.SETTINGS_SCENARIO_BUILDER;// TODO: replace scenario builder
         } else {
           typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.ADEQUACY_PATCH : TRAJECTORY_TYPE.FLOWBASED;
         }

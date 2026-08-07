@@ -902,7 +902,7 @@ export const isTechnicalParametersType = (type: TRAJECTORY_TYPE): boolean =>
  * thermal technical parameter categories; otherwise, returns false.
  */
 export const isSettingsParametersType = (type: TRAJECTORY_TYPE): boolean =>
-  type === TRAJECTORY_TYPE.ADEQUACY_PATCH || type === TRAJECTORY_TYPE.FLOWBASED;
+  type === TRAJECTORY_TYPE.ADEQUACY_PATCH || type === TRAJECTORY_TYPE.FLOWBASED || type === TRAJECTORY_TYPE.SETTINGS;
 
 /**
  * Determines the file path based on the trajectory type.
@@ -1232,7 +1232,7 @@ export const getFetchFromDbParams = (
   }
   if (type === TRAJECTORY_TYPE.ADEQUACY_PATCH) {
     if (indexArray.length > 1) {
-      typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.SETTINGS : TRAJECTORY_TYPE.SETTINGS;// TODO: replace scenario builder
+      typeToUse = indexArray[1] === 0 ? TRAJECTORY_TYPE.SETTINGS : TRAJECTORY_TYPE.SETTINGS;// TODO: replace scenario builder
     } else {
       typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.ADEQUACY_PATCH : TRAJECTORY_TYPE.FLOWBASED;
     }

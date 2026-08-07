@@ -79,8 +79,8 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
       { type: TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER, labelKey: t('thermal.@economics') },
     ],
   ];
-  const options = { withReadOnlyRow: false, isStudyGenerated };
-  const { firstTableData } = useFetchFixHypothesisTrajectories(configs, options, studyData?.id);
+  const options = { withReadOnlyRow: false };
+  const { firstTableData } = useFetchFixHypothesisTrajectories(configs, options, isStudyGenerated, studyData?.id);
   const { handleFetchFromFS } = useTrajectoryFetchFromFSHandler();
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch, setReadOnly);
   const { attachTrajectory } = useTrajectoryAttach(studyData, studyState, dispatch, setReadOnly);

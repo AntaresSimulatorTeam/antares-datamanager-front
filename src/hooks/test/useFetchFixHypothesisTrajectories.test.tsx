@@ -59,9 +59,9 @@ describe('useFetchFixHypothesisTrajectories', () => {
         { type: TRAJECTORY_TYPE.LINK, labelKey: 'links' },
       ],
     ];
-    const options = { withReadOnlyRow: true, isStudyGenerated: false };
+    const options = { withReadOnlyRow: true };
     it('devrait initialiser avec des tableaux vides', async () => {
-      const { result } = renderHook(() => useFetchFixHypothesisTrajectories(configs, options, undefined));
+      const { result } = renderHook(() => useFetchFixHypothesisTrajectories(configs, options, false,undefined));
 
       await waitFor(() => {
         expect(mockGetStudyTrajectories).not.toHaveBeenCalled();
@@ -91,7 +91,7 @@ describe('useFetchFixHypothesisTrajectories', () => {
         return Promise.resolve([]);
       });
 
-      const { result } = renderHook(() => useFetchFixHypothesisTrajectories(configs, options, 1));
+      const { result } = renderHook(() => useFetchFixHypothesisTrajectories(configs, options, false, 1));
 
       await waitFor(() => {
         expect(mockGetStudyTrajectories).toHaveBeenCalledWith(1, TRAJECTORY_TYPE.AREA);
@@ -120,7 +120,7 @@ describe('useFetchFixHypothesisTrajectories', () => {
     it('devrait définir le statut MISSING quand les trajectoires sont vides', async () => {
       mockGetStudyTrajectories.mockResolvedValue([]);
 
-      const { result } = renderHook(() => useFetchFixHypothesisTrajectories(configs, options, 1));
+      const { result } = renderHook(() => useFetchFixHypothesisTrajectories(configs, options, false,1));
 
       await waitFor(() => {
         expect(result.current.firstTableData[0].status).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
@@ -135,7 +135,7 @@ describe('useFetchFixHypothesisTrajectories', () => {
         return Promise.resolve([]);
       });
 
-      renderHook(() => useFetchFixHypothesisTrajectories(configs, options, 1));
+      renderHook(() => useFetchFixHypothesisTrajectories(configs, options, false, 1));
 
       await waitFor(() => {
         expect(mockDispatch).toHaveBeenCalledWith({
@@ -169,29 +169,12 @@ describe('useFetchFixHypothesisTrajectories', () => {
         return Promise.resolve([]);
       });
 
-      const { result } = renderHook(() => useFetchFixHypothesisTrajectories(configs, options, 1));
+      const { result } = renderHook(() => useFetchFixHypothesisTrajectories(configs, options, false, 1));
 
       await waitFor(() => {
         expect(result.current.firstTableReadOnlyRow).toEqual({
           '0': false,
           '1': false,
-        });
-      });
-    });
-
-    it('devrait définir la ligne 1 comme readOnly quand area est vide et isStudyGenerated est true', async () => {
-      mockGetStudyTrajectories.mockImplementation(async (_id: number, type: TRAJECTORY_TYPE) => {
-        if (type === TRAJECTORY_TYPE.AREA) return Promise.resolve([]);
-        if (type === TRAJECTORY_TYPE.LINK) return Promise.resolve([]);
-        return [];
-      });
-
-      const { result } = renderHook(() => useFetchFixHypothesisTrajectories(configs, options, 1));
-
-      await waitFor(() => {
-        expect(result.current.firstTableReadOnlyRow).toEqual({
-          '0': false,
-          '1': true,
         });
       });
     });
@@ -204,7 +187,7 @@ describe('useFetchFixHypothesisTrajectories', () => {
       });
 
       const { result } = renderHook(() =>
-        useFetchFixHypothesisTrajectories(configs, { withReadOnlyRow: true, isStudyGenerated: true }, 1),
+        useFetchFixHypothesisTrajectories(configs, { withReadOnlyRow: true }, true, 1),
       );
 
       await waitFor(() => {
@@ -222,7 +205,7 @@ describe('useFetchFixHypothesisTrajectories', () => {
         return Promise.resolve([]);
       });
 
-      const { result } = renderHook(() => useFetchFixHypothesisTrajectories(configs, options, 1));
+      const { result } = renderHook(() => useFetchFixHypothesisTrajectories(configs, options, false,1));
 
       await waitFor(() => {
         expect(result.current.firstTableReadOnlyRow).toEqual({
@@ -249,8 +232,8 @@ describe('useFetchFixHypothesisTrajectories', () => {
         return Promise.resolve([]);
       });
       const spy = vi.spyOn(trajectoryUtils, 'buildDispatchPayload');
-      const optionsOk = { isStudyGenerated: true, withReadOnlyRow: false } as unknown as HypothesisTableOptions;
-      const { result } = renderHook(() => useFetchFixHypothesisTrajectories(configsOk, optionsOk, 123));
+      const optionsOk = { withReadOnlyRow: false } as unknown as HypothesisTableOptions;
+      const { result } = renderHook(() => useFetchFixHypothesisTrajectories(configsOk, optionsOk, true,123));
       await waitFor(() => {
         expect(spy).toHaveBeenNthCalledWith(1, configsOk[0], [[mockAreaTrajectory], []]);
         expect(spy).toHaveBeenNthCalledWith(2, configsOk[1], [[], []]);
@@ -268,11 +251,11 @@ describe('useFetchFixHypothesisTrajectories', () => {
         { type: TRAJECTORY_TYPE.LINK, labelKey: 'links' },
       ],
     ];
-    const options = { withReadOnlyRow: true, isStudyGenerated: false };
+    const options = { withReadOnlyRow: true };
     it('devrait gérer silencieusement les erreurs', async () => {
       mockGetStudyTrajectories.mockRejectedValue(new Error('API Error'));
 
-      const { result } = renderHook(() => useFetchFixHypothesisTrajectories(configs, options, 1));
+      const { result } = renderHook(() => useFetchFixHypothesisTrajectories(configs, options, false,1));
 
       await waitFor(() => {
         expect(result.current.firstTableData).toEqual([]);
@@ -286,7 +269,7 @@ describe('useFetchFixHypothesisTrajectories', () => {
     it('ne devrait pas dispatcher si une erreur survient', async () => {
       mockGetStudyTrajectories.mockRejectedValue(new Error('Network error'));
 
-      renderHook(() => useFetchFixHypothesisTrajectories(configs, options, 1));
+      renderHook(() => useFetchFixHypothesisTrajectories(configs, options, false,1));
 
       await waitFor(() => {
         expect(mockDispatch).not.toHaveBeenCalled();
@@ -306,7 +289,7 @@ describe('useFetchFixHypothesisTrajectories', () => {
       mockGetStudyTrajectories.mockResolvedValue([mockAreaTrajectory]);
 
       const { rerender } = renderHook(
-        ({ studyId }) => useFetchFixHypothesisTrajectories(configs, mockOptions, studyId),
+        ({ studyId }) => useFetchFixHypothesisTrajectories(configs, mockOptions, false, studyId),
         {
           initialProps: { studyId: 1 },
         },
@@ -344,7 +327,7 @@ describe('useFetchFixHypothesisTrajectories', () => {
         return Promise.resolve([]);
       });
 
-      const { result } = renderHook(() => useFetchFixHypothesisTrajectories(configs, options, 1));
+      const { result } = renderHook(() => useFetchFixHypothesisTrajectories(configs, options, false,1));
 
       await waitFor(() => {
         expect(result.current.firstTableData[0].status).toBe(TRAJECTORY_SELECTION_STATUS.OK);
@@ -356,7 +339,7 @@ describe('useFetchFixHypothesisTrajectories', () => {
       mockUseStudyDispatch.mockReturnValue(null);
       mockGetStudyTrajectories.mockResolvedValue([mockAreaTrajectory]);
 
-      const { result } = renderHook(() => useFetchFixHypothesisTrajectories(configs, options, 1));
+      const { result } = renderHook(() => useFetchFixHypothesisTrajectories(configs, options, false,1));
 
       await waitFor(() => {
         expect(result.current.firstTableData).toHaveLength(2);
@@ -376,7 +359,7 @@ describe('useFetchFixHypothesisTrajectories', () => {
         return Promise.resolve([]);
       });
 
-      const { result } = renderHook(() => useFetchFixHypothesisTrajectories(configs, options, 1));
+      const { result } = renderHook(() => useFetchFixHypothesisTrajectories(configs, options, false, 1));
 
       await waitFor(() => {
         expect(result.current.firstTableData[0].trajectory).toEqual(mockAreaTrajectory);
@@ -395,14 +378,14 @@ describe('useFetchFixHypothesisTrajectories', () => {
         { type: TRAJECTORY_TYPE.FLOWBASED, labelKey: 'flowbased' },
       ],
     ];
-    const options = { withReadOnlyRow: true, isStudyGenerated: false };
+    const options = { withReadOnlyRow: true };
     it('ne devrait inclure que les trajectoires area dans le payload si link est vide', async () => {
       mockGetStudyTrajectories.mockImplementation(async (_id: number, type: TRAJECTORY_TYPE) => {
         if (type === TRAJECTORY_TYPE.AREA) return Promise.resolve([mockAreaTrajectory]);
         return Promise.resolve([]);
       });
 
-      renderHook(() => useFetchFixHypothesisTrajectories(configs, options, 1));
+      renderHook(() => useFetchFixHypothesisTrajectories(configs, options, false, 1));
 
       await waitFor(() => {
         expect(mockDispatch).toHaveBeenCalledWith({
@@ -420,7 +403,7 @@ describe('useFetchFixHypothesisTrajectories', () => {
         return Promise.resolve([]);
       });
 
-      renderHook(() => useFetchFixHypothesisTrajectories(configs, options, 1));
+      renderHook(() => useFetchFixHypothesisTrajectories(configs, options, false,1));
 
       await waitFor(() => {
         expect(mockDispatch).toHaveBeenCalledWith({
@@ -435,7 +418,7 @@ describe('useFetchFixHypothesisTrajectories', () => {
     it('ne devrait pas inclure de payload si les deux sont vides', async () => {
       mockGetStudyTrajectories.mockResolvedValue([]);
 
-      renderHook(() => useFetchFixHypothesisTrajectories(configs, options, 1));
+      renderHook(() => useFetchFixHypothesisTrajectories(configs, options, false, 1));
 
       await waitFor(() => {
         expect(mockDispatch).toHaveBeenCalledWith({
@@ -451,7 +434,7 @@ describe('useFetchFixHypothesisTrajectories', () => {
       { type: TRAJECTORY_TYPE.AREA, labelKey: 'areas' },
       { type: TRAJECTORY_TYPE.LINK, labelKey: 'links', hasHvdcOption: true },
     ]];
-    const options = { withReadOnlyRow: true, isStudyGenerated: false };
+    const options = { withReadOnlyRow: true };
     it('should call getStudyById service', async () => {
       mockGetStudy.mockResolvedValue({hvdc: true} as StudyDTO);
       mockGetStudyTrajectories.mockImplementation(async (_id: number, type: TRAJECTORY_TYPE) => {
@@ -459,7 +442,7 @@ describe('useFetchFixHypothesisTrajectories', () => {
         return Promise.resolve([]);
       });
 
-      renderHook(() => useFetchFixHypothesisTrajectories(configs, options, 1));
+      renderHook(() => useFetchFixHypothesisTrajectories(configs, options, false, 1));
 
       await waitFor(() => {
         expect(mockGetStudy).toHaveBeenCalledWith(1);
