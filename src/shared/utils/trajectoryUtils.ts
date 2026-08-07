@@ -827,6 +827,19 @@ export const getSubRowsList = (row: Row<HypothesisRowData>): string[] =>
       }, [])
     : [];
 
+export const getMessageFromType = (type: TRAJECTORY_TYPE, t: TFunction) => {
+  switch (type) {
+    case TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER:
+     return t('thermal.@specificInformation');
+    case TRAJECTORY_TYPE.ADEQUACY_PATCH :
+      return t('settings.@settingsInformation');
+    case TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION:
+      return t('thermal.@timeSeriesInformation');
+    default:
+      return t('thermal.@technologyFilledIn');
+  }
+}
+
 /**
  * Provide information message about number and subrow name linked to a trajectory
  * @param subRowsList
@@ -846,9 +859,8 @@ export const getSubRowListWithArea = (
     type === TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION ||
     isTrajectoryResType(type)
   ) {
-    const prefix =
-      type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER
-        ? t('thermal.@specificInformation') : type === TRAJECTORY_TYPE.ADEQUACY_PATCH ? t('settings.@settingsInformation') : type === TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION ? t('thermal.@timeSeriesInformation') : t('thermal.@technologyFilledIn');
+    const prefix = getMessageFromType(type, t);
+
     const subRowsListLabel = isTrajectoryResType(type) ? subRowsList.map((item) => sentenceCase(item)) : subRowsList;
     return {
       message: `${prefix}: ${subRowsListLabel.join(', ')}`,
@@ -914,56 +926,56 @@ export const isSettingsParametersType = (type: TRAJECTORY_TYPE): boolean =>
 export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE, hypothesis?: HypothesisType): string | null => {
   switch (type) {
     case TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER:
-      return '\\\\thermal\\economic parameters\\economic';
+      return String.raw`\\thermal\\economic parameters\\economic`;
     case TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER:
-      return '\\\\thermal\\economic parameters\\costs';
+      return String.raw`\\thermal\\economic parameters\\costs`;
     case TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER:
-      return '\\\\thermal\\technical parameters\\param_modulation';
+      return String.raw`\\thermal\\technical parameters\\param_modulation`;
     case TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER:
     case TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER:
-      return '\\\\thermal\\technical parameters';
+      return String.raw`\\thermal\\technical parameters`;
     case TRAJECTORY_TYPE.STS:
-      return hypothesis?.technology ? `\\\\STS\\${hypothesis?.technology}\\clusters` : '\\\\STS\\clusters';
+      return hypothesis?.technology ? String.raw`\\STS\\${hypothesis?.technology}\\clusters` : String.raw`\\STS\\clusters`;
     case TRAJECTORY_TYPE.DSR:
-      return '\\\\DSR\\cluster';
+      return String.raw`\\DSR\\cluster`;
     case TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION:
-      return '\\\\DSR\\capacity modulation';
+      return String.raw`\\DSR\\capacity modulation`;
     case TRAJECTORY_TYPE.MISC_CAPACITY:
-      return '\\\\MISC\\installed power';
+      return String.raw`\\MISC\\installed power`;
     case TRAJECTORY_TYPE.MISC_LOAD:
-      return '\\\\MISC\\load factor';
+      return String.raw`\\MISC\\load factor`;
     case TRAJECTORY_TYPE.RES_CAPACITY:
-      return `\\\\RES\\installed power${hypothesis?.isDefault && hypothesis?.area != OTHER_AREAS_LABEL ? `\\${hypothesis?.area}` : ''}`;
+      return String.raw`\\RES\\installed power${hypothesis?.isDefault && hypothesis?.area != OTHER_AREAS_LABEL ? String.raw`\\${hypothesis?.area}` : ''}`;
     case TRAJECTORY_TYPE.RES_LOAD:
-      return '\\\\RES\\load factor';
+      return String.raw`\\RES\\load factor`;
     case TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION:
-      return '\\\\RES\\technicalParameters';
+      return String.raw`\\RES\\technicalParameters`;
     case TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION:
-      return '\\\\RES\\technicalParameters';
+      return String.raw`\\RES\\technicalParameters`;
     case TRAJECTORY_TYPE.HYDRO_SERIES:
-      return '\\\\hydro\\series';
+      return String.raw`\\hydro\\series`;
     case TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS:
-      return '\\\\hydro\\technical_parameters';
+      return String.raw`\\hydro\\technical_parameters`;
     case TRAJECTORY_TYPE.HYDRO_PSP_SERIES:
-      return '\\\\PSP_virtual\\series';
+      return String.raw`\\PSP_virtual\\series`;
     case TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS:
-      return '\\\\PSP_virtual\\technical_parameters';
+      return String.raw`\\PSP_virtual\\technical_parameters`;
     case TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION:
-      return '\\\\specific_nuclear\\Modulation';
+      return String.raw`\\specific_nuclear\\Modulation`;
     case TRAJECTORY_TYPE.NUCLEAR_FR_TALON:
-      return '\\\\specific_nuclear\\Talon_nuc';
+      return String.raw`\\specific_nuclear\\Talon_nuc`;
     case TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP:
-      return '\\\\specific_nuclear\\TS_dispo\\EPR';
+      return String.raw`\\specific_nuclear\\TS_dispo\\EPR`;
     case TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM:
-      return '\\\\specific_nuclear\\TS_dispo';
+      return String.raw`\\specific_nuclear\\TS_dispo`;
     case TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR:
-      return '\\\\specific_nuclear\\TS_dispo\\SMR';
+      return String.raw`\\specific_nuclear\\TS_dispo\\SMR`;
     case TRAJECTORY_TYPE.ADEQUACY_PATCH:
-      return '\\\\adequacy_patch';
+      return String.raw`\\adequacy_patch`;
     case TRAJECTORY_TYPE.FLOWBASED:
-      return '\\\\flowbased';
+      return String.raw`\\flowbased`;
     case TRAJECTORY_TYPE.SETTINGS:
-      return '\\\\settings\\general_data';
+      return String.raw`\\settings\\general_data`;
     default:
       return null;
   }
@@ -1232,7 +1244,7 @@ export const getFetchFromDbParams = (
   }
   if (type === TRAJECTORY_TYPE.ADEQUACY_PATCH) {
     if (indexArray.length > 1) {
-      typeToUse = indexArray[1] === 0 ? TRAJECTORY_TYPE.SETTINGS : TRAJECTORY_TYPE.SETTINGS;// TODO: replace scenario builder
+      typeToUse = indexArray[1] === 0 ? TRAJECTORY_TYPE.SETTINGS : TRAJECTORY_TYPE.SETTINGS_SCENARIO_BUILDER;// TODO: replace scenario builder
     } else {
       typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.ADEQUACY_PATCH : TRAJECTORY_TYPE.FLOWBASED;
     }

@@ -587,134 +587,142 @@ describe('getTrajectoryTypeByIndex', () => {
 describe('getPathFromTrajectoryType', () => {
   it('should return economic path for THERMAL_ECONOMIC_PARAMETER', () => {
     expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER)).toBe(
-      '\\\\thermal\\economic parameters\\economic',
+      String.raw`\\thermal\\economic parameters\\economic`,
     );
   });
 
   it('should return cost path for THERMAL_ECONOMIC_COST_PARAMETER', () => {
     expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER)).toBe(
-      '\\\\thermal\\economic parameters\\costs',
+      String.raw`\\thermal\\economic parameters\\costs`,
     );
   });
 
   it('should return modulation path for THERMAL_TECHNICAL_MODULATION_PARAMETER', () => {
     expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER)).toBe(
-      '\\\\thermal\\technical parameters\\param_modulation',
+      String.raw`\\thermal\\technical parameters\\param_modulation`,
     );
   });
 
   it('should return technical path for THERMAL_TECHNICAL_SPECIFIC_PARAMETER', () => {
     expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER)).toBe(
-      '\\\\thermal\\technical parameters',
+      String.raw`\\thermal\\technical parameters`,
     );
   });
 
   it('should return technical path for THERMAL_TECHNICAL_COMMON_PARAMETER', () => {
     expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER)).toBe(
-      '\\\\thermal\\technical parameters',
+      String.raw`\\thermal\\technical parameters`,
     );
   });
 
   it('should return technical path for STS with technology', () => {
     expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.STS, { area: 'AT', technology: 'DSR', isDefault: false })).toBe(
-      '\\\\STS\\DSR\\clusters',
+      String.raw`\\STS\\DSR\\clusters`,
     );
   });
 
   it('should return technical path for STS', () => {
     expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.STS, { area: 'AT', technology: '', isDefault: false })).toBe(
-      '\\\\STS\\clusters',
+      String.raw`\\STS\\clusters`,
     );
   });
 
   it('should return technical path for DSR type', () => {
-    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.DSR)).toBe('\\\\DSR\\cluster');
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.DSR)).toBe(String.raw`\\DSR\\cluster`);
   });
 
   it('should return technical path for DSR_CAPACITY_MODULATION type', () => {
-    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION)).toBe('\\\\DSR\\capacity modulation');
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION)).toBe(String.raw`\\DSR\\capacity modulation`);
   });
 
   it('should return technical path for MISC_CAPACITY type', () => {
-    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.MISC_CAPACITY)).toBe('\\\\MISC\\installed power');
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.MISC_CAPACITY)).toBe(String.raw`\\MISC\\installed power`);
   });
 
   it('should return technical path for MISC_LOAD type', () => {
-    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.MISC_LOAD)).toBe('\\\\MISC\\load factor');
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.MISC_LOAD)).toBe(String.raw`\\MISC\\load factor`);
   });
 
   it('should return technical path for RES_CAPACITY type and default area', () => {
     expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.RES_CAPACITY, { area: 'FR', isDefault: true })).toBe(
-      '\\\\RES\\installed power\\FR',
+      String.raw`\\RES\\installed power\\FR`,
     );
   });
 
   it('should return technical path for RES_CAPACITY type and Other areas', () => {
     expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.RES_CAPACITY, { area: OTHER_AREAS_LABEL, isDefault: true })).toBe(
-      '\\\\RES\\installed power',
+      String.raw`\\RES\\installed power`,
     );
   });
 
   it('should return technical path for RES_CAPACITY type and specific area', () => {
     expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.RES_CAPACITY, { area: 'AT', isDefault: false })).toBe(
-      '\\\\RES\\installed power',
+      String.raw`\\RES\\installed power`,
     );
   });
 
   it('should return technical path for RES_LOAD type', () => {
-    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.RES_LOAD)).toBe('\\\\RES\\load factor');
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.RES_LOAD)).toBe(String.raw`\\RES\\load factor`);
   });
 
   it('should return technical path for RES_TECHNOLOGY_DISTRIBUTION type', () => {
-    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION)).toBe('\\\\RES\\technicalParameters');
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION)).toBe(String.raw`\\RES\\technicalParameters`);
   });
 
   it('should return technical path for RES_ZONAL_DISTRIBUTION type', () => {
-    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION)).toBe('\\\\RES\\technicalParameters');
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION)).toBe(String.raw`\\RES\\technicalParameters`);
   });
 
   it('should return technical path for HYDRO_SERIES type', () => {
-    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.HYDRO_SERIES)).toBe('\\\\hydro\\series');
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.HYDRO_SERIES)).toBe(String.raw`\\hydro\\series`);
   });
 
   it('should return technical path for HYDRO_TECHNICAL_PARAMETERS type', () => {
     expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS)).toBe(
-      '\\\\hydro\\technical_parameters',
+      String.raw`\\hydro\\technical_parameters`,
     );
   });
 
   it('should return technical path for HYDRO_PSP_SERIES type', () => {
-    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.HYDRO_PSP_SERIES)).toBe('\\\\PSP_virtual\\series');
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.HYDRO_PSP_SERIES)).toBe(String.raw`\\PSP_virtual\\series`);
   });
 
   it('should return technical path for HYDRO_PSP_TECHNICAL_PARAMETERS type', () => {
     expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS)).toBe(
-      '\\\\PSP_virtual\\technical_parameters',
+      String.raw`\\PSP_virtual\\technical_parameters`,
     );
   });
 
   it('should return technical path for NUCLEAR_FR_MODULATION type', () => {
-    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION)).toBe('\\\\specific_nuclear\\Modulation');
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION)).toBe(String.raw`\\specific_nuclear\\Modulation`);
   });
 
   it('should return technical path for NUCLEAR_FR_TALON type', () => {
-    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.NUCLEAR_FR_TALON)).toBe('\\\\specific_nuclear\\Talon_nuc');
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.NUCLEAR_FR_TALON)).toBe(String.raw`\\specific_nuclear\\Talon_nuc`);
   });
 
   it('should return technical path for NUCLEAR_FR_TS_ERP type', () => {
-    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP)).toBe('\\\\specific_nuclear\\TS_dispo\\EPR');
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP)).toBe(String.raw`\\specific_nuclear\\TS_dispo\\EPR`);
   });
 
   it('should return technical path for NUCLEAR_FR_TS_LONG_TERM type', () => {
-    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM)).toBe('\\\\specific_nuclear\\TS_dispo');
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM)).toBe(String.raw`\\specific_nuclear\\TS_dispo`);
   });
 
   it('should return technical path for NUCLEAR_FR_TS_SMR type', () => {
-    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR)).toBe('\\\\specific_nuclear\\TS_dispo\\SMR');
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR)).toBe(String.raw`\\specific_nuclear\\TS_dispo\\SMR`);
   });
 
   it('should return technical path for ADEQUACY PATCH type', () => {
-    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.ADEQUACY_PATCH)).toBe('\\\\adequacy_patch');
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.ADEQUACY_PATCH)).toBe(String.raw`\\adequacy_patch`);
+  });
+
+  it('should return technical path for FLOWBASED type', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.FLOWBASED)).toBe(String.raw`\\flowbased`);
+  });
+
+  it('should return technical path for SETTINGS type', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.SETTINGS)).toBe(String.raw`\\settings\\general_data`);
   });
 
   it('should return technical path for unknown type', () => {
