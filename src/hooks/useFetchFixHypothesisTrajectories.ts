@@ -70,9 +70,9 @@ export const useFetchFixHypothesisTrajectories = (
           });
         }
       } else if (isStudyGenerated) {
-        setFirstTableReadOnlyRow(buildReadOnlyRow([0, 1]));
+        setFirstTableReadOnlyRow(buildReadOnlyRow(['0', '1']));
         if (configs[1]) {
-          setSecondTableReadOnlyRow(buildReadOnlyRow([0, 1, 2.0, 2.1]));
+          setSecondTableReadOnlyRow(buildReadOnlyRow(['0', '1', '2.0', '2.1']));
         }
       }
     } catch(error) {

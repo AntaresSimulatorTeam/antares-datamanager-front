@@ -4,15 +4,14 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { RdsModal } from 'rte-design-system-react';
 import { useTranslation } from 'react-i18next';
 import KeywordsInput from '@/components/input/KeywordsInput.tsx';
 import HorizonInput from '@/components/input/HorizonInput';
-import { duplicateStudy, updateStudy } from '@/shared/services/studyService';
 import { SelectDSOption, StudyDTO } from '@/shared/types';
 import { useUser } from '@/store/contexts/UserContext.tsx';
-import { notifyAlert, notifyToast } from '@/shared/notification/notification';
+import { notifyToast } from '@/shared/notification/notification';
 import { validateMaxLength } from '@/shared/utils/validateMaxTextLength';
 import {
   MAX_KEYWORD_LENGTH,
@@ -24,7 +23,8 @@ import { hasArrayChanged } from '@/shared/utils/arrayUtils.ts';
 import { Button, Select, TextInput } from '@design-system-rte/react';
 import { FieldInFormation } from '@common/base/FieldInFormation.tsx';
 import { convertToOneYearHorizon } from '@/shared/utils/textUtils.ts';
-import { fetchProjectsFromPartialName } from '@/shared/services/projectService.ts';
+import { useFetchProjectOptions } from '@/hooks/useFetchProjectOptions.ts';
+import { useStudyModification } from '@/hooks/useStudyModification.ts';
 
 interface StudyCreationModalProps {
   isOpen?: boolean;
@@ -38,10 +38,12 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
   onClose,
   study,
   setReloadStudies,
-  isDuplicateMode,
+  isDuplicateMode = false,
 }) => {
   const { t } = useTranslation();
   const { user } = useUser();
+  const { projects } = useFetchProjectOptions();
+
   const baseStudyName = study.name.substring(0, study.name.lastIndexOf('_'));
   const [studyName, setStudyName] = useState<string>(baseStudyName);
   const [project, setProject] = useState<SelectDSOption>({
@@ -49,7 +51,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
     label: study.project,
     value: study.project,
   });
-  const [projects, setProjects] = useState<SelectDSOption[]>([]);
+
   const [keywords, setKeywords] = useState<string[]>(study?.keywords || []);
   const [horizon, setHorizon] = useState<string>(() => convertToOneYearHorizon(study.horizon));
   const [isFormValid, setIsFormValid] = useState(false);
@@ -62,81 +64,23 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
     setHorizonErrorMessage('');
   };
 
-  const updateStudyHandler = useCallback(async () => {
-    resetErrorMessage();
-    const studyData = {
-      ...study,
-      createdBy: user?.profile.sub,
-      name: studyName,
-      keywords,
-      project: project.label,
-      projectId: project?.id?.toString() || '',
-      horizon,
-    };
-
-    try {
-      if (isDuplicateMode) {
-        await duplicateStudy(studyData);
-      } else {
-        await updateStudy(studyData, study.id);
-      }
+  const { confirmUpdate } = useStudyModification(
+    () => {
       setReloadStudies?.((prev) => prev + 1);
       notifyToast({
         type: 'success',
         message: `Study ${isDuplicateMode ? 'duplicated' : 'updated'} successfully`,
       });
       onClose();
-    } catch (error) {
-      const errorMessage = (error as Error)?.message;
-      if (errorMessage?.includes(t('studyDetails.@duplicateModalStudyError'))) {
-        setStudyErrorMessage(errorMessage);
-        setIsFormValid(false);
-      } else if (errorMessage?.includes('Horizon must be')) {
-        setHorizonErrorMessage(errorMessage);
-      } else {
-        notifyAlert({
-          icon: 'close',
-          message: errorMessage,
-          type: 'error',
-          filledIcon: true,
-        });
+    },
+    (message) => {
+      if (message?.includes(t('studyDetails.@duplicateModalStudyError'))) {
+        setStudyErrorMessage(message);
+      } else if (message?.includes(t('horizonInput.@validYearError'))) {
+        setHorizonErrorMessage(message);
       }
-    }
-  }, [
-    horizon,
-    isDuplicateMode,
-    keywords,
-    onClose,
-    project?.id,
-    project.label,
-    setReloadStudies,
-    study,
-    studyName,
-    user?.profile.sub,
-  ]);
-
-  useEffect(() => {
-    const loadProjects = async (valueLabel?: string) => {
-      try {
-        const projectList = await fetchProjectsFromPartialName(valueLabel ?? '');
-        const projectOptions = projectList.map(({ name, id }) => ({
-          id: Number(id),
-          label: name,
-          value: name,
-        }));
-        setProjects(projectOptions);
-      } catch (error) {
-        notifyAlert({
-          icon: 'check',
-          message: t('project.@fetch_failed'),
-          content: (error as Error).message,
-          type: 'error',
-          filledIcon: true,
-        });
-      }
-    };
-    void loadProjects();
-  }, [t]);
+    },
+  );
 
   useEffect(() => {
     const validateForm = () => {
@@ -145,7 +89,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
       const keywordsChanged = hasArrayChanged(study.keywords, keywords);
       const horizonChanged = isHorizonValid && convertToOneYearHorizon(study.horizon) !== horizon;
       if (isDuplicateMode) {
-        setIsFormValid(horizonChanged || studyNameChanged);
+        setIsFormValid(horizonChanged || studyNameChanged || projectNameChanged);
       } else {
         setIsFormValid(studyNameChanged || projectNameChanged || keywordsChanged);
       }
@@ -229,7 +173,19 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
         <Button
           icon={isDuplicateMode ? 'copy' : 'edit'}
           label={isDuplicateMode ? t('study.@duplicate') : t('modal.@button_update')}
-          onClick={() => void updateStudyHandler()}
+          onClick={() => {
+            const studyData = {
+              ...study,
+              createdBy: user?.profile.sub,
+              name: studyName,
+              keywords,
+              project: project.label,
+              projectId: project?.id?.toString() || '',
+              horizon,
+            };
+
+            void confirmUpdate(study.id, studyData, isDuplicateMode);
+          }}
           variant="primary"
           disabled={!isFormValid}
         />

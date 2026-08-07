@@ -43,7 +43,7 @@ const SelectAndSearchableInput = ({
   const [valueInput, setValueInput] = useState<string>(defaultValue ?? '');
   const dropdownList = useRef<HTMLDivElement | null>(null);
   const selectInputClass = isInputDisabled ? `bg-gray-200 border-opacity-0 cursor-not-allowed pointer-events-none` : '';
-  const classNameIcon = `absolute right-1 top-0.5 z-50`;
+  const classNameIcon = `absolute right-1 top-0.5 z-auto`;
 
   const handleInputChange = useCallback(
     async (value: string) => {

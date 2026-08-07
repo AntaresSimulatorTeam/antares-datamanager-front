@@ -25,7 +25,7 @@ const ProjectDetails = () => {
   const { user } = useUser();
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const { id } = useParams();
-  const { projectDetails } = useGetProjectDetails(id ?? null, reFetchProject);
+  const { projectDetails } = useGetProjectDetails(id != null ? Number(id) : null, reFetchProject);
   const navigate = useNavigate();
 
   const headerItems: PegaseBreadcrumbItemType[] = [

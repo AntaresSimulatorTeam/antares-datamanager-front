@@ -3,10 +3,10 @@ import { fetchProjectDetails } from '@/shared/services/projectService.ts';
 import { ProjectInfo } from '@/shared/types';
 import { notifyToast } from '@/shared/notification/notification.tsx';
 
-export const useGetProjectDetails = (projectId: string | null, reFetch: number) => {
+export const useGetProjectDetails = (projectId: number | null, reFetch: number) => {
   const [projectDetails, setProjectDetails] = useState<ProjectInfo>({} as ProjectInfo);
 
-  const getProjectDetails = useCallback(async (id: string) => {
+  const getProjectDetails = useCallback(async (id: number) => {
     try {
       const projectInfo = await fetchProjectDetails(id);
       setProjectDetails({

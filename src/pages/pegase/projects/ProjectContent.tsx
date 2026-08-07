@@ -48,7 +48,7 @@ const ProjectContent = () => {
     }
   };
 
-  const handleDeleteProject = async (projectId: string) => {
+  const handleDeleteProject = async (projectId: number) => {
     await deleteProject(projectId);
     try {
       await refetch(current, intervalSize, searchTerm ?? '');

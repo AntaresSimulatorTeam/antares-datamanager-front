@@ -40,9 +40,9 @@ export const useHandlePinnedProjectList = () => {
   /**
    * Handles the pin action. Displays a toast if the API call is successful.
    *
-   * @param {string} projectId - Project id
+   * @param {number} projectId - Project id
    */
-  const handlePinProject = useCallback(async (projectId: string) => {
+  const handlePinProject = useCallback(async (projectId: number) => {
     const toastId = uuidv4();
     try {
       const newProject = await pinProject(projectId, user?.profile.sub);
@@ -72,9 +72,9 @@ export const useHandlePinnedProjectList = () => {
    * The API call to the /unpin endpoint is made only if the "Cancel" button
    * on the toast is not clicked.
    *
-   * @param {string} projectId - Project id
+   * @param {number} projectId - Project id
    */
-  const handleUnpinProject = useCallback(async (projectId: string) => {
+  const handleUnpinProject = useCallback(async (projectId: number) => {
     const toastId = uuidv4();
 
     try {

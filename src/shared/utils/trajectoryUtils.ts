@@ -443,12 +443,12 @@ export const buildDefaultEmptyTrajectoryList = (
 
 /**
  * Create read-only mapping from the read-only item indexes array
- * @param {(number | null)[]} indexes
+ * @param {(string | null)[]} indexes
  * @return {ReadOnlyObject}
  */
-export const buildReadOnlyRow = (indexes?: (number | null)[]): ReadOnlyObject => {
+export const buildReadOnlyRow = (indexes?: (string | null)[]): ReadOnlyObject => {
   const readOnlyRows = {};
-  (indexes || []).forEach((readOnlyIndex) => {
+  indexes?.forEach((readOnlyIndex) => {
     if (readOnlyIndex != null) {
       Object.assign(readOnlyRows, { [`${readOnlyIndex}`]: true });
     }
@@ -464,9 +464,9 @@ export const buildReadOnlyRow = (indexes?: (number | null)[]): ReadOnlyObject =>
  * @return {ReadOnlyObject}
  */
 export const retrieveReadOnlyArea = (rowData: HypothesisRowData[], itemsToReadOnly: string[]): ReadOnlyObject => {
-  const readOnlyIndexes: (number | null)[] = itemsToReadOnly?.map((areaName) => {
+  const readOnlyIndexes: (string | null)[] = itemsToReadOnly?.map((areaName) => {
     const index = rowData.findIndex((trajectory) => areaName === trajectory.hypothesis);
-    return index >= 0 ? index : null;
+    return index >= 0 ? `${index}` : null;
   });
   return buildReadOnlyRow(readOnlyIndexes);
 };
@@ -925,6 +925,12 @@ export const isSettingsParametersType = (type: TRAJECTORY_TYPE): boolean =>
  */
 export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE, hypothesis?: HypothesisType): string | null => {
   switch (type) {
+    case TRAJECTORY_TYPE.AREA:
+      return String.raw`\\area`;
+    case TRAJECTORY_TYPE.LINK:
+      return String.raw`\\link`;
+    case TRAJECTORY_TYPE.LOAD:
+      return String.raw`\\load`;
     case TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER:
       return String.raw`\\thermal\\economic parameters\\economic`;
     case TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER:

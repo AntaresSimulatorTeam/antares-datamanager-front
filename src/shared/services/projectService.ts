@@ -11,10 +11,10 @@ import { BackendError, PaginatedResponse, ProjectInfo, ProjectResponse } from '@
 /**
  * Delete project
  *
- * @param {string} projectId
+ * @param {number} projectId
  * @return {Promise<void>}
  */
-export const deleteProjectById = async (projectId: string): Promise<void> => {
+export const deleteProjectById = async (projectId: number): Promise<void> => {
   try {
     await AuthService.authFetch(`${PROJECT_ENDPOINT}/${projectId}`, {
       method: 'DELETE',
@@ -27,10 +27,10 @@ export const deleteProjectById = async (projectId: string): Promise<void> => {
 /**
  * Retrieve details of a project
  *
- * @param {string} projectId - Project id
+ * @param {number} projectId - Project id
  * @return {Promise<ProjectInfo>} - Project details
  */
-export const fetchProjectDetails = async (projectId: string): Promise<ProjectInfo> => {
+export const fetchProjectDetails = async (projectId: number): Promise<ProjectInfo> => {
   try {
     const response = await AuthService.authFetch(`${PROJECT_ENDPOINT}/${projectId}`);
 

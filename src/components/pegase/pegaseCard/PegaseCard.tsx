@@ -12,7 +12,7 @@ import { RdsIconButtonProps } from 'rte-design-system-react';
 export type PegaseCardSecondaryButtonPosition = 'default' | 'center';
 
 type CardProps = {
-  id?: string;
+  id?: number;
   disabled?: boolean;
   onClick?: () => void;
   title: string;
