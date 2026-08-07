@@ -89,7 +89,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
       const keywordsChanged = hasArrayChanged(study.keywords, keywords);
       const horizonChanged = isHorizonValid && convertToOneYearHorizon(study.horizon) !== horizon;
       if (isDuplicateMode) {
-        setIsFormValid(horizonChanged || studyNameChanged);
+        setIsFormValid(horizonChanged || studyNameChanged || projectNameChanged);
       } else {
         setIsFormValid(studyNameChanged || projectNameChanged || keywordsChanged);
       }

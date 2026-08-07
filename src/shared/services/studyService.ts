@@ -87,8 +87,8 @@ export const fetchSuggestedKeywords = async (partialName: string): Promise<strin
  * @return {Promise<void>}
  * @throws {BackendError} Throws an error if the update fails on the server-side.
  */
-export const saveStudy = async (
-  studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate' | 'projectId' | 'generationDate' | 'hvdc'> & {
+export const createStudy = async (
+  studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate' | 'projectId' | 'generationDate'> & {
     id: number | undefined;
   },
 ): Promise<void> => {

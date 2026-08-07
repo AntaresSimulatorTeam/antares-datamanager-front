@@ -7,6 +7,7 @@
 import { describe, expect, Mock, vi } from 'vitest';
 import { waitFor } from '@testing-library/react';
 import {
+  createStudy,
   deleteStudy,
   duplicateStudy,
   fetchSearchStudies,
@@ -14,7 +15,6 @@ import {
   generateStudy,
   getStudyById,
   getStudyTrajectories,
-  saveStudy,
   updateStudy,
 } from '@/shared/services/studyService.ts';
 import { notifyAlert, notifyToast } from '@/shared/notification/notification.tsx';
@@ -118,7 +118,7 @@ describe('fetchSuggestedKeywords', () => {
   });
 });
 
-describe('saveStudy', () => {
+describe('createStudy', () => {
   afterEach(() => {
     vi.restoreAllMocks();
   });
@@ -129,7 +129,7 @@ describe('saveStudy', () => {
       json: async () => Promise.resolve(),
     });
 
-    await saveStudy(mockStudy);
+    await createStudy(mockStudy);
 
     expect(AuthService.authFetch).toHaveBeenCalledTimes(1);
     expect(AuthService.authFetch).toHaveBeenCalledWith('https://mockapi.com/v1/study', {

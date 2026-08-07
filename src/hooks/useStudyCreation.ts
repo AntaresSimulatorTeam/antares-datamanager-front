@@ -1,4 +1,4 @@
-import { saveStudy } from '@/shared/services/studyService.ts';
+import { createStudy } from '@/shared/services/studyService.ts';
 import { useCallback } from 'react';
 import { StudyDataCreation } from '@/shared/types';
 
@@ -6,7 +6,7 @@ export const useStudyCreation = (onSuccess?: () => void, onError?: (message: str
   const confirmCreation = useCallback(
     async (studyData: StudyDataCreation) => {
       try {
-        await saveStudy(studyData);
+        await createStudy(studyData);
         onSuccess?.();
       } catch (error) {
         const errorMessages = (error as Error)?.message;

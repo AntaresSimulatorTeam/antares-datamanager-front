@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
 import * as studyService from '@/shared/services/studyService.ts';
-import { saveStudy } from '@/shared/services/studyService.ts';
+import { createStudy } from '@/shared/services/studyService.ts';
 import { useStudyCreation } from '@/hooks/useStudyCreation.ts';
 import { vi } from 'vitest';
 import { StudyDataCreation } from '@/shared/types';
@@ -8,13 +8,13 @@ import { StudyDataCreation } from '@/shared/types';
 vi.mock('@/shared/services/studyService');
 
 describe('useStudyCreation', () => {
-  const mockSaveStudy = vi.mocked(studyService.saveStudy);
+  const mockSaveStudy = vi.mocked(studyService.createStudy);
 
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('calls saveStudy and then onSuccess on success', async () => {
+  it('calls createStudy and then onSuccess on success', async () => {
     mockSaveStudy.mockResolvedValue(undefined);
 
     const onSuccess = vi.fn();
@@ -26,7 +26,7 @@ describe('useStudyCreation', () => {
       await result.current.confirmCreation({ name: 'Study A' } as StudyDataCreation);
     });
 
-    expect(saveStudy).toHaveBeenCalledWith({ name: 'Study A' });
+    expect(createStudy).toHaveBeenCalledWith({ name: 'Study A' });
     expect(onSuccess).toHaveBeenCalled();
     expect(onError).not.toHaveBeenCalled();
   });
