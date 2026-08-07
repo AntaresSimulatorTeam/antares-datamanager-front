@@ -7,6 +7,7 @@ import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
 import { RowToDeleteProps } from '@/shared/types/HypothesisTable.ts';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
+import { getTypeToUse } from '@/shared/helpers/hypothesisTableHelper.ts';
 
 interface UseHypothesisTableUpdateHandlerArgs {
   studyData: StudyDTO;
@@ -55,24 +56,7 @@ export const useHypothesisTableUpdateHandler = ({
       setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
     ) => {
       const indexArray = rowId.split('.').map(Number);
-      let typeToUse = type;
-      const isLastIndex = indexArray[0] === Math.max(data.length - 1, 0);
-      if (type === TRAJECTORY_TYPE.AREA) {
-        typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK;
-      }
-      if (type === TRAJECTORY_TYPE.ADEQUACY_PATCH) {
-        if (indexArray.length > 1) {
-          typeToUse = indexArray[1] === 0 ? TRAJECTORY_TYPE.SETTINGS : TRAJECTORY_TYPE.SETTINGS_SCENARIO_BUILDER;// TODO: replace scenario builder
-        } else {
-          typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.ADEQUACY_PATCH : TRAJECTORY_TYPE.FLOWBASED;
-        }
-      }
-      if (type === TRAJECTORY_TYPE.DSR && isLastIndex) {
-        typeToUse = TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION;
-      }
-      if (type === TRAJECTORY_TYPE.HYDRO_SERIES && indexArray.length === 2 && indexArray[1] === 1) {
-        typeToUse = TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS;
-      }
+      const typeToUse = getTypeToUse(type, indexArray, data.length);
       if (status === 'empty' || status === 'emptyError') {
         const row = getRowDataSelected(data, indexArray) ?? null;
         if (row) {

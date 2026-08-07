@@ -678,3 +678,27 @@ export const getParamForFetchFSTrajectory = (
   }
   return { typeToUse, areaToUse, isDefaultArea };
 };
+
+export const getTypeToUse = (type: TRAJECTORY_TYPE, indexArray: number[], nbRows: number) => {
+  let typeToUse = type;
+  if (type === TRAJECTORY_TYPE.AREA) {
+    typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK;
+  }
+  if (type === TRAJECTORY_TYPE.ADEQUACY_PATCH) {
+    if (indexArray.length > 1) {
+      typeToUse = indexArray[1] === 0 ? TRAJECTORY_TYPE.SETTINGS : TRAJECTORY_TYPE.SETTINGS_SCENARIO_BUILDER;// TODO: replace scenario builder
+    } else {
+      typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.ADEQUACY_PATCH : TRAJECTORY_TYPE.FLOWBASED;
+    }
+  }
+  if (type === TRAJECTORY_TYPE.DSR) {
+    const isLastIndex = indexArray[0] === Math.max(nbRows - 1, 0);
+    if (isLastIndex) {
+      typeToUse = TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION;
+    }
+  }
+  if (type === TRAJECTORY_TYPE.HYDRO_SERIES && indexArray.length === 2 && indexArray[1] === 1) {
+    typeToUse = TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS;
+  }
+  return typeToUse;
+}
