@@ -925,6 +925,12 @@ export const isSettingsParametersType = (type: TRAJECTORY_TYPE): boolean =>
  */
 export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE, hypothesis?: HypothesisType): string | null => {
   switch (type) {
+    case TRAJECTORY_TYPE.AREA:
+      return String.raw`\\area`;
+    case TRAJECTORY_TYPE.LINK:
+      return String.raw`\\link`;
+    case TRAJECTORY_TYPE.LOAD:
+      return String.raw`\\load`;
     case TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER:
       return String.raw`\\thermal\\economic parameters\\economic`;
     case TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER:
