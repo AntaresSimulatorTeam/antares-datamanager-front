@@ -78,7 +78,7 @@ export interface LocationStudy {
 
 export type StudyDataCreation = Omit<
   StudyDTO,
-  'id' | 'status' | 'creationDate' | 'projectId' | 'generationDate' | 'hvdc'
+  'id' | 'status' | 'creationDate' | 'projectId' | 'generationDate'
 > & {
   id: number | undefined;
 };

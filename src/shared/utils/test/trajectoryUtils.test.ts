@@ -258,7 +258,7 @@ describe('buildDefaultEmptyTrajectoryList', () => {
 
 describe('buildReadOnlyRow', () => {
   it('should return an read only object type from indexes array', () => {
-    const readOnlyRows = buildReadOnlyRow([1, 7, 10]);
+    const readOnlyRows = buildReadOnlyRow(['1', '7', '10']);
     expect(readOnlyRows).toStrictEqual({ '1': true, '7': true, '10': true });
   });
 
