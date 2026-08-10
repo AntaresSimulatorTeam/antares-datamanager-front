@@ -5,20 +5,20 @@
  */
 
 import { Suspense } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { NavLink, Route, Routes } from 'react-router-dom';
 import PegaseStar from '@/components/pegase/star/PegaseStar';
 import ProjectDetails from '@/pages/pegase/projects/projectDetails/ProjectDetails';
 import StudyDetails from '@/pages/pegase/studies/studyDetails/StudyDetails';
-import { menuBottomData, menuTopData } from '@/routes';
+import { footerRoutes, mainRoutes } from '@/routes';
 import { UserSettingsContext } from '@/store/contexts/UserSettingsContext';
 import { THEME_COLOR } from '@/shared/types';
 import ThemeHandler from '@common/handler/ThemeHandler';
 import { PegaseAlertContainer, PegaseToastContainer } from '@/shared/notification/containers';
-import { navBarConfig } from '@/shared/const/navBarConfig';
+import { footerMenuItems, mainMenuItems, navBarConfig } from '@/shared/const/navBarConfig';
 import { StudyProvider } from '@/store/contexts/StudyProvider';
-import StdNavbar from '@common/layout/stdNavbar/StdNavbar.tsx';
-import { translateMenuItemLabel } from '@/shared/utils/textUtils.ts';
 import { useTranslation } from 'react-i18next';
+import { NavigationProvider, SideNav } from '@design-system-rte/react';
+import { translateMenuItemLabel } from '@/shared/utils/textUtils.ts';
 import { PEGASE_NAVBAR_ID } from '@/shared/constants.ts';
 
 const MainContent = () => {
@@ -29,12 +29,17 @@ const MainContent = () => {
         <ThemeHandler />
         <PegaseToastContainer />
         <PegaseAlertContainer />
-        <StdNavbar
-          id={PEGASE_NAVBAR_ID}
-          topItems={translateMenuItemLabel(menuTopData, t)}
-          bottomItems={translateMenuItemLabel(menuBottomData, t)}
-          config={navBarConfig}
-        />
+        <NavigationProvider
+          linkComponent={NavLink}
+        >
+          <SideNav
+            id={PEGASE_NAVBAR_ID}
+            headerConfig={navBarConfig}
+            items={translateMenuItemLabel(mainMenuItems, t)}
+            footerItems={translateMenuItemLabel(footerMenuItems, t)}
+            collapsible
+            />
+        </NavigationProvider>
         <div className="flex h-full w-full min-w-0 flex-col">
           <PegaseStar />
           <Suspense>
@@ -48,8 +53,8 @@ const MainContent = () => {
                 }
               />
               <Route path="/project/:id" element={<ProjectDetails />} />
-              {Object.entries([...menuBottomData, ...menuTopData]).map(([key, route]) => (
-                <Route key={key} path={route.path} Component={route.component} />
+              {Object.entries([...mainRoutes, ...footerRoutes]).map(([key, route]) => (
+                <Route key={key} path={route.link} Component={route.component} />
               ))}
             </Routes>
           </Suspense>
