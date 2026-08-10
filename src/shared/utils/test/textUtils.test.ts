@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { avatarCase, convertToOneYearHorizon, sentenceCase } from '@/shared/utils/textUtils.ts';
+import { avatarCase, convertToOneYearHorizon, sentenceCase, translateMenuItemLabel } from '@/shared/utils/textUtils.ts';
 
 describe('sentenceCase', () => {
   it('met la première lettre en majuscule et le reste en minuscule', () => {
@@ -75,5 +75,50 @@ describe('convertToOneYearHorizon', () => {
     const input = '12 123 12345 2024';
     const result = convertToOneYearHorizon(input);
     expect(result).toBe('2024');
+  });
+});
+
+describe('translateMenuItemLabel', () => {
+  it('should translate all labels', () => {
+    const menuItems = [
+      { label: 'home', path: '/' },
+      { label: 'about', path: '/about' },
+    ];
+
+    const t = vi.fn((key: string) => `translated-${key}`);
+
+    const result = translateMenuItemLabel(menuItems, t);
+
+    expect(result).toEqual([
+      { label: 'translated-home', path: '/' },
+      { label: 'translated-about', path: '/about' },
+    ]);
+
+    expect(t).toHaveBeenCalledTimes(2);
+    expect(t).toHaveBeenNthCalledWith(1, 'home');
+    expect(t).toHaveBeenNthCalledWith(2, 'about');
+  });
+
+  it('should not mutate original array', () => {
+    const menuItems = [
+      { label: 'home', path: '/' },
+    ];
+
+    const t = vi.fn((key: string) => `translated-${key}`);
+
+    translateMenuItemLabel(menuItems, t);
+
+    expect(menuItems).toEqual([
+      { label: 'home', path: '/' },
+    ]);
+  });
+
+  it('should return empty array when menuItems is empty', () => {
+    const t = vi.fn();
+
+    const result = translateMenuItemLabel([], t);
+
+    expect(result).toEqual([]);
+    expect(t).not.toHaveBeenCalled();
   });
 });
