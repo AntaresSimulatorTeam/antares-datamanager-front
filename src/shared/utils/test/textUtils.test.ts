@@ -90,8 +90,8 @@ describe('translateMenuItemLabel', () => {
     const result = translateMenuItemLabel(menuItems, t);
 
     expect(result).toEqual([
-      { label: 'translated-home', path: '/' },
-      { label: 'translated-about', path: '/about' },
+      { key: "0-home", label: 'translated-home', path: '/' },
+      { key: "1-about", label: 'translated-about', path: '/about' },
     ]);
 
     expect(t).toHaveBeenCalledTimes(2);

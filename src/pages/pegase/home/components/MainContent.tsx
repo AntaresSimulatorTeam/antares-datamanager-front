@@ -19,7 +19,7 @@ import { StudyProvider } from '@/store/contexts/StudyProvider';
 import { useTranslation } from 'react-i18next';
 import { NavigationProvider, SideNav } from '@design-system-rte/react';
 import { translateMenuItemLabel } from '@/shared/utils/textUtils.ts';
-import { PEGASE_NAVBAR_ID } from '@/shared/constants.ts';
+import { PEGASE_CONTEXT_ID, PEGASE_NAVBAR_ID } from '@/shared/constants.ts';
 
 const MainContent = () => {
   const { t } = useTranslation();
@@ -27,10 +27,12 @@ const MainContent = () => {
     <div className="flex h-screen w-screen dark:bg-gray-900 dark:text-gray-200">
       <UserSettingsContext.Provider initialState={{ theme: THEME_COLOR.LIGHT }}>
         <ThemeHandler />
+        <div className="z-50">
         <PegaseToastContainer />
         <PegaseAlertContainer />
         <NavigationProvider
           linkComponent={NavLink}
+          key={PEGASE_CONTEXT_ID}
         >
           <SideNav
             id={PEGASE_NAVBAR_ID}
@@ -40,6 +42,7 @@ const MainContent = () => {
             collapsible
             />
         </NavigationProvider>
+        </div>
         <div className="flex h-full w-full min-w-0 flex-col">
           <PegaseStar />
           <Suspense>
@@ -54,7 +57,7 @@ const MainContent = () => {
               />
               <Route path="/project/:id" element={<ProjectDetails />} />
               {Object.entries([...mainRoutes, ...footerRoutes]).map(([key, route]) => (
-                <Route key={key} path={route.link} Component={route.component} />
+                <Route key={`${key}-${route.link}`} path={route.link} Component={route.component} />
               ))}
             </Routes>
           </Suspense>
