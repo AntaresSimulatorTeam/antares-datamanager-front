@@ -68,8 +68,8 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
       { type: TRAJECTORY_TYPE.ADEQUACY_PATCH, labelKey: t('settings.@adequacyPatch') },
       { type: TRAJECTORY_TYPE.FLOWBASED, labelKey: t('settings.@flowBased') },
       { type: TRAJECTORY_TYPE.SETTINGS, labelKey: t('settings.@title'), subRows: [
-        { type: TRAJECTORY_TYPE.SETTINGS, labelKey: t('settings.@generalData') },
-        { type: TRAJECTORY_TYPE.SETTINGS_SCENARIO_BUILDER, labelKey: t('settings.@scenarioBuilder') }]
+        { type: TRAJECTORY_TYPE.SETTINGS, labelKey: t('settings.@generalData') }]
+        //{ type: TRAJECTORY_TYPE.SETTINGS_SCENARIO_BUILDER, labelKey: t('settings.@scenarioBuilder') }]
       },
     ]],
     [t]
@@ -244,13 +244,15 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
             toggleModal();
             if (typeToUse) {
               setSelectedTrajectoryType(typeToUse);
-              await importTrajectory(
-                isSettingsParametersType(typeToUse) ? setSettingsData : setData,
-                value,
-                typeToUse,
-                indexArray,
-                hypothesis,
-              );
+              if(value) {
+                await importTrajectory(
+                  isSettingsParametersType(typeToUse) ? setSettingsData : setData,
+                  value,
+                  typeToUse,
+                  indexArray,
+                  hypothesis,
+                );
+              }
             }
           }}
           tabType={selectedTrajectoryType}

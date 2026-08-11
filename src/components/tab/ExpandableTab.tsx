@@ -236,7 +236,9 @@ const ExpandableTab = ({
             indexArray?: number[],
           ) => {
             toggleModal();
-            await importTrajectory(setData, value, typeToUse, indexArray, hypothesis);
+            if (value) {
+              await importTrajectory(setData, value, typeToUse, indexArray, hypothesis);
+            }
           }}
           tabType={tabType}
           hypothesis={getAreaTrajectoryName(rowIdSelected, data, technologies)}
