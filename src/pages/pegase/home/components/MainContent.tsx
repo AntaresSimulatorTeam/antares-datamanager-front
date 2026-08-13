@@ -46,6 +46,10 @@ const MainContent = () => {
         <div className="flex h-full w-full min-w-0 flex-col">
           <PegaseStar />
           <Suspense>
+            <NavigationProvider
+              linkComponent={NavLink}
+              key={PEGASE_CONTEXT_ID}
+            >
             <Routes>
               <Route
                 path="/study/:id"
@@ -60,6 +64,7 @@ const MainContent = () => {
                 <Route key={`${key}-${route.link}`} path={route.link} Component={route.component} />
               ))}
             </Routes>
+            </NavigationProvider>
           </Suspense>
         </div>
       </UserSettingsContext.Provider>
