@@ -7,7 +7,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import StudyNavigationMenu from '@/components/menu/StudyNavigationMenu.tsx';
-import { PegaseBreadcrumbItemType, StudyDTO } from '@/shared/types';
+import { StudyDTO } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { generateStudy, getStudyById } from '@/shared/services/studyService.ts';
@@ -16,9 +16,8 @@ import { DetailsContent } from '@/components/banner/DetailsContent.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import StudyModificationModal from '@common/modal/StudyModificationModal.tsx';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
-import { Button, Divider, Loader } from '@design-system-rte/react';
-import { PegaseBreadcrumb } from '@common/layout/PegaseBreadcrumb/PegaseBreadcrumb.tsx';
-import { useProjectNavigation } from '@/hooks/useProjectNavigation.ts';
+import { Breadcrumbs, Button, Divider, Loader } from '@design-system-rte/react';
+import { BreadcrumbItemProps } from '@design-system-rte/core/components/breadcrumbs/breadcrumbs.interface';
 
 const StudyDetails = () => {
   const { id } = useParams();
@@ -29,18 +28,15 @@ const StudyDetails = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [reloadStudy, setReloadStudy] = useState(0);
   const [studyData, setStudyData] = useState<StudyDTO | null>(null);
-  const { navigateToProject } = useProjectNavigation();
-  const headerItems: PegaseBreadcrumbItemType[] = [
+
+  const headerItems: BreadcrumbItemProps[] = [
     {
-      key: 'item-0',
       label: studyData?.project ?? '',
-      data: { id: studyData?.projectId ?? '', name: studyData?.project ?? '' },
-      onClickItem: navigateToProject,
+      link: `/project/${studyData?.projectId ?? ''}`,
     },
     {
-      key: 'item-1',
       label: studyData?.name ?? '',
-      data: null,
+      link: '',
     },
   ];
 
@@ -78,7 +74,7 @@ const StudyDetails = () => {
     </div>
   ) : (
     <div className="flex min-h-0 flex-1 flex-col items-start gap-4 overflow-hidden p-3">
-      <PegaseBreadcrumb items={headerItems}></PegaseBreadcrumb>
+      <Breadcrumbs items={headerItems}></Breadcrumbs>
       <Divider />
       <div className="flex min-h-0 w-full flex-1 flex-col gap-2 overflow-hidden pb-3">
         <DetailsContent content={studyData} onClickButton={toggleModal} tagsList={studyData?.keywords} />
