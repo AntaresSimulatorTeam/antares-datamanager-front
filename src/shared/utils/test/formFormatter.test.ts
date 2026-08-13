@@ -5,7 +5,9 @@ import {
 } from '@/shared/utils/formFormatter.ts';
 import {
   mockDbTrajectoryArray,
+  mockFBDbTrajectoryArray,
   mockFsTrajectoryAreaArray,
+  mockFsTrajectoryFBArray,
   mockFsTrajectoryLoadArray,
   mockFsTrajectoryParaModulationArray,
   mockFsTrajectoryResArray,
@@ -18,6 +20,12 @@ describe('convertToSelectionOptionType', () => {
     expect(convertToSelectionOptionType(mockDbTrajectoryArray)).toEqual([
       { id: 1, label: 'area_PB_2024', value: 'area_PB_2024' },
       { id: 2, label: 'area_PB_2026', value: 'area_PB_2026' },
+    ]);
+  });
+  it('should return an array of SelectOption type when array of Flowbased DbTrajectory as an argument', () => {
+    expect(convertToSelectionOptionType(mockFBDbTrajectoryArray)).toEqual([
+      { id: 1, label: 'porygon_2023/2021', value: 'porygon_2023###2021' },
+      { id: 2, label: 'porygon_2023/2022', value: 'porygon_2023###2022' },
     ]);
   });
   it('should return an empty array when empty as an argument', () => {
@@ -60,6 +68,13 @@ describe('convertToFSSelectionOptionType', () => {
       { id: 0, label: 'BP_REF_A', value: 'BP_REF_A' },
       { id: 1, label: 'BP_REF_B', value: 'BP_REF_B' },
       { id: 2, label: 'BP_REF_C', value: 'BP_REF_C' },
+    ]);
+  });
+  it('should return an array of SelectOption type in which value is the formatted when array of FLOWBASED as an argument', () => {
+    expect(convertToFSSelectionOptionType(mockFsTrajectoryFBArray, true)).toEqual([
+      { id: 0, label: 'porygon_2023/2021', value: 'porygon_2023###2021' },
+      { id: 1, label: 'porygon_2023/2022', value: 'porygon_2023###2022' },
+      { id: 2, label: 'porygon_2023/2023', value: 'porygon_2023###2023' },
     ]);
   });
   it('should return an empty array when empty array as an argument', () => {
