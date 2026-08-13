@@ -800,6 +800,27 @@ describe('uploadTrajectory', () => {
       'PEMMEDB25',
       'AT',
       onProgress,
+      false
+    );
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/trajectory/load-factor-res?area=AT&technology=&trajectoryToUse=PEMMEDB25&horizon=2030-2031&studyId=87',
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
+
+  it('should import RES Load factor trajectory with technology into data base', async () => {
+    await uploadTrajectory(
+      '2030-2031',
+      87,
+      TRAJECTORY_TYPE.RES_LOAD,
+      'PEMMEDB25',
+      'AT',
+      onProgress,
       false,
       'Wind Offshore',
     );
@@ -1046,6 +1067,90 @@ describe('uploadTrajectory', () => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
       expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
         'https://mockapi.com/v1/trajectory/nuclear-ts-smr?area=FR&trajectoryToUse=repartition_techno_PEMMEDB25&horizon=2030-2031&studyId=87&isCivilYear=false',
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
+
+  it('should import ADEQUACY_PATCH trajectory without technology into data base', async () => {
+    await uploadTrajectory(
+      '2030-2031',
+      87,
+      TRAJECTORY_TYPE.ADEQUACY_PATCH,
+      'adcq',
+      '',
+      onProgress,
+      false,
+    );
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/trajectory/adequacy-patch?trajectoryToUse=adcq&horizon=2030-2031&studyId=87&isCivilYear=false',
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
+
+  it('should import FLOWBASED trajectory without technology into data base', async () => {
+    await uploadTrajectory(
+      '2030-2031',
+      87,
+      TRAJECTORY_TYPE.FLOWBASED,
+      'porygon###2021',
+      '',
+      onProgress,
+      false,
+    );
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/trajectory/flowbased?trajectoryToUse=porygon%23%23%232021&horizon=2030-2031&studyId=87',
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
+
+  it('should import ADEQUACY_PATCH trajectory without technology into data base', async () => {
+    await uploadTrajectory(
+      '2030-2031',
+      87,
+      TRAJECTORY_TYPE.ADEQUACY_PATCH,
+      'adcq',
+      '',
+      onProgress,
+      false,
+    );
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/trajectory/adequacy-patch?trajectoryToUse=adcq&horizon=2030-2031&studyId=87&isCivilYear=false',
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
+
+  it('should import SETTINGS trajectory without technology into data base', async () => {
+    await uploadTrajectory(
+      '2030-2031',
+      87,
+      TRAJECTORY_TYPE.SETTINGS,
+      'general_data_BP_23',
+      '',
+      onProgress,
+      false,
+    );
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/trajectory/settings?trajectoryToUse=general_data_BP_23&horizon=2030-2031&studyId=87&isCivilYear=false',
         requestOptions,
         onProgress,
       );
