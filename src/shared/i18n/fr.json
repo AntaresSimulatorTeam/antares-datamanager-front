@@ -29,7 +29,7 @@
   },
   "page": {
     "@logs": "Logs",
-    "@projet": "Projet",
+    "@project": "Projet",
     "@logout": "Se déconnecter",
     "@parameters": "Paramètres",
     "@antares": "Antares",

@@ -4,10 +4,10 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { MenuNavItem } from '@/shared/types';
+import { NavItemProps } from '@design-system-rte/core/components/side-nav/nav-item/nav-item.interface';
 
-export const translateMenuItemLabel = (menuItems: MenuNavItem[], t: (key: string) => string): MenuNavItem[] =>
-  menuItems.map((data: MenuNavItem) => ({ ...data, label: t(data.label) }));
+export const translateMenuItemLabel = (menuItems: NavItemProps[], t: (key: string) => string): NavItemProps[] =>
+  menuItems.map((data: NavItemProps, index: number) => ({ ...data, label: t(data.label), key: `${index}-${data.label}` }));
 
 export const titleCase = (str: string, shouldLower = false) => {
   const s = shouldLower ? str.toLowerCase() : str;
