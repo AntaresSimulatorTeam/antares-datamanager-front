@@ -11,7 +11,7 @@ import KeywordsInput from '@/components/input/KeywordsInput.tsx';
 import HorizonInput from '@/components/input/HorizonInput';
 import { SelectDSOption, StudyDTO } from '@/shared/types';
 import { useUser } from '@/store/contexts/UserContext.tsx';
-import { notifyToast } from '@/shared/notification/notification';
+import { notifyAlert, notifyToast } from '@/shared/notification/notification';
 import { validateMaxLength } from '@/shared/utils/validateMaxTextLength';
 import {
   MAX_KEYWORD_LENGTH,
@@ -78,6 +78,13 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
         setStudyErrorMessage(message);
       } else if (message?.includes(t('horizonInput.@validYearError'))) {
         setHorizonErrorMessage(message);
+      } else {
+        notifyAlert({
+          icon: 'close',
+          message,
+          type: 'error',
+          filledIcon: true,
+        });
       }
     },
   );
