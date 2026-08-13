@@ -7,6 +7,7 @@
 export interface SelectOption {
   id?: number;
   label: string;
+  value: string;
 }
 
 export interface SelectDSOption {

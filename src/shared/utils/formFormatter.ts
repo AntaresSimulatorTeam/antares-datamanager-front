@@ -6,11 +6,13 @@
 
 import { DbTrajectory, FsTrajectory, isTrajectoryHydroType, SelectOption } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { formatFlowBasedLabel, formatLabel } from '@/shared/utils/textUtils.ts';
 
 export const convertToSelectionOptionType = (trajectories: DbTrajectory[]): SelectOption[] =>
   trajectories.map((trajectory) => ({
     id: trajectory.id,
     label: trajectory.trajectoryName,
+    value: trajectory.type === TRAJECTORY_TYPE.FLOWBASED ? formatFlowBasedLabel(trajectory.trajectoryName) : trajectory.trajectoryName
   }));
 
 export const isRepositoryTrajectory = (type: TRAJECTORY_TYPE, isDefaultArea = false) =>
@@ -22,17 +24,17 @@ export const isRepositoryTrajectory = (type: TRAJECTORY_TYPE, isDefaultArea = fa
   isTrajectoryHydroType(type) ||
   type === TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION ||
   type === TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM ||
-  type === TRAJECTORY_TYPE.ADEQUACY_PATCH ||
-  type === TRAJECTORY_TYPE.FLOWBASED;
+  type === TRAJECTORY_TYPE.ADEQUACY_PATCH;
 
 export const convertToFSSelectionOptionType = (options: FsTrajectory[], isDefaultArea = false): SelectOption[] =>
-  options.map((option, indexTrajectory) => ({
-    id: indexTrajectory,
-    label:
-      option.trajectoryName && !isRepositoryTrajectory(option.type, isDefaultArea)
-        ? option.trajectoryName.substring(0, option.trajectoryName.lastIndexOf('.'))
-        : option.trajectoryName,
-  }));
+  options.map((option, indexTrajectory) => {
+    const formattedLabel = formatLabel(option, isDefaultArea);
+    return {
+      id: indexTrajectory,
+      label: formattedLabel,
+      value: option.type === TRAJECTORY_TYPE.FLOWBASED ? option.trajectoryName.replace('/', '###') : formattedLabel
+    }
+  });
 
 export const getNuclearTrajectoryType = (indexArray: number[]): TRAJECTORY_TYPE => {
   if (indexArray.length === 2) {

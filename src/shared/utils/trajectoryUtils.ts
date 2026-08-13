@@ -21,6 +21,7 @@ import {
   TRAJECTORY_DSR_CAPACITY_MODULATION,
   TRAJECTORY_DSR_CLUSTER,
   TRAJECTORY_ENDPOINT,
+  TRAJECTORY_FLOWBASED,
   TRAJECTORY_HYDRO_SERIES,
   TRAJECTORY_HYDRO_TECHNICAL_PARAMETERS,
   TRAJECTORY_MISC_INSTALLED_POWER,
@@ -1154,6 +1155,8 @@ export const getUrlApiUploadTrajectory = (
       return `${TRAJECTORY_NUCLEAR_TS_SMR}?area=FR&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
     case TRAJECTORY_TYPE.ADEQUACY_PATCH:
       return `${TRAJECTORY_ADEQUACY_PATCH}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
+    case TRAJECTORY_TYPE.FLOWBASED:
+      return `${TRAJECTORY_FLOWBASED}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
     case TRAJECTORY_TYPE.SETTINGS:
       return `${TRAJECTORY_SETTINGS}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
     default:

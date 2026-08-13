@@ -48,7 +48,7 @@ describe('useTrajectoryImport', () => {
 
   const studyState = {};
 
-  const value = { id: 12, label: 'Trajectory A' };
+  const value = { id: 12, label: 'Trajectory A', value: 'Trajectory A' };
 
   beforeEach(() => {
     vi.clearAllMocks();
