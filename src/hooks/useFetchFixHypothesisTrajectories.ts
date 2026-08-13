@@ -63,8 +63,8 @@ export const useFetchFixHypothesisTrajectories = (
         });
         if (configs[1]) {
           setSecondTableReadOnlyRow({
-            0: !firstResults[0]?.length || (!!secondResults[0]?.length),
-            1: !firstResults[0]?.length || (!!secondResults[1]?.length),
+            0: !firstResults[0]?.length,
+            1: !firstResults[0]?.length,
             '2.0': false,
             '2.1': false,
           });
