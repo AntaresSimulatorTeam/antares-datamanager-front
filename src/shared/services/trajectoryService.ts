@@ -19,6 +19,7 @@ import {
 import {
   BackendError,
   DbTrajectory,
+  FetchTrajectoriesParams,
   FsTrajectory,
   TechnologyType,
   TRAJECTORY_DATA_TYPE,
@@ -88,10 +89,7 @@ export const getResTechnologyList = async (): Promise<TechnologyType[]> => {
  * @throws {Error}
  * @param args
  */
-export const fetchTrajectoriesFromFS = async (
-  ...args: [trajectoryType: TRAJECTORY_TYPE, area?: string, searchTerm?: string]
-): Promise<FsTrajectory[]> => {
-  const [trajectoryType, area, searchTerm] = args;
+export const fetchTrajectoriesFromFS = async ({ trajectoryType, area, searchTerm,}: FetchTrajectoriesParams): Promise<FsTrajectory[]> => {
   const queryString = new URLSearchParams({
     trajectoryType,
     ...(trajectoryType !== TRAJECTORY_TYPE.STS && area && { area }),

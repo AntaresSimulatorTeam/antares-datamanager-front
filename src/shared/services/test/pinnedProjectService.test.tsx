@@ -4,13 +4,13 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { fetchPinnedProjects, pinProject, unpinProject } from '../pinnedProjectService';
 import { vi } from 'vitest';
 import { waitFor } from '@testing-library/react';
 import { mockPinProjectResponseArray, mockResponse } from '@/mocks/data/tests/pinnedProject.mock.ts';
 import { AuthService } from '@/shared/services/authService.ts';
 import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
 import { DEFAULT_USER } from '@/shared/const/authConfig.ts';
+import { fetchPinnedProjects, pinProject, unpinProject } from '@/shared/services/pinnedProjectService.ts';
 
 vi.mock('@/shared/notification/notification');
 vi.mock('@/envVariables', () => ({
@@ -18,7 +18,7 @@ vi.mock('@/envVariables', () => ({
 }));
 vi.mock('@/shared/services/authService');
 
-const projectId = 'test-project-id';
+const projectId = 123;
 const userId = 'testUser';
 
 describe('pinProject', () => {
@@ -32,7 +32,7 @@ describe('pinProject', () => {
 
   afterEach(() => {
     vi.unstubAllGlobals();
-    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('should successfully pin a project and call notifyToast with success', async () => {
@@ -44,7 +44,7 @@ describe('pinProject', () => {
     const response = await pinProject(projectId, userId);
 
     expect(AuthService.authFetch).toHaveBeenCalledWith(
-      'https://mockapi.com/v1/project/pin?userId=testUser&projectId=test-project-id',
+      `https://mockapi.com/v1/project/pin?userId=testUser&projectId=${projectId}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -62,7 +62,7 @@ describe('pinProject', () => {
     await pinProject(projectId, undefined);
 
     expect(AuthService.authFetch).toHaveBeenCalledWith(
-      `https://mockapi.com/v1/project/pin?userId=${DEFAULT_USER}&projectId=test-project-id`,
+      `https://mockapi.com/v1/project/pin?userId=${DEFAULT_USER}&projectId=${projectId}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -92,7 +92,7 @@ describe('fetchPinnedProjects', () => {
 
   afterEach(() => {
     vi.unstubAllGlobals();
-    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('should fetch pinned project list', async () => {
@@ -140,7 +140,7 @@ describe('unpinProject', () => {
   });
 
   afterEach(() => {
-    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('should unpin project from pinned project list', async () => {

@@ -17,6 +17,7 @@ export const useTrajectoryDetach = (
   setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
   setIsDeletionModalOpen?: Dispatch<SetStateAction<boolean>>,
   setRowIdSelected?: Dispatch<SetStateAction<string>>,
+  setSecondTableReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
 ) => {
   const { user } = useUser();
   const { t } = useTranslation();
@@ -42,11 +43,14 @@ export const useTrajectoryDetach = (
       );
 
       try {
+        let hvdcValue;
         // 2. Suppression backend si nécessaire
         if (trajectoryToDelete && trajectoryIds?.length > 0 && status === 'empty') {
           await performBackendDeletion(trajectoryIds);
           if (trajectoryToDelete.type === TRAJECTORY_TYPE.LINK) {
             await updateStudy({ hvdc: false }, study.id);
+            dispatch?.({ type: STUDY_ACTION.SET_STUDY_HVDC, payload: false });
+            hvdcValue = false;
           }
         }
 
@@ -73,10 +77,14 @@ export const useTrajectoryDetach = (
           indexArray,
           studyId: study.id,
           horizon: study.horizon,
+          hvdcValue,
         });
 
         setData(newData);
-        if (newReadOnly) setReadOnly?.((prev) => ({ ...prev, ...newReadOnly }));
+        if (newReadOnly) {
+          setReadOnly?.((prev) => ({ ...prev, ...newReadOnly }));
+          setSecondTableReadOnly?.({ '0': newReadOnly[1], '1': newReadOnly[1] });
+        }
       } catch (error) {
         if ((error as TrajectoryBackendError).message.includes('Confirmation required')) {
           setRowIdSelected?.(String(indexArray[0]));

@@ -6,7 +6,7 @@
 
 /* eslint-disable react-refresh/only-export-components */
 import { lazy } from 'react';
-import { MenuNavItem } from './shared/types';
+import { RouteItem } from './shared/types';
 
 const Settings = lazy(() => import('./pages/pegase/settings/Settings'));
 const HomePage = lazy(() => import('./pages/pegase/home/HomePage'));
@@ -16,71 +16,43 @@ const AntaresPage = lazy(() => import('./pages/pegase/antares/Antares'));
 const About = lazy(() => import('./pages/pegase/about/About'));
 const LogoutPage = lazy(() => import('./pages/pegase/logout/Logout'));
 
-export const menuTopData: MenuNavItem[] = [
+export const mainRoutes: RouteItem[] = [
   {
     id: 'home-link',
-    key: 'home',
-    label: 'home.@label',
-    path: '/',
-    as: 'a',
-    icon: 'home',
+    link: '/',
     component: HomePage,
   },
   {
     id: 'project-link',
-    key: 'project',
-    label: 'page.@project',
-    path: '/projects',
-    as: 'a',
-    icon: 'folder',
+    link: '/projects',
     component: ProjectsPage,
   },
   {
     id: 'logs-link',
-    key: 'logs',
-    label: 'page.@logs',
-    path: '/logs',
-    as: 'a',
-    icon: 'text-snippet',
+    link: '/logs',
     component: LogsPage,
   },
   {
     id: 'parameters-link',
-    key: 'parameters',
-    label: 'page.@parameters',
-    path: '/parameters',
-    as: 'a',
-    icon: 'settings',
+    link: '/parameters',
     component: Settings,
   },
   {
     id: 'antares-link',
-    key: 'antares',
-    label: 'page.@antares',
-    path: '/antares',
-    as: 'a',
-    icon: 'apps',
+    link: '/antares',
     component: AntaresPage,
   },
   {
     id: 'about-link',
-    key: 'about',
-    label: 'page.@about',
-    path: '/about',
-    as: 'a',
-    icon: 'info',
+    link: '/about',
     component: About,
   },
 ];
 
-export const menuBottomData: MenuNavItem[] = [
+export const footerRoutes = [
   {
     id: 'logout-link',
-    key: 'logout',
-    label: 'page.@logout',
-    path: '/logout',
-    as: 'a',
-    icon: 'logout',
+    link: '/logout',
     component: LogoutPage,
   },
 ];

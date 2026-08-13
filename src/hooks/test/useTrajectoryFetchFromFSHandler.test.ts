@@ -36,7 +36,7 @@ describe('useTrajectoryFetchFromFSHandler', () => {
       isDefaultArea: false,
     });
 
-    expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith(TRAJECTORY_TYPE.LOAD, 'Area A');
+    expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith({trajectoryType: TRAJECTORY_TYPE.LOAD, area: 'Area A'});
   });
 
   it('should use type when TRAJECTORY_TYPE.AREA is used', async () => {
@@ -59,7 +59,7 @@ describe('useTrajectoryFetchFromFSHandler', () => {
       isDefaultArea: false,
     });
 
-    expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith(TRAJECTORY_TYPE.AREA);
+    expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith({trajectoryType: TRAJECTORY_TYPE.AREA});
   });
 
   it('should switch to LINK type for last index when TRAJECTORY_TYPE.AREA is used', async () => {
@@ -82,7 +82,7 @@ describe('useTrajectoryFetchFromFSHandler', () => {
       isDefaultArea: false,
     });
 
-    expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith(TRAJECTORY_TYPE.LINK);
+    expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith({trajectoryType: TRAJECTORY_TYPE.LINK});
   });
 
   it('should switch to DSR_CAPACITY_MODULATION type for last index when type is DSR', async () => {
@@ -105,7 +105,7 @@ describe('useTrajectoryFetchFromFSHandler', () => {
       isDefaultArea: false,
     });
 
-    expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith(TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION);
+    expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith({trajectoryType: TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION});
   });
 
   it('should use subRows hypothesis when type is STS', async () => {
@@ -128,7 +128,7 @@ describe('useTrajectoryFetchFromFSHandler', () => {
       isDefaultArea: false,
     });
 
-    expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith(TRAJECTORY_TYPE.STS, 'battery');
+    expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith({trajectoryType: TRAJECTORY_TYPE.STS, area: 'battery'});
   });
 
   it('should use HYDRO_SERIES type for first index when type is HYDRO SERIES', async () => {
@@ -152,7 +152,7 @@ describe('useTrajectoryFetchFromFSHandler', () => {
       searchTerm: 'BP',
     });
 
-    expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith(TRAJECTORY_TYPE.HYDRO_SERIES, 'BP');
+    expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith({trajectoryType: TRAJECTORY_TYPE.HYDRO_SERIES, searchTerm: 'BP'});
   });
 
   it('should use HYDRO_TECHNICAL_PARAMETERS type for last index when type is HYDRO SERIES', async () => {
@@ -175,7 +175,7 @@ describe('useTrajectoryFetchFromFSHandler', () => {
       isDefaultArea: false,
     });
 
-    expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith(TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS);
+    expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith({trajectoryType: TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS});
   });
 
   it('should use HYDRO_PSP_SERIES type for first index when type is HYDRO PSP SERIES', async () => {
@@ -198,7 +198,7 @@ describe('useTrajectoryFetchFromFSHandler', () => {
       isDefaultArea: false,
     });
 
-    expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith(TRAJECTORY_TYPE.HYDRO_PSP_SERIES);
+    expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith({trajectoryType: TRAJECTORY_TYPE.HYDRO_PSP_SERIES});
   });
 
   it('should use HYDRO_PSP_TECHNICAL_PARAMETERS type for last index when type is HYDRO PSP SERIES', async () => {
@@ -222,7 +222,7 @@ describe('useTrajectoryFetchFromFSHandler', () => {
     });
 
     expect(trajectoryService.fetchTrajectoriesFromFS).toHaveBeenCalledWith(
-      TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS,
+      {trajectoryType: TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS}
     );
   });
 });

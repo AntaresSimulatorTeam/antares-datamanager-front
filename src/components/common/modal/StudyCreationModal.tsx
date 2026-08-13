@@ -9,9 +9,7 @@ import { RdsModal } from 'rte-design-system-react';
 import { useTranslation } from 'react-i18next';
 import KeywordsInput from '@/components/input/KeywordsInput.tsx';
 import HorizonInput from '@/components/input/HorizonInput';
-import { saveStudy } from '@/shared/services/studyService';
 import { StudyDTO } from '@/shared/types';
-import { useUser } from '@/store/contexts/UserContext.tsx';
 import { notifyToast } from '@/shared/notification/notification';
 import { validateMaxLength } from '@/shared/utils/validateMaxTextLength';
 import {
@@ -22,6 +20,8 @@ import {
 } from '@/shared/const/studyConfig';
 import { Button, TextInput } from '@design-system-rte/react';
 import { FieldInFormation } from '@common/base/FieldInFormation.tsx';
+import { useStudyCreation } from '@/hooks/useStudyCreation.ts';
+import { useUser } from '@/store/contexts/UserContext.tsx';
 
 interface StudyCreationModalProps {
   isOpen?: boolean;
@@ -43,49 +43,33 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
   const [horizon, setHorizon] = useState<string>('');
   const [trajectoryIds] = useState<number[]>([]);
   const [isFormValid, setIsFormValid] = useState(false);
-  const { user } = useUser();
   const [isHorizonValid, setIsHorizonValid] = useState(false);
   const [studyErrorMessage, setStudyErrorMessage] = useState<string>('');
+  const { user } = useUser();
 
-  const saveStudyHandler = async () => {
+  const resetFields = () => {
+    setStudyName('');
+    setHorizon('');
+    setKeywords([]);
+  };
+
+  const resetNameField = () => {
+    setStudyName('');
     setStudyErrorMessage('');
-    const studyData = {
-      id: study?.id,
-      name: studyName,
-      createdBy: user?.profile.sub,
-      keywords,
-      project: projectInfoName,
-      horizon,
-      trajectoryIds,
-      studyId: study?.id,
-      hvdc: false,
-    };
+  };
 
-    try {
-      await saveStudy(studyData);
-      setReloadStudies((prev) => prev + 1); // Trigger reload after successful save
-      setStudyName('');
-      setHorizon('');
-      setKeywords([]);
+  const { confirmCreation } = useStudyCreation(
+    () => {
+      setReloadStudies((prev) => prev + 1);
+      resetFields();
       notifyToast({
         type: 'success',
         message: 'Study created successfully',
       });
       onClose();
-    } catch (error) {
-      const errorMessages = (error as Error)?.message;
-      if (errorMessages?.includes('study')) {
-        setStudyErrorMessage(errorMessages);
-        setIsFormValid(false);
-      } else {
-        notifyToast({
-          type: 'error',
-          message: (error as Error)?.message ?? 'An error occurred while saving the study',
-        });
-        onClose();
-      }
-    }
-  };
+    },
+    (message) => setStudyErrorMessage(message),
+  );
 
   useEffect(() => {
     studyName && horizon && isHorizonValid ? setIsFormValid(true) : setIsFormValid(false);
@@ -130,6 +114,8 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
                 showCounter={true}
                 error={!!studyErrorMessage}
                 assistiveTextLabel={studyErrorMessage}
+                rightIconAction="clean"
+                onRightIconClick={resetNameField}
               />
               <HorizonInput
                 horizon={horizon}
@@ -153,7 +139,20 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
         <Button
           icon="add"
           label={t('modal.@button_create')}
-          onClick={() => void saveStudyHandler()}
+          onClick={() => {
+            const studyData = {
+              id: study?.id,
+              name: studyName,
+              createdBy: user?.profile.sub,
+              keywords,
+              project: projectInfoName,
+              horizon,
+              trajectoryIds,
+              studyId: study?.id,
+              hvdc: false
+            };
+            void confirmCreation(studyData);
+          }}
           variant="primary"
           disabled={!isFormValid}
         />

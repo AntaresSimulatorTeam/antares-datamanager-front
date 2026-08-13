@@ -29,7 +29,7 @@
   },
   "page": {
     "@logs": "Logs",
-    "@projet": "Projet",
+    "@project": "Projet",
     "@logout": "Se déconnecter",
     "@parameters": "Paramètres",
     "@antares": "Antares",
@@ -119,6 +119,7 @@
     "@links": "Liens",
     "@link": "Lien",
     "@areas_links": "Zones & Liens",
+    "@configuration": "Configuration",
     "@load": "Consommation",
     "@thermal": "Central thermique",
     "@res": "Energie renouvelable",
@@ -159,7 +160,7 @@
   },
   "thermal": {
     "@installedPower": "Capacités installées",
-    "@installedPowerInformation": "Technology filled in",
+    "@technologyFilledIn": "Technologie renseignée",
     "@parameters": "Paramètres",
     "@parametersTechnical": "Paramètres techniques",
     "@specific": "Spécifique",
@@ -170,7 +171,8 @@
     "@costs": "Coûts",
     "@economics": "Économique",
     "@paramModulationMessage": "Au moins une trajectoire \"Specific\" doit être renseignée afin de pouvoir renseigner une trajectoire \"Param modulation\".",
-    "@nuclearFR": "Nucléaire FR"
+    "@nuclearFR": "Nucléaire FR",
+    "@timeSeriesInformation": "Time Series filled in"
   },
   "dsr": {
     "@capacityModulation": "Capacity Modulation",
@@ -188,6 +190,16 @@
     "@psp_virtual": "PSP virtual",
     "@series": "Series",
     "@informationMessage": "If a \"mod\" file is included in a \"series\" folder, the \"technical parameters\" folder is required."
+  },
+  "settings": {
+    "@title": "Settings",
+    "@settingsInformation": "Settings filled in",
+    "@adequacyPatch": "Adequacy Patch",
+    "@flowBased": "Flowbased",
+    "@generalData": "General data",
+    "@scenarioBuilder": "Scenario builder",
+    "@recalculate": "Recalculate",
+    "@read": "Read"
   },
   "trajectoryViewModal": {
     "@title_area": "Zones",

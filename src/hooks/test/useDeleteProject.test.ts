@@ -44,16 +44,16 @@ describe('useDeleteProject', () => {
       expectTypeOf(result.current.deleteProject).toBeFunction();
     });
 
-    await act(async () => result.current.deleteProject('projectId'));
+    await act(async () => result.current.deleteProject(123));
 
     await waitFor(() => {
-      expect(projectService.deleteProjectById).toHaveBeenCalledWith('projectId');
+      expect(projectService.deleteProjectById).toHaveBeenCalledWith(123);
       expect(projectService.deleteProjectById).toHaveBeenCalledTimes(1);
       expect(mockUseProjectDispatch).toHaveBeenCalledTimes(1);
       expect(mockDispatch).toHaveBeenCalledTimes(1);
       expect(mockDispatch).toHaveBeenCalledWith({
         type: PROJECT_ACTION.REMOVE_PROJECT,
-        payload: 'projectId',
+        payload: 123,
       });
       expect(notifyToast).toHaveBeenCalledWith({
         type: 'success',
@@ -70,10 +70,10 @@ describe('useDeleteProject', () => {
       expectTypeOf(result.current.deleteProject).toBeFunction();
     });
 
-    await act(async () => result.current.deleteProject('projectId'));
+    await act(async () => result.current.deleteProject(123));
 
     await waitFor(() => {
-      expect(projectService.deleteProjectById).toHaveBeenCalledWith('projectId');
+      expect(projectService.deleteProjectById).toHaveBeenCalledWith(123);
       expect(projectService.deleteProjectById).toHaveBeenCalledTimes(1);
       expect(mockUseProjectDispatch).toHaveBeenCalledTimes(1);
       expect(mockDispatch).toHaveBeenCalledTimes(0);

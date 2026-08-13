@@ -14,6 +14,7 @@ import { SelectInputWithButton } from '@common/data/SelectInputWithButton.tsx';
 import { ProgressBar } from '@/components/input/ProgressBar.tsx';
 import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { IconButton, Switch } from '@design-system-rte/react';
+import { ChangeEvent } from 'react';
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
 
@@ -34,7 +35,7 @@ const getEditableHypothesisTableHeaders = ({
     cell: ({ getValue, row, table: { options } }) => {
       const { trajectory, status, isDefault } = row.original;
       return (
-        <div className="w-2/5">
+        <div className="w-4/5">
           <LabelWithButtonPreview
             value={getValue()}
             extraValue={isDefault && getValue() !== OTHER_AREAS_LABEL ? `(${t('studyDetails.@default')})` : ''}
@@ -49,12 +50,12 @@ const getEditableHypothesisTableHeaders = ({
   }),
   columnHelper.accessor('trajectory', {
     header: t('studyDetails.@trajectory'),
-    size: 623,
+    size: type === TRAJECTORY_TYPE.STS ? 520 : 623,
     cell: ({ row, table }) => {
       const { trajectory, status } = row.original;
 
       return trajectory?.trajectoryName && status !== TRAJECTORY_SELECTION_STATUS.MISSING ? (
-        <div className="flex w-full items-center gap-2 py-1">
+        <div className="flex w-full items-center justify-start gap-2 py-1">
           <LabelWithDeleteButton
             label={trajectory.trajectoryName}
             isDeletable={!isStudyGenerated}
@@ -102,20 +103,21 @@ const getEditableHypothesisTableHeaders = ({
     ? [
         columnHelper.accessor('hvdc', {
           header: '',
-          size: 50,
+          size: 220,
           cell: ({ row, table: { options } }) => {
-            const { hvdc, trajectory, status } = row.original;
-            if (hvdc == null) return null;
+            if (row.index === 0 || row.original.hvdc == undefined) return null;
+            const {hvdc, trajectory, status} = row.original;
             return (
               <Switch
                 appearance="brand"
                 label={t('link.@toggle_hvdc')}
-                onChange={() => void options?.meta?.activate?.()}
-                checked={hvdc}
+                onChange={(event: ChangeEvent<HTMLInputElement>) => void options?.meta?.activate?.(event.target.checked)}
+                defaultChecked={hvdc}
                 showIcon
                 showLabel
                 disabled={
                   status === TRAJECTORY_SELECTION_STATUS.ERROR ||
+                  isStudyGenerated ||
                   (!trajectory?.trajectoryName && status === TRAJECTORY_SELECTION_STATUS.MISSING)
                 }
                 readOnly={isStudyGenerated}

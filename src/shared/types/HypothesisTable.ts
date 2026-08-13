@@ -2,9 +2,9 @@ import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { TableOperationRow } from '@/shared/types/Generic.type.ts';
 import { TechnologyType } from '@/shared/types/Trajectory.type.ts';
 
-export type HypothesisConfig = { type: TRAJECTORY_TYPE; labelKey: string; hvdc?: boolean };
+export type HypothesisConfig = { type: TRAJECTORY_TYPE; labelKey: string; hasHvdcOption?: boolean, subRows?: HypothesisConfig[] };
 
-export type HypothesisTableOptions = { withReadOnlyRow: boolean; isStudyGenerated: boolean };
+export type HypothesisTableOptions = { withReadOnlyRow: boolean; };
 
 export type ReadOnlyObject = Record<string | number, boolean>;
 

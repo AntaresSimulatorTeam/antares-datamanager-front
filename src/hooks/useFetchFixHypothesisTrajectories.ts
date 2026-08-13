@@ -1,70 +1,83 @@
-import { getStudyTrajectories } from '@/shared/services/studyService.ts';
+import { getStudyById, getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { useEffect, useState } from 'react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
-import { DbTrajectory, HypothesisRowData } from '@/shared/types';
+import { HypothesisRowData } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 import { useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
-import { STUDY_ACTION } from '@/shared/enum/study.ts';
-import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
 import { HypothesisConfig, HypothesisTableOptions } from '@/shared/types/HypothesisTable.ts';
-import { buildReadOnlyRow } from '@/shared/utils/trajectoryUtils.ts';
+import { buildDispatchPayload, buildReadOnlyRow, buildTableData } from '@/shared/utils/trajectoryUtils.ts';
+import { STUDY_ACTION } from '@/shared/enum/study.ts';
 
 export const useFetchFixHypothesisTrajectories = (
-  configs: HypothesisConfig[],
+  configs: HypothesisConfig[][],
   options: HypothesisTableOptions,
+  isStudyGenerated: boolean,
   studyId?: number,
 ) => {
-  const [hypothesisTrajectories, setHypothesisTrajectories] = useState<HypothesisRowData[]>([]);
-  const [readOnlyRow, setReadOnlyRow] = useState<ReadOnlyObject>({});
+  const [firstTableData, setFirstTableData] = useState<HypothesisRowData[]>([]);
+  const [firstTableReadOnlyRow, setFirstTableReadOnlyRow] = useState<ReadOnlyObject>({});
+  const [secondTableData, setSecondTableData] = useState<HypothesisRowData[]>([]);
+  const [secondTableReadOnlyRow, setSecondTableReadOnlyRow] = useState<ReadOnlyObject>({});
   const dispatch = useStudyDispatch();
   const { t } = useTranslation();
 
+  const fetchTrajectories = async (id: number, config: (typeof configs)[number]) =>
+    Promise.all(config.map(({ type }) => getStudyTrajectories(id, type)));
+
   const getTrajectories = async (id: number) => {
     try {
-      const results = await Promise.all(configs.map((cfg) => getStudyTrajectories(id, cfg.type)));
+      let hvdcValue: boolean | undefined;
+      if (configs[0][1].hasHvdcOption && id != null) {
+        const studyData = await getStudyById(id);
+        hvdcValue = studyData.hvdc;
+      }
+      const promises = [configs[0], configs[1]]
+        .filter(Boolean)
+        .map(config => fetchTrajectories(id, config));
 
-      // Dispatch
+      const [firstResults, secondResults] = await Promise.all(promises);
+
       dispatch?.({
         type: STUDY_ACTION.ADD_TRAJECTORIES,
-        payload: configs.reduce(
-          (acc, cfg, idx) => {
-            const res = results[idx];
-            if (res?.length > 0) {
-              acc[cfg.type] = { trajectories: res };
-            }
-            return acc;
-          },
-          {} as Record<string, { trajectories: DbTrajectory[] }>,
-        ),
+        payload: {
+          ...(configs[0] && buildDispatchPayload(configs[0], firstResults)),
+          ...(configs[1] && buildDispatchPayload(configs[1], secondResults)),
+        },
       });
 
-      // Hypothesis rows
-      const dataTable: { hvdc?: boolean; label: string; result: DbTrajectory[] }[] = configs.map((cfg, idx) => ({
-        label: t(cfg.labelKey),
-        result: results[idx],
-        ...(cfg?.hvdc != null && { hvdc: cfg.hvdc }),
-      }));
-
-      const dataTrajectories = dataTable.map((data) => ({
-        hypothesis: data?.label,
-        trajectory: data?.result?.[0],
-        status: data?.result.length > 0 ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
-        ...(data.hvdc != null && { hvdc: data.hvdc }),
-      }));
-      setHypothesisTrajectories(dataTrajectories);
-
-      if (options.withReadOnlyRow) {
-        setReadOnlyRow({
-          '0': false,
-          '1': !results[0]?.length || (!results[1]?.length && options.isStudyGenerated),
-        });
-      } else if (options.isStudyGenerated) {
-        const indexes = [...dataTrajectories.keys()];
-        const onlyRows = buildReadOnlyRow(indexes);
-        setReadOnlyRow(onlyRows);
+      let firstData: HypothesisRowData[] = [];
+      if (configs[0]) {
+        firstData = buildTableData(configs[0], t, firstResults, {hvdc: hvdcValue});
+        firstData.length > 0 && setFirstTableData(firstData);
       }
-    } catch {
+      let secondData: HypothesisRowData[] = [];
+      if (configs[1]) {
+        secondData = buildTableData(configs[1], t, secondResults);
+        secondData.length > 0 && setSecondTableData(secondData);
+      }
+
+      if (options.withReadOnlyRow && !isStudyGenerated) {
+        setFirstTableReadOnlyRow({
+          0: false,
+          1: !firstResults[0]?.length,
+        });
+        if (configs[1]) {
+          setSecondTableReadOnlyRow({
+            0: !firstResults[0]?.length,
+            1: !firstResults[0]?.length,
+            '2.0': false,
+            '2.1': false,
+          });
+        }
+      } else if (isStudyGenerated) {
+        setFirstTableReadOnlyRow(buildReadOnlyRow(['0', '1']));
+        if (configs[1]) {
+          setSecondTableReadOnlyRow(buildReadOnlyRow(['0', '1', '2.0', '2.1']));
+        }
+      }
+    } catch(error) {
       // Silent handler
+      console.error(error);
     }
   };
 
@@ -74,7 +87,7 @@ export const useFetchFixHypothesisTrajectories = (
     }
   }, [studyId]);
 
-  return options.withReadOnlyRow || options.isStudyGenerated
-    ? { hypothesisTrajectories, readOnlyRow }
-    : { hypothesisTrajectories };
+  return options.withReadOnlyRow || isStudyGenerated
+    ? { firstTableData, firstTableReadOnlyRow, secondTableData, secondTableReadOnlyRow }
+    : { firstTableData, secondTableData };
 };
