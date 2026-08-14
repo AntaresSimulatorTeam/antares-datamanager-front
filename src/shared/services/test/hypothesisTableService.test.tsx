@@ -65,6 +65,25 @@ vi.mock('@/shared/utils/formFormatter', async (importOriginal) => {
   };
 });
 
+vi.mock('@/shared/utils/trajectoryUtils', async (importOriginal) => {
+  const actual: Mock = await importOriginal();
+  return {
+    ...actual,
+    setNestedData: vi
+      .fn()
+      .mockImplementation(
+        (prev: HypothesisRowData[], _index, update) => [{ ...prev[0], ...update }] as HypothesisRowData[],
+      ),
+    buildErrorTrajectory: vi.fn().mockReturnValue({
+      id: 42,
+      label: 'Test Trajectory',
+      error: true,
+      user: 'Alice',
+      hypothesis: 'Hypothesis A',
+    }),
+  };
+});
+
 describe('handleTrajectoryError', () => {
   it('should update data and trigger alert', () => {
     const mockSetData = vi.fn();
@@ -74,25 +93,6 @@ describe('handleTrajectoryError', () => {
     const hypothesis = 'Hypothesis A';
     const userName = 'Alice';
     const alert = { message: 'Error occurred', content: 'Invalid trajectory' };
-
-    vi.mock('@/shared/utils/trajectoryUtils', async (importOriginal) => {
-      const actual: Mock = await importOriginal();
-      return {
-        ...actual,
-        setNestedData: vi
-          .fn()
-          .mockImplementation(
-            (prev: HypothesisRowData[], _index, update) => [{ ...prev[0], ...update }] as HypothesisRowData[],
-          ),
-        buildErrorTrajectory: vi.fn().mockReturnValue({
-          id: 42,
-          label: 'Test Trajectory',
-          error: true,
-          user: 'Alice',
-          hypothesis: 'Hypothesis A',
-        }),
-      };
-    });
 
     handleTrajectoryError(type, rowIndex, trajectory, hypothesis, userName, mockSetData, alert);
 

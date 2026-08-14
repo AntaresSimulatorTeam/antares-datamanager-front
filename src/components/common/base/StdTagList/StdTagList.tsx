@@ -74,6 +74,7 @@ const StdTagList = ({
         {plusTagsVisible && (
             <Dropdown
               dropdownId="card-options"
+              role="dropdown"
               onClose={() => setIsModalOpen(false)}
               style={{width: '200px'}}
               trigger={
