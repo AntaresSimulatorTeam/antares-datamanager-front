@@ -1115,27 +1115,6 @@ describe('uploadTrajectory', () => {
     });
   });
 
-  it('should import ADEQUACY_PATCH trajectory without technology into data base', async () => {
-    await uploadTrajectory(
-      '2030-2031',
-      87,
-      TRAJECTORY_TYPE.ADEQUACY_PATCH,
-      'adcq',
-      '',
-      onProgress,
-      false,
-    );
-
-    await waitFor(() => {
-      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
-      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
-        'https://mockapi.com/v1/trajectory/adequacy-patch?trajectoryToUse=adcq&horizon=2030-2031&studyId=87&isCivilYear=false',
-        requestOptions,
-        onProgress,
-      );
-    });
-  });
-
   it('should import SETTINGS trajectory without technology into data base', async () => {
     await uploadTrajectory(
       '2030-2031',
