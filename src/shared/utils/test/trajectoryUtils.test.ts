@@ -585,9 +585,21 @@ describe('getTrajectoryTypeByIndex', () => {
 });
 
 describe('getPathFromTrajectoryType', () => {
-  it('should return economic path for THERMAL_ECONOMIC_PARAMETER', () => {
-    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER)).toBe(
-      String.raw`\\thermal\\economic parameters\\economic`,
+  it('should return economic path for AREA', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.AREA)).toBe(
+      String.raw`\\area`,
+    );
+  });
+
+  it('should return economic path for LINK', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.LINK)).toBe(
+      String.raw`\\link`,
+    );
+  });
+
+  it('should return economic path for LOAD', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.LOAD)).toBe(
+      String.raw`\\load`,
     );
   });
 
@@ -1103,6 +1115,8 @@ describe('getSubRowListWithArea', () => {
   const mockT = vi.fn((key: string) => {
     if (key === 'thermal.@technologyFilledIn') return 'Technology filled in';
     if (key === 'thermal.@specificInformation') return 'Specific Info';
+    if (key === 'settings.@settingsInformation') return 'Settings Info';
+    if (key === 'thermal.@timeSeriesInformation') return 'Time series Info';
     return key;
   }) as unknown as TFunction<'translation', undefined>;
 
@@ -1129,6 +1143,24 @@ describe('getSubRowListWithArea', () => {
     const result = getSubRowListWithArea(mockRow, mockT, TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER);
     expect(result).toEqual({
       message: 'Specific Info: AT, FR',
+      messageNb: 2,
+    });
+  });
+
+  it('should return message and count for ADEQUACY_PATCH', () => {
+    const mockRow = ['AT', 'FR'];
+    const result = getSubRowListWithArea(mockRow, mockT, TRAJECTORY_TYPE.ADEQUACY_PATCH);
+    expect(result).toEqual({
+      message: 'Settings Info: AT, FR',
+      messageNb: 2,
+    });
+  });
+
+  it('should return message and count for NUCLEAR_FR_MODULATION', () => {
+    const mockRow = ['AT', 'FR'];
+    const result = getSubRowListWithArea(mockRow, mockT, TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION);
+    expect(result).toEqual({
+      message: 'Time series Info: AT, FR',
       messageNb: 2,
     });
   });

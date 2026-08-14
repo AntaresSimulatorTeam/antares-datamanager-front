@@ -122,6 +122,31 @@ export const mockDbTrajectoryArray: DbTrajectory[] = [
   },
 ];
 
+export const mockFBDbTrajectoryArray: DbTrajectory[] = [
+  {
+    id: 1,
+    trajectoryName: 'porygon_2023/2021',
+    type: TRAJECTORY_TYPE.FLOWBASED,
+    version: 3,
+    userName: 'mouad',
+    creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+    area: '',
+    technology: '',
+    hasTimeSeries: false,
+  },
+  {
+    id: 2,
+    trajectoryName: 'porygon_2023/2022',
+    type: TRAJECTORY_TYPE.FLOWBASED,
+    version: 3,
+    userName: 'mouad',
+    creationDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+    area: '',
+    technology: '',
+    hasTimeSeries: false,
+  },
+];
+
 export const mockDbTrajectoryArrayLoad: DbTrajectory[] = [
   {
     id: 1,
@@ -488,6 +513,24 @@ export const mockFsTrajectoryResFRArray: FsTrajectory[] = [
   {
     trajectoryName: 'BP_REF_C',
     type: TRAJECTORY_TYPE.RES_CAPACITY,
+    lastModifiedDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+  },
+];
+
+export const mockFsTrajectoryFBArray: FsTrajectory[] = [
+  {
+    trajectoryName: 'porygon_2023/2021',
+    type: TRAJECTORY_TYPE.FLOWBASED,
+    lastModifiedDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+  },
+  {
+    trajectoryName: 'porygon_2023/2022',
+    type: TRAJECTORY_TYPE.FLOWBASED,
+    lastModifiedDate: '2026-08-22 15:13:56.860045' as unknown as Date,
+  },
+  {
+    trajectoryName: 'porygon_2023/2023',
+    type: TRAJECTORY_TYPE.FLOWBASED,
     lastModifiedDate: '2026-08-22 15:13:56.860045' as unknown as Date,
   },
 ];

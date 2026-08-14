@@ -47,7 +47,7 @@ export const useTrajectoryImport = (
             study?.horizon,
             study?.id,
             type,
-            value?.label,
+            value?.value,
             hypothesis?.area,
             (progressValue: number) => {
               setProgress(+progressValue.toFixed(0));
