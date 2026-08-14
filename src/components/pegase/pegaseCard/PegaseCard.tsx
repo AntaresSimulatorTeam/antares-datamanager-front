@@ -7,7 +7,7 @@
 import { PropsWithChildren, ReactElement } from 'react';
 import PegaseCardTitle from './pegaseCardTitle/PegaseCardTitle';
 import { RdsIconButtonProps } from 'rte-design-system-react';
-import { DropdownItemProps } from '@design-system-rte/core/components/dropdown/dropdown.interface';
+import { DropdownItemOption } from '@/shared/types';
 
 export type PegaseCardSecondaryButtonPosition = 'default' | 'center';
 
@@ -16,7 +16,7 @@ type CardProps = {
   disabled?: boolean;
   onClick?: () => void;
   title: string;
-  dropdownOptions: DropdownItemProps[];
+  dropdownOptions: DropdownItemOption[];
   icons?: ReactElement<RdsIconButtonProps>;
   lineClamp?: number;
 };

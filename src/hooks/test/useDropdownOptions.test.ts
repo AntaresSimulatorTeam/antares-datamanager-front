@@ -7,7 +7,7 @@
 import { renderHook } from '@testing-library/react';
 import { useDropdownOptions } from '@/hooks/useDropdownOptions';
 import { describe, expectTypeOf, it } from 'vitest';
-import { DropdownItemProps } from '@design-system-rte/core/components/dropdown/dropdown.interface';
+import { DropdownItemOption } from '@/shared/types';
 
 describe('useDropdownOptions', () => {
   const mockOnClick = vi.fn();
@@ -16,11 +16,11 @@ describe('useDropdownOptions', () => {
     const { result } = renderHook(() => useDropdownOptions());
 
     expectTypeOf(result.current.editOption).toBeFunction();
-    expectTypeOf(result.current.editOption).returns.toEqualTypeOf<DropdownItemProps>();
+    expectTypeOf(result.current.editOption).returns.toEqualTypeOf<DropdownItemOption>();
     expectTypeOf(result.current.deleteOption).toBeFunction();
-    expectTypeOf(result.current.deleteOption).returns.toEqualTypeOf<DropdownItemProps>();
+    expectTypeOf(result.current.deleteOption).returns.toEqualTypeOf<DropdownItemOption>();
     expectTypeOf(result.current.pinOption).toBeFunction();
-    expectTypeOf(result.current.pinOption).returns.toEqualTypeOf<DropdownItemProps>();
+    expectTypeOf(result.current.pinOption).returns.toEqualTypeOf<DropdownItemOption>();
   });
 
   it('should call editOption and return the right set of options', () => {

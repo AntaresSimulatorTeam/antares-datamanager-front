@@ -5,7 +5,7 @@
  */
 
 import { createColumnHelper, TableOptions } from '@tanstack/react-table';
-import { HypothesisRowData, TableHeadersGetterProps } from '@/shared/types';
+import { DropdownItemOption, HypothesisRowData, TableHeadersGetterProps } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { CellWithStatus } from '@common/data/CellWithStatus.tsx';
 import { LabelWithButtonPreview } from '@common/data/LabelWithButtonPreview.tsx';
@@ -16,7 +16,6 @@ import { getAlignment, hasLabelDefault } from '@/shared/utils/hypothesisTableUti
 import { getSubRowListWithArea, getSubRowsList, isEmptyRow } from '@/shared/utils/trajectoryUtils.ts';
 import { getInformationMessage } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { Button, Icon, IconButton, Tooltip } from '@design-system-rte/react';
-import { DropdownItemProps } from '@design-system-rte/core/components/dropdown/dropdown.interface';
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
 const getExpandableHypothesisTableHeaders = ({
@@ -109,7 +108,7 @@ const getExpandableHypothesisTableHeaders = ({
       ) : (
         <div className="flex w-full items-center justify-start gap-2 py-0.5">
           <SelectInputWithButton
-            onSelect={(value: DropdownItemProps & { id?: number }) => {
+            onSelect={(value: DropdownItemOption) => {
               setErrorInfo({ index: row.index, message: '' });
               void options?.meta?.updateData?.(row.id, value.id, 'success');
             }}

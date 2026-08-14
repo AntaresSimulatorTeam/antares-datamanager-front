@@ -1,11 +1,11 @@
 import { useTranslation } from 'react-i18next';
 import { Button } from '@design-system-rte/react';
 import SelectAndSearchableInput from '@/components/input/SelectAndSearchableInput.tsx';
-import { DropdownItemProps } from '@design-system-rte/core/components/dropdown/dropdown.interface';
+import { DropdownItemOption } from '@/shared/types';
 
 interface SelectInputWithButtonProps {
-  onSelect: (value: DropdownItemProps & { id?: number }) => void;
-  onSearch: (value?: string) => Promise<DropdownItemProps[] | undefined>;
+  onSelect: (value: DropdownItemOption) => void;
+  onSearch: (value?: string) => Promise<DropdownItemOption[] | undefined>;
   isDisabled: boolean;
   onClickButton?: () => void | Promise<void>;
   placeHolder?: string;
@@ -23,7 +23,7 @@ export const SelectInputWithButton = ({
   return (
     <div className="flex w-[400px] items-center justify-start gap-2">
       <SelectAndSearchableInput
-        onSelect={(value: DropdownItemProps & { id?: number }) => void onSelect(value)}
+        onSelect={(value: DropdownItemOption) => void onSelect(value)}
         setSearchTerm={async (value?: string) => await onSearch(value)}
         defaultPlaceHolder={isDisabled ? '' : placeHolder || t('studyDetails.@select_trajectory')}
         isSearchable={true}

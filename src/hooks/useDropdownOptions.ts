@@ -6,7 +6,7 @@
 
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DropdownItemProps } from '@design-system-rte/core/components/dropdown/dropdown.interface';
+import { DropdownItemOption } from '@/shared/types';
 
 export const NO_WRAP_CLASS = 'whitespace-nowrap';
 
@@ -14,7 +14,7 @@ export const useDropdownOptions = () => {
   const { t } = useTranslation();
 
   const editOption = useCallback(
-    (onClick: () => void, label?: string, disabled?: boolean): DropdownItemProps =>
+    (onClick: () => void, label?: string, disabled?: boolean): DropdownItemOption =>
       ({
         label: label ?? t('project.@edit'),
         leftIcon: 'edit',
@@ -25,7 +25,7 @@ export const useDropdownOptions = () => {
   );
 
   const deleteOption = useCallback(
-    (onClick: () => void, label?: string, disabled?: boolean): DropdownItemProps =>
+    (onClick: () => void, label?: string, disabled?: boolean): DropdownItemOption =>
       ({
         label: label ?? t('project.@delete'),
         leftIcon: 'delete',
@@ -36,7 +36,7 @@ export const useDropdownOptions = () => {
   );
 
   const pinOption = useCallback(
-    (pinned: boolean, onClick: () => void, disabled?: boolean): DropdownItemProps =>
+    (pinned: boolean, onClick: () => void, disabled?: boolean): DropdownItemOption =>
       ({
         label: pinned ? t('project.@unpin') : t('project.@pin'),
         leftIcon: pinned ? 'keep-off' : 'keep',

@@ -1,6 +1,7 @@
 import StdSimpleTable from '@common/data/stdSimpleTable/StdSimpleTable.tsx';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
+  DropdownItemOption,
   ErrorMessageType,
   ExpandedState,
   HypothesisRowData,
@@ -11,14 +12,13 @@ import {
 import { useTranslation } from 'react-i18next';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { TableOptions } from '@tanstack/react-table';
-import { DropdownItemProps } from '@design-system-rte/core/components/dropdown/dropdown.interface';
 
 interface PegaseHypothesisTableProps extends TableHeadersProps {
   id: string;
   data: HypothesisRowData[];
   getTableHeaders: (context: TableHeadersGetterProps) => TableOptions<HypothesisRowData>['columns'];
   readOnly?: ReadOnlyObject;
-  handleSearch?: (fileNameContains: string, rowId: string) => Promise<DropdownItemProps[] | undefined>;
+  handleSearch?: (fileNameContains: string, rowId: string) => Promise<DropdownItemOption[] | undefined>;
   handleImport?: (rowId: string) => Promise<void>;
   isReadOnlyEnable?: boolean;
   removeRow?: (value: string, rowId?: string) => void | Promise<void>;

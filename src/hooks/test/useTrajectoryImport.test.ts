@@ -3,12 +3,11 @@ import { act, renderHook } from '@testing-library/react';
 import { uploadTrajectory } from '@/shared/services/trajectoryService.ts';
 import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory';
-import { StudyDTO, UserState } from '@/shared/types';
+import { DropdownItemOption, StudyDTO, UserState } from '@/shared/types';
 import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.ts';
 import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
-import { DropdownItemProps } from '@design-system-rte/core/components/dropdown/dropdown.interface';
 
 vi.mock('@/shared/services/trajectoryService', () => ({
   uploadTrajectory: vi.fn(),
@@ -49,7 +48,7 @@ describe('useTrajectoryImport', () => {
 
   const studyState = {};
 
-  const value = { id: 12, label: 'Trajectory A', value: 'Trajectory A' } as DropdownItemProps & {id?: number};
+  const value = { id: '12', label: 'Trajectory A', value: 'Trajectory A' } as DropdownItemOption;
 
   beforeEach(() => {
     vi.clearAllMocks();

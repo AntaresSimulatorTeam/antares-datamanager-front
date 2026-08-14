@@ -8,13 +8,13 @@ import { Button, Icon } from '@design-system-rte/react';
 import { useTrajectoryFetchFromFSHandler } from '@/hooks/useTrajectoryFetchFromFSHandler.ts';
 import { getParamForFetchFSTrajectory } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { HypothesisType } from '@/shared/types/HypothesisTable.ts';
-import { DropdownItemProps } from '@design-system-rte/core/components/dropdown/dropdown.interface';
+import { DropdownItemOption } from '@/shared/types';
 
 interface ImportTrajectoryModalProps {
-  options: DropdownItemProps[] | undefined;
+  options: DropdownItemOption[] | undefined;
   onClose: (
     typeToUse?: TRAJECTORY_TYPE,
-    value?: DropdownItemProps,
+    value?: DropdownItemOption,
     hypothesis?: HypothesisType,
     indexArray?: number[],
   ) => Promise<void>;
@@ -33,8 +33,8 @@ export const ImportTrajectoryModal = ({
   rowsNb,
 }: ImportTrajectoryModalProps) => {
   const { t } = useTranslation();
-  const [trajectorySelected, setTrajectorySelected] = useState<DropdownItemProps | null>(null);
-  const [optionsFS, setOptionsFS] = useState<DropdownItemProps[] | undefined>(options);
+  const [trajectorySelected, setTrajectorySelected] = useState<DropdownItemOption | null>(null);
+  const [optionsFS, setOptionsFS] = useState<DropdownItemOption[] | undefined>(options);
   const { typeToUse, areaToUse, isDefaultArea } = getParamForFetchFSTrajectory(tabType, indexArray, rowsNb, hypothesis);
   const path = getPathFromTrajectoryType(typeToUse, hypothesis);
   const { handleFetchFromFS } = useTrajectoryFetchFromFSHandler();

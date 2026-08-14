@@ -6,15 +6,15 @@
 
 import { useCallback, useState } from 'react';
 import { Dropdown, DropdownItem, IconButton, TextInput } from '@design-system-rte/react';
-import { DropdownItemProps } from '@design-system-rte/core/components/dropdown/dropdown.interface';
+import { DropdownItemOption } from '@/shared/types';
 
 interface ProjectManagerProps {
-  onSelect: (value: DropdownItemProps & { id?: number }) => void;
-  setSearchTerm?: (value?: string) => Promise<DropdownItemProps[] | undefined>;
+  onSelect: (value: DropdownItemOption) => void;
+  setSearchTerm?: (value?: string) => Promise<DropdownItemOption[] | undefined>;
   isSearchable?: boolean;
   isInputDisabled?: boolean;
   resetField?: () => void;
-  options?: DropdownItemProps[];
+  options?: DropdownItemOption[];
   required?: boolean;
   errorMessage?: string;
   defaultValue?: string;
@@ -37,8 +37,8 @@ const SelectAndSearchableInput = ({
   defaultPlaceHolder,
   dropdownWidth
 }: ProjectManagerProps) => {
-  const [defaultOptions] = useState<DropdownItemProps[] | undefined>(options);
-  const [optionsSelection, setOptionsSelection] = useState<DropdownItemProps[] | undefined>(options ?? []);
+  const [defaultOptions] = useState<DropdownItemOption[] | undefined>(options);
+  const [optionsSelection, setOptionsSelection] = useState<DropdownItemOption[] | undefined>(options ?? []);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isSelectEnable, setIsSelectEnable] = useState(true);
   const [valueInput, setValueInput] = useState(defaultValue ?? '');
@@ -72,8 +72,8 @@ const SelectAndSearchableInput = ({
   );
 
   const handleSelectOption = useCallback(
-    (value: DropdownItemProps & { id?: number }) => {
-      value?.label && setValueInput(value?.label);
+    (value: DropdownItemOption) => {
+      value?.value && setValueInput(value?.value);
       onSelect(value);
       setIsDropdownOpen(false);
     },

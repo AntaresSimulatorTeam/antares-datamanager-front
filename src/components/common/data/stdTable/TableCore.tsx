@@ -6,20 +6,19 @@
 
 import { Row, RowData, Table } from '@tanstack/react-table';
 import { tableCoreRowClassBuilder } from './tableCoreRowClassBuilder';
-import { RowStatus } from '@/shared/types';
+import { DropdownItemOption, RowStatus } from '@/shared/types';
 import { Fragment } from 'react';
 import { TableHeader } from '@common/data/stdTable/TableHeader.tsx';
 import { TableDataCell } from '@common/data/stdTable/TableDataCell.tsx';
 import { tableStyleBuilder } from '@common/data/stdTable/tableStyleBuilder.ts';
 import { useRdsId } from 'rte-design-system-react';
 import { tableClassBuilder } from '@common/data/stdTable/tableClassBuilder.ts';
-import { DropdownItemProps } from '@design-system-rte/core/components/dropdown/dropdown.interface';
 
 declare module '@tanstack/react-table' {
   interface TableMeta<TData extends RowData> {
     updateData?: (rowId: string, value: unknown, status: RowStatus) => void;
     removeRow?: (value: string, rowId?: string) => void | Promise<void>;
-    search?: (value: string, rowId: string) => Promise<DropdownItemProps[] | undefined> | undefined;
+    search?: (value: string, rowId: string) => Promise<DropdownItemOption[] | undefined> | undefined;
     importData?: (rowId: string) => Promise<void>;
     viewData?: (rowId: string) => void | Promise<void>;
     activate?: (value?: string | boolean) => void | Promise<void>;

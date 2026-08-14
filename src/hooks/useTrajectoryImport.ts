@@ -2,15 +2,20 @@ import { Dispatch, SetStateAction, useCallback, useState } from 'react';
 import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.ts';
 import { uploadTrajectory } from '@/shared/services/trajectoryService.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { FileInputStatus, HypothesisRowData, StudyActionType, StudyDTO, StudyState } from '@/shared/types';
+import {
+  DropdownItemOption,
+  FileInputStatus,
+  HypothesisRowData,
+  StudyActionType,
+  StudyDTO,
+  StudyState,
+} from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
 import { isBusinessError } from '@/shared/utils/errorUtils.ts';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { HypothesisType } from '@/shared/types/HypothesisTable.ts';
-import { DropdownItemProps } from '@design-system-rte/core/components/dropdown/dropdown.interface';
-import { formatFlowBasedLabel } from '@/shared/utils/textUtils.ts';
 
 export const useTrajectoryImport = (
   study: StudyDTO,
@@ -29,7 +34,7 @@ export const useTrajectoryImport = (
   const importTrajectory = useCallback(
     async (
       setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
-      value?: DropdownItemProps & {id?: number},
+      value?: DropdownItemOption,
       type?: TRAJECTORY_TYPE,
       indexArray?: number[],
       hypothesis?: HypothesisType,
@@ -42,7 +47,7 @@ export const useTrajectoryImport = (
             study?.horizon,
             study?.id,
             type,
-            type === TRAJECTORY_TYPE.FLOWBASED && value?.label ? formatFlowBasedLabel(value?.label) : value?.label,
+            value?.value,
             hypothesis?.area,
             (progressValue: number) => {
               setProgress(+progressValue.toFixed(0));

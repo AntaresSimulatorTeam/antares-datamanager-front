@@ -71,7 +71,7 @@ export const useHypothesisTableUpdateHandler = ({
       } else if (status === 'success') {
         const dbTrajectory =
           dbTrajectories.length > 0
-            ? dbTrajectories.find((item) => item.id === value)
+            ? dbTrajectories.find((item) => item.id ==value)
             : getRowDataSelected(data, indexArray)?.trajectory;
         if (dbTrajectory) {
           await attachTrajectory(typeToUse, indexArray, status, dbTrajectory, setData);
