@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { DbTrajectory, HypothesisRowData, RowStatus, SelectOption, TabProps } from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, RowStatus, TabProps } from '@/shared/types';
 import { useCallback, useEffect, useState } from 'react';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
@@ -26,6 +26,7 @@ import { snakeCaseUnderscore } from '@/shared/utils/textUtils.ts';
 import { useTrajectoryFetchFromFSHandler } from '@/hooks/useTrajectoryFetchFromFSHandler.ts';
 import { getParamForFetchFSTrajectory } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { HypothesisType } from '@/shared/types/HypothesisTable.ts';
+import { DropdownItemProps } from '@design-system-rte/core/components/dropdown/dropdown.interface';
 
 const ResDistributionTab = ({ defaultAreas, areas, studyData, types }: TabProps & { types: TRAJECTORY_TYPE[] }) => {
   const studyState = useStudy();
@@ -37,7 +38,7 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData, types }: TabProps 
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
   const [technologies, setTechnologies] = useState<string[]>([]);
   const { isModalOpen, toggleModal } = useNewStudyModal();
-  const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
+  const [optionsFS, setOptionsFS] = useState<DropdownItemProps[]>();
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const [selectedType, setSelectedType] = useState<TRAJECTORY_TYPE>(TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION);
   const { hypothesisTrajectories, readOnlyRow, technologyList } = useFetchHypothesisTrajectories(
@@ -186,7 +187,7 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData, types }: TabProps 
           options={optionsFS}
           onClose={async (
             typeToUse?: TRAJECTORY_TYPE,
-            value?: SelectOption,
+            value?: DropdownItemProps & {id?: number},
             hypothesis?: HypothesisType,
             indexArray?: number[],
           ) => {

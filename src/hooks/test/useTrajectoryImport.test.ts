@@ -8,6 +8,7 @@ import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.
 import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
+import { DropdownItemProps } from '@design-system-rte/core/components/dropdown/dropdown.interface';
 
 vi.mock('@/shared/services/trajectoryService', () => ({
   uploadTrajectory: vi.fn(),
@@ -48,7 +49,7 @@ describe('useTrajectoryImport', () => {
 
   const studyState = {};
 
-  const value = { id: 12, label: 'Trajectory A', value: 'Trajectory A' };
+  const value = { id: 12, label: 'Trajectory A', value: 'Trajectory A' } as DropdownItemProps & {id?: number};
 
   beforeEach(() => {
     vi.clearAllMocks();

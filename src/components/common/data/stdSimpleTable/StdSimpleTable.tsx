@@ -14,7 +14,8 @@ import {
 } from '@tanstack/react-table';
 import TableCore, { TableCoreProps } from '../stdTable/TableCore';
 import { ReadOnlyFeature } from '@common/data/stdTable/features/readOnly.ts';
-import { RowStatus, SelectOption } from '@/shared/types';
+import { RowStatus } from '@/shared/types';
+import { DropdownItemProps } from '@design-system-rte/core/components/dropdown/dropdown.interface';
 
 export type StdSimpleTableProps<TData> = {
   getCoreRowModel?: (table: Table<TData>) => () => RowModel<TData>;
@@ -23,7 +24,7 @@ export type StdSimpleTableProps<TData> = {
   updateData?: (rowId: string, value: unknown, status: RowStatus) => void;
   removeRow?: (value: string, rowId?: string) => void | Promise<void>;
   viewData?: (rowId: string) => void | Promise<void>;
-  search?: (value: string, rowId: string) => Promise<SelectOption[] | undefined> | undefined;
+  search?: (value: string, rowId: string) => Promise<DropdownItemProps[] | undefined> | undefined;
   importData?: (rowId: string) => Promise<void>;
   activate?: (value?: string | boolean) => void | Promise<void>;
 } & Omit<TableCoreProps<TData>, 'table'> &

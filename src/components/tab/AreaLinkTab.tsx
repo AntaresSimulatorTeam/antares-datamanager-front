@@ -10,7 +10,7 @@ import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { useTranslation } from 'react-i18next';
 import { unlinkAllTrajectoriesFromStudy } from '@/shared/services/trajectoryService.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { DbTrajectory, HypothesisRowData, RowStatus, SelectOption, StudyDTO, TrajectoryViewData } from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, RowStatus, StudyDTO, TrajectoryViewData } from '@/shared/types';
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
@@ -35,6 +35,7 @@ import { useHypothesisTableUpdateHandler } from '@/hooks/useHypothesisTableUpdat
 import { updateStudy } from '@/shared/services/studyService.ts';
 import { HypothesisType } from '@/shared/types/HypothesisTable.ts';
 import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
+import { DropdownItemProps } from '@design-system-rte/core/components/dropdown/dropdown.interface';
 
 interface AreaLinkTabProps {
   studyData: StudyDTO;
@@ -45,7 +46,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const dispatch = useStudyDispatch();
   const { t } = useTranslation();
-  const [optionsFS, setOptionsFS] = useState<SelectOption[] | undefined>();
+  const [optionsFS, setOptionsFS] = useState<DropdownItemProps[] | undefined>();
   const [rowIdSelected, setRowIdSelected] = useState<string>('0');
   const [trajectoryData, setTrajectoryData] = useState<TrajectoryViewData | undefined>();
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -237,7 +238,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
           options={optionsFS}
           onClose={async (
             typeToUse?: TRAJECTORY_TYPE,
-            value?: SelectOption,
+            value?: DropdownItemProps & {id?: number},
             hypothesis?: HypothesisType,
             indexArray?: number[],
           ) => {

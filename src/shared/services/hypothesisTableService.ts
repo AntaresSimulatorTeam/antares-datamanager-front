@@ -12,7 +12,6 @@ import {
   HypothesisRowData,
   isTrajectorySubrowsType,
   ParamTrajectoryState,
-  SelectOption,
   StudyActionType,
   ThermalParamTrajectoryType,
   TrajectoryViewData,
@@ -33,6 +32,7 @@ import { getSchemeData } from '@/shared/utils/hypothesisTableUtils.ts';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { computeDsrDataAndReadOnly } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { TrajectorySearchParams } from '@/shared/types/HypothesisTable.ts';
+import { DropdownItemProps } from '@design-system-rte/core/components/dropdown/dropdown.interface';
 
 export const handleTrajectoryError = (
   type: TRAJECTORY_TYPE,
@@ -74,7 +74,7 @@ export const handleTrajectoryError = (
  * @param {string | undefined} options.technology - An optional parameter specifying the technology associated with the trajectory.
  * @param {string | undefined} options.fileNameContains - The value used as a search filter.
  *
- * @returns {Promise<SelectOption[] | undefined>} A Promise resolving to an array of selection options
+ * @returns {Promise<DropdownItemProps[] | undefined>} A Promise resolving to an array of selection options
  * converted from the search results, or undefined in case of an error.
  */
 export const handleTrajectorySearch = async (
@@ -82,7 +82,7 @@ export const handleTrajectorySearch = async (
   setDbTrajectories: Dispatch<SetStateAction<DbTrajectory[]>>,
   studyHorizon: string,
   options: TrajectorySearchParams,
-): Promise<SelectOption[] | undefined> => {
+): Promise<DropdownItemProps[] | undefined> => {
   try {
     if (options?.area && options.area === OTHER_AREAS_LABEL) {
       options.area = OTHER_AREAS;

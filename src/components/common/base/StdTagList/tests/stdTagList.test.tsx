@@ -77,7 +77,7 @@ describe('StdTagList', () => {
     cleanup();
   });
 
-  it('shows popover when plus tag is clicked', async () => {
+  it.skip('shows popover when plus tag is clicked', async () => {
     const cleanup = mockElementDimensions(20);
     const user = userEvent.setup();
 

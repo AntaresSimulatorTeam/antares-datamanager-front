@@ -9,7 +9,6 @@ import {
   DbTrajectory,
   HypothesisRowData,
   RowStatus,
-  SelectOption,
   TabProps,
   TechnologyType,
   TrajectoryViewData,
@@ -38,6 +37,7 @@ import { useTrajectoryFetchFromFSHandler } from '@/hooks/useTrajectoryFetchFromF
 import { HypothesisType, RowToDeleteProps } from '@/shared/types/HypothesisTable.ts';
 import { useHypothesisTableUpdateHandler } from '@/hooks/useHypothesisTableUpdateHandler.ts';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
+import { DropdownItemProps } from '@design-system-rte/core/components/dropdown/dropdown.interface';
 
 const ExpandableTab = ({
   defaultAreas,
@@ -57,7 +57,7 @@ const ExpandableTab = ({
   const [technologies, setTechnologies] = useState<TechnologyType[]>([]);
   const [technologiesLabel, setTechnologiesLabel] = useState<string[]>([]);
   const { isModalOpen, toggleModal } = useNewStudyModal();
-  const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
+  const [optionsFS, setOptionsFS] = useState<DropdownItemProps[]>();
   const [trajectoryData, setTrajectoryData] = useState<TrajectoryViewData | undefined>();
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
@@ -231,7 +231,7 @@ const ExpandableTab = ({
           options={optionsFS}
           onClose={async (
             typeToUse?: TRAJECTORY_TYPE,
-            value?: SelectOption,
+            value?: DropdownItemProps & {id?: number},
             hypothesis?: HypothesisType,
             indexArray?: number[],
           ) => {

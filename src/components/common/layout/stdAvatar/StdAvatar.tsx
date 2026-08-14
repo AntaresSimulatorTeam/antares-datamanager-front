@@ -5,7 +5,7 @@
  */
 
 import { avatarClassBuilder } from './avatarClassBuilder';
-import { AVATAR_COLORS } from '../stdAvatarGroup/avatarTools';
+import { AVATAR_COLORS } from './avatarTools.ts';
 import { RdsTextTooltip, useRdsId } from 'rte-design-system-react';
 
 export type AvatarSize = 'es' | 's' | 'm';

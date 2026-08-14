@@ -16,7 +16,7 @@ import {
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 
 describe('convertToSelectionOptionType', () => {
-  it('should return an array of SelectOption type when array of DbTrajectory as an argument', () => {
+  it('should return an array of DropdownItemProps type when array of DbTrajectory as an argument', () => {
     expect(convertToSelectionOptionType(mockDbTrajectoryArray)).toEqual([
       { id: 1, label: 'area_PB_2024', value: 'area_PB_2024' },
       { id: 2, label: 'area_PB_2026', value: 'area_PB_2026' },
@@ -34,14 +34,14 @@ describe('convertToSelectionOptionType', () => {
 });
 
 describe('convertToFSSelectionOptionType', () => {
-  it('should return an array of SelectOption type without file format within label when array of AREA as an argument', () => {
+  it('should return an array of DropdownItemProps type without file format within label when array of AREA as an argument', () => {
     expect(convertToFSSelectionOptionType(mockFsTrajectoryAreaArray)).toEqual([
       { id: 0, label: 'area_BP_2028', value: 'area_BP_2028' },
       { id: 1, label: 'area_BP_2027', value: 'area_BP_2027' },
       { id: 2, label: 'area_BP_2030_2050', value: 'area_BP_2030_2050' },
     ]);
   });
-  it('should return an array of SelectOption type in which label is the trajectory name when array of LOAD as an argument', () => {
+  it('should return an array of DropdownItemProps type in which label is the trajectory name when array of LOAD as an argument', () => {
     expect(convertToFSSelectionOptionType(mockFsTrajectoryLoadArray)).toEqual([
       { id: 0, label: 'BP23_TEST_LOAD', value: 'BP23_TEST_LOAD' },
       { id: 1, label: 'BP23_LOAD_3332', value: 'BP23_LOAD_3332' },
@@ -49,21 +49,21 @@ describe('convertToFSSelectionOptionType', () => {
       { id: 3, label: 'BP23_AREF_EU_CBN_VIDE', value: 'BP23_AREF_EU_CBN_VIDE' },
     ]);
   });
-  it('should return an array of SelectOption type in which label is the trajectory name when array of THERMAL_TECHNICAL_MODULATION_PARAMETER as an argument', () => {
+  it('should return an array of DropdownItemProps type in which label is the trajectory name when array of THERMAL_TECHNICAL_MODULATION_PARAMETER as an argument', () => {
     expect(convertToFSSelectionOptionType(mockFsTrajectoryParaModulationArray)).toEqual([
       { id: 0, label: 'params', value: 'params' },
       { id: 1, label: 'params_2', value: 'params_2' },
       { id: 2, label: 'params_PEMMDB', value: 'params_PEMMDB' },
     ]);
   });
-  it('should return an array of SelectOption type in which label is the trajectory name when array of RES as an argument', () => {
+  it('should return an array of DropdownItemProps type in which label is the trajectory name when array of RES as an argument', () => {
     expect(convertToFSSelectionOptionType(mockFsTrajectoryResArray)).toEqual([
       { id: 0, label: 'installedRES_BP_2028', value: 'installedRES_BP_2028' },
       { id: 1, label: 'installedRES_BP_2027', value: 'installedRES_BP_2027' },
       { id: 2, label: 'installedRES_BP_2030_2050', value: 'installedRES_BP_2030_2050' },
     ]);
   });
-  it('should return an array of SelectOption type in which label is the trajectory name when array of RES - FR as an argument', () => {
+  it('should return an array of DropdownItemProps type in which label is the trajectory name when array of RES - FR as an argument', () => {
     expect(convertToFSSelectionOptionType(mockFsTrajectoryResFRArray, true)).toEqual([
       { id: 0, label: 'BP_REF_A', value: 'BP_REF_A' },
       { id: 1, label: 'BP_REF_B', value: 'BP_REF_B' },

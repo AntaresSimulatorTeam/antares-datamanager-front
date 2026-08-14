@@ -5,9 +5,9 @@
  */
 
 import { renderHook } from '@testing-library/react';
-import { NO_WRAP_CLASS, useDropdownOptions } from '@/hooks/useDropdownOptions';
+import { useDropdownOptions } from '@/hooks/useDropdownOptions';
 import { describe, expectTypeOf, it } from 'vitest';
-import { StdDropdownOption } from '@common/layout/stdDropdown/StdDropdown.tsx';
+import { DropdownItemProps } from '@design-system-rte/core/components/dropdown/dropdown.interface';
 
 describe('useDropdownOptions', () => {
   const mockOnClick = vi.fn();
@@ -16,168 +16,124 @@ describe('useDropdownOptions', () => {
     const { result } = renderHook(() => useDropdownOptions());
 
     expectTypeOf(result.current.editOption).toBeFunction();
-    expectTypeOf(result.current.editOption).returns.toEqualTypeOf<StdDropdownOption>();
+    expectTypeOf(result.current.editOption).returns.toEqualTypeOf<DropdownItemProps>();
     expectTypeOf(result.current.deleteOption).toBeFunction();
-    expectTypeOf(result.current.deleteOption).returns.toEqualTypeOf<StdDropdownOption>();
+    expectTypeOf(result.current.deleteOption).returns.toEqualTypeOf<DropdownItemProps>();
     expectTypeOf(result.current.pinOption).toBeFunction();
-    expectTypeOf(result.current.pinOption).returns.toEqualTypeOf<StdDropdownOption>();
+    expectTypeOf(result.current.pinOption).returns.toEqualTypeOf<DropdownItemProps>();
   });
 
   it('should call editOption and return the right set of options', () => {
     const { result } = renderHook(() => useDropdownOptions());
     const settingOptions = {
-      key: 'edit',
       label: 'Edit',
-      value: 'edit',
-      onItemClick: mockOnClick,
+      onClick: mockOnClick,
       disabled: undefined,
-      icon: 'edit',
-      extraClasses: NO_WRAP_CLASS,
-    } as StdDropdownOption;
+      leftIcon: 'edit',
+    };
 
     expect(result.current.editOption(mockOnClick)).toEqual(settingOptions);
     expect(result.current.editOption(mockOnClick, 'noSettings')).toEqual({
-      key: 'edit',
       label: 'noSettings',
-      value: 'edit',
-      onItemClick: mockOnClick,
+      onClick: mockOnClick,
       disabled: undefined,
-      icon: 'edit',
-      extraClasses: NO_WRAP_CLASS,
+      leftIcon: 'edit',
     });
     expect(result.current.editOption(mockOnClick)).toEqual({
-      key: 'edit',
       label: 'Edit',
-      value: 'edit',
-      onItemClick: mockOnClick,
+      onClick: mockOnClick,
       disabled: undefined,
-      icon: 'edit',
-      extraClasses: NO_WRAP_CLASS,
+      leftIcon: 'edit',
     });
     expect(result.current.editOption(mockOnClick, 'Edit', true)).toEqual({
-      key: 'edit',
       label: 'Edit',
-      value: 'edit',
-      onItemClick: mockOnClick,
+      onClick: mockOnClick,
       disabled: true,
-      icon: 'edit',
-      extraClasses: NO_WRAP_CLASS,
+      leftIcon: 'edit',
     });
   });
 
   it('should call deleteOption and return the right set of options', () => {
     const { result } = renderHook(() => useDropdownOptions());
-    const classes = 'whitespace-nowrap [&]:text-error-600 [&]:hover:text-error-600';
 
     const deleteOptions = {
-      key: 'delete',
       label: 'Delete',
-      value: 'delete',
-      onItemClick: mockOnClick,
+      onClick: mockOnClick,
       disabled: undefined,
-      icon: 'delete',
-      extraClasses: classes,
-    } as StdDropdownOption;
+      leftIcon: 'delete',
+    };
 
     expect(result.current.deleteOption(mockOnClick)).toEqual(deleteOptions);
     expect(result.current.deleteOption(mockOnClick, 'deleteLabel')).toEqual({
-      key: 'delete',
       label: 'deleteLabel',
-      value: 'delete',
-      onItemClick: mockOnClick,
+      onClick: mockOnClick,
       disabled: undefined,
-      icon: 'delete',
-      extraClasses: classes,
-    } as StdDropdownOption);
+      leftIcon: 'delete',
+    });
     expect(result.current.deleteOption(mockOnClick, undefined, false)).toEqual({
-      key: 'delete',
       label: 'Delete',
-      value: 'delete',
-      onItemClick: mockOnClick,
+      onClick: mockOnClick,
       disabled: false,
-      icon: 'delete',
-      extraClasses: classes,
-    } as StdDropdownOption);
+      leftIcon: 'delete',
+    });
   });
 
   it('should call deleteOption and onClickItem is undefined if option is disabled', () => {
     const { result } = renderHook(() => useDropdownOptions());
-    const classes = 'whitespace-nowrap [&]:text-error-600 [&]:hover:text-error-600';
 
     const deleteOptions = {
-      key: 'delete',
       label: 'Delete',
-      value: 'delete',
-      onItemClick: undefined,
+      onClick: undefined,
       disabled: true,
-      icon: 'delete',
-      extraClasses: classes,
-    } as StdDropdownOption;
+      leftIcon: 'delete',
+    };
 
     expect(result.current.deleteOption(mockOnClick, 'Delete', true)).toEqual(deleteOptions);
     expect(result.current.deleteOption(mockOnClick, 'deleteLabel', true)).toEqual({
-      key: 'delete',
       label: 'deleteLabel',
-      value: 'delete',
-      onItemClick: undefined,
+      onClick: undefined,
       disabled: true,
-      icon: 'delete',
-      extraClasses: classes,
-    } as StdDropdownOption);
+      leftIcon: 'delete',
+    });
     expect(result.current.deleteOption(mockOnClick, undefined, true)).toEqual({
-      key: 'delete',
       label: 'Delete',
-      value: 'delete',
-      onItemClick: undefined,
+      onClick: undefined,
       disabled: true,
-      icon: 'delete',
-      extraClasses: classes,
-    } as StdDropdownOption);
+      leftIcon: 'delete',
+    });
   });
 
   it('should call pinOption and return the right set of options', () => {
     const { result } = renderHook(() => useDropdownOptions());
     const pinOptions = {
-      key: 'pin',
       label: 'Unpin',
-      value: 'pin',
-      onItemClick: mockOnClick,
-      icon: 'keep-off',
-      extraClasses: NO_WRAP_CLASS,
-    } as StdDropdownOption;
+      onClick: mockOnClick,
+      leftIcon: 'keep-off',
+    };
 
     expect(result.current.pinOption(true, mockOnClick)).toEqual(pinOptions);
     expect(result.current.pinOption(false, mockOnClick)).toEqual({
-      key: 'pin',
       label: 'Pin',
-      value: 'pin',
-      onItemClick: mockOnClick,
-      icon: 'keep',
-      extraClasses: NO_WRAP_CLASS,
-    } as StdDropdownOption);
+      onClick: mockOnClick,
+      leftIcon: 'keep',
+    });
   });
 
   it('should call pinOption and onClickItem is undefined if option is disabled', () => {
     const { result } = renderHook(() => useDropdownOptions());
     const pinOptions = {
-      key: 'pin',
       label: 'Unpin',
-      value: 'pin',
-      onItemClick: undefined,
+      onClick: undefined,
       disabled: true,
-      icon: 'keep-off',
-      extraClasses: NO_WRAP_CLASS,
-    } as StdDropdownOption;
+      leftIcon: 'keep-off',
+    };
 
     expect(result.current.pinOption(true, mockOnClick, true)).toEqual(pinOptions);
     expect(result.current.pinOption(false, mockOnClick, true)).toEqual({
-      key: 'pin',
       label: 'Pin',
-      value: 'pin',
       disabled: true,
-      onItemClick: undefined,
-      icon: 'keep',
-      extraClasses: NO_WRAP_CLASS,
-    } as StdDropdownOption);
+      onClick: undefined,
+      leftIcon: 'keep',
+    });
   });
 });

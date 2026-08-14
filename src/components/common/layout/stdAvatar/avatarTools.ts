@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { UserInfo } from '@/shared/types/common/User.type';
+import { UserInfo } from '@/shared/types/common/User.type.ts';
 
 export const AVATAR_COLORS = ['green', 'blue', 'pink', 'gray', 'orange'] as const;
 const USER_SEPARATOR = ' - ';

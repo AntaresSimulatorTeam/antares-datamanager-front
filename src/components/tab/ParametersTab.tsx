@@ -1,14 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useCallback, useEffect, useState } from 'react';
-import {
-  CheckBoxData,
-  DbTrajectory,
-  HypothesisRowData,
-  RowStatus,
-  SelectOption,
-  TableOperationRow,
-  TabProps,
-} from '@/shared/types';
+import { CheckBoxData, DbTrajectory, HypothesisRowData, RowStatus, TableOperationRow, TabProps } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import getEditableHypothesisTableHeaders from '@/components/header/EditableHypothesisTableHeaders.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
@@ -42,6 +34,7 @@ import { useFetchHypothesisParametersTrajectories } from '@/hooks/useFetchHypoth
 import { useFetchFixHypothesisTrajectories } from '@/hooks/useFetchFixHypothesisTrajectories.ts';
 import { useTrajectoryFetchFromFSHandler } from '@/hooks/useTrajectoryFetchFromFSHandler.ts';
 import { HypothesisType } from '@/shared/types/HypothesisTable.ts';
+import { DropdownItemProps } from '@design-system-rte/core/components/dropdown/dropdown.interface';
 
 export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const { t } = useTranslation();
@@ -54,7 +47,7 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
   const [technicalData, setTechnicalData] = useState<HypothesisRowData[]>([]);
   const [data, setData] = useState<HypothesisRowData[]>([]);
-  const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
+  const [optionsFS, setOptionsFS] = useState<DropdownItemProps[]>();
   const [rowIdSelected, setRowIdSelected] = useState<string>('0');
   const [rowToDelete, setRowToDelete] = useState<{
     index: number;
@@ -316,7 +309,7 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
           options={optionsFS}
           onClose={async (
             typeToUse?: TRAJECTORY_TYPE,
-            value?: SelectOption,
+            value?: DropdownItemProps & {id?: number},
             hypothesis?: HypothesisType,
             indexArray?: number[],
           ) => {

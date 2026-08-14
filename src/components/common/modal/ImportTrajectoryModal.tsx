@@ -2,19 +2,19 @@ import { RdsModal } from 'rte-design-system-react';
 import SelectAndSearchableInput from '@/components/input/SelectAndSearchableInput.tsx';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
-import { SelectOption } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { getModalTile, getPathFromTrajectoryType } from '@/shared/utils/trajectoryUtils.ts';
 import { Button, Icon } from '@design-system-rte/react';
 import { useTrajectoryFetchFromFSHandler } from '@/hooks/useTrajectoryFetchFromFSHandler.ts';
 import { getParamForFetchFSTrajectory } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { HypothesisType } from '@/shared/types/HypothesisTable.ts';
+import { DropdownItemProps } from '@design-system-rte/core/components/dropdown/dropdown.interface';
 
 interface ImportTrajectoryModalProps {
-  options: SelectOption[] | undefined;
+  options: DropdownItemProps[] | undefined;
   onClose: (
     typeToUse?: TRAJECTORY_TYPE,
-    value?: SelectOption,
+    value?: DropdownItemProps,
     hypothesis?: HypothesisType,
     indexArray?: number[],
   ) => Promise<void>;
@@ -33,8 +33,8 @@ export const ImportTrajectoryModal = ({
   rowsNb,
 }: ImportTrajectoryModalProps) => {
   const { t } = useTranslation();
-  const [trajectorySelected, setTrajectorySelected] = useState<SelectOption | null>(null);
-  const [optionsFS, setOptionsFS] = useState<SelectOption[] | undefined>(options);
+  const [trajectorySelected, setTrajectorySelected] = useState<DropdownItemProps | null>(null);
+  const [optionsFS, setOptionsFS] = useState<DropdownItemProps[] | undefined>(options);
   const { typeToUse, areaToUse, isDefaultArea } = getParamForFetchFSTrajectory(tabType, indexArray, rowsNb, hypothesis);
   const path = getPathFromTrajectoryType(typeToUse, hypothesis);
   const { handleFetchFromFS } = useTrajectoryFetchFromFSHandler();
@@ -65,6 +65,7 @@ export const ImportTrajectoryModal = ({
                 }}
                 resetField={() => setTrajectorySelected(null)}
                 isInputDisabled={!options?.length}
+                dropdownWidth={400}
               />
             </div>
             {tabType === TRAJECTORY_TYPE.STS && (

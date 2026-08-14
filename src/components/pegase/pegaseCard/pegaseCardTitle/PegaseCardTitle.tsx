@@ -4,33 +4,36 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { ReactElement } from 'react';
+import { ReactElement, useState } from 'react';
 import cardTitleClassBuilder from './cardTitleClassBuilder';
-import { RdsFloatingWrapper, RdsIconButtonProps } from 'rte-design-system-react';
-import StdDropdown, { StdDropdownOption } from '@common/layout/stdDropdown/StdDropdown.tsx';
-import { IconButton } from '@design-system-rte/react';
+import { RdsIconButtonProps } from 'rte-design-system-react';
+import { Button, Dropdown, DropdownItem, IconButton } from '@design-system-rte/react';
+import { DropdownItemProps } from '@design-system-rte/core/components/dropdown/dropdown.interface';
 
 export type PegaseCardTitleProps = {
   id: string;
   title: string;
-  dropdownOptions: StdDropdownOption[];
+  dropdownOptions: DropdownItemProps[];
   icons?: ReactElement<RdsIconButtonProps>;
   lineClamp?: number;
   onClick?: () => void;
 };
 
-const { Trigger, Element } = RdsFloatingWrapper;
-
 const PegaseCardTitle = ({ title, dropdownOptions, icons, lineClamp, onClick, id }: PegaseCardTitleProps) => {
   const { titleClasses } = cardTitleClassBuilder(lineClamp, !!onClick);
+  const [open, setOpen] = useState(false);
+
   return (
     <header className="flex items-start justify-between gap-1">
-      <div className="flex min-w-0 items-center gap-1">
+      <div className="flex justify-start min-w-0 items-center gap-1">
         {icons && <span className="flex shrink items-center">{icons}</span>}
         {onClick ? (
-          <button className={titleClasses} onClick={onClick} aria-label={`title-${id}`}>
-            {title}
-          </button>
+          <Button
+            label={title}
+            onClick={onClick}
+            variant="neutral"
+            size="s"
+          />
         ) : (
           <span className={titleClasses} id={`title-${id}`}>
             {title}
@@ -38,24 +41,29 @@ const PegaseCardTitle = ({ title, dropdownOptions, icons, lineClamp, onClick, id
         )}
       </div>
       <div role="presentation" onClick={(e) => e.stopPropagation()}>
-        <RdsFloatingWrapper placement={'bottom-start'} fallbackPlacements={['bottom-end']} autoClose>
-          <Trigger>
-            <IconButton
-              id={`${id}-button`}
-              data-testid="project-card-menu"
-              aria-label="more-vert"
-              variant="text"
-              size="m"
-              name="more-vert"
-              disabled={dropdownOptions.length === 0}
-            />
-          </Trigger>
-          <Element>
-            <div className="whitespace-nowrap">
-              <StdDropdown items={dropdownOptions} />
-            </div>
-          </Element>
-        </RdsFloatingWrapper>
+          <Dropdown
+            dropdownId="card-options"
+            onClose={() => setOpen(false)}
+            style={{width: '20px'}}
+            trigger={
+              <IconButton
+                id={`${id}-button`}
+                data-testid="project-card-menu"
+                aria-label="more-vert"
+                variant="text"
+                size="m"
+                name="more-vert"
+                disabled={dropdownOptions.length === 0}
+                onClick={(e) => {
+                  setOpen(true);
+                  e.stopPropagation();
+                }}
+              />
+            }
+            isOpen={open}
+          >
+            {dropdownOptions.map(option => (<DropdownItem key={option.label} {...option} />))}
+          </Dropdown>
       </div>
     </header>
   );

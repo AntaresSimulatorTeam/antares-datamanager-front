@@ -8,7 +8,7 @@ import {
   handleTrajectorySearch,
   handleViewTrajectory,
 } from '@/shared/services/hypothesisTableService.ts';
-import { DbTrajectory, HypothesisRowData, SelectOption, StudyDTO, ThermalParamTrajectoryType } from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, StudyDTO, ThermalParamTrajectoryType } from '@/shared/types';
 import { notifyAlert } from '@/shared/notification/notification.tsx';
 import * as trajectoryService from '@/shared/services/trajectoryService.ts';
 import { getStudyTrajectoriesWithWarnings, getTrajectoryDataByTypeAndId } from '@/shared/services/trajectoryService.ts';
@@ -21,6 +21,7 @@ import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { generateTrajectoryViewHeader } from '@/components/header/TrajectoryViewHeader.tsx';
 import { TFunction } from 'i18next';
 import { ReadOnlyObject } from '@/shared/types/HypothesisTable.ts';
+import { DropdownItemProps } from '@design-system-rte/core/components/dropdown/dropdown.interface';
 
 vi.mock('@/shared/notification/notification');
 
@@ -131,9 +132,9 @@ describe('handleTrajectorySearch', () => {
     { id: 2, label: 'Trajectory B' },
   ] as unknown as DbTrajectory[];
   const mockConvertedOptionsArraySearch = [
-    { value: '1', label: 'Trajectory A' },
-    { value: '2', label: 'Trajectory B' },
-  ] as unknown as SelectOption[];
+    { label: 'Trajectory A' },
+    { label: 'Trajectory B' },
+  ] as unknown as DropdownItemProps[];
   it('should fetch trajectories and return converted options', async () => {
     vi.mocked(trajectoryService.fetchTrajectoriesFromDB).mockResolvedValue(mockResultsArraySearch);
     vi.mocked(formFormatter.convertToSelectionOptionType).mockReturnValue(mockConvertedOptionsArraySearch);

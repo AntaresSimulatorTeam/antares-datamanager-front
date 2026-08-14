@@ -8,7 +8,6 @@ import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/traj
 import { FileInputStatus } from 'rte-design-system-react';
 // @ts-ignore
 import { AccessorKeyColumnDef } from '@tanstack/table-core/src/types.ts';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { TrajectoryState } from '@/shared/types/Study.type.ts';
 
 export interface FsTrajectory {
@@ -124,11 +123,6 @@ export const TrajectorySTSDataScheme = {
   cluster: 'string',
   series: 'string',
 } as const;
-
-export interface HypothesisTab extends Tab {
-  icon: StdIconId;
-  isDisabled: boolean;
-}
 
 export interface Tab {
   name: TRAJECTORY_TYPE;

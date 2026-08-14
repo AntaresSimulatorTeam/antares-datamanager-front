@@ -16,7 +16,6 @@ import { TabMenu } from '@/components/menu/TabMenu.tsx';
 import ExpandableTab from '@/components/tab/ExpandableTab.tsx';
 import { ContainerWithExpander } from '@/components/banner/ContainerWithExpander.tsx';
 import { useFetchWarningMessages } from '@/hooks/useFetchWarningMessages.ts';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { getNbMessagesFromTrajectoryType } from '@/shared/services/trajectoryService.ts';
 import { Tab } from '@design-system-rte/react';
 import { TabItemProps } from '@design-system-rte/core/components/tab/tab.interface';
@@ -35,7 +34,7 @@ const StudyNavigationMenu = ({ studyData }: StudyNavigationMenuProps) => {
     id: TRAJECTORY_TYPE.AREA,
     panelId: TRAJECTORY_TYPE.AREA,
     label: t('studyDetails.@areas_links'),
-    icon: StdIconId.LinkedServices,
+    icon: "linked-services",
     disabled: false,
   });
   const { areaDefault, trajectoryAreas } = useFetchAreas(studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0]);

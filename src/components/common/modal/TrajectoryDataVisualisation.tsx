@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import StdSimpleTable from '@common/data/stdSimpleTable/StdSimpleTable.tsx';
 import { TrajectoryViewData } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { Button, Icon } from '@design-system-rte/react';
 
 interface TrajectoryDataVisualisationProps {
@@ -23,7 +22,7 @@ export const TrajectoryDataVisualisation = ({ trajectoryData, onClose }: Traject
         : t('trajectoryViewModal.@title_sts');
   const icon =
     trajectory.type === TRAJECTORY_TYPE.AREA || trajectory.type === TRAJECTORY_TYPE.LINK
-      ? StdIconId.LinkedServices
+      ? 'linked-services'
       : 'battery-charging-full';
 
   return (

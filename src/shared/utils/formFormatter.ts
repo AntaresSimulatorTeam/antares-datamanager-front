@@ -4,11 +4,12 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { DbTrajectory, FsTrajectory, isTrajectoryHydroType, SelectOption } from '@/shared/types';
+import { DbTrajectory, FsTrajectory, isTrajectoryHydroType } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { formatFlowBasedLabel, formatLabel } from '@/shared/utils/textUtils.ts';
+import { DropdownItemProps } from '@design-system-rte/core/components/dropdown/dropdown.interface';
 
-export const convertToSelectionOptionType = (trajectories: DbTrajectory[]): SelectOption[] =>
+export const convertToSelectionOptionType = (trajectories: DbTrajectory[]): DropdownItemProps[] =>
   trajectories.map((trajectory) => ({
     id: trajectory.id,
     label: trajectory.trajectoryName,
@@ -27,7 +28,7 @@ export const isRepositoryTrajectory = (type: TRAJECTORY_TYPE, isDefaultArea = fa
   type === TRAJECTORY_TYPE.ADEQUACY_PATCH ||
   type === TRAJECTORY_TYPE.FLOWBASED;
 
-export const convertToFSSelectionOptionType = (options: FsTrajectory[], isDefaultArea = false): SelectOption[] =>
+export const convertToFSSelectionOptionType = (options: FsTrajectory[], isDefaultArea = false): DropdownItemProps[] =>
   options.map((option, indexTrajectory) => {
     const formattedLabel = formatLabel(option, isDefaultArea);
     return {

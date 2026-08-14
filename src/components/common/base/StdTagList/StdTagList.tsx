@@ -1,12 +1,10 @@
 import { useCountMaxTagsToFitInContainer } from '@/components/common/base/StdTagList/tagListUtils';
 import { useStdId } from '@/hooks/useStdId';
-import { stopPropagationAndPreventDefault } from '@/shared/utils/event/stopPropagation';
 import clsx from 'clsx';
 import { memo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import StdPopover from '../../layout/stdPopover/StdPopover';
 import { tagListClassBuilder } from './tagListClassBuilder';
-import { Button, Icon, Tag, Tooltip } from '@design-system-rte/react';
+import { Button, Dropdown, Icon, Tag, Tooltip } from '@design-system-rte/react';
 
 type StdTagListProps = {
   tags: string[];
@@ -22,7 +20,6 @@ type StdTagListProps = {
 const TAG_LIST_CLASSES = 'flex h-full w-full items-center gap-1';
 
 const ICON_SIZE = 16;
-const POPOVER_OFFSET = 10;
 
 const StdTagList = ({
   tags,
@@ -38,7 +35,7 @@ const StdTagList = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const tagsRef = useRef<(HTMLSpanElement | null)[]>([]);
   const plusTagRef = useRef<HTMLSpanElement>(null);
-  const [showPopover, setShowPopover] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const id = useStdId('tag-list', propsId);
 
   const { tagsNumber, isReady } = useCountMaxTagsToFitInContainer({
@@ -75,52 +72,51 @@ const StdTagList = ({
           </span>
         ))}
         {plusTagsVisible && (
-          <span
-            onKeyDown={stopPropagationAndPreventDefault}
-            className="flex h-2.25 items-center"
-            ref={plusTagRef}
-            onClick={stopPropagationAndPreventDefault}
-          >
-            <StdPopover
-              offset={POPOVER_OFFSET}
-              show={showPopover}
-              setShow={setShowPopover}
-              placement="bottom"
-              id={`${id}-popover`}
-            >
-              <StdPopover.Trigger>
+            <Dropdown
+              dropdownId="card-options"
+              onClose={() => setIsModalOpen(false)}
+              style={{width: '200px'}}
+              trigger={
                 <Button
                   color="primary"
                   variant="primary"
                   size="s"
                   label={`+ ${isReady ? tags.length - (tagsNumber ?? 0) : '00'}`}
                   id={`${id}-popover-trigger`}
+                  onClick={(e   ) => {
+                    setIsModalOpen(true);
+                    e.stopPropagation();
+                  }}
                 />
-              </StdPopover.Trigger>
-              <StdPopover.Content>
-                <div className="flex max-w-32 flex-wrap gap-x-0.5 gap-y-1">
-                  {tags.slice(tagsNumber).map((tag) => (
+              }
+              isOpen={isModalOpen}
+            >
+              <div className="flex flex-col p-1 gap-2">
+                <div className="flex gap-1">
+                  {tags?.slice(tagsNumber).map((tag: string | undefined) => (
                     <Tag
                       label={tag}
-                      key={tag.toLowerCase()}
+                      key={tag?.toLowerCase()}
                       tagType="decorative"
                       color="neutral"
                       compactSpacing={true}
                     />
                   ))}
                 </div>
-              </StdPopover.Content>
-              <StdPopover.Footer>
-                <Button
-                  label={t('components.popover.@close')}
-                  size="s"
-                  variant="primary"
-                  onClick={() => setShowPopover(false)}
-                  id={`${id}-popover-close`}
-                />
-              </StdPopover.Footer>
-            </StdPopover>
-          </span>
+                <div className="flex">
+                  <Button
+                    label={t('components.popover.@close')}
+                    size="s"
+                    variant="primary"
+                    onClick={(e) => {
+                      setIsModalOpen(false);
+                      e.stopPropagation();
+                    }}
+                    id={`${id}-popover-close`}
+                  />
+                </div>
+              </div>
+            </Dropdown>
         )}
       </div>
     </div>

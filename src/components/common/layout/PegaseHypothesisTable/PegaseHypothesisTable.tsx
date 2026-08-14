@@ -5,20 +5,20 @@ import {
   ExpandedState,
   HypothesisRowData,
   RowStatus,
-  SelectOption,
   TableHeadersGetterProps,
   TableHeadersProps,
 } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { TableOptions } from '@tanstack/react-table';
+import { DropdownItemProps } from '@design-system-rte/core/components/dropdown/dropdown.interface';
 
 interface PegaseHypothesisTableProps extends TableHeadersProps {
   id: string;
   data: HypothesisRowData[];
   getTableHeaders: (context: TableHeadersGetterProps) => TableOptions<HypothesisRowData>['columns'];
   readOnly?: ReadOnlyObject;
-  handleSearch?: (fileNameContains: string, rowId: string) => Promise<SelectOption[] | undefined>;
+  handleSearch?: (fileNameContains: string, rowId: string) => Promise<DropdownItemProps[] | undefined>;
   handleImport?: (rowId: string) => Promise<void>;
   isReadOnlyEnable?: boolean;
   removeRow?: (value: string, rowId?: string) => void | Promise<void>;
