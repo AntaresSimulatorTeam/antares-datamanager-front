@@ -10,6 +10,7 @@ import { isBusinessError } from '@/shared/utils/errorUtils.ts';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { HypothesisType } from '@/shared/types/HypothesisTable.ts';
 import { DropdownItemProps } from '@design-system-rte/core/components/dropdown/dropdown.interface';
+import { formatFlowBasedLabel } from '@/shared/utils/textUtils.ts';
 
 export const useTrajectoryImport = (
   study: StudyDTO,
@@ -41,7 +42,7 @@ export const useTrajectoryImport = (
             study?.horizon,
             study?.id,
             type,
-            value?.value,
+            type === TRAJECTORY_TYPE.FLOWBASED && value?.label ? formatFlowBasedLabel(value?.label) : value?.label,
             hypothesis?.area,
             (progressValue: number) => {
               setProgress(+progressValue.toFixed(0));

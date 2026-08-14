@@ -33,8 +33,7 @@ export const convertToFSSelectionOptionType = (options: FsTrajectory[], isDefaul
     const formattedLabel = formatLabel(option, isDefaultArea);
     return {
       id: indexTrajectory,
-      label: formattedLabel,
-      value: option.type === TRAJECTORY_TYPE.FLOWBASED ? formatFlowBasedLabel(option.trajectoryName) : formattedLabel
+      label: formattedLabel
     }
   });
 
