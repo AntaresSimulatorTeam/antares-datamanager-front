@@ -60,7 +60,7 @@ export const useUserDisplay = (nni: string) => {
       }
     };
 
-    loadUser();
+    void loadUser();
   }, [nni]);
 
   return { fullname, firstName, lastName, isLoading, error };
