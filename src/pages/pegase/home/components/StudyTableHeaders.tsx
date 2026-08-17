@@ -67,7 +67,7 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
   columnHelper.accessor('createdBy', {
     header: t('home.@user_name'),
     size: 50,
-    cell: ({ getValue }) => <UserDisplayCell nni={getValue() ?? 'Un'} />,
+    cell: ({ getValue }) => <div className="py-0.25"><UserDisplayCell nni={getValue() ?? 'Un'} /></div>,
   }),
 
   columnHelper.accessor('keywords', {

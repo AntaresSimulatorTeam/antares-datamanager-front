@@ -6,7 +6,7 @@
 
 import { avatarCase } from '@/shared/utils/textUtils';
 import { useUserDisplay } from '@/shared/hooks/useUserDisplay';
-import { Avatar } from '@design-system-rte/react';
+import { Avatar, Tooltip } from '@design-system-rte/react';
 
 type UserDisplayCellProps = {
   nni: string;
@@ -17,32 +17,36 @@ export const UserDisplayCell = ({ nni }: UserDisplayCellProps) => {
 
   if (isLoading) {
     return (
-    <Avatar
-      alt={fullname}
-      colorType="decorative"
-      decorativeColor="vert-foret"
-      imgSrc=""
-      initials=".."
-      layout="initials"
-      size={32}
-      type="user"
-    />
+      <Tooltip label={fullname} position="top">
+        <Avatar
+          alt={fullname}
+          colorType="decorative"
+          decorativeColor="vert-foret"
+          imgSrc=""
+          initials=".."
+          layout="initials"
+          size={32}
+          type="user"
+        />
+      </Tooltip>
     );
   }
 
   const displayName = error ? nni : fullname;
 
   return (
-    <Avatar
-      alt={displayName}
-      colorType="decorative"
-      decorativeColor="vert-foret"
-      imgSrc=""
-      initials={avatarCase(displayName)}
-      layout="initials"
-      size={32}
-      type="user"
-    />
+    <Tooltip label={fullname} position="top">
+      <Avatar
+        alt={displayName}
+        colorType="decorative"
+        decorativeColor="vert-foret"
+        imgSrc=""
+        initials={avatarCase(displayName)}
+        layout="initials"
+        size={32}
+        type="user"
+      />
+    </Tooltip>
   );
 };
 
