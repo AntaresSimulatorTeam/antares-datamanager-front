@@ -142,6 +142,7 @@ const SelectAndSearchableInput = ({
           </div>
         }
         isOpen={isDropdownOpen}
+        autofocus={false}
       >
         {optionsSelection?.map(option => (<DropdownItem key={option.label} {...option} onClick={() => handleSelectOption(option)}/>))}
       </Dropdown>
