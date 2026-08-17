@@ -63,10 +63,10 @@ export const useFetchFixHypothesisTrajectories = (
         });
         if (configs[1]) {
           setSecondTableReadOnlyRow({
-            0: !firstResults[0]?.length,
-            1: !firstResults[0]?.length,
-            '2.0': false,
-            '2.1': false,
+            '0': !firstResults[0]?.length,
+            '1': !firstResults[0]?.length,
+            '2.0': !firstResults[0]?.length,
+            '2.1': !firstResults[0]?.length,
           });
         }
       } else if (isStudyGenerated) {
@@ -77,7 +77,6 @@ export const useFetchFixHypothesisTrajectories = (
       }
     } catch(error) {
       // Silent handler
-      console.error(error);
     }
   };
 

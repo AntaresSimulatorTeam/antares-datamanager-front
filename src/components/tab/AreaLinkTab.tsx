@@ -170,7 +170,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
     setReadOnly({ '0': false, '1': true });
 
     setSettingsData(buildTableData(configs[1], t));
-    setReadOnlySettings({ '0': true, '1': true, '2.0': false, '2.1': false });
+    setReadOnlySettings(buildReadOnlyRow(['0', '1', '2.0', '2.1']));
 
     setIsDeletionModalOpen(false);
   }, [configs, dispatch, studyData.id, t]);
