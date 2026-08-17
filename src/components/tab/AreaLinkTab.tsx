@@ -239,9 +239,9 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
         type={TRAJECTORY_TYPE.ADEQUACY_PATCH}
       />
       </div>
-      {isModalOpen && (
         <ImportTrajectoryModal
           options={optionsFS}
+          isOpen={isModalOpen}
           onClose={async (
             typeToUse?: TRAJECTORY_TYPE,
             value?: DropdownItemOption,
@@ -270,9 +270,8 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
           indexArray={rowIdSelected?.split('.').map(Number)}
           rowsNb={data.length}
         />
-      )}
-      {isViewModalOpen && trajectoryData && (
-        <TrajectoryDataVisualisation trajectoryData={trajectoryData} onClose={() => setIsViewModalOpen(false)} />
+      {trajectoryData && (
+        <TrajectoryDataVisualisation trajectoryData={trajectoryData} onClose={() => setIsViewModalOpen(false)} isOpen={isViewModalOpen}/>
       )}
       <AreaDeletionConfirmationModal
         isOpen={isDeletionModalOpen}

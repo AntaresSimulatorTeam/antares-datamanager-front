@@ -226,9 +226,9 @@ const ExpandableTab = ({
         removeRow={removeTableRow}
         handleViewData={tabType === TRAJECTORY_TYPE.STS ? handleViewData : undefined}
       />
-      {isModalOpen && (
         <ImportTrajectoryModal
           options={optionsFS}
+          isOpen={isModalOpen}
           onClose={async (
             typeToUse?: TRAJECTORY_TYPE,
             value?: DropdownItemOption,
@@ -245,9 +245,8 @@ const ExpandableTab = ({
           indexArray={rowIdSelected?.split('.').map(Number)}
           rowsNb={data.length}
         />
-      )}
-      {isViewModalOpen && trajectoryData && (
-        <TrajectoryDataVisualisation trajectoryData={trajectoryData} onClose={() => setIsViewModalOpen(false)} />
+      {trajectoryData && (
+        <TrajectoryDataVisualisation trajectoryData={trajectoryData} onClose={() => setIsViewModalOpen(false)} isOpen={isViewModalOpen}/>
       )}
         <AreaDeletionConfirmationModal
           isOpen={isDeletionModalOpen}

@@ -1,7 +1,6 @@
 import React from 'react';
-import { RdsModal } from 'rte-design-system-react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@design-system-rte/react';
+import { Button, Modal } from '@design-system-rte/react';
 
 interface AreaDeletionConfirmationModalProps {
   isOpen?: boolean;
@@ -18,18 +17,18 @@ export const AreaDeletionConfirmationModal: React.FC<AreaDeletionConfirmationMod
 }) => {
   const { t } = useTranslation();
 
-  if (!isOpen) return null;
-
   return (
-    <RdsModal size="small">
-      <RdsModal.Title onClose={onClose}>{t('trajectoryDeletionModal.@confirmDeleteTitle')}</RdsModal.Title>
-      <RdsModal.Content>
-        <p>{message ?? t('trajectoryDeletionModal.@confirmDeleteMessage')}</p>
-      </RdsModal.Content>
-      <RdsModal.Footer>
-        <Button label={t('trajectoryDeletionModal.@cancel')} variant="text" onClick={onClose} />
-        <Button label={t('trajectoryDeletionModal.@confirm')} variant="secondary" onClick={() => void onConfirm()} />
-      </RdsModal.Footer>
-    </RdsModal>
+    <Modal
+      isOpen={isOpen}
+      closeOnOverlayClick
+      id="area-deletion-modal"
+      onClose={onClose}
+      primaryButton={<Button label={t('trajectoryDeletionModal.@confirm')} variant="secondary" onClick={() => void onConfirm()} />}
+      secondaryButton={<Button label={t('trajectoryDeletionModal.@cancel')} variant="text" onClick={onClose} />}
+      size="s"
+      title={t('trajectoryDeletionModal.@confirmDeleteTitle')}
+    >
+      <p>{message ?? t('trajectoryDeletionModal.@confirmDeleteMessage')}</p>
+    </Modal>
   );
 };

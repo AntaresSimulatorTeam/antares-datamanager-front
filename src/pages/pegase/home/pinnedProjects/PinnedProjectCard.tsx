@@ -52,7 +52,7 @@ const PinnedProjectCards = () => {
           </PegaseCard>
         </div>
       ))}
-      {isModalOpen && <ProjectCreationModal onClose={toggleModal} projectInfo={selectedProject} />}
+      <ProjectCreationModal onClose={toggleModal} projectInfo={selectedProject} isOpen={isModalOpen} />
     </>
   );
 };

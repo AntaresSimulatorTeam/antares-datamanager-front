@@ -6,7 +6,6 @@
 
 import { PropsWithChildren, ReactElement } from 'react';
 import PegaseCardTitle from './pegaseCardTitle/PegaseCardTitle';
-import { RdsIconButtonProps } from 'rte-design-system-react';
 import { DropdownItemOption } from '@/shared/types';
 
 export type PegaseCardSecondaryButtonPosition = 'default' | 'center';
@@ -17,7 +16,7 @@ type CardProps = {
   onClick?: () => void;
   title: string;
   dropdownOptions: DropdownItemOption[];
-  icons?: ReactElement<RdsIconButtonProps>;
+  icons?: ReactElement;
   lineClamp?: number;
 };
 

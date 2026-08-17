@@ -17,7 +17,7 @@
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@design-system-rte/react": "^1.14.0",
+    "@design-system-rte/react": "^1.15.0",
     "@floating-ui/react": "^0.26.28",
     "@fontsource-variable/nunito-sans": "^5.2.7",
     "@tanstack/react-table": "^8.20.5",
@@ -33,7 +33,6 @@
     "react-i18next": "^15.0.3",
     "react-router-dom": "^7.0.2",
     "react-toastify": "^10.0.5",
-    "rte-design-system-react": "^0.1.1",
     "uuid": "^11.0.3",
     "vite-plugin-top-level-await": "^1.4.4"
   },

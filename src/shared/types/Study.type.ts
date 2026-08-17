@@ -27,7 +27,7 @@ export interface StudyDTO {
 
 export interface PaginatedResponse<T> {
   content: T[];
-  totalElements: number;
+  totalPages: number;
 }
 
 export type TrajectoryState = {

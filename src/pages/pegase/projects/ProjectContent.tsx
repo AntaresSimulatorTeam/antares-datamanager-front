@@ -7,7 +7,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PegaseCard from '@/components/pegase/pegaseCard/PegaseCard';
-import StudiesPagination from '@/pages/pegase/home/components/StudiesPagination';
 import { useDropdownOptions } from '@/hooks/useDropdownOptions';
 import { useProjectNavigation } from '@/hooks/useProjectNavigation';
 import { useFetchProjectList } from '@/hooks/useFetchProjectList';
@@ -19,7 +18,7 @@ import { DropdownItemOption, ProjectInfo, ProjectResponse } from '@/shared/types
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { ProjectCreationModal } from '@common/modal/ProjectCreationModal.tsx';
 import { PegaseCardContent } from '@/components/pegase/pegaseCard/pegaseCardContent/PegaseCardContent.tsx';
-import { Chip, Searchbar } from '@design-system-rte/react';
+import { Chip, Pagination, Searchbar } from '@design-system-rte/react';
 
 const ProjectContent = () => {
   const { t } = useTranslation();
@@ -101,10 +100,12 @@ const ProjectContent = () => {
             </PegaseCard>
           );
         })}
-        {isModalOpen && <ProjectCreationModal onClose={toggleModal} projectInfo={selectedProject} />}
+        <ProjectCreationModal onClose={toggleModal} projectInfo={selectedProject} isOpen={isModalOpen} />
       </div>
       <div className="flex h-[60px] items-center justify-between bg-gray-200 px-[32px]">
-        <StudiesPagination count={count} intervalSize={intervalSize} current={current} onChange={setCurrent} />
+        <div className="flex h-9 shrink-0 grow basis-0 items-center justify-end px-4 py-3">
+          <Pagination appearance="brand" totalPages={count} activePage={current} onPageChange={setCurrent} />
+        </div>
       </div>
     </div>
   );

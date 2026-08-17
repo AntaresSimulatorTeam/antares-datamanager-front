@@ -9,7 +9,6 @@ import { ProjectInfo, StudyDTO } from '@/shared/types';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type';
 import getStudyTableHeaders from './StudyTableHeaders';
 import { addSortColumn } from './StudyTableUtils';
-import StudiesPagination from './StudiesPagination';
 import { RowSelectionState } from '@tanstack/react-table';
 import { deleteStudy } from '@/shared/services/studyService';
 import StdSimpleTable from '@/components/common/data/stdSimpleTable/StdSimpleTable';
@@ -19,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal';
 import StudyCreationModal from '@common/modal/StudyCreationModal';
 import StudyModificationModal from '@common/modal/StudyModificationModal.tsx';
-import { Button } from '@design-system-rte/react';
+import { Button, Pagination } from '@design-system-rte/react';
 
 interface StudyTableDisplayProps {
   searchStudy: string | undefined;
@@ -39,21 +38,19 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
 
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const [isModalStudyCreation, setIsModalStudyCreation] = useState(false);
+  const [page, setPage] = useState<number>(0);
   const { navigateToStudy } = useStudyNavigation();
-  const { rows, count, intervalSize, currentPage, setPage } = useStudyTableDisplay({
+  const { rows, totalPagesNb } = useStudyTableDisplay({
     searchTerm: searchStudy,
     projectInfo,
     sortBy,
-    reloadStudies, // Key change here
+    page,
+    reloadStudies
   });
 
   useEffect(() => {
     !rows?.some((row) => row.status === StudyStatus.IN_PROGRESS) && setRowSelection({});
   }, [rows.length]);
-
-  const handleHeaderHover = (hovered: boolean) => {
-    setIsHeaderHovered(hovered);
-  };
 
   const headers = getStudyTableHeaders(t);
 
@@ -97,11 +94,11 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
     setIsDuplicateMode(false);
   };
 
-  const sortedHeaders = addSortColumn(headers, handleSort, sortBy, sortedColumn, handleHeaderHover, isHeaderHovered);
+  const sortedHeaders = addSortColumn(headers, handleSort, sortBy, sortedColumn, setIsHeaderHovered, isHeaderHovered);
 
   return (
     <div className="flex w-fit grow-0 flex-col">
-      <div style={{ maxHeight: '50vh', overflowY: 'auto' }}>
+      <div style={{ maxHeight: '85vh', overflowY: 'auto' }}>
         <StdSimpleTable
           columns={sortedHeaders}
           columnSize="rem"
@@ -149,18 +146,20 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
             )
           )}
         </div>
-        <StudiesPagination count={count} intervalSize={intervalSize} current={currentPage} onChange={setPage} />
+        <div className="flex h-9 shrink-0 grow basis-0 items-center justify-end px-4 py-3">
+          <Pagination appearance="brand" totalPages={totalPagesNb} activePage={Math.max(0, page + 1)} onPageChange={(pageNb: number) => setPage(Math.max(0, pageNb - 1))} />
+        </div>
       </div>
-      {isModalStudyCreation && !isDuplicateMode && projectInfo?.name && (
+      {!isDuplicateMode && projectInfo?.name && (
         <StudyCreationModal
-          isOpen={isModalOpen}
+          isOpen={isModalStudyCreation}
           onClose={handleModalClose}
           study={selectedStudy}
           setReloadStudies={setReloadStudies}
           projectInfoName={projectInfo.name}
         />
       )}
-      {isModalOpen && isDuplicateMode && selectedStudy && (
+      {isDuplicateMode && selectedStudy && (
         <StudyModificationModal
           isOpen={isModalOpen}
           onClose={handleModalClose}

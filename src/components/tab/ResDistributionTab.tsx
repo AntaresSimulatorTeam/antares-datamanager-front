@@ -181,7 +181,6 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData, types }: TabProps 
           await handleUpdateTableData(TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION, rowId, value, status)
         }
       />
-      {isModalOpen && (
         <ImportTrajectoryModal
           options={optionsFS}
           onClose={async (
@@ -203,8 +202,8 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData, types }: TabProps 
           )}
           indexArray={rowIdSelected?.split('.').map(Number)}
           rowsNb={data.length}
+          isOpen={isModalOpen}
         />
-      )}
     </div>
   );
 };
