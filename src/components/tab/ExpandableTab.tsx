@@ -7,9 +7,9 @@
 import {
   CheckBoxData,
   DbTrajectory,
+  DropdownItemOption,
   HypothesisRowData,
   RowStatus,
-  SelectOption,
   TabProps,
   TechnologyType,
   TrajectoryViewData,
@@ -57,7 +57,7 @@ const ExpandableTab = ({
   const [technologies, setTechnologies] = useState<TechnologyType[]>([]);
   const [technologiesLabel, setTechnologiesLabel] = useState<string[]>([]);
   const { isModalOpen, toggleModal } = useNewStudyModal();
-  const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
+  const [optionsFS, setOptionsFS] = useState<DropdownItemOption[]>();
   const [trajectoryData, setTrajectoryData] = useState<TrajectoryViewData | undefined>();
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
@@ -231,7 +231,7 @@ const ExpandableTab = ({
           options={optionsFS}
           onClose={async (
             typeToUse?: TRAJECTORY_TYPE,
-            value?: SelectOption,
+            value?: DropdownItemOption,
             hypothesis?: HypothesisType,
             indexArray?: number[],
           ) => {

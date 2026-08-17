@@ -9,10 +9,10 @@ import { notifyAlert } from '@/shared/notification/notification.tsx';
 import { Dispatch, SetStateAction } from 'react';
 import {
   DbTrajectory,
+  DropdownItemOption,
   HypothesisRowData,
   isTrajectorySubrowsType,
   ParamTrajectoryState,
-  SelectOption,
   StudyActionType,
   ThermalParamTrajectoryType,
   TrajectoryViewData,
@@ -74,7 +74,7 @@ export const handleTrajectoryError = (
  * @param {string | undefined} options.technology - An optional parameter specifying the technology associated with the trajectory.
  * @param {string | undefined} options.fileNameContains - The value used as a search filter.
  *
- * @returns {Promise<SelectOption[] | undefined>} A Promise resolving to an array of selection options
+ * @returns {Promise<DropdownItemOption[] | undefined>} A Promise resolving to an array of selection options
  * converted from the search results, or undefined in case of an error.
  */
 export const handleTrajectorySearch = async (
@@ -82,7 +82,7 @@ export const handleTrajectorySearch = async (
   setDbTrajectories: Dispatch<SetStateAction<DbTrajectory[]>>,
   studyHorizon: string,
   options: TrajectorySearchParams,
-): Promise<SelectOption[] | undefined> => {
+): Promise<DropdownItemOption[] | undefined> => {
   try {
     if (options?.area && options.area === OTHER_AREAS_LABEL) {
       options.area = OTHER_AREAS;

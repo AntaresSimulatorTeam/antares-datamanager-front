@@ -5,7 +5,7 @@
  */
 
 import { createColumnHelper, TableOptions } from '@tanstack/react-table';
-import { HypothesisRowData, SelectOption, TableHeadersGetterProps } from '@/shared/types';
+import { DropdownItemOption, HypothesisRowData, TableHeadersGetterProps } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { CellWithStatus } from '@common/data/CellWithStatus.tsx';
 import { LabelWithButtonPreview } from '@common/data/LabelWithButtonPreview.tsx';
@@ -108,7 +108,7 @@ const getExpandableHypothesisTableHeaders = ({
       ) : (
         <div className="flex w-full items-center justify-start gap-2 py-0.5">
           <SelectInputWithButton
-            onSelect={(value: SelectOption) => {
+            onSelect={(value: DropdownItemOption) => {
               setErrorInfo({ index: row.index, message: '' });
               void options?.meta?.updateData?.(row.id, value.id, 'success');
             }}

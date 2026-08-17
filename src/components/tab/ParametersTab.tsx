@@ -3,9 +3,9 @@ import { useCallback, useEffect, useState } from 'react';
 import {
   CheckBoxData,
   DbTrajectory,
+  DropdownItemOption,
   HypothesisRowData,
   RowStatus,
-  SelectOption,
   TableOperationRow,
   TabProps,
 } from '@/shared/types';
@@ -54,7 +54,7 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
   const [areasOptions, setAreasOptions] = useState<CheckBoxData[]>([]);
   const [technicalData, setTechnicalData] = useState<HypothesisRowData[]>([]);
   const [data, setData] = useState<HypothesisRowData[]>([]);
-  const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
+  const [optionsFS, setOptionsFS] = useState<DropdownItemOption[]>();
   const [rowIdSelected, setRowIdSelected] = useState<string>('0');
   const [rowToDelete, setRowToDelete] = useState<{
     index: number;
@@ -316,7 +316,7 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
           options={optionsFS}
           onClose={async (
             typeToUse?: TRAJECTORY_TYPE,
-            value?: SelectOption,
+            value?: DropdownItemOption,
             hypothesis?: HypothesisType,
             indexArray?: number[],
           ) => {

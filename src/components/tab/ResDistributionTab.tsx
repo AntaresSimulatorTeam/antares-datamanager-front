@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { DbTrajectory, HypothesisRowData, RowStatus, SelectOption, TabProps } from '@/shared/types';
+import { DbTrajectory, DropdownItemOption, HypothesisRowData, RowStatus, TabProps } from '@/shared/types';
 import { useCallback, useEffect, useState } from 'react';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
@@ -37,7 +37,7 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData, types }: TabProps 
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
   const [technologies, setTechnologies] = useState<string[]>([]);
   const { isModalOpen, toggleModal } = useNewStudyModal();
-  const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
+  const [optionsFS, setOptionsFS] = useState<DropdownItemOption[]>();
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const [selectedType, setSelectedType] = useState<TRAJECTORY_TYPE>(TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION);
   const { hypothesisTrajectories, readOnlyRow, technologyList } = useFetchHypothesisTrajectories(
@@ -186,7 +186,7 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData, types }: TabProps 
           options={optionsFS}
           onClose={async (
             typeToUse?: TRAJECTORY_TYPE,
-            value?: SelectOption,
+            value?: DropdownItemOption,
             hypothesis?: HypothesisType,
             indexArray?: number[],
           ) => {

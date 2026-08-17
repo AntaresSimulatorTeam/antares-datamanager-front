@@ -1,11 +1,11 @@
 import StdSimpleTable from '@common/data/stdSimpleTable/StdSimpleTable.tsx';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
+  DropdownItemOption,
   ErrorMessageType,
   ExpandedState,
   HypothesisRowData,
   RowStatus,
-  SelectOption,
   TableHeadersGetterProps,
   TableHeadersProps,
 } from '@/shared/types';
@@ -18,7 +18,7 @@ interface PegaseHypothesisTableProps extends TableHeadersProps {
   data: HypothesisRowData[];
   getTableHeaders: (context: TableHeadersGetterProps) => TableOptions<HypothesisRowData>['columns'];
   readOnly?: ReadOnlyObject;
-  handleSearch?: (fileNameContains: string, rowId: string) => Promise<SelectOption[] | undefined>;
+  handleSearch?: (fileNameContains: string, rowId: string) => Promise<DropdownItemOption[] | undefined>;
   handleImport?: (rowId: string) => Promise<void>;
   isReadOnlyEnable?: boolean;
   removeRow?: (value: string, rowId?: string) => void | Promise<void>;

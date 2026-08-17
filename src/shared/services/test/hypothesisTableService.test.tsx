@@ -8,7 +8,7 @@ import {
   handleTrajectorySearch,
   handleViewTrajectory,
 } from '@/shared/services/hypothesisTableService.ts';
-import { DbTrajectory, HypothesisRowData, SelectOption, StudyDTO, ThermalParamTrajectoryType } from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, StudyDTO, ThermalParamTrajectoryType } from '@/shared/types';
 import { notifyAlert } from '@/shared/notification/notification.tsx';
 import * as trajectoryService from '@/shared/services/trajectoryService.ts';
 import { getStudyTrajectoriesWithWarnings, getTrajectoryDataByTypeAndId } from '@/shared/services/trajectoryService.ts';
@@ -21,6 +21,7 @@ import { getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { generateTrajectoryViewHeader } from '@/components/header/TrajectoryViewHeader.tsx';
 import { TFunction } from 'i18next';
 import { ReadOnlyObject } from '@/shared/types/HypothesisTable.ts';
+import { DropdownItemProps } from '@design-system-rte/core/components/dropdown/dropdown.interface';
 
 vi.mock('@/shared/notification/notification');
 
@@ -64,6 +65,25 @@ vi.mock('@/shared/utils/formFormatter', async (importOriginal) => {
   };
 });
 
+vi.mock('@/shared/utils/trajectoryUtils', async (importOriginal) => {
+  const actual: Mock = await importOriginal();
+  return {
+    ...actual,
+    setNestedData: vi
+      .fn()
+      .mockImplementation(
+        (prev: HypothesisRowData[], _index, update) => [{ ...prev[0], ...update }] as HypothesisRowData[],
+      ),
+    buildErrorTrajectory: vi.fn().mockReturnValue({
+      id: 42,
+      label: 'Test Trajectory',
+      error: true,
+      user: 'Alice',
+      hypothesis: 'Hypothesis A',
+    }),
+  };
+});
+
 describe('handleTrajectoryError', () => {
   it('should update data and trigger alert', () => {
     const mockSetData = vi.fn();
@@ -73,25 +93,6 @@ describe('handleTrajectoryError', () => {
     const hypothesis = 'Hypothesis A';
     const userName = 'Alice';
     const alert = { message: 'Error occurred', content: 'Invalid trajectory' };
-
-    vi.mock('@/shared/utils/trajectoryUtils', async (importOriginal) => {
-      const actual: Mock = await importOriginal();
-      return {
-        ...actual,
-        setNestedData: vi
-          .fn()
-          .mockImplementation(
-            (prev: HypothesisRowData[], _index, update) => [{ ...prev[0], ...update }] as HypothesisRowData[],
-          ),
-        buildErrorTrajectory: vi.fn().mockReturnValue({
-          id: 42,
-          label: 'Test Trajectory',
-          error: true,
-          user: 'Alice',
-          hypothesis: 'Hypothesis A',
-        }),
-      };
-    });
 
     handleTrajectoryError(type, rowIndex, trajectory, hypothesis, userName, mockSetData, alert);
 
@@ -131,9 +132,9 @@ describe('handleTrajectorySearch', () => {
     { id: 2, label: 'Trajectory B' },
   ] as unknown as DbTrajectory[];
   const mockConvertedOptionsArraySearch = [
-    { value: '1', label: 'Trajectory A' },
-    { value: '2', label: 'Trajectory B' },
-  ] as unknown as SelectOption[];
+    { label: 'Trajectory A' },
+    { label: 'Trajectory B' },
+  ] as unknown as DropdownItemProps[];
   it('should fetch trajectories and return converted options', async () => {
     vi.mocked(trajectoryService.fetchTrajectoriesFromDB).mockResolvedValue(mockResultsArraySearch);
     vi.mocked(formFormatter.convertToSelectionOptionType).mockReturnValue(mockConvertedOptionsArraySearch);

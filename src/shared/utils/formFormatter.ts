@@ -4,13 +4,13 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { DbTrajectory, FsTrajectory, isTrajectoryHydroType, SelectOption } from '@/shared/types';
+import { DbTrajectory, DropdownItemOption, FsTrajectory, isTrajectoryHydroType } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { formatFlowBasedLabel, formatLabel } from '@/shared/utils/textUtils.ts';
 
-export const convertToSelectionOptionType = (trajectories: DbTrajectory[]): SelectOption[] =>
+export const convertToSelectionOptionType = (trajectories: DbTrajectory[]): DropdownItemOption[] =>
   trajectories.map((trajectory) => ({
-    id: trajectory.id,
+    id: String(trajectory.id),
     label: trajectory.trajectoryName,
     value: trajectory.type === TRAJECTORY_TYPE.FLOWBASED ? formatFlowBasedLabel(trajectory.trajectoryName) : trajectory.trajectoryName
   }));
@@ -27,11 +27,11 @@ export const isRepositoryTrajectory = (type: TRAJECTORY_TYPE, isDefaultArea = fa
   type === TRAJECTORY_TYPE.ADEQUACY_PATCH ||
   type === TRAJECTORY_TYPE.FLOWBASED;
 
-export const convertToFSSelectionOptionType = (options: FsTrajectory[], isDefaultArea = false): SelectOption[] =>
+export const convertToFSSelectionOptionType = (options: FsTrajectory[], isDefaultArea = false): DropdownItemOption[] =>
   options.map((option, indexTrajectory) => {
     const formattedLabel = formatLabel(option, isDefaultArea);
     return {
-      id: indexTrajectory,
+      id: String(indexTrajectory),
       label: formattedLabel,
       value: option.type === TRAJECTORY_TYPE.FLOWBASED ? formatFlowBasedLabel(option.trajectoryName) : formattedLabel
     }

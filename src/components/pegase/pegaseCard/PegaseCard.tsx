@@ -6,8 +6,8 @@
 
 import { PropsWithChildren, ReactElement } from 'react';
 import PegaseCardTitle from './pegaseCardTitle/PegaseCardTitle';
-import { StdDropdownOption } from '@common/layout/stdDropdown/StdDropdown.tsx';
 import { RdsIconButtonProps } from 'rte-design-system-react';
+import { DropdownItemOption } from '@/shared/types';
 
 export type PegaseCardSecondaryButtonPosition = 'default' | 'center';
 
@@ -16,7 +16,7 @@ type CardProps = {
   disabled?: boolean;
   onClick?: () => void;
   title: string;
-  dropdownOptions: StdDropdownOption[];
+  dropdownOptions: DropdownItemOption[];
   icons?: ReactElement<RdsIconButtonProps>;
   lineClamp?: number;
 };
@@ -48,7 +48,7 @@ const PegaseCard = ({
       lineClamp={lineClamp}
       dropdownOptions={dropdownOptions}
     />
-    <div className="flex grow">{children}</div>
+    <div className="flex">{children}</div>
   </section>
 );
 export default PegaseCard;

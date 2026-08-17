@@ -4,7 +4,7 @@ import { avatarCase } from '@/shared/utils/textUtils.ts';
 import { ProjectInfo } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 import { useUserDisplay } from '@/shared/hooks/useUserDisplay';
-import StdAvatar from '@common/layout/stdAvatar/StdAvatar.tsx';
+import { Avatar } from '@design-system-rte/react';
 
 export type PegaseCardContentProps = {
   project: ProjectInfo;
@@ -18,7 +18,7 @@ export const PegaseCardContent = ({ project }: PegaseCardContentProps) => {
     <div className="flex flex-col items-start justify-between">
       <div className="flex items-center gap-1">
         {project.tags && (
-          <div className="flex h-3 w-32">
+          <div className="flex h-3">
             <StdTagList id={`${project.id}-tag-list`} tags={project.tags} maxVisibleTags={12} />
           </div>
         )}
@@ -29,12 +29,15 @@ export const PegaseCardContent = ({ project }: PegaseCardContentProps) => {
           <span className="text-body-xs font-medium">{formatDateToDDMMYYYY(project.creationDate)} </span>
           <span className="ml-2">{`${t('project.@by')}: `}</span>
         </div>
-        <StdAvatar
-          size="es"
-          backgroundColor="green"
-          fullname={fullname}
+        <Avatar
+          alt={fullname}
+          colorType="decorative"
+          decorativeColor="vert-foret"
+          imgSrc=""
           initials={avatarCase(fullname)}
-          textColor="primary"
+          layout="initials"
+          size={32}
+          type="user"
         />
         <span className="text-body-xs font-light text-gray-600">{fullname}</span>
       </div>

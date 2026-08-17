@@ -8,16 +8,16 @@ import { render, screen } from '@testing-library/react';
 
 import { noop } from '@/shared/utils/common/defaultUtils';
 import PegaseCard from '../PegaseCard';
-import { StdDropdownOption } from '@common/layout/stdDropdown/StdDropdown.tsx';
+import { DropdownItemProps } from '@design-system-rte/core/components/dropdown/dropdown.interface';
 
 const TEST_TITLE = 'Card Title';
 const TEST_CHILDREN = <div role="article"></div>;
 const TEST_ID = 123;
 const TEST_DROPDOWN_DROPDOWN = [
-  { key: 'op1', label: 'Option 1', value: 'op1', onItemClick: noop },
-  { key: 'op2', label: 'Option 2', value: 'op2', onItemClick: noop },
-  { key: 'op3', label: 'Option 3', value: 'op3', onItemClick: noop },
-] as StdDropdownOption[];
+  { label: 'Option 1', onClick: noop },
+  { label: 'Option 2', onClick: noop },
+  { label: 'Option 3', onClick: noop },
+] as DropdownItemProps[];
 
 describe('PegaseCard', () => {
   it('renders the default PegaseCard component', () => {

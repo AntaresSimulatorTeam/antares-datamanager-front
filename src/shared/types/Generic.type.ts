@@ -17,6 +17,7 @@ import {
   NUCLEAR_FR_MODULATION_TYPES,
   NUCLEAR_FR_TIME_SERIES_TYPES,
 } from '@/shared/const/trajectoryTypes.ts';
+import { DropdownItemProps } from '@design-system-rte/core/components/dropdown/dropdown.interface';
 
 export type Entries<T> = {
   [K in keyof T]: [K, T[K]];
@@ -151,4 +152,9 @@ export interface HypothesisTableResults extends FetchResult {
     checkedValues: string[];
   };
   readOnlyMap: Record<string, boolean>;
+}
+
+export interface DropdownItemOption extends DropdownItemProps {
+  id?: string;
+  value?: string
 }

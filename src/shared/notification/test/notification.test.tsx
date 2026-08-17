@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { notifyAlert, notifyToast } from '@/shared/notification/notification.tsx';
 import { DisplayStatus } from '@/shared/types';
 import { ToastAction } from 'rte-design-system-react';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 
 vi.mock('react-toastify', () => {
   const toastFn = vi.fn();
@@ -70,7 +69,7 @@ describe('notifyAlert', () => {
     content: 'Contenu détaillé',
     type: 'warning' as DisplayStatus,
     action: vi.fn() as unknown as ToastAction,
-    icon: 'alert-icon' as StdIconId,
+    icon: 'alert-icon',
     filledIcon: true,
   };
 
@@ -105,7 +104,7 @@ describe('notifyAlert', () => {
         content: string;
         status: DisplayStatus;
         onClose: () => void;
-        icon: StdIconId;
+        icon: string;
         filledIcon: boolean;
       };
     };

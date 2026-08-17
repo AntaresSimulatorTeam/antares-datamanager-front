@@ -3,9 +3,9 @@ import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.
 import { uploadTrajectory } from '@/shared/services/trajectoryService.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import {
+  DropdownItemOption,
   FileInputStatus,
   HypothesisRowData,
-  SelectOption,
   StudyActionType,
   StudyDTO,
   StudyState,
@@ -34,7 +34,7 @@ export const useTrajectoryImport = (
   const importTrajectory = useCallback(
     async (
       setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
-      value?: SelectOption,
+      value?: DropdownItemOption,
       type?: TRAJECTORY_TYPE,
       indexArray?: number[],
       hypothesis?: HypothesisType,
@@ -74,7 +74,7 @@ export const useTrajectoryImport = (
           handleTrajectoryError(
             type,
             indexArray,
-            { id: value?.id, label: value?.label ?? '' },
+            { id: Number(value?.id), label: value?.label ?? '' },
             hypothesis?.technology ?? hypothesis?.area ?? '',
             user?.profile?.sub ?? '',
             setData,
