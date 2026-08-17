@@ -83,7 +83,7 @@ export const useTrajectoryDetach = (
         setData(newData);
         if (newReadOnly) {
           setReadOnly?.((prev) => ({ ...prev, ...newReadOnly }));
-          setSecondTableReadOnly?.({ '0': newReadOnly[1], '1': newReadOnly[1] });
+          setSecondTableReadOnly?.({ '0': newReadOnly[1], '1': newReadOnly[1], '2.0': newReadOnly[1], '2.1': newReadOnly[1] });
         }
       } catch (error) {
         if ((error as TrajectoryBackendError).message.includes('Confirmation required')) {
