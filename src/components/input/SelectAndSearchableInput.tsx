@@ -95,8 +95,8 @@ const SelectAndSearchableInput = ({
             setIsDropdownOpen(false);
           }
         }
-      } finally {
-        //setIsDropdownOpen(prev => !prev);
+      } catch {
+        // Silent handler
       }
     },
     [isDropdownOpen, setSearchTerm],
