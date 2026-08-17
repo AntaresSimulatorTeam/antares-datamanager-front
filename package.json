@@ -20,6 +20,7 @@
     "@design-system-rte/react": "^1.14.0",
     "@floating-ui/react": "^0.26.28",
     "@fontsource-variable/nunito-sans": "^5.2.7",
+    "@swc/core": "1.7.x",
     "@tanstack/react-table": "^8.20.5",
     "@tanstack/react-virtual": "^3.13.8",
     "@testing-library/user-event": "^14.5.2",
