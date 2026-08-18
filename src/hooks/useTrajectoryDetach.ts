@@ -44,12 +44,17 @@ export const useTrajectoryDetach = (
 
       try {
         let hvdcValue;
+        let recalculateValue;
         // 2. Suppression backend si nécessaire
         if (trajectoryToDelete && trajectoryIds?.length > 0 && status === 'empty') {
           await performBackendDeletion(trajectoryIds);
           if (trajectoryToDelete.type === TRAJECTORY_TYPE.LINK) {
             await updateStudy({ hvdc: false }, study.id);
             hvdcValue = false;
+          }
+          if (trajectoryToDelete.type === TRAJECTORY_TYPE.FLOWBASED) {
+            await updateStudy({ recalculate: false }, study.id);
+            recalculateValue = false;
           }
         }
 
@@ -77,6 +82,7 @@ export const useTrajectoryDetach = (
           studyId: study.id,
           horizon: study.horizon,
           hvdcValue,
+          recalculateValue,
         });
 
         setData(newData);
