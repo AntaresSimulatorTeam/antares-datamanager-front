@@ -81,8 +81,7 @@ export const useTrajectoryDetach = (
           indexArray,
           studyId: study.id,
           horizon: study.horizon,
-          hvdcValue,
-          recalculateValue,
+          options: {hvdcValue, recalculateValue}
         });
 
         setData(newData);
