@@ -267,6 +267,8 @@ describe('duplicateStudy', () => {
     project: 'BP_REF_23',
     horizon: '2021-2022',
     trajectoryIds: [102, 123],
+    hvdc: false,
+    recalculate: false,
   };
   afterEach(() => {
     vi.restoreAllMocks();

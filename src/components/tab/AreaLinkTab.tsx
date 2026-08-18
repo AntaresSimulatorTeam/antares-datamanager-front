@@ -70,10 +70,10 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
   const configs = useMemo(
     () => [[
       { type: TRAJECTORY_TYPE.AREA, labelKey: t('studyDetails.@areas') },
-      { type: TRAJECTORY_TYPE.LINK, labelKey: t('studyDetails.@links'), hasHvdcOption: true },
+      { type: TRAJECTORY_TYPE.LINK, labelKey: t('studyDetails.@links'), options: {hasHvdcOption: true} },
     ],[
       { type: TRAJECTORY_TYPE.ADEQUACY_PATCH, labelKey: t('settings.@adequacyPatch') },
-      { type: TRAJECTORY_TYPE.FLOWBASED, labelKey: t('settings.@flowBased') },
+      { type: TRAJECTORY_TYPE.FLOWBASED, labelKey: t('settings.@flowBased'), options: {hasRecalculateOption: true} },
       { type: TRAJECTORY_TYPE.SETTINGS, labelKey: t('settings.@title'), subRows: [
         { type: TRAJECTORY_TYPE.SETTINGS, labelKey: t('settings.@generalData') }]
         //{ type: TRAJECTORY_TYPE.SETTINGS_SCENARIO_BUILDER, labelKey: t('settings.@scenarioBuilder') }]
@@ -159,17 +159,16 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
     async (value?: boolean) => {
       await updateStudy({ hvdc: value }, studyData.id);
       setData((prev) => prev.map((item, index) => (index === 1 ? { ...item, hvdc: value } : item)));
-      dispatch?.({ type: STUDY_ACTION.SET_STUDY_HVDC, payload: !!value });
     },
-    [dispatch, studyData.id],
+    [studyData.id],
   );
 
   const handleRecalculateActivate = useCallback(
     async (value?: boolean) => {
       await updateStudy({ recalculate: value }, studyData.id);
-      setData((prev) => prev.map((item, index) => (index === 1 ? { ...item, recalculate: value } : item)));
+      setSettingsData((prev) => prev.map((item, index) => (index === 1 ? { ...item, recalculate: value } : item)));
     },
-    [dispatch, studyData.id],
+    [studyData.id],
   );
 
   const handleConfirmedAreaDeletion = useCallback(async () => {
@@ -177,7 +176,6 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
     void updateStudy({ hvdc: false }, studyData.id);
 
     setData(buildTableData(configs[0], t, [], {hvdc: false}));
-    dispatch?.({ type: STUDY_ACTION.SET_STUDY_HVDC, payload: false });
     dispatch?.({
       type: STUDY_ACTION.CLEAR_TRAJECTORY_BY_TYPE,
       payload: [TRAJECTORY_TYPE.AREA],

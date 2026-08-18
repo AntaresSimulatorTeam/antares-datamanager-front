@@ -115,7 +115,8 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
             horizon,
             trajectoryIds,
             studyId: study?.id,
-            hvdc: false
+            hvdc: false,
+            recalculate: false
           };
           void confirmCreation(studyData);
         }}

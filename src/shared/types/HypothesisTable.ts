@@ -2,16 +2,11 @@ import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { TableOperationRow } from '@/shared/types/Generic.type.ts';
 import { TechnologyType } from '@/shared/types/Trajectory.type.ts';
 
-export type HypothesisConfig = { type: TRAJECTORY_TYPE; labelKey: string; hasHvdcOption?: boolean, subRows?: HypothesisConfig[] };
+export type HypothesisConfig = { type: TRAJECTORY_TYPE; labelKey: string; options?: {hasHvdcOption?: boolean, hasRecalculateOption?: boolean}, subRows?: HypothesisConfig[] };
 
 export type HypothesisTableOptions = { withReadOnlyRow: boolean; };
 
 export type ReadOnlyObject = Record<string | number, boolean>;
-
-export type DsrUpdateResult<T> = {
-  data: T[];
-  computeReadOnly: (prevReadOnly: ReadOnlyObject) => ReadOnlyObject;
-};
 
 export interface TrajectorySearchParams {
   area?: string;

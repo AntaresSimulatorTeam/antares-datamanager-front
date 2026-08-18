@@ -27,9 +27,12 @@ export const useFetchFixHypothesisTrajectories = (
   const getTrajectories = async (id: number) => {
     try {
       let hvdcValue: boolean | undefined;
-      if (configs[0][1].hasHvdcOption && id != null) {
+      let recalculateValue: boolean | undefined;
+      const studyOptions = configs[0][1].options || configs[1][1].options || {};
+      if (Object.keys(studyOptions)?.length > 0 && id != null) {
         const studyData = await getStudyById(id);
         hvdcValue = studyData.hvdc;
+        recalculateValue = studyData.recalculate;
       }
       const promises = [configs[0], configs[1]]
         .filter(Boolean)
@@ -52,7 +55,7 @@ export const useFetchFixHypothesisTrajectories = (
       }
       let secondData: HypothesisRowData[] = [];
       if (configs[1]) {
-        secondData = buildTableData(configs[1], t, secondResults);
+        secondData = buildTableData(configs[1], t, secondResults, {recalculate: recalculateValue});
         secondData.length > 0 && setSecondTableData(secondData);
       }
 

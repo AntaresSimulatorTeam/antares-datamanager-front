@@ -49,7 +49,6 @@ export const useTrajectoryDetach = (
           await performBackendDeletion(trajectoryIds);
           if (trajectoryToDelete.type === TRAJECTORY_TYPE.LINK) {
             await updateStudy({ hvdc: false }, study.id);
-            dispatch?.({ type: STUDY_ACTION.SET_STUDY_HVDC, payload: false });
             hvdcValue = false;
           }
         }
