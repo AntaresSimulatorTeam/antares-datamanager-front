@@ -66,7 +66,6 @@ export const ImportTrajectoryModal = ({
         <span className="mb-1 flex text-body-s text-gray-600">{t('studyDetails.@select_from', { path })}</span>
       )}
       <div className="flex h-full flex-col">
-        <div className="absolute z-10">
           <div className="w-[400px]">
             <SelectAndSearchableInput
               options={optionsFS}
@@ -92,7 +91,6 @@ export const ImportTrajectoryModal = ({
             </div>
           )}
         </div>
-      </div>
     </Modal>
   );
 };
