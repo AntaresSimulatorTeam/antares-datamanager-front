@@ -37,7 +37,7 @@ export type HypothesisRowData = {
   isDeletable?: boolean;
   timeSeries?: string;
   hvdc?: boolean;
-  read?: string;
+  recalculate?: boolean;
 };
 
 export type RowStatus = 'success' | 'warning' | 'emptyError' | 'error' | 'empty' | 'loading';

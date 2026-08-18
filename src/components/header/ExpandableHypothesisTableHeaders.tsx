@@ -15,7 +15,7 @@ import { ProgressBar } from '@/components/input/ProgressBar.tsx';
 import { getAlignment, hasLabelDefault } from '@/shared/utils/hypothesisTableUtils.ts';
 import { getSubRowListWithArea, getSubRowsList, isEmptyRow } from '@/shared/utils/trajectoryUtils.ts';
 import { getInformationMessage } from '@/shared/helpers/hypothesisTableHelper.ts';
-import { Button, Icon, IconButton, Tooltip } from '@design-system-rte/react';
+import { Button, Icon, IconButton, SegmentedControl, Tooltip } from '@design-system-rte/react';
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
 const getExpandableHypothesisTableHeaders = ({
@@ -154,31 +154,31 @@ const getExpandableHypothesisTableHeaders = ({
 
   ...(type === TRAJECTORY_TYPE.ADEQUACY_PATCH
     ? [
-      columnHelper.accessor('read', {
+      columnHelper.accessor('recalculate', {
         header: '',
         size: 220,
-        cell: ({ row }) => {
-          const { trajectory, status } = row.original; // TODO : add read props
+        cell: ({ row, table: { options } }) => {
+          const { trajectory, status, recalculate } = row.original;
           const hasTrajectory = status === TRAJECTORY_SELECTION_STATUS.OK && !!trajectory?.trajectoryName?.length;
           if (row.depth === 1 || row.index !== 1 || row.getReadOnly() || !hasTrajectory) return null;
-          // return (
-          //   <SegmentedControl
-          //     appearance="brand"
-          //     onChange={(value: string) => void options?.meta?.activate?.(value)}
-          //     options={[
-          //       {
-          //         id: 'option1',
-          //         label: t('settings.@read'),
-          //       },
-          //       {
-          //         id: 'option2',
-          //         label: t('settings.@recalculate'),
-          //       },
-          //     ]}
-          //     selectedSegment="option1"
-          //     compactSpacing={true}
-          //   />
-          // );
+          return (
+            <SegmentedControl
+              appearance="brand"
+              onChange={(value: string) => void options?.meta?.activate?.(value)}
+              options={[
+                {
+                  id: 'option1',
+                  label: t('settings.@read'),
+                },
+                {
+                  id: 'option2',
+                  label: t('settings.@recalculate'),
+                },
+              ]}
+              selectedSegment={recalculate ? "option2" : 'option1'}
+              compactSpacing={true}
+            />
+          );
         },
       }),
     ]
