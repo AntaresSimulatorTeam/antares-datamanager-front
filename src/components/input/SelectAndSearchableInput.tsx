@@ -73,7 +73,7 @@ const SelectAndSearchableInput = ({
 
   const handleSelectOption = useCallback(
     (value: DropdownItemOption) => {
-      value?.value && setValueInput(value?.value);
+      value?.label && setValueInput(value?.label);
       onSelect(value);
       setIsDropdownOpen(false);
     },
