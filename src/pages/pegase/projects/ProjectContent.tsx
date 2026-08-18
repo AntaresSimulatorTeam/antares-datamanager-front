@@ -104,7 +104,7 @@ const ProjectContent = () => {
       </div>
       <div className="flex h-[60px] items-center justify-between bg-gray-200 px-[32px]">
         <div className="flex h-9 shrink-0 grow basis-0 items-center justify-end px-4 py-3">
-          <Pagination appearance="brand" totalPages={count} activePage={current} onPageChange={setCurrent} />
+          <Pagination appearance="brand" totalPages={count} activePage={Math.max(0, current + 1)} onPageChange={(pageNb: number) => setCurrent(Math.max(0, pageNb - 1))} />
         </div>
       </div>
     </div>
