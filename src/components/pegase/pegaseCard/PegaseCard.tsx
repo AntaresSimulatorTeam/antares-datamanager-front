@@ -34,6 +34,7 @@ const PegaseCard = ({
       cardType="default"
       clickable
       onClick={onClick}
+      style={{ backgroundColor: '#ffffff' }}
     >
       <div className="flex h-full w-full cursor-pointer flex-col gap-2 p-2">
         <PegaseCardTitle
