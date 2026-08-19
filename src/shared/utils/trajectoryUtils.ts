@@ -1316,13 +1316,14 @@ export const buildDispatchPayload = (
     {} as Record<string, { trajectories: DbTrajectory[] }>,
   );
 
-export const buildTableData = (config: HypothesisConfig[], t: TFunction, results?: DbTrajectory[][], configOptions?: {hvdc?: boolean}): HypothesisRowData[] =>
+export const buildTableData = (config: HypothesisConfig[], t: TFunction, results?: DbTrajectory[][], configOptions?: {hvdc?: boolean, recalculate?: boolean}): HypothesisRowData[] =>
   config.map((cfg, idx) => ({
     hypothesis: t(cfg.labelKey),
     trajectory: !cfg.subRows?.length && results?.[idx]?.[0] ? results?.[idx]?.[0] : null,
     status: (!cfg.subRows?.length && results?.[idx]?.length) ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
     isDeletable: false,
     isDefault: false,
-    ...(cfg.hasHvdcOption && { hvdc: configOptions?.hvdc }),
-    ...((!!cfg.subRows?.length) && {subRows : buildTableData(cfg.subRows, t, results?.[idx] ? [results[idx]] : [])})
+    ...(cfg.options?.hasHvdcOption && { hvdc: configOptions?.hvdc }),
+    ...((!!cfg.subRows?.length) && {subRows : buildTableData(cfg.subRows, t, results?.[idx] ? [results[idx]] : [])}),
+    ...(cfg.options?.hasRecalculateOption && {recalculate: configOptions?.recalculate})
   }));

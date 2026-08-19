@@ -1384,6 +1384,7 @@ describe('updateTableAfterCellDetach', () => {
       ] as HypothesisRowData[];
 
       const indexArray = [1];
+      const options = { hvdcValue: false};
 
       const result = await updateTableAfterCellDetach({
         type: TRAJECTORY_TYPE.AREA,
@@ -1392,6 +1393,7 @@ describe('updateTableAfterCellDetach', () => {
         indexArray,
         studyId: 42,
         horizon: '2030',
+        options
       });
 
       expect(result).toEqual({
@@ -1400,7 +1402,40 @@ describe('updateTableAfterCellDetach', () => {
             hypothesis: 'H1',
             trajectory: { trajectoryName: 'name', area: 'H1' },
           },
-          { hypothesis: 'H2', status: TRAJECTORY_SELECTION_STATUS.MISSING, trajectory: null },
+          { hypothesis: 'H2', status: TRAJECTORY_SELECTION_STATUS.MISSING, trajectory: null, hvdc: false },
+        ],
+        newReadOnly: { '0': false, '1': false },
+      });
+    });
+
+    it('détache la 2nd cellule', async () => {
+      const data = [
+        { hypothesis: 'H1', trajectory: { trajectoryName: 'name', area: 'H1' } },
+        { hypothesis: 'H2', trajectory: { trajectoryName: 'name', area: 'H2' } },
+      ] as HypothesisRowData[];
+
+      const indexArray = [1];
+      const hvdcValue = false;
+      const recalculateValue = false;
+      const options = {hvdcValue, recalculateValue}
+
+      const result = await updateTableAfterCellDetach({
+        type: TRAJECTORY_TYPE.FLOWBASED,
+        data,
+        additionalTrajectory: null,
+        indexArray,
+        studyId: 42,
+        horizon: '2030',
+        options
+      });
+
+      expect(result).toEqual({
+        newData: [
+          {
+            hypothesis: 'H1',
+            trajectory: { trajectoryName: 'name', area: 'H1' },
+          },
+          { hypothesis: 'H2', status: TRAJECTORY_SELECTION_STATUS.MISSING, trajectory: null, recalculate: false },
         ],
         newReadOnly: { '0': false, '1': false },
       });
@@ -1668,6 +1703,98 @@ describe('getParamForFetchFSTrajectory', () => {
       isDefault: false,
     });
     expect(typeToUse).toEqual(TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR);
+    expect(areaToUse).toEqual('');
+  });
+
+  it('return ADEQUACY_PATCH type when index table is the first one', () => {
+    vi.mocked(trajectoryUtils.getFetchFromDbParams).mockReturnValue({
+      typeToUse: TRAJECTORY_TYPE.ADEQUACY_PATCH,
+      areaToUse: '',
+    });
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.ADEQUACY_PATCH, [0], 3, {
+      area: 'H2',
+      isDefault: false,
+    });
+    expect(typeToUse).toEqual(TRAJECTORY_TYPE.ADEQUACY_PATCH);
+    expect(areaToUse).toEqual('');
+  });
+
+  it('return FLOWBASED type when index table is the second one', () => {
+    vi.mocked(trajectoryUtils.getFetchFromDbParams).mockReturnValue({
+      typeToUse: TRAJECTORY_TYPE.ADEQUACY_PATCH,
+      areaToUse: '',
+    });
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.ADEQUACY_PATCH, [1], 3, {
+      area: 'H2',
+      isDefault: false,
+    });
+    expect(typeToUse).toEqual(TRAJECTORY_TYPE.FLOWBASED);
+    expect(areaToUse).toEqual('');
+  });
+
+  it('return SETTINGS_SCENARIO_BUILDER type when index table is the first one of subrows', () => {
+    vi.mocked(trajectoryUtils.getFetchFromDbParams).mockReturnValue({
+      typeToUse: TRAJECTORY_TYPE.ADEQUACY_PATCH,
+      areaToUse: '',
+    });
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.ADEQUACY_PATCH, [2, 0], 3, {
+      area: 'H2',
+      isDefault: false,
+    });
+    expect(typeToUse).toEqual(TRAJECTORY_TYPE.SETTINGS);
+    expect(areaToUse).toEqual('');
+  });
+
+  it('return SETTINGS_SCENARIO_BUILDER type when index table is the last one of subrows', () => {
+    vi.mocked(trajectoryUtils.getFetchFromDbParams).mockReturnValue({
+      typeToUse: TRAJECTORY_TYPE.ADEQUACY_PATCH,
+      areaToUse: '',
+    });
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.ADEQUACY_PATCH, [2, 2], 3, {
+      area: 'H2',
+      isDefault: false,
+    });
+    expect(typeToUse).toEqual(TRAJECTORY_TYPE.SETTINGS_SCENARIO_BUILDER);
+    expect(areaToUse).toEqual('');
+  });
+
+  it('return STS and area as technology type when technology is provided for STS type', () => {
+    vi.mocked(trajectoryUtils.getFetchFromDbParams).mockReturnValue({
+      typeToUse: TRAJECTORY_TYPE.STS,
+      areaToUse: '',
+    });
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.STS, [2, 0], 3, {
+      area: 'H2',
+      technology: 'battery',
+      isDefault: false,
+    });
+    expect(typeToUse).toEqual(TRAJECTORY_TYPE.STS);
+    expect(areaToUse).toEqual('battery');
+  });
+
+  it('return HYDRO_SERIES and no area type when for HYDRO_SERIES type', () => {
+    vi.mocked(trajectoryUtils.getFetchFromDbParams).mockReturnValue({
+      typeToUse: TRAJECTORY_TYPE.HYDRO_SERIES,
+      areaToUse: '',
+    });
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.HYDRO_SERIES, [2, 0], 3, {
+      area: 'H2',
+      isDefault: false,
+    });
+    expect(typeToUse).toEqual(TRAJECTORY_TYPE.HYDRO_SERIES);
+    expect(areaToUse).toEqual('');
+  });
+
+  it('return HYDRO_PSP_SERIES and no area type when for HYDRO_PSP_SERIES type', () => {
+    vi.mocked(trajectoryUtils.getFetchFromDbParams).mockReturnValue({
+      typeToUse: TRAJECTORY_TYPE.HYDRO_PSP_SERIES,
+      areaToUse: '',
+    });
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.HYDRO_PSP_SERIES, [2, 0], 3, {
+      area: 'H2',
+      isDefault: false,
+    });
+    expect(typeToUse).toEqual(TRAJECTORY_TYPE.HYDRO_PSP_SERIES);
     expect(areaToUse).toEqual('');
   });
 });

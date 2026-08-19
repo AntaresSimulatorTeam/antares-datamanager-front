@@ -14,6 +14,7 @@ export const mockStudy: StudyDTO = {
   horizon: '2030-2031',
   trajectoryIds: [1, 7],
   hvdc: false,
+  recalculate: false,
 };
 
 export const mockStudyResponse: PaginatedResponse<StudyDTO> = {
@@ -31,6 +32,7 @@ export const mockStudyResponse: PaginatedResponse<StudyDTO> = {
       horizon: '2030-2031',
       trajectoryIds: [1, 7],
       hvdc: false,
+      recalculate: false,
     },
   ],
   totalPages: 1,

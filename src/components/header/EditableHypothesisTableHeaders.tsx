@@ -113,6 +113,7 @@ const getEditableHypothesisTableHeaders = ({
                 label={t('link.@toggle_hvdc')}
                 onChange={(event: ChangeEvent<HTMLInputElement>) => void options?.meta?.activate?.(event.target.checked)}
                 defaultChecked={hvdc}
+                checked={hvdc}
                 showIcon
                 showLabel
                 disabled={

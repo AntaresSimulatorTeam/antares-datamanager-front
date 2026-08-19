@@ -70,10 +70,10 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
   const configs = useMemo(
     () => [[
       { type: TRAJECTORY_TYPE.AREA, labelKey: t('studyDetails.@areas') },
-      { type: TRAJECTORY_TYPE.LINK, labelKey: t('studyDetails.@links'), hasHvdcOption: true },
+      { type: TRAJECTORY_TYPE.LINK, labelKey: t('studyDetails.@links'), options: {hasHvdcOption: true} },
     ],[
       { type: TRAJECTORY_TYPE.ADEQUACY_PATCH, labelKey: t('settings.@adequacyPatch') },
-      { type: TRAJECTORY_TYPE.FLOWBASED, labelKey: t('settings.@flowBased') },
+      { type: TRAJECTORY_TYPE.FLOWBASED, labelKey: t('settings.@flowBased'), options: {hasRecalculateOption: true} },
       { type: TRAJECTORY_TYPE.SETTINGS, labelKey: t('settings.@title'), subRows: [
         { type: TRAJECTORY_TYPE.SETTINGS, labelKey: t('settings.@generalData') }]
         //{ type: TRAJECTORY_TYPE.SETTINGS_SCENARIO_BUILDER, labelKey: t('settings.@scenarioBuilder') }]
@@ -155,13 +155,20 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
     [data, t],
   );
 
-  const handleActivate = useCallback(
+  const handleHvdcActivate = useCallback(
     async (value?: boolean) => {
       await updateStudy({ hvdc: value }, studyData.id);
       setData((prev) => prev.map((item, index) => (index === 1 ? { ...item, hvdc: value } : item)));
-      dispatch?.({ type: STUDY_ACTION.SET_STUDY_HVDC, payload: !!value });
     },
-    [dispatch, studyData.id],
+    [studyData.id],
+  );
+
+  const handleRecalculateActivate = useCallback(
+    async (value?: boolean) => {
+      await updateStudy({ recalculate: value }, studyData.id);
+      setSettingsData((prev) => prev.map((item, index) => (index === 1 ? { ...item, recalculate: value } : item)));
+    },
+    [studyData.id],
   );
 
   const handleConfirmedAreaDeletion = useCallback(async () => {
@@ -169,7 +176,6 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
     void updateStudy({ hvdc: false }, studyData.id);
 
     setData(buildTableData(configs[0], t, [], {hvdc: false}));
-    dispatch?.({ type: STUDY_ACTION.SET_STUDY_HVDC, payload: false });
     dispatch?.({
       type: STUDY_ACTION.CLEAR_TRAJECTORY_BY_TYPE,
       payload: [TRAJECTORY_TYPE.AREA],
@@ -186,58 +192,58 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
     <div className="flex w-full flex-col gap-6 items-start">
       <div className="flex w-full flex-col gap-2 items-start">
         <div className="text-heading-xs font-medium">{t('studyDetails.@areas_links')}</div>
-      <PegaseHypothesisTable
-        id="area-link-table"
-        columnHeader={t('studyDetails.@hypothesis')}
-        data={data}
-        getTableHeaders={getEditableHypothesisTableHeaders}
-        fileStatus={fileStatus}
-        isStudyGenerated={isStudyGenerated}
-        readOnly={readOnly}
-        isReadOnlyEnable={true}
-        progress={isSettingsParametersType(selectedTrajectoryType) ? 0 : progress}
-        idSelected={String(rowIdSelected)}
-        handleSearch={async (fileNameContains: string, rowId: string) => await handleSelectionChange(fileNameContains, rowId, TRAJECTORY_TYPE.AREA)}
-        updateData={(rowId: string, value: unknown, status: RowStatus) => {
-          void handleHypothesisTableUpdate(rowId, value, status, TRAJECTORY_TYPE.AREA, data, setData);
-        }}
-        handleImport={async (rowId: string) => await handleFetchTrajectoryFromFs(rowId, TRAJECTORY_TYPE.AREA)}
-        handleViewData={handleViewTrajectoryData}
-        activate={async (value?: boolean | string) => await handleActivate(value as boolean)}
-        type={TRAJECTORY_TYPE.AREA}
-      />
+          <PegaseHypothesisTable
+            id="area-link-table"
+            columnHeader={t('studyDetails.@hypothesis')}
+            data={data}
+            getTableHeaders={getEditableHypothesisTableHeaders}
+            fileStatus={fileStatus}
+            isStudyGenerated={isStudyGenerated}
+            readOnly={readOnly}
+            isReadOnlyEnable={true}
+            progress={isSettingsParametersType(selectedTrajectoryType) ? 0 : progress}
+            idSelected={String(rowIdSelected)}
+            handleSearch={async (fileNameContains: string, rowId: string) => await handleSelectionChange(fileNameContains, rowId, TRAJECTORY_TYPE.AREA)}
+            updateData={(rowId: string, value: unknown, status: RowStatus) => {
+              void handleHypothesisTableUpdate(rowId, value, status, TRAJECTORY_TYPE.AREA, data, setData);
+            }}
+            handleImport={async (rowId: string) => await handleFetchTrajectoryFromFs(rowId, TRAJECTORY_TYPE.AREA)}
+            handleViewData={handleViewTrajectoryData}
+            activate={async (value?: boolean | string) => await handleHvdcActivate(value as boolean)}
+            type={TRAJECTORY_TYPE.AREA}
+          />
       </div>
       <div className="flex w-full flex-col gap-2 items-start">
         <div className="text-heading-xs font-medium">{t('studyDetails.@configuration')}</div>
-      <PegaseHypothesisTable
-        id="settings-table"
-        columnHeader={t('studyDetails.@hypothesis')}
-        data={settingsData}
-        getTableHeaders={getExpandableHypothesisTableHeaders}
-        fileStatus={fileStatus}
-        isStudyGenerated={isStudyGenerated}
-        readOnly={readOnlySettings}
-        isReadOnlyEnable={true}
-        progress={isSettingsParametersType(selectedTrajectoryType) ? progress : 0}
-        idSelected={String(rowIdSelected)}
-        handleSearch={async (fileNameContains: string, rowId: string) => {
-          setSelectedTrajectoryType(TRAJECTORY_TYPE.ADEQUACY_PATCH);
-          return await handleSelectionChange(fileNameContains, rowId, TRAJECTORY_TYPE.ADEQUACY_PATCH)
-        }}
-        updateData={(rowId: string, value: unknown, status: RowStatus) => {
-          void handleHypothesisTableUpdate(
-            rowId,
-            value,
-            status,
-            TRAJECTORY_TYPE.ADEQUACY_PATCH,
-            settingsData,
-            setSettingsData,
-          );
-        }}
-        handleImport={async (rowId: string) => await handleFetchTrajectoryFromFs(rowId, TRAJECTORY_TYPE.ADEQUACY_PATCH)}
-        activate={() => {}}
-        type={TRAJECTORY_TYPE.ADEQUACY_PATCH}
-      />
+          <PegaseHypothesisTable
+            id="settings-table"
+            columnHeader={t('studyDetails.@hypothesis')}
+            data={settingsData}
+            getTableHeaders={getExpandableHypothesisTableHeaders}
+            fileStatus={fileStatus}
+            isStudyGenerated={isStudyGenerated}
+            readOnly={readOnlySettings}
+            isReadOnlyEnable={true}
+            progress={isSettingsParametersType(selectedTrajectoryType) ? progress : 0}
+            idSelected={String(rowIdSelected)}
+            handleSearch={async (fileNameContains: string, rowId: string) => {
+              setSelectedTrajectoryType(TRAJECTORY_TYPE.ADEQUACY_PATCH);
+              return await handleSelectionChange(fileNameContains, rowId, TRAJECTORY_TYPE.ADEQUACY_PATCH)
+            }}
+            updateData={(rowId: string, value: unknown, status: RowStatus) => {
+              void handleHypothesisTableUpdate(
+                rowId,
+                value,
+                status,
+                TRAJECTORY_TYPE.ADEQUACY_PATCH,
+                settingsData,
+                setSettingsData,
+              );
+            }}
+            handleImport={async (rowId: string) => await handleFetchTrajectoryFromFs(rowId, TRAJECTORY_TYPE.ADEQUACY_PATCH)}
+            activate={async (value?: boolean | string) => await handleRecalculateActivate(value as boolean)}
+            type={TRAJECTORY_TYPE.ADEQUACY_PATCH}
+          />
       </div>
         <ImportTrajectoryModal
           options={optionsFS}
