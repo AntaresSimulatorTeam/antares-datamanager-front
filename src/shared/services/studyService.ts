@@ -53,7 +53,7 @@ export const fetchSearchStudies = async (
     }
     const json = (await (response as Response).json()) as PaginatedResponse<StudyDTO>;
 
-    return { content: json.content, totalElements: json.totalElements };
+    return { content: json.content, totalPages: json.totalPages };
   } catch (error) {
     throw new Error('Failed to fetch user studies');
   }

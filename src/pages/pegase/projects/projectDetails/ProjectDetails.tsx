@@ -79,7 +79,7 @@ const ProjectDetails = () => {
         </div>
       </div>
       <StudyTableDisplay searchStudy={searchTerm} projectInfo={projectDetails} />
-      {isModalOpen && <ProjectCreationModal onClose={onCloseModal} projectInfo={projectDetails} />}
+      <ProjectCreationModal onClose={onCloseModal} projectInfo={projectDetails} isOpen={isModalOpen} />
     </div>
   );
 };

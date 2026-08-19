@@ -311,9 +311,9 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
           }}
         />
       </div>
-      {isModalOpen && (
         <ImportTrajectoryModal
           options={optionsFS}
+          isOpen={isModalOpen}
           onClose={async (
             typeToUse?: TRAJECTORY_TYPE,
             value?: DropdownItemOption,
@@ -335,7 +335,6 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
           indexArray={rowIdSelected?.split('.').map(Number)}
           rowsNb={data.length}
         />
-      )}
         <AreaDeletionConfirmationModal
           isOpen={isDeletionModalOpen}
           onClose={() => setIsDeletionModalOpen(false)}

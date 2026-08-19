@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
 import { notifyAlert, notifyToast } from '@/shared/notification/notification.tsx';
 import { DisplayStatus } from '@/shared/types';
-import { ToastAction } from 'rte-design-system-react';
+import { AlertAction } from '@common/layout/stdAlert/StdAlert.tsx';
 
 vi.mock('react-toastify', () => {
   const toastFn = vi.fn();
@@ -44,7 +44,7 @@ describe('notifyToast', () => {
     notifyToast({
       message: baseProps.message,
       type: baseProps.type as DisplayStatus,
-      action: baseProps.action as unknown as ToastAction,
+      action: baseProps.action as unknown as AlertAction,
       id: 'custom-id',
     });
     expect(toast.clearWaitingQueue).toHaveBeenCalledWith({ containerId: 'toast' });
@@ -56,7 +56,7 @@ describe('notifyToast', () => {
     notifyToast({
       message: baseProps.message,
       type: baseProps.type as DisplayStatus,
-      action: baseProps.action as unknown as ToastAction,
+      action: baseProps.action as unknown as AlertAction,
     });
     expect(uuidv4).toHaveBeenCalled();
     expect(toast).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ toastId: 'mock-uuid' }));
@@ -68,7 +68,7 @@ describe('notifyAlert', () => {
     message: 'Alerte test',
     content: 'Contenu détaillé',
     type: 'warning' as DisplayStatus,
-    action: vi.fn() as unknown as ToastAction,
+    action: vi.fn() as unknown as AlertAction,
     icon: 'alert-icon',
     filledIcon: true,
   };

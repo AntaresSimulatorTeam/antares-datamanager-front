@@ -6,7 +6,6 @@
 
 import { ReactElement, useState } from 'react';
 import cardTitleClassBuilder from './cardTitleClassBuilder';
-import { RdsIconButtonProps } from 'rte-design-system-react';
 import { Button, Dropdown, DropdownItem, IconButton } from '@design-system-rte/react';
 import { DropdownItemOption } from '@/shared/types';
 
@@ -14,7 +13,7 @@ export type PegaseCardTitleProps = {
   id: string;
   title: string;
   dropdownOptions: DropdownItemOption[];
-  icons?: ReactElement<RdsIconButtonProps>;
+  icons?: ReactElement;
   lineClamp?: number;
   onClick?: () => void;
 };

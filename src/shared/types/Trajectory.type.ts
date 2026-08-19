@@ -5,7 +5,6 @@
  */
 
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { FileInputStatus } from 'rte-design-system-react';
 // @ts-ignore
 import { AccessorKeyColumnDef } from '@tanstack/table-core/src/types.ts';
 import { TrajectoryState } from '@/shared/types/Study.type.ts';
@@ -41,7 +40,7 @@ export type HypothesisRowData = {
   read?: string;
 };
 
-export type RowStatus = FileInputStatus | 'warning' | 'emptyError';
+export type RowStatus = 'success' | 'warning' | 'emptyError' | 'error' | 'empty' | 'loading';
 
 export interface TrajectoryViewData {
   trajectory: DbTrajectory;

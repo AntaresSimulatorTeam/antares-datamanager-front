@@ -107,8 +107,8 @@ const StudyDetails = () => {
           </div>
         </div>
       </div>
-      {isModalOpen && studyData && studyData.status !== StudyStatus.GENERATED && (
-        <StudyModificationModal onClose={onCloseModal} study={studyData} />
+      {studyData && studyData.status !== StudyStatus.GENERATED && (
+        <StudyModificationModal onClose={onCloseModal} study={studyData} isOpen={isModalOpen}/>
       )}
     </div>
   );

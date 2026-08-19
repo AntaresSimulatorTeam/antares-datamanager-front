@@ -9,7 +9,6 @@ import {
   TechnologyType,
 } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { FileInputStatus } from 'rte-design-system-react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { generateId } from '@/shared/utils/defaultUtils.ts';
@@ -68,9 +67,9 @@ export const getStatus = (status?: RowStatus) => {
 
 /**
  * Get background color from a file status
- * @param {FileInputStatus | null} status
+ * @param {RowStatus | null} status
  */
-export const getBgColor = (status?: FileInputStatus) => {
+export const getBgColor = (status?: RowStatus) => {
   switch (status) {
     case 'loading':
       return 'bg-primary-600';

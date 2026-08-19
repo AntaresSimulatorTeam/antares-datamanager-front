@@ -5,7 +5,6 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { RdsModal } from 'rte-design-system-react';
 import { useTranslation } from 'react-i18next';
 import KeywordsInput from '@/components/input/KeywordsInput.tsx';
 import HorizonInput from '@/components/input/HorizonInput';
@@ -20,14 +19,14 @@ import {
   MIN_KEYWORD_LENGTH,
 } from '@/shared/const/studyConfig';
 import { hasArrayChanged } from '@/shared/utils/arrayUtils.ts';
-import { Button, Select, TextInput } from '@design-system-rte/react';
+import { Button, Modal, Select, TextInput } from '@design-system-rte/react';
 import { FieldInFormation } from '@common/base/FieldInFormation.tsx';
 import { convertToOneYearHorizon } from '@/shared/utils/textUtils.ts';
 import { useFetchProjectOptions } from '@/hooks/useFetchProjectOptions.ts';
 import { useStudyModification } from '@/hooks/useStudyModification.ts';
 
 interface StudyCreationModalProps {
-  isOpen?: boolean;
+  isOpen: boolean;
   onClose: () => void;
   study: StudyDTO;
   setReloadStudies?: React.Dispatch<React.SetStateAction<number>>;
@@ -39,6 +38,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
   study,
   setReloadStudies,
   isDuplicateMode = false,
+  isOpen
 }) => {
   const { t } = useTranslation();
   const { user } = useUser();
@@ -112,92 +112,92 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
   };
 
   return (
-    <RdsModal size="small">
-      <RdsModal.Title onClose={onClose}>
-        {isDuplicateMode ? t('home.@duplicate_study') : t('studyModal.@update_study')}
-      </RdsModal.Title>
-      <RdsModal.Content>
-        <div className="flex w-full flex-col items-start justify-start space-y-2">
-          <FieldInFormation />
-          <div className="flex w-full flex-col items-start justify-start space-y-4">
-            <div className="flex w-full items-start justify-start space-x-4">
-              <div className="w-1/2">
-                <TextInput
-                  id="text-input-study-modify-name"
-                  value={studyName}
-                  label={t('modal.@input_name')}
-                  onChange={handleStudyNameChange}
-                  required
-                  maxLength={MAX_STUDY_NAME_LENGTH}
-                  showCounter={true}
-                  error={!!studyErrorMessage}
-                  assistiveTextLabel={studyErrorMessage}
-                  assistiveAppearance={studyErrorMessage ? 'error' : 'description'}
-                  rightIconAction="clean"
-                  onRightIconClick={() => setStudyName('')}
-                />
-              </div>
-              <div className="w-1/2">
-                <Select
-                  id="project-select"
-                  value={project?.value ?? ''}
-                  onChange={(value: string) => {
-                    const selectedProject = projects.find((projectOption) => projectOption.value === value);
-                    if (selectedProject) {
-                      setProject(selectedProject);
-                    }
-                  }}
-                  label={t('page.@project')}
-                  options={projects}
-                  multiple={false}
-                  required={true}
-                  width={280}
-                />
-              </div>
-            </div>
+    <Modal
+      isOpen={isOpen}
+      closeOnOverlayClick
+      id="study-update-modal"
+      onClose={() => void onClose()}
+      primaryButton={<Button
+        icon={isDuplicateMode ? 'copy' : 'edit'}
+        label={isDuplicateMode ? t('study.@duplicate') : t('modal.@button_update')}
+        onClick={() => {
+          const studyData = {
+            ...study,
+            createdBy: user?.profile.sub,
+            name: studyName,
+            keywords,
+            project: project.label,
+            projectId: project?.id?.toString() || '',
+            horizon,
+          };
+
+          void confirmUpdate(study.id, studyData, isDuplicateMode);
+        }}
+        variant="primary"
+        disabled={!isFormValid}
+      />}
+      secondaryButton={<Button label={t('components.quickAccess.@cancel')} onClick={onClose} variant="text" />}
+      size="s"
+      title={isDuplicateMode ? t('home.@duplicate_study') : t('studyModal.@update_study')}
+    >
+      <div className="flex w-full flex-col items-start justify-start space-y-2">
+        <FieldInFormation />
+        <div className="flex w-full flex-col items-start justify-start space-y-4">
+          <div className="flex w-full items-start justify-start space-x-4">
             <div className="w-1/2">
-              <HorizonInput
-                horizon={horizon}
-                onChange={setHorizon}
-                onValidChange={setIsHorizonValid}
+              <TextInput
+                id="text-input-study-modify-name"
+                value={studyName}
+                label={t('modal.@input_name')}
+                onChange={handleStudyNameChange}
                 required
-                disabled={!isDuplicateMode}
-                customErrorMessage={isDuplicateMode && horizonErrorMessage ? horizonErrorMessage : ''}
+                maxLength={MAX_STUDY_NAME_LENGTH}
+                showCounter={true}
+                error={!!studyErrorMessage}
+                assistiveTextLabel={studyErrorMessage}
+                assistiveAppearance={studyErrorMessage ? 'error' : 'description'}
+                rightIconAction="clean"
+                onRightIconClick={() => setStudyName('')}
               />
             </div>
-            <KeywordsInput
-              keywords={keywords}
-              setKeywords={setKeywords}
-              maxNbKeywords={MAX_KEYWORD_NUMBER}
-              maxNbCharacters={MAX_KEYWORD_LENGTH}
-              minNbCharacters={MIN_KEYWORD_LENGTH}
+            <div className="w-1/2">
+              <Select
+                id="project-select"
+                value={project?.value ?? ''}
+                onChange={(value: string) => {
+                  const selectedProject = projects.find((projectOption) => projectOption.value === value);
+                  if (selectedProject) {
+                    setProject(selectedProject);
+                  }
+                }}
+                label={t('page.@project')}
+                options={projects}
+                multiple={false}
+                required={true}
+                width={280}
+              />
+            </div>
+          </div>
+          <div className="w-1/2">
+            <HorizonInput
+              horizon={horizon}
+              onChange={setHorizon}
+              onValidChange={setIsHorizonValid}
+              required
+              disabled={!isDuplicateMode}
+              customErrorMessage={isDuplicateMode && horizonErrorMessage ? horizonErrorMessage : ''}
             />
           </div>
+          <KeywordsInput
+            keywords={keywords}
+            setKeywords={setKeywords}
+            maxNbKeywords={MAX_KEYWORD_NUMBER}
+            maxNbCharacters={MAX_KEYWORD_LENGTH}
+            minNbCharacters={MIN_KEYWORD_LENGTH}
+          />
         </div>
-      </RdsModal.Content>
-      <RdsModal.Footer>
-        <Button label={t('components.quickAccess.@cancel')} onClick={onClose} variant="text" />
-        <Button
-          icon={isDuplicateMode ? 'copy' : 'edit'}
-          label={isDuplicateMode ? t('study.@duplicate') : t('modal.@button_update')}
-          onClick={() => {
-            const studyData = {
-              ...study,
-              createdBy: user?.profile.sub,
-              name: studyName,
-              keywords,
-              project: project.label,
-              projectId: project?.id?.toString() || '',
-              horizon,
-            };
-
-            void confirmUpdate(study.id, studyData, isDuplicateMode);
-          }}
-          variant="primary"
-          disabled={!isFormValid}
-        />
-      </RdsModal.Footer>
-    </RdsModal>
+      </div>
+    </Modal>
   );
 };
 

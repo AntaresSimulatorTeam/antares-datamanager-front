@@ -4,7 +4,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { RdsModal } from 'rte-design-system-react';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import KeywordsInput from '@/components/input/KeywordsInput.tsx';
@@ -19,16 +18,17 @@ import {
   MAX_PROJECT_NAME_LENGTH,
   MIN_KEYWORD_LENGTH,
 } from '@/shared/const/studyConfig.ts';
-import { Button, Textarea, TextInput } from '@design-system-rte/react';
+import { Button, Modal, Textarea, TextInput } from '@design-system-rte/react';
 import { FieldInFormation } from '@common/base/FieldInFormation.tsx';
 import { useProjectCreation } from '@/hooks/useProjectCreation.ts';
 
 interface ProjectCreationModalProps {
   onClose: () => void;
   projectInfo?: ProjectResponse | null;
+  isOpen: boolean;
 }
 
-export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationModalProps) => {
+export const ProjectCreationModal = ({ onClose, projectInfo, isOpen }: ProjectCreationModalProps) => {
   const { t } = useTranslation();
   const [name, setName] = useState<string>(projectInfo?.name ?? '');
   const [description, setDescription] = useState<string>(projectInfo?.description ?? '');
@@ -66,86 +66,86 @@ export const ProjectCreationModal = ({ onClose, projectInfo }: ProjectCreationMo
   }, [keywords.length]);
 
   return (
-    <RdsModal size="small">
-      <RdsModal.Title onClose={onClose}>
-        {projectInfo ? t('home.@update_project') : t('home.@new_project')}
-      </RdsModal.Title>
-      <RdsModal.Content>
-        <div className="flex flex-col items-start gap-4">
-          <FieldInFormation />
-          <div className="flex w-1/2 flex-col items-start gap-4">
-            <TextInput
-              aria-required
-              id="text-input-default"
-              label={t('modal.@input_name')}
-              labelPosition="top"
-              rightIconAction="clean"
-              onRightIconClick={resetNameField}
-              onChange={(value: string) => {
-                if (validateMaxLength(value, MAX_PROJECT_NAME_LENGTH)) {
-                  setNameError(null);
-                  setName(value);
-                  setIsFormValid(true);
-                } else if (value?.length === MAX_PROJECT_NAME_LENGTH + 1) {
-                  setNameError(t('modal.@number_characters_exceeds'));
-                  setIsFormValid(false);
-                  setName('');
-                }
-              }}
-              maxLength={MAX_PROJECT_NAME_LENGTH}
-              showCounter={true}
-              required
-              value={name}
-              assistiveTextLabel={nameError ?? ''}
-              assistiveAppearance="error"
-              error={!!nameError?.length}
-            />
-            <Textarea
-              label={t('modal.@input_description')}
-              value={description}
-              onChange={(event: ChangeEvent<HTMLTextAreaElement>) => {
-                const text = event.target.value;
-                if (validateMaxLength(text, MAX_PROJECT_DESCRIPTION_LENGTH)) {
-                  setDescription(text || '');
-                  !nameError && setIsFormValid(true);
-                } else if (text?.length === MAX_PROJECT_DESCRIPTION_LENGTH + 1) {
-                  setDescription(text || '');
-                  setIsFormValid(false);
-                }
-              }}
-              maxLength={MAX_PROJECT_DESCRIPTION_LENGTH}
-              showCounter={true}
-              rows={MAX_PROJECT_DESCRIPTION_ROWS_NB}
-              resizeable={false}
-            />
-            <KeywordsInput
-              keywords={keywords}
-              setKeywords={setKeywords}
-              maxNbKeywords={MAX_KEYWORD_NUMBER}
-              maxNbCharacters={MAX_KEYWORD_LENGTH}
-              minNbCharacters={MIN_KEYWORD_LENGTH}
-            />
-          </div>
-        </div>
-      </RdsModal.Content>
-      <RdsModal.Footer>
-        <Button label={t('components.quickAccess.@cancel')} onClick={onClose} variant="text" />
-        <Button
-          icon={projectInfo ? 'edit' : 'add'}
-          label={projectInfo ? t('modal.@button_update') : t('modal.@button_create')}
-          onClick={() => {
-            const projectData = {
-              name,
-              tags: keywords,
-              description,
-            };
-            void confirmCreation(projectData, projectInfo?.id);
+  <Modal
+    isOpen={isOpen}
+    closeOnOverlayClick
+    id="project-creation-modal"
+    onClose={() => void onClose()}
+    primaryButton={<Button
+      label={projectInfo ? t('modal.@button_update') : t('modal.@button_create')}
+      icon={projectInfo ? 'edit' : 'add'}
+      onClick={() => {
+        const projectData = {
+          name,
+          tags: keywords,
+          description,
+        };
+        void confirmCreation(projectData, projectInfo?.id);
+      }}
+      variant="primary"
+      color="primary"
+      disabled={!isFormValid}
+    />}
+    secondaryButton={<Button label={t('components.quickAccess.@cancel')} onClick={onClose} variant="text" />}
+    size="s"
+    title={projectInfo ? t('home.@update_project') : t('home.@new_project')}
+    >
+    <div className="flex flex-col items-start gap-4">
+      <FieldInFormation />
+      <div className="flex w-1/2 flex-col items-start gap-4">
+        <TextInput
+          aria-required
+          id="text-input-default"
+          label={t('modal.@input_name')}
+          labelPosition="top"
+          rightIconAction="clean"
+          onRightIconClick={resetNameField}
+          onChange={(value: string) => {
+            if (validateMaxLength(value, MAX_PROJECT_NAME_LENGTH)) {
+              setNameError(null);
+              setName(value);
+              setIsFormValid(true);
+            } else if (value?.length === MAX_PROJECT_NAME_LENGTH + 1) {
+              setNameError(t('modal.@number_characters_exceeds'));
+              setIsFormValid(false);
+              setName('');
+            }
           }}
-          variant="primary"
-          color="primary"
-          disabled={!isFormValid}
+          maxLength={MAX_PROJECT_NAME_LENGTH}
+          showCounter={true}
+          required
+          value={name}
+          assistiveTextLabel={nameError ?? ''}
+          assistiveAppearance="error"
+          error={!!nameError?.length}
         />
-      </RdsModal.Footer>
-    </RdsModal>
+        <Textarea
+          label={t('modal.@input_description')}
+          value={description}
+          onChange={(event: ChangeEvent<HTMLTextAreaElement>) => {
+            const text = event.target.value;
+            if (validateMaxLength(text, MAX_PROJECT_DESCRIPTION_LENGTH)) {
+              setDescription(text || '');
+              !nameError && setIsFormValid(true);
+            } else if (text?.length === MAX_PROJECT_DESCRIPTION_LENGTH + 1) {
+              setDescription(text || '');
+              setIsFormValid(false);
+            }
+          }}
+          maxLength={MAX_PROJECT_DESCRIPTION_LENGTH}
+          showCounter={true}
+          rows={MAX_PROJECT_DESCRIPTION_ROWS_NB}
+          resizeable={false}
+        />
+        <KeywordsInput
+          keywords={keywords}
+          setKeywords={setKeywords}
+          maxNbKeywords={MAX_KEYWORD_NUMBER}
+          maxNbCharacters={MAX_KEYWORD_LENGTH}
+          minNbCharacters={MIN_KEYWORD_LENGTH}
+        />
+      </div>
+    </div>
+  </Modal>
   );
 };

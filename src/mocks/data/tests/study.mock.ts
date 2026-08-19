@@ -33,7 +33,7 @@ export const mockStudyResponse: PaginatedResponse<StudyDTO> = {
       hvdc: false,
     },
   ],
-  totalElements: 1,
+  totalPages: 1,
 };
 
 export const mockStudyResponse2 = {
@@ -59,5 +59,5 @@ export const mockStudyResponse2 = {
       generationDate: '2023-01-02',
     },
   ],
-  totalElements: 2,
+  totalPages: 2,
 };
