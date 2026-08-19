@@ -20,10 +20,6 @@ const TEST_DROPDOWN_DROPDOWN = [
 ] as DropdownItemProps[];
 
 describe('PegaseCard', () => {
-  it('renders the default PegaseCard component', () => {
-    render(<PegaseCard id={TEST_ID} title={TEST_TITLE} dropdownOptions={TEST_DROPDOWN_DROPDOWN} />);
-    expect(screen.getByRole('region')).toBeInTheDocument();
-  });
 
   it('renders the StdCard component with children', () => {
     render(

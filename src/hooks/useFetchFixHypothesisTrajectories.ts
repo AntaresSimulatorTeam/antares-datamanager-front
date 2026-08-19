@@ -28,13 +28,15 @@ export const useFetchFixHypothesisTrajectories = (
     try {
       let hvdcValue: boolean | undefined;
       let recalculateValue: boolean | undefined;
-      const studyOptions = configs[0][1].options || configs[1][1].options || {};
+      const firstConfig = configs?.[0];
+      const secondConfig = configs?.[1];
+      const studyOptions = firstConfig?.[1].options || secondConfig?.[1].options || {};
       if (Object.keys(studyOptions)?.length > 0 && id != null) {
         const studyData = await getStudyById(id);
         hvdcValue = studyData.hvdc;
         recalculateValue = studyData.recalculate;
       }
-      const promises = [configs[0], configs[1]]
+      const promises = [firstConfig, secondConfig]
         .filter(Boolean)
         .map(config => fetchTrajectories(id, config));
 
@@ -43,19 +45,19 @@ export const useFetchFixHypothesisTrajectories = (
       dispatch?.({
         type: STUDY_ACTION.ADD_TRAJECTORIES,
         payload: {
-          ...(configs[0] && buildDispatchPayload(configs[0], firstResults)),
-          ...(configs[1] && buildDispatchPayload(configs[1], secondResults)),
+          ...(firstConfig && buildDispatchPayload(firstConfig, firstResults)),
+          ...(secondConfig && buildDispatchPayload(secondConfig, secondResults)),
         },
       });
 
       let firstData: HypothesisRowData[] = [];
-      if (configs[0]) {
-        firstData = buildTableData(configs[0], t, firstResults, {hvdc: hvdcValue});
+      if (firstConfig) {
+        firstData = buildTableData(firstConfig, t, firstResults, {hvdc: hvdcValue});
         firstData.length > 0 && setFirstTableData(firstData);
       }
       let secondData: HypothesisRowData[] = [];
-      if (configs[1]) {
-        secondData = buildTableData(configs[1], t, secondResults, {recalculate: recalculateValue});
+      if (secondConfig) {
+        secondData = buildTableData(secondConfig, t, secondResults, {recalculate: recalculateValue});
         secondData.length > 0 && setSecondTableData(secondData);
       }
 
@@ -64,7 +66,7 @@ export const useFetchFixHypothesisTrajectories = (
           0: false,
           1: !firstResults[0]?.length,
         });
-        if (configs[1]) {
+        if (secondConfig) {
           setSecondTableReadOnlyRow({
             '0': !firstResults[0]?.length,
             '1': !firstResults[0]?.length,
@@ -74,12 +76,12 @@ export const useFetchFixHypothesisTrajectories = (
         }
       } else if (isStudyGenerated) {
         setFirstTableReadOnlyRow(buildReadOnlyRow(['0', '1']));
-        if (configs[1]) {
+        if (secondConfig) {
           setSecondTableReadOnlyRow(buildReadOnlyRow(['0', '1', '2.0', '2.1']));
         }
       }
     } catch(error) {
-      // Silent handler
+      console.log("================= error", error)
     }
   };
 
