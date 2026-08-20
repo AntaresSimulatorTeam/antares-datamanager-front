@@ -116,7 +116,7 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData, types }: TabProps 
       } else if (status === 'success') {
         const dbTrajectory =
           dbTrajectories.length > 0
-            ? dbTrajectories.find((item) => item.id === value)
+            ? dbTrajectories.find((item) => item.id == value)
             : getRowDataSelected(dataToUse, indexArray)?.trajectory;
         if (dbTrajectory) {
           await attachTrajectory(tableType, indexArray, status, dbTrajectory, setterToUse);
