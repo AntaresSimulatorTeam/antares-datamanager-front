@@ -1745,7 +1745,7 @@ describe('getParamForFetchFSTrajectory', () => {
     expect(areaToUse).toEqual('');
   });
 
-  it('return SETTINGS_SCENARIO_BUILDER type when index table is the last one of subrows', () => {
+  it('return SCENARIO_BUILDER type when index table is the last one of subrows', () => {
     vi.mocked(trajectoryUtils.getFetchFromDbParams).mockReturnValue({
       typeToUse: TRAJECTORY_TYPE.ADEQUACY_PATCH,
       areaToUse: '',
@@ -1754,7 +1754,7 @@ describe('getParamForFetchFSTrajectory', () => {
       area: 'H2',
       isDefault: false,
     });
-    expect(typeToUse).toEqual(TRAJECTORY_TYPE.SETTINGS_SCENARIO_BUILDER);
+    expect(typeToUse).toEqual(TRAJECTORY_TYPE.SCENARIO_BUILDER);
     expect(areaToUse).toEqual('');
   });
 
