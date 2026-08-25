@@ -603,6 +603,12 @@ describe('getPathFromTrajectoryType', () => {
     );
   });
 
+  it('should return cost path for THERMAL_ECONOMIC_PARAMETER', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER)).toBe(
+      String.raw`\\thermal\\economic parameters\\economic`,
+    );
+  });
+
   it('should return cost path for THERMAL_ECONOMIC_COST_PARAMETER', () => {
     expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER)).toBe(
       String.raw`\\thermal\\economic parameters\\costs`,
@@ -735,6 +741,10 @@ describe('getPathFromTrajectoryType', () => {
 
   it('should return technical path for SETTINGS type', () => {
     expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.SETTINGS)).toBe(String.raw`\\settings\\general_data`);
+  });
+
+  it('should return technical path for SCENARIO_BUILDER type', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.SCENARIO_BUILDER)).toBe(String.raw`\\settings\\scenario_builder`);
   });
 
   it('should return technical path for unknown type', () => {

@@ -65,7 +65,7 @@ describe('useTrajectorySearchHandler', () => {
     );
   });
 
-  it('should switch type when TRAJECTORY_TYPE.AREA is used', async () => {
+  it('should switch type when TRAJECTORY_TYPE.AREA is used for the last index', async () => {
     const setDbTrajectories = vi.fn();
 
     const { result } = renderHook(() =>
@@ -396,6 +396,273 @@ describe('useTrajectorySearchHandler', () => {
       setDbTrajectories,
       '2030',
       {
+        fileNameContains: 'xyz',
+      },
+    );
+  });
+
+  it('should switch into ADEQUACY_PATCH', async () => {
+    const setDbTrajectories = vi.fn();
+
+    const { result } = renderHook(() =>
+      useTrajectorySearchHandler({
+        studyHorizon: '2030',
+        setDbTrajectories,
+      }),
+    );
+
+    await act(async () => {
+      await result.current.handleSearch(TRAJECTORY_TYPE.ADEQUACY_PATCH, [0], {
+        area: 'Area A',
+        fileNameContains: 'xyz',
+        isLastIndex: false,
+      });
+    });
+
+    expect(hypothesisTableService.handleTrajectorySearch).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.ADEQUACY_PATCH,
+      setDbTrajectories,
+      '2030',
+      {
+        fileNameContains: 'xyz',
+      },
+    );
+  });
+
+  it('should switch into FLOWBASED when ADEQUACY_PATCH is used for the second index', async () => {
+    const setDbTrajectories = vi.fn();
+
+    const { result } = renderHook(() =>
+      useTrajectorySearchHandler({
+        studyHorizon: '2030',
+        setDbTrajectories,
+      }),
+    );
+
+    await act(async () => {
+      await result.current.handleSearch(TRAJECTORY_TYPE.ADEQUACY_PATCH, [1], {
+        area: 'Area A',
+        fileNameContains: 'xyz',
+        isLastIndex: false,
+      });
+    });
+
+    expect(hypothesisTableService.handleTrajectorySearch).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.FLOWBASED,
+      setDbTrajectories,
+      '2030',
+      {
+        fileNameContains: 'xyz',
+      },
+    );
+  });
+
+  it('should switch into SETTINGS when ADEQUACY_PATCH is used for the settings first subrow', async () => {
+    const setDbTrajectories = vi.fn();
+
+    const { result } = renderHook(() =>
+      useTrajectorySearchHandler({
+        studyHorizon: '2030',
+        setDbTrajectories,
+      }),
+    );
+
+    await act(async () => {
+      await result.current.handleSearch(TRAJECTORY_TYPE.ADEQUACY_PATCH, [0, 0], {
+        area: 'Area A',
+        fileNameContains: 'xyz',
+        isLastIndex: false,
+      });
+    });
+
+    expect(hypothesisTableService.handleTrajectorySearch).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.SETTINGS,
+      setDbTrajectories,
+      '2030',
+      {
+        fileNameContains: 'xyz',
+      },
+    );
+  });
+
+  it('should switch into SCENARIO_BUILDER when ADEQUACY_PATCH is used for the settings second subrow', async () => {
+    const setDbTrajectories = vi.fn();
+
+    const { result } = renderHook(() =>
+      useTrajectorySearchHandler({
+        studyHorizon: '2030',
+        setDbTrajectories,
+      }),
+    );
+
+    await act(async () => {
+      await result.current.handleSearch(TRAJECTORY_TYPE.ADEQUACY_PATCH, [0, 1], {
+        area: 'Area A',
+        fileNameContains: 'xyz',
+        isLastIndex: false,
+      });
+    });
+
+    expect(hypothesisTableService.handleTrajectorySearch).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.SCENARIO_BUILDER,
+      setDbTrajectories,
+      '2030',
+      {
+        fileNameContains: 'xyz',
+      },
+    );
+  });
+
+  it('should switch into THERMAL_TECHNICAL_SPECIFIC_PARAMETER', async () => {
+    const setDbTrajectories = vi.fn();
+
+    const { result } = renderHook(() =>
+      useTrajectorySearchHandler({
+        studyHorizon: '2030',
+        setDbTrajectories,
+      }),
+    );
+
+    await act(async () => {
+      await result.current.handleSearch(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, [0], {
+        area: 'Area A',
+        fileNameContains: 'xyz',
+        technology: 'FR',
+        isLastIndex: false,
+      });
+    });
+
+    expect(hypothesisTableService.handleTrajectorySearch).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+      setDbTrajectories,
+      '2030',
+      {
+        area: 'FR',
+        technology: 'FR',
+        fileNameContains: 'xyz',
+      },
+    );
+  });
+
+  it('should switch into THERMAL_TECHNICAL_MODULATION_PARAMETER when second index', async () => {
+    const setDbTrajectories = vi.fn();
+
+    const { result } = renderHook(() =>
+      useTrajectorySearchHandler({
+        studyHorizon: '2030',
+        setDbTrajectories,
+      }),
+    );
+
+    await act(async () => {
+      await result.current.handleSearch(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, [1], {
+        area: 'Area A',
+        fileNameContains: 'xyz',
+        technology: 'FR',
+        isLastIndex: false,
+      });
+    });
+
+    expect(hypothesisTableService.handleTrajectorySearch).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER,
+      setDbTrajectories,
+      '2030',
+      {
+        area: 'Area A',
+        technology: 'FR',
+        fileNameContains: 'xyz',
+      },
+    );
+  });
+
+  it('should switch into THERMAL_TECHNICAL_MODULATION_PARAMETER when third index', async () => {
+    const setDbTrajectories = vi.fn();
+
+    const { result } = renderHook(() =>
+      useTrajectorySearchHandler({
+        studyHorizon: '2030',
+        setDbTrajectories,
+      }),
+    );
+
+    await act(async () => {
+      await result.current.handleSearch(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, [2], {
+        area: 'Area A',
+        fileNameContains: 'xyz',
+        technology: 'FR',
+        isLastIndex: false,
+      });
+    });
+
+    expect(hypothesisTableService.handleTrajectorySearch).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER,
+      setDbTrajectories,
+      '2030',
+      {
+        area: 'Area A',
+        technology: 'FR',
+        fileNameContains: 'xyz',
+      },
+    );
+  });
+
+  it('should switch into THERMAL_ECONOMIC_COST_PARAMETER', async () => {
+    const setDbTrajectories = vi.fn();
+
+    const { result } = renderHook(() =>
+      useTrajectorySearchHandler({
+        studyHorizon: '2030',
+        setDbTrajectories,
+      }),
+    );
+
+    await act(async () => {
+      await result.current.handleSearch(TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER, [0], {
+        area: 'Area A',
+        fileNameContains: 'xyz',
+        technology: 'FR',
+        isLastIndex: false,
+      });
+    });
+
+    expect(hypothesisTableService.handleTrajectorySearch).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER,
+      setDbTrajectories,
+      '2030',
+      {
+        area: 'Area A',
+        technology: 'FR',
+        fileNameContains: 'xyz',
+      },
+    );
+  });
+
+  it('should switch into THERMAL_ECONOMIC_PARAMETER when second index', async () => {
+    const setDbTrajectories = vi.fn();
+
+    const { result } = renderHook(() =>
+      useTrajectorySearchHandler({
+        studyHorizon: '2030',
+        setDbTrajectories,
+      }),
+    );
+
+    await act(async () => {
+      await result.current.handleSearch(TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER, [1], {
+        area: 'Area A',
+        fileNameContains: 'xyz',
+        technology: 'FR',
+        isLastIndex: false,
+      });
+    });
+
+    expect(hypothesisTableService.handleTrajectorySearch).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER,
+      setDbTrajectories,
+      '2030',
+      {
+        area: 'Area A',
+        technology: 'FR',
         fileNameContains: 'xyz',
       },
     );
