@@ -62,6 +62,7 @@ export const TRAJECTORY_NUCLEAR_TS_SMR = `${BACK_END_BASE_URL}/v1/trajectory/nuc
 export const TRAJECTORY_ADEQUACY_PATCH = `${BACK_END_BASE_URL}/v1/trajectory/adequacy-patch`;
 export const TRAJECTORY_FLOWBASED = `${BACK_END_BASE_URL}/v1/trajectory/flowbased`;
 export const TRAJECTORY_SETTINGS = `${BACK_END_BASE_URL}/v1/trajectory/settings`;
+export const TRAJECTORY_SCENARIO_BUILDER = `${BACK_END_BASE_URL}/v1/trajectory/scenarioBuilder`;
 
 //ABOUT
 export const BACK_END_ACTUATOR_ENDPOINT = `${BACK_END_BASE_URL}/actuator/info`;

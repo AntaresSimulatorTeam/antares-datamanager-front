@@ -34,6 +34,7 @@ import {
   TRAJECTORY_RES_LOAD_FACTOR,
   TRAJECTORY_RES_TECHNOLOGY_DISTRIBUTION,
   TRAJECTORY_RES_ZONAL_DISTRIBUTION,
+  TRAJECTORY_SCENARIO_BUILDER,
   TRAJECTORY_SETTINGS,
   TRAJECTORY_STS,
   TRAJECTORY_THERMAL_COMMON_PARAMETER_IMPORT,
@@ -1160,6 +1161,8 @@ export const getUrlApiUploadTrajectory = (
       return `${TRAJECTORY_FLOWBASED}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
     case TRAJECTORY_TYPE.SETTINGS:
       return `${TRAJECTORY_SETTINGS}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
+    case TRAJECTORY_TYPE.SCENARIO_BUILDER:
+      return `${TRAJECTORY_SCENARIO_BUILDER}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
     default:
       return `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   }
