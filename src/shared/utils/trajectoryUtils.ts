@@ -1321,14 +1321,38 @@ export const buildDispatchPayload = (
     {} as Record<string, { trajectories: DbTrajectory[] }>,
   );
 
-export const buildTableData = (config: HypothesisConfig[], t: TFunction, results?: DbTrajectory[][], configOptions?: {hvdc?: boolean, recalculate?: boolean}): HypothesisRowData[] =>
-  config.map((cfg, idx) => ({
-    hypothesis: t(cfg.labelKey),
-    trajectory: !cfg.subRows?.length && results?.[idx]?.[0] ? results?.[idx]?.[0] : null,
-    status: (!cfg.subRows?.length && results?.[idx]?.length) ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
-    isDeletable: false,
-    isDefault: false,
-    ...(cfg.options?.hasHvdcOption && { hvdc: configOptions?.hvdc }),
-    ...((!!cfg.subRows?.length) && {subRows : buildTableData(cfg.subRows, t, results?.[idx] ? [results[idx]] : [])}),
-    ...(cfg.options?.hasRecalculateOption && {recalculate: configOptions?.recalculate})
-  }));
+export const buildTableData = (
+  config: HypothesisConfig[],
+  t: TFunction,
+  results?: DbTrajectory[][],
+  configOptions?: { hvdc?: boolean; recalculate?: boolean },
+): HypothesisRowData[] => {
+  // Aplatit tous les tableaux de trajectoires pour une recherche directe par type
+  const allTrajectories = results?.flat() ?? [];
+
+  return config.map((cfg) => {
+    const hasSubRows = !!cfg.subRows?.length;
+
+    // Si pas de subRows, on cherche la trajectoire correspondant au type
+    const trajectory = !hasSubRows
+      ? allTrajectories.find((traj) => traj.type === cfg.type) ?? null
+      : null;
+
+    return {
+      hypothesis: t(cfg.labelKey),
+      trajectory,
+      status: trajectory
+        ? TRAJECTORY_SELECTION_STATUS.OK
+        : TRAJECTORY_SELECTION_STATUS.MISSING,
+      isDeletable: false,
+      isDefault: false,
+      ...(cfg.options?.hasHvdcOption && { hvdc: configOptions?.hvdc }),
+      ...(hasSubRows && {
+        subRows: buildTableData(cfg.subRows!, t, results, configOptions),
+      }),
+      ...(cfg.options?.hasRecalculateOption && {
+        recalculate: configOptions?.recalculate,
+      }),
+    };
+  });
+};
