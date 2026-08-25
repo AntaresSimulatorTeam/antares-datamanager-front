@@ -10,7 +10,7 @@ import {
 } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
-import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
+import { FLOWBASED_MANDATORY_AREAS, OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { generateId } from '@/shared/utils/defaultUtils.ts';
 import { Row } from '@tanstack/react-table';
 import { TFunction } from 'i18next';
@@ -1355,4 +1355,13 @@ export const buildTableData = (
       }),
     };
   });
+};
+
+export const areAllFlowbasedAreasPresent = (areasName: string[]): boolean => {
+  const normalizedAreas = new Set(
+    areasName.map((name) => name?.trim().toUpperCase())
+  );
+  return FLOWBASED_MANDATORY_AREAS.every((mandatoryArea) =>
+    normalizedAreas.has(mandatoryArea.toUpperCase())
+  );
 };

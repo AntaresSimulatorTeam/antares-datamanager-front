@@ -59,7 +59,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
   const [data, setData] = useState<HypothesisRowData[]>([]);
   const [settingsData, setSettingsData] = useState<HypothesisRowData[]>([]);
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({ '0': false, '1': true });
-  const [readOnlySettings, setReadOnlySettings] = useState<ReadOnlyObject>({ '0': true, '1': true });
+  const [readOnlySettings, setReadOnlySettings] = useState<ReadOnlyObject>({ '0': true, '1': true, '2.0': true, '2.1': true });
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const [isDeletionModalOpen, setIsDeletionModalOpen] = useState(false);
   const [selectedTrajectoryType, setSelectedTrajectoryType] = useState<TRAJECTORY_TYPE>(TRAJECTORY_TYPE.AREA);
@@ -101,7 +101,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
     setIsDeletionModalOpen,
     dbTrajectories,
     setReadOnly,
-    setSecondTableReadOnly: setReadOnlySettings,
+    setSecondTableReadOnly: setReadOnlySettings
   });
 
   useEffect(() => {

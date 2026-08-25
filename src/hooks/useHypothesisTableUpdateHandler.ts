@@ -26,7 +26,7 @@ export const useHypothesisTableUpdateHandler = ({
   dbTrajectories,
   setRowIdSelected,
   setReadOnly,
-  setSecondTableReadOnly,
+  setSecondTableReadOnly
 }: UseHypothesisTableUpdateHandlerArgs) => {
   const studyState = useStudy();
   const dispatch = useStudyDispatch();
@@ -35,7 +35,7 @@ export const useHypothesisTableUpdateHandler = ({
     studyState,
     dispatch,
     setReadOnly,
-    setSecondTableReadOnly,
+    setSecondTableReadOnly
   );
   const { detachTrajectory } = useTrajectoryDetach(
     studyData,
@@ -43,7 +43,7 @@ export const useHypothesisTableUpdateHandler = ({
     setReadOnly,
     setIsDeletionModalOpen,
     setRowIdSelected,
-    setSecondTableReadOnly,
+    setSecondTableReadOnly
   );
 
   const handleHypothesisTableUpdate = useCallback(

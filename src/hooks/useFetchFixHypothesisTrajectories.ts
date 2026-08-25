@@ -90,9 +90,9 @@ export const useFetchFixHypothesisTrajectories = (
     if (studyId != null) {
       void getTrajectories(studyId);
     }
-  }, [studyId]);
+  }, [studyId, isStudyGenerated, configs]);
 
-  return options.withReadOnlyRow || isStudyGenerated
+  return options.withReadOnlyRow
     ? { firstTableData, firstTableReadOnlyRow, secondTableData, secondTableReadOnlyRow }
     : { firstTableData, secondTableData };
 };

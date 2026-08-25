@@ -126,6 +126,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
       secondaryButton={<Button label={t('components.quickAccess.@cancel')} onClick={onClose} variant="text" />}
       size="s"
       title={t('studyModal.@new_study')}
+      className="[&_h2]:!text-left"
     >
       <div className="flex w-full flex-col gap-4 self-stretch">
         <div className="flex flex-col items-start gap-4">

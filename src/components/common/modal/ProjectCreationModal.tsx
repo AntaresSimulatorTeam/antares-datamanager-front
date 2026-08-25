@@ -89,6 +89,7 @@ export const ProjectCreationModal = ({ onClose, projectInfo, isOpen }: ProjectCr
     secondaryButton={<Button label={t('components.quickAccess.@cancel')} onClick={onClose} variant="text" />}
     size="s"
     title={projectInfo ? t('home.@update_project') : t('home.@new_project')}
+    className="[&_h2]:!text-left"
     >
     <div className="flex flex-col items-start gap-4">
       <FieldInFormation />

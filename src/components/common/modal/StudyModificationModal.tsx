@@ -139,6 +139,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
       secondaryButton={<Button label={t('components.quickAccess.@cancel')} onClick={onClose} variant="text" />}
       size="s"
       title={isDuplicateMode ? t('home.@duplicate_study') : t('studyModal.@update_study')}
+      className="[&_h2]:!text-left"
     >
       <div className="flex w-full flex-col items-start justify-start space-y-2">
         <FieldInFormation />

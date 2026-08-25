@@ -37,7 +37,7 @@ const StudyNavigationMenu = ({ studyData }: StudyNavigationMenuProps) => {
     icon: "linked-services",
     disabled: false,
   });
-  const { areaDefault, trajectoryAreas } = useFetchAreas(studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0]);
+  const { areaDefault, trajectoryAreas } = useFetchAreas(activeTab?.id as TRAJECTORY_TYPE, studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0]);
   const { warningMessages } = useFetchWarningMessages(
     studyData.id ? Number(studyData.id) : null,
     activeTab?.id as TRAJECTORY_TYPE,
@@ -103,7 +103,7 @@ const StudyNavigationMenu = ({ studyData }: StudyNavigationMenuProps) => {
             <TabMenu key={type} type={type} defaultAreas={areaDefault} areas={trajectoryAreas} studyData={studyData} />
           );
         default:
-          return <AreaLinkTab studyData={studyData} />;
+          return <AreaLinkTab studyData={studyData}/>;
       }
     },
     [areaDefault, studyData, trajectoryAreas],

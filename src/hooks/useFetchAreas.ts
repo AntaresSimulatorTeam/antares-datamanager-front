@@ -4,7 +4,7 @@ import { getTrajectoryDataByTypeAndId } from '@/shared/services/trajectoryServic
 import { DbTrajectory, TrajectoryAreaData } from '@/shared/types';
 import { getDefaultAreas } from '@/shared/services/defaultConfigService.ts';
 
-export const useFetchAreas = (trajectoryArea?: DbTrajectory | null) => {
+export const useFetchAreas = (activeTabId: TRAJECTORY_TYPE, trajectoryArea?: DbTrajectory | null) => {
   const [areaDefault, setAreaDefault] = useState<{ name: string }[]>([]);
   const [trajectoryAreas, setTrajectoryAreas] = useState<TrajectoryAreaData[]>([]);
 
@@ -22,10 +22,12 @@ export const useFetchAreas = (trajectoryArea?: DbTrajectory | null) => {
     } catch {
       // Silent handler
     }
-  }, [trajectoryArea]);
+  }, [trajectoryArea?.id]);
 
   useEffect(() => {
-    void fetchAreas();
+    if (activeTabId !== TRAJECTORY_TYPE.AREA) {
+      void fetchAreas();
+    }
   }, [trajectoryArea]);
 
   return { areaDefault, trajectoryAreas };

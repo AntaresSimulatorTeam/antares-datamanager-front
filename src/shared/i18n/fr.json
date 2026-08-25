@@ -170,13 +170,13 @@
     "@parametersEconomic": "Paramètres économiques",
     "@costs": "Coûts",
     "@economics": "Économique",
-    "@paramModulationMessage": "Au moins une trajectoire \"Specific\" doit être renseignée afin de pouvoir renseigner une trajectoire \"Param modulation\".",
+    "@informationMessage": "Au moins une trajectoire \"Specific\" doit être renseignée afin de pouvoir renseigner une trajectoire \"Param modulation\".",
     "@nuclearFR": "Nucléaire FR",
     "@timeSeriesInformation": "Time Series filled in"
   },
   "dsr": {
     "@capacityModulation": "Capacity Modulation",
-    "@capacityModulationMessage": "At least one area trajectory must be defined in order to complete the \"Capacity modulation\" Trajectory."
+    "@v": "At least one area trajectory must be defined in order to complete the \"Capacity modulation\" Trajectory."
   },
   "misc": {
     "@installedPower": "Installed Power",
@@ -190,6 +190,9 @@
     "@psp_virtual": "PSP virtual",
     "@series": "Series",
     "@informationMessage": "If a \"mod\" file is included in a \"series\" folder, the \"technical parameters\" folder is required."
+  },
+  "flowbased": {
+    "@informationMessage": "Mandatory areas : FR, BE ,DE, NL and AT. Mandatory TS : LOAD, RES (Wind and Solar) and RoR"
   },
   "settings": {
     "@title": "Settings",
