@@ -119,7 +119,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
         setReadOnlySettings(buildReadOnlyRow(['0', '1', '2.0', '2.1']));
       }
     }
-  }, [studyState.studyStatus]);
+  }, [configs, studyState.studyStatus]);
 
   const handleSelectionChange = useCallback(
     async (fileNameContains: string, rowId: string, type: TRAJECTORY_TYPE) => {
@@ -142,17 +142,17 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
     setOptionsFS(results);
     setRowIdSelected(rowId);
     toggleModal();
-  }, []);
+  }, [data, handleFetchFromFS, toggleModal]);
 
   const handleViewTrajectoryData = useCallback(
     (rowId: string) => {
       const index = Number(rowId);
       const trajectory = data[index].trajectory;
       if (trajectory) {
-        void handleViewTrajectory(trajectory, setTrajectoryData, setIsViewModalOpen, t);
+        void handleViewTrajectory(trajectory, setTrajectoryData, setIsViewModalOpen, t, studyState.areas);
       }
     },
-    [data, t],
+    [data, studyState.areas, t],
   );
 
   const handleHvdcActivate = useCallback(

@@ -37,8 +37,8 @@ import {
 import { HydroSubRows } from '@/mocks/data/list/names.ts';
 
 export const useFetchHypothesisTrajectories = (
-  areas: TrajectoryAreaData[],
   trajectoryTypes: TRAJECTORY_TYPE[],
+  areas: TrajectoryAreaData[],
   defaultAreas: { name: string }[],
   studyId: number,
   studyStatus: StudyStatus,

@@ -4,7 +4,6 @@ import {
   DbTrajectory,
   HypothesisRowData,
   TechnologyType,
-  TrajectoryAreaData,
   TrajectoryWithSubRowsType,
 } from '@/shared/types/Trajectory.type.ts';
 import { Dispatch, SetStateAction } from 'react';
@@ -75,8 +74,6 @@ export type FileInputStatus = 'success' | 'error' | 'loading' | 'empty' | 'empty
 export type ExpandedState = true | Record<string, boolean>;
 
 export interface TabProps {
-  defaultAreas: { name: string }[];
-  areas: TrajectoryAreaData[];
   studyData: StudyDTO;
 }
 
@@ -131,7 +128,6 @@ export type TableOperationRow = 'empty' | 'remove';
 
 export interface MenuProps {
   defaultAreas: { name: string }[];
-  areas: TrajectoryAreaData[];
   studyData: StudyDTO;
   type: TRAJECTORY_TYPE;
 }

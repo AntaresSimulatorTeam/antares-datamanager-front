@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { DbTrajectory, RowStatus } from '@/shared/types/Trajectory.type.ts';
+import { DbTrajectory, RowStatus, TrajectoryAreaData } from '@/shared/types/Trajectory.type.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
@@ -48,6 +48,8 @@ export type StudyState = StudyTrajectoriesData & {
   discardActionTriggered?: boolean;
   discardWarningMessage?: (id: number) => Promise<void>;
   hvdc?: boolean;
+  areas?: TrajectoryAreaData[];
+  defaultAreas?: { name: string }[];
 };
 
 export type StudyActionType =
@@ -71,7 +73,7 @@ export type StudyActionType =
       payload: { discardActionTriggered: boolean };
     }
   | { type: STUDY_ACTION.RESET_STUDY_STATE }
-  | { type: STUDY_ACTION.SET_STUDY_HVDC; payload: boolean };
+  | { type: STUDY_ACTION.SET_STUDY_AREAS; payload: {areas: TrajectoryAreaData[], defaultAreas: { name: string }[]} };
 
 export interface LocationStudy {
   study: StudyDTO;

@@ -7,6 +7,8 @@ import { useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { HypothesisConfig, HypothesisTableOptions } from '@/shared/types/HypothesisTable.ts';
 import { buildDispatchPayload, buildReadOnlyRow, buildTableData } from '@/shared/utils/trajectoryUtils.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
+import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { useFetchAreas } from '@/hooks/useFetchAreas.ts';
 
 export const useFetchFixHypothesisTrajectories = (
   configs: HypothesisConfig[][],
@@ -20,6 +22,7 @@ export const useFetchFixHypothesisTrajectories = (
   const [secondTableReadOnlyRow, setSecondTableReadOnlyRow] = useState<ReadOnlyObject>({});
   const dispatch = useStudyDispatch();
   const { t } = useTranslation();
+  const {isFlowbasedAllowed} = useFetchAreas();
 
   const fetchTrajectories = async (id: number, config: (typeof configs)[number]) =>
     Promise.all(config.map(({ type }) => getStudyTrajectories(id, type)));
@@ -68,11 +71,19 @@ export const useFetchFixHypothesisTrajectories = (
           1: !firstResults[0]?.length,
         });
         if (secondConfig) {
+          const hasFirstResult = Boolean(firstResults[0]?.length);
+          let isFlowbasedDisabled = !hasFirstResult;
+
+          if (hasFirstResult && firstConfig?.[0]?.type === TRAJECTORY_TYPE.AREA) {
+            const allMandatoryAreasInStudy = await isFlowbasedAllowed(firstResults[0][0]?.id);
+            isFlowbasedDisabled = !allMandatoryAreasInStudy;
+          }
+
           setSecondTableReadOnlyRow({
-            '0': !firstResults[0]?.length,
-            '1': !firstResults[0]?.length,
-            '2.0': !firstResults[0]?.length,
-            '2.1': !firstResults[0]?.length,
+            '0': !hasFirstResult,
+            '1': isFlowbasedDisabled,
+            '2.0': !hasFirstResult,
+            '2.1': !hasFirstResult,
           });
         }
       } else if (isStudyGenerated) {

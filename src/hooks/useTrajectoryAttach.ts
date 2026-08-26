@@ -1,26 +1,14 @@
 import { Dispatch, SetStateAction, useCallback } from 'react';
-import {
-  DbTrajectory,
-  HypothesisRowData,
-  RowStatus,
-  StudyActionType,
-  StudyDTO,
-  StudyState,
-  TrajectoryAreaData,
-} from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, RowStatus, StudyActionType, StudyDTO, StudyState } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { isParamModulationRequired, linkTrajectoryToStudy } from '@/shared/services/trajectoryService.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.ts';
-import {
-  areAllFlowbasedAreasPresent,
-  isUniqueTrajectoryType,
-  normalize,
-  setNestedData,
-} from '@/shared/utils/trajectoryUtils.ts';
+import { isUniqueTrajectoryType, normalize, setNestedData } from '@/shared/utils/trajectoryUtils.ts';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { useTranslation } from 'react-i18next';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
+import { useFetchAreas } from '@/hooks/useFetchAreas.ts';
 
 export const useTrajectoryAttach = (
   study: StudyDTO,
@@ -31,6 +19,7 @@ export const useTrajectoryAttach = (
 ) => {
   const { user } = useUser();
   const { t } = useTranslation();
+  const {isFlowbasedAllowed} = useFetchAreas();
 
   const attachTrajectory = useCallback(
     async (
@@ -38,8 +27,7 @@ export const useTrajectoryAttach = (
       indexArray: number[],
       status: RowStatus,
       trajectory: DbTrajectory,
-      setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
-      areas?: TrajectoryAreaData[]
+      setData: Dispatch<SetStateAction<HypothesisRowData[]>>
     ) => {
       try {
         const newDbTrajectory = await linkTrajectoryToStudy(type, trajectory.id, study?.id);
@@ -91,14 +79,11 @@ export const useTrajectoryAttach = (
               return newData;
             });
           } else {
+            const allMandatoryAreasInStudy = type === TRAJECTORY_TYPE.AREA && newDbTrajectory?.id != null ? await isFlowbasedAllowed(newDbTrajectory.id) : false;
             setData((prev) => {
               newData = setNestedData(prev, indexArray, newTrajectory);
               if (type === TRAJECTORY_TYPE.AREA) {
                 setReadOnly?.({ '0': false, '1': false });
-                const areasName = areas?.map(areaData => areaData.areaName);
-                const allMandatoryAreasInStudy = areasName?.length ? areAllFlowbasedAreasPresent(areasName): false;
-                //console.log("================== areasName", areasName)
-                //console.log("================== ", allMandatoryAreasInStudy)
                 setSecondTableReadOnly?.({ '0': false, '1': !allMandatoryAreasInStudy, '2.0': false, '2.1': false });
               }
               if (type === TRAJECTORY_TYPE.DSR) {
@@ -137,7 +122,7 @@ export const useTrajectoryAttach = (
         }
       }
     },
-    [study.id, study?.horizon, study?.name, studyState, dispatch, setReadOnly, t, user?.profile?.sub],
+    [study.id, study?.horizon, study?.name, studyState, dispatch, setReadOnly, isFlowbasedAllowed, setSecondTableReadOnly, t, user?.profile?.sub],
   );
 
   return { attachTrajectory };

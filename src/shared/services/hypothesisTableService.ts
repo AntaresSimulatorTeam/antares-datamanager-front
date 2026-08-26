@@ -15,6 +15,7 @@ import {
   ParamTrajectoryState,
   StudyActionType,
   ThermalParamTrajectoryType,
+  TrajectoryAreaData,
   TrajectoryViewData,
 } from '@/shared/types';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
@@ -219,6 +220,7 @@ export const fetchTrajectoriesFromTypes = async (
  * @param {Dispatch<SetStateAction<TrajectoryViewData | undefined>>} setTrajectoryData - Function to update the state with trajectory data and related information.
  * @param {Dispatch<SetStateAction<boolean>>} setIsViewModalOpen - Function to update the state controlling the visibility of the view modal.
  * @param {TFunction<"translation", undefined>} t - Translation function for localizing column headers.
+ * @param areasData
  * @returns {Promise<void>} Resolves when the trajectory data has been successfully fetched and state updated, or does nothing on error.
  * @description This function retrieves trajectory data by its type and ID and prepares it for display by generating localized column headers. It updates the necessary state to display the data in a view modal. Errors are silently ignored.
  */
@@ -227,15 +229,21 @@ export const handleViewTrajectory = async (
   setTrajectoryData: Dispatch<SetStateAction<TrajectoryViewData | undefined>>,
   setIsViewModalOpen: Dispatch<SetStateAction<boolean>>,
   t: TFunction<'translation', undefined>,
+  areasData?: TrajectoryAreaData[],
 ): Promise<void> => {
   try {
-    const results = await getTrajectoryDataByTypeAndId(trajectory.type, trajectory.id);
+    let results;
+    if (trajectory.type === TRAJECTORY_TYPE.AREA) {
+      results = areasData;
+    } else {
+      results = await getTrajectoryDataByTypeAndId(trajectory.type, trajectory.id);
+    }
     const scheme = getSchemeData(trajectory.type);
     const size = trajectory.type === TRAJECTORY_TYPE.AREA ? 350 : 128;
     const columns = generateTrajectoryViewHeader(scheme, t, size);
     setTrajectoryData({
       trajectory,
-      data: results,
+      data: results ?? [],
       columns,
     });
     setIsViewModalOpen(true);

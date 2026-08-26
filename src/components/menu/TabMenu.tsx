@@ -9,7 +9,7 @@ import { EXPANDABLE_TYPES_MAP } from '@/shared/const/trajectoryTypes.ts';
 import { Tab } from '@design-system-rte/react';
 import { getItemsMenu } from '@/shared/utils/trajectoryUtils.ts';
 
-export const TabMenu = ({ defaultAreas, areas, studyData, type }: MenuProps) => {
+export const TabMenu = ({ studyData, defaultAreas, type }: MenuProps) => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<TRAJECTORY_TYPE>(type);
   const tabs = useMemo(() => getItemsMenu(type, t, defaultAreas), [type, t, defaultAreas]);
@@ -20,8 +20,6 @@ export const TabMenu = ({ defaultAreas, areas, studyData, type }: MenuProps) => 
         return (
           <ParametersTab
             key={`${tab}-parameters-tab`}
-            defaultAreas={defaultAreas}
-            areas={areas}
             studyData={studyData}
           />
         );
@@ -30,8 +28,6 @@ export const TabMenu = ({ defaultAreas, areas, studyData, type }: MenuProps) => 
         return (
           <ResDistributionTab
             key={`${tab}-distribution-tab`}
-            defaultAreas={defaultAreas}
-            areas={areas}
             studyData={studyData}
             types={EXPANDABLE_TYPES_MAP[tab] ?? [tab]}
           />
@@ -41,14 +37,12 @@ export const TabMenu = ({ defaultAreas, areas, studyData, type }: MenuProps) => 
         <ExpandableTab
           key={`${tab}-expandable-tab`}
           tabType={tab}
-          defaultAreas={defaultAreas}
-          areas={areas}
           studyData={studyData}
           types={EXPANDABLE_TYPES_MAP[tab] ?? [tab]}
         />
       );
     },
-    [areas, defaultAreas, studyData],
+    [studyData],
   );
 
   return (

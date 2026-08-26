@@ -27,7 +27,7 @@ import { useTrajectoryFetchFromFSHandler } from '@/hooks/useTrajectoryFetchFromF
 import { getParamForFetchFSTrajectory } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { HypothesisType } from '@/shared/types/HypothesisTable.ts';
 
-const ResDistributionTab = ({ defaultAreas, areas, studyData, types }: TabProps & { types: TRAJECTORY_TYPE[] }) => {
+const ResDistributionTab = ({ studyData, types }: TabProps & { types: TRAJECTORY_TYPE[] }) => {
   const studyState = useStudy();
   const dispatch = useStudyDispatch();
   const { t } = useTranslation();
@@ -41,9 +41,9 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData, types }: TabProps 
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const [selectedType, setSelectedType] = useState<TRAJECTORY_TYPE>(TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION);
   const { hypothesisTrajectories, readOnlyRow, technologyList } = useFetchHypothesisTrajectories(
-    areas,
     types,
-    defaultAreas,
+    studyState.areas ?? [],
+    studyState.defaultAreas ?? [],
     studyData?.id,
     studyData?.status,
     studyState.studyStatus,

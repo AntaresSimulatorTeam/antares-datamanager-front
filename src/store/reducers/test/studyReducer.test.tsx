@@ -655,17 +655,6 @@ describe('studyReducer', () => {
     expect(result?.[TRAJECTORY_TYPE.AREA]).toBeUndefined();
   });
 
-  it('should handles SET_STUDY_HVDC action', () => {
-    const action: StudyActionType = {
-      type: STUDY_ACTION.SET_STUDY_HVDC,
-      payload: true,
-    };
-
-    const result = studyReducer(mockPrevStateArea(), action);
-
-    expect(result?.hvdc).toBeTruthy();
-  });
-
   it('should return previous state when action is undefined', () => {
     const state = mockPrevStateArea();
     const result = studyReducer(state, undefined);

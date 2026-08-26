@@ -163,8 +163,8 @@ export const studyReducer = (prevState: Partial<StudyState>, action?: StudyActio
         return { ...clearByType(prevState, action.payload) };
       case STUDY_ACTION.RESET_STUDY_STATE:
         return { studyStatus: StudyStatus.IN_PROGRESS };
-      case STUDY_ACTION.SET_STUDY_HVDC:
-        return { ...updateHvdcOption(prevState, action.payload) };
+      case STUDY_ACTION.SET_STUDY_AREAS:
+        return { ...prevState, areas: action.payload.areas ?? [], defaultAreas: action.payload.defaultAreas ?? [] };
       default:
         return prevState;
     }

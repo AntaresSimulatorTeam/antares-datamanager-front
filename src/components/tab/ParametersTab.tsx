@@ -43,7 +43,7 @@ import { useFetchFixHypothesisTrajectories } from '@/hooks/useFetchFixHypothesis
 import { useTrajectoryFetchFromFSHandler } from '@/hooks/useTrajectoryFetchFromFSHandler.ts';
 import { HypothesisType } from '@/shared/types/HypothesisTable.ts';
 
-export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
+export const ParametersTab = ({ studyData }: TabProps) => {
   const { t } = useTranslation();
   const studyState = useStudy();
   const dispatch = useStudyDispatch();
@@ -71,7 +71,7 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
     TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
   );
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
-    useFetchHypothesisParametersTrajectories(areas, studyData, defaultAreas, isStudyGenerated);
+    useFetchHypothesisParametersTrajectories(studyState.areas ?? [], studyData, studyState?.defaultAreas ?? [], isStudyGenerated);
 
   const configs = [
     [
@@ -115,7 +115,7 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
       setIsStudyGenerated(true);
       const newTechnicalData = filterRow(technicalData);
       setTechnicalData(newTechnicalData);
-      const newCheckedValues = getCheckedValues(newTechnicalData[0]?.subRows ?? [], areas, defaultAreas);
+      const newCheckedValues = getCheckedValues(newTechnicalData[0]?.subRows ?? [], studyState.areas ?? [], studyState?.defaultAreas ?? []);
       setCheckedValues(newCheckedValues);
       const rows = generateReadOnlyIndexMap(technicalData);
       setReadOnly(rows);
@@ -133,7 +133,7 @@ export const ParametersTab = ({ defaultAreas, areas, studyData }: TabProps) => {
           setCheckedValues,
           setTechnicalData,
           [],
-          defaultAreas,
+          studyState?.defaultAreas ?? [],
         );
       } else if (
         shouldOpenDeletionModal(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, 0, technicalData, value)

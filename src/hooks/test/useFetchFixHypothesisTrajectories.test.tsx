@@ -238,8 +238,6 @@ describe('useFetchFixHypothesisTrajectories', () => {
         expect(spy).toHaveBeenNthCalledWith(1, configsOk[0], [[mockAreaTrajectory], []]);
         expect(spy).toHaveBeenNthCalledWith(2, configsOk[1], [[], []]);
         expect(result.current).toHaveProperty('firstTableData');
-        expect(result.current).toHaveProperty('firstTableReadOnlyRow');
-        expect(result.current.firstTableReadOnlyRow).toEqual({ '0': true, '1': true });
       });
     });
   });

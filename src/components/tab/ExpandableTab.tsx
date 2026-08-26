@@ -40,8 +40,6 @@ import { useHypothesisTableUpdateHandler } from '@/hooks/useHypothesisTableUpdat
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
 
 const ExpandableTab = ({
-  defaultAreas,
-  areas,
   studyData,
   tabType,
   types,
@@ -65,9 +63,9 @@ const ExpandableTab = ({
   const [isDeletionModalOpen, setIsDeletionModalOpen] = useState(false);
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow, technologyList } =
     useFetchHypothesisTrajectories(
-      areas,
       types,
-      defaultAreas,
+      studyState?.areas ?? [],
+      studyState?.defaultAreas ?? [],
       studyData?.id,
       studyData?.status,
       studyState.studyStatus,
