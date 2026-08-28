@@ -1135,6 +1135,27 @@ describe('uploadTrajectory', () => {
       );
     });
   });
+
+  it('should import SCENARIO_BUILDER trajectory without technology into data base', async () => {
+    await uploadTrajectory(
+      '2030-2031',
+      87,
+      TRAJECTORY_TYPE.SCENARIO_BUILDER,
+      'general_data_BP_23',
+      '',
+      onProgress,
+      false,
+    );
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/trajectory/scenarioBuilder?trajectoryToUse=general_data_BP_23&horizon=2030-2031&studyId=87&isCivilYear=false',
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
 });
 
 describe('isParamModulationRequired', () => {

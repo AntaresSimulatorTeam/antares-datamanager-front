@@ -92,7 +92,7 @@ export const ProjectCreationModal = ({ onClose, projectInfo, isOpen }: ProjectCr
     >
     <div className="flex flex-col items-start gap-4">
       <FieldInFormation />
-      <div className="flex w-1/2 flex-col items-start gap-4">
+      <div className="flex flex-col items-start gap-4">
         <TextInput
           aria-required
           id="text-input-default"

@@ -36,7 +36,8 @@ export const useFetchFixHypothesisTrajectories = (
         hvdcValue = studyData.hvdc;
         recalculateValue = studyData.recalculate;
       }
-      const promises = [firstConfig, secondConfig]
+      const secondConfigData = secondConfig ? [secondConfig[0], secondConfig[1], ...(secondConfig[2]?.subRows ?? [])] : [];
+      const promises = [firstConfig, secondConfigData]
         .filter(Boolean)
         .map(config => fetchTrajectories(id, config));
 

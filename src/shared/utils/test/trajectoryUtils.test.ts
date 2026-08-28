@@ -4,6 +4,7 @@ import {
   buildEmptyTrajectory,
   buildErrorTrajectory,
   buildReadOnlyRow,
+  buildTableData,
   convertIntoHypothesisRowWithTechnologies,
   filterRow,
   findTechnologyMatch,
@@ -52,7 +53,7 @@ import { ThermalOptions } from '@/mocks/data/list/names.ts';
 import { TFunction } from 'i18next';
 import * as textUtils from '@/shared/utils/textUtils.ts';
 import { TabItemProps } from '@design-system-rte/core/components/tab/tab.interface';
-import { HypothesisType } from '@/shared/types/HypothesisTable.ts';
+import { HypothesisConfig, HypothesisType } from '@/shared/types/HypothesisTable.ts';
 
 describe('getStatus', () => {
   it("should return an ERROR selection status for 'error' status", () => {
@@ -603,6 +604,12 @@ describe('getPathFromTrajectoryType', () => {
     );
   });
 
+  it('should return cost path for THERMAL_ECONOMIC_PARAMETER', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER)).toBe(
+      String.raw`\\thermal\\economic parameters\\economic`,
+    );
+  });
+
   it('should return cost path for THERMAL_ECONOMIC_COST_PARAMETER', () => {
     expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER)).toBe(
       String.raw`\\thermal\\economic parameters\\costs`,
@@ -735,6 +742,10 @@ describe('getPathFromTrajectoryType', () => {
 
   it('should return technical path for SETTINGS type', () => {
     expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.SETTINGS)).toBe(String.raw`\\settings\\general_data`);
+  });
+
+  it('should return technical path for SCENARIO_BUILDER type', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.SCENARIO_BUILDER)).toBe(String.raw`\\settings\\scenario_builder`);
   });
 
   it('should return technical path for unknown type', () => {
@@ -1762,5 +1773,216 @@ describe('getModalTile', () => {
     const result = getModalTile(TRAJECTORY_TYPE.HYDRO_SERIES);
 
     expect(result).toBe(TRAJECTORY_TYPE.HYDRO_SERIES);
+  });
+});
+
+describe('buildTableData', () => {
+  const t = ((key: string) => `translated:${key}`) as unknown as TFunction;
+
+  const mockTrajectoryArea = {
+    id: 1,
+    trajectoryName: 'trajectory_area',
+    type: TRAJECTORY_TYPE.AREA,
+    area: 'FR',
+    technology: '',
+  } as DbTrajectory;
+
+  const mockTrajectoryLink = {
+    id: 2,
+    trajectoryName: 'trajectory_link',
+    type: TRAJECTORY_TYPE.LINK,
+    area: 'FR',
+    technology: '',
+  } as DbTrajectory;
+
+  const mockTrajectorySettings = {
+    id: 3,
+    trajectoryName: 'trajectory_settings',
+    type: TRAJECTORY_TYPE.SETTINGS,
+    area: '',
+    technology: '',
+  } as DbTrajectory;
+
+  it('should return an empty array when config is empty', () => {
+    const result = buildTableData([], t);
+    expect(result).toEqual([]);
+  });
+
+  it('should build table data with status MISSING and null trajectory when results are undefined', () => {
+    const config: HypothesisConfig[] = [
+      { type: TRAJECTORY_TYPE.AREA, labelKey: 'studyDetails.@areas' },
+      { type: TRAJECTORY_TYPE.LINK, labelKey: 'studyDetails.@links' },
+    ];
+
+    const result = buildTableData(config, t);
+
+    expect(result).toEqual([
+      {
+        hypothesis: 'translated:studyDetails.@areas',
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+        isDeletable: false,
+        isDefault: false,
+      },
+      {
+        hypothesis: 'translated:studyDetails.@links',
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+        isDeletable: false,
+        isDefault: false,
+      },
+    ]);
+  });
+
+  it('should match trajectory by type from results and set status to OK', () => {
+    const config: HypothesisConfig[] = [
+      { type: TRAJECTORY_TYPE.AREA, labelKey: 'studyDetails.@areas' },
+      { type: TRAJECTORY_TYPE.LINK, labelKey: 'studyDetails.@links' },
+    ];
+    const results: DbTrajectory[][] = [[mockTrajectoryArea], [mockTrajectoryLink]];
+
+    const result = buildTableData(config, t, results);
+
+    expect(result).toEqual([
+      {
+        hypothesis: 'translated:studyDetails.@areas',
+        trajectory: mockTrajectoryArea,
+        status: TRAJECTORY_SELECTION_STATUS.OK,
+        isDeletable: false,
+        isDefault: false,
+      },
+      {
+        hypothesis: 'translated:studyDetails.@links',
+        trajectory: mockTrajectoryLink,
+        status: TRAJECTORY_SELECTION_STATUS.OK,
+        isDeletable: false,
+        isDefault: false,
+      },
+    ]);
+  });
+
+  it('should set status to MISSING and trajectory to null when type is not found in results', () => {
+    const config: HypothesisConfig[] = [
+      { type: TRAJECTORY_TYPE.AREA, labelKey: 'studyDetails.@areas' },
+      { type: TRAJECTORY_TYPE.LINK, labelKey: 'studyDetails.@links' },
+    ];
+    const results: DbTrajectory[][] = [[mockTrajectoryArea]];
+
+    const result = buildTableData(config, t, results);
+
+    expect(result[0].trajectory).toEqual(mockTrajectoryArea);
+    expect(result[0].status).toBe(TRAJECTORY_SELECTION_STATUS.OK);
+    expect(result[1].trajectory).toBeNull();
+    expect(result[1].status).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
+  });
+
+  it('should recursively handle subRows and set parent trajectory to null and status MISSING', () => {
+    const config: HypothesisConfig[] = [
+      {
+        type: TRAJECTORY_TYPE.SETTINGS,
+        labelKey: 'settings.@title',
+        subRows: [
+          { type: TRAJECTORY_TYPE.SETTINGS, labelKey: 'settings.@generalData' },
+        ],
+      },
+    ];
+    const results: DbTrajectory[][] = [[mockTrajectorySettings]];
+
+    const result = buildTableData(config, t, results);
+
+    expect(result).toEqual([
+      {
+        hypothesis: 'translated:settings.@title',
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+        isDeletable: false,
+        isDefault: false,
+        subRows: [
+          {
+            hypothesis: 'translated:settings.@generalData',
+            trajectory: mockTrajectorySettings,
+            status: TRAJECTORY_SELECTION_STATUS.OK,
+            isDeletable: false,
+            isDefault: false,
+          },
+        ],
+      },
+    ]);
+  });
+
+  it('should set hvdc property when hasHvdcOption is true', () => {
+    const config: HypothesisConfig[] = [
+      {
+        type: TRAJECTORY_TYPE.LINK,
+        labelKey: 'studyDetails.@links',
+        options: { hasHvdcOption: true },
+      },
+    ];
+
+    const resultWithHvdcTrue = buildTableData(config, t, [], { hvdc: true });
+    expect(resultWithHvdcTrue[0].hvdc).toBe(true);
+
+    const resultWithHvdcFalse = buildTableData(config, t, [], { hvdc: false });
+    expect(resultWithHvdcFalse[0].hvdc).toBe(false);
+
+    const resultWithoutConfigOptions = buildTableData(config, t, []);
+    expect(resultWithoutConfigOptions[0].hvdc).toBeUndefined();
+    expect('hvdc' in resultWithoutConfigOptions[0]).toBe(true);
+  });
+
+  it('should not set hvdc property when hasHvdcOption is absent or false', () => {
+    const config: HypothesisConfig[] = [
+      {
+        type: TRAJECTORY_TYPE.LINK,
+        labelKey: 'studyDetails.@links',
+        options: { hasHvdcOption: false },
+      },
+      {
+        type: TRAJECTORY_TYPE.AREA,
+        labelKey: 'studyDetails.@areas',
+      },
+    ];
+
+    const result = buildTableData(config, t, [], { hvdc: true });
+    expect('hvdc' in result[0]).toBe(false);
+    expect('hvdc' in result[1]).toBe(false);
+  });
+
+  it('should set recalculate property when hasRecalculateOption is true', () => {
+    const config: HypothesisConfig[] = [
+      {
+        type: TRAJECTORY_TYPE.FLOWBASED,
+        labelKey: 'settings.@flowBased',
+        options: { hasRecalculateOption: true },
+      },
+    ];
+
+    const resultWithRecalculateTrue = buildTableData(config, t, [], { recalculate: true });
+    expect(resultWithRecalculateTrue[0].recalculate).toBe(true);
+
+    const resultWithRecalculateFalse = buildTableData(config, t, [], { recalculate: false });
+    expect(resultWithRecalculateFalse[0].recalculate).toBe(false);
+
+    const resultWithoutConfigOptions = buildTableData(config, t, []);
+    expect(resultWithoutConfigOptions[0].recalculate).toBeUndefined();
+    expect('recalculate' in resultWithoutConfigOptions[0]).toBe(true);
+  });
+
+  it('should not set recalculate property when hasRecalculateOption is absent or false', () => {
+    const config: HypothesisConfig[] = [
+      {
+        type: TRAJECTORY_TYPE.FLOWBASED,
+        labelKey: 'settings.@flowBased',
+        options: { hasRecalculateOption: false },
+      },
+      {
+        type: TRAJECTORY_TYPE.ADEQUACY_PATCH,
+        labelKey: 'settings.@adequacyPatch',
+      },
+    ];
+
+    const result = buildTableData(config, t, [], { recalculate: true });
+    expect('recalculate' in result[0]).toBe(false);
+    expect('recalculate' in result[1]).toBe(false);
   });
 });
