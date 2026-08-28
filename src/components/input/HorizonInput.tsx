@@ -76,7 +76,6 @@ const HorizonInput: React.FC<YearInputProps> = ({
     customErrorMessage || errorMessage || t('components.horizonInput.@assistiveTextForYear');
 
   return (
-    <div style={{ width: '12ch' }}>
     <TextInput
       id="text-input-horizon"
       label={t('home.@horizon')}
@@ -94,7 +93,6 @@ const HorizonInput: React.FC<YearInputProps> = ({
       rightIconAction="clean"
       onRightIconClick={() => onChange('')}
     />
-    </div>
   );
 };
 
