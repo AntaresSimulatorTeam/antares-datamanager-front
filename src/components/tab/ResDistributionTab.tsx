@@ -111,7 +111,7 @@ const ResDistributionTab = ({ studyData, types }: TabProps & { types: TRAJECTORY
       if (status === 'empty' || status === 'emptyError') {
         const row = getRowDataSelected(dataToUse, indexArray) ?? null;
         if (row) {
-          await detachTrajectory(tableType, indexArray, setterToUse, dataToUse, status, row?.hypothesis);
+          await detachTrajectory(tableType, indexArray, setterToUse, dataToUse, status, row?.hypothesis, setReadOnly);
         }
       } else if (status === 'success') {
         const dbTrajectory =
@@ -119,7 +119,7 @@ const ResDistributionTab = ({ studyData, types }: TabProps & { types: TRAJECTORY
             ? dbTrajectories.find((item) => item.id == value)
             : getRowDataSelected(dataToUse, indexArray)?.trajectory;
         if (dbTrajectory) {
-          await attachTrajectory(tableType, indexArray, status, dbTrajectory, setterToUse);
+          await attachTrajectory(tableType, indexArray, status, dbTrajectory, setterToUse, setReadOnly);
         }
       }
     },
@@ -192,7 +192,7 @@ const ResDistributionTab = ({ studyData, types }: TabProps & { types: TRAJECTORY
             toggleModal();
             if (value != null) {
               const setterToUse = typeToUse === TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION ? setData : setTechnologyData;
-              await importTrajectory(setterToUse, value, typeToUse, indexArray, hypothesis);
+              await importTrajectory(setterToUse, value, typeToUse, indexArray, hypothesis, setReadOnly);
             }
           }}
           tabType={selectedType}

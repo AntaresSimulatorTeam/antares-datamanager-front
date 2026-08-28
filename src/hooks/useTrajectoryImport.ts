@@ -20,16 +20,14 @@ import { HypothesisType } from '@/shared/types/HypothesisTable.ts';
 export const useTrajectoryImport = (
   study: StudyDTO,
   studyState: Partial<StudyState>,
-  dispatch: Dispatch<StudyActionType> | null,
-  setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
-  setSecondTableReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>
+  dispatch: Dispatch<StudyActionType> | null
 ) => {
   const [fileStatus, setFileStatus] = useState<FileInputStatus>('empty');
   const [progress, setProgress] = useState<number>(0);
   const { t } = useTranslation();
   const { user } = useUser();
 
-  const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch, setReadOnly, setSecondTableReadOnly);
+  const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch);
 
   const importTrajectory = useCallback(
     async (
@@ -38,6 +36,8 @@ export const useTrajectoryImport = (
       type?: TRAJECTORY_TYPE,
       indexArray?: number[],
       hypothesis?: HypothesisType,
+      setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
+      setSecondTableReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>
     ) => {
       setFileStatus('loading');
 
@@ -59,7 +59,7 @@ export const useTrajectoryImport = (
           setFileStatus('success');
 
           if (newTrajectory.id != null && !!indexArray?.length) {
-            await attachTrajectory(type, indexArray, 'success', newTrajectory, setData);
+            await attachTrajectory(type, indexArray, 'success', newTrajectory, setData, setReadOnly, setSecondTableReadOnly);
           }
         }
       } catch (error) {

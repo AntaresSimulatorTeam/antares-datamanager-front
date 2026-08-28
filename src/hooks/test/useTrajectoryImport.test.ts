@@ -58,13 +58,13 @@ describe('useTrajectoryImport', () => {
     const mockTrajectory = { id: 101, trajectoryName: 'Trajectory A' };
     (uploadTrajectory as Mock).mockResolvedValue(mockTrajectory);
 
-    const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch, mockSetReadOnly));
+    const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch));
 
     await act(async () => {
       await result.current.importTrajectory(mockSetData, value, TRAJECTORY_TYPE.AREA, [0, 0], {
         area: 'FR',
         technology: 'Solar',
-      });
+      }, mockSetReadOnly);
     });
 
     expect(uploadTrajectory).toHaveBeenCalledWith(
@@ -86,13 +86,13 @@ describe('useTrajectoryImport', () => {
     const mockTrajectory = { id: 101, trajectoryName: 'Trajectory A' };
     (uploadTrajectory as Mock).mockResolvedValue(mockTrajectory);
 
-    const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch, mockSetReadOnly));
+    const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch));
 
     await act(async () => {
       await result.current.importTrajectory(mockSetData, value, TRAJECTORY_TYPE.LINK, [0, 0], {
         area: 'FR',
         technology: 'Solar',
-      });
+      }, mockSetReadOnly);
     });
 
     expect(uploadTrajectory).toHaveBeenCalledWith(
@@ -385,12 +385,12 @@ describe('useTrajectoryImport', () => {
   it('should use set read only when trajectory type is DSR', async () => {
     (uploadTrajectory as Mock).mockResolvedValue({ id: 102, hasTimeSeries: true });
 
-    const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch, mockSetReadOnly));
+    const { result } = renderHook(() => useTrajectoryImport(study, studyState, mockDispatch));
 
     await act(async () => {
       await result.current.importTrajectory(mockSetData, value, TRAJECTORY_TYPE.DSR, [0], {
         area: OTHER_AREAS,
-      });
+      }, mockSetReadOnly);
     });
 
     expect(uploadTrajectory).toHaveBeenCalledWith(

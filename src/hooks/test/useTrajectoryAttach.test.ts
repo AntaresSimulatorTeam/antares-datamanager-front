@@ -62,6 +62,7 @@ vi.mock('@/store/contexts/UserContext', async (importOriginal) => {
 describe('useTrajectoryAttach', () => {
   const mockDispatch = vi.fn();
   const mockSetData = vi.fn();
+  const mockSetReadOnly = vi.fn();
 
   const study: StudyDTO = { id: 'study-001', name: 'Demo Study' } as unknown as StudyDTO;
 
@@ -92,7 +93,7 @@ describe('useTrajectoryAttach', () => {
 
     const { result } = renderHook(() => useTrajectoryAttach(study, studyState, mockDispatch));
 
-    await result.current.attachTrajectory(TRAJECTORY_TYPE.LOAD, [0], 'success', trajectory, mockSetData);
+    await result.current.attachTrajectory(TRAJECTORY_TYPE.LOAD, [0], 'success', trajectory, mockSetData, mockSetReadOnly);
 
     expect(trajectoryService.linkTrajectoryToStudy).toHaveBeenCalledWith(TRAJECTORY_TYPE.LOAD, 42, 'study-001');
     expect(mockDispatch).toHaveBeenCalledWith({
@@ -111,7 +112,7 @@ describe('useTrajectoryAttach', () => {
 
     const { result } = renderHook(() => useTrajectoryAttach(study, emptyState, mockDispatch));
 
-    await result.current.attachTrajectory(TRAJECTORY_TYPE.LOAD, [1], 'success', trajectory, mockSetData);
+    await result.current.attachTrajectory(TRAJECTORY_TYPE.LOAD, [1], 'success', trajectory, mockSetData, mockSetReadOnly);
 
     expect(mockDispatch).toHaveBeenCalledWith({
       type: STUDY_ACTION.ADD_TRAJECTORIES,
@@ -150,6 +151,7 @@ describe('useTrajectoryAttach', () => {
       'success',
       newTrajectory2,
       mockSetData,
+      mockSetReadOnly
     );
 
     expect(mockDispatch).toHaveBeenCalledWith({
@@ -167,7 +169,7 @@ describe('useTrajectoryAttach', () => {
 
     const { result } = renderHook(() => useTrajectoryAttach(study, studyState, mockDispatch));
 
-    await result.current.attachTrajectory(TRAJECTORY_TYPE.LOAD, [0], 'success', trajectory, mockSetData);
+    await result.current.attachTrajectory(TRAJECTORY_TYPE.LOAD, [0], 'success', trajectory, mockSetData, mockSetReadOnly);
 
     expect(handleTrajectoryError).toHaveBeenCalledWith(
       TRAJECTORY_TYPE.LOAD,
@@ -199,7 +201,7 @@ describe('useTrajectoryAttach', () => {
       creationDate: '2025-08-07T14:17:09.895028' as unknown as Date,
     } as DbTrajectory;
 
-    await result.current.attachTrajectory(TRAJECTORY_TYPE.AREA, [0], 'success', trajectoryArea, mockSetData);
+    await result.current.attachTrajectory(TRAJECTORY_TYPE.AREA, [0], 'success', trajectoryArea, mockSetData, mockSetReadOnly);
 
     expect(handleTrajectoryError).toHaveBeenCalledWith(
       TRAJECTORY_TYPE.AREA,
@@ -222,7 +224,6 @@ describe('useTrajectoryAttach', () => {
     } as StudyState;
 
     const dispatch = vi.fn();
-    const setReadOnly = vi.fn();
     const setData: Dispatch<SetStateAction<HypothesisRowData[]>> = vi.fn((fn: SetStateAction<HypothesisRowData[]>) => {
       const prev = [{ hypothesis: 'FR' }] as HypothesisRowData[];
       // Si fn est une fonction, on l'exécute
@@ -244,7 +245,7 @@ describe('useTrajectoryAttach', () => {
       { hypothesis: 'FR', status: TRAJECTORY_SELECTION_STATUS.OK },
     ] as HypothesisRowData[]);
 
-    const { result } = renderHook(() => useTrajectoryAttach(studyThermal, studyStateThermal, dispatch, setReadOnly));
+    const { result } = renderHook(() => useTrajectoryAttach(studyThermal, studyStateThermal, dispatch));
 
     await act(async () => {
       await result.current.attachTrajectory(
@@ -253,6 +254,7 @@ describe('useTrajectoryAttach', () => {
         'success',
         newTrajectoryThermal,
         setData,
+        mockSetReadOnly
       );
     });
 
@@ -268,10 +270,10 @@ describe('useTrajectoryAttach', () => {
 
     // Vérifie la mise à jour des données
     expect(trajectoryUtils.setNestedData).toHaveBeenCalled();
-    expect(setReadOnly).toHaveBeenCalledWith(expect.any(Function));
+    expect(mockSetReadOnly).toHaveBeenCalledWith(expect.any(Function));
 
     // Vérifie que readOnly est mis à jour avec !isRequired
-    const readOnlyUpdater = setReadOnly.mock.calls[0][0] as (prev: ReadOnlyObject) => ReadOnlyObject;
+    const readOnlyUpdater = mockSetReadOnly.mock.calls[0][0] as (prev: ReadOnlyObject) => ReadOnlyObject;
     const updatedReadOnly = readOnlyUpdater({ '1': false });
     expect(updatedReadOnly).toEqual({ '1': false }); // car isRequired = true → !true = false
 
@@ -295,7 +297,6 @@ describe('useTrajectoryAttach', () => {
     } as StudyState;
 
     const dispatch = vi.fn();
-    const setReadOnly = vi.fn();
     const setData: Dispatch<SetStateAction<HypothesisRowData[]>> = vi.fn((fn: SetStateAction<HypothesisRowData[]>) => {
       const prev = [{ hypothesis: 'FR' }] as HypothesisRowData[];
       // Si fn est une fonction, on l'exécute
@@ -318,7 +319,7 @@ describe('useTrajectoryAttach', () => {
       { hypothesis: 'FR', status: TRAJECTORY_SELECTION_STATUS.OK },
     ] as HypothesisRowData[]);
 
-    const { result } = renderHook(() => useTrajectoryAttach(studySpecific, studyStateSpecific, dispatch, setReadOnly));
+    const { result } = renderHook(() => useTrajectoryAttach(studySpecific, studyStateSpecific, dispatch));
 
     await act(async () => {
       await result.current.attachTrajectory(
@@ -327,6 +328,7 @@ describe('useTrajectoryAttach', () => {
         'success',
         newTrajectorySpecific,
         setData,
+        mockSetReadOnly
       );
     });
 
@@ -340,7 +342,7 @@ describe('useTrajectoryAttach', () => {
     });
 
     // Vérifie readOnly = !isRequired = !false = true
-    const readOnlyUpdater = setReadOnly.mock.calls[0][0] as (prev: ReadOnlyObject) => ReadOnlyObject;
+    const readOnlyUpdater = mockSetReadOnly.mock.calls[0][0] as (prev: ReadOnlyObject) => ReadOnlyObject;
     const updated = readOnlyUpdater({ '1': false });
     expect(updated).toEqual({ '1': true });
   });
@@ -352,7 +354,6 @@ describe('useTrajectoryAttach', () => {
     } as StudyState;
 
     const dispatch = vi.fn();
-    const setReadOnly = vi.fn();
     const setData: Dispatch<SetStateAction<HypothesisRowData[]>> = vi.fn((fn: SetStateAction<HypothesisRowData[]>) => {
       const prev = [{ hypothesis: 'FR' }] as HypothesisRowData[];
       // Si fn est une fonction, on l'exécute
@@ -371,17 +372,17 @@ describe('useTrajectoryAttach', () => {
     vi.mocked(trajectoryService.linkTrajectoryToStudy).mockResolvedValue(newTrajectoryArea);
     vi.mocked(trajectoryUtils.setNestedData).mockReturnValue([{ updated: true }] as unknown as HypothesisRowData[]);
 
-    const { result } = renderHook(() => useTrajectoryAttach(studyArea, studyStateArea, dispatch, setReadOnly));
+    const { result } = renderHook(() => useTrajectoryAttach(studyArea, studyStateArea, dispatch));
 
     await act(async () => {
-      await result.current.attachTrajectory(TRAJECTORY_TYPE.AREA, [0], 'success', newTrajectoryArea, setData);
+      await result.current.attachTrajectory(TRAJECTORY_TYPE.AREA, [0], 'success', newTrajectoryArea, setData, mockSetReadOnly);
     });
 
     // Vérifie la mise à jour des données
     expect(trajectoryUtils.setNestedData).toHaveBeenCalled();
 
     // Vérifie setReadOnly
-    expect(setReadOnly).toHaveBeenCalledWith({ '0': false, '1': false });
+    expect(mockSetReadOnly).toHaveBeenCalledWith({ '0': false, '1': false });
 
     // Vérifie le dispatch ADD
     expect(dispatch).toHaveBeenCalledWith({
@@ -401,7 +402,6 @@ describe('useTrajectoryAttach', () => {
     } as StudyState;
 
     const dispatch = vi.fn();
-    const setReadOnly = vi.fn();
     const setData: Dispatch<SetStateAction<HypothesisRowData[]>> = vi.fn((fn: SetStateAction<HypothesisRowData[]>) => {
       const prev = [
         { status: TRAJECTORY_SELECTION_STATUS.ERROR },
@@ -428,20 +428,20 @@ describe('useTrajectoryAttach', () => {
       { status: TRAJECTORY_SELECTION_STATUS.OK, trajectory: { hasTimeSeries: true } },
     ] as HypothesisRowData[]);
 
-    const { result } = renderHook(() => useTrajectoryAttach(studyDSR, studyStateDSR, dispatch, setReadOnly));
+    const { result } = renderHook(() => useTrajectoryAttach(studyDSR, studyStateDSR, dispatch));
 
     await act(async () => {
-      await result.current.attachTrajectory(TRAJECTORY_TYPE.DSR, [1], 'success', newTrajectoryDsr, setData);
+      await result.current.attachTrajectory(TRAJECTORY_TYPE.DSR, [1], 'success', newTrajectoryDsr, setData, mockSetReadOnly);
     });
 
     // Vérifie setNestedData
     expect(trajectoryUtils.setNestedData).toHaveBeenCalled();
 
     // Vérifie que setReadOnly est appelé avec une fonction
-    expect(setReadOnly).toHaveBeenCalledWith(expect.any(Function));
+    expect(mockSetReadOnly).toHaveBeenCalledWith(expect.any(Function));
 
     // On exécute la fonction pour vérifier le résultat
-    const updater = setReadOnly.mock.calls[0][0] as (prev: ReadOnlyObject) => ReadOnlyObject;
+    const updater = mockSetReadOnly.mock.calls[0][0] as (prev: ReadOnlyObject) => ReadOnlyObject;
     const updated = updater({ 0: true, 1: true });
 
     // hasTimeSeries = true → readOnly[lastIndex] = false
@@ -455,7 +455,6 @@ describe('useTrajectoryAttach', () => {
     } as StudyState;
 
     const dispatch = vi.fn();
-    const setReadOnly = vi.fn();
     const setData: Dispatch<SetStateAction<HypothesisRowData[]>> = vi.fn((fn: SetStateAction<HypothesisRowData[]>) => {
       const prev = [
         { status: TRAJECTORY_SELECTION_STATUS.OK, trajectory: { hasTimeSeries: false } },
@@ -480,15 +479,15 @@ describe('useTrajectoryAttach', () => {
       { status: TRAJECTORY_SELECTION_STATUS.OK, trajectory: { hasTimeSeries: false } },
     ] as HypothesisRowData[]);
 
-    const { result } = renderHook(() => useTrajectoryAttach(studyDSR2, studyStateDSR2, dispatch, setReadOnly));
+    const { result } = renderHook(() => useTrajectoryAttach(studyDSR2, studyStateDSR2, dispatch));
 
     await act(async () => {
-      await result.current.attachTrajectory(TRAJECTORY_TYPE.DSR, [0], 'success', newTrajectoryDSR2, setData);
+      await result.current.attachTrajectory(TRAJECTORY_TYPE.DSR, [0], 'success', newTrajectoryDSR2, setData, mockSetReadOnly);
     });
 
-    expect(setReadOnly).toHaveBeenCalledWith(expect.any(Function));
+    expect(mockSetReadOnly).toHaveBeenCalledWith(expect.any(Function));
 
-    const updater = setReadOnly.mock.calls[0][0] as (prev: ReadOnlyObject) => ReadOnlyObject;
+    const updater = mockSetReadOnly.mock.calls[0][0] as (prev: ReadOnlyObject) => ReadOnlyObject;
     const updated = updater({ 0: false });
 
     // hasTimeSeries = false → readOnly[lastIndex] = true

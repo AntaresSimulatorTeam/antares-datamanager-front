@@ -89,7 +89,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
   );
   const { firstTableData, firstTableReadOnlyRow, secondTableData, secondTableReadOnlyRow } =
     useFetchFixHypothesisTrajectories(configs, options, isStudyGenerated, studyData?.id);
-  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch, setReadOnly, setReadOnlySettings);
+  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch);
   const { handleSearch } = useTrajectorySearchHandler({
     studyHorizon: studyData.horizon,
     setDbTrajectories,
@@ -99,9 +99,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
     studyData,
     setRowIdSelected,
     setIsDeletionModalOpen,
-    dbTrajectories,
-    setReadOnly,
-    setSecondTableReadOnly: setReadOnlySettings
+    dbTrajectories
   });
 
   useEffect(() => {
@@ -205,7 +203,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
             idSelected={String(rowIdSelected)}
             handleSearch={async (fileNameContains: string, rowId: string) => await handleSelectionChange(fileNameContains, rowId, TRAJECTORY_TYPE.AREA)}
             updateData={(rowId: string, value: unknown, status: RowStatus) => {
-              void handleHypothesisTableUpdate(rowId, value, status, TRAJECTORY_TYPE.AREA, data, setData);
+              void handleHypothesisTableUpdate(rowId, value, status, TRAJECTORY_TYPE.AREA, data, setData, setReadOnly, setReadOnlySettings);
             }}
             handleImport={async (rowId: string) => await handleFetchTrajectoryFromFs(rowId, TRAJECTORY_TYPE.AREA)}
             handleViewData={handleViewTrajectoryData}
@@ -238,6 +236,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
                 TRAJECTORY_TYPE.ADEQUACY_PATCH,
                 settingsData,
                 setSettingsData,
+                setReadOnlySettings
               );
             }}
             handleImport={async (rowId: string) => await handleFetchTrajectoryFromFs(rowId, TRAJECTORY_TYPE.ADEQUACY_PATCH)}
@@ -264,6 +263,8 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
                   typeToUse,
                   indexArray,
                   hypothesis,
+                  setReadOnly,
+                  setReadOnlySettings
                 );
               }
             }

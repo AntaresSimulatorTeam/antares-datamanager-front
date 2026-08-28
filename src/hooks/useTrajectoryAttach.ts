@@ -14,8 +14,6 @@ export const useTrajectoryAttach = (
   study: StudyDTO,
   studyState: Partial<StudyState>,
   dispatch: Dispatch<StudyActionType> | null,
-  setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
-  setSecondTableReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
 ) => {
   const { user } = useUser();
   const { t } = useTranslation();
@@ -27,7 +25,9 @@ export const useTrajectoryAttach = (
       indexArray: number[],
       status: RowStatus,
       trajectory: DbTrajectory,
-      setData: Dispatch<SetStateAction<HypothesisRowData[]>>
+      setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
+      setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
+      setSecondTableReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
     ) => {
       try {
         const newDbTrajectory = await linkTrajectoryToStudy(type, trajectory.id, study?.id);
@@ -78,14 +78,17 @@ export const useTrajectoryAttach = (
               setReadOnly?.((prevReadOnly) => ({ ...prevReadOnly, ['1']: !isRequired }));
               return newData;
             });
-          } else {
-            const allMandatoryAreasInStudy = type === TRAJECTORY_TYPE.AREA && newDbTrajectory?.id != null ? await isFlowbasedAllowed(newDbTrajectory.id) : false;
-            setData((prev) => {
-              newData = setNestedData(prev, indexArray, newTrajectory);
-              if (type === TRAJECTORY_TYPE.AREA) {
+          } else if (type === TRAJECTORY_TYPE.AREA) {
+              const allMandatoryAreasInStudy = type === TRAJECTORY_TYPE.AREA && newDbTrajectory?.id != null ? await isFlowbasedAllowed(newDbTrajectory.id) : false;
+              setData((prev) => {
+                newData = setNestedData(prev, indexArray, newTrajectory);
                 setReadOnly?.({ '0': false, '1': false });
                 setSecondTableReadOnly?.({ '0': false, '1': !allMandatoryAreasInStudy, '2.0': false, '2.1': false });
-              }
+                return newData;
+              });
+          } else {
+            setData((prev) => {
+              newData = setNestedData(prev, indexArray, newTrajectory);
               if (type === TRAJECTORY_TYPE.DSR) {
                 const hasTrajectoryWithTS =
                   newData.some(
@@ -122,7 +125,7 @@ export const useTrajectoryAttach = (
         }
       }
     },
-    [study.id, study?.horizon, study?.name, studyState, dispatch, setReadOnly, isFlowbasedAllowed, setSecondTableReadOnly, t, user?.profile?.sub],
+    [study.id, study?.horizon, study?.name, studyState, dispatch, isFlowbasedAllowed, t, user?.profile?.sub],
   );
 
   return { attachTrajectory };
