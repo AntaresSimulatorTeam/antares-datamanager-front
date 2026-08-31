@@ -5,7 +5,7 @@
  */
 
 import { DbTrajectory, DropdownItemOption, HypothesisRowData, RowStatus, TabProps } from '@/shared/types';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
@@ -40,16 +40,18 @@ const ResDistributionTab = ({ studyData, types }: TabProps & { types: TRAJECTORY
   const [optionsFS, setOptionsFS] = useState<DropdownItemOption[]>();
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const [selectedType, setSelectedType] = useState<TRAJECTORY_TYPE>(TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION);
+  const defaultAreas = useMemo(() => studyState?.defaultAreas ?? [], [studyState?.defaultAreas]);
+  const areas = useMemo(() => studyState?.areas ?? [], [studyState?.areas]);
   const { hypothesisTrajectories, readOnlyRow, technologyList } = useFetchHypothesisTrajectories(
     types,
-    studyState.areas ?? [],
-    studyState.defaultAreas ?? [],
+    areas,
+    defaultAreas,
     studyData?.id,
     studyData?.status,
     studyState.studyStatus,
   );
-  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch);
-  const { attachTrajectory } = useTrajectoryAttach(studyData, studyState, dispatch);
+  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, dispatch);
+  const { attachTrajectory } = useTrajectoryAttach(studyData, dispatch);
   const { detachTrajectory } = useTrajectoryDetach(studyData, dispatch);
   const { handleFetchFromFS } = useTrajectoryFetchFromFSHandler();
 

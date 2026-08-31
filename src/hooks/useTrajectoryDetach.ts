@@ -86,7 +86,7 @@ export const useTrajectoryDetach = (
 
         setData(newData);
         if (newReadOnly) {
-          setReadOnly?.((prev) => ({ ...prev, ...newReadOnly }));
+          setReadOnly?.((prev) => ({...prev, ...newReadOnly}));
           if (trajectoryToDelete?.type === TRAJECTORY_TYPE.AREA) {
             setSecondTableReadOnly?.(buildReadOnlyRow(['0', '1', '2.0', '2.1']));
           }

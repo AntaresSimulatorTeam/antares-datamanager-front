@@ -75,8 +75,8 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
       { type: TRAJECTORY_TYPE.ADEQUACY_PATCH, labelKey: t('settings.@adequacyPatch') },
       { type: TRAJECTORY_TYPE.FLOWBASED, labelKey: t('settings.@flowBased'), options: {hasRecalculateOption: true} },
       { type: TRAJECTORY_TYPE.SETTINGS, labelKey: t('settings.@title'), subRows: [
-        { type: TRAJECTORY_TYPE.SETTINGS, labelKey: t('settings.@generalData') }]
-        //{ type: TRAJECTORY_TYPE.SCENARIO_BUILDER, labelKey: t('settings.@scenarioBuilder') }]
+        { type: TRAJECTORY_TYPE.SETTINGS, labelKey: t('settings.@generalData') },
+        { type: TRAJECTORY_TYPE.SCENARIO_BUILDER, labelKey: t('settings.@scenarioBuilder') }]
       },
     ]],
     [t]
@@ -89,7 +89,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
   );
   const { firstTableData, firstTableReadOnlyRow, secondTableData, secondTableReadOnlyRow } =
     useFetchFixHypothesisTrajectories(configs, options, isStudyGenerated, studyData?.id);
-  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch);
+  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, dispatch);
   const { handleSearch } = useTrajectorySearchHandler({
     studyHorizon: studyData.horizon,
     setDbTrajectories,

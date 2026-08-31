@@ -83,7 +83,7 @@ export const useFetchHypothesisTrajectories = (
       },
       {} as Record<TRAJECTORY_TYPE, DbTrajectory[]>,
     );
-  }, [studyStatus, trajectoryTypesKey]);
+  }, [studyStatus, trajectoryTypes]);
 
   /**
    * Fonction principale de récupération + normalisation
@@ -306,7 +306,7 @@ export const useFetchHypothesisTrajectories = (
       }
     },
 
-    [studyContextStatus, studyStatus, defaultAreas, emptyAreaSelected, areas, t, dispatch],
+    [studyContextStatus, studyStatus, defaultAreas, areas, trajectoryTypes, emptyAreaSelected, t, dispatch],
   );
 
   const fetchAreasRef = useRef(fetchAreas);

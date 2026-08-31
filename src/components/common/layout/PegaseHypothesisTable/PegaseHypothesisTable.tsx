@@ -84,11 +84,13 @@ export const PegaseHypothesisTable = ({
     [handleImport, t],
   );
 
+  const rawData = useMemo(() => data ?? [], [data]);
+
   return (
     <div className="flex h-fit w-full">
       <StdSimpleTable
         id={id}
-        data={data}
+        data={rawData}
         columns={columns}
         columnSize="rem"
         enableColumnResizing={false}

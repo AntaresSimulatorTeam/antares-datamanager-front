@@ -6,7 +6,7 @@ import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
 import { RowToDeleteProps } from '@/shared/types/HypothesisTable.ts';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
-import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
+import { useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { getTypeToUse } from '@/shared/helpers/hypothesisTableHelper.ts';
 
 interface UseHypothesisTableUpdateHandlerArgs {
@@ -24,11 +24,9 @@ export const useHypothesisTableUpdateHandler = ({
   dbTrajectories,
   setRowIdSelected,
 }: UseHypothesisTableUpdateHandlerArgs) => {
-  const studyState = useStudy();
   const dispatch = useStudyDispatch();
   const { attachTrajectory } = useTrajectoryAttach(
     studyData,
-    studyState,
     dispatch,
   );
   const { detachTrajectory } = useTrajectoryDetach(

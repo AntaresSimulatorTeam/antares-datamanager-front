@@ -89,16 +89,15 @@ export const useTrajectoryDeletionLogic = (study: StudyDTO) => {
         if (rowIndex == null) {
           throw new Error('computeDeletion: indexRow and indexArray are both null. One must be provided.');
         }
-
         const row =
-          data[rowIndex].subRows && indexArray?.length == 2 ? data[rowIndex].subRows[indexArray[1]] : data[rowIndex];
+          data[rowIndex]?.subRows && indexArray?.length == 2 ? data[rowIndex].subRows[indexArray[1]] : data[rowIndex];
         if (status === 'empty') {
           trajectoryIds = row?.trajectory?.id ? [row.trajectory.id] : [];
         } else {
           const allTrajectories = collectTrajectoriesRecursively(row);
           trajectoryIds = allTrajectories.map((t) => t.id);
         }
-        trajectoryToDelete = row.trajectory;
+        trajectoryToDelete = row?.trajectory;
       }
       return { trajectoryIds, trajectoryToDelete, additionalTrajectory };
     },

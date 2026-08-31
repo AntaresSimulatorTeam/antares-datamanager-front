@@ -14,7 +14,7 @@ import {
   TechnologyType,
   TrajectoryViewData,
 } from '@/shared/types';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
@@ -61,16 +61,19 @@ const ExpandableTab = ({
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const [rowToDelete, setRowToDelete] = useState<RowToDeleteProps | null>(null);
   const [isDeletionModalOpen, setIsDeletionModalOpen] = useState(false);
+  const defaultAreas = useMemo(() => studyState?.defaultAreas ?? [], [studyState?.defaultAreas]);
+  const areas = useMemo(() => studyState?.areas ?? [], [studyState?.areas]);
+
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow, technologyList } =
     useFetchHypothesisTrajectories(
       types,
-      studyState?.areas ?? [],
-      studyState?.defaultAreas ?? [],
+      areas,
+      defaultAreas,
       studyData?.id,
       studyData?.status,
       studyState.studyStatus,
     );
-  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch);
+  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, dispatch);
   const { removeRow } = useHypothesisTableRemoveRow(studyData, dispatch, setData, setCheckedValues, setReadOnly);
   const { handleSearch } = useTrajectorySearchHandler({
     studyHorizon: studyData.horizon,

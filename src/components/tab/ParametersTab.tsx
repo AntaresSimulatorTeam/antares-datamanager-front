@@ -70,8 +70,10 @@ export const ParametersTab = ({ studyData }: TabProps) => {
   const [selectedTrajectoryType, setSelectedTrajectoryType] = useState<TRAJECTORY_TYPE>(
     TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
   );
+  const defaultAreas = useMemo(() => studyState?.defaultAreas ?? [], [studyState?.defaultAreas]);
+  const areas = useMemo(() => studyState?.areas ?? [], [studyState?.areas]);
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
-    useFetchHypothesisParametersTrajectories(studyState.areas ?? [], studyData, studyState?.defaultAreas ?? [], isStudyGenerated);
+    useFetchHypothesisParametersTrajectories(areas, studyData, defaultAreas, isStudyGenerated);
   const configs = useMemo(
     () => [
       [
@@ -90,8 +92,8 @@ export const ParametersTab = ({ studyData }: TabProps) => {
   );
   const { firstTableData } = useFetchFixHypothesisTrajectories(configs, options, isStudyGenerated, studyData?.id);
   const { handleFetchFromFS } = useTrajectoryFetchFromFSHandler();
-  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch);
-  const { attachTrajectory } = useTrajectoryAttach(studyData, studyState, dispatch);
+  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, dispatch);
+  const { attachTrajectory } = useTrajectoryAttach(studyData, dispatch);
   const { removeRow } = useHypothesisTableRemoveRow(
     studyData,
     dispatch,
@@ -213,34 +215,33 @@ export const ParametersTab = ({ studyData }: TabProps) => {
       } else {
         typeToUse = getTrajectoryTypeByIndex(topIndex);
       }
-      const dataToUse = typeToUse === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER ? technicalData : data;
-      const dataSetterToUse = typeToUse === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER ? setTechnicalData : setData;
-      const readOnlySetterToUse = typeToUse === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER ? setTechnicalReadOnly : setReadOnlyParam;
+
+      const dataToUse = tableType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER ? technicalData : data;
+      const dataSetterToUse = tableType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER ? setTechnicalData : setData;
+      const readOnlySetterToUse = tableType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER ? setTechnicalReadOnly : setReadOnlyParam;
       if (status === 'empty' || status === 'emptyError') {
         const row = subIndex == null ? technicalData[topIndex] : technicalData[topIndex]?.subRows?.[subIndex];
-        const current = row?.trajectory ?? null;
-        if (current) {
-          if (
-            typeToUse === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER &&
-            topIndex === 0 &&
-            row?.trajectory &&
-            row?.status === TRAJECTORY_SELECTION_STATUS.OK &&
-            shouldDeleteParamModulation(0, technicalData)
-          ) {
-            setRowToDelete({ index: topIndex, subIndex, value: row?.hypothesis, operation: 'empty' });
-            setIsDeletionModalOpen(true);
-          } else {
-            const hypothesis = typeToUse === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER ? technicalData[topIndex]?.subRows?.[subIndex]?.hypothesis : data[topIndex]?.hypothesis;
-            await detachTrajectory(
-              typeToUse,
-              [topIndex, subIndex].filter((n) => n !== undefined),
-              dataSetterToUse,
-              dataToUse,
-              status,
-              hypothesis ?? '',
-              readOnlySetterToUse
-            );
-          }
+        if (
+          typeToUse === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER &&
+          topIndex === 0 &&
+          row?.trajectory &&
+          row?.status === TRAJECTORY_SELECTION_STATUS.OK &&
+          shouldDeleteParamModulation(0, technicalData)
+        ) {
+          setRowToDelete({ index: topIndex, subIndex, value: row?.hypothesis, operation: 'empty' });
+          setIsDeletionModalOpen(true);
+        } else {
+          const hypothesis = tableType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER ? technicalData[topIndex]?.subRows?.[subIndex]?.hypothesis : data[topIndex]?.hypothesis;
+
+          await detachTrajectory(
+            typeToUse,
+            [topIndex, subIndex].filter((n) => n !== undefined),
+            dataSetterToUse,
+            dataToUse,
+            status,
+            hypothesis ?? '',
+            readOnlySetterToUse
+          );
         }
       }
 
@@ -317,7 +318,7 @@ export const ParametersTab = ({ studyData }: TabProps) => {
           progress={isTechnicalParametersType(selectedTrajectoryType) ? 0 : progress}
           handleSearch={async (fileNameContains: string, rowId: string) => await handleTrajectoryFromDB(TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER, data, fileNameContains, rowId)}
           handleImport={async (rowId: string) =>
-            await handleFetchTrajectoriesFromFS(rowId, technicalData, TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER)
+            await handleFetchTrajectoriesFromFS(rowId, data, TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER)
           }
           updateData={async (rowId: string, value: unknown, status: RowStatus) =>
             await handleHypothesisTableUpdate(TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER, rowId, value, status)

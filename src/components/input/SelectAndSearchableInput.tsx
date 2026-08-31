@@ -109,6 +109,7 @@ const SelectAndSearchableInput = ({
         onClose={() => setIsDropdownOpen(false)}
         style={{width: dropdownWidth != null ? `${dropdownWidth}px` : '250px'}}
         hasMaxWidth={!dropdownWidth}
+        maxHeight={400}
         trigger={
           <div className="flex">
             <TextInput

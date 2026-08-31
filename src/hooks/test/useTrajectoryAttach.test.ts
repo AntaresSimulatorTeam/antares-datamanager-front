@@ -1,9 +1,8 @@
 import { describe, expect, it, Mock, vi } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
-import { DbTrajectory, HypothesisRowData, StudyDTO, StudyState, UserState } from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, StudyDTO, UserState } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import * as trajectoryService from '@/shared/services/trajectoryService.ts';
-import * as studyService from '@/shared/services/studyService.ts';
 import * as trajectoryUtils from '@/shared/utils/trajectoryUtils.ts';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
 import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.ts';
@@ -78,20 +77,20 @@ describe('useTrajectoryAttach', () => {
     id: 42,
   };
 
-  const studyState: Partial<StudyState> = {
-    [TRAJECTORY_TYPE.LOAD]: {
-      trajectories: [{ area: 'Zone A', type: TRAJECTORY_TYPE.LOAD } as DbTrajectory],
-    },
-  };
+  // const studyState: Partial<StudyState> = {
+  //   [TRAJECTORY_TYPE.LOAD]: {
+  //     trajectories: [{ area: 'Zone A', type: TRAJECTORY_TYPE.LOAD } as DbTrajectory],
+  //   },
+  // };
 
   afterEach(() => {
     vi.clearAllMocks();
   });
 
-  it('should update existing trajectory', async () => {
+  it('should dispatch UPDATE_TRAJECTORY on attach', async () => {
     vi.mocked(trajectoryService.linkTrajectoryToStudy as ReturnType<typeof vi.fn>).mockResolvedValue(newTrajectory);
 
-    const { result } = renderHook(() => useTrajectoryAttach(study, studyState, mockDispatch));
+    const { result } = renderHook(() => useTrajectoryAttach(study, mockDispatch));
 
     await result.current.attachTrajectory(TRAJECTORY_TYPE.LOAD, [0], 'success', trajectory, mockSetData, mockSetReadOnly);
 
@@ -106,26 +105,25 @@ describe('useTrajectoryAttach', () => {
     expect(mockSetData).toHaveBeenCalled();
   });
 
-  it('should add new trajectory if not already in state', async () => {
-    const emptyState: Partial<StudyState> = {};
-    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue([newTrajectory]);
+  it('should dispatch UPDATE_TRAJECTORY even if not already in state', async () => {
+    //const emptyState: Partial<StudyState> = {};
+    vi.mocked(trajectoryService.linkTrajectoryToStudy as ReturnType<typeof vi.fn>).mockResolvedValue(newTrajectory);
 
-    const { result } = renderHook(() => useTrajectoryAttach(study, emptyState, mockDispatch));
+    const { result } = renderHook(() => useTrajectoryAttach(study, mockDispatch));
 
     await result.current.attachTrajectory(TRAJECTORY_TYPE.LOAD, [1], 'success', trajectory, mockSetData, mockSetReadOnly);
 
     expect(mockDispatch).toHaveBeenCalledWith({
-      type: STUDY_ACTION.ADD_TRAJECTORIES,
+      type: STUDY_ACTION.UPDATE_TRAJECTORY,
       payload: {
-        [TRAJECTORY_TYPE.LOAD]: {
-          trajectories: [newTrajectory],
-        },
+        trajectory: newTrajectory,
+        status: 'success',
       },
     });
     expect(mockSetData).toHaveBeenCalled();
   });
 
-  it('should dispatch UPDATE_TRAJECTORY if unique type already exists', async () => {
+  it('should dispatch UPDATE_TRAJECTORY for unique type', async () => {
     const mockTrajectory = { id: '123', type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER };
     const newTrajectory2 = {
       id: '123',
@@ -133,17 +131,16 @@ describe('useTrajectoryAttach', () => {
       area: 'Zone A',
       type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER,
     } as unknown as DbTrajectory;
-    const studyState2: Partial<StudyState> = {
-      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]: {
-        trajectories: [
-          { area: 'Zone A', type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER } as DbTrajectory,
-        ],
-      },
-    };
+    // const studyState2: Partial<StudyState> = {
+    //   [TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]: {
+    //     trajectories: [
+    //       { area: 'Zone A', type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER } as DbTrajectory,
+    //     ],
+    //   },
+    // };
     vi.mocked(trajectoryService.linkTrajectoryToStudy).mockResolvedValue(mockTrajectory as unknown as DbTrajectory);
-    vi.mocked(trajectoryUtils.isUniqueTrajectoryType).mockResolvedValue(true);
 
-    const { result } = renderHook(() => useTrajectoryAttach(study, studyState2, mockDispatch));
+    const { result } = renderHook(() => useTrajectoryAttach(study, mockDispatch));
 
     await result.current.attachTrajectory(
       TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER,
@@ -167,7 +164,7 @@ describe('useTrajectoryAttach', () => {
   it('should handle error and call handleTrajectoryError', async () => {
     vi.mocked(trajectoryService.linkTrajectoryToStudy).mockRejectedValue(new Error('link failed'));
 
-    const { result } = renderHook(() => useTrajectoryAttach(study, studyState, mockDispatch));
+    const { result } = renderHook(() => useTrajectoryAttach(study, mockDispatch));
 
     await result.current.attachTrajectory(TRAJECTORY_TYPE.LOAD, [0], 'success', trajectory, mockSetData, mockSetReadOnly);
 
@@ -189,7 +186,7 @@ describe('useTrajectoryAttach', () => {
     vi.mocked(trajectoryService.linkTrajectoryToStudy).mockRejectedValue(new Error('link failed'));
     const mockUseUser = useUser as Mock<typeof useUser>;
     mockUseUser.mockImplementation(() => ({ user: { profile: {} } }) as UserState);
-    const { result } = renderHook(() => useTrajectoryAttach(study, studyState, mockDispatch));
+    const { result } = renderHook(() => useTrajectoryAttach(study, mockDispatch));
 
     const trajectoryArea = {
       id: 100,
@@ -219,9 +216,9 @@ describe('useTrajectoryAttach', () => {
 
   it('attache une trajectoire thermique spécifique et met à jour readOnly selon isParamModulationRequired', async () => {
     const studyThermal = { id: 1, horizon: 2030 } as unknown as StudyDTO;
-    const studyStateThermal = {
-      THERMAL_TECHNICAL_SPECIFIC_PARAMETER: { trajectories: [] },
-    } as StudyState;
+    // const studyStateThermal = {
+    //   THERMAL_TECHNICAL_SPECIFIC_PARAMETER: { trajectories: [] },
+    // } as StudyState;
 
     const dispatch = vi.fn();
     const setData: Dispatch<SetStateAction<HypothesisRowData[]>> = vi.fn((fn: SetStateAction<HypothesisRowData[]>) => {
@@ -245,7 +242,7 @@ describe('useTrajectoryAttach', () => {
       { hypothesis: 'FR', status: TRAJECTORY_SELECTION_STATUS.OK },
     ] as HypothesisRowData[]);
 
-    const { result } = renderHook(() => useTrajectoryAttach(studyThermal, studyStateThermal, dispatch));
+    const { result } = renderHook(() => useTrajectoryAttach(studyThermal, dispatch));
 
     await act(async () => {
       await result.current.attachTrajectory(
@@ -279,22 +276,16 @@ describe('useTrajectoryAttach', () => {
 
     // Vérifie le dispatch ADD
     expect(dispatch).toHaveBeenCalledWith({
-      type: STUDY_ACTION.ADD_TRAJECTORIES,
+      type: STUDY_ACTION.UPDATE_TRAJECTORY,
       payload: {
-        [TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]: {
-          trajectories: [newTrajectory],
-        },
+        trajectory: newTrajectory,
+        status: 'success'
       },
     });
   });
 
   it('update la trajectoire si elle existe déjà', async () => {
     const studySpecific = { id: 1, horizon: 2030 } as unknown as StudyDTO;
-    const studyStateSpecific = {
-      THERMAL_TECHNICAL_SPECIFIC_PARAMETER: {
-        trajectories: [{ id: 10, type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, area: 'FR' }],
-      },
-    } as StudyState;
 
     const dispatch = vi.fn();
     const setData: Dispatch<SetStateAction<HypothesisRowData[]>> = vi.fn((fn: SetStateAction<HypothesisRowData[]>) => {
@@ -319,7 +310,7 @@ describe('useTrajectoryAttach', () => {
       { hypothesis: 'FR', status: TRAJECTORY_SELECTION_STATUS.OK },
     ] as HypothesisRowData[]);
 
-    const { result } = renderHook(() => useTrajectoryAttach(studySpecific, studyStateSpecific, dispatch));
+    const { result } = renderHook(() => useTrajectoryAttach(studySpecific, dispatch));
 
     await act(async () => {
       await result.current.attachTrajectory(
@@ -349,9 +340,6 @@ describe('useTrajectoryAttach', () => {
 
   it('met à jour les données et setReadOnly pour le type AREA', async () => {
     const studyArea = { id: 1 } as StudyDTO;
-    const studyStateArea = {
-      AREA: { trajectories: [] },
-    } as StudyState;
 
     const dispatch = vi.fn();
     const setData: Dispatch<SetStateAction<HypothesisRowData[]>> = vi.fn((fn: SetStateAction<HypothesisRowData[]>) => {
@@ -372,7 +360,7 @@ describe('useTrajectoryAttach', () => {
     vi.mocked(trajectoryService.linkTrajectoryToStudy).mockResolvedValue(newTrajectoryArea);
     vi.mocked(trajectoryUtils.setNestedData).mockReturnValue([{ updated: true }] as unknown as HypothesisRowData[]);
 
-    const { result } = renderHook(() => useTrajectoryAttach(studyArea, studyStateArea, dispatch));
+    const { result } = renderHook(() => useTrajectoryAttach(studyArea, dispatch));
 
     await act(async () => {
       await result.current.attachTrajectory(TRAJECTORY_TYPE.AREA, [0], 'success', newTrajectoryArea, setData, mockSetReadOnly);
@@ -386,20 +374,16 @@ describe('useTrajectoryAttach', () => {
 
     // Vérifie le dispatch ADD
     expect(dispatch).toHaveBeenCalledWith({
-      type: STUDY_ACTION.ADD_TRAJECTORIES,
+      type: STUDY_ACTION.UPDATE_TRAJECTORY,
       payload: {
-        [TRAJECTORY_TYPE.AREA]: {
-          trajectories: [newTrajectoryArea],
-        },
+          trajectory: newTrajectoryArea,
+          status: 'success'
       },
     });
   });
 
   it('met à jour readOnly pour DSR selon hasTimeSeries = true', async () => {
     const studyDSR = { id: 1 } as StudyDTO;
-    const studyStateDSR = {
-      DSR: { trajectories: [] },
-    } as StudyState;
 
     const dispatch = vi.fn();
     const setData: Dispatch<SetStateAction<HypothesisRowData[]>> = vi.fn((fn: SetStateAction<HypothesisRowData[]>) => {
@@ -428,7 +412,7 @@ describe('useTrajectoryAttach', () => {
       { status: TRAJECTORY_SELECTION_STATUS.OK, trajectory: { hasTimeSeries: true } },
     ] as HypothesisRowData[]);
 
-    const { result } = renderHook(() => useTrajectoryAttach(studyDSR, studyStateDSR, dispatch));
+    const { result } = renderHook(() => useTrajectoryAttach(studyDSR, dispatch));
 
     await act(async () => {
       await result.current.attachTrajectory(TRAJECTORY_TYPE.DSR, [1], 'success', newTrajectoryDsr, setData, mockSetReadOnly);
@@ -450,9 +434,6 @@ describe('useTrajectoryAttach', () => {
 
   it('met à jour readOnly pour DSR selon hasTimeSeries = false', async () => {
     const studyDSR2 = { id: 1 } as StudyDTO;
-    const studyStateDSR2 = {
-      DSR: { trajectories: [] },
-    } as StudyState;
 
     const dispatch = vi.fn();
     const setData: Dispatch<SetStateAction<HypothesisRowData[]>> = vi.fn((fn: SetStateAction<HypothesisRowData[]>) => {
@@ -479,7 +460,7 @@ describe('useTrajectoryAttach', () => {
       { status: TRAJECTORY_SELECTION_STATUS.OK, trajectory: { hasTimeSeries: false } },
     ] as HypothesisRowData[]);
 
-    const { result } = renderHook(() => useTrajectoryAttach(studyDSR2, studyStateDSR2, dispatch));
+    const { result } = renderHook(() => useTrajectoryAttach(studyDSR2, dispatch));
 
     await act(async () => {
       await result.current.attachTrajectory(TRAJECTORY_TYPE.DSR, [0], 'success', newTrajectoryDSR2, setData, mockSetReadOnly);

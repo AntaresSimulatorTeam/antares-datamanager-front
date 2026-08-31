@@ -85,6 +85,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
           type: 'error',
           filledIcon: true,
         });
+        onClose()
       }
     },
   );
