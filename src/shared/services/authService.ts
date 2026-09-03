@@ -85,7 +85,6 @@ export const AuthService = {
           type: 'error',
           message: errorData?.antaresErrorMessage || 'An error occurred',
         });
-        throw new Error(errorData?.antaresErrorMessage);
       }
     } else {
       return response;

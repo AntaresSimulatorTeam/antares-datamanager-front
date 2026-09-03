@@ -115,7 +115,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
   return (
     <Modal
       isOpen={isOpen}
-      closeOnOverlayClick
+      closeOnOverlayClick={false}
       id="study-update-modal"
       onClose={() => void onClose()}
       primaryButton={<Button

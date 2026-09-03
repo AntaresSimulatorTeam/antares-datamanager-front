@@ -43,7 +43,7 @@ export const ImportTrajectoryModal = ({
   return (
     <Modal
       isOpen={isOpen}
-      closeOnOverlayClick
+      closeOnOverlayClick={false}
       id="import-modal"
       icon="upload"
       onClose={() => void onClose()}

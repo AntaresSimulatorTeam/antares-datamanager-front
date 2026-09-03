@@ -68,7 +68,7 @@ export const ProjectCreationModal = ({ onClose, projectInfo, isOpen }: ProjectCr
   return (
   <Modal
     isOpen={isOpen}
-    closeOnOverlayClick
+    closeOnOverlayClick={false}
     id="project-creation-modal"
     onClose={() => void onClose()}
     primaryButton={<Button

@@ -99,7 +99,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
   return (
     <Modal
       isOpen={isOpen}
-      closeOnOverlayClick
+      closeOnOverlayClick={false}
       id="study-creation-modal"
       onClose={() => void onClose()}
       primaryButton={<Button

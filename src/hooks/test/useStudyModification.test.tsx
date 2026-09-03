@@ -52,7 +52,7 @@ describe('useStudyModification', () => {
   });
 
   it('calls onError when updateStudy fails', async () => {
-    mockUpdateStudy.mockRejectedValue(new Error('Update failed'));
+    mockUpdateStudy.mockRejectedValue({antaresErrorMessage: 'Update failed'});
 
     const onError = vi.fn();
 
@@ -66,7 +66,7 @@ describe('useStudyModification', () => {
   });
 
   it('calls onError when duplicateStudy fails', async () => {
-    mockDuplicateStudy.mockRejectedValue(new Error('Duplicate failed'));
+    mockDuplicateStudy.mockRejectedValue({antaresErrorMessage: 'Duplicate failed'});
 
     const onError = vi.fn();
 

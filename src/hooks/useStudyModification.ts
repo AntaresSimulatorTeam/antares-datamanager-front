@@ -9,7 +9,7 @@ export const useStudyModification = (onSuccess?: () => void, onError?: (message:
         isDuplicateMode ? await duplicateStudy(studyData) : await updateStudy(studyData, studyId);
         onSuccess?.();
       } catch (error) {
-        onError?.((error as Error)?.message ?? (error as BackendError).antaresErrorMessage);
+        onError?.((error as BackendError).antaresErrorMessage);
       }
     },
     [onError, onSuccess],

@@ -20,7 +20,6 @@ export const AreaDeletionConfirmationModal: React.FC<AreaDeletionConfirmationMod
   return (
     <Modal
       isOpen={isOpen}
-      closeOnOverlayClick
       id="area-deletion-modal"
       onClose={onClose}
       primaryButton={<Button label={t('trajectoryDeletionModal.@confirm')} variant="secondary" onClick={() => void onConfirm()} />}
@@ -28,6 +27,7 @@ export const AreaDeletionConfirmationModal: React.FC<AreaDeletionConfirmationMod
       size="s"
       title={t('trajectoryDeletionModal.@confirmDeleteTitle')}
       className="[&_h2]:!text-left"
+      closeOnOverlayClick={false}
     >
       <p>{message ?? t('trajectoryDeletionModal.@confirmDeleteMessage')}</p>
     </Modal>

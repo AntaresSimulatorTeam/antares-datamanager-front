@@ -28,7 +28,7 @@ export const TrajectoryDataVisualisation = ({ trajectoryData, onClose, isOpen }:
   return (
     <Modal
       isOpen={isOpen}
-      closeOnOverlayClick
+      closeOnOverlayClick={false}
       icon={icon}
       iconAppearance="filled"
       id="data-visualisation-modal"
