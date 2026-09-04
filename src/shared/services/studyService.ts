@@ -10,6 +10,7 @@ import { STUDY_ENDPOINT, STUDY_KEYWORDS_SEARCH_ENDPOINT } from '@/shared/const/a
 import { notifyAlert, notifyToast } from '@/shared/notification/notification.tsx';
 import { AuthService } from '@/shared/services/authService.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
 
 /**
  * Retrieve a list of studies from a term
@@ -191,7 +192,7 @@ export const generateStudy = async (id: number): Promise<Response | void> => {
       },
     });
   } catch (error) {
-    if ((error as BackendError).antaresErrorMessage) {
+    if ((error as BackendError).type === ERROR_MESSAGE_TYPE.BUSINESS) {
       notifyAlert({
         icon: 'close',
         message: (error as BackendError).antaresErrorMessage,
