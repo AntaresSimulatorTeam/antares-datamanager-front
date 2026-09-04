@@ -54,11 +54,6 @@ const StudyDetails = () => {
     }
   };
 
-  const onCloseModal = () => {
-    toggleModal();
-    setReloadStudy((prev) => prev + 1);
-  };
-
   useEffect(() => {
     const fetchStudyData = async (studyId: number) => {
       const studyUpdated = await getStudyById(studyId);
@@ -109,7 +104,7 @@ const StudyDetails = () => {
         </div>
       </div>
       {studyData && studyData.status !== StudyStatus.GENERATED && (
-        <StudyModificationModal onClose={onCloseModal} study={studyData} isOpen={isModalOpen}/>
+        <StudyModificationModal onClose={toggleModal} study={studyData} isOpen={isModalOpen} setReloadStudies={setReloadStudy} />
       )}
     </div>
   );
