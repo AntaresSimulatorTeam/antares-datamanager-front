@@ -24,6 +24,7 @@ import { FieldInFormation } from '@common/base/FieldInFormation.tsx';
 import { convertToOneYearHorizon } from '@/shared/utils/textUtils.ts';
 import { useFetchProjectOptions } from '@/hooks/useFetchProjectOptions.ts';
 import { useStudyModification } from '@/hooks/useStudyModification.ts';
+import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
 
 interface StudyCreationModalProps {
   isOpen: boolean;
@@ -64,6 +65,13 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
     setHorizonErrorMessage('');
   };
 
+  const resetFields = () => {
+    setStudyName('');
+    setHorizon('');
+    setKeywords([]);
+    resetErrorMessage();
+  };
+
   const { confirmUpdate } = useStudyModification(
     () => {
       setReloadStudies?.((prev) => prev + 1);
@@ -71,21 +79,25 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
         type: 'success',
         message: `Study ${isDuplicateMode ? 'duplicated' : 'updated'} successfully`,
       });
+      resetFields();
       onClose();
     },
-    (message) => {
-      if (message?.includes(t('studyDetails.@duplicateModalStudyError'))) {
-        setStudyErrorMessage(message);
-      } else if (message?.includes(t('horizonInput.@validYearError'))) {
-        setHorizonErrorMessage(message);
+    (error) => {
+      if (error?.antaresErrorMessage?.includes(t('studyDetails.@duplicateModalStudyError'))) {
+        setStudyErrorMessage(error?.antaresErrorMessage);
+      } else if (error?.antaresErrorMessage?.includes(t('horizonInput.@validYearError'))) {
+        setHorizonErrorMessage(error?.antaresErrorMessage);
       } else {
-        notifyAlert({
-          icon: 'close',
-          message,
-          type: 'error',
-          filledIcon: true,
-        });
-        onClose()
+        if (error?.type === ERROR_MESSAGE_TYPE.BUSINESS) {
+          notifyAlert({
+            icon: 'close',
+            message: error?.antaresErrorMessage,
+            type: 'error',
+            filledIcon: true,
+          });
+        }
+        resetFields();
+        onClose();
       }
     },
   );
@@ -117,7 +129,10 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
       isOpen={isOpen}
       closeOnOverlayClick={false}
       id="study-update-modal"
-      onClose={() => void onClose()}
+      onClose={() => {
+        resetFields()
+        void onClose()
+      }}
       primaryButton={<Button
         icon={isDuplicateMode ? 'copy' : 'edit'}
         label={isDuplicateMode ? t('study.@duplicate') : t('modal.@button_update')}
@@ -137,7 +152,10 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
         variant="primary"
         disabled={!isFormValid}
       />}
-      secondaryButton={<Button label={t('components.quickAccess.@cancel')} onClick={onClose} variant="text" />}
+      secondaryButton={<Button label={t('components.quickAccess.@cancel')} onClick={() => {
+        resetFields()
+        void onClose()
+      }} variant="text" />}
       size="s"
       title={isDuplicateMode ? t('home.@duplicate_study') : t('studyModal.@update_study')}
       className="[&_h2]:!text-left"

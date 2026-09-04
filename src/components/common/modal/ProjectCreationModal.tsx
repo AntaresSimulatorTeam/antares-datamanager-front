@@ -40,6 +40,7 @@ export const ProjectCreationModal = ({ onClose, projectInfo, isOpen }: ProjectCr
     setName('');
     setDescription('');
     setKeywords([]);
+    setNameError('')
   };
 
   const resetNameField = () => {
@@ -70,7 +71,10 @@ export const ProjectCreationModal = ({ onClose, projectInfo, isOpen }: ProjectCr
     isOpen={isOpen}
     closeOnOverlayClick={false}
     id="project-creation-modal"
-    onClose={() => void onClose()}
+    onClose={() => {
+      resetFields()
+      void onClose()
+    }}
     primaryButton={<Button
       label={projectInfo ? t('modal.@button_update') : t('modal.@button_create')}
       icon={projectInfo ? 'edit' : 'add'}
@@ -86,7 +90,10 @@ export const ProjectCreationModal = ({ onClose, projectInfo, isOpen }: ProjectCr
       color="primary"
       disabled={!isFormValid}
     />}
-    secondaryButton={<Button label={t('components.quickAccess.@cancel')} onClick={onClose} variant="text" />}
+    secondaryButton={<Button label={t('components.quickAccess.@cancel')} onClick={() => {
+      resetFields()
+      void onClose()
+    }} variant="text" />}
     size="s"
     title={projectInfo ? t('home.@update_project') : t('home.@new_project')}
     className="[&_h2]:!text-left"

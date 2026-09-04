@@ -139,6 +139,7 @@ export const updateStudy = async (studyData: Partial<StudyDTO>, studyId: number)
 export const duplicateStudy = async (
   studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate' | 'projectId' | 'generationDate' | 'hvdc'>,
 ): Promise<void> => {
+  // eslint-disable-next-line no-useless-catch
   try {
     await AuthService.authFetch(`${STUDY_ENDPOINT}/duplicate`, {
       method: 'POST',
@@ -148,7 +149,7 @@ export const duplicateStudy = async (
       body: JSON.stringify(studyData),
     });
   } catch (error: unknown) {
-    throw new Error((error as BackendError).antaresErrorMessage);
+    throw error
   }
 };
 

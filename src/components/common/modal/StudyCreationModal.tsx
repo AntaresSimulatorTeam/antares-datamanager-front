@@ -51,6 +51,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
     setStudyName('');
     setHorizon('');
     setKeywords([]);
+    setStudyErrorMessage('');
   };
 
   const resetNameField = () => {
@@ -66,9 +67,10 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
         type: 'success',
         message: 'Study created successfully',
       });
+      resetFields()
       onClose();
     },
-    (message) => setStudyErrorMessage(message),
+    (message) => setStudyErrorMessage(message)
   );
 
   useEffect(() => {
@@ -101,7 +103,10 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
       isOpen={isOpen}
       closeOnOverlayClick={false}
       id="study-creation-modal"
-      onClose={() => void onClose()}
+      onClose={() => {
+        resetFields()
+        void onClose()
+      }}
       primaryButton={<Button
         icon="add"
         label={t('modal.@button_create')}
@@ -123,7 +128,10 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
         variant="primary"
         disabled={!isFormValid}
       />}
-      secondaryButton={<Button label={t('components.quickAccess.@cancel')} onClick={onClose} variant="text" />}
+      secondaryButton={<Button label={t('components.quickAccess.@cancel')} onClick={() => {
+        resetFields()
+        void onClose()
+      }} variant="text" />}
       size="s"
       title={t('studyModal.@new_study')}
       className="[&_h2]:!text-left"
@@ -142,6 +150,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
               showCounter={true}
               error={!!studyErrorMessage}
               assistiveTextLabel={studyErrorMessage}
+              assistiveAppearance="error"
               rightIconAction="clean"
               onRightIconClick={resetNameField}
             />

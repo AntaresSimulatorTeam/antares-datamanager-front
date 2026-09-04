@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ProjectInfo, StudyDTO } from '@/shared/types';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type';
 import getStudyTableHeaders from './StudyTableHeaders';
@@ -52,7 +52,7 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
     !rows?.some((row) => row.status === StudyStatus.IN_PROGRESS) && setRowSelection({});
   }, [rows.length]);
 
-  const headers = getStudyTableHeaders(t);
+  const headers = useMemo(() => getStudyTableHeaders(t), [t]);
 
   const handleSort = (column: string) => {
     const newSortOrder = sortBy[column] === 'asc' ? 'desc' : 'asc';

@@ -62,7 +62,7 @@ describe('useStudyModification', () => {
       await result.current.confirmUpdate(3, { name: 'Bad Update' } as StudyDTO, false);
     });
 
-    expect(onError).toHaveBeenCalledWith('Update failed');
+    expect(onError).toHaveBeenCalledWith({antaresErrorMessage: "Update failed"});
   });
 
   it('calls onError when duplicateStudy fails', async () => {
@@ -76,6 +76,6 @@ describe('useStudyModification', () => {
       await result.current.confirmUpdate(3, { name: 'Bad Duplicate' } as StudyDTO, true);
     });
 
-    expect(onError).toHaveBeenCalledWith('Duplicate failed');
+    expect(onError).toHaveBeenCalledWith({antaresErrorMessage: "Duplicate failed"});
   });
 });
