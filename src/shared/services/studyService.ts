@@ -177,12 +177,13 @@ export const deleteStudy = async (id: number): Promise<void> => {
  * Generate a study
  *
  * @param {number} id - Study id
+ * @returns{Promise<Response|void>}
  * @throws {Error}
  */
-export const generateStudy = async (id: number): Promise<void> => {
+export const generateStudy = async (id: number): Promise<Response | void> => {
   const urlApi = `${STUDY_GENERATE_ENDPOINT}?id=${id}`;
   try {
-    await AuthService.authFetch(urlApi, {
+    return await AuthService.authFetch(urlApi, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -196,8 +197,8 @@ export const generateStudy = async (id: number): Promise<void> => {
         type: 'error',
         filledIcon: true,
       });
+      throw new Error((error as BackendError).antaresErrorMessage);
     }
-    throw new Error((error as BackendError).antaresErrorMessage);
   }
 };
 

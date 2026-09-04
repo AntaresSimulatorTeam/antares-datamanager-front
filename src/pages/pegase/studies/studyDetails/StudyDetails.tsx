@@ -43,10 +43,12 @@ const StudyDetails = () => {
   const handleGenerateStudy = async (studyId: number) => {
     try {
       setIsGenerating(true);
-      await generateStudy(studyId);
-      dispatch?.({ type: STUDY_ACTION.SET_STUDY_STATUS, payload: StudyStatus.GENERATED });
-    } catch {
-      // Silent handler
+      const response = await generateStudy(studyId);
+      if (response && response.ok) {
+        dispatch?.({ type: STUDY_ACTION.SET_STUDY_STATUS, payload: StudyStatus.GENERATED });
+      }
+    } catch (error) {
+      console.error("================= error", error)
     } finally {
       setIsGenerating(false);
     }
