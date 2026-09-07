@@ -28,7 +28,7 @@ export const TrajectoryDataVisualisation = ({ trajectoryData, onClose, isOpen }:
   return (
     <Modal
       isOpen={isOpen}
-      closeOnOverlayClick
+      closeOnOverlayClick={false}
       icon={icon}
       iconAppearance="filled"
       id="data-visualisation-modal"
@@ -36,6 +36,7 @@ export const TrajectoryDataVisualisation = ({ trajectoryData, onClose, isOpen }:
       primaryButton={<Button label={t('project.@close')} onClick={onClose} variant="primary" />}
       size="xl"
       title={`${title}: ${trajectory.trajectoryName}`}
+      className="[&_h2]:!text-left"
       >
     <div className="w-full">
       <StdSimpleTable

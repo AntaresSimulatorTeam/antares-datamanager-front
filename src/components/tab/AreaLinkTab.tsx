@@ -59,7 +59,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
   const [data, setData] = useState<HypothesisRowData[]>([]);
   const [settingsData, setSettingsData] = useState<HypothesisRowData[]>([]);
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({ '0': false, '1': true });
-  const [readOnlySettings, setReadOnlySettings] = useState<ReadOnlyObject>({ '0': true, '1': true });
+  const [readOnlySettings, setReadOnlySettings] = useState<ReadOnlyObject>({ '0': true, '1': true, '2.0': true, '2.1': true });
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const [isDeletionModalOpen, setIsDeletionModalOpen] = useState(false);
   const [selectedTrajectoryType, setSelectedTrajectoryType] = useState<TRAJECTORY_TYPE>(TRAJECTORY_TYPE.AREA);
@@ -75,8 +75,8 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
       { type: TRAJECTORY_TYPE.ADEQUACY_PATCH, labelKey: t('settings.@adequacyPatch') },
       { type: TRAJECTORY_TYPE.FLOWBASED, labelKey: t('settings.@flowBased'), options: {hasRecalculateOption: true} },
       { type: TRAJECTORY_TYPE.SETTINGS, labelKey: t('settings.@title'), subRows: [
-        { type: TRAJECTORY_TYPE.SETTINGS, labelKey: t('settings.@generalData') }]
-        //{ type: TRAJECTORY_TYPE.SCENARIO_BUILDER, labelKey: t('settings.@scenarioBuilder') }]
+        { type: TRAJECTORY_TYPE.SETTINGS, labelKey: t('settings.@generalData') },
+        { type: TRAJECTORY_TYPE.SCENARIO_BUILDER, labelKey: t('settings.@scenarioBuilder') }]
       },
     ]],
     [t]
@@ -89,7 +89,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
   );
   const { firstTableData, firstTableReadOnlyRow, secondTableData, secondTableReadOnlyRow } =
     useFetchFixHypothesisTrajectories(configs, options, isStudyGenerated, studyData?.id);
-  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch, setReadOnly, setReadOnlySettings);
+  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, dispatch);
   const { handleSearch } = useTrajectorySearchHandler({
     studyHorizon: studyData.horizon,
     setDbTrajectories,
@@ -99,9 +99,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
     studyData,
     setRowIdSelected,
     setIsDeletionModalOpen,
-    dbTrajectories,
-    setReadOnly,
-    setSecondTableReadOnly: setReadOnlySettings,
+    dbTrajectories
   });
 
   useEffect(() => {
@@ -119,7 +117,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
         setReadOnlySettings(buildReadOnlyRow(['0', '1', '2.0', '2.1']));
       }
     }
-  }, [studyState.studyStatus]);
+  }, [configs, studyState.studyStatus]);
 
   const handleSelectionChange = useCallback(
     async (fileNameContains: string, rowId: string, type: TRAJECTORY_TYPE) => {
@@ -142,17 +140,17 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
     setOptionsFS(results);
     setRowIdSelected(rowId);
     toggleModal();
-  }, []);
+  }, [data, handleFetchFromFS, toggleModal]);
 
   const handleViewTrajectoryData = useCallback(
     (rowId: string) => {
       const index = Number(rowId);
       const trajectory = data[index].trajectory;
       if (trajectory) {
-        void handleViewTrajectory(trajectory, setTrajectoryData, setIsViewModalOpen, t);
+        void handleViewTrajectory(trajectory, setTrajectoryData, setIsViewModalOpen, t, studyState.areas);
       }
     },
-    [data, t],
+    [data, studyState.areas, t],
   );
 
   const handleHvdcActivate = useCallback(
@@ -205,7 +203,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
             idSelected={String(rowIdSelected)}
             handleSearch={async (fileNameContains: string, rowId: string) => await handleSelectionChange(fileNameContains, rowId, TRAJECTORY_TYPE.AREA)}
             updateData={(rowId: string, value: unknown, status: RowStatus) => {
-              void handleHypothesisTableUpdate(rowId, value, status, TRAJECTORY_TYPE.AREA, data, setData);
+              void handleHypothesisTableUpdate(rowId, value, status, TRAJECTORY_TYPE.AREA, data, setData, setReadOnly, setReadOnlySettings);
             }}
             handleImport={async (rowId: string) => await handleFetchTrajectoryFromFs(rowId, TRAJECTORY_TYPE.AREA)}
             handleViewData={handleViewTrajectoryData}
@@ -238,6 +236,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
                 TRAJECTORY_TYPE.ADEQUACY_PATCH,
                 settingsData,
                 setSettingsData,
+                setReadOnlySettings
               );
             }}
             handleImport={async (rowId: string) => await handleFetchTrajectoryFromFs(rowId, TRAJECTORY_TYPE.ADEQUACY_PATCH)}
@@ -264,6 +263,8 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
                   typeToUse,
                   indexArray,
                   hypothesis,
+                  setReadOnly,
+                  setReadOnlySettings
                 );
               }
             }

@@ -10,6 +10,7 @@ import { STUDY_ENDPOINT, STUDY_KEYWORDS_SEARCH_ENDPOINT } from '@/shared/const/a
 import { notifyAlert, notifyToast } from '@/shared/notification/notification.tsx';
 import { AuthService } from '@/shared/services/authService.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
 
 /**
  * Retrieve a list of studies from a term
@@ -139,6 +140,7 @@ export const updateStudy = async (studyData: Partial<StudyDTO>, studyId: number)
 export const duplicateStudy = async (
   studyData: Omit<StudyDTO, 'id' | 'status' | 'creationDate' | 'projectId' | 'generationDate' | 'hvdc'>,
 ): Promise<void> => {
+  // eslint-disable-next-line no-useless-catch
   try {
     await AuthService.authFetch(`${STUDY_ENDPOINT}/duplicate`, {
       method: 'POST',
@@ -148,7 +150,7 @@ export const duplicateStudy = async (
       body: JSON.stringify(studyData),
     });
   } catch (error: unknown) {
-    throw new Error((error as BackendError).antaresErrorMessage);
+    throw error
   }
 };
 
@@ -177,27 +179,28 @@ export const deleteStudy = async (id: number): Promise<void> => {
  * Generate a study
  *
  * @param {number} id - Study id
+ * @returns{Promise<Response|void>}
  * @throws {Error}
  */
-export const generateStudy = async (id: number): Promise<void> => {
+export const generateStudy = async (id: number): Promise<Response | void> => {
   const urlApi = `${STUDY_GENERATE_ENDPOINT}?id=${id}`;
   try {
-    await AuthService.authFetch(urlApi, {
+    return await AuthService.authFetch(urlApi, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
     });
   } catch (error) {
-    if ((error as BackendError).antaresErrorMessage) {
+    if ((error as BackendError).type === ERROR_MESSAGE_TYPE.BUSINESS) {
       notifyAlert({
         icon: 'close',
         message: (error as BackendError).antaresErrorMessage,
         type: 'error',
         filledIcon: true,
       });
+      throw new Error((error as BackendError).antaresErrorMessage);
     }
-    throw new Error((error as BackendError).antaresErrorMessage);
   }
 };
 

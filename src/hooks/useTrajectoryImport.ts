@@ -2,14 +2,7 @@ import { Dispatch, SetStateAction, useCallback, useState } from 'react';
 import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.ts';
 import { uploadTrajectory } from '@/shared/services/trajectoryService.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import {
-  DropdownItemOption,
-  FileInputStatus,
-  HypothesisRowData,
-  StudyActionType,
-  StudyDTO,
-  StudyState,
-} from '@/shared/types';
+import { DropdownItemOption, FileInputStatus, HypothesisRowData, StudyActionType, StudyDTO } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
@@ -19,17 +12,14 @@ import { HypothesisType } from '@/shared/types/HypothesisTable.ts';
 
 export const useTrajectoryImport = (
   study: StudyDTO,
-  studyState: Partial<StudyState>,
-  dispatch: Dispatch<StudyActionType> | null,
-  setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
-  setSecondTableReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>
+  dispatch: Dispatch<StudyActionType> | null
 ) => {
   const [fileStatus, setFileStatus] = useState<FileInputStatus>('empty');
   const [progress, setProgress] = useState<number>(0);
   const { t } = useTranslation();
   const { user } = useUser();
 
-  const { attachTrajectory } = useTrajectoryAttach(study, studyState, dispatch, setReadOnly, setSecondTableReadOnly);
+  const { attachTrajectory } = useTrajectoryAttach(study, dispatch);
 
   const importTrajectory = useCallback(
     async (
@@ -38,6 +28,8 @@ export const useTrajectoryImport = (
       type?: TRAJECTORY_TYPE,
       indexArray?: number[],
       hypothesis?: HypothesisType,
+      setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
+      setSecondTableReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>
     ) => {
       setFileStatus('loading');
 
@@ -59,7 +51,7 @@ export const useTrajectoryImport = (
           setFileStatus('success');
 
           if (newTrajectory.id != null && !!indexArray?.length) {
-            await attachTrajectory(type, indexArray, 'success', newTrajectory, setData);
+            await attachTrajectory(type, indexArray, 'success', newTrajectory, setData, setReadOnly, setSecondTableReadOnly);
           }
         }
       } catch (error) {

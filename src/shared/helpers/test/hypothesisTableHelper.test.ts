@@ -511,7 +511,7 @@ describe('getInformationMessage', () => {
     const result = getInformationMessage(5, TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, '0', null);
 
     expect(result).toEqual({
-      messageKey: 'thermal.@paramModulationMessage',
+      messageKey: 'thermal.@informationMessage',
       id: '1',
     });
   });
@@ -520,19 +520,19 @@ describe('getInformationMessage', () => {
     const result = getInformationMessage(4, TRAJECTORY_TYPE.DSR, '0', null);
 
     expect(result).toEqual({
-      messageKey: 'dsr.@capacityModulationMessage',
+      messageKey: 'dsr.@informationMessage',
       id: '3',
     });
   });
 
   it('retourne un index minimum de 0 pour DSR si nbRows <= 1', () => {
     expect(getInformationMessage(1, TRAJECTORY_TYPE.DSR, '0', null)).toEqual({
-      messageKey: 'dsr.@capacityModulationMessage',
+      messageKey: 'dsr.@informationMessage',
       id: '0',
     });
 
     expect(getInformationMessage(0, TRAJECTORY_TYPE.DSR, '0', null)).toEqual({
-      messageKey: 'dsr.@capacityModulationMessage',
+      messageKey: 'dsr.@informationMessage',
       id: '0',
     });
   });

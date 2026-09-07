@@ -52,7 +52,7 @@ describe('useStudyModification', () => {
   });
 
   it('calls onError when updateStudy fails', async () => {
-    mockUpdateStudy.mockRejectedValue(new Error('Update failed'));
+    mockUpdateStudy.mockRejectedValue({antaresErrorMessage: 'Update failed'});
 
     const onError = vi.fn();
 
@@ -62,11 +62,11 @@ describe('useStudyModification', () => {
       await result.current.confirmUpdate(3, { name: 'Bad Update' } as StudyDTO, false);
     });
 
-    expect(onError).toHaveBeenCalledWith('Update failed');
+    expect(onError).toHaveBeenCalledWith({antaresErrorMessage: "Update failed"});
   });
 
   it('calls onError when duplicateStudy fails', async () => {
-    mockDuplicateStudy.mockRejectedValue(new Error('Duplicate failed'));
+    mockDuplicateStudy.mockRejectedValue({antaresErrorMessage: 'Duplicate failed'});
 
     const onError = vi.fn();
 
@@ -76,6 +76,6 @@ describe('useStudyModification', () => {
       await result.current.confirmUpdate(3, { name: 'Bad Duplicate' } as StudyDTO, true);
     });
 
-    expect(onError).toHaveBeenCalledWith('Duplicate failed');
+    expect(onError).toHaveBeenCalledWith({antaresErrorMessage: "Duplicate failed"});
   });
 });

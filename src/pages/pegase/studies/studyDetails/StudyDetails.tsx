@@ -43,18 +43,15 @@ const StudyDetails = () => {
   const handleGenerateStudy = async (studyId: number) => {
     try {
       setIsGenerating(true);
-      await generateStudy(studyId);
-      dispatch?.({ type: STUDY_ACTION.SET_STUDY_STATUS, payload: StudyStatus.GENERATED });
-    } catch {
-      // Silent handler
+      const response = await generateStudy(studyId);
+      if (response && response.ok) {
+        dispatch?.({ type: STUDY_ACTION.SET_STUDY_STATUS, payload: StudyStatus.GENERATED });
+      }
+    } catch (error) {
+      console.error("================= error", error)
     } finally {
       setIsGenerating(false);
     }
-  };
-
-  const onCloseModal = () => {
-    toggleModal();
-    setReloadStudy((prev) => prev + 1);
   };
 
   useEffect(() => {
@@ -107,7 +104,7 @@ const StudyDetails = () => {
         </div>
       </div>
       {studyData && studyData.status !== StudyStatus.GENERATED && (
-        <StudyModificationModal onClose={onCloseModal} study={studyData} isOpen={isModalOpen}/>
+        <StudyModificationModal onClose={toggleModal} study={studyData} isOpen={isModalOpen} setReloadStudies={setReloadStudy} />
       )}
     </div>
   );

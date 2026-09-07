@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import KeywordsInput from '@/components/input/KeywordsInput.tsx';
 import HorizonInput from '@/components/input/HorizonInput';
@@ -47,28 +47,26 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
   const [studyErrorMessage, setStudyErrorMessage] = useState<string>('');
   const { user } = useUser();
 
-  const resetFields = () => {
-    setStudyName('');
-    setHorizon('');
-    setKeywords([]);
-  };
-
   const resetNameField = () => {
     setStudyName('');
     setStudyErrorMessage('');
   };
 
+  const handleClose = useCallback(() => {
+    setStudyErrorMessage('');
+    onClose();
+  }, [onClose]);
+
   const { confirmCreation } = useStudyCreation(
     () => {
       setReloadStudies((prev) => prev + 1);
-      resetFields();
       notifyToast({
         type: 'success',
         message: 'Study created successfully',
       });
-      onClose();
+      handleClose();
     },
-    (message) => setStudyErrorMessage(message),
+    (message) => setStudyErrorMessage(message)
   );
 
   useEffect(() => {
@@ -99,9 +97,9 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
   return (
     <Modal
       isOpen={isOpen}
-      closeOnOverlayClick
+      closeOnOverlayClick={false}
       id="study-creation-modal"
-      onClose={() => void onClose()}
+      onClose={handleClose}
       primaryButton={<Button
         icon="add"
         label={t('modal.@button_create')}
@@ -123,9 +121,10 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
         variant="primary"
         disabled={!isFormValid}
       />}
-      secondaryButton={<Button label={t('components.quickAccess.@cancel')} onClick={onClose} variant="text" />}
+      secondaryButton={<Button label={t('components.quickAccess.@cancel')} onClick={handleClose} variant="text" />}
       size="s"
       title={t('studyModal.@new_study')}
+      className="[&_h2]:!text-left"
     >
       <div className="flex w-full flex-col gap-4 self-stretch">
         <div className="flex flex-col items-start gap-4">
@@ -141,6 +140,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
               showCounter={true}
               error={!!studyErrorMessage}
               assistiveTextLabel={studyErrorMessage}
+              assistiveAppearance="error"
               rightIconAction="clean"
               onRightIconClick={resetNameField}
             />

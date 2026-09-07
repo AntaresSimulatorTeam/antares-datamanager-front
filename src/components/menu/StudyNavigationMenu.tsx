@@ -10,7 +10,6 @@ import { useTranslation } from 'react-i18next';
 import { useStudy } from '@/store/contexts/StudyContext.tsx';
 import { StudyDTO } from '@/shared/types';
 import { getStudyMenu } from '@/shared/utils/trajectoryUtils.ts';
-import { useFetchAreas } from '@/hooks/useFetchAreas.ts';
 import { AreaLinkTab } from '@/components/tab/AreaLinkTab.tsx';
 import { TabMenu } from '@/components/menu/TabMenu.tsx';
 import ExpandableTab from '@/components/tab/ExpandableTab.tsx';
@@ -37,7 +36,6 @@ const StudyNavigationMenu = ({ studyData }: StudyNavigationMenuProps) => {
     icon: "linked-services",
     disabled: false,
   });
-  const { areaDefault, trajectoryAreas } = useFetchAreas(studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0]);
   const { warningMessages } = useFetchWarningMessages(
     studyData.id ? Number(studyData.id) : null,
     activeTab?.id as TRAJECTORY_TYPE,
@@ -51,7 +49,7 @@ const StudyNavigationMenu = ({ studyData }: StudyNavigationMenuProps) => {
         disabled: tab.id !== (TRAJECTORY_TYPE.AREA as string) && !hasAreaTrajectory,
       })),
     );
-  }, [studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories]);
+  }, [studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0]]);
 
   useEffect(() => {
     const countNbWarningMessages = async (id: number) => {
@@ -90,8 +88,6 @@ const StudyNavigationMenu = ({ studyData }: StudyNavigationMenuProps) => {
             <ExpandableTab
               tabType={type}
               types={[type]}
-              defaultAreas={areaDefault}
-              areas={trajectoryAreas}
               studyData={studyData}
             />
           );
@@ -100,13 +96,13 @@ const StudyNavigationMenu = ({ studyData }: StudyNavigationMenuProps) => {
         case TRAJECTORY_TYPE.RES_CAPACITY:
         case TRAJECTORY_TYPE.HYDRO_SERIES:
           return (
-            <TabMenu key={type} type={type} defaultAreas={areaDefault} areas={trajectoryAreas} studyData={studyData} />
+            <TabMenu key={type} type={type} defaultAreas={studyState.defaultAreas ?? []} studyData={studyData} />
           );
         default:
-          return <AreaLinkTab studyData={studyData} />;
+          return <AreaLinkTab studyData={studyData}/>;
       }
     },
-    [areaDefault, studyData, trajectoryAreas],
+    [studyData, studyState.defaultAreas],
   );
 
   return (

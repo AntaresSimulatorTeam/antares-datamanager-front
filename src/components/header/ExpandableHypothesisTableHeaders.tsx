@@ -162,10 +162,10 @@ const getExpandableHypothesisTableHeaders = ({
           const hasTrajectory = status === TRAJECTORY_SELECTION_STATUS.OK && !!trajectory?.trajectoryName?.length;
           if (row.depth === 1 || row.index !== 1 || !hasTrajectory) return null;
           if (row?.getReadOnly() && hasTrajectory) {
-            return (<Tag iconName="check" compactSpacing={true} color="vert-foret" tagType="decorative" label={recalculate ? t('settings.@recalculate') : t('settings.@read')}/>);
+            return (<Tag iconName="check" compactSpacing={true} color="neutral" tagType="decorative" label={recalculate ? t('settings.@recalculate') : t('settings.@read')}/>);
           } else {
             return (
-              <div className="w-1/2">
+              <div className="w-1/2 [&_span[class*='segment-selected-indicator']]:!transition-none">
                 <SegmentedControl
                   appearance="brand"
                   onChange={(value: string) => void options?.meta?.activate?.(value === 'option2')}

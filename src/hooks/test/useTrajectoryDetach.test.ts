@@ -90,10 +90,10 @@ describe('useTrajectoryDetach', () => {
       }),
       performBackendDeletion: vi.fn().mockResolvedValue(undefined),
     });
-    const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch, mockSetReadOnly));
+    const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch));
 
     await act(async () => {
-      await result.current.detachTrajectory(TRAJECTORY_TYPE.DSR, [0], mockSetData, sampleData, 'empty', 'H1');
+      await result.current.detachTrajectory(TRAJECTORY_TYPE.DSR, [0], mockSetData, sampleData, 'empty', 'H1', mockSetReadOnly);
     });
 
     // computeDeletion appelé
@@ -147,10 +147,10 @@ describe('useTrajectoryDetach', () => {
       }),
       performBackendDeletion: vi.fn().mockResolvedValue(undefined),
     });
-    const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch, mockSetReadOnly));
+    const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch));
 
     await act(async () => {
-      await result.current.detachTrajectory(TRAJECTORY_TYPE.AREA, [0], mockSetData, sampleData, 'empty', 'H1');
+      await result.current.detachTrajectory(TRAJECTORY_TYPE.AREA, [0], mockSetData, sampleData, 'empty', 'H1', mockSetReadOnly);
     });
 
     // computeDeletion appelé
@@ -197,10 +197,10 @@ describe('useTrajectoryDetach', () => {
       performBackendDeletion: vi.fn().mockResolvedValue(undefined),
     });
     const mockUpdateSTudy = vi.mocked(studyService.updateStudy);
-    const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch, mockSetReadOnly));
+    const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch));
 
     await act(async () => {
-      await result.current.detachTrajectory(TRAJECTORY_TYPE.LINK, [0], mockSetData, sampleData, 'empty', 'H1');
+      await result.current.detachTrajectory(TRAJECTORY_TYPE.LINK, [0], mockSetData, sampleData, 'empty', 'H1', mockSetReadOnly);
     });
 
     // computeDeletion appelé
@@ -245,10 +245,10 @@ describe('useTrajectoryDetach', () => {
       performBackendDeletion: vi.fn().mockRejectedValue(new Error('Boom')),
     });
 
-    const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch, mockSetReadOnly));
+    const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch));
 
     await act(async () => {
-      await result.current.detachTrajectory(TRAJECTORY_TYPE.DSR, [0], mockSetData, sampleData, 'empty', 'H1');
+      await result.current.detachTrajectory(TRAJECTORY_TYPE.DSR, [0], mockSetData, sampleData, 'empty', 'H1', mockSetReadOnly);
     });
 
     expect(hypothesisTableService.handleTrajectoryError).toHaveBeenCalled();
@@ -272,11 +272,11 @@ describe('useTrajectoryDetach', () => {
     });
 
     const { result } = renderHook(() =>
-      useTrajectoryDetach(study, mockDispatch, mockSetReadOnly, mockSetIsDeletionModalOpen, mockSetRowIdSelected),
+      useTrajectoryDetach(study, mockDispatch, mockSetIsDeletionModalOpen, mockSetRowIdSelected),
     );
 
     await act(async () => {
-      await result.current.detachTrajectory(TRAJECTORY_TYPE.AREA, [0], mockSetData, sampleData, 'empty', 'H1');
+      await result.current.detachTrajectory(TRAJECTORY_TYPE.AREA, [0], mockSetData, sampleData, 'empty', 'H1', mockSetReadOnly);
     });
 
     expect(mockSetIsDeletionModalOpen).toHaveBeenCalledWith(true);
@@ -305,11 +305,11 @@ describe('useTrajectoryDetach', () => {
     ] as HypothesisRowData[];
 
     const { result } = renderHook(() =>
-      useTrajectoryDetach(study, mockDispatch, mockSetReadOnly, mockSetIsDeletionModalOpen, mockSetRowIdSelected),
+      useTrajectoryDetach(study, mockDispatch, mockSetIsDeletionModalOpen, mockSetRowIdSelected),
     );
 
     await act(async () => {
-      await result.current.detachTrajectory(TRAJECTORY_TYPE.AREA, [0], mockSetData, data, 'empty', 'H1');
+      await result.current.detachTrajectory(TRAJECTORY_TYPE.AREA, [0], mockSetData, data, 'empty', 'H1', mockSetReadOnly);
     });
 
     expect(useTrajectoryDeletionLogic(study).performBackendDeletion).toHaveBeenCalledTimes(2);

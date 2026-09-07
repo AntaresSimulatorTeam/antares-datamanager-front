@@ -6,7 +6,7 @@ import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
 import { RowToDeleteProps } from '@/shared/types/HypothesisTable.ts';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
-import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
+import { useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { getTypeToUse } from '@/shared/helpers/hypothesisTableHelper.ts';
 
 interface UseHypothesisTableUpdateHandlerArgs {
@@ -14,9 +14,7 @@ interface UseHypothesisTableUpdateHandlerArgs {
   setIsDeletionModalOpen: Dispatch<SetStateAction<boolean>>;
   dbTrajectories: DbTrajectory[];
   setRowIdSelected: Dispatch<SetStateAction<string>>;
-  setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>;
   setRowToDelete?: Dispatch<SetStateAction<RowToDeleteProps | null>>;
-  setSecondTableReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>;
 }
 
 export const useHypothesisTableUpdateHandler = ({
@@ -25,25 +23,17 @@ export const useHypothesisTableUpdateHandler = ({
   setIsDeletionModalOpen,
   dbTrajectories,
   setRowIdSelected,
-  setReadOnly,
-  setSecondTableReadOnly,
 }: UseHypothesisTableUpdateHandlerArgs) => {
-  const studyState = useStudy();
   const dispatch = useStudyDispatch();
   const { attachTrajectory } = useTrajectoryAttach(
     studyData,
-    studyState,
     dispatch,
-    setReadOnly,
-    setSecondTableReadOnly,
   );
   const { detachTrajectory } = useTrajectoryDetach(
     studyData,
     dispatch,
-    setReadOnly,
     setIsDeletionModalOpen,
     setRowIdSelected,
-    setSecondTableReadOnly,
   );
 
   const handleHypothesisTableUpdate = useCallback(
@@ -54,6 +44,8 @@ export const useHypothesisTableUpdateHandler = ({
       type: TRAJECTORY_TYPE,
       data: HypothesisRowData[],
       setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
+      setReadOnly: Dispatch<SetStateAction<ReadOnlyObject>>,
+      setSecondTableReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>
     ) => {
       const indexArray = rowId.split('.').map(Number);
       const typeToUse = getTypeToUse(type, indexArray, data.length);
@@ -65,16 +57,13 @@ export const useHypothesisTableUpdateHandler = ({
             setRowToDelete?.({ index: indexArray[0], value: hypothesis, operation: 'empty' });
             setIsDeletionModalOpen(true);
           } else {
-            await detachTrajectory(typeToUse, indexArray, setData, data, status, hypothesis);
+            await detachTrajectory(typeToUse, indexArray, setData, data, status, hypothesis, setReadOnly, setSecondTableReadOnly);
           }
         }
       } else if (status === 'success') {
-        const dbTrajectory =
-          dbTrajectories.length > 0
-            ? dbTrajectories.find((item) => item.id == value)
-            : getRowDataSelected(data, indexArray)?.trajectory;
+        const dbTrajectory = dbTrajectories.length > 0 ? dbTrajectories.find((item) => item.id == value) : getRowDataSelected(data, indexArray)?.trajectory;
         if (dbTrajectory) {
-          await attachTrajectory(typeToUse, indexArray, status, dbTrajectory, setData);
+          await attachTrajectory(typeToUse, indexArray, status, dbTrajectory, setData, setReadOnly, setSecondTableReadOnly);
         }
       }
     },

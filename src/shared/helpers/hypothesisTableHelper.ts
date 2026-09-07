@@ -148,9 +148,9 @@ export const getInformationMessage = (
 ): { messageKey: string; id: string } | null => {
   switch (type) {
     case TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER:
-      return { messageKey: 'thermal.@paramModulationMessage', id: '1' };
+      return { messageKey: 'thermal.@informationMessage', id: '1' };
     case TRAJECTORY_TYPE.DSR:
-      return { messageKey: 'dsr.@capacityModulationMessage', id: String(Math.max(nbRows - 1, 0)) };
+      return { messageKey: 'dsr.@informationMessage', id: String(Math.max(nbRows - 1, 0)) };
     case TRAJECTORY_TYPE.HYDRO_PSP_SERIES:
     case TRAJECTORY_TYPE.HYDRO_SERIES:
       return (!trajectory && rowId?.split('.')[1] === '1') ||
@@ -158,6 +158,8 @@ export const getInformationMessage = (
         trajectory?.type === TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS
         ? { messageKey: 'hydro.@informationMessage', id: rowId }
         : null;
+    case TRAJECTORY_TYPE.ADEQUACY_PATCH:
+      return { messageKey: 'flowbased.@informationMessage', id: '1' };
     default:
       return null;
   }

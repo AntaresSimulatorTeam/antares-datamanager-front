@@ -37,8 +37,8 @@ import {
 import { HydroSubRows } from '@/mocks/data/list/names.ts';
 
 export const useFetchHypothesisTrajectories = (
-  areas: TrajectoryAreaData[],
   trajectoryTypes: TRAJECTORY_TYPE[],
+  areas: TrajectoryAreaData[],
   defaultAreas: { name: string }[],
   studyId: number,
   studyStatus: StudyStatus,
@@ -83,7 +83,7 @@ export const useFetchHypothesisTrajectories = (
       },
       {} as Record<TRAJECTORY_TYPE, DbTrajectory[]>,
     );
-  }, [studyStatus, trajectoryTypesKey]);
+  }, [studyStatus, trajectoryTypes]);
 
   /**
    * Fonction principale de récupération + normalisation
@@ -306,7 +306,7 @@ export const useFetchHypothesisTrajectories = (
       }
     },
 
-    [studyContextStatus, studyStatus, defaultAreas, emptyAreaSelected, areas, t, dispatch],
+    [studyContextStatus, studyStatus, defaultAreas, areas, trajectoryTypes, emptyAreaSelected, t, dispatch],
   );
 
   const fetchAreasRef = useRef(fetchAreas);

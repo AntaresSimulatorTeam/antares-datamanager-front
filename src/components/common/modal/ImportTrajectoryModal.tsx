@@ -43,7 +43,7 @@ export const ImportTrajectoryModal = ({
   return (
     <Modal
       isOpen={isOpen}
-      closeOnOverlayClick
+      closeOnOverlayClick={false}
       id="import-modal"
       icon="upload"
       onClose={() => void onClose()}
@@ -61,6 +61,7 @@ export const ImportTrajectoryModal = ({
       secondaryButton={<Button label={t('trajectoryDeletionModal.@cancel')} onClick={() => void onClose()} variant="text" />}
       size="s"
       title={`${t('studyDetails.@import_from_file_system')} ${getModalTile(tabType, hypothesis)}`}
+      className="[&_h2]:!text-left"
     >
       {path && (
         <span className="mb-1 flex text-body-s text-gray-600">{t('studyDetails.@select_from', { path })}</span>

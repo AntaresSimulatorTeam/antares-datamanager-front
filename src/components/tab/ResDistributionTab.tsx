@@ -5,7 +5,7 @@
  */
 
 import { DbTrajectory, DropdownItemOption, HypothesisRowData, RowStatus, TabProps } from '@/shared/types';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
@@ -27,7 +27,7 @@ import { useTrajectoryFetchFromFSHandler } from '@/hooks/useTrajectoryFetchFromF
 import { getParamForFetchFSTrajectory } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { HypothesisType } from '@/shared/types/HypothesisTable.ts';
 
-const ResDistributionTab = ({ defaultAreas, areas, studyData, types }: TabProps & { types: TRAJECTORY_TYPE[] }) => {
+const ResDistributionTab = ({ studyData, types }: TabProps & { types: TRAJECTORY_TYPE[] }) => {
   const studyState = useStudy();
   const dispatch = useStudyDispatch();
   const { t } = useTranslation();
@@ -40,16 +40,18 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData, types }: TabProps 
   const [optionsFS, setOptionsFS] = useState<DropdownItemOption[]>();
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const [selectedType, setSelectedType] = useState<TRAJECTORY_TYPE>(TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION);
+  const defaultAreas = useMemo(() => studyState?.defaultAreas ?? [], [studyState?.defaultAreas]);
+  const areas = useMemo(() => studyState?.areas ?? [], [studyState?.areas]);
   const { hypothesisTrajectories, readOnlyRow, technologyList } = useFetchHypothesisTrajectories(
-    areas,
     types,
+    areas,
     defaultAreas,
     studyData?.id,
     studyData?.status,
     studyState.studyStatus,
   );
-  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch);
-  const { attachTrajectory } = useTrajectoryAttach(studyData, studyState, dispatch);
+  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, dispatch);
+  const { attachTrajectory } = useTrajectoryAttach(studyData, dispatch);
   const { detachTrajectory } = useTrajectoryDetach(studyData, dispatch);
   const { handleFetchFromFS } = useTrajectoryFetchFromFSHandler();
 
@@ -111,7 +113,7 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData, types }: TabProps 
       if (status === 'empty' || status === 'emptyError') {
         const row = getRowDataSelected(dataToUse, indexArray) ?? null;
         if (row) {
-          await detachTrajectory(tableType, indexArray, setterToUse, dataToUse, status, row?.hypothesis);
+          await detachTrajectory(tableType, indexArray, setterToUse, dataToUse, status, row?.hypothesis, setReadOnly);
         }
       } else if (status === 'success') {
         const dbTrajectory =
@@ -119,7 +121,7 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData, types }: TabProps 
             ? dbTrajectories.find((item) => item.id == value)
             : getRowDataSelected(dataToUse, indexArray)?.trajectory;
         if (dbTrajectory) {
-          await attachTrajectory(tableType, indexArray, status, dbTrajectory, setterToUse);
+          await attachTrajectory(tableType, indexArray, status, dbTrajectory, setterToUse, setReadOnly);
         }
       }
     },
@@ -192,7 +194,7 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData, types }: TabProps 
             toggleModal();
             if (value != null) {
               const setterToUse = typeToUse === TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION ? setData : setTechnologyData;
-              await importTrajectory(setterToUse, value, typeToUse, indexArray, hypothesis);
+              await importTrajectory(setterToUse, value, typeToUse, indexArray, hypothesis, setReadOnly);
             }
           }}
           tabType={selectedType}

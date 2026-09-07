@@ -16,10 +16,10 @@ export const PegaseCardContent = ({ project }: PegaseCardContentProps) => {
 
   return (
     <div className="flex flex-col items-start justify-between">
-      <div className="flex items-center gap-1">
+      <div className="flex w-full items-start gap-1">
         {project.tags && (
-          <div className="flex h-3">
-            <StdTagList id={`${project.id}-tag-list`} tags={project.tags} maxVisibleTags={12} />
+          <div className="flex w-full h-3">
+            <StdTagList id={`${project.id}-tag-list`} tags={project.tags} maxVisibleTags={4} />
           </div>
         )}
       </div>

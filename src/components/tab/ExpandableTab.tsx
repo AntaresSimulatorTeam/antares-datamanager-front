@@ -14,7 +14,7 @@ import {
   TechnologyType,
   TrajectoryViewData,
 } from '@/shared/types';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
@@ -40,8 +40,6 @@ import { useHypothesisTableUpdateHandler } from '@/hooks/useHypothesisTableUpdat
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
 
 const ExpandableTab = ({
-  defaultAreas,
-  areas,
   studyData,
   tabType,
   types,
@@ -63,16 +61,19 @@ const ExpandableTab = ({
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const [rowToDelete, setRowToDelete] = useState<RowToDeleteProps | null>(null);
   const [isDeletionModalOpen, setIsDeletionModalOpen] = useState(false);
+  const defaultAreas = useMemo(() => studyState?.defaultAreas ?? [], [studyState?.defaultAreas]);
+  const areas = useMemo(() => studyState?.areas ?? [], [studyState?.areas]);
+
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow, technologyList } =
     useFetchHypothesisTrajectories(
-      areas,
       types,
+      areas,
       defaultAreas,
       studyData?.id,
       studyData?.status,
       studyState.studyStatus,
     );
-  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch, setReadOnly);
+  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, dispatch);
   const { removeRow } = useHypothesisTableRemoveRow(studyData, dispatch, setData, setCheckedValues, setReadOnly);
   const { handleSearch } = useTrajectorySearchHandler({
     studyHorizon: studyData.horizon,
@@ -85,14 +86,12 @@ const ExpandableTab = ({
     setRowIdSelected,
     setIsDeletionModalOpen,
     dbTrajectories,
-    setReadOnly,
     setRowToDelete,
   });
 
   const { detachTrajectory } = useTrajectoryDetach(
     studyData,
     dispatch,
-    setReadOnly,
     setIsDeletionModalOpen,
     setRowIdSelected,
   );
@@ -221,7 +220,7 @@ const ExpandableTab = ({
         handleImport={handleTrajectoryFetchFromFS}
         isReadOnlyEnable={true}
         updateData={(rowId: string, value: unknown, status: RowStatus) => {
-          void handleHypothesisTableUpdate(rowId, value, status, tabType, data, setData);
+          void handleHypothesisTableUpdate(rowId, value, status, tabType, data, setData, setReadOnly);
         }}
         removeRow={removeTableRow}
         handleViewData={tabType === TRAJECTORY_TYPE.STS ? handleViewData : undefined}
@@ -237,7 +236,7 @@ const ExpandableTab = ({
           ) => {
             toggleModal();
             if (value) {
-              await importTrajectory(setData, value, typeToUse, indexArray, hypothesis);
+              await importTrajectory(setData, value, typeToUse, indexArray, hypothesis, setReadOnly);
             }
           }}
           tabType={tabType}
@@ -255,7 +254,7 @@ const ExpandableTab = ({
             if (!rowToDelete?.value) return;
             const { value, index, operation } = rowToDelete;
             if (operation === 'empty') {
-              await detachTrajectory(tabType, [index], setData, data, 'empty', value);
+              await detachTrajectory(tabType, [index], setData, data, 'empty', value, setReadOnly);
             } else {
               await removeRow(tabType, index, data, value);
             }

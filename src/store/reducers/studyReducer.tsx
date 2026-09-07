@@ -2,7 +2,7 @@ import { DbTrajectory, RowStatus, StudyActionType, StudyState, StudyTrajectories
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
-import { isMatchingTrajectoryType, normalize, removeDuplicateByTechnology } from '@/shared/utils/trajectoryUtils.ts';
+import { isMatchingTrajectoryType, isUniqueTrajectoryType, normalize, removeDuplicateByTechnology } from '@/shared/utils/trajectoryUtils.ts';
 
 export const addTrajectories = (prevState: Partial<StudyState>, data: StudyTrajectoriesData): Partial<StudyState> => {
   const studyState: Partial<StudyState> = { ...prevState };
@@ -63,52 +63,68 @@ export const updateTrajectory = (
   const trajectoryType = trajectory.type;
   const trajectories = Array.isArray(prevState[`${trajectoryType}`]?.trajectories)
     ? (prevState[`${trajectoryType}`]?.trajectories as DbTrajectory[])
-    : null;
-  if (trajectories?.length) {
-    const newTrajectories = trajectories.map((trajectoryDb) => {
+    : [];
+
+  const alreadyExists = isUniqueTrajectoryType(trajectoryType)
+    ? trajectories.some((item) => item.type === trajectoryType)
+    : trajectories.some(
+        (item) =>
+          normalize(item.area ?? '') === normalize(trajectory.area ?? '') &&
+          normalize(item.technology) === normalize(trajectory.technology),
+      );
+
+  let newTrajectories: DbTrajectory[];
+
+  if (alreadyExists) {
+    newTrajectories = trajectories.map((trajectoryDb) => {
       const sameArea = normalize(trajectoryDb.area ?? '') === normalize(trajectory.area ?? '');
       const sameTech = normalize(trajectoryDb.technology ?? '') === normalize(trajectory.technology ?? '');
       const sameType = trajectoryDb.type === trajectory.type;
-      if (sameArea && sameTech && sameType) {
+      const isMatch = isUniqueTrajectoryType(trajectoryType) ? sameType : sameArea && sameTech && sameType;
+
+      if (isMatch) {
         if (trajectoryDb.id === trajectory.id) {
           return {
             ...trajectoryDb,
             trajectoryName: status === 'success' ? trajectory.trajectoryName : '',
           };
-        } else {
-          return trajectory;
         }
+        return trajectory;
       }
 
       return trajectoryDb;
     });
-
-    const isMultipleUpdate =
-      trajectoryType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER &&
-      newTrajectories.every((traj) => !traj.trajectoryName);
-
-    const newStudyState = {
-      ...prevState[`${trajectoryType}`],
-      trajectories: newTrajectories,
-    };
-
-    return {
-      ...prevState,
-      hvdc: trajectoryType === TRAJECTORY_TYPE.LINK && status === 'empty' ? false : prevState.hvdc,
-      [trajectoryType]: newStudyState,
-      ...(isMultipleUpdate && {
-        [TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]: {
-          trajectories:
-            prevState[TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]?.trajectories.map((trajectoryDb) => ({
-              ...trajectoryDb,
-              trajectoryName: '',
-            })) ?? [],
-        },
-      }),
-    };
+  } else {
+    if (trajectoryType === TRAJECTORY_TYPE.AREA || trajectoryType === TRAJECTORY_TYPE.LINK) {
+      newTrajectories = [trajectory];
+    } else {
+      newTrajectories = removeDuplicateByTechnology([...trajectories, trajectory]);
+    }
   }
 
-  return prevState;
+  const isMultipleUpdate =
+    trajectoryType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER &&
+    newTrajectories.every((traj) => !traj.trajectoryName);
+
+  const newStudyState = {
+    ...prevState[`${trajectoryType}`],
+    trajectories: newTrajectories,
+  };
+
+  return {
+    ...prevState,
+    hvdc: trajectoryType === TRAJECTORY_TYPE.LINK && status === 'empty' ? false : prevState.hvdc,
+    [trajectoryType]: newStudyState,
+    ...(isMultipleUpdate && {
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]: {
+        trajectories:
+          prevState[TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER]?.trajectories.map((trajectoryDb) => ({
+            ...trajectoryDb,
+            trajectoryName: '',
+          })) ?? [],
+      },
+    }),
+  };
 };
 
 export const skipWarningMessage = (
@@ -163,8 +179,8 @@ export const studyReducer = (prevState: Partial<StudyState>, action?: StudyActio
         return { ...clearByType(prevState, action.payload) };
       case STUDY_ACTION.RESET_STUDY_STATE:
         return { studyStatus: StudyStatus.IN_PROGRESS };
-      case STUDY_ACTION.SET_STUDY_HVDC:
-        return { ...updateHvdcOption(prevState, action.payload) };
+      case STUDY_ACTION.SET_STUDY_AREAS:
+        return { ...prevState, areas: action.payload.areas ?? [], defaultAreas: action.payload.defaultAreas ?? [] };
       default:
         return prevState;
     }

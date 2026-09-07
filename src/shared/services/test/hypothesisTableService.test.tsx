@@ -22,6 +22,7 @@ import { generateTrajectoryViewHeader } from '@/components/header/TrajectoryView
 import { TFunction } from 'i18next';
 import { ReadOnlyObject } from '@/shared/types/HypothesisTable.ts';
 import { DropdownItemProps } from '@design-system-rte/core/components/dropdown/dropdown.interface';
+import { areas } from '@/mocks/data/list/areas.ts';
 
 vi.mock('@/shared/notification/notification');
 
@@ -545,10 +546,6 @@ describe('handleViewTrajectory', () => {
     type: TRAJECTORY_TYPE.AREA,
   } as DbTrajectory;
 
-  const mockResultsVien = [
-    { id: 'row1', type: TRAJECTORY_TYPE.AREA },
-    { id: 'row2', type: TRAJECTORY_TYPE.AREA },
-  ] as unknown as DbTrajectory[];
   const mockColumns = [{ Header: 'Col1', accessor: 'col1' }];
 
   const mockSetTrajectoryData = vi.fn();
@@ -559,17 +556,16 @@ describe('handleViewTrajectory', () => {
     vi.clearAllMocks();
   });
 
-  it('should fetch data and set trajectory view for AREA type', async () => {
-    mockedGetTrajectoryData.mockResolvedValue(mockResultsVien);
+  it('should not fetch data and should set trajectory view for AREA type', async () => {
     mockedGenerateHeader.mockReturnValue(mockColumns);
 
-    await handleViewTrajectory(mockTrajectory, mockSetTrajectoryData, mockSetIsViewModalOpen, mockT);
+    await handleViewTrajectory(mockTrajectory, mockSetTrajectoryData, mockSetIsViewModalOpen, mockT, areas);
 
-    expect(mockedGetTrajectoryData).toHaveBeenCalledWith(mockTrajectory.type, mockTrajectory.id);
+    expect(mockedGetTrajectoryData).not.toHaveBeenCalledWith();
     expect(mockedGenerateHeader).toHaveBeenCalledWith(expect.anything(), mockT, 350);
     expect(mockSetTrajectoryData).toHaveBeenCalledWith({
       trajectory: mockTrajectory,
-      data: mockResultsVien,
+      data: areas,
       columns: mockColumns,
     });
     expect(mockSetIsViewModalOpen).toHaveBeenCalledWith(true);
@@ -602,8 +598,11 @@ describe('handleViewTrajectory', () => {
 
   it('should silently fail on error', async () => {
     vi.mocked(trajectoryService.getTrajectoryDataByTypeAndId).mockRejectedValueOnce(new Error('fail'));
-
-    await handleViewTrajectory(mockTrajectory, mockSetTrajectoryData, mockSetIsViewModalOpen, mockT);
+    const mockTrajectoryLink = {
+      id: 1,
+      type: TRAJECTORY_TYPE.LINK,
+    } as DbTrajectory;
+    await handleViewTrajectory(mockTrajectoryLink, mockSetTrajectoryData, mockSetIsViewModalOpen, mockT);
 
     expect(mockSetTrajectoryData).not.toHaveBeenCalled();
     expect(mockSetIsViewModalOpen).not.toHaveBeenCalled();
