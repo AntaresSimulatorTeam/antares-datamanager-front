@@ -203,30 +203,35 @@ export const ParametersTab = ({ studyData }: TabProps) => {
     [data.length, handleFetchFromFS, toggleModal],
   );
 
+  const getParameterType = useCallback((tableType: TRAJECTORY_TYPE, topIndex: number): TRAJECTORY_TYPE => {
+    let typeToUse = tableType;
+    if (tableType === TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER) {
+      if (topIndex === 1) {
+        typeToUse = TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER;
+      }
+      setSelectedTrajectoryType(typeToUse);
+    } else {
+      typeToUse = getTrajectoryTypeByIndex(topIndex);
+    }
+    return typeToUse;
+  }, []);
+
   const handleHypothesisTableUpdate = useCallback(
     async (tableType: TRAJECTORY_TYPE, rowId: string, value: unknown, status: RowStatus) => {
       const [topIndex, subIndex] = rowId.split('.').map(Number);
-      let typeToUse = tableType;
-      if (tableType === TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER) {
-         if (topIndex === 1) {
-           typeToUse = TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER;
-         }
-        setSelectedTrajectoryType(typeToUse);
-      } else {
-        typeToUse = getTrajectoryTypeByIndex(topIndex);
-      }
-
+      const typeToUse = getParameterType(tableType, topIndex);
       const dataToUse = tableType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER ? technicalData : data;
       const dataSetterToUse = tableType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER ? setTechnicalData : setData;
       const readOnlySetterToUse = tableType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER ? setTechnicalReadOnly : setReadOnlyParam;
+
       if (status === 'empty' || status === 'emptyError') {
-        const row = subIndex == null ? technicalData[topIndex] : technicalData[topIndex]?.subRows?.[subIndex];
+        const row = subIndex == null ? dataToUse[topIndex] : dataToUse[topIndex]?.subRows?.[subIndex];
         if (
           typeToUse === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER &&
           topIndex === 0 &&
           row?.trajectory &&
           row?.status === TRAJECTORY_SELECTION_STATUS.OK &&
-          shouldDeleteParamModulation(0, technicalData)
+          shouldDeleteParamModulation(0, dataToUse)
         ) {
           setRowToDelete({ index: topIndex, subIndex, value: row?.hypothesis, operation: 'empty' });
           setIsDeletionModalOpen(true);
@@ -245,9 +250,8 @@ export const ParametersTab = ({ studyData }: TabProps) => {
         }
       }
 
-      if (status === 'success') {
-        const dbTrajectory = dbTrajectories.find((traj) => traj.id == value) ?? null;
-        if (dbTrajectory) {
+      const dbTrajectory = dbTrajectories.find((traj) => traj.id == value) ?? null;
+      if (status === 'success' && dbTrajectory) {
           await attachTrajectory(
             typeToUse,
             [topIndex, subIndex].filter((n) => n !== undefined),
@@ -256,10 +260,9 @@ export const ParametersTab = ({ studyData }: TabProps) => {
             dataSetterToUse,
             readOnlySetterToUse
           );
-        }
       }
     },
-    [attachTrajectory, dbTrajectories, detachTrajectory, technicalData],
+    [attachTrajectory, data, dbTrajectories, detachTrajectory, getParameterType, technicalData],
   );
 
   return (

@@ -43,7 +43,7 @@ export const ProjectCreationModal = ({ onClose, projectInfo, isOpen }: ProjectCr
 
   const handleClose = useCallback(() => {
     setNameError('');
-    void onClose();
+    onClose();
   }, [onClose]);
 
   const { confirmCreation } = useProjectCreation(
