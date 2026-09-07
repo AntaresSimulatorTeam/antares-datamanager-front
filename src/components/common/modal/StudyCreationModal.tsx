@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import KeywordsInput from '@/components/input/KeywordsInput.tsx';
 import HorizonInput from '@/components/input/HorizonInput';
@@ -47,28 +47,24 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
   const [studyErrorMessage, setStudyErrorMessage] = useState<string>('');
   const { user } = useUser();
 
-  const resetFields = () => {
-    setStudyName('');
-    setHorizon('');
-    setKeywords([]);
-    setStudyErrorMessage('');
-  };
-
   const resetNameField = () => {
     setStudyName('');
     setStudyErrorMessage('');
   };
 
+  const handleClose = useCallback(() => {
+    setStudyErrorMessage('');
+    onClose();
+  }, [onClose]);
+
   const { confirmCreation } = useStudyCreation(
     () => {
       setReloadStudies((prev) => prev + 1);
-      resetFields();
       notifyToast({
         type: 'success',
         message: 'Study created successfully',
       });
-      resetFields()
-      onClose();
+      handleClose();
     },
     (message) => setStudyErrorMessage(message)
   );
@@ -103,10 +99,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
       isOpen={isOpen}
       closeOnOverlayClick={false}
       id="study-creation-modal"
-      onClose={() => {
-        resetFields()
-        void onClose()
-      }}
+      onClose={handleClose}
       primaryButton={<Button
         icon="add"
         label={t('modal.@button_create')}
@@ -128,10 +121,7 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
         variant="primary"
         disabled={!isFormValid}
       />}
-      secondaryButton={<Button label={t('components.quickAccess.@cancel')} onClick={() => {
-        resetFields()
-        void onClose()
-      }} variant="text" />}
+      secondaryButton={<Button label={t('components.quickAccess.@cancel')} onClick={handleClose} variant="text" />}
       size="s"
       title={t('studyModal.@new_study')}
       className="[&_h2]:!text-left"

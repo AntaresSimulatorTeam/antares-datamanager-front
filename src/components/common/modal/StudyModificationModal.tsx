@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import KeywordsInput from '@/components/input/KeywordsInput.tsx';
 import HorizonInput from '@/components/input/HorizonInput';
@@ -65,12 +65,10 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
     setHorizonErrorMessage('');
   };
 
-  const resetFields = () => {
-    setStudyName('');
-    setHorizon('');
-    setKeywords([]);
+  const handleClose = useCallback(() => {
     resetErrorMessage();
-  };
+    onClose();
+  }, [onClose]);
 
   const { confirmUpdate } = useStudyModification(
     () => {
@@ -79,8 +77,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
         type: 'success',
         message: `Study ${isDuplicateMode ? 'duplicated' : 'updated'} successfully`,
       });
-      resetFields();
-      onClose();
+      handleClose();
     },
     (error) => {
       if (error?.antaresErrorMessage?.includes(t('studyDetails.@duplicateModalStudyError'))) {
@@ -96,8 +93,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
             filledIcon: true,
           });
         }
-        resetFields();
-        onClose();
+        handleClose();
       }
     },
   );
@@ -129,10 +125,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
       isOpen={isOpen}
       closeOnOverlayClick={false}
       id="study-update-modal"
-      onClose={() => {
-        resetFields()
-        void onClose()
-      }}
+      onClose={handleClose}
       primaryButton={<Button
         icon={isDuplicateMode ? 'copy' : 'edit'}
         label={isDuplicateMode ? t('study.@duplicate') : t('modal.@button_update')}
@@ -152,10 +145,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
         variant="primary"
         disabled={!isFormValid}
       />}
-      secondaryButton={<Button label={t('components.quickAccess.@cancel')} onClick={() => {
-        resetFields()
-        void onClose()
-      }} variant="text" />}
+      secondaryButton={<Button label={t('components.quickAccess.@cancel')} onClick={handleClose} variant="text" />}
       size="s"
       title={isDuplicateMode ? t('home.@duplicate_study') : t('studyModal.@update_study')}
       className="[&_h2]:!text-left"

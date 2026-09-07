@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import KeywordsInput from '@/components/input/KeywordsInput.tsx';
 import { notifyToast } from '@/shared/notification/notification.tsx';
@@ -36,17 +36,15 @@ export const ProjectCreationModal = ({ onClose, projectInfo, isOpen }: ProjectCr
   const [isFormValid, setIsFormValid] = useState(false);
   const [nameError, setNameError] = useState<string | null>(null);
 
-  const resetFields = () => {
-    setName('');
-    setDescription('');
-    setKeywords([]);
-    setNameError('')
-  };
-
   const resetNameField = () => {
     setName('');
     setNameError('');
   };
+
+  const handleClose = useCallback(() => {
+    setNameError('');
+    void onClose();
+  }, [onClose]);
 
   const { confirmCreation } = useProjectCreation(
     () => {
@@ -54,8 +52,7 @@ export const ProjectCreationModal = ({ onClose, projectInfo, isOpen }: ProjectCr
         type: 'success',
         message: 'Successful project save',
       });
-      resetFields();
-      onClose();
+      handleClose();
     },
     (message) => setNameError(message),
   );
@@ -71,10 +68,7 @@ export const ProjectCreationModal = ({ onClose, projectInfo, isOpen }: ProjectCr
     isOpen={isOpen}
     closeOnOverlayClick={false}
     id="project-creation-modal"
-    onClose={() => {
-      resetFields()
-      void onClose()
-    }}
+    onClose={handleClose}
     primaryButton={<Button
       label={projectInfo ? t('modal.@button_update') : t('modal.@button_create')}
       icon={projectInfo ? 'edit' : 'add'}
@@ -90,10 +84,7 @@ export const ProjectCreationModal = ({ onClose, projectInfo, isOpen }: ProjectCr
       color="primary"
       disabled={!isFormValid}
     />}
-    secondaryButton={<Button label={t('components.quickAccess.@cancel')} onClick={() => {
-      resetFields()
-      void onClose()
-    }} variant="text" />}
+    secondaryButton={<Button label={t('components.quickAccess.@cancel')} onClick={handleClose} variant="text" />}
     size="s"
     title={projectInfo ? t('home.@update_project') : t('home.@new_project')}
     className="[&_h2]:!text-left"
