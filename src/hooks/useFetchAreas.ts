@@ -30,13 +30,13 @@ export const useFetchAreas = (tableType?: TRAJECTORY_TYPE, trajectoryArea?: DbTr
     } catch {
       // Silent handler
     }
-  }, [trajectoryArea?.id]);
+  }, [dispatch, trajectoryArea?.id]);
 
   useEffect(() => {
     if (tableType !== TRAJECTORY_TYPE.AREA || !studyAreasContext?.length) {
       void fetchTrajectoryAreas();
     }
-  }, [tableType, trajectoryArea]);
+  }, [studyAreasContext?.length, tableType, trajectoryArea]);
 
   const isFlowbasedAllowed = useCallback(async (trajectoryId: number) => {
     try {

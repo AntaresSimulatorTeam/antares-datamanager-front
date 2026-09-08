@@ -13,18 +13,14 @@ export const ReadOnlyFeature: TableFeature = {
     ...state,
   }),
 
-  getDefaultOptions: <TData extends RowData>(table: Table<TData>): ReadOnlyOptions => {
-    return {
+  getDefaultOptions: <TData extends RowData>(table: Table<TData>): ReadOnlyOptions => ({
       enableReadOnly: false,
       onReadOnlyChange: makeStateUpdater('readOnly', table),
-    } as ReadOnlyOptions;
-  },
+    } as ReadOnlyOptions),
 
   createTable: <TData extends RowData>(table: Table<TData>): void => {
     table.setReadOnly = (updater) => {
-      const safeUpdater: Updater<ReadOnlyObject> = (old) => {
-        return functionalUpdate(updater, old);
-      };
+      const safeUpdater: Updater<ReadOnlyObject> = (old) => functionalUpdate(updater, old);
       return table.options.onReadOnlyChange?.(safeUpdater);
     };
     // table.toggleReadOnly = value => {

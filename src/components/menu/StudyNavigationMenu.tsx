@@ -42,7 +42,7 @@ const StudyNavigationMenu = ({ studyData }: StudyNavigationMenuProps) => {
     activeTab?.id as TRAJECTORY_TYPE,
   );
 
-  const { areasDefault, trajectoryAreas, isFlowbasedAllowed } = useFetchAreas(activeTab?.id as TRAJECTORY_TYPE, studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0]);
+  const { areasDefault, trajectoryAreas } = useFetchAreas(activeTab?.id as TRAJECTORY_TYPE, studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0]);
 
   useEffect(() => {
     const hasAreaTrajectory = !!studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0];
@@ -107,7 +107,7 @@ const StudyNavigationMenu = ({ studyData }: StudyNavigationMenuProps) => {
           return <AreaLinkTab studyData={studyData}/>;
       }
     },
-    [areasDefault, isFlowbasedAllowed, studyData, trajectoryAreas],
+    [areasDefault, studyData, trajectoryAreas],
   );
 
   return (

@@ -94,7 +94,7 @@ const StdTagList = ({
             >
               <div className="flex flex-col p-1 gap-2">
                 <div className="flex gap-1">
-                  {tags?.slice(tagsNumber).map((tag: string | undefined) => (
+                  {tags?.slice(tagsNumber).map((tag: string) => (
                     <Tag
                       label={tag}
                       key={tag?.toLowerCase()}
