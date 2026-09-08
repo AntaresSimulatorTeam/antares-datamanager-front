@@ -21,7 +21,6 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
     header: '',
     size: 50,
     cell: ({ row }) => (
-      <div className="[&_div[class*='radioButtonContainer']]:![gap:0]">
         <RadioButton
           groupName="study-table-radio-group"
           value={row.original.id.toString()}
@@ -31,7 +30,6 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
           name={`radio-${row.original.id}`}
           onChange={() => {}}
         />
-      </div>
     ),
   }),
 
