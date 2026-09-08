@@ -21,7 +21,7 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
     header: '',
     size: 50,
     cell: ({ row }) => (
-      <div className={`${row.getIsSelected() ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+      <div className="[&_div[class*='radioButtonContainer']]:![gap:0]">
         <RadioButton
           groupName="study-table-radio-group"
           value={row.original.id.toString()}
