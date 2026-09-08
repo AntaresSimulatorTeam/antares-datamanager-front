@@ -12,7 +12,7 @@ export const useFetchAreas = (tableType?: TRAJECTORY_TYPE, trajectoryArea?: DbTr
   const [areasDefault, setAreasDefault] = useState<{ name: string }[]>([]);
   const [trajectoryAreas, setTrajectoryAreas] = useState<TrajectoryAreaData[]>([]);
   const studyState = useStudy();
-  const studyAreasContext = useMemo(() => studyState.areas, [studyState.areas])
+  const studyAreasContext = useMemo(() => studyState?.areas, [studyState?.areas])
 
   const fetchAreas = useCallback(async () => {
     try {
