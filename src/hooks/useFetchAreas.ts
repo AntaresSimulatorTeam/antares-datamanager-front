@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { getDefaultAreas } from '@/shared/services/defaultConfigService.ts';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { getTrajectoryDataByTypeAndId } from '@/shared/services/trajectoryService.ts';
@@ -12,6 +12,7 @@ export const useFetchAreas = (tableType?: TRAJECTORY_TYPE, trajectoryArea?: DbTr
   const [areasDefault, setAreasDefault] = useState<{ name: string }[]>([]);
   const [trajectoryAreas, setTrajectoryAreas] = useState<TrajectoryAreaData[]>([]);
   const studyState = useStudy();
+  const studyAreasContext = useMemo(() => studyState.areas, [studyState.areas])
 
   const fetchAreas = useCallback(async () => {
     try {
@@ -31,7 +32,7 @@ export const useFetchAreas = (tableType?: TRAJECTORY_TYPE, trajectoryArea?: DbTr
   }, [trajectoryArea?.id]);
 
   useEffect(() => {
-    if (tableType !== TRAJECTORY_TYPE.AREA || !studyState.areas?.length) {
+    if (tableType !== TRAJECTORY_TYPE.AREA && !studyAreasContext?.length) {
       void fetchAreas();
     }
   }, [tableType, trajectoryArea]);
