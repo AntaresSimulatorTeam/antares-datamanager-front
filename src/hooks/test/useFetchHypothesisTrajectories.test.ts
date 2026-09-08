@@ -585,7 +585,7 @@ describe('useFetchHypothesisTrajectories', () => {
 
     await waitFor(() => {
       expect(result.current.dropDownListOptions).toEqual({
-        [TRAJECTORY_TYPE.LOAD]: ['FR', 'AT', 'BE', 'OTHERS'],
+        [TRAJECTORY_TYPE.LOAD]: ['FR', 'AT', 'BE'],
       });
     });
   });

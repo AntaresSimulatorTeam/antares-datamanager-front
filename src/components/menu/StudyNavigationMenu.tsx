@@ -18,6 +18,7 @@ import { useFetchWarningMessages } from '@/hooks/useFetchWarningMessages.ts';
 import { getNbMessagesFromTrajectoryType } from '@/shared/services/trajectoryService.ts';
 import { Tab } from '@design-system-rte/react';
 import { TabItemProps } from '@design-system-rte/core/components/tab/tab.interface';
+import { useFetchAreas } from '@/hooks/useFetchAreas.ts';
 
 type StudyNavigationMenuProps = {
   studyData: StudyDTO;
@@ -40,6 +41,8 @@ const StudyNavigationMenu = ({ studyData }: StudyNavigationMenuProps) => {
     studyData.id ? Number(studyData.id) : null,
     activeTab?.id as TRAJECTORY_TYPE,
   );
+
+  const { areasDefault, trajectoryAreas, isFlowbasedAllowed } = useFetchAreas(activeTab?.id as TRAJECTORY_TYPE, studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0]);
 
   useEffect(() => {
     const hasAreaTrajectory = !!studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0];
@@ -89,6 +92,8 @@ const StudyNavigationMenu = ({ studyData }: StudyNavigationMenuProps) => {
               tabType={type}
               types={[type]}
               studyData={studyData}
+              defaultAreas={areasDefault}
+              areas={trajectoryAreas}
             />
           );
         case TRAJECTORY_TYPE.THERMAL_CAPACITY:
@@ -96,13 +101,13 @@ const StudyNavigationMenu = ({ studyData }: StudyNavigationMenuProps) => {
         case TRAJECTORY_TYPE.RES_CAPACITY:
         case TRAJECTORY_TYPE.HYDRO_SERIES:
           return (
-            <TabMenu key={type} type={type} defaultAreas={studyState.defaultAreas ?? []} studyData={studyData} />
+            <TabMenu key={type} type={type} defaultAreas={areasDefault} areas={trajectoryAreas} studyData={studyData} />
           );
         default:
           return <AreaLinkTab studyData={studyData}/>;
       }
     },
-    [studyData, studyState.defaultAreas],
+    [areasDefault, isFlowbasedAllowed, studyData, trajectoryAreas],
   );
 
   return (

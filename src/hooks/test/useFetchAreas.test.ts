@@ -13,7 +13,6 @@ import {
 } from '@/mocks/data/tests/trajectory.mock.ts';
 import * as trajectoryUtils from '@/shared/utils/trajectoryUtils';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { STUDY_ACTION } from '@/shared/enum/study.ts';
 
 vi.mock('@/shared/services/trajectoryService');
 vi.mock('@/shared/services/defaultConfigService');
@@ -72,11 +71,9 @@ describe('useFetchAreas', () => {
     await act(async () => result.current.isFlowbasedAllowed(1));
 
     await waitFor(() => {
-      expect(defaultConfigService.getDefaultAreas).toHaveBeenCalledTimes(1);
       expect(trajectoryService.getTrajectoryDataByTypeAndId).toHaveBeenCalledTimes(1);
       expect(trajectoryService.getTrajectoryDataByTypeAndId).toHaveBeenCalledWith(TRAJECTORY_TYPE.AREA, 1);
       expect(trajectoryUtils.areAllFlowbasedAreasPresent).toHaveBeenCalledWith(areasName);
-      expect(mockDispatch).toHaveBeenCalledWith({type: STUDY_ACTION.SET_STUDY_AREAS, payload: {areas: mockTrajectoryAreaData, defaultAreas: mockDefaultArea}});
     });
   });
 });

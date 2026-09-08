@@ -233,7 +233,7 @@ export const handleViewTrajectory = async (
 ): Promise<void> => {
   try {
     let results;
-    if (trajectory.type === TRAJECTORY_TYPE.AREA) {
+    if (trajectory.type === TRAJECTORY_TYPE.AREA && areasData?.length) {
       results = areasData;
     } else {
       results = await getTrajectoryDataByTypeAndId(trajectory.type, trajectory.id);
