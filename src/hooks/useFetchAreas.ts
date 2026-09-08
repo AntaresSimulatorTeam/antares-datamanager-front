@@ -14,7 +14,7 @@ export const useFetchAreas = (tableType?: TRAJECTORY_TYPE, trajectoryArea?: DbTr
   const studyState = useStudy();
   const studyAreasContext = useMemo(() => studyState?.areas, [studyState?.areas])
 
-  const fetchAreas = useCallback(async () => {
+  const fetchTrajectoryAreas = useCallback(async () => {
     try {
       const defaultAreas: { name: string }[] = await getDefaultAreas();
       setAreasDefault(defaultAreas);
@@ -26,14 +26,15 @@ export const useFetchAreas = (tableType?: TRAJECTORY_TYPE, trajectoryArea?: DbTr
         );
         setTrajectoryAreas(areas);
       }
+      dispatch?.({ type: STUDY_ACTION.SET_STUDY_AREAS, payload: {areas, defaultAreas} });
     } catch {
       // Silent handler
     }
   }, [trajectoryArea?.id]);
 
   useEffect(() => {
-    if (tableType !== TRAJECTORY_TYPE.AREA && !studyAreasContext?.length) {
-      void fetchAreas();
+    if (tableType !== TRAJECTORY_TYPE.AREA || !studyAreasContext?.length) {
+      void fetchTrajectoryAreas();
     }
   }, [tableType, trajectoryArea]);
 
