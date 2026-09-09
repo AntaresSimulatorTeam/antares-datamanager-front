@@ -63,8 +63,8 @@ const ExpandableTab = ({
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const [rowToDelete, setRowToDelete] = useState<RowToDeleteProps | null>(null);
   const [isDeletionModalOpen, setIsDeletionModalOpen] = useState(false);
-  const defaultTrajAreas = useMemo(() => studyState?.defaultAreas ?? defaultAreas, [defaultAreas, studyState?.defaultAreas]);
-  const areasTrajectory = useMemo(() => studyState?.areas ?? areas, [areas, studyState?.areas]);
+  const defaultTrajAreas = useMemo(() => defaultAreas ?? studyState?.defaultAreas, [defaultAreas, studyState?.defaultAreas]);
+  const areasTrajectory = useMemo(() => areas ?? studyState?.areas, [areas, studyState?.areas]);
 
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow, technologyList } =
     useFetchHypothesisTrajectories(

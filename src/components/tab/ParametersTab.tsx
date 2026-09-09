@@ -70,8 +70,8 @@ export const ParametersTab = ({ studyData, defaultAreas, areas }: TabProps) => {
   const [selectedTrajectoryType, setSelectedTrajectoryType] = useState<TRAJECTORY_TYPE>(
     TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
   );
-  const defaultTrajAreas = useMemo(() => studyState?.defaultAreas ?? defaultAreas, [defaultAreas, studyState?.defaultAreas]);
-  const areasTrajectory = useMemo(() => studyState?.areas ?? areas, [areas, studyState?.areas]);
+  const defaultTrajAreas = useMemo(() => defaultAreas ?? studyState?.defaultAreas, [defaultAreas, studyState?.defaultAreas]);
+  const areasTrajectory = useMemo(() => areas ?? studyState?.areas, [areas, studyState?.areas]);
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
     useFetchHypothesisParametersTrajectories(areasTrajectory, studyData, defaultTrajAreas, isStudyGenerated);
   const configs = useMemo(

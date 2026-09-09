@@ -40,8 +40,8 @@ const ResDistributionTab = ({ studyData, types, defaultAreas, areas }: TabProps 
   const [optionsFS, setOptionsFS] = useState<DropdownItemOption[]>();
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const [selectedType, setSelectedType] = useState<TRAJECTORY_TYPE>(TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION);
-  const defaultTrajAreas = useMemo(() => studyState?.defaultAreas ?? defaultAreas, [defaultAreas, studyState?.defaultAreas]);
-  const areasTrajectory = useMemo(() => studyState?.areas ?? areas, [areas, studyState?.areas]);
+  const defaultTrajAreas = useMemo(() => defaultAreas ?? studyState?.defaultAreas, [defaultAreas, studyState?.defaultAreas]);
+  const areasTrajectory = useMemo(() => areas ?? studyState?.areas, [areas, studyState?.areas]);
   const { hypothesisTrajectories, readOnlyRow, technologyList } = useFetchHypothesisTrajectories(
     types,
     areasTrajectory,
