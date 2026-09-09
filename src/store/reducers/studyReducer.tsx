@@ -2,7 +2,12 @@ import { DbTrajectory, RowStatus, StudyActionType, StudyState, StudyTrajectories
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
-import { isMatchingTrajectoryType, isUniqueTrajectoryType, normalize, removeDuplicateByTechnology } from '@/shared/utils/trajectoryUtils.ts';
+import {
+  isMatchingTrajectoryType,
+  isUniqueTrajectoryType,
+  normalize,
+  removeDuplicateByTechnology,
+} from '@/shared/utils/trajectoryUtils.ts';
 
 export const addTrajectories = (prevState: Partial<StudyState>, data: StudyTrajectoriesData): Partial<StudyState> => {
   const studyState: Partial<StudyState> = { ...prevState };

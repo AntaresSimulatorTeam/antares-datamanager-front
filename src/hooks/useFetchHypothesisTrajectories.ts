@@ -35,6 +35,7 @@ import {
   NUCLEAR_FR_TIME_SERIES_TYPES,
 } from '@/shared/const/trajectoryTypes.ts';
 import { HydroSubRows } from '@/mocks/data/list/names.ts';
+import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
 
 export const useFetchHypothesisTrajectories = (
   trajectoryTypes: TRAJECTORY_TYPE[],
@@ -156,13 +157,15 @@ export const useFetchHypothesisTrajectories = (
           const effectiveTrajectories = rawResults.flatMap((result) =>
             result.shouldSkipFetch ? result.contextTrajectories : result.trajectories,
           );
-          const areasWithTrajectory = effectiveTrajectories.flatMap((traj) => (traj.area?.length > 0 ? traj : []));
+
+          const allowedAreas = [...areas.map(area => area.areaName), ...defaultAreas.map(area => area.name), OTHER_AREAS];
+          const areasWithTrajectory = effectiveTrajectories.flatMap((traj) => (traj.area?.length > 0 && allowedAreas.includes(traj.area) ? traj : []));
           const hydroTypes = hydroTypeToSet === TRAJECTORY_TYPE.HYDRO_SERIES ? HYDRO_TYPES : HYDRO_PSP_TYPES;
 
           const allHydroRows = hydroTypes.flatMap((type) =>
             buildHypothesisRows({
               trajType: type,
-              trajectories: effectiveTrajectories,
+              trajectories: areasWithTrajectory,
               defaultAreas,
               areas,
               technologies: HydroSubRows.map((row) => row.label),
