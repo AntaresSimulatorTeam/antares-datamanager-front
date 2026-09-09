@@ -36,7 +36,7 @@ export const useFetchAreas = (tableType?: TRAJECTORY_TYPE, trajectoryArea?: DbTr
     if (tableType !== TRAJECTORY_TYPE.AREA || !studyAreasContext?.length) {
       void fetchTrajectoryAreas();
     }
-  }, [studyAreasContext?.length, tableType, trajectoryArea]);
+  }, [tableType, trajectoryArea]);
 
   const isFlowbasedAllowed = useCallback(async (trajectoryId: number) => {
     try {
