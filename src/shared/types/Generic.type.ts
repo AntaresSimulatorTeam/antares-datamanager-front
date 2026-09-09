@@ -4,6 +4,7 @@ import {
   DbTrajectory,
   HypothesisRowData,
   TechnologyType,
+  TrajectoryAreaData,
   TrajectoryWithSubRowsType,
 } from '@/shared/types/Trajectory.type.ts';
 import { Dispatch, SetStateAction } from 'react';
@@ -75,6 +76,8 @@ export type ExpandedState = true | Record<string, boolean>;
 
 export interface TabProps {
   studyData: StudyDTO;
+  defaultAreas: { name: string }[];
+  areas: TrajectoryAreaData[];
 }
 
 export type TableHeadersProps = {
@@ -130,6 +133,7 @@ export interface MenuProps {
   defaultAreas: { name: string }[];
   studyData: StudyDTO;
   type: TRAJECTORY_TYPE;
+  areas: TrajectoryAreaData[];
 }
 
 export interface FetchResult {

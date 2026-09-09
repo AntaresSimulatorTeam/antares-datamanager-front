@@ -27,7 +27,7 @@ import { useTrajectoryFetchFromFSHandler } from '@/hooks/useTrajectoryFetchFromF
 import { getParamForFetchFSTrajectory } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { HypothesisType } from '@/shared/types/HypothesisTable.ts';
 
-const ResDistributionTab = ({ studyData, types }: TabProps & { types: TRAJECTORY_TYPE[] }) => {
+const ResDistributionTab = ({ studyData, types, defaultAreas, areas }: TabProps & { types: TRAJECTORY_TYPE[] }) => {
   const studyState = useStudy();
   const dispatch = useStudyDispatch();
   const { t } = useTranslation();
@@ -40,12 +40,12 @@ const ResDistributionTab = ({ studyData, types }: TabProps & { types: TRAJECTORY
   const [optionsFS, setOptionsFS] = useState<DropdownItemOption[]>();
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const [selectedType, setSelectedType] = useState<TRAJECTORY_TYPE>(TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION);
-  const defaultAreas = useMemo(() => studyState?.defaultAreas ?? [], [studyState?.defaultAreas]);
-  const areas = useMemo(() => studyState?.areas ?? [], [studyState?.areas]);
+  const defaultTrajAreas = useMemo(() => defaultAreas ?? studyState?.defaultAreas, [defaultAreas, studyState?.defaultAreas]);
+  const areasTrajectory = useMemo(() => areas ?? studyState?.areas, [areas, studyState?.areas]);
   const { hypothesisTrajectories, readOnlyRow, technologyList } = useFetchHypothesisTrajectories(
     types,
-    areas,
-    defaultAreas,
+    areasTrajectory,
+    defaultTrajAreas,
     studyData?.id,
     studyData?.status,
     studyState.studyStatus,

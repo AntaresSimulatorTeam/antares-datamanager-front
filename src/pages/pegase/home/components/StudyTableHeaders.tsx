@@ -16,32 +16,31 @@ import UserDisplayCell from '@/components/common/layout/UserDisplayCell';
 const columnHelper = createColumnHelper<StudyDTO>();
 
 const getStudyTableHeaders = (t: (value: string) => string) => [
-  columnHelper.display({
-    id: 'radioColumn',
-    header: '',
-    size: 50,
-    cell: ({ row }) => (
-      <div className={`${row.getIsSelected() ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
-        <RadioButton
-          groupName="study-table-radio-group"
-          value={row.original.id.toString()}
-          label=""
-          disabled={!row.getCanSelect()}
-          checked={row.getIsSelected()}
-          name={`radio-${row.original.id}`}
-          onChange={() => {}}
-        />
-      </div>
-    ),
-  }),
-
   columnHelper.accessor('name', {
     header: t('home.@study_name'),
     size: 300,
     cell: ({ getValue, row }) => {
       const status = row.original.status;
-      const textClass = status === StudyStatus.GENERATED ? 'text-primary-600' : 'group-hover:text-green-500';
-      return <span className={`transition-colors ${textClass}`}>{getValue()}</span>;
+      return (
+        <div
+          className={`[&_[class*='radioButtonLabel']]:![font-size:inherit] [&_[class*='radioButtonLabel']]:![font-family:inherit] ${
+            row.getIsSelected()
+              ? "[&_[class*='radioButtonBackground']]:opacity-100"
+              : "[&_[class*='radioButtonBackground']]:opacity-0 group-hover:[&_[class*='radioButtonBackground']]:opacity-100"
+          }`}
+        >
+          <RadioButton
+            groupName="study-table-radio-group"
+            value={row.original.id.toString()}
+            label={getValue()}
+            disabled={!row.getCanSelect()}
+            checked={row.getIsSelected()}
+            name={`radio-${row.original.id}`}
+            onChange={() => {}}
+            className={`transition-colors ![font-size:inherit] ![font-family:inherit] ${status === StudyStatus.GENERATED ? '!text-primary-600 group-hover:!text-primary-600' : '!text-gray-800 group-hover:!text-gray-800'}`}
+          />
+        </div>
+      );
     },
   }),
 

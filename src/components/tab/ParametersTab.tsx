@@ -43,7 +43,7 @@ import { useFetchFixHypothesisTrajectories } from '@/hooks/useFetchFixHypothesis
 import { useTrajectoryFetchFromFSHandler } from '@/hooks/useTrajectoryFetchFromFSHandler.ts';
 import { HypothesisType } from '@/shared/types/HypothesisTable.ts';
 
-export const ParametersTab = ({ studyData }: TabProps) => {
+export const ParametersTab = ({ studyData, defaultAreas, areas }: TabProps) => {
   const { t } = useTranslation();
   const studyState = useStudy();
   const dispatch = useStudyDispatch();
@@ -70,10 +70,10 @@ export const ParametersTab = ({ studyData }: TabProps) => {
   const [selectedTrajectoryType, setSelectedTrajectoryType] = useState<TRAJECTORY_TYPE>(
     TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
   );
-  const defaultAreas = useMemo(() => studyState?.defaultAreas ?? [], [studyState?.defaultAreas]);
-  const areas = useMemo(() => studyState?.areas ?? [], [studyState?.areas]);
+  const defaultTrajAreas = useMemo(() => defaultAreas ?? studyState?.defaultAreas, [defaultAreas, studyState?.defaultAreas]);
+  const areasTrajectory = useMemo(() => areas ?? studyState?.areas, [areas, studyState?.areas]);
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow } =
-    useFetchHypothesisParametersTrajectories(areas, studyData, defaultAreas, isStudyGenerated);
+    useFetchHypothesisParametersTrajectories(areasTrajectory, studyData, defaultTrajAreas, isStudyGenerated);
   const configs = useMemo(
     () => [
       [
