@@ -94,32 +94,8 @@ describe('useFetchAreas', () => {
     renderHook(() => useFetchAreas(TRAJECTORY_TYPE.AREA, {id: 1} as DbTrajectory));
 
     await waitFor(() => {
-      expect(defaultConfigService.getDefaultAreas).toHaveBeenCalledTimes(0);
-      expect(trajectoryService.getTrajectoryDataByTypeAndId).toHaveBeenCalledTimes(0);
-    });
-  });
-
-  it('should not call all api when useFetchAreas is initialized with LOAD tableType and areas in context', async () => {
-    const trajectoryData = [
-      {
-        areaName: 'B',
-        spilledEnergyCost: '',
-        unsuppliedEnergyCost: '300.256',
-      },
-    ];
-    mockUseStudy.mockImplementationOnce(
-      () =>
-        ({
-          ['AREA']: { trajectories: [mockDbTrajectory], warningMessages: [] },
-          ['LOAD']: { trajectories: mockDbTrajectoryArray, warningMessages: [] },
-          ['areas']: trajectoryData
-        }) as Partial<StudyState>,
-    );
-    renderHook(() => useFetchAreas(TRAJECTORY_TYPE.AREA, {id: 1} as DbTrajectory));
-
-    await waitFor(() => {
-      expect(defaultConfigService.getDefaultAreas).toHaveBeenCalledTimes(0);
-      expect(trajectoryService.getTrajectoryDataByTypeAndId).toHaveBeenCalledTimes(0);
+      expect(defaultConfigService.getDefaultAreas).toHaveBeenCalled();
+      expect(trajectoryService.getTrajectoryDataByTypeAndId).toHaveBeenCalled();
     });
   });
 
