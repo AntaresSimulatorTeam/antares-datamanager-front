@@ -4,8 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { useEffect, useMemo, useState } from 'react';
-import { ProjectInfo, StudyDTO } from '@/shared/types';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { ProjectInfo } from '@/shared/types';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type';
 import getStudyTableHeaders from './StudyTableHeaders';
 import { addSortColumn } from './StudyTableUtils';
@@ -29,13 +29,11 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
   const { t } = useTranslation();
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [isHeaderHovered, setIsHeaderHovered] = useState<boolean>(false);
-  const [selectedStudy, setSelectedStudy] = useState<StudyDTO | null>(null);
   // Reload trigger for re-fetching data
   const [reloadStudies, setReloadStudies] = useState<number>(0);
   const [sortBy, setSortBy] = useState<{ [key: string]: 'asc' | 'desc' }>({});
   const [sortedColumn, setSortedColumn] = useState<string | null>('status');
   const [isDuplicateMode, setIsDuplicateMode] = useState(false);
-
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const [isModalStudyCreation, setIsModalStudyCreation] = useState(false);
   const [page, setPage] = useState<number>(0);
@@ -48,43 +46,48 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
     reloadStudies
   });
 
+  const selectedStudyId = Object.keys(rowSelection)[0];
+  const selectedStudy = useMemo(
+    () => (selectedStudyId ? rows.find((r) => r.id?.toString() === selectedStudyId) ?? null : null),
+    [rows, selectedStudyId]
+  );
+
+  const isDeleteActive = useMemo(() => {
+    const status = selectedStudy?.status?.toUpperCase() as StudyStatus | undefined;
+    return status === StudyStatus.ERROR || status === StudyStatus.IN_PROGRESS;
+  }, [selectedStudy]);
+
   useEffect(() => {
     !rows?.some((row) => row.status === StudyStatus.IN_PROGRESS) && setRowSelection({});
   }, [rows.length]);
 
   const headers = useMemo(() => getStudyTableHeaders(t), [t]);
 
-  const handleSort = (column: string) => {
+  const handleSort = useCallback((column: string) => {
     const newSortOrder = sortBy[column] === 'asc' ? 'desc' : 'asc';
     setSortBy({ [column]: newSortOrder });
     setSortedColumn(column);
-  };
+  }, [sortBy]);
 
-  const selectedRowId = Object.keys(rowSelection)[0];
-  const selectedStatus = rows[Number.parseInt(selectedRowId || '-1')]?.status?.toUpperCase() as StudyStatus;
-  const isDeleteActive = selectedStatus === StudyStatus.ERROR || selectedStatus === StudyStatus.IN_PROGRESS;
 
-  const handleDuplicate = () => {
-    setSelectedStudy(rows[Number.parseInt(selectedRowId || '-1')]);
+  const handleDuplicate = useCallback(() => {
     setIsDuplicateMode(true);
     toggleModal();
     setReloadStudies((prev) => prev + 1);
-  };
+  }, [toggleModal]);
 
-  const handleDeleteClick = async () => {
+  const handleDeleteClick = useCallback(async () => {
     try {
-      const selectedStudyId = rows[Number.parseInt(selectedRowId || '-1')]?.id;
-      if (selectedStudyId) {
-        await deleteStudy(selectedStudyId);
+      if (selectedStudy?.id) {
+        await deleteStudy(Number(selectedStudy.id));
         setReloadStudies((prev) => prev + 1);
       }
     } catch {
       // Silent handler
     }
-  };
+  }, [selectedStudy?.id]);
 
-  const handleModalClose = () => {
-    setSelectedStudy(null);
+  const handleModalClose = useCallback(() => {
     setRowSelection({});
     if (isModalOpen) {
       toggleModal();
@@ -92,7 +95,7 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
       setIsModalStudyCreation(false);
     }
     setIsDuplicateMode(false);
-  };
+  }, [isModalOpen]);
 
   const sortedHeaders = addSortColumn(headers, handleSort, sortBy, sortedColumn, setIsHeaderHovered, isHeaderHovered);
 
@@ -103,28 +106,21 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
           columns={sortedHeaders}
           columnSize="rem"
           data={rows}
+          getRowId={(row) => row.id?.toString()}
           enableRowSelection={true}
           state={{
             rowSelection,
           }}
-          onRowSelectionChange={(
-            updaterOrValue: RowSelectionState | ((oldState: RowSelectionState) => RowSelectionState),
-          ) => {
-            if (typeof updaterOrValue === 'function') {
-              setRowSelection((prev: RowSelectionState) => updaterOrValue(prev));
-            } else {
-              setRowSelection(updaterOrValue);
-            }
-          }}
+          onRowSelectionChange={setRowSelection}
         />
       </div>
       <div className="sticky bottom-0 flex h-8 items-center justify-between bg-gray-200 px-4">
         <div className="flex gap-2">
-          {selectedRowId !== undefined ? (
+          {selectedStudy ? (
             <>
               <Button
                 label={t('study.@open')}
-                onClick={() => void navigateToStudy(rows[Number.parseInt(selectedRowId || '-1')])}
+                onClick={() => void navigateToStudy(selectedStudy)}
                 variant="secondary"
               />
               <Button label={t('study.@duplicate')} onClick={handleDuplicate} variant="secondary" />
