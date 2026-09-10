@@ -63,6 +63,13 @@ export const ProjectCreationModal = ({ onClose, projectInfo, isOpen }: ProjectCr
     }
   }, [keywords.length]);
 
+  useEffect(() => {
+    setName(projectInfo?.name ?? '');
+    setDescription(projectInfo?.description ?? '');
+    setKeywords(projectInfo?.tags ?? []);
+  }, [projectInfo]);
+
+
   return (
   <Modal
     isOpen={isOpen}
