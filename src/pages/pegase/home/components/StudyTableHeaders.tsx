@@ -42,6 +42,7 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
               : "[&_[class*='radioButtonBackground']]:opacity-0 group-hover:[&_[class*='radioButtonBackground']]:opacity-100"
           }`}
           onClick={handleToggle}
+          onKeyDown={() => {}}
         >
           <RadioButton
             groupName="study-table-radio-group"
