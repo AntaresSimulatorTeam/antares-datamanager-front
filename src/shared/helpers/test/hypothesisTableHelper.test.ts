@@ -1348,6 +1348,101 @@ describe('updateTableAfterCellDetach', () => {
         newReadOnly: { 1: true },
       });
     });
+
+    it('met à jour la cellule, trie les spécifiques et vide la ligne modulation', async () => {
+      const data = [{ hypothesis: 'H1', status: TRAJECTORY_SELECTION_STATUS.OK }, { hypothesis: 'MODULATION', status: TRAJECTORY_SELECTION_STATUS.OK }] as HypothesisRowData[];
+
+      const indexArray = [0];
+
+      const empty = {
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+      };
+
+      const updated = [{ hypothesis: 'H1', status: TRAJECTORY_SELECTION_STATUS.OK }, { hypothesis: 'MODULATION', status: TRAJECTORY_SELECTION_STATUS.MISSING, trajectory: null }] as unknown as HypothesisRowData[];
+      const sortedSpecific = [{
+        hypothesis: "H1",
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+      }] as unknown as HypothesisRowData[];
+
+      vi.mocked(trajectoryUtils.setNestedData).mockReturnValue(updated);
+      vi.mocked(sortUtils.sortWithFixedPosition).mockReturnValue(sortedSpecific);
+
+      const result = await updateTableAfterCellDetach({
+        type: TRAJECTORY_TYPE.DSR,
+        data,
+        additionalTrajectory: { type: TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION, hypothesis: 'MODULATION' } as unknown as DbTrajectory,
+        indexArray,
+        studyId: 42,
+        horizon: '2030',
+      });
+
+      expect(trajectoryUtils.setNestedData).toHaveBeenCalledWith(updated, indexArray, empty);
+      expect(sortUtils.sortWithFixedPosition).toHaveBeenCalledWith(updated.slice(0, -1));
+
+      expect(result).toEqual({
+        newData: [{ hypothesis: 'H1', status: TRAJECTORY_SELECTION_STATUS.MISSING }, { hypothesis: 'MODULATION', status: TRAJECTORY_SELECTION_STATUS.MISSING, trajectory: null }],
+        newReadOnly: { 1: true },
+      });
+    });
+  });
+
+  describe('P2G', () => {
+    it('met à jour la 1ère cellule', async () => {
+      const data = [{ hypothesis: 'Capacity', status: TRAJECTORY_SELECTION_STATUS.OK }, { hypothesis: 'MODULATION', status: TRAJECTORY_SELECTION_STATUS.OK }] as HypothesisRowData[];
+
+      const indexArray = [0];
+
+      const empty = {
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+      };
+
+      const updated =  [{ hypothesis: 'Capacity', ...empty }, { hypothesis: 'MODULATION', status: TRAJECTORY_SELECTION_STATUS.OK }] as unknown as HypothesisRowData[];
+
+      vi.mocked(trajectoryUtils.setNestedData).mockReturnValue(updated);
+
+      const result = await updateTableAfterCellDetach({
+        type: TRAJECTORY_TYPE.P2G_CAPACITY_COST,
+        data,
+        additionalTrajectory: null,
+        indexArray,
+        studyId: 42,
+        horizon: '2030',
+      });
+
+      expect(result).toEqual({
+        newData: updated
+      });
+    });
+
+    it('met à jour la 2ème cellule', async () => {
+      const data = [{ hypothesis: 'Capacity', status: TRAJECTORY_SELECTION_STATUS.OK }, { hypothesis: 'MODULATION', status: TRAJECTORY_SELECTION_STATUS.OK }] as HypothesisRowData[];
+
+      const indexArray = [1];
+
+      const empty = {
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+      };
+
+      const updated =  [{ hypothesis: 'Capacity', status: TRAJECTORY_SELECTION_STATUS.OK }, { hypothesis: 'MODULATION', ...empty }] as unknown as HypothesisRowData[];
+
+      vi.mocked(trajectoryUtils.setNestedData).mockReturnValue(updated);
+
+      const result = await updateTableAfterCellDetach({
+        type: TRAJECTORY_TYPE.P2G_MARKET_MODULATION,
+        data,
+        additionalTrajectory: null,
+        indexArray,
+        studyId: 42,
+        horizon: '2030',
+      });
+
+      expect(result).toEqual({
+        newData: updated
+      });
+    });
   });
 
   describe('AREA', () => {
