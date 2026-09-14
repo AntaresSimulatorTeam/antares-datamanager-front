@@ -1156,6 +1156,48 @@ describe('uploadTrajectory', () => {
       );
     });
   });
+
+  it('should import P2G_CAPACITY_COST trajectory without technology into data base', async () => {
+    await uploadTrajectory(
+      '2030-2031',
+      87,
+      TRAJECTORY_TYPE.P2G_CAPACITY_COST,
+      'FE_60_Liv',
+      '',
+      onProgress,
+      false,
+    );
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/trajectory/capacity-cost-p2g?trajectoryToUse=FE_60_Liv&horizon=2030-2031&studyId=87&isCivilYear=false',
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
+
+  it('should import P2G_MARKET_MODULATION trajectory without technology into data base', async () => {
+    await uploadTrajectory(
+      '2030-2031',
+      87,
+      TRAJECTORY_TYPE.P2G_MARKET_MODULATION,
+      'FE_60_same',
+      '',
+      onProgress,
+      false,
+    );
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/trajectory/modulation-p2g?trajectoryToUse=FE_60_same&horizon=2030-2031&studyId=87&isCivilYear=false',
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
 });
 
 describe('isParamModulationRequired', () => {

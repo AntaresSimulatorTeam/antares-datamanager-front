@@ -18,6 +18,7 @@ import {
   mockEmptyDbTrajectoryArrayLoadSTS,
   mockEmptyDbTrajectoryLoadFR,
   mockEmptyDbTrajectoryLoadOthers,
+  mockEmptyDbTrajectorySTSOthers,
   resTechnologies,
 } from '@/mocks/data/tests/trajectory.mock.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
@@ -132,7 +133,7 @@ describe('useFetchHypothesisTrajectories', () => {
       mockEmptyDbTrajectoryLoadOthers,
     ]);
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.LOAD], [], [], 5, study.status),
+      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.LOAD], 5, study.status),
     );
 
     await waitFor(() => {
@@ -249,7 +250,7 @@ describe('useFetchHypothesisTrajectories', () => {
       mockEmptyDbTrajectoryLoadOthers,
     ]);
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.LOAD], [], [{ name: 'FR' }], 5, study.status),
+      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.LOAD], 5, study.status, undefined, [{ name: 'FR' }]),
     );
 
     await waitFor(() => {
@@ -369,11 +370,10 @@ describe('useFetchHypothesisTrajectories', () => {
     const { result } = renderHook(() =>
       useFetchHypothesisTrajectories(
         [TRAJECTORY_TYPE.LOAD],
-        [],
-        [{ name: 'FR' }],
         5,
         study.status,
         StudyStatus.IN_PROGRESS,
+        [{ name: 'FR' }],
       ),
     );
 
@@ -466,10 +466,10 @@ describe('useFetchHypothesisTrajectories', () => {
     const { result } = renderHook(() =>
       useFetchHypothesisTrajectories(
         [TRAJECTORY_TYPE.LOAD],
-        [],
-        [{ name: 'FR' }, { name: 'BE' }],
         5,
         StudyStatus.IN_PROGRESS,
+        undefined,
+        [{ name: 'FR' }, { name: 'BE' }],
       ),
     );
 
@@ -560,7 +560,7 @@ describe('useFetchHypothesisTrajectories', () => {
     vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArrayLoad);
 
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.LOAD], areas, defaultAreas, 5, StudyStatus.IN_PROGRESS),
+      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.LOAD], 5, StudyStatus.IN_PROGRESS, undefined, defaultAreas, areas),
     );
 
     await waitFor(() => {
@@ -580,7 +580,7 @@ describe('useFetchHypothesisTrajectories', () => {
     vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArrayLoad);
 
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.LOAD], areas, defaultAreas, 5, StudyStatus.IN_PROGRESS),
+      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.LOAD], 5, StudyStatus.IN_PROGRESS, undefined, defaultAreas, areas),
     );
 
     await waitFor(() => {
@@ -603,11 +603,11 @@ describe('useFetchHypothesisTrajectories', () => {
     const { result } = renderHook(() =>
       useFetchHypothesisTrajectories(
         [TRAJECTORY_TYPE.LOAD],
-        areas,
-        defaultAreas,
         5,
         StudyStatus.GENERATED,
         StudyStatus.GENERATED,
+        defaultAreas,
+        areas
       ),
     );
 
@@ -631,7 +631,7 @@ describe('useFetchHypothesisTrajectories', () => {
     }));
 
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.THERMAL_CAPACITY], [], [], 7, StudyStatus.IN_PROGRESS),
+      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.THERMAL_CAPACITY],7, StudyStatus.IN_PROGRESS),
     );
 
     await waitFor(() =>
@@ -644,6 +644,9 @@ describe('useFetchHypothesisTrajectories', () => {
   it('should include STSTechnology when trajectoryType is STS', async () => {
     const defaultAreas = [{ name: 'FR' }];
     const areas = [{ areaName: 'AT' }, { areaName: 'BE' }] as TrajectoryAreaData[];
+    vi.mocked(trajectoryUtils.buildDefaultEmptyTrajectoryList).mockImplementationOnce(() => [
+      mockEmptyDbTrajectorySTSOthers,
+    ]);
     mockUseStudy.mockImplementation(
       () =>
         ({
@@ -663,11 +666,11 @@ describe('useFetchHypothesisTrajectories', () => {
     const { result } = renderHook(() =>
       useFetchHypothesisTrajectories(
         [TRAJECTORY_TYPE.STS],
-        areas,
-        defaultAreas,
         7,
         StudyStatus.IN_PROGRESS,
         StudyStatus.IN_PROGRESS,
+        defaultAreas,
+        areas
       ),
     );
 
@@ -725,7 +728,7 @@ describe('useFetchHypothesisTrajectories', () => {
     vi.mocked(studyService.getStudyTrajectories).mockResolvedValue([]);
 
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.DSR], areas, defaultAreas, 5, StudyStatus.IN_PROGRESS),
+      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.DSR], 5, StudyStatus.IN_PROGRESS, undefined, defaultAreas, areas),
     );
 
     await waitFor(() => {
@@ -826,7 +829,7 @@ describe('useFetchHypothesisTrajectories', () => {
     }));
 
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.RES_CAPACITY], areas, defaultAreas, 7, StudyStatus.IN_PROGRESS),
+      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.RES_CAPACITY], 7, StudyStatus.IN_PROGRESS, undefined, defaultAreas, areas),
     );
 
     await waitFor(() => {
@@ -850,7 +853,7 @@ describe('useFetchHypothesisTrajectories', () => {
     }));
 
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.RES_LOAD], areas, defaultAreas, 7, StudyStatus.IN_PROGRESS),
+      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.RES_LOAD],7, StudyStatus.IN_PROGRESS, undefined, defaultAreas, areas),
     );
 
     await waitFor(() => {
@@ -868,10 +871,9 @@ describe('useFetchHypothesisTrajectories', () => {
     const { result } = renderHook(() =>
       useFetchHypothesisTrajectories(
         [TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION, TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION],
-        areas,
-        defaultAreas,
         7,
         StudyStatus.IN_PROGRESS,
+        undefined, defaultAreas, areas
       ),
     );
 
@@ -889,7 +891,7 @@ describe('useFetchHypothesisTrajectories', () => {
 
   it('should not call api if only study id is provided', async () => {
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.DSR], [], [], 5, StudyStatus.IN_PROGRESS),
+      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.DSR],5, StudyStatus.IN_PROGRESS),
     );
 
     await waitFor(() => {
@@ -900,7 +902,7 @@ describe('useFetchHypothesisTrajectories', () => {
 
   it('should not call api when no arguments area provided', async () => {
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.DSR], [], [], 5, StudyStatus.IN_PROGRESS),
+      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.DSR], 5, StudyStatus.IN_PROGRESS),
     );
 
     await waitFor(() => {
@@ -911,7 +913,7 @@ describe('useFetchHypothesisTrajectories', () => {
 
   it('should throw error when api call throw an exception', async () => {
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.DSR], [], [], 5, StudyStatus.IN_PROGRESS),
+      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.DSR],5, StudyStatus.IN_PROGRESS),
     );
 
     await waitFor(() => {
@@ -963,10 +965,9 @@ describe('useFetchHypothesisTrajectories', () => {
     const { result } = renderHook(() =>
       useFetchHypothesisTrajectories(
         [TRAJECTORY_TYPE.HYDRO_SERIES, TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS],
-        areas,
-        [],
         5,
         StudyStatus.IN_PROGRESS,
+        undefined, [], areas
       ),
     );
 
@@ -1040,10 +1041,9 @@ describe('useFetchHypothesisTrajectories', () => {
     const { result } = renderHook(() =>
       useFetchHypothesisTrajectories(
         [TRAJECTORY_TYPE.HYDRO_PSP_SERIES, TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS],
-        areas,
-        [],
         5,
         StudyStatus.IN_PROGRESS,
+        undefined, [], areas
       ),
     );
 
@@ -1079,7 +1079,7 @@ describe('useFetchHypothesisTrajectories', () => {
 
     const { rerender } = renderHook(
       ({ types }: { types: TRAJECTORY_TYPE[] }) =>
-        useFetchHypothesisTrajectories(types, [], [], 5, StudyStatus.IN_PROGRESS),
+        useFetchHypothesisTrajectories(types, 5, StudyStatus.IN_PROGRESS),
       { initialProps: { types: [TRAJECTORY_TYPE.LOAD] } },
     );
 
@@ -1098,7 +1098,7 @@ describe('useFetchHypothesisTrajectories', () => {
 
     const { rerender } = renderHook(
       ({ types }: { types: TRAJECTORY_TYPE[] }) =>
-        useFetchHypothesisTrajectories(types, [], [], 5, StudyStatus.IN_PROGRESS),
+        useFetchHypothesisTrajectories(types, 5, StudyStatus.IN_PROGRESS),
       { initialProps: { types: [TRAJECTORY_TYPE.LOAD] } },
     );
 
@@ -1116,7 +1116,7 @@ describe('useFetchHypothesisTrajectories', () => {
 
     const { rerender } = renderHook(
       ({ contextStatus }: { contextStatus: StudyStatus }) =>
-        useFetchHypothesisTrajectories([TRAJECTORY_TYPE.LOAD], [], [], 5, StudyStatus.IN_PROGRESS, contextStatus),
+        useFetchHypothesisTrajectories([TRAJECTORY_TYPE.LOAD], 5, StudyStatus.IN_PROGRESS, contextStatus),
       { initialProps: { contextStatus: StudyStatus.IN_PROGRESS } },
     );
 
@@ -1133,7 +1133,7 @@ describe('useFetchHypothesisTrajectories', () => {
 
     const { rerender } = renderHook(
       ({ studyId }: { studyId: number }) =>
-        useFetchHypothesisTrajectories([TRAJECTORY_TYPE.LOAD], [], [], studyId, StudyStatus.IN_PROGRESS),
+        useFetchHypothesisTrajectories([TRAJECTORY_TYPE.LOAD], studyId, StudyStatus.IN_PROGRESS),
       { initialProps: { studyId: 5 } },
     );
 
@@ -1150,7 +1150,7 @@ describe('useFetchHypothesisTrajectories', () => {
 
     const { rerender } = renderHook(
       ({ studyId }: { studyId: number }) =>
-        useFetchHypothesisTrajectories([TRAJECTORY_TYPE.LOAD], [], [], studyId, StudyStatus.IN_PROGRESS),
+        useFetchHypothesisTrajectories([TRAJECTORY_TYPE.LOAD], studyId, StudyStatus.IN_PROGRESS),
       { initialProps: { studyId: 5 } },
     );
 

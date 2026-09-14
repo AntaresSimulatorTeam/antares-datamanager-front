@@ -16,9 +16,9 @@ import {
   getCheckedValues,
   getHypothesisLabel,
   getInformationMessage,
-  getNuclearHypothesisLabel,
   getParamForFetchFSTrajectory,
   getReadOnlyForGeneratedStudy,
+  getRowHypothesisLabel,
   getSpecificTrajectories,
   shouldOpenDeletionModal,
   updateTableAfterCellDetach,
@@ -1799,7 +1799,7 @@ describe('getParamForFetchFSTrajectory', () => {
   });
 });
 
-describe('getNuclearHypothesisLabel', () => {
+describe('getSubRowHypothesisLabel', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -1809,7 +1809,7 @@ describe('getNuclearHypothesisLabel', () => {
       if (key === 'thermal.@epr') return 'EPR';
       return key;
     }) as unknown as TFunction<'translation', undefined>;
-    const result = getNuclearHypothesisLabel(TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP, mockTranslate);
+    const result = getRowHypothesisLabel(TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP, mockTranslate);
 
     expect(mockTranslate).toHaveBeenCalledWith('thermal.@epr');
     expect(result).toBe('EPR');
@@ -1820,7 +1820,7 @@ describe('getNuclearHypothesisLabel', () => {
       if (key === 'thermal.@long_term') return 'Long Term';
       return key;
     }) as unknown as TFunction<'translation', undefined>;
-    const result = getNuclearHypothesisLabel(TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM, mockTranslate);
+    const result = getRowHypothesisLabel(TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM, mockTranslate);
 
     expect(mockTranslate).toHaveBeenCalledWith('thermal.@long_term');
     expect(result).toBe('Long Term');
@@ -1831,7 +1831,7 @@ describe('getNuclearHypothesisLabel', () => {
       if (key === 'thermal.@smr') return 'SMR';
       return key;
     }) as unknown as TFunction<'translation', undefined>;
-    const result = getNuclearHypothesisLabel(TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR, mockTranslate);
+    const result = getRowHypothesisLabel(TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR, mockTranslate);
 
     expect(mockTranslate).toHaveBeenCalledWith('thermal.@smr');
     expect(result).toBe('SMR');
@@ -1999,9 +1999,7 @@ vi.mock('@/utils/getNuclearHypothesisLabel', () => ({
 
 describe('buildRowsByType', () => {
   it('should build parent rows with correct hypothesis labels', () => {
-    const rowTypes = [TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION, TRAJECTORY_TYPE.NUCLEAR_FR_TALON];
-
-    const subRowTypes = [] as TRAJECTORY_TYPE[];
+    const rowTypes = [{types: [TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION, TRAJECTORY_TYPE.NUCLEAR_FR_TALON], isEmpty: false}];
 
     const trajectoriesByType = [] as unknown as FetchResult[];
 
@@ -2012,21 +2010,19 @@ describe('buildRowsByType', () => {
     }) as unknown as TFunction<'translation', undefined>;
 
     const result = buildRowsByType({
-      rowTypes,
-      subRowTypes,
       trajectoriesByType,
       t,
+      rowTypes,
     });
 
-    expect(result).toHaveLength(3); // 2 parents + 1 time_series row
+    expect(result).toHaveLength(2);
 
     expect(result[0].hypothesis).toBe('thermal.@modulation');
     expect(result[1].hypothesis).toBe('talon');
   });
 
   it('should assign trajectory and status OK when trajectory exists', () => {
-    const rowTypes = [TRAJECTORY_TYPE.NUCLEAR_FR_TALON];
-    const subRowTypes = [] as TRAJECTORY_TYPE[];
+    const rowTypes = [{types: [TRAJECTORY_TYPE.NUCLEAR_FR_TALON], isEmpty: false}];
 
     const trajectoriesByType = [
       {
@@ -2042,10 +2038,9 @@ describe('buildRowsByType', () => {
     }) as unknown as TFunction<'translation', undefined>;
 
     const result = buildRowsByType({
-      rowTypes,
-      subRowTypes,
       trajectoriesByType,
       t,
+      rowTypes,
     });
 
     const parent = result[0];
@@ -2055,8 +2050,7 @@ describe('buildRowsByType', () => {
   });
 
   it('should set status MISSING when no trajectory exists', () => {
-    const rowTypes = [TRAJECTORY_TYPE.NUCLEAR_FR_TALON];
-    const subRowTypes = [] as TRAJECTORY_TYPE[];
+    const rowTypes = [{types: [TRAJECTORY_TYPE.NUCLEAR_FR_TALON], isEmpty: false}];
 
     const trajectoriesByType = [] as unknown as FetchResult[]; // aucun résultat
 
@@ -2067,10 +2061,9 @@ describe('buildRowsByType', () => {
     }) as unknown as TFunction<'translation', undefined>;
 
     const result = buildRowsByType({
-      rowTypes,
-      subRowTypes,
       trajectoriesByType,
       t,
+      rowTypes,
     });
 
     expect(result[0].trajectory).toBeNull();
@@ -2078,8 +2071,7 @@ describe('buildRowsByType', () => {
   });
 
   it('should build subRows correctly with labels and statuses', () => {
-    const rowTypes = [] as TRAJECTORY_TYPE[];
-    const subRowTypes = [TRAJECTORY_TYPE.NUCLEAR_FR_TALON];
+    const rowTypes =  [{types: [TRAJECTORY_TYPE.NUCLEAR_FR_TALON], subRowTypes: [TRAJECTORY_TYPE.NUCLEAR_FR_TALON], isEmpty: false}];
 
     const trajectoriesByType = [
       {
@@ -2095,10 +2087,9 @@ describe('buildRowsByType', () => {
     }) as unknown as TFunction<'translation', undefined>;
 
     const result = buildRowsByType({
-      rowTypes,
-      subRowTypes,
       trajectoriesByType,
       t,
+      rowTypes,
     });
 
     const timeSeriesRow = result[result.length - 1];
@@ -2109,8 +2100,7 @@ describe('buildRowsByType', () => {
   });
 
   it('should add a final time_series parent row with missing status', () => {
-    const rowTypes = [] as TRAJECTORY_TYPE[];
-    const subRowTypes = [] as TRAJECTORY_TYPE[];
+    const rowTypes = [{types: [TRAJECTORY_TYPE.NUCLEAR_FR_TS_SERIES], isEmpty: false}];
 
     const trajectoriesByType = [] as unknown as FetchResult[];
 
@@ -2121,10 +2111,9 @@ describe('buildRowsByType', () => {
     }) as unknown as TFunction<'translation', undefined>;
 
     const result = buildRowsByType({
-      rowTypes,
-      subRowTypes,
       trajectoriesByType,
       t,
+      rowTypes,
     });
 
     const lastRow = result[result.length - 1];

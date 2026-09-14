@@ -100,6 +100,7 @@ const StudyNavigationMenu = ({ studyData }: StudyNavigationMenuProps) => {
         case TRAJECTORY_TYPE.MISC_CAPACITY:
         case TRAJECTORY_TYPE.RES_CAPACITY:
         case TRAJECTORY_TYPE.HYDRO_SERIES:
+        case TRAJECTORY_TYPE.OTHER_VECTOR:
           return (
             <TabMenu key={type} type={type} defaultAreas={areasDefault} areas={trajectoryAreas} studyData={studyData} />
           );
@@ -122,13 +123,13 @@ const StudyNavigationMenu = ({ studyData }: StudyNavigationMenuProps) => {
         direction="horizontal"
         alignment="start"
         overflowType="scrollable"
-        selectedTabId={activeTab.id}
+        selectedTabId={activeTab.panelId}
         inverted={false}
         options={tabs}
       />
       <div className="flex flex-1 flex-col gap-4 overflow-y-auto">
         <ContainerWithExpander content={warningMessages?.data ?? []} placeholder={t('studyDetails.@noWarnings')} />
-        {!activeTab?.disabled && renderActiveComponent(activeTab?.id as TRAJECTORY_TYPE)}
+        {!activeTab?.disabled && renderActiveComponent(activeTab?.panelId as TRAJECTORY_TYPE)}
       </div>
     </div>
   );

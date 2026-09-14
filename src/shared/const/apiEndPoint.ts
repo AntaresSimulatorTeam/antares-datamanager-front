@@ -63,6 +63,8 @@ export const TRAJECTORY_ADEQUACY_PATCH = `${BACK_END_BASE_URL}/v1/trajectory/ade
 export const TRAJECTORY_FLOWBASED = `${BACK_END_BASE_URL}/v1/trajectory/flowbased`;
 export const TRAJECTORY_SETTINGS = `${BACK_END_BASE_URL}/v1/trajectory/settings`;
 export const TRAJECTORY_SCENARIO_BUILDER = `${BACK_END_BASE_URL}/v1/trajectory/scenarioBuilder`;
+export const TRAJECTORY_P2G_CAPACITY_COST = `${BACK_END_BASE_URL}/v1/trajectory/capacity-cost-p2g`;
+export const TRAJECTORY_P2G_MARKET_MODULATION = `${BACK_END_BASE_URL}/v1/trajectory/modulation-p2g`;
 
 //ABOUT
 export const BACK_END_ACTUATOR_ENDPOINT = `${BACK_END_BASE_URL}/actuator/info`;

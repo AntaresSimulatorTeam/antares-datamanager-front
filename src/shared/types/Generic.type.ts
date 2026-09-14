@@ -16,6 +16,8 @@ import {
   HYDRO_TYPES,
   NUCLEAR_FR_MODULATION_TYPES,
   NUCLEAR_FR_TIME_SERIES_TYPES,
+  OTHER_VECTOR_TYPES,
+  P2G_TYPES,
 } from '@/shared/const/trajectoryTypes.ts';
 import { DropdownItemProps } from '@design-system-rte/core/components/dropdown/dropdown.interface';
 
@@ -76,8 +78,8 @@ export type ExpandedState = true | Record<string, boolean>;
 
 export interface TabProps {
   studyData: StudyDTO;
-  defaultAreas: { name: string }[];
-  areas: TrajectoryAreaData[];
+  defaultAreas?: { name: string }[];
+  areas?: TrajectoryAreaData[];
 }
 
 export type TableHeadersProps = {
@@ -127,22 +129,26 @@ export const isTrajectoryNuclearType = (value: TRAJECTORY_TYPE) => NUCLEAR_FR_MO
 
 export const isTrajectoryNuclearTSType = (value: TRAJECTORY_TYPE) => NUCLEAR_FR_TIME_SERIES_TYPES.includes(value);
 
+export const isTrajectoryOtherVectorType = (value: TRAJECTORY_TYPE) => OTHER_VECTOR_TYPES.includes(value);
+
+export const isTrajectoryP2GType = (value: TRAJECTORY_TYPE) => P2G_TYPES.includes(value);
+
 export type TableOperationRow = 'empty' | 'remove';
 
 export interface MenuProps {
-  defaultAreas: { name: string }[];
+  defaultAreas?: { name: string }[];
   studyData: StudyDTO;
   type: TRAJECTORY_TYPE;
-  areas: TrajectoryAreaData[];
+  areas?: TrajectoryAreaData[];
 }
 
 export interface FetchResult {
   trajType: TRAJECTORY_TYPE;
   trajectories: DbTrajectory[];
-  dsrCmResult: DbTrajectory[] | null;
+  dsrCmResult?: DbTrajectory[] | null;
   technologies?: TechnologyType[] | null;
-  shouldSkipFetch: boolean;
-  contextTrajectories: DbTrajectory[];
+  shouldSkipFetch?: boolean;
+  contextTrajectories?: DbTrajectory[];
 }
 
 export interface HypothesisTableResults extends FetchResult {
