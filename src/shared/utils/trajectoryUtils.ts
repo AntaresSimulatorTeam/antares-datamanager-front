@@ -1399,3 +1399,13 @@ export const areAllFlowbasedAreasPresent = (areasName: string[]): boolean => {
     normalizedAreas.has(mandatoryArea.toUpperCase())
   );
 };
+
+export const getColumnHeader = (t: TFunction, type?: TRAJECTORY_TYPE) => {
+  switch (type) {
+    case TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION:
+    case TRAJECTORY_TYPE.P2G:
+      return t('studyDetails.@hypothesis');
+    default:
+      return t('studyDetails.@areas');
+  }
+}
