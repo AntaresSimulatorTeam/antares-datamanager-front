@@ -152,7 +152,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
           const studyData = {
             ...study,
             createdBy: user?.profile.sub,
-            name: isDuplicateMode ? studyName : `${studyName}_${horizon}`,
+            name: studyName,
             keywords,
             project: project?.label ?? '',
             projectId: project?.id?.toString() || '',
