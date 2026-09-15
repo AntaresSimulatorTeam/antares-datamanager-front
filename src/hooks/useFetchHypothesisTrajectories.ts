@@ -180,8 +180,8 @@ export const useFetchHypothesisTrajectories = (
             result.shouldSkipFetch ? result.contextTrajectories : result.trajectories,
           );
 
-          const allowedAreas = [...(areas ?? []).map(area => area.areaName), ...(defaultAreas ?? []).map(area => area.name), OTHER_AREAS];
-          const areasWithTrajectory = effectiveTrajectories.flatMap((traj) => (traj?.area?.length && allowedAreas.includes(traj?.area) ? traj : []));
+          const allowedAreas = new Set([...(areas ?? []).map(area => area.areaName), ...(defaultAreas ?? []).map(area => area.name), OTHER_AREAS]);
+          const areasWithTrajectory = effectiveTrajectories.flatMap((traj) => (traj?.area?.length && allowedAreas.has(traj?.area) ? traj : []));
           const hydroTypes = hydroTypeToSet === TRAJECTORY_TYPE.HYDRO_SERIES ? HYDRO_TYPES : HYDRO_PSP_TYPES;
 
           const allHydroRows = hydroTypes.flatMap((type) =>

@@ -296,7 +296,7 @@ export const buildHypothesisRows = ({
 }: {
   trajType: TRAJECTORY_TYPE;
   trajectories: DbTrajectory[];
-  defaultAreas?: { name: string }[] | undefined;
+  defaultAreas?: { name: string }[];
   areas?: TrajectoryAreaData[];
   technologies?: string[] | null;
   isStudyGenerated?: boolean;

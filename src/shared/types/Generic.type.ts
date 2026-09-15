@@ -142,8 +142,10 @@ export interface MenuProps {
   areas?: TrajectoryAreaData[];
 }
 
+export type TrajectoryType = TRAJECTORY_TYPE;
+
 export interface FetchResult {
-  trajType: TRAJECTORY_TYPE;
+  trajType: TrajectoryType;
   trajectories: DbTrajectory[];
   dsrCmResult?: DbTrajectory[] | null;
   technologies?: TechnologyType[] | null;
