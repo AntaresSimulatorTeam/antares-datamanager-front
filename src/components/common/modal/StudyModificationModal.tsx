@@ -45,28 +45,47 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
   const { user } = useUser();
   const { projects } = useFetchProjectOptions();
 
-  const baseStudyName = study.name.substring(0, study.name.lastIndexOf('_'));
-  const [studyName, setStudyName] = useState<string>(baseStudyName);
-  const [project, setProject] = useState<SelectDSOption>({
-    id: Number(study.projectId),
-    label: study.project,
-    value: study.project,
-  });
+  const [baseStudyName, setBaseStudyName] = useState<string>('');
+  const [studyName, setStudyName] = useState<string>('');
+  const [project, setProject] = useState<SelectDSOption | null>(null);
 
-  const [keywords, setKeywords] = useState<string[]>(study?.keywords || []);
-  const [horizon, setHorizon] = useState<string>(() => convertToOneYearHorizon(study.horizon));
+  const [keywords, setKeywords] = useState<string[]>([]);
+  const [horizon, setHorizon] = useState<string>('');
   const [isFormValid, setIsFormValid] = useState(false);
   const [isHorizonValid, setIsHorizonValid] = useState(true);
   const [studyErrorMessage, setStudyErrorMessage] = useState<string>('');
   const [horizonErrorMessage, setHorizonErrorMessage] = useState<string>('');
+
+  useEffect(() => {
+    setBaseStudyName(study.name.substring(0, study.name.lastIndexOf('_')));
+    setStudyName(baseStudyName);
+    setProject({
+      id: Number(study.projectId),
+      label: study.project,
+      value: study.project,
+    });
+
+    setKeywords(study?.keywords || []);
+    setHorizon(() => convertToOneYearHorizon(study.horizon));
+  }, [baseStudyName, study.horizon, study?.keywords, study.name, study.project, study.projectId]);
 
   const resetErrorMessage = () => {
     setStudyErrorMessage('');
     setHorizonErrorMessage('');
   };
 
+  const resetFields = () => {
+    setBaseStudyName('');
+    setStudyName('');
+    setProject(null);
+    setKeywords([]);
+    setHorizon('');
+  };
+
+
   const handleClose = useCallback(() => {
     resetErrorMessage();
+    resetFields();
     onClose();
   }, [onClose]);
 
@@ -80,7 +99,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
       handleClose();
     },
     (error) => {
-      if (error?.antaresErrorMessage?.includes(t('studyDetails.@duplicateModalStudyError'))) {
+      if (error?.antaresErrorMessage?.includes(t('A study with the same name already exists'))) {
         setStudyErrorMessage(error?.antaresErrorMessage);
       } else if (error?.antaresErrorMessage?.includes(t('horizonInput.@validYearError'))) {
         setHorizonErrorMessage(error?.antaresErrorMessage);
@@ -100,9 +119,9 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
 
   useEffect(() => {
     const validateForm = () => {
-      const studyNameChanged = studyName.length > 0 && studyName.trim() !== baseStudyName.trim();
-      const projectNameChanged = study.project.trim() !== project?.label.trim();
-      const keywordsChanged = hasArrayChanged(study.keywords, keywords);
+      const studyNameChanged = studyName?.length && studyName?.trim() !== baseStudyName?.trim();
+      const projectNameChanged = study.project?.trim() !== project?.label?.trim();
+      const keywordsChanged = hasArrayChanged(study.keywords, keywords ?? []);
       const horizonChanged = isHorizonValid && convertToOneYearHorizon(study.horizon) !== horizon;
       if (isDuplicateMode) {
         setIsFormValid(horizonChanged || studyNameChanged || projectNameChanged);
@@ -133,9 +152,9 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
           const studyData = {
             ...study,
             createdBy: user?.profile.sub,
-            name: studyName,
+            name: isDuplicateMode ? studyName : `${studyName}_${horizon}`,
             keywords,
-            project: project.label,
+            project: project?.label ?? '',
             projectId: project?.id?.toString() || '',
             horizon,
           };
