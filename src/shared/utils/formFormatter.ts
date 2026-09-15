@@ -25,7 +25,9 @@ export const isRepositoryTrajectory = (type: TRAJECTORY_TYPE, isDefaultArea = fa
   type === TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION ||
   type === TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM ||
   type === TRAJECTORY_TYPE.ADEQUACY_PATCH ||
-  type === TRAJECTORY_TYPE.FLOWBASED;
+  type === TRAJECTORY_TYPE.FLOWBASED ||
+  type === TRAJECTORY_TYPE.P2G_CAPACITY_COST ||
+  type === TRAJECTORY_TYPE.P2G_MARKET_MODULATION;
 
 export const convertToFSSelectionOptionType = (options: FsTrajectory[], isDefaultArea = false): DropdownItemOption[] =>
   options.map((option, indexTrajectory) => {

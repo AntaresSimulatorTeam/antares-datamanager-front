@@ -332,7 +332,7 @@ describe('getStudyMenu', () => {
   it('should return correct tab structure when area is not linked', () => {
     const result: TabItemProps[] = getStudyMenu(mockTranslate, false);
 
-    expect(result.length).toBe(8);
+    expect(result).toHaveLength(9);
 
     expect(result[0]).toEqual({
       id: TRAJECTORY_TYPE.AREA,
@@ -746,6 +746,14 @@ describe('getPathFromTrajectoryType', () => {
 
   it('should return technical path for SCENARIO_BUILDER type', () => {
     expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.SCENARIO_BUILDER)).toBe(String.raw`\\settings\\scenario_builder`);
+  });
+
+  it('should return technical path for P2G_CAPACITY_COST type', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.P2G_CAPACITY_COST)).toBe(String.raw`\\P2G`);
+  });
+
+  it('should return technical path for P2G_MARKET_MODULATION type', () => {
+    expect(getPathFromTrajectoryType(TRAJECTORY_TYPE.P2G_MARKET_MODULATION)).toBe(String.raw`\\thermal\\economic parameters\\market_bid_marg_cost_modulation`);
   });
 
   it('should return technical path for unknown type', () => {
