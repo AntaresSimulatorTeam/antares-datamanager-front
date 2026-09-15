@@ -351,4 +351,15 @@ describe('updateStudy', () => {
       body: JSON.stringify(mockStudyData),
     });
   });
+
+  it('should handle update study failure gracefully', async () => {
+    const mockError = {
+      antaresErrorMessage: 'A study already exists',
+      date: new Date(),
+      type: ERROR_MESSAGE_TYPE.BUSINESS,
+    };
+    vi.mocked(AuthService.authFetch).mockRejectedValueOnce(mockError);
+
+    await expect(updateStudy(mockStudyData, 123)).rejects.toEqual(mockError);
+  });
 });
