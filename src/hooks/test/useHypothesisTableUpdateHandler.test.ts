@@ -58,14 +58,13 @@ describe('useHypothesisTableUpdateHandler', () => {
         setRowToDelete,
         setIsDeletionModalOpen,
         dbTrajectories: [],
-        setRowIdSelected,
-        setReadOnly,
+        setRowIdSelected
       }),
     );
 
-    await result.current.handleHypothesisTableUpdate('0', null, 'empty', TRAJECTORY_TYPE.LOAD, data, setData);
+    await result.current.handleHypothesisTableUpdate('0', null, 'empty', TRAJECTORY_TYPE.LOAD, data, setData, setReadOnly);
 
-    expect(mockDetach).toHaveBeenCalledWith(TRAJECTORY_TYPE.LOAD, [0], setData, data, 'empty', 'Area A');
+    expect(mockDetach).toHaveBeenCalledWith(TRAJECTORY_TYPE.LOAD, [0], setData, data, 'empty', 'Area A', setReadOnly, undefined);
   });
 
   it('should open deletion modal for DSR capacity modulation', async () => {
@@ -80,12 +79,11 @@ describe('useHypothesisTableUpdateHandler', () => {
         setRowToDelete,
         setIsDeletionModalOpen,
         dbTrajectories: [],
-        setRowIdSelected,
-        setReadOnly,
+        setRowIdSelected
       }),
     );
 
-    await result.current.handleHypothesisTableUpdate('1', null, 'empty', TRAJECTORY_TYPE.DSR, data, setData);
+    await result.current.handleHypothesisTableUpdate('1', null, 'empty', TRAJECTORY_TYPE.DSR, data, setData, setReadOnly);
 
     expect(setRowToDelete).toHaveBeenCalledWith({
       index: 1,
@@ -111,13 +109,12 @@ describe('useHypothesisTableUpdateHandler', () => {
         setIsDeletionModalOpen,
         dbTrajectories,
         setRowIdSelected,
-        setReadOnly,
       }),
     );
 
-    await result.current.handleHypothesisTableUpdate('0', 42, 'success', TRAJECTORY_TYPE.LOAD, data, setData);
+    await result.current.handleHypothesisTableUpdate('0', 42, 'success', TRAJECTORY_TYPE.LOAD, data, setData, setReadOnly);
 
-    expect(mockAttach).toHaveBeenCalledWith(TRAJECTORY_TYPE.LOAD, [0], 'success', dbTrajectories[0], setData);
+    expect(mockAttach).toHaveBeenCalledWith(TRAJECTORY_TYPE.LOAD, [0], 'success', dbTrajectories[0], setData, setReadOnly, undefined);
   });
 
   describe('type AREA', () => {
@@ -133,14 +130,13 @@ describe('useHypothesisTableUpdateHandler', () => {
           setRowToDelete,
           setIsDeletionModalOpen,
           dbTrajectories: [],
-          setRowIdSelected,
-          setReadOnly,
+          setRowIdSelected
         }),
       );
 
-      await result.current.handleHypothesisTableUpdate('0', null, 'empty', TRAJECTORY_TYPE.AREA, data, setData);
+      await result.current.handleHypothesisTableUpdate('0', null, 'empty', TRAJECTORY_TYPE.AREA, data, setData, setReadOnly);
 
-      expect(mockDetach).toHaveBeenCalledWith(TRAJECTORY_TYPE.AREA, [0], setData, data, 'empty', 'Area A');
+      expect(mockDetach).toHaveBeenCalledWith(TRAJECTORY_TYPE.AREA, [0], setData, data, 'empty', 'Area A', setReadOnly, undefined);
     });
 
     it('should use AREA type when status is success and first index is 0', async () => {
@@ -153,14 +149,13 @@ describe('useHypothesisTableUpdateHandler', () => {
           setRowToDelete,
           setIsDeletionModalOpen,
           dbTrajectories,
-          setRowIdSelected,
-          setReadOnly,
+          setRowIdSelected
         }),
       );
 
-      await result.current.handleHypothesisTableUpdate('0', 10, 'success', TRAJECTORY_TYPE.AREA, data, setData);
+      await result.current.handleHypothesisTableUpdate('0', 10, 'success', TRAJECTORY_TYPE.AREA, data, setData, setReadOnly);
 
-      expect(mockAttach).toHaveBeenCalledWith(TRAJECTORY_TYPE.AREA, [0], 'success', dbTrajectories[0], setData);
+      expect(mockAttach).toHaveBeenCalledWith(TRAJECTORY_TYPE.AREA, [0], 'success', dbTrajectories[0], setData, setReadOnly, undefined);
     });
 
     it('should use LINK type when first index is not 0', async () => {
@@ -175,14 +170,13 @@ describe('useHypothesisTableUpdateHandler', () => {
           setRowToDelete,
           setIsDeletionModalOpen,
           dbTrajectories: [],
-          setRowIdSelected,
-          setReadOnly,
+          setRowIdSelected
         }),
       );
 
-      await result.current.handleHypothesisTableUpdate('1', null, 'empty', TRAJECTORY_TYPE.AREA, data, setData);
+      await result.current.handleHypothesisTableUpdate('1', null, 'empty', TRAJECTORY_TYPE.AREA, data, setData, setReadOnly);
 
-      expect(mockDetach).toHaveBeenCalledWith(TRAJECTORY_TYPE.LINK, [1], setData, data, 'empty', 'Link B');
+      expect(mockDetach).toHaveBeenCalledWith(TRAJECTORY_TYPE.LINK, [1], setData, data, 'empty', 'Link B', setReadOnly, undefined);
     });
 
     it('should use LINK type when status is success and first index is not 0', async () => {
@@ -195,14 +189,13 @@ describe('useHypothesisTableUpdateHandler', () => {
           setRowToDelete,
           setIsDeletionModalOpen,
           dbTrajectories,
-          setRowIdSelected,
-          setReadOnly,
+          setRowIdSelected
         }),
       );
 
-      await result.current.handleHypothesisTableUpdate('1', 20, 'success', TRAJECTORY_TYPE.AREA, data, setData);
+      await result.current.handleHypothesisTableUpdate('1', 20, 'success', TRAJECTORY_TYPE.AREA, data, setData, setReadOnly);
 
-      expect(mockAttach).toHaveBeenCalledWith(TRAJECTORY_TYPE.LINK, [1], 'success', dbTrajectories[0], setData);
+      expect(mockAttach).toHaveBeenCalledWith(TRAJECTORY_TYPE.LINK, [1], 'success', dbTrajectories[0], setData, setReadOnly, undefined);
     });
   });
 
@@ -219,8 +212,7 @@ describe('useHypothesisTableUpdateHandler', () => {
           setRowToDelete,
           setIsDeletionModalOpen,
           dbTrajectories: [],
-          setRowIdSelected,
-          setReadOnly,
+          setRowIdSelected
         }),
       );
 
@@ -231,6 +223,7 @@ describe('useHypothesisTableUpdateHandler', () => {
         TRAJECTORY_TYPE.HYDRO_SERIES,
         data,
         setData,
+        setReadOnly
       );
 
       expect(mockDetach).toHaveBeenCalledWith(
@@ -240,6 +233,7 @@ describe('useHypothesisTableUpdateHandler', () => {
         data,
         'empty',
         'Hydro A',
+        setReadOnly, undefined
       );
     });
 
@@ -253,8 +247,7 @@ describe('useHypothesisTableUpdateHandler', () => {
           setRowToDelete,
           setIsDeletionModalOpen,
           dbTrajectories,
-          setRowIdSelected,
-          setReadOnly,
+          setRowIdSelected
         }),
       );
 
@@ -265,6 +258,7 @@ describe('useHypothesisTableUpdateHandler', () => {
         TRAJECTORY_TYPE.HYDRO_SERIES,
         data,
         setData,
+        setReadOnly
       );
 
       expect(mockAttach).toHaveBeenCalledWith(
@@ -273,6 +267,7 @@ describe('useHypothesisTableUpdateHandler', () => {
         'success',
         dbTrajectories[0],
         setData,
+        setReadOnly, undefined
       );
     });
 
@@ -288,8 +283,7 @@ describe('useHypothesisTableUpdateHandler', () => {
           setRowToDelete,
           setIsDeletionModalOpen,
           dbTrajectories: [],
-          setRowIdSelected,
-          setReadOnly,
+          setRowIdSelected
         }),
       );
 
@@ -300,9 +294,10 @@ describe('useHypothesisTableUpdateHandler', () => {
         TRAJECTORY_TYPE.HYDRO_SERIES,
         data,
         setData,
+        setReadOnly
       );
 
-      expect(mockDetach).toHaveBeenCalledWith(TRAJECTORY_TYPE.HYDRO_SERIES, [0, 0], setData, data, 'empty', 'Hydro A');
+      expect(mockDetach).toHaveBeenCalledWith(TRAJECTORY_TYPE.HYDRO_SERIES, [0, 0], setData, data, 'empty', 'Hydro A', setReadOnly, undefined);
     });
   });
 });

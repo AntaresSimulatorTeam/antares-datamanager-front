@@ -10,7 +10,14 @@ import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
 import { useTranslation } from 'react-i18next';
 import { unlinkAllTrajectoriesFromStudy } from '@/shared/services/trajectoryService.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { DbTrajectory, HypothesisRowData, RowStatus, SelectOption, StudyDTO, TrajectoryViewData } from '@/shared/types';
+import {
+  DbTrajectory,
+  DropdownItemOption,
+  HypothesisRowData,
+  RowStatus,
+  StudyDTO,
+  TrajectoryViewData,
+} from '@/shared/types';
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
@@ -45,14 +52,14 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
   const { isModalOpen, toggleModal } = useNewStudyModal();
   const dispatch = useStudyDispatch();
   const { t } = useTranslation();
-  const [optionsFS, setOptionsFS] = useState<SelectOption[] | undefined>();
+  const [optionsFS, setOptionsFS] = useState<DropdownItemOption[] | undefined>();
   const [rowIdSelected, setRowIdSelected] = useState<string>('0');
   const [trajectoryData, setTrajectoryData] = useState<TrajectoryViewData | undefined>();
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [data, setData] = useState<HypothesisRowData[]>([]);
   const [settingsData, setSettingsData] = useState<HypothesisRowData[]>([]);
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({ '0': false, '1': true });
-  const [readOnlySettings, setReadOnlySettings] = useState<ReadOnlyObject>({ '0': true, '1': true });
+  const [readOnlySettings, setReadOnlySettings] = useState<ReadOnlyObject>({ '0': true, '1': true, '2.0': true, '2.1': true });
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const [isDeletionModalOpen, setIsDeletionModalOpen] = useState(false);
   const [selectedTrajectoryType, setSelectedTrajectoryType] = useState<TRAJECTORY_TYPE>(TRAJECTORY_TYPE.AREA);
@@ -63,13 +70,13 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
   const configs = useMemo(
     () => [[
       { type: TRAJECTORY_TYPE.AREA, labelKey: t('studyDetails.@areas') },
-      { type: TRAJECTORY_TYPE.LINK, labelKey: t('studyDetails.@links'), hasHvdcOption: true },
+      { type: TRAJECTORY_TYPE.LINK, labelKey: t('studyDetails.@links'), options: {hasHvdcOption: true} },
     ],[
       { type: TRAJECTORY_TYPE.ADEQUACY_PATCH, labelKey: t('settings.@adequacyPatch') },
-      { type: TRAJECTORY_TYPE.FLOWBASED, labelKey: t('settings.@flowBased') },
+      { type: TRAJECTORY_TYPE.FLOWBASED, labelKey: t('settings.@flowBased'), options: {hasRecalculateOption: true} },
       { type: TRAJECTORY_TYPE.SETTINGS, labelKey: t('settings.@title'), subRows: [
-        { type: TRAJECTORY_TYPE.SETTINGS, labelKey: t('settings.@generalData') }]
-        //{ type: TRAJECTORY_TYPE.SETTINGS_SCENARIO_BUILDER, labelKey: t('settings.@scenarioBuilder') }]
+        { type: TRAJECTORY_TYPE.SETTINGS, labelKey: t('settings.@generalData') },
+        { type: TRAJECTORY_TYPE.SCENARIO_BUILDER, labelKey: t('settings.@scenarioBuilder') }]
       },
     ]],
     [t]
@@ -82,7 +89,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
   );
   const { firstTableData, firstTableReadOnlyRow, secondTableData, secondTableReadOnlyRow } =
     useFetchFixHypothesisTrajectories(configs, options, isStudyGenerated, studyData?.id);
-  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch, setReadOnly, setReadOnlySettings);
+  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, dispatch);
   const { handleSearch } = useTrajectorySearchHandler({
     studyHorizon: studyData.horizon,
     setDbTrajectories,
@@ -92,9 +99,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
     studyData,
     setRowIdSelected,
     setIsDeletionModalOpen,
-    dbTrajectories,
-    setReadOnly,
-    setSecondTableReadOnly: setReadOnlySettings,
+    dbTrajectories
   });
 
   useEffect(() => {
@@ -112,7 +117,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
         setReadOnlySettings(buildReadOnlyRow(['0', '1', '2.0', '2.1']));
       }
     }
-  }, [studyState.studyStatus]);
+  }, [configs, studyState.studyStatus]);
 
   const handleSelectionChange = useCallback(
     async (fileNameContains: string, rowId: string, type: TRAJECTORY_TYPE) => {
@@ -135,26 +140,33 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
     setOptionsFS(results);
     setRowIdSelected(rowId);
     toggleModal();
-  }, []);
+  }, [data, handleFetchFromFS, toggleModal]);
 
   const handleViewTrajectoryData = useCallback(
     (rowId: string) => {
       const index = Number(rowId);
       const trajectory = data[index].trajectory;
       if (trajectory) {
-        void handleViewTrajectory(trajectory, setTrajectoryData, setIsViewModalOpen, t);
+        void handleViewTrajectory(trajectory, setTrajectoryData, setIsViewModalOpen, t, studyState.areas);
       }
     },
-    [data, t],
+    [data, studyState.areas, t],
   );
 
-  const handleActivate = useCallback(
+  const handleHvdcActivate = useCallback(
     async (value?: boolean) => {
       await updateStudy({ hvdc: value }, studyData.id);
       setData((prev) => prev.map((item, index) => (index === 1 ? { ...item, hvdc: value } : item)));
-      dispatch?.({ type: STUDY_ACTION.SET_STUDY_HVDC, payload: !!value });
     },
-    [dispatch, studyData.id],
+    [studyData.id],
+  );
+
+  const handleRecalculateActivate = useCallback(
+    async (value?: boolean) => {
+      await updateStudy({ recalculate: value }, studyData.id);
+      setSettingsData((prev) => prev.map((item, index) => (index === 1 ? { ...item, recalculate: value } : item)));
+    },
+    [studyData.id],
   );
 
   const handleConfirmedAreaDeletion = useCallback(async () => {
@@ -162,7 +174,6 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
     void updateStudy({ hvdc: false }, studyData.id);
 
     setData(buildTableData(configs[0], t, [], {hvdc: false}));
-    dispatch?.({ type: STUDY_ACTION.SET_STUDY_HVDC, payload: false });
     dispatch?.({
       type: STUDY_ACTION.CLEAR_TRAJECTORY_BY_TYPE,
       payload: [TRAJECTORY_TYPE.AREA],
@@ -170,7 +181,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
     setReadOnly({ '0': false, '1': true });
 
     setSettingsData(buildTableData(configs[1], t));
-    setReadOnlySettings({ '0': true, '1': true, '2.0': false, '2.1': false });
+    setReadOnlySettings(buildReadOnlyRow(['0', '1', '2.0', '2.1']));
 
     setIsDeletionModalOpen(false);
   }, [configs, dispatch, studyData.id, t]);
@@ -179,65 +190,66 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
     <div className="flex w-full flex-col gap-6 items-start">
       <div className="flex w-full flex-col gap-2 items-start">
         <div className="text-heading-xs font-medium">{t('studyDetails.@areas_links')}</div>
-      <PegaseHypothesisTable
-        id="area-link-table"
-        columnHeader={t('studyDetails.@hypothesis')}
-        data={data}
-        getTableHeaders={getEditableHypothesisTableHeaders}
-        fileStatus={fileStatus}
-        isStudyGenerated={isStudyGenerated}
-        readOnly={readOnly}
-        isReadOnlyEnable={true}
-        progress={isSettingsParametersType(selectedTrajectoryType) ? 0 : progress}
-        idSelected={String(rowIdSelected)}
-        handleSearch={async (fileNameContains: string, rowId: string) => await handleSelectionChange(fileNameContains, rowId, TRAJECTORY_TYPE.AREA)}
-        updateData={(rowId: string, value: unknown, status: RowStatus) => {
-          void handleHypothesisTableUpdate(rowId, value, status, TRAJECTORY_TYPE.AREA, data, setData);
-        }}
-        handleImport={async (rowId: string) => await handleFetchTrajectoryFromFs(rowId, TRAJECTORY_TYPE.AREA)}
-        handleViewData={handleViewTrajectoryData}
-        activate={async (value?: boolean | string) => await handleActivate(value as boolean)}
-        type={TRAJECTORY_TYPE.AREA}
-      />
+          <PegaseHypothesisTable
+            id="area-link-table"
+            columnHeader={t('studyDetails.@hypothesis')}
+            data={data}
+            getTableHeaders={getEditableHypothesisTableHeaders}
+            fileStatus={fileStatus}
+            isStudyGenerated={isStudyGenerated}
+            readOnly={readOnly}
+            isReadOnlyEnable={true}
+            progress={isSettingsParametersType(selectedTrajectoryType) ? 0 : progress}
+            idSelected={String(rowIdSelected)}
+            handleSearch={async (fileNameContains: string, rowId: string) => await handleSelectionChange(fileNameContains, rowId, TRAJECTORY_TYPE.AREA)}
+            updateData={(rowId: string, value: unknown, status: RowStatus) => {
+              void handleHypothesisTableUpdate(rowId, value, status, TRAJECTORY_TYPE.AREA, data, setData, setReadOnly, setReadOnlySettings);
+            }}
+            handleImport={async (rowId: string) => await handleFetchTrajectoryFromFs(rowId, TRAJECTORY_TYPE.AREA)}
+            handleViewData={handleViewTrajectoryData}
+            activate={async (value?: boolean | string) => await handleHvdcActivate(value as boolean)}
+            type={TRAJECTORY_TYPE.AREA}
+          />
       </div>
       <div className="flex w-full flex-col gap-2 items-start">
         <div className="text-heading-xs font-medium">{t('studyDetails.@configuration')}</div>
-      <PegaseHypothesisTable
-        id="settings-table"
-        columnHeader={t('studyDetails.@hypothesis')}
-        data={settingsData}
-        getTableHeaders={getExpandableHypothesisTableHeaders}
-        fileStatus={fileStatus}
-        isStudyGenerated={isStudyGenerated}
-        readOnly={readOnlySettings}
-        isReadOnlyEnable={true}
-        progress={isSettingsParametersType(selectedTrajectoryType) ? progress : 0}
-        idSelected={String(rowIdSelected)}
-        handleSearch={async (fileNameContains: string, rowId: string) => {
-          setSelectedTrajectoryType(TRAJECTORY_TYPE.ADEQUACY_PATCH);
-          return await handleSelectionChange(fileNameContains, rowId, TRAJECTORY_TYPE.ADEQUACY_PATCH)
-        }}
-        updateData={(rowId: string, value: unknown, status: RowStatus) => {
-          void handleHypothesisTableUpdate(
-            rowId,
-            value,
-            status,
-            TRAJECTORY_TYPE.ADEQUACY_PATCH,
-            settingsData,
-            setSettingsData,
-          );
-        }}
-        handleImport={async (rowId: string) => await handleFetchTrajectoryFromFs(rowId, TRAJECTORY_TYPE.ADEQUACY_PATCH)}
-        activate={() => {}}
-        type={TRAJECTORY_TYPE.ADEQUACY_PATCH}
-      />
+          <PegaseHypothesisTable
+            id="settings-table"
+            columnHeader={t('studyDetails.@hypothesis')}
+            data={settingsData}
+            getTableHeaders={getExpandableHypothesisTableHeaders}
+            fileStatus={fileStatus}
+            isStudyGenerated={isStudyGenerated}
+            readOnly={readOnlySettings}
+            isReadOnlyEnable={true}
+            progress={isSettingsParametersType(selectedTrajectoryType) ? progress : 0}
+            idSelected={String(rowIdSelected)}
+            handleSearch={async (fileNameContains: string, rowId: string) => {
+              setSelectedTrajectoryType(TRAJECTORY_TYPE.ADEQUACY_PATCH);
+              return await handleSelectionChange(fileNameContains, rowId, TRAJECTORY_TYPE.ADEQUACY_PATCH)
+            }}
+            updateData={(rowId: string, value: unknown, status: RowStatus) => {
+              void handleHypothesisTableUpdate(
+                rowId,
+                value,
+                status,
+                TRAJECTORY_TYPE.ADEQUACY_PATCH,
+                settingsData,
+                setSettingsData,
+                setReadOnlySettings
+              );
+            }}
+            handleImport={async (rowId: string) => await handleFetchTrajectoryFromFs(rowId, TRAJECTORY_TYPE.ADEQUACY_PATCH)}
+            activate={async (value?: boolean | string) => await handleRecalculateActivate(value as boolean)}
+            type={TRAJECTORY_TYPE.ADEQUACY_PATCH}
+          />
       </div>
-      {isModalOpen && (
         <ImportTrajectoryModal
           options={optionsFS}
+          isOpen={isModalOpen}
           onClose={async (
             typeToUse?: TRAJECTORY_TYPE,
-            value?: SelectOption,
+            value?: DropdownItemOption,
             hypothesis?: HypothesisType,
             indexArray?: number[],
           ) => {
@@ -251,6 +263,8 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
                   typeToUse,
                   indexArray,
                   hypothesis,
+                  setReadOnly,
+                  setReadOnlySettings
                 );
               }
             }
@@ -263,9 +277,8 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
           indexArray={rowIdSelected?.split('.').map(Number)}
           rowsNb={data.length}
         />
-      )}
-      {isViewModalOpen && trajectoryData && (
-        <TrajectoryDataVisualisation trajectoryData={trajectoryData} onClose={() => setIsViewModalOpen(false)} />
+      {trajectoryData && (
+        <TrajectoryDataVisualisation trajectoryData={trajectoryData} onClose={() => setIsViewModalOpen(false)} isOpen={isViewModalOpen}/>
       )}
       <AreaDeletionConfirmationModal
         isOpen={isDeletionModalOpen}

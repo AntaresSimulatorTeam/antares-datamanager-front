@@ -1,8 +1,8 @@
-import { useRdsId } from 'rte-design-system-react';
 import { DisplayStatus } from '@/shared/types';
 import { alertClassBuilder } from './alertClassBuilder';
 import { useState } from 'react';
 import { Button, Icon, IconButton } from '@design-system-rte/react';
+import { useStdId } from '@/hooks/useStdId.ts';
 
 const DEFAULT_ICON = {
   success: 'check',
@@ -39,7 +39,7 @@ const StdAlert = ({
   filledIcon,
   content,
 }: StdAlertProps) => {
-  const id = useRdsId('alert', propsId);
+  const id = useStdId('alert', propsId);
   const [expanded, setExpanded] = useState(false);
   const { containerClasses, iconClasses, textClasses } = alertClassBuilder(status, filledIcon);
 

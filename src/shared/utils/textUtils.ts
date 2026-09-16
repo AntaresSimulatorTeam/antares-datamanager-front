@@ -5,6 +5,8 @@
  */
 
 import { NavItemProps } from '@design-system-rte/core/components/side-nav/nav-item/nav-item.interface';
+import { FsTrajectory } from '@/shared/types';
+import { isRepositoryTrajectory } from '@/shared/utils/formFormatter.ts';
 
 export const translateMenuItemLabel = (menuItems: NavItemProps[], t: (key: string) => string): NavItemProps[] =>
   menuItems.map((data: NavItemProps, index: number) => ({ ...data, label: t(data.label), key: `${index}-${data.label}` }));
@@ -28,3 +30,9 @@ export const convertToOneYearHorizon = (rawHorizon: string) => {
   const maxYear = years.length ? Math.max(...years) : '';
   return maxYear.toString();
 };
+
+export const formatFlowBasedLabel = (name: string) => name.replace('/', '###');
+
+export const formatLabel = (option: FsTrajectory, isDefaultArea = false) => option.trajectoryName && !isRepositoryTrajectory(option.type, isDefaultArea)
+  ? option.trajectoryName.substring(0, option.trajectoryName.lastIndexOf('.'))
+  : option.trajectoryName;

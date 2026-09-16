@@ -35,24 +35,25 @@ describe('useStudyTableDisplay', () => {
         searchTerm: 'test',
         sortBy: { status: 'desc' },
         reloadStudies: 1,
+        page: 4,
       }),
     );
     await waitFor(() => {
       expect(result.current.rows).toHaveLength(2);
       expect(result.current.rows).toEqual(mockStudyResponse2.content);
-      expect(result.current.count).toEqual(2);
+      expect(result.current.totalPagesNb).toEqual(2);
       expect(global.fetch).toHaveBeenCalledWith(
-        'https://mockapi.com/v1/study/search?page=1&size=12&search=test&sortColumn=status&sortDirection=desc',
+        'https://mockapi.com/v1/study/search?page=5&size=12&search=test&sortColumn=status&sortDirection=desc',
         {},
       );
     });
 
     act(() => {
-      renderHook(() => useStudyTableDisplay({ searchTerm: 'mouad', sortBy: { project: 'asc' }, reloadStudies: 1 }));
+      renderHook(() => useStudyTableDisplay({ searchTerm: 'mouad', sortBy: { project: 'asc' }, reloadStudies: 1, page: 4 }));
     });
 
     expect(global.fetch).toHaveBeenCalledWith(
-      'https://mockapi.com/v1/study/search?page=1&size=12&search=mouad&sortColumn=project&sortDirection=asc',
+      'https://mockapi.com/v1/study/search?page=5&size=12&search=mouad&sortColumn=project&sortDirection=asc',
       {},
     );
   });
@@ -69,12 +70,12 @@ describe('useStudyTableDisplay', () => {
     });
 
     const { result } = renderHook(() =>
-      useStudyTableDisplay({ searchTerm: 'test', sortBy: { status: 'desc' }, reloadStudies: 2 }),
+      useStudyTableDisplay({ searchTerm: 'test', sortBy: { status: 'desc' }, reloadStudies: 2, page: 4 }),
     );
 
     await waitFor(() => {
       expect(result.current.rows).toEqual([]);
-      expect(result.current.count).toEqual(0);
+      expect(result.current.totalPagesNb).toEqual(0);
       expect(global.fetch).toHaveBeenCalledTimes(1);
     });
   });
@@ -91,17 +92,13 @@ describe('useStudyTableDisplay', () => {
         projectInfo: { id: 134 } as ProjectInfo,
         sortBy: { status: 'desc' },
         reloadStudies: 3,
+        page: 3,
       }),
     );
 
-    act(() => {
-      result.current.setPage(3);
-    });
-
     await waitFor(() => {
       expect(result.current.rows).toHaveLength(1);
-      expect(result.current.count).toEqual(1);
-      expect(result.current.currentPage).toEqual(3);
+      expect(result.current.totalPagesNb).toEqual(1);
     });
   });
 });

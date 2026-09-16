@@ -479,20 +479,13 @@ describe('updateTrajectory', () => {
     ).toBe(true);
   });
 
-  it('should not update if trajectory is not in prevState', () => {
+  it('should add trajectory if not already in prevState', () => {
     const baseTrajectoryMock = [
       {
         id: '14',
         area: 'Zone B',
         technology: 'Tech X1',
         type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER,
-        trajectoryName: 'Initial',
-      },
-      {
-        id: '15',
-        area: 'Zone F',
-        technology: 'Tech DE',
-        type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER,
         trajectoryName: 'Initial',
       },
     ] as unknown as DbTrajectory[];
@@ -510,10 +503,11 @@ describe('updateTrajectory', () => {
 
     const result = updateTrajectory(prevState, payload);
 
-    expect(result).toEqual(prevState);
+    expect(result[TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]?.trajectories).toContainEqual(baseTrajectory);
+    expect(result[TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]?.trajectories).toHaveLength(2);
   });
 
-  it('should return prevState if no trajectories found', () => {
+  it('should add trajectory to empty state when updating', () => {
     const prevState = {
       [TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]: {
         trajectories: [],
@@ -527,7 +521,36 @@ describe('updateTrajectory', () => {
 
     const result = updateTrajectory(prevState, payload);
 
-    expect(result).toEqual(prevState);
+    expect(result[TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER]?.trajectories).toEqual([baseTrajectory]);
+  });
+
+  it('should update unique trajectory type by replacing it when matching type', () => {
+    const uniqueTrajectory = {
+      id: '1',
+      type: TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER,
+      trajectoryName: 'Old Trajectory',
+    } as unknown as DbTrajectory;
+
+    const newUniqueTrajectory = {
+      id: '2',
+      type: TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER,
+      trajectoryName: 'New Trajectory',
+    } as unknown as DbTrajectory;
+
+    const prevState = {
+      [TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER]: {
+        trajectories: [uniqueTrajectory],
+      },
+    };
+
+    const payload = {
+      trajectory: newUniqueTrajectory,
+      status: 'success' as RowStatus,
+    };
+
+    const result = updateTrajectory(prevState, payload);
+
+    expect(result[TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER]?.trajectories).toEqual([newUniqueTrajectory]);
   });
 });
 
@@ -653,17 +676,6 @@ describe('studyReducer', () => {
     const result = studyReducer(mockPrevStateArea(), action);
 
     expect(result?.[TRAJECTORY_TYPE.AREA]).toBeUndefined();
-  });
-
-  it('should handles SET_STUDY_HVDC action', () => {
-    const action: StudyActionType = {
-      type: STUDY_ACTION.SET_STUDY_HVDC,
-      payload: true,
-    };
-
-    const result = studyReducer(mockPrevStateArea(), action);
-
-    expect(result?.hvdc).toBeTruthy();
   });
 
   it('should return previous state when action is undefined', () => {

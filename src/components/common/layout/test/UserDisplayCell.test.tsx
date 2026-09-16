@@ -36,7 +36,7 @@ describe('UserDisplayCell Component', () => {
 
     render(<UserDisplayCell nni="R12345" />);
 
-    const avatar = screen.getByRole('figure');
+    const avatar = screen.getByText('Jo');
     expect(avatar).toBeInTheDocument();
   });
 
@@ -44,13 +44,13 @@ describe('UserDisplayCell Component', () => {
     vi.mocked(useUserDisplayHook.useUserDisplay).mockReturnValueOnce({
       ...mockUserData,
       isLoading: true,
-      fullname: '...',
+      fullname: '..',
     });
 
     render(<UserDisplayCell nni="R12345" />);
 
     // The component should render with loading state
-    expect(screen.getByText('...')).toBeInTheDocument();
+    expect(screen.getByText('..')).toBeInTheDocument();
   });
 
   it('should handle error state and fallback to NNI', () => {
@@ -63,7 +63,7 @@ describe('UserDisplayCell Component', () => {
 
     render(<UserDisplayCell nni="R12345" />);
 
-    const avatar = screen.getByRole('figure');
+    const avatar = screen.getByText('R1');
     expect(avatar).toBeInTheDocument();
   });
 
@@ -97,7 +97,7 @@ describe('UserDisplayCell Component', () => {
 
     render(<UserDisplayCell nni="R12345" />);
 
-    const avatar = screen.getByRole('figure');
+    const avatar = screen.getByText('Jo');
     expect(avatar).toBeInTheDocument();
   });
 
@@ -107,7 +107,7 @@ describe('UserDisplayCell Component', () => {
     render(<UserDisplayCell nni="R12345" />);
 
     // Avatar should be rendered
-    const avatar = screen.getByRole('figure');
+    const avatar = screen.getByText('Jo');
     expect(avatar).toBeInTheDocument();
   });
 });

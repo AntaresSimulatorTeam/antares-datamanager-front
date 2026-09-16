@@ -148,9 +148,9 @@ export const getInformationMessage = (
 ): { messageKey: string; id: string } | null => {
   switch (type) {
     case TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER:
-      return { messageKey: 'thermal.@paramModulationMessage', id: '1' };
+      return { messageKey: 'thermal.@informationMessage', id: '1' };
     case TRAJECTORY_TYPE.DSR:
-      return { messageKey: 'dsr.@capacityModulationMessage', id: String(Math.max(nbRows - 1, 0)) };
+      return { messageKey: 'dsr.@informationMessage', id: String(Math.max(nbRows - 1, 0)) };
     case TRAJECTORY_TYPE.HYDRO_PSP_SERIES:
     case TRAJECTORY_TYPE.HYDRO_SERIES:
       return (!trajectory && rowId?.split('.')[1] === '1') ||
@@ -158,6 +158,8 @@ export const getInformationMessage = (
         trajectory?.type === TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS
         ? { messageKey: 'hydro.@informationMessage', id: rowId }
         : null;
+    case TRAJECTORY_TYPE.ADEQUACY_PATCH:
+      return { messageKey: 'flowbased.@informationMessage', id: '1' };
     default:
       return null;
   }
@@ -535,7 +537,7 @@ export interface CellDetachParams {
   indexArray: number[];
   studyId: number;
   horizon: string;
-  hvdcValue?: boolean;
+  options?: {hvdcValue?: boolean; recalculateValue?: boolean;}
 }
 
 export interface CellDetachResult {
@@ -550,7 +552,7 @@ export const updateTableAfterCellDetach = async ({
   indexArray,
   studyId,
   horizon,
-  hvdcValue,
+  options
 }: CellDetachParams): Promise<CellDetachResult> => {
   const empty = {
     trajectory: null,
@@ -601,8 +603,26 @@ export const updateTableAfterCellDetach = async ({
             ...item,
             trajectory: null,
             status: TRAJECTORY_SELECTION_STATUS.MISSING,
-            ...(hvdcValue != null && { hvdc: hvdcValue }),
+            ...(options?.hvdcValue != null && { hvdc: options?.hvdcValue }),
           }
+        : item,
+    );
+
+    return {
+      newData,
+      newReadOnly: { '0': false, '1': indexArray[0] === 0 },
+    };
+  }
+
+  if (type === TRAJECTORY_TYPE.FLOWBASED) {
+    const newData = data.map((item, index) =>
+      index === indexArray[0]
+        ? {
+          ...item,
+          trajectory: null,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          ...(options?.recalculateValue != null && { recalculate: options?.recalculateValue }),
+        }
         : item,
     );
 
@@ -634,7 +654,7 @@ export const getParamForFetchFSTrajectory = (
   }
   if (type === TRAJECTORY_TYPE.ADEQUACY_PATCH) {
     if (indexArray.length > 1) {
-      typeToUse = indexArray[1] === 0 ? TRAJECTORY_TYPE.SETTINGS : TRAJECTORY_TYPE.SETTINGS_SCENARIO_BUILDER;// TODO: replace scenario builder
+      typeToUse = indexArray[1] === 0 ? TRAJECTORY_TYPE.SETTINGS : TRAJECTORY_TYPE.SCENARIO_BUILDER;
     } else {
       typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.ADEQUACY_PATCH : TRAJECTORY_TYPE.FLOWBASED;
     }
@@ -686,7 +706,7 @@ export const getTypeToUse = (type: TRAJECTORY_TYPE, indexArray: number[], nbRows
   }
   if (type === TRAJECTORY_TYPE.ADEQUACY_PATCH) {
     if (indexArray.length > 1) {
-      typeToUse = indexArray[1] === 0 ? TRAJECTORY_TYPE.SETTINGS : TRAJECTORY_TYPE.SETTINGS_SCENARIO_BUILDER;// TODO: replace scenario builder
+      typeToUse = indexArray[1] === 0 ? TRAJECTORY_TYPE.SETTINGS : TRAJECTORY_TYPE.SCENARIO_BUILDER;
     } else {
       typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.ADEQUACY_PATCH : TRAJECTORY_TYPE.FLOWBASED;
     }

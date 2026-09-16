@@ -267,6 +267,8 @@ describe('duplicateStudy', () => {
     project: 'BP_REF_23',
     horizon: '2021-2022',
     trajectoryIds: [102, 123],
+    hvdc: false,
+    recalculate: false,
   };
   afterEach(() => {
     vi.restoreAllMocks();
@@ -348,5 +350,16 @@ describe('updateStudy', () => {
       },
       body: JSON.stringify(mockStudyData),
     });
+  });
+
+  it('should handle update study failure gracefully', async () => {
+    const mockError = {
+      antaresErrorMessage: 'A study already exists',
+      date: new Date(),
+      type: ERROR_MESSAGE_TYPE.BUSINESS,
+    };
+    vi.mocked(AuthService.authFetch).mockRejectedValueOnce(mockError);
+
+    await expect(updateStudy(mockStudyData, 123)).rejects.toEqual(mockError);
   });
 });

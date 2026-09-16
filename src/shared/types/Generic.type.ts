@@ -17,6 +17,7 @@ import {
   NUCLEAR_FR_MODULATION_TYPES,
   NUCLEAR_FR_TIME_SERIES_TYPES,
 } from '@/shared/const/trajectoryTypes.ts';
+import { DropdownItemProps } from '@design-system-rte/core/components/dropdown/dropdown.interface';
 
 export type Entries<T> = {
   [K in keyof T]: [K, T[K]];
@@ -74,9 +75,9 @@ export type FileInputStatus = 'success' | 'error' | 'loading' | 'empty' | 'empty
 export type ExpandedState = true | Record<string, boolean>;
 
 export interface TabProps {
+  studyData: StudyDTO;
   defaultAreas: { name: string }[];
   areas: TrajectoryAreaData[];
-  studyData: StudyDTO;
 }
 
 export type TableHeadersProps = {
@@ -130,9 +131,9 @@ export type TableOperationRow = 'empty' | 'remove';
 
 export interface MenuProps {
   defaultAreas: { name: string }[];
-  areas: TrajectoryAreaData[];
   studyData: StudyDTO;
   type: TRAJECTORY_TYPE;
+  areas: TrajectoryAreaData[];
 }
 
 export interface FetchResult {
@@ -151,4 +152,9 @@ export interface HypothesisTableResults extends FetchResult {
     checkedValues: string[];
   };
   readOnlyMap: Record<string, boolean>;
+}
+
+export interface DropdownItemOption extends DropdownItemProps {
+  id?: string;
+  value?: string
 }

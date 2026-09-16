@@ -4,11 +4,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-export interface SelectOption {
-  id?: number;
-  label: string;
-}
-
 export interface SelectDSOption {
   id?: number;
   label: string;

@@ -16,32 +16,49 @@ import UserDisplayCell from '@/components/common/layout/UserDisplayCell';
 const columnHelper = createColumnHelper<StudyDTO>();
 
 const getStudyTableHeaders = (t: (value: string) => string) => [
-  columnHelper.display({
-    id: 'radioColumn',
-    header: '',
-    size: 50,
-    cell: ({ row }) => (
-      <div className={`${row.getIsSelected() ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
-        <RadioButton
-          groupName="study-table-radio-group"
-          value={row.original.id.toString()}
-          label=""
-          disabled={!row.getCanSelect()}
-          checked={row.getIsSelected()}
-          name={`radio-${row.original.id}`}
-          onChange={() => {}}
-        />
-      </div>
-    ),
-  }),
-
   columnHelper.accessor('name', {
     header: t('home.@study_name'),
     size: 300,
     cell: ({ getValue, row }) => {
       const status = row.original.status;
-      const textClass = status === StudyStatus.GENERATED ? 'text-primary-600' : 'group-hover:text-green-500';
-      return <span className={`transition-colors ${textClass}`}>{getValue()}</span>;
+      const isSelected = row.getIsSelected();
+
+      const handleToggle = (e: React.MouseEvent) => {
+        const target = e.target as HTMLElement;
+        if (target.tagName !== 'INPUT') {
+          e.preventDefault();
+        }
+        e.stopPropagation();
+
+        if (row.getCanSelect()) {
+          row.toggleSelected(!isSelected);
+        }
+      };
+      return (
+        <div
+          className={`[&_[class*='radioButtonLabel']]:![font-size:inherit] [&_[class*='radioButtonLabel']]:![font-family:inherit] ${
+            isSelected
+              ? "[&_[class*='radioButtonBackground']]:opacity-100"
+              : "[&_[class*='radioButtonBackground']]:opacity-0 group-hover:[&_[class*='radioButtonBackground']]:opacity-100"
+          }`}
+          onClick={handleToggle}
+          onKeyDown={() => {}}
+        >
+          <RadioButton
+            groupName="study-table-radio-group"
+            value={row.id}
+            label={getValue()}
+            disabled={!row.getCanSelect()}
+            isChecked={isSelected}
+            onChange={() => {
+              if (row.getCanSelect()) {
+                row.toggleSelected(!isSelected);
+              }
+            }}
+            className={`transition-colors ![font-size:inherit] ![font-family:inherit] ${status === StudyStatus.GENERATED ? '!text-primary-600 group-hover:!text-primary-600' : '!text-gray-800 group-hover:!text-gray-800'}`}
+          />
+        </div>
+      );
     },
   }),
 
@@ -67,7 +84,7 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
   columnHelper.accessor('createdBy', {
     header: t('home.@user_name'),
     size: 50,
-    cell: ({ getValue }) => <UserDisplayCell nni={getValue() ?? ''} />,
+    cell: ({ getValue }) => <div className="py-0.25"><UserDisplayCell nni={getValue() ?? 'Un'} /></div>,
   }),
 
   columnHelper.accessor('keywords', {

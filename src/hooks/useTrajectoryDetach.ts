@@ -8,16 +8,14 @@ import { useUser } from '@/store/contexts/UserContext.tsx';
 import { useTranslation } from 'react-i18next';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { updateTableAfterCellDetach } from '@/shared/helpers/hypothesisTableHelper.ts';
-import { buildErrorTrajectory } from '@/shared/utils/trajectoryUtils.ts';
+import { buildErrorTrajectory, buildReadOnlyRow } from '@/shared/utils/trajectoryUtils.ts';
 import { updateStudy } from '@/shared/services/studyService.ts';
 
 export const useTrajectoryDetach = (
   study: StudyDTO,
   dispatch: Dispatch<StudyActionType> | null,
-  setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
   setIsDeletionModalOpen?: Dispatch<SetStateAction<boolean>>,
   setRowIdSelected?: Dispatch<SetStateAction<string>>,
-  setSecondTableReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
 ) => {
   const { user } = useUser();
   const { t } = useTranslation();
@@ -31,6 +29,8 @@ export const useTrajectoryDetach = (
       data: HypothesisRowData[],
       status: RowStatus,
       hypothesis: string,
+      setReadOnly: Dispatch<SetStateAction<ReadOnlyObject>>,
+      setSecondTableReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
     ): Promise<void> => {
       // 1. Détermination des trajectoires à supprimer
       const { trajectoryIds, trajectoryToDelete, additionalTrajectory } = computeDeletion(
@@ -44,13 +44,17 @@ export const useTrajectoryDetach = (
 
       try {
         let hvdcValue;
+        let recalculateValue;
         // 2. Suppression backend si nécessaire
         if (trajectoryToDelete && trajectoryIds?.length > 0 && status === 'empty') {
           await performBackendDeletion(trajectoryIds);
           if (trajectoryToDelete.type === TRAJECTORY_TYPE.LINK) {
             await updateStudy({ hvdc: false }, study.id);
-            dispatch?.({ type: STUDY_ACTION.SET_STUDY_HVDC, payload: false });
             hvdcValue = false;
+          }
+          if (trajectoryToDelete.type === TRAJECTORY_TYPE.FLOWBASED) {
+            await updateStudy({ recalculate: false }, study.id);
+            recalculateValue = false;
           }
         }
 
@@ -77,13 +81,15 @@ export const useTrajectoryDetach = (
           indexArray,
           studyId: study.id,
           horizon: study.horizon,
-          hvdcValue,
+          options: {hvdcValue, recalculateValue}
         });
 
         setData(newData);
         if (newReadOnly) {
-          setReadOnly?.((prev) => ({ ...prev, ...newReadOnly }));
-          setSecondTableReadOnly?.({ '0': newReadOnly[1], '1': newReadOnly[1] });
+          setReadOnly?.((prev) => ({...prev, ...newReadOnly}));
+          if (trajectoryToDelete?.type === TRAJECTORY_TYPE.AREA) {
+            setSecondTableReadOnly?.(buildReadOnlyRow(['0', '1', '2.0', '2.1']));
+          }
         }
       } catch (error) {
         if ((error as TrajectoryBackendError).message.includes('Confirmation required')) {
@@ -155,7 +161,6 @@ export const useTrajectoryDetach = (
       study.horizon,
       study.name,
       performBackendDeletion,
-      setReadOnly,
       t,
       user?.profile?.sub,
     ],

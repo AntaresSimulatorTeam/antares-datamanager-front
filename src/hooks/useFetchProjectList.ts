@@ -25,7 +25,7 @@ export const useFetchProjectList = (current: number, intervalSize: number, searc
           payload: response?.content,
         } as ProjectActionType);
         setProjects(response?.content);
-        setCount(response?.totalElements);
+        setCount(response?.totalPages);
       } catch (error) {
         console.error(error);
       }

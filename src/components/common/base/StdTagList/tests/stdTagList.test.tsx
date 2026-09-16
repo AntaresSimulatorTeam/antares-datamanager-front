@@ -1,6 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { t } from 'i18next';
 import { vi } from 'vitest';
 import StdTagList from '../StdTagList';
 
@@ -77,7 +76,7 @@ describe('StdTagList', () => {
     cleanup();
   });
 
-  it('shows popover when plus tag is clicked', async () => {
+  it('shows dropdown when plus tag is clicked', async () => {
     const cleanup = mockElementDimensions(20);
     const user = userEvent.setup();
 
@@ -95,16 +94,18 @@ describe('StdTagList', () => {
       await user.click(plusButton);
 
       // Popover should be visible with remaining tags
-      const popover = screen.getByRole('popover');
-      expect(popover).toBeInTheDocument();
+      const dropdown = screen.getByRole('dropdown');
+      expect(dropdown).toBeInTheDocument();
 
       // Close button should work
-      const closeButton = screen.getByRole('button', { name: new RegExp(t('components.popover.@close')) });
-      await user.click(closeButton);
+      const closeButton = screen.getByText('Close');
+      expect(closeButton).toBeEnabled();
+      expect(closeButton).toBeVisible();
+      fireEvent.click(closeButton);
 
       // Popover should close
       await waitFor(() => {
-        expect(screen.queryByRole('popover')).not.toBeInTheDocument();
+        expect(screen.queryByRole('dropdown')).not.toBeInTheDocument();
       });
     });
 

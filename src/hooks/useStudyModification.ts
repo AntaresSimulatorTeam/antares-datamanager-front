@@ -1,15 +1,15 @@
 import { useCallback } from 'react';
 import { duplicateStudy, updateStudy } from '@/shared/services/studyService.ts';
-import { StudyDTO } from '@/shared/types';
+import { BackendError, StudyDTO } from '@/shared/types';
 
-export const useStudyModification = (onSuccess?: () => void, onError?: (message: string) => void) => {
+export const useStudyModification = (onSuccess?: () => void, onError?: (error: BackendError) => void) => {
   const confirmUpdate = useCallback(
     async (studyId: number, studyData: StudyDTO, isDuplicateMode: boolean) => {
       try {
         isDuplicateMode ? await duplicateStudy(studyData) : await updateStudy(studyData, studyId);
         onSuccess?.();
       } catch (error) {
-        onError?.((error as Error)?.message);
+        onError?.((error as BackendError));
       }
     },
     [onError, onSuccess],

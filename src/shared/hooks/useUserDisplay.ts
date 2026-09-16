@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { fetchUsersByNni } from '@/shared/services/userService';
 
 const userCache = new Map<string, { fullname: string; firstName: string; lastName: string }>();
@@ -22,6 +22,30 @@ export const useUserDisplay = (nni: string) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const loadUser = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const users = await fetchUsersByNni([nni]);
+      if (users.length > 0) {
+        const user = users[0];
+        setFullname(user.fullname);
+        setFirstName(user.firstName);
+        setLastName(user.lastName);
+        // Cache the result
+        userCache.set(nni, {
+          fullname: user.fullname,
+          firstName: user.firstName,
+          lastName: user.lastName,
+        });
+      }
+    } catch (err) {
+      setError((err as Error).message);
+      console.error(`Failed to fetch user ${nni}:`, err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [nni]);
+
   useEffect(() => {
     if (!nni || nni.trim() === '') {
       return;
@@ -36,32 +60,8 @@ export const useUserDisplay = (nni: string) => {
       return;
     }
 
-    const loadUser = async () => {
-      setIsLoading(true);
-      try {
-        const users = await fetchUsersByNni([nni]);
-        if (users.length > 0) {
-          const user = users[0];
-          setFullname(user.fullname);
-          setFirstName(user.firstName);
-          setLastName(user.lastName);
-          // Cache the result
-          userCache.set(nni, {
-            fullname: user.fullname,
-            firstName: user.firstName,
-            lastName: user.lastName,
-          });
-        }
-      } catch (err) {
-        setError((err as Error).message);
-        console.error(`Failed to fetch user ${nni}:`, err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadUser();
-  }, [nni]);
+    void loadUser();
+  }, [loadUser, nni]);
 
   return { fullname, firstName, lastName, isLoading, error };
 };

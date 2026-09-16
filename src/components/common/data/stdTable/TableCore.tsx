@@ -6,19 +6,19 @@
 
 import { Row, RowData, Table } from '@tanstack/react-table';
 import { tableCoreRowClassBuilder } from './tableCoreRowClassBuilder';
-import { RowStatus, SelectOption } from '@/shared/types';
+import { DropdownItemOption, RowStatus } from '@/shared/types';
 import { Fragment } from 'react';
 import { TableHeader } from '@common/data/stdTable/TableHeader.tsx';
 import { TableDataCell } from '@common/data/stdTable/TableDataCell.tsx';
 import { tableStyleBuilder } from '@common/data/stdTable/tableStyleBuilder.ts';
-import { useRdsId } from 'rte-design-system-react';
 import { tableClassBuilder } from '@common/data/stdTable/tableClassBuilder.ts';
+import { useStdId } from '@/hooks/useStdId.ts';
 
 declare module '@tanstack/react-table' {
   interface TableMeta<TData extends RowData> {
     updateData?: (rowId: string, value: unknown, status: RowStatus) => void;
     removeRow?: (value: string, rowId?: string) => void | Promise<void>;
-    search?: (value: string, rowId: string) => Promise<SelectOption[] | undefined> | undefined;
+    search?: (value: string, rowId: string) => Promise<DropdownItemOption[] | undefined> | undefined;
     importData?: (rowId: string) => Promise<void>;
     viewData?: (rowId: string) => void | Promise<void>;
     activate?: (value?: string | boolean) => void | Promise<void>;
@@ -38,7 +38,7 @@ export type TableCoreProps<TData> = {
 };
 
 const TableCore = <TData,>({ table, id: propId, striped, trClassName, columnSize = 'meta' }: TableCoreProps<TData>) => {
-  const id = useRdsId('table-', propId);
+  const id = useStdId('table-', propId);
 
   const handleToggleRow = (row: Row<TData>) => () => {
     if (row.getCanSelect()) {

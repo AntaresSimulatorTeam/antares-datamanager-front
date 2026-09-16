@@ -35,7 +35,7 @@ describe('useFetchProjectList', () => {
   it('fetches projects on mount', async () => {
     vi.mocked(projectService.fetchProjectFromSearchTerm).mockResolvedValueOnce({
       content: [mockProjectCreation],
-      totalElements: 1,
+      totalPages: 1,
     });
     const { result } = renderHook(() => useFetchProjectList(0, 9, 'mouad'));
 

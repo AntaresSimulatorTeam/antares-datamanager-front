@@ -4,8 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { DbTrajectory, HypothesisRowData, RowStatus, SelectOption, TabProps } from '@/shared/types';
-import { useCallback, useEffect, useState } from 'react';
+import { DbTrajectory, DropdownItemOption, HypothesisRowData, RowStatus, TabProps } from '@/shared/types';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
@@ -27,7 +27,7 @@ import { useTrajectoryFetchFromFSHandler } from '@/hooks/useTrajectoryFetchFromF
 import { getParamForFetchFSTrajectory } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { HypothesisType } from '@/shared/types/HypothesisTable.ts';
 
-const ResDistributionTab = ({ defaultAreas, areas, studyData, types }: TabProps & { types: TRAJECTORY_TYPE[] }) => {
+const ResDistributionTab = ({ studyData, types, defaultAreas, areas }: TabProps & { types: TRAJECTORY_TYPE[] }) => {
   const studyState = useStudy();
   const dispatch = useStudyDispatch();
   const { t } = useTranslation();
@@ -37,19 +37,21 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData, types }: TabProps 
   const [readOnly, setReadOnly] = useState<ReadOnlyObject>({});
   const [technologies, setTechnologies] = useState<string[]>([]);
   const { isModalOpen, toggleModal } = useNewStudyModal();
-  const [optionsFS, setOptionsFS] = useState<SelectOption[]>();
+  const [optionsFS, setOptionsFS] = useState<DropdownItemOption[]>();
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const [selectedType, setSelectedType] = useState<TRAJECTORY_TYPE>(TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION);
+  const defaultTrajAreas = useMemo(() => defaultAreas ?? studyState?.defaultAreas, [defaultAreas, studyState?.defaultAreas]);
+  const areasTrajectory = useMemo(() => areas ?? studyState?.areas, [areas, studyState?.areas]);
   const { hypothesisTrajectories, readOnlyRow, technologyList } = useFetchHypothesisTrajectories(
-    areas,
     types,
-    defaultAreas,
+    areasTrajectory,
+    defaultTrajAreas,
     studyData?.id,
     studyData?.status,
     studyState.studyStatus,
   );
-  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, studyState, dispatch);
-  const { attachTrajectory } = useTrajectoryAttach(studyData, studyState, dispatch);
+  const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, dispatch);
+  const { attachTrajectory } = useTrajectoryAttach(studyData, dispatch);
   const { detachTrajectory } = useTrajectoryDetach(studyData, dispatch);
   const { handleFetchFromFS } = useTrajectoryFetchFromFSHandler();
 
@@ -111,15 +113,15 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData, types }: TabProps 
       if (status === 'empty' || status === 'emptyError') {
         const row = getRowDataSelected(dataToUse, indexArray) ?? null;
         if (row) {
-          await detachTrajectory(tableType, indexArray, setterToUse, dataToUse, status, row?.hypothesis);
+          await detachTrajectory(tableType, indexArray, setterToUse, dataToUse, status, row?.hypothesis, setReadOnly);
         }
       } else if (status === 'success') {
         const dbTrajectory =
           dbTrajectories.length > 0
-            ? dbTrajectories.find((item) => item.id === value)
+            ? dbTrajectories.find((item) => item.id == value)
             : getRowDataSelected(dataToUse, indexArray)?.trajectory;
         if (dbTrajectory) {
-          await attachTrajectory(tableType, indexArray, status, dbTrajectory, setterToUse);
+          await attachTrajectory(tableType, indexArray, status, dbTrajectory, setterToUse, setReadOnly);
         }
       }
     },
@@ -181,19 +183,18 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData, types }: TabProps 
           await handleUpdateTableData(TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION, rowId, value, status)
         }
       />
-      {isModalOpen && (
         <ImportTrajectoryModal
           options={optionsFS}
           onClose={async (
             typeToUse?: TRAJECTORY_TYPE,
-            value?: SelectOption,
+            value?: DropdownItemOption,
             hypothesis?: HypothesisType,
             indexArray?: number[],
           ) => {
             toggleModal();
             if (value != null) {
               const setterToUse = typeToUse === TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION ? setData : setTechnologyData;
-              await importTrajectory(setterToUse, value, typeToUse, indexArray, hypothesis);
+              await importTrajectory(setterToUse, value, typeToUse, indexArray, hypothesis, setReadOnly);
             }
           }}
           tabType={selectedType}
@@ -203,8 +204,8 @@ const ResDistributionTab = ({ defaultAreas, areas, studyData, types }: TabProps 
           )}
           indexArray={rowIdSelected?.split('.').map(Number)}
           rowsNb={data.length}
+          isOpen={isModalOpen}
         />
-      )}
     </div>
   );
 };

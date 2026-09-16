@@ -57,38 +57,38 @@ export const AuthService = {
   //removeAccessTokenExpired: () => userManager.events.removeAccessTokenExpired(),
 
   authFetch: async (url: string, options: RequestInit = {}): Promise<Response | void> => {
-    if (isAuthenticationActive()) {
-      const token = await AuthService.getAccessToken();
-      if (token) {
-        // Add Authorization header for different types of options.headers
-        if (options.headers instanceof Headers) {
-          options.headers.append('Authorization', `Bearer ${token}`);
-        } else if (Array.isArray(options.headers)) {
-          options.headers.push(['Authorization', `Bearer ${token}`]);
-        } else {
-          options.headers = {
-            ...options.headers,
-            Authorization: `Bearer ${token}`,
-          };
+      if (isAuthenticationActive()) {
+        const token = await AuthService.getAccessToken();
+        if (token) {
+          // Add Authorization header for different types of options.headers
+          if (options.headers instanceof Headers) {
+            options.headers.append('Authorization', `Bearer ${token}`);
+          } else if (Array.isArray(options.headers)) {
+            options.headers.push(['Authorization', `Bearer ${token}`]);
+          } else {
+            options.headers = {
+              ...options.headers,
+              Authorization: `Bearer ${token}`,
+            };
+          }
         }
       }
-    }
 
-    const response = await fetch(url, options);
+      const response = await fetch(url, options);
 
-    if (!response.ok) {
-      const errorData = (await response.json()) as BackendError;
-      if (errorData.type === ERROR_MESSAGE_TYPE.BUSINESS) {
-        throw errorData;
+      if (!response.ok) {
+        const errorData = (await response.json()) as BackendError;
+        if (errorData.type === ERROR_MESSAGE_TYPE.BUSINESS) {
+          throw errorData;
+        } else {
+          notifyToast({
+            type: 'error',
+            message: errorData?.antaresErrorMessage || 'An error occurred',
+          });
+          throw errorData;
+        }
       } else {
-        notifyToast({
-          type: 'error',
-          message: errorData?.antaresErrorMessage || 'An error occurred',
-        });
-        throw new Error(errorData?.antaresErrorMessage);
+        return response;
       }
-    } else {
-      return response;
-    }
-  },
+  }
 };

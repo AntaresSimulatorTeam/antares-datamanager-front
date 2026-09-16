@@ -6,8 +6,8 @@
 
 import { PropsWithChildren, ReactElement } from 'react';
 import PegaseCardTitle from './pegaseCardTitle/PegaseCardTitle';
-import { StdDropdownOption } from '@common/layout/stdDropdown/StdDropdown.tsx';
-import { RdsIconButtonProps } from 'rte-design-system-react';
+import { DropdownItemOption } from '@/shared/types';
+import { Card } from '@design-system-rte/react';
 
 export type PegaseCardSecondaryButtonPosition = 'default' | 'center';
 
@@ -16,8 +16,8 @@ type CardProps = {
   disabled?: boolean;
   onClick?: () => void;
   title: string;
-  dropdownOptions: StdDropdownOption[];
-  icons?: ReactElement<RdsIconButtonProps>;
+  dropdownOptions: DropdownItemOption[];
+  icons?: ReactElement;
   lineClamp?: number;
 };
 
@@ -30,25 +30,23 @@ const PegaseCard = ({
   dropdownOptions,
   children,
 }: PropsWithChildren<CardProps>) => (
-  <section
-    className="flex h-full w-full cursor-pointer flex-col gap-2 p-2"
-    style={{
-      borderRadius: '0.375rem',
-      boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.2), 0 2px 4px -2px rgb(0 0 0 / 0.2)',
-    }}
-    onClick={onClick}
-    onKeyDown={onClick}
-    role="region"
-  >
-    <PegaseCardTitle
-      id={`${id}-title`}
-      title={title}
+    <Card
+      cardType="default"
+      clickable
       onClick={onClick}
-      icons={icons}
-      lineClamp={lineClamp}
-      dropdownOptions={dropdownOptions}
-    />
-    <div className="flex grow">{children}</div>
-  </section>
+      style={{ backgroundColor: '#ffffff' }}
+    >
+      <div className="flex h-full w-full cursor-pointer flex-col gap-2 p-2">
+        <PegaseCardTitle
+          id={`${id}-title`}
+          title={title}
+          onClick={onClick}
+          icons={icons}
+          lineClamp={lineClamp}
+          dropdownOptions={dropdownOptions}
+        />
+        <div className="flex">{children}</div>
+      </div>
+    </Card>
 );
 export default PegaseCard;

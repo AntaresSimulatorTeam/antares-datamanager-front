@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ProjectInfo, StudyDTO } from '@/shared/types';
 import { fetchSearchStudies } from '@/shared/services/studyService.ts';
 
@@ -16,15 +16,13 @@ interface UseStudyTableDisplayProps {
   searchTerm: string | undefined;
   projectInfo?: ProjectInfo;
   sortBy: { [key: string]: 'asc' | 'desc' };
+  page: number;
   reloadStudies: number;
 }
 
 interface UseStudyTableDisplayReturn {
   rows: StudyDTO[];
-  count: number;
-  intervalSize: number;
-  currentPage: number;
-  setPage: Dispatch<SetStateAction<number>>;
+  totalPagesNb: number;
   error: unknown;
 }
 
@@ -33,34 +31,30 @@ export const useStudyTableDisplay = ({
   projectInfo,
   sortBy,
   reloadStudies,
+  page
 }: UseStudyTableDisplayProps): UseStudyTableDisplayReturn => {
   const [rows, setRows] = useState<StudyDTO[]>([]);
-  const [count, setCount] = useState(0);
-  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPagesNb, setTotalPagesNb] = useState(0);
   const [errorValue, setErrorValue] = useState<Error | null>(null);
-
-  useEffect(() => {
-    setCurrentPage(PAGINATION_CURRENT);
-  }, []);
 
   useEffect(() => {
     const fetchStudyList = async () => {
       try {
-        const { content, totalElements } = await fetchSearchStudies(
+        const { content, totalPages } = await fetchSearchStudies(
           searchTerm,
           projectInfo?.id,
-          currentPage,
+          page ?? PAGINATION_CURRENT,
           intervalSize,
           sortBy,
         );
         setRows(content);
-        setCount(totalElements);
+        setTotalPagesNb(totalPages);
       } catch (error: unknown) {
         setErrorValue(error as Error);
       }
     };
     void fetchStudyList();
-  }, [currentPage, searchTerm, projectInfo, sortBy, reloadStudies]);
+  }, [page, searchTerm, reloadStudies, projectInfo, sortBy]);
 
-  return { rows, count, intervalSize, currentPage, setPage: setCurrentPage, error: errorValue };
+  return { rows, totalPagesNb, error: errorValue };
 };

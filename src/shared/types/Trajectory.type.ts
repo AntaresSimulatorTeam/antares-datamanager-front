@@ -5,10 +5,8 @@
  */
 
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { FileInputStatus } from 'rte-design-system-react';
 // @ts-ignore
 import { AccessorKeyColumnDef } from '@tanstack/table-core/src/types.ts';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { TrajectoryState } from '@/shared/types/Study.type.ts';
 
 export interface FsTrajectory {
@@ -39,10 +37,10 @@ export type HypothesisRowData = {
   isDeletable?: boolean;
   timeSeries?: string;
   hvdc?: boolean;
-  read?: string;
+  recalculate?: boolean;
 };
 
-export type RowStatus = FileInputStatus | 'warning' | 'emptyError';
+export type RowStatus = 'success' | 'warning' | 'emptyError' | 'error' | 'empty' | 'loading';
 
 export interface TrajectoryViewData {
   trajectory: DbTrajectory;
@@ -124,11 +122,6 @@ export const TrajectorySTSDataScheme = {
   cluster: 'string',
   series: 'string',
 } as const;
-
-export interface HypothesisTab extends Tab {
-  icon: StdIconId;
-  isDisabled: boolean;
-}
 
 export interface Tab {
   name: TRAJECTORY_TYPE;

@@ -6,4 +6,5 @@
 
 export const APP_NAME = 'Pegase';
 export const PEGASE_NAVBAR_ID = 'pegase-navbar';
-export const PEGASE_CONTEXT_ID = 'pegase-nav-context';
+export const PEGASE_CONTEXT_MAIN_NAV_BAR_ID = 'pegase-main-nav-context';
+export const PEGASE_CONTEXT_SECONDARY_NAV_BAR_ID = 'pegase-secondary-nav-context';

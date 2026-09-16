@@ -1,23 +1,22 @@
 import { Dispatch, SetStateAction, useCallback } from 'react';
-import { DbTrajectory, HypothesisRowData, RowStatus, StudyActionType, StudyDTO, StudyState } from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, RowStatus, StudyActionType, StudyDTO } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { isParamModulationRequired, linkTrajectoryToStudy } from '@/shared/services/trajectoryService.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.ts';
-import { isUniqueTrajectoryType, normalize, setNestedData } from '@/shared/utils/trajectoryUtils.ts';
+import { setNestedData } from '@/shared/utils/trajectoryUtils.ts';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { useTranslation } from 'react-i18next';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
+import { useFetchAreas } from '@/hooks/useFetchAreas.ts';
 
 export const useTrajectoryAttach = (
   study: StudyDTO,
-  studyState: Partial<StudyState>,
-  dispatch: Dispatch<StudyActionType> | null,
-  setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
-  setSecondTableReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
+  dispatch?: Dispatch<StudyActionType> | null,
 ) => {
   const { user } = useUser();
   const { t } = useTranslation();
+  const {isFlowbasedAllowed} = useFetchAreas();
 
   const attachTrajectory = useCallback(
     async (
@@ -26,75 +25,48 @@ export const useTrajectoryAttach = (
       status: RowStatus,
       trajectory: DbTrajectory,
       setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
+      setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
+      setSecondTableReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
     ) => {
       try {
         const newDbTrajectory = await linkTrajectoryToStudy(type, trajectory.id, study?.id);
 
         if (newDbTrajectory) {
-          let alreadyExists = false;
-          if (isUniqueTrajectoryType(newDbTrajectory.type)) {
-            alreadyExists =
-              studyState[newDbTrajectory.type]?.trajectories?.some((item) => item.type === newDbTrajectory.type) ??
-              false;
-          } else {
-            alreadyExists =
-              studyState[newDbTrajectory.type]?.trajectories?.some(
-                (item) =>
-                  normalize(item.area ?? '') === normalize(newDbTrajectory.area ?? '') &&
-                  normalize(item.technology) === normalize(newDbTrajectory.technology),
-              ) ?? false;
-          }
-
-          if (alreadyExists) {
-            dispatch?.({
-              type: STUDY_ACTION.UPDATE_TRAJECTORY,
-              payload: {
-                trajectory: newDbTrajectory,
-                status,
-              },
-            });
-          } else {
-            dispatch?.({
-              type: STUDY_ACTION.ADD_TRAJECTORIES,
-              payload: {
-                [type]: {
-                  trajectories: [newDbTrajectory],
-                },
-              },
-            });
-          }
+          dispatch?.({
+            type: STUDY_ACTION.UPDATE_TRAJECTORY,
+            payload: {
+              trajectory: newDbTrajectory,
+              status,
+            },
+          });
 
           const newTrajectory = {
             trajectory: newDbTrajectory,
             status: TRAJECTORY_SELECTION_STATUS.OK,
           };
-          let newData: HypothesisRowData[] = [];
-          if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
+
+          if (type === TRAJECTORY_TYPE.AREA) {
+            const allMandatoryAreasInStudy =
+              newDbTrajectory?.id != null ? await isFlowbasedAllowed(newDbTrajectory.id) : false;
+
+            setData((prev) => setNestedData(prev, indexArray, newTrajectory));
+            setReadOnly?.({ '0': false, '1': false });
+            setSecondTableReadOnly?.({ '0': false, '1': !allMandatoryAreasInStudy, '2.0': false, '2.1': false });
+          } else if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
             const isRequired = await isParamModulationRequired(study.id, study?.horizon);
-            setData((prev) => {
-              newData = setNestedData(prev, indexArray, newTrajectory);
-              setReadOnly?.((prevReadOnly) => ({ ...prevReadOnly, ['1']: !isRequired }));
-              return newData;
-            });
+
+            setData((prev) => setNestedData(prev, indexArray, newTrajectory));
+            setReadOnly?.((prevReadOnly) => ({ ...prevReadOnly, ['1']: !isRequired }));
           } else {
+            let lastIndex = 0;
             setData((prev) => {
-              newData = setNestedData(prev, indexArray, newTrajectory);
-              if (type === TRAJECTORY_TYPE.AREA) {
-                setReadOnly?.({ '0': false, '1': false });
-                setSecondTableReadOnly?.({ '0': false, '1': false });
-              }
-              if (type === TRAJECTORY_TYPE.DSR) {
-                const hasTrajectoryWithTS =
-                  newData.some(
-                    (row) => row.status === TRAJECTORY_SELECTION_STATUS.OK && row?.trajectory?.hasTimeSeries,
-                  ) || newDbTrajectory.hasTimeSeries;
-                setReadOnly?.((prevReadOnly) => {
-                  const lastIndex = Math.max(Object.keys(prev)?.length - 1, 0);
-                  return { ...prevReadOnly, [lastIndex]: !hasTrajectoryWithTS };
-                });
-              }
-              return newData;
+              lastIndex = Math.max(Object.keys(prev)?.length - 1, 0);
+              return setNestedData(prev, indexArray, newTrajectory);
             });
+
+            if (type === TRAJECTORY_TYPE.DSR) {
+              setReadOnly?.((prevReadOnly) => ({ ...prevReadOnly, [lastIndex]: !newDbTrajectory.hasTimeSeries }));
+            }
           }
         }
       } catch (error) {
@@ -119,7 +91,7 @@ export const useTrajectoryAttach = (
         }
       }
     },
-    [study.id, study?.horizon, study?.name, studyState, dispatch, setReadOnly, t, user?.profile?.sub],
+    [study.id, study?.horizon, study?.name, dispatch, isFlowbasedAllowed, t, user?.profile?.sub],
   );
 
   return { attachTrajectory };

@@ -9,9 +9,8 @@ import {
   TechnologyType,
 } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { FileInputStatus } from 'rte-design-system-react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
-import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
+import { FLOWBASED_MANDATORY_AREAS, OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { generateId } from '@/shared/utils/defaultUtils.ts';
 import { Row } from '@tanstack/react-table';
 import { TFunction } from 'i18next';
@@ -21,6 +20,7 @@ import {
   TRAJECTORY_DSR_CAPACITY_MODULATION,
   TRAJECTORY_DSR_CLUSTER,
   TRAJECTORY_ENDPOINT,
+  TRAJECTORY_FLOWBASED,
   TRAJECTORY_HYDRO_SERIES,
   TRAJECTORY_HYDRO_TECHNICAL_PARAMETERS,
   TRAJECTORY_MISC_INSTALLED_POWER,
@@ -34,6 +34,7 @@ import {
   TRAJECTORY_RES_LOAD_FACTOR,
   TRAJECTORY_RES_TECHNOLOGY_DISTRIBUTION,
   TRAJECTORY_RES_ZONAL_DISTRIBUTION,
+  TRAJECTORY_SCENARIO_BUILDER,
   TRAJECTORY_SETTINGS,
   TRAJECTORY_STS,
   TRAJECTORY_THERMAL_COMMON_PARAMETER_IMPORT,
@@ -67,9 +68,9 @@ export const getStatus = (status?: RowStatus) => {
 
 /**
  * Get background color from a file status
- * @param {FileInputStatus | null} status
+ * @param {RowStatus | null} status
  */
-export const getBgColor = (status?: FileInputStatus) => {
+export const getBgColor = (status?: RowStatus) => {
   switch (status) {
     case 'loading':
       return 'bg-primary-600';
@@ -914,7 +915,7 @@ export const isTechnicalParametersType = (type: TRAJECTORY_TYPE): boolean =>
  * thermal technical parameter categories; otherwise, returns false.
  */
 export const isSettingsParametersType = (type: TRAJECTORY_TYPE): boolean =>
-  type === TRAJECTORY_TYPE.ADEQUACY_PATCH || type === TRAJECTORY_TYPE.FLOWBASED || type === TRAJECTORY_TYPE.SETTINGS;
+  type === TRAJECTORY_TYPE.ADEQUACY_PATCH || type === TRAJECTORY_TYPE.FLOWBASED || type === TRAJECTORY_TYPE.SETTINGS || type === TRAJECTORY_TYPE.SCENARIO_BUILDER;
 
 /**
  * Determines the file path based on the trajectory type.
@@ -986,6 +987,8 @@ export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE, hypothesis?: Hy
       return String.raw`\\flowbased`;
     case TRAJECTORY_TYPE.SETTINGS:
       return String.raw`\\settings\\general_data`;
+    case TRAJECTORY_TYPE.SCENARIO_BUILDER:
+      return String.raw`\\settings\\scenario_builder`;
     default:
       return null;
   }
@@ -1154,8 +1157,12 @@ export const getUrlApiUploadTrajectory = (
       return `${TRAJECTORY_NUCLEAR_TS_SMR}?area=FR&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
     case TRAJECTORY_TYPE.ADEQUACY_PATCH:
       return `${TRAJECTORY_ADEQUACY_PATCH}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
+    case TRAJECTORY_TYPE.FLOWBASED:
+      return `${TRAJECTORY_FLOWBASED}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
     case TRAJECTORY_TYPE.SETTINGS:
       return `${TRAJECTORY_SETTINGS}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
+    case TRAJECTORY_TYPE.SCENARIO_BUILDER:
+      return `${TRAJECTORY_SCENARIO_BUILDER}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
     default:
       return `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   }
@@ -1254,7 +1261,7 @@ export const getFetchFromDbParams = (
   }
   if (type === TRAJECTORY_TYPE.ADEQUACY_PATCH) {
     if (indexArray.length > 1) {
-      typeToUse = indexArray[1] === 0 ? TRAJECTORY_TYPE.SETTINGS : TRAJECTORY_TYPE.SETTINGS_SCENARIO_BUILDER;// TODO: replace scenario builder
+      typeToUse = indexArray[1] === 0 ? TRAJECTORY_TYPE.SETTINGS : TRAJECTORY_TYPE.SCENARIO_BUILDER;
     } else {
       typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.ADEQUACY_PATCH : TRAJECTORY_TYPE.FLOWBASED;
     }
@@ -1314,13 +1321,47 @@ export const buildDispatchPayload = (
     {} as Record<string, { trajectories: DbTrajectory[] }>,
   );
 
-export const buildTableData = (config: HypothesisConfig[], t: TFunction, results?: DbTrajectory[][], configOptions?: {hvdc?: boolean}): HypothesisRowData[] =>
-  config.map((cfg, idx) => ({
-    hypothesis: t(cfg.labelKey),
-    trajectory: !cfg.subRows?.length && results?.[idx]?.[0] ? results?.[idx]?.[0] : null,
-    status: (!cfg.subRows?.length && results?.[idx]?.length) ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
-    isDeletable: false,
-    isDefault: false,
-    ...(cfg.hasHvdcOption && { hvdc: configOptions?.hvdc }),
-    ...((!!cfg.subRows?.length) && {subRows : buildTableData(cfg.subRows, t, results?.[idx] ? [results[idx]] : [])})
-  }));
+export const buildTableData = (
+  config: HypothesisConfig[],
+  t: TFunction,
+  results?: DbTrajectory[][],
+  configOptions?: { hvdc?: boolean; recalculate?: boolean },
+): HypothesisRowData[] => {
+  // Aplatit tous les tableaux de trajectoires pour une recherche directe par type
+  const allTrajectories = results?.flat() ?? [];
+
+  return config.map((cfg) => {
+    const hasSubRows = !!cfg.subRows?.length;
+
+    // Si pas de subRows, on cherche la trajectoire correspondant au type
+    const trajectory = !hasSubRows
+      ? allTrajectories.find((traj) => traj.type === cfg.type) ?? null
+      : null;
+
+    return {
+      hypothesis: t(cfg.labelKey),
+      trajectory,
+      status: trajectory
+        ? TRAJECTORY_SELECTION_STATUS.OK
+        : TRAJECTORY_SELECTION_STATUS.MISSING,
+      isDeletable: false,
+      isDefault: false,
+      ...(cfg.options?.hasHvdcOption && { hvdc: configOptions?.hvdc }),
+      ...(hasSubRows && {
+        subRows: buildTableData(cfg.subRows!, t, results, configOptions),
+      }),
+      ...(cfg.options?.hasRecalculateOption && {
+        recalculate: configOptions?.recalculate,
+      }),
+    };
+  });
+};
+
+export const areAllFlowbasedAreasPresent = (areasName: string[]): boolean => {
+  const normalizedAreas = new Set(
+    areasName.map((name) => name?.trim().toUpperCase())
+  );
+  return FLOWBASED_MANDATORY_AREAS.every((mandatoryArea) =>
+    normalizedAreas.has(mandatoryArea.toUpperCase())
+  );
+};

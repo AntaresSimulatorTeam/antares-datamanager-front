@@ -10,16 +10,15 @@ import { useTranslation } from 'react-i18next';
 import { useStudy } from '@/store/contexts/StudyContext.tsx';
 import { StudyDTO } from '@/shared/types';
 import { getStudyMenu } from '@/shared/utils/trajectoryUtils.ts';
-import { useFetchAreas } from '@/hooks/useFetchAreas.ts';
 import { AreaLinkTab } from '@/components/tab/AreaLinkTab.tsx';
 import { TabMenu } from '@/components/menu/TabMenu.tsx';
 import ExpandableTab from '@/components/tab/ExpandableTab.tsx';
 import { ContainerWithExpander } from '@/components/banner/ContainerWithExpander.tsx';
 import { useFetchWarningMessages } from '@/hooks/useFetchWarningMessages.ts';
-import { StdIconId } from '@/shared/utils/common/mappings/iconMaps.ts';
 import { getNbMessagesFromTrajectoryType } from '@/shared/services/trajectoryService.ts';
 import { Tab } from '@design-system-rte/react';
 import { TabItemProps } from '@design-system-rte/core/components/tab/tab.interface';
+import { useFetchAreas } from '@/hooks/useFetchAreas.ts';
 
 type StudyNavigationMenuProps = {
   studyData: StudyDTO;
@@ -35,14 +34,15 @@ const StudyNavigationMenu = ({ studyData }: StudyNavigationMenuProps) => {
     id: TRAJECTORY_TYPE.AREA,
     panelId: TRAJECTORY_TYPE.AREA,
     label: t('studyDetails.@areas_links'),
-    icon: StdIconId.LinkedServices,
+    icon: "linked-services",
     disabled: false,
   });
-  const { areaDefault, trajectoryAreas } = useFetchAreas(studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0]);
   const { warningMessages } = useFetchWarningMessages(
     studyData.id ? Number(studyData.id) : null,
     activeTab?.id as TRAJECTORY_TYPE,
   );
+
+  const { areasDefault, trajectoryAreas } = useFetchAreas(activeTab?.id as TRAJECTORY_TYPE, studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0]);
 
   useEffect(() => {
     const hasAreaTrajectory = !!studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0];
@@ -52,7 +52,7 @@ const StudyNavigationMenu = ({ studyData }: StudyNavigationMenuProps) => {
         disabled: tab.id !== (TRAJECTORY_TYPE.AREA as string) && !hasAreaTrajectory,
       })),
     );
-  }, [studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories]);
+  }, [studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0]]);
 
   useEffect(() => {
     const countNbWarningMessages = async (id: number) => {
@@ -91,9 +91,9 @@ const StudyNavigationMenu = ({ studyData }: StudyNavigationMenuProps) => {
             <ExpandableTab
               tabType={type}
               types={[type]}
-              defaultAreas={areaDefault}
-              areas={trajectoryAreas}
               studyData={studyData}
+              defaultAreas={areasDefault}
+              areas={trajectoryAreas}
             />
           );
         case TRAJECTORY_TYPE.THERMAL_CAPACITY:
@@ -101,13 +101,13 @@ const StudyNavigationMenu = ({ studyData }: StudyNavigationMenuProps) => {
         case TRAJECTORY_TYPE.RES_CAPACITY:
         case TRAJECTORY_TYPE.HYDRO_SERIES:
           return (
-            <TabMenu key={type} type={type} defaultAreas={areaDefault} areas={trajectoryAreas} studyData={studyData} />
+            <TabMenu key={type} type={type} defaultAreas={areasDefault} areas={trajectoryAreas} studyData={studyData} />
           );
         default:
-          return <AreaLinkTab studyData={studyData} />;
+          return <AreaLinkTab studyData={studyData}/>;
       }
     },
-    [areaDefault, studyData, trajectoryAreas],
+    [areasDefault, studyData, trajectoryAreas],
   );
 
   return (
