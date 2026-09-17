@@ -470,7 +470,7 @@ describe('getHypothesis', () => {
   it('should return undefined values for invalid rowId', () => {
     const result = getHypothesis(mockData, '5');
     expect(result).toEqual({
-      hypothesis: undefined,
+      hypothesis: "",
       technology: undefined,
     });
   });
