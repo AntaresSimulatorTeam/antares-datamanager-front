@@ -18,6 +18,7 @@ import {
   mockEmptyDbTrajectoryArrayLoadSTS,
   mockEmptyDbTrajectoryLoadFR,
   mockEmptyDbTrajectoryLoadOthers,
+  mockEmptyDbTrajectorySTSOthers,
   resTechnologies,
 } from '@/mocks/data/tests/trajectory.mock.ts';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
@@ -28,6 +29,7 @@ import * as trajectoryService from '@/shared/services/trajectoryService';
 import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { HydroSubRows, STSTechnology, ThermalOptionsResults } from '@/mocks/data/list/names.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
+import { NUCLEAR_FR_MODULATION_TYPES, P2G_TYPES } from '@/shared/const/trajectoryTypes.ts';
 
 vi.mock('@/shared/services/trajectoryService', async (importOriginal) => {
   const actual: Mock = await importOriginal();
@@ -132,7 +134,7 @@ describe('useFetchHypothesisTrajectories', () => {
       mockEmptyDbTrajectoryLoadOthers,
     ]);
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.LOAD], [], [], 5, study.status),
+      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.LOAD], 5, study.status),
     );
 
     await waitFor(() => {
@@ -249,7 +251,7 @@ describe('useFetchHypothesisTrajectories', () => {
       mockEmptyDbTrajectoryLoadOthers,
     ]);
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.LOAD], [], [{ name: 'FR' }], 5, study.status),
+      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.LOAD], 5, study.status, undefined, [{ name: 'FR' }]),
     );
 
     await waitFor(() => {
@@ -369,11 +371,10 @@ describe('useFetchHypothesisTrajectories', () => {
     const { result } = renderHook(() =>
       useFetchHypothesisTrajectories(
         [TRAJECTORY_TYPE.LOAD],
-        [],
-        [{ name: 'FR' }],
         5,
         study.status,
         StudyStatus.IN_PROGRESS,
+        [{ name: 'FR' }],
       ),
     );
 
@@ -466,10 +467,10 @@ describe('useFetchHypothesisTrajectories', () => {
     const { result } = renderHook(() =>
       useFetchHypothesisTrajectories(
         [TRAJECTORY_TYPE.LOAD],
-        [],
-        [{ name: 'FR' }, { name: 'BE' }],
         5,
         StudyStatus.IN_PROGRESS,
+        undefined,
+        [{ name: 'FR' }, { name: 'BE' }],
       ),
     );
 
@@ -560,7 +561,7 @@ describe('useFetchHypothesisTrajectories', () => {
     vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArrayLoad);
 
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.LOAD], areas, defaultAreas, 5, StudyStatus.IN_PROGRESS),
+      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.LOAD], 5, StudyStatus.IN_PROGRESS, undefined, defaultAreas, areas),
     );
 
     await waitFor(() => {
@@ -580,7 +581,7 @@ describe('useFetchHypothesisTrajectories', () => {
     vi.mocked(studyService.getStudyTrajectories).mockResolvedValue(mockDbTrajectoryArrayLoad);
 
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.LOAD], areas, defaultAreas, 5, StudyStatus.IN_PROGRESS),
+      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.LOAD], 5, StudyStatus.IN_PROGRESS, undefined, defaultAreas, areas),
     );
 
     await waitFor(() => {
@@ -603,11 +604,11 @@ describe('useFetchHypothesisTrajectories', () => {
     const { result } = renderHook(() =>
       useFetchHypothesisTrajectories(
         [TRAJECTORY_TYPE.LOAD],
-        areas,
-        defaultAreas,
         5,
         StudyStatus.GENERATED,
         StudyStatus.GENERATED,
+        defaultAreas,
+        areas
       ),
     );
 
@@ -631,7 +632,7 @@ describe('useFetchHypothesisTrajectories', () => {
     }));
 
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.THERMAL_CAPACITY], [], [], 7, StudyStatus.IN_PROGRESS),
+      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.THERMAL_CAPACITY],7, StudyStatus.IN_PROGRESS),
     );
 
     await waitFor(() =>
@@ -644,6 +645,9 @@ describe('useFetchHypothesisTrajectories', () => {
   it('should include STSTechnology when trajectoryType is STS', async () => {
     const defaultAreas = [{ name: 'FR' }];
     const areas = [{ areaName: 'AT' }, { areaName: 'BE' }] as TrajectoryAreaData[];
+    vi.mocked(trajectoryUtils.buildDefaultEmptyTrajectoryList).mockImplementationOnce(() => [
+      mockEmptyDbTrajectorySTSOthers,
+    ]);
     mockUseStudy.mockImplementation(
       () =>
         ({
@@ -663,11 +667,11 @@ describe('useFetchHypothesisTrajectories', () => {
     const { result } = renderHook(() =>
       useFetchHypothesisTrajectories(
         [TRAJECTORY_TYPE.STS],
-        areas,
-        defaultAreas,
         7,
         StudyStatus.IN_PROGRESS,
         StudyStatus.IN_PROGRESS,
+        defaultAreas,
+        areas
       ),
     );
 
@@ -725,7 +729,7 @@ describe('useFetchHypothesisTrajectories', () => {
     vi.mocked(studyService.getStudyTrajectories).mockResolvedValue([]);
 
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.DSR], areas, defaultAreas, 5, StudyStatus.IN_PROGRESS),
+      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.DSR], 5, StudyStatus.IN_PROGRESS, undefined, defaultAreas, areas),
     );
 
     await waitFor(() => {
@@ -826,7 +830,7 @@ describe('useFetchHypothesisTrajectories', () => {
     }));
 
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.RES_CAPACITY], areas, defaultAreas, 7, StudyStatus.IN_PROGRESS),
+      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.RES_CAPACITY], 7, StudyStatus.IN_PROGRESS, undefined, defaultAreas, areas),
     );
 
     await waitFor(() => {
@@ -850,7 +854,7 @@ describe('useFetchHypothesisTrajectories', () => {
     }));
 
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.RES_LOAD], areas, defaultAreas, 7, StudyStatus.IN_PROGRESS),
+      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.RES_LOAD],7, StudyStatus.IN_PROGRESS, undefined, defaultAreas, areas),
     );
 
     await waitFor(() => {
@@ -868,10 +872,9 @@ describe('useFetchHypothesisTrajectories', () => {
     const { result } = renderHook(() =>
       useFetchHypothesisTrajectories(
         [TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION, TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION],
-        areas,
-        defaultAreas,
         7,
         StudyStatus.IN_PROGRESS,
+        undefined, defaultAreas, areas
       ),
     );
 
@@ -889,7 +892,7 @@ describe('useFetchHypothesisTrajectories', () => {
 
   it('should not call api if only study id is provided', async () => {
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.DSR], [], [], 5, StudyStatus.IN_PROGRESS),
+      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.DSR],5, StudyStatus.IN_PROGRESS),
     );
 
     await waitFor(() => {
@@ -900,7 +903,7 @@ describe('useFetchHypothesisTrajectories', () => {
 
   it('should not call api when no arguments area provided', async () => {
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.DSR], [], [], 5, StudyStatus.IN_PROGRESS),
+      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.DSR], 5, StudyStatus.IN_PROGRESS),
     );
 
     await waitFor(() => {
@@ -911,7 +914,7 @@ describe('useFetchHypothesisTrajectories', () => {
 
   it('should throw error when api call throw an exception', async () => {
     const { result } = renderHook(() =>
-      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.DSR], [], [], 5, StudyStatus.IN_PROGRESS),
+      useFetchHypothesisTrajectories([TRAJECTORY_TYPE.DSR],5, StudyStatus.IN_PROGRESS),
     );
 
     await waitFor(() => {
@@ -963,10 +966,9 @@ describe('useFetchHypothesisTrajectories', () => {
     const { result } = renderHook(() =>
       useFetchHypothesisTrajectories(
         [TRAJECTORY_TYPE.HYDRO_SERIES, TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS],
-        areas,
-        [],
         5,
         StudyStatus.IN_PROGRESS,
+        undefined, [], areas
       ),
     );
 
@@ -1040,10 +1042,9 @@ describe('useFetchHypothesisTrajectories', () => {
     const { result } = renderHook(() =>
       useFetchHypothesisTrajectories(
         [TRAJECTORY_TYPE.HYDRO_PSP_SERIES, TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS],
-        areas,
-        [],
         5,
         StudyStatus.IN_PROGRESS,
+        undefined, [], areas
       ),
     );
 
@@ -1079,7 +1080,7 @@ describe('useFetchHypothesisTrajectories', () => {
 
     const { rerender } = renderHook(
       ({ types }: { types: TRAJECTORY_TYPE[] }) =>
-        useFetchHypothesisTrajectories(types, [], [], 5, StudyStatus.IN_PROGRESS),
+        useFetchHypothesisTrajectories(types, 5, StudyStatus.IN_PROGRESS),
       { initialProps: { types: [TRAJECTORY_TYPE.LOAD] } },
     );
 
@@ -1098,7 +1099,7 @@ describe('useFetchHypothesisTrajectories', () => {
 
     const { rerender } = renderHook(
       ({ types }: { types: TRAJECTORY_TYPE[] }) =>
-        useFetchHypothesisTrajectories(types, [], [], 5, StudyStatus.IN_PROGRESS),
+        useFetchHypothesisTrajectories(types, 5, StudyStatus.IN_PROGRESS),
       { initialProps: { types: [TRAJECTORY_TYPE.LOAD] } },
     );
 
@@ -1116,7 +1117,7 @@ describe('useFetchHypothesisTrajectories', () => {
 
     const { rerender } = renderHook(
       ({ contextStatus }: { contextStatus: StudyStatus }) =>
-        useFetchHypothesisTrajectories([TRAJECTORY_TYPE.LOAD], [], [], 5, StudyStatus.IN_PROGRESS, contextStatus),
+        useFetchHypothesisTrajectories([TRAJECTORY_TYPE.LOAD], 5, StudyStatus.IN_PROGRESS, contextStatus),
       { initialProps: { contextStatus: StudyStatus.IN_PROGRESS } },
     );
 
@@ -1133,7 +1134,7 @@ describe('useFetchHypothesisTrajectories', () => {
 
     const { rerender } = renderHook(
       ({ studyId }: { studyId: number }) =>
-        useFetchHypothesisTrajectories([TRAJECTORY_TYPE.LOAD], [], [], studyId, StudyStatus.IN_PROGRESS),
+        useFetchHypothesisTrajectories([TRAJECTORY_TYPE.LOAD], studyId, StudyStatus.IN_PROGRESS),
       { initialProps: { studyId: 5 } },
     );
 
@@ -1150,7 +1151,7 @@ describe('useFetchHypothesisTrajectories', () => {
 
     const { rerender } = renderHook(
       ({ studyId }: { studyId: number }) =>
-        useFetchHypothesisTrajectories([TRAJECTORY_TYPE.LOAD], [], [], studyId, StudyStatus.IN_PROGRESS),
+        useFetchHypothesisTrajectories([TRAJECTORY_TYPE.LOAD], studyId, StudyStatus.IN_PROGRESS),
       { initialProps: { studyId: 5 } },
     );
 
@@ -1160,5 +1161,355 @@ describe('useFetchHypothesisTrajectories', () => {
 
     await waitFor(() => expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(99, TRAJECTORY_TYPE.LOAD));
     expect(studyService.getStudyTrajectories).toHaveBeenCalledTimes(2);
+  });
+
+  it('should build hypothesis trajectories for nuclear types when isTrajectoryNuclearType is true', async () => {
+    const nuclearModulationTrajectory: DbTrajectory = {
+      id: 101,
+      trajectoryName: 'nuclear_modulation_traj',
+      type: TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION,
+      area: '',
+      technology: '',
+      version: 1,
+      userName: 'user1',
+      creationDate: '2024-01-01' as unknown as Date,
+      hasTimeSeries: false,
+    };
+
+    const nuclearTalonTrajectory: DbTrajectory = {
+      id: 102,
+      trajectoryName: 'nuclear_talon_traj',
+      type: TRAJECTORY_TYPE.NUCLEAR_FR_TALON,
+      area: '',
+      technology: '',
+      version: 1,
+      userName: 'user1',
+      creationDate: '2024-01-01' as unknown as Date,
+      hasTimeSeries: false,
+    };
+
+    const nuclearTsErpTrajectory: DbTrajectory = {
+      id: 103,
+      trajectoryName: 'nuclear_erp_traj',
+      type: TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP,
+      area: '',
+      technology: '',
+      version: 1,
+      userName: 'user1',
+      creationDate: '2024-01-01' as unknown as Date,
+      hasTimeSeries: false,
+    };
+
+    const nuclearTsLongTermTrajectory: DbTrajectory = {
+      id: 104,
+      trajectoryName: 'nuclear_long_term_traj',
+      type: TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM,
+      area: '',
+      technology: '',
+      version: 1,
+      userName: 'user1',
+      creationDate: '2024-01-01' as unknown as Date,
+      hasTimeSeries: false,
+    };
+
+    const nuclearTsSmrTrajectory: DbTrajectory = {
+      id: 105,
+      trajectoryName: 'nuclear_smr_traj',
+      type: TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR,
+      area: '',
+      technology: '',
+      version: 1,
+      userName: 'user1',
+      creationDate: '2024-01-01' as unknown as Date,
+      hasTimeSeries: false,
+    };
+
+    mockUseStudy.mockReturnValue({
+      [TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION]: { trajectories: [], warningMessages: [] },
+      [TRAJECTORY_TYPE.NUCLEAR_FR_TALON]: { trajectories: [], warningMessages: [] },
+      [TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP]: { trajectories: [], warningMessages: [] },
+      [TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM]: { trajectories: [], warningMessages: [] },
+      [TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR]: { trajectories: [], warningMessages: [] },
+    } as Partial<StudyState>);
+
+    vi.mocked(studyService.getStudyTrajectories).mockImplementation((_, type) => {
+      if (type === TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION) return Promise.resolve([nuclearModulationTrajectory]);
+      if (type === TRAJECTORY_TYPE.NUCLEAR_FR_TALON) return Promise.resolve([nuclearTalonTrajectory]);
+      if (type === TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP) return Promise.resolve([nuclearTsErpTrajectory]);
+      if (type === TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM) return Promise.resolve([nuclearTsLongTermTrajectory]);
+      if (type === TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR) return Promise.resolve([nuclearTsSmrTrajectory]);
+      return Promise.resolve([]);
+    });
+
+    const { result } = renderHook(() =>
+      useFetchHypothesisTrajectories(NUCLEAR_FR_MODULATION_TYPES, 5, StudyStatus.IN_PROGRESS),
+    );
+
+    await waitFor(() => {
+      expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION);
+      expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.NUCLEAR_FR_TALON);
+      expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP);
+      expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM);
+      expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR);
+
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: STUDY_ACTION.ADD_TRAJECTORIES,
+        payload: {
+          [TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION]: {
+            trajectories: [nuclearModulationTrajectory],
+          },
+        },
+      });
+
+      expect(result.current.hypothesisTrajectories?.[TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION]).toEqual([
+        {
+          hypothesis: 'thermal.@modulation',
+          trajectory: nuclearModulationTrajectory,
+          status: TRAJECTORY_SELECTION_STATUS.OK,
+          isDefault: false,
+          isDeletable: false,
+          subRows: [],
+        },
+        {
+          hypothesis: 'thermal.@talon',
+          trajectory: nuclearTalonTrajectory,
+          status: TRAJECTORY_SELECTION_STATUS.OK,
+          isDefault: false,
+          isDeletable: false,
+          subRows: [],
+        },
+        {
+          hypothesis: 'thermal.@time_series',
+          trajectory: null,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          isDefault: false,
+          isDeletable: false,
+          subRows: [
+            {
+              hypothesis: 'thermal.@epr',
+              trajectory: nuclearTsErpTrajectory,
+              status: TRAJECTORY_SELECTION_STATUS.OK,
+              isDefault: false,
+              isDeletable: false,
+              subRows: null,
+            },
+            {
+              hypothesis: 'thermal.@long_term',
+              trajectory: nuclearTsLongTermTrajectory,
+              status: TRAJECTORY_SELECTION_STATUS.OK,
+              isDefault: false,
+              isDeletable: false,
+              subRows: null,
+            },
+            {
+              hypothesis: 'thermal.@smr',
+              trajectory: nuclearTsSmrTrajectory,
+              status: TRAJECTORY_SELECTION_STATUS.OK,
+              isDefault: false,
+              isDeletable: false,
+              subRows: null,
+            },
+          ],
+        },
+      ]);
+
+      expect(result.current.hypothesisTrajectories?.[TRAJECTORY_TYPE.NUCLEAR_FR_TALON]).toBeUndefined();
+      expect(result.current.areasTrajectoryOptions).toBeUndefined();
+      expect(result.current.dropDownListOptions).toBeUndefined();
+    });
+  });
+
+  it('should build hypothesis trajectories for nuclear types with missing trajectories and generated status', async () => {
+    mockUseStudy.mockReturnValue({} as StudyState);
+    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue([]);
+
+    const { result } = renderHook(() =>
+      useFetchHypothesisTrajectories(
+        NUCLEAR_FR_MODULATION_TYPES,
+        5,
+        StudyStatus.GENERATED,
+        StudyStatus.GENERATED,
+      ),
+    );
+
+    await waitFor(() => {
+      expect(result.current.hypothesisTrajectories?.[TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION]).toEqual([
+        {
+          hypothesis: 'thermal.@modulation',
+          trajectory: null,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          isDefault: false,
+          isDeletable: false,
+          subRows: [],
+        },
+        {
+          hypothesis: 'thermal.@talon',
+          trajectory: null,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          isDefault: false,
+          isDeletable: false,
+          subRows: [],
+        },
+        {
+          hypothesis: 'thermal.@time_series',
+          trajectory: null,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          isDefault: false,
+          isDeletable: false,
+          subRows: [
+            {
+              hypothesis: 'thermal.@epr',
+              trajectory: null,
+              status: TRAJECTORY_SELECTION_STATUS.MISSING,
+              isDefault: false,
+              isDeletable: false,
+              subRows: null,
+            },
+            {
+              hypothesis: 'thermal.@long_term',
+              trajectory: null,
+              status: TRAJECTORY_SELECTION_STATUS.MISSING,
+              isDefault: false,
+              isDeletable: false,
+              subRows: null,
+            },
+            {
+              hypothesis: 'thermal.@smr',
+              trajectory: null,
+              status: TRAJECTORY_SELECTION_STATUS.MISSING,
+              isDefault: false,
+              isDeletable: false,
+              subRows: null,
+            },
+          ],
+        },
+      ]);
+
+      expect(result.current.readOnlyRow?.[TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION]).toEqual({
+        '0': true,
+        '1': true,
+        '2': true,
+        '2.0': true,
+        '2.1': true,
+        '2.2': true,
+      });
+    });
+  });
+
+  it('should build hypothesis trajectories for other vector types when isTrajectoryOtherVectorType is true', async () => {
+    const p2gCapacityTrajectory: DbTrajectory = {
+      id: 201,
+      trajectoryName: 'p2g_capacity_traj',
+      type: TRAJECTORY_TYPE.P2G_CAPACITY_COST,
+      area: '',
+      technology: '',
+      version: 1,
+      userName: 'user1',
+      creationDate: '2024-01-01' as unknown as Date,
+      hasTimeSeries: false,
+    };
+
+    const p2gModulationTrajectory: DbTrajectory = {
+      id: 202,
+      trajectoryName: 'p2g_modulation_traj',
+      type: TRAJECTORY_TYPE.P2G_MARKET_MODULATION,
+      area: '',
+      technology: '',
+      version: 1,
+      userName: 'user1',
+      creationDate: '2024-01-01' as unknown as Date,
+      hasTimeSeries: false,
+    };
+
+    mockUseStudy.mockReturnValue({
+      [TRAJECTORY_TYPE.P2G_CAPACITY_COST]: { trajectories: [], warningMessages: [] },
+      [TRAJECTORY_TYPE.P2G_MARKET_MODULATION]: { trajectories: [], warningMessages: [] },
+    } as Partial<StudyState>);
+
+    vi.mocked(studyService.getStudyTrajectories).mockImplementation((_, type) => {
+      if (type === TRAJECTORY_TYPE.P2G_CAPACITY_COST) return Promise.resolve([p2gCapacityTrajectory]);
+      if (type === TRAJECTORY_TYPE.P2G_MARKET_MODULATION) return Promise.resolve([p2gModulationTrajectory]);
+      return Promise.resolve([]);
+    });
+
+    const { result } = renderHook(() =>
+      useFetchHypothesisTrajectories(P2G_TYPES, 5, StudyStatus.IN_PROGRESS),
+    );
+
+    await waitFor(() => {
+      expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.P2G_CAPACITY_COST);
+      expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.P2G_MARKET_MODULATION);
+
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: STUDY_ACTION.ADD_TRAJECTORIES,
+        payload: {
+          [TRAJECTORY_TYPE.P2G]: {
+            trajectories: [p2gCapacityTrajectory, p2gModulationTrajectory],
+          },
+        },
+      });
+
+      expect(result.current.hypothesisTrajectories?.[TRAJECTORY_TYPE.P2G]).toEqual([
+        {
+          hypothesis: 'p2g.@capacity',
+          trajectory: p2gCapacityTrajectory,
+          status: TRAJECTORY_SELECTION_STATUS.OK,
+          isDefault: false,
+          isDeletable: false,
+          subRows: [],
+        },
+        {
+          hypothesis: 'p2g.@modulation',
+          trajectory: p2gModulationTrajectory,
+          status: TRAJECTORY_SELECTION_STATUS.OK,
+          isDefault: false,
+          isDeletable: false,
+          subRows: [],
+        },
+      ]);
+
+      expect(result.current.areasTrajectoryOptions).toBeUndefined();
+      expect(result.current.dropDownListOptions).toBeUndefined();
+    });
+  });
+
+  it('should build hypothesis trajectories for other vector types with missing trajectories and generated status', async () => {
+    mockUseStudy.mockReturnValue({} as StudyState);
+    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue([]);
+
+    const { result } = renderHook(() =>
+      useFetchHypothesisTrajectories(
+        P2G_TYPES,
+        5,
+        StudyStatus.GENERATED,
+        StudyStatus.GENERATED,
+      ),
+    );
+
+    await waitFor(() => {
+      expect(result.current.hypothesisTrajectories?.[TRAJECTORY_TYPE.P2G]).toEqual([
+        {
+          hypothesis: 'p2g.@capacity',
+          trajectory: null,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          isDefault: false,
+          isDeletable: false,
+          subRows: [],
+        },
+        {
+          hypothesis: 'p2g.@modulation',
+          trajectory: null,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          isDefault: false,
+          isDeletable: false,
+          subRows: [],
+        },
+      ]);
+
+      expect(result.current.readOnlyRow?.[TRAJECTORY_TYPE.P2G]).toEqual({
+        '0': true,
+        '1': true,
+      });
+    });
   });
 });

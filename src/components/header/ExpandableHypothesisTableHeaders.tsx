@@ -13,7 +13,7 @@ import { LabelWithDeleteButton } from '@common/data/LabelWithDeleteButton.tsx';
 import { SelectInputWithButton } from '@common/data/SelectInputWithButton.tsx';
 import { ProgressBar } from '@/components/input/ProgressBar.tsx';
 import { getAlignment, hasLabelDefault } from '@/shared/utils/hypothesisTableUtils.ts';
-import { getSubRowListWithArea, getSubRowsList, isEmptyRow } from '@/shared/utils/trajectoryUtils.ts';
+import { getColumnHeader, getSubRowListWithArea, getSubRowsList, isEmptyRow } from '@/shared/utils/trajectoryUtils.ts';
 import { getInformationMessage } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { Button, Icon, IconButton, SegmentedControl, Tag, Tooltip } from '@design-system-rte/react';
 
@@ -31,7 +31,7 @@ const getExpandableHypothesisTableHeaders = ({
   list,
 }: TableHeadersGetterProps): TableOptions<HypothesisRowData>['columns'] => [
   columnHelper.accessor('hypothesis', {
-    header: columnHeader || t('studyDetails.@areas'),
+    header: columnHeader || getColumnHeader(t, type),
     size: type === TRAJECTORY_TYPE.STS ? 200 : 233,
     cell: ({ getValue, row, table }) => {
       const { status, isDefault, hypothesis, trajectory } = row.original;
