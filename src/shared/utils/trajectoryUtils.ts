@@ -677,16 +677,16 @@ export const getStudyMenu = (t: (value: string) => string, isTrajectoryAreaLinke
     badgeContent: 'number',
     showBadge: true,
   },
-  {
-    id: TRAJECTORY_TYPE.OTHER_VECTOR,
-    panelId: TRAJECTORY_TYPE.OTHER_VECTOR,
-    label: t('studyDetails.@other_vector'),
-    icon: 'bolt-alt-circle',
-    disabled: true,
-    badgeType: 'brand',
-    badgeContent: 'number',
-    showBadge: true,
-  },
+  // {
+  //   id: TRAJECTORY_TYPE.OTHER_VECTOR,
+  //   panelId: TRAJECTORY_TYPE.OTHER_VECTOR,
+  //   label: t('studyDetails.@other_vector'),
+  //   icon: 'bolt-alt-circle',
+  //   disabled: true,
+  //   badgeType: 'brand',
+  //   badgeContent: 'number',
+  //   showBadge: true,
+  // },
 ];
 
 export const getItemsMenu = (
