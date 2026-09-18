@@ -38,7 +38,7 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
       return (
         <div
           className={`[&_[class*='radioButtonLabel']]:![font-size:inherit] [&_[class*='radioButtonLabel']]:![font-family:inherit] ${
-            row.getIsSelected()
+            isSelected
               ? "[&_[class*='radioButtonBackground']]:opacity-100"
               : "[&_[class*='radioButtonBackground']]:opacity-0 group-hover:[&_[class*='radioButtonBackground']]:opacity-100"
           }`}
@@ -47,12 +47,15 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
         >
           <RadioButton
             groupName="study-table-radio-group"
-            value={row.original.id.toString()}
+            value={row.id}
             label={getValue()}
             disabled={!row.getCanSelect()}
-            checked={row.getIsSelected()}
-            name={`radio-${row.original.id}`}
-            onChange={() => {}}
+            isChecked={isSelected}
+            onChange={() => {
+              if (row.getCanSelect()) {
+                row.toggleSelected(!isSelected);
+              }
+            }}
             className={`transition-colors ![font-size:inherit] ![font-family:inherit] ${status === StudyStatus.GENERATED ? '!text-primary-600 group-hover:!text-primary-600' : '!text-gray-800 group-hover:!text-gray-800'}`}
           />
         </div>
