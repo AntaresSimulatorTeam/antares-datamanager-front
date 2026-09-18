@@ -227,7 +227,7 @@ export const useFetchHypothesisTrajectories = (
             const { trajType, trajectories, dsrCmResult, technologies, shouldSkipFetch, contextTrajectories } = res;
 
             const effectiveTrajectories = shouldSkipFetch ? contextTrajectories : trajectories;
-            const areasWithTrajectory = effectiveTrajectories.flatMap((traj) => (traj.area?.length > 0 ? traj : []));
+            const areasWithTrajectory = effectiveTrajectories?.flatMap((traj) => (traj.area?.length > 0 ? traj : []));
             const list = buildCheckListBox(areasWithTrajectory, areas, defaultAreas);
 
             const rows = buildHypothesisRows({
