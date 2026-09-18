@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import * as trajectoryUtils from '@/shared/utils/trajectoryUtils.ts';
 import { useHypothesisTableUpdateHandler } from '@/hooks/useHypothesisTableUpdateHandler.ts';
@@ -28,10 +28,14 @@ vi.mock('@/hooks/useTrajectoryDetach', () => ({
 }));
 
 // Mock utilitaires
-vi.mock('@/shared/utils/trajectoryUtils', () => ({
-  getRowDataSelected: vi.fn(),
-  shouldDeleteCapacityModulation: vi.fn(),
-}));
+vi.mock('@/shared/utils/trajectoryUtils', async (importOriginal) => {
+  const actual: Mock = await importOriginal();
+  return {
+    ...actual,
+    getRowDataSelected: vi.fn(),
+    shouldDeleteCapacityModulation: vi.fn(),
+  };
+});
 
 describe('useHypothesisTableUpdateHandler', () => {
   const setData = vi.fn();

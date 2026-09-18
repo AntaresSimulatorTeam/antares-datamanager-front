@@ -823,14 +823,14 @@ export const getAreaTrajectoryName = (
 export const getHypothesis = (
   data: HypothesisRowData[],
   rowId: string,
-): { hypothesis: string | undefined; technology: string | undefined } => {
+): { hypothesis: string; technology: string | undefined } => {
   const indexArray = rowId.split('.').map((item) => parseInt(item));
   const dataRowSelected = getRowDataSelected(data, indexArray);
   if (indexArray.length === 2) {
     return { hypothesis: data[indexArray[0]]?.hypothesis, technology: dataRowSelected?.hypothesis };
   } else {
     return {
-      hypothesis: dataRowSelected?.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : dataRowSelected?.hypothesis,
+      hypothesis: dataRowSelected?.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : dataRowSelected?.hypothesis ?? '',
       technology: undefined,
     };
   }

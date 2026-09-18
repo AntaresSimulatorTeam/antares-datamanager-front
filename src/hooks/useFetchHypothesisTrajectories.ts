@@ -81,7 +81,7 @@ export const useFetchHypothesisTrajectories = (
     return trajectoryTypes.reduce<Record<TRAJECTORY_TYPE, DbTrajectory[]>>(
       (acc, type) => {
         const trajectories = studyStateRef.current?.[type]?.trajectories ?? [];
-        acc[type] = trajectories.filter((trajectory) => (trajectory?.trajectoryName?.length ?? 0) < 1);
+        acc[type] = trajectories.filter((trajectory: DbTrajectory) => (trajectory?.trajectoryName?.length ?? 0) < 1);
         return acc;
       },
       {} as Record<TRAJECTORY_TYPE, DbTrajectory[]>,
@@ -203,8 +203,8 @@ export const useFetchHypothesisTrajectories = (
             isStudyGenerated,
             defaultAreaListNotInList,
           });
-          const areasWithTrajectoryOK = areasWithTrajectory.filter(trajectory => trajectory.trajectoryName?.length > 0);
-          const { areaOptions, checkedValues } = buildCheckListBox(areasWithTrajectoryOK, areas, defaultAreas);
+
+          const { areaOptions, checkedValues } = buildCheckListBox(areasWithTrajectory, areas, defaultAreas);
 
           results = rawResults.flatMap((result) => {
             if (result.trajType === hydroTypeToSet) {
@@ -228,8 +228,7 @@ export const useFetchHypothesisTrajectories = (
 
             const effectiveTrajectories = shouldSkipFetch ? contextTrajectories : trajectories;
             const areasWithTrajectory = effectiveTrajectories?.flatMap((traj) => (traj.area?.length > 0 ? traj : []));
-            const areasWithTrajectoryOK = areasWithTrajectory?.filter(trajectory => trajectory.trajectoryName?.length > 0);
-            const list = buildCheckListBox(areasWithTrajectoryOK, areas, defaultAreas);
+            const list = buildCheckListBox(areasWithTrajectory, areas, defaultAreas);
 
             const rows = buildHypothesisRows({
               trajType,

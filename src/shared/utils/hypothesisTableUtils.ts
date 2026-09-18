@@ -8,7 +8,7 @@ import {
   TrajectorySTSDataScheme,
 } from '@/shared/types';
 import { Row } from '@tanstack/react-table';
-import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
+import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 
 /**
@@ -142,7 +142,7 @@ export const buildCheckValuesList = (
   defaultAreas?: { name: string }[],
 ): string[] => {
   const areasValuesChecked: string[] = (areaWithTrajectory ?? [])
-    .filter((trajectoryArea) => !defaultAreas?.some((item) => item.name === trajectoryArea.area))
+    .filter((trajectoryArea) => ![...(defaultAreas) ?? [], {name: OTHER_AREAS}]?.some((item) => item.name === trajectoryArea.area))
     .map((trajectory) => trajectory.area);
   const defaultCheckedValues = (defaultAreas ?? []).map((item) => item.name);
 
