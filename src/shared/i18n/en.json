@@ -127,6 +127,7 @@
     "@misc": "Misc",
     "@sts": "STS",
     "@dsr": "DSR",
+    "@other_vector": "Other vector",
     "@trajectory": "Trajectory to use",
     "@select_trajectory": "Select a trajectory",
     "@select_no_trajectory": "No trajectory in the file system",
@@ -214,6 +215,14 @@
     "@scenarioBuilder": "Scenario builder",
     "@recalculate": "Recalculate",
     "@read": "Read"
+  },
+  "otherVector": {
+    "@p2g": "Power to Gas (P2G)",
+    "@me": "Multi Energy (ME)"
+  },
+  "p2g": {
+    "@capacity": "Capacity",
+    "@modulation": "Market bid modulation"
   },
   "trajectoryViewModal": {
     "@title_area": "Areas",

@@ -69,11 +69,11 @@ const ExpandableTab = ({
   const { hypothesisTrajectories, areasTrajectoryOptions, dropDownListOptions, readOnlyRow, technologyList } =
     useFetchHypothesisTrajectories(
       types,
-      areasTrajectory,
-      defaultTrajAreas,
       studyData?.id,
       studyData?.status,
       studyState.studyStatus,
+      defaultTrajAreas,
+      areasTrajectory,
     );
   const { fileStatus, progress, importTrajectory } = useTrajectoryImport(studyData, dispatch);
   const { removeRow } = useHypothesisTableRemoveRow(studyData, dispatch, setData, setCheckedValues, setReadOnly);
