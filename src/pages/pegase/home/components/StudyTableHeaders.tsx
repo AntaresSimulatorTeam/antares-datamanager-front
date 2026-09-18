@@ -21,6 +21,19 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
     size: 300,
     cell: ({ getValue, row }) => {
       const status = row.original.status;
+      const isSelected = row.getIsSelected();
+
+      const handleToggle = (e: React.MouseEvent) => {
+        const target = e.target as HTMLElement;
+        if (target.tagName !== 'INPUT') {
+          e.preventDefault();
+        }
+        e.stopPropagation();
+
+        if (row.getCanSelect()) {
+          row.toggleSelected(!isSelected);
+        }
+      };
       return (
         <div
           className={`[&_[class*='radioButtonLabel']]:![font-size:inherit] [&_[class*='radioButtonLabel']]:![font-family:inherit] ${
@@ -28,6 +41,8 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
               ? "[&_[class*='radioButtonBackground']]:opacity-100"
               : "[&_[class*='radioButtonBackground']]:opacity-0 group-hover:[&_[class*='radioButtonBackground']]:opacity-100"
           }`}
+          onClick={handleToggle}
+          onKeyDown={() => {}}
         >
           <RadioButton
             groupName="study-table-radio-group"

@@ -181,8 +181,7 @@ export const useFetchHypothesisTrajectories = (
             isStudyGenerated,
             defaultAreaListNotInList,
           });
-          const areasWithTrajectoryOK = areasWithTrajectory.filter(trajectory => trajectory.trajectoryName?.length > 0);
-          const { areaOptions, checkedValues } = buildCheckListBox(areasWithTrajectoryOK, areas, defaultAreas);
+          const { areaOptions, checkedValues } = buildCheckListBox(areasWithTrajectory, areas, defaultAreas);
 
           results = rawResults.flatMap((result) => {
             if (result.trajType === hydroTypeToSet) {
@@ -206,8 +205,8 @@ export const useFetchHypothesisTrajectories = (
 
             const effectiveTrajectories = shouldSkipFetch ? contextTrajectories : trajectories;
             const areasWithTrajectory = effectiveTrajectories.flatMap((traj) => (traj.area?.length > 0 ? traj : []));
-            const areasWithTrajectoryOK = areasWithTrajectory.filter(trajectory => trajectory.trajectoryName?.length > 0);
-            const list = buildCheckListBox(areasWithTrajectoryOK, areas, defaultAreas);
+
+            const list = buildCheckListBox(areasWithTrajectory, areas, defaultAreas);
 
             const rows = buildHypothesisRows({
               trajType,

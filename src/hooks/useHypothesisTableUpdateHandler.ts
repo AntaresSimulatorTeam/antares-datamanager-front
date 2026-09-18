@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useCallback } from 'react';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { DbTrajectory, HypothesisRowData, RowStatus, StudyDTO } from '@/shared/types';
-import { getRowDataSelected, shouldDeleteCapacityModulation } from '@/shared/utils/trajectoryUtils.ts';
+import { getHypothesis, getRowDataSelected, shouldDeleteCapacityModulation } from '@/shared/utils/trajectoryUtils.ts';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
 import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
 import { RowToDeleteProps } from '@/shared/types/HypothesisTable.ts';
@@ -52,12 +52,12 @@ export const useHypothesisTableUpdateHandler = ({
       if (status === 'empty' || status === 'emptyError') {
         const row = getRowDataSelected(data, indexArray) ?? null;
         if (row) {
-          const hypothesis = row?.hypothesis ?? '';
+          const hypothesisInfo = getHypothesis(data, rowId);
           if (type === TRAJECTORY_TYPE.DSR && shouldDeleteCapacityModulation(data, indexArray[0])) {
-            setRowToDelete?.({ index: indexArray[0], value: hypothesis, operation: 'empty' });
+            setRowToDelete?.({ index: indexArray[0], value: hypothesisInfo.hypothesis, operation: 'empty' });
             setIsDeletionModalOpen(true);
           } else {
-            await detachTrajectory(typeToUse, indexArray, setData, data, status, hypothesis, setReadOnly, setSecondTableReadOnly);
+            await detachTrajectory(typeToUse, indexArray, setData, data, status, hypothesisInfo.hypothesis, setReadOnly, setSecondTableReadOnly);
           }
         }
       } else if (status === 'success') {

@@ -116,6 +116,7 @@ export const createStudy = async (
  * @throws {BackendError} Throws an error if the update fails on the server-side.
  */
 export const updateStudy = async (studyData: Partial<StudyDTO>, studyId: number): Promise<void> => {
+  // eslint-disable-next-line no-useless-catch
   try {
     await AuthService.authFetch(`${STUDY_ENDPOINT}/${studyId}`, {
       method: 'PUT',
@@ -125,7 +126,7 @@ export const updateStudy = async (studyData: Partial<StudyDTO>, studyId: number)
       body: JSON.stringify(studyData),
     });
   } catch (error: unknown) {
-    throw new Error((error as BackendError).antaresErrorMessage);
+    throw error;
   }
 };
 
