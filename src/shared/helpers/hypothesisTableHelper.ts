@@ -374,7 +374,7 @@ export const buildRowsByType = ({
         return {
           hypothesis: getRowHypothesisLabel(subRowType, t),
           trajectory: subRowTrajectory,
-          status: subRowTrajectory ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+          status: subRowTrajectory?.trajectoryName ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
           isDefault: false,
           isDeletable: false,
           subRows: null,
