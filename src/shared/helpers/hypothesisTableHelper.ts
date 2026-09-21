@@ -248,7 +248,9 @@ export const fetchAndNormalizeTrajectories = async ({
   }
 
   // Other types
-  result = await getStudyTrajectories(id, trajType);
+  if (trajType !== TRAJECTORY_TYPE.THERMAL_CAPACITY_ME) { // TODO: to remove when thermal_me is ok
+    result = await getStudyTrajectories(id, trajType);
+  }
 
   if (trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
     technologies = await getThermalTechnologyList();
@@ -356,7 +358,6 @@ export const getNuclearRowHypothesisKey = (type: TRAJECTORY_TYPE) => {
 }
 
 export const getMERowHypothesisKey = (type: TRAJECTORY_TYPE) => {
-
   switch (type) {
     case TRAJECTORY_TYPE.AREA_ME:
       return 'studyDetails.@areas';
@@ -378,11 +379,16 @@ export const getMERowHypothesisKey = (type: TRAJECTORY_TYPE) => {
       return 'thermal.@time_series';
     case TRAJECTORY_TYPE.HYDRO_CAPACITY_ME:
       return 'p2g.@capacity';
+    case TRAJECTORY_TYPE.THERMAL_CAPACITY_ME:
+      return 'studyDetails.@thermal';
+    case TRAJECTORY_TYPE.EFFICIENCY_ME:
+      return 'me.@efficiency';
+    case TRAJECTORY_TYPE.CONSTRAINT_ME:
+      return 'me.@constraints';
   }
 }
 
 export const getP2GRowHypothesisKey = (type: TRAJECTORY_TYPE) => {
-
   switch (type) {
     case TRAJECTORY_TYPE.P2G_CAPACITY_COST:
       return 'p2g.@capacity';
@@ -395,7 +401,7 @@ export const getRowHypothesisLabel = (type: TRAJECTORY_TYPE, t: TFunction) => {
   switch (true) {
     case isTrajectoryNuclearType(type) || type === TRAJECTORY_TYPE.NUCLEAR_FR_TS_SERIES:
       return t(`${getNuclearRowHypothesisKey(type)}`);
-    case isTrajectoryMEType(type):
+    case isTrajectoryMEType(type) || type === TRAJECTORY_TYPE.HYDRO_ME:
       return t(`${getMERowHypothesisKey(type)}`);
     case isTrajectoryP2GType(type):
       return t(`${getP2GRowHypothesisKey(type)}`);
@@ -415,6 +421,7 @@ export const buildRowsByType = ({
 }): HypothesisRowData[] => rowTypes.flatMap(item => item?.types?.map((type) => {
     const trajectory =
       trajectoriesByType?.find((trajectoryByType) => trajectoryByType.trajType === type)?.trajectories?.[0] ?? null;
+
     return {
       hypothesis: getRowHypothesisLabel(type, t),
       trajectory: item.isEmpty ? null : trajectory,

@@ -69,6 +69,7 @@ export const TRAJECTORY_LOAD_ME = `${BACK_END_BASE_URL}/v1/trajectory/load-me`;
 export const TRAJECTORY_STS_ME = `${BACK_END_BASE_URL}/v1/trajectory/st-storage-me`;
 export const TRAJECTORY_EFFICIENCY_ME = `${BACK_END_BASE_URL}/v1/trajectory/efficiency-me`;
 export const TRAJECTORY_CONSTRAINT_ME = `${BACK_END_BASE_URL}/v1/trajectory/constraint-me`;
+export const TRAJECTORY_HYDRO_CAPACITY_ME = `${BACK_END_BASE_URL}/v1/trajectory/hydro-capacity-me`;
 
 //ABOUT
 export const BACK_END_ACTUATOR_ENDPOINT = `${BACK_END_BASE_URL}/actuator/info`;

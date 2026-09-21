@@ -36,6 +36,7 @@ import {
   TRAJECTORY_EFFICIENCY_ME,
   TRAJECTORY_ENDPOINT,
   TRAJECTORY_FLOWBASED,
+  TRAJECTORY_HYDRO_CAPACITY_ME,
   TRAJECTORY_HYDRO_SERIES,
   TRAJECTORY_HYDRO_TECHNICAL_PARAMETERS,
   TRAJECTORY_LOAD_ME,
@@ -437,10 +438,10 @@ export const convertIntoHypothesisRowWithTechnologies = (
  * @param {DbTrajectory[]} trajectories - An array of trajectory objects to be checked against the area.
  * @returns {boolean} Returns true if the area is linked to at least one trajectory with a matching area name and an empty technology field; otherwise, false.
  */
-export const isTrajectoryLinked = (area: { name: string }, trajectories: DbTrajectory[]): boolean =>
-  trajectories.some(
+export const isTrajectoryLinked = (area: { name: string }, trajectories?: DbTrajectory[]): boolean =>
+  trajectories?.some(
     (trajectory) => area.name === trajectory.area && (trajectory.technology === '' || trajectory.technology == null),
-  );
+  ) ?? false;
 
 /**
  * Function to build a default list of empty trajectories based on the provided trajectory type,
@@ -453,7 +454,7 @@ export const isTrajectoryLinked = (area: { name: string }, trajectories: DbTraje
  */
 export const buildDefaultEmptyTrajectoryList = (
   type: TRAJECTORY_TYPE,
-  trajectories: DbTrajectory[],
+  trajectories?: DbTrajectory[],
   defaultAreas?: { name: string }[],
 ): DbTrajectory[] => {
   const areaDefault = [...(Array.isArray(defaultAreas) && defaultAreas.length > 0 ? defaultAreas : [])];
@@ -463,7 +464,7 @@ export const buildDefaultEmptyTrajectoryList = (
 
   // Check if default areas (without technology) are not already linked to a trajectory
   const defaultAreasNotLinkedToTrajectory =
-    trajectories.length === 0 ? areaDefault : areaDefault.filter((area) => !isTrajectoryLinked(area, trajectories));
+    trajectories?.length === 0 ? areaDefault : areaDefault.filter((area) => !isTrajectoryLinked(area, trajectories));
   // Then build default empty areas
   return (defaultAreasNotLinkedToTrajectory || []).map((defaultArea) => buildEmptyTrajectory(defaultArea.name, type));
 };
@@ -956,6 +957,7 @@ export const getSubRowListWithArea = (
     type === TRAJECTORY_TYPE.STS ||
     type === TRAJECTORY_TYPE.ADEQUACY_PATCH ||
     type === TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION ||
+    type === TRAJECTORY_TYPE.ME ||
     isTrajectoryResType(type)
   ) {
     const prefix = getMessageFromType(type, t);
@@ -1412,6 +1414,8 @@ const getOtherMEEndPointType = (type: TRAJECTORY_TYPE) => {
       return TRAJECTORY_LOAD_ME;
     case TRAJECTORY_TYPE.STS_ME:
       return TRAJECTORY_STS_ME;
+    case TRAJECTORY_TYPE.HYDRO_CAPACITY_ME:
+      return TRAJECTORY_HYDRO_CAPACITY_ME;
     case TRAJECTORY_TYPE.EFFICIENCY_ME:
       return TRAJECTORY_EFFICIENCY_ME;
     case TRAJECTORY_TYPE.CONSTRAINT_ME:
@@ -1469,6 +1473,8 @@ export const isEmptyRow = (
   hypothesis === t('thermal.@specific') ||
   hypothesis === t('thermal.@time_series') ||
   hypothesis === t('settings.@title') ||
+  hypothesis === t('studyDetails.@hydro') ||
+  type === TRAJECTORY_TYPE.HYDRO_ME ||
   ((type === TRAJECTORY_TYPE.STS ||
     type === TRAJECTORY_TYPE.HYDRO_SERIES ||
     type === TRAJECTORY_TYPE.HYDRO_PSP_SERIES) &&

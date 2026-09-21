@@ -93,7 +93,7 @@ export const getMETypeToUse = (indexArray: number[]): TRAJECTORY_TYPE => {
     case 4:
       return getMEHydroTypeToUse(indexArray[1]);
     case 5:
-      return TRAJECTORY_TYPE.THERMAL_CAPACITY_ME;
+       return TRAJECTORY_TYPE.THERMAL_CAPACITY_ME;
     case 6:
       return TRAJECTORY_TYPE.EFFICIENCY_ME;
     case 7:
