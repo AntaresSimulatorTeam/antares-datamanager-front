@@ -6,6 +6,7 @@ import {
   HypothesisTableResults,
   isTrajectoryHydroPSPType,
   isTrajectoryHydroType,
+  isTrajectoryMEType,
   isTrajectoryNuclearType,
   isTrajectoryOtherVectorType,
   isTrajectoryP2GType,
@@ -33,6 +34,7 @@ import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
 import {
   HYDRO_PSP_TYPES,
   HYDRO_TYPES,
+  ME_TYPES,
   NUCLEAR_FR_TIME_NON_SERIES_TYPES,
   NUCLEAR_FR_TIME_SERIES_TYPES,
   P2G_TYPES,
@@ -174,6 +176,27 @@ export const useFetchHypothesisTrajectories = (
             rows: otherVectorRows,
             readOnlyMap: otherVectorReadOnlyMap,
             trajType: TRAJECTORY_TYPE.P2G,
+          }];
+
+        } else if (isTrajectoryMEType(trajTypes[0])) {
+          const meRows = buildRowsByType({
+            trajectoriesByType: rawResults,
+            t,
+            rowTypes: [{types: ME_TYPES, isEmpty: false}],
+          });
+
+          const meReadOnlyMap = buildReadOnlyMap({
+            rows: meRows,
+            trajType: trajectoryTypes[0],
+            isStudyGenerated,
+            defaultAreaListNotInList,
+          });
+
+          results = [{
+            trajectories: rawResults.flatMap(result => result.trajectories?.filter(traj => !traj.area)),
+            rows: meRows,
+            readOnlyMap: meReadOnlyMap,
+            trajType: TRAJECTORY_TYPE.ME,
           }];
 
         } else if (isTrajectoryHydroType(trajTypes[0])) {

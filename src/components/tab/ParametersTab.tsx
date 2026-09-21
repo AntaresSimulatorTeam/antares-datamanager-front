@@ -5,6 +5,7 @@ import {
   DbTrajectory,
   DropdownItemOption,
   HypothesisRowData,
+  isTrajectoryThermalTechnicalParametersType,
   RowStatus,
   TableOperationRow,
   TabProps,
@@ -22,7 +23,6 @@ import {
   generateReadOnlyIndexMap,
   getAreaTrajectoryName,
   getTrajectoryTypeByIndex,
-  isTechnicalParametersType,
   shouldDeleteParamModulation,
 } from '@/shared/utils/trajectoryUtils.ts';
 import { useNewStudyModal } from '@/hooks/useNewStudyModal.ts';
@@ -282,7 +282,7 @@ export const ParametersTab = ({ studyData, defaultAreas, areas }: TabProps) => {
           fileStatus={fileStatus}
           isStudyGenerated={isStudyGenerated}
           readOnly={technicalReadOnly}
-          progress={isTechnicalParametersType(selectedTrajectoryType) ? progress : 0}
+          progress={isTrajectoryThermalTechnicalParametersType(selectedTrajectoryType) ? progress : 0}
           idSelected={rowIdSelected}
           handleSearch={async (fileNameContains: string, rowId: string) => await handleTrajectoryFromDB(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, technicalData, fileNameContains, rowId)}
           handleImport={async (rowId: string) =>
@@ -318,7 +318,7 @@ export const ParametersTab = ({ studyData, defaultAreas, areas }: TabProps) => {
           idSelected={rowIdSelected}
           isReadOnlyEnable={true}
           readOnly={readOnlyParam}
-          progress={isTechnicalParametersType(selectedTrajectoryType) ? 0 : progress}
+          progress={isTrajectoryThermalTechnicalParametersType(selectedTrajectoryType) ? 0 : progress}
           handleSearch={async (fileNameContains: string, rowId: string) => await handleTrajectoryFromDB(TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER, data, fileNameContains, rowId)}
           handleImport={async (rowId: string) =>
             await handleFetchTrajectoriesFromFS(rowId, data, TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER)
@@ -339,7 +339,7 @@ export const ParametersTab = ({ studyData, defaultAreas, areas }: TabProps) => {
           ) => {
             toggleModal();
             if (value != null) {
-              const isTechnicalParamType = typeToUse ? isTechnicalParametersType(typeToUse) : false;
+              const isTechnicalParamType = typeToUse ? isTrajectoryThermalTechnicalParametersType(typeToUse) : false;
               const setDataTable = isTechnicalParamType ? setTechnicalData : setData;
               const setReadOnlyTable = isTechnicalParamType ? setTechnicalReadOnly : setReadOnlyParam;
               await importTrajectory(setDataTable, value, typeToUse, indexArray, hypothesis, setReadOnlyTable);
@@ -348,7 +348,7 @@ export const ParametersTab = ({ studyData, defaultAreas, areas }: TabProps) => {
           tabType={selectedTrajectoryType ?? getTrajectoryTypeByIndex(Number(rowIdSelected))}
           hypothesis={getAreaTrajectoryName(
             rowIdSelected,
-            isTechnicalParametersType(selectedTrajectoryType) ? technicalData : data,
+            isTrajectoryThermalTechnicalParametersType(selectedTrajectoryType) ? technicalData : data,
           )}
           indexArray={rowIdSelected?.split('.').map(Number)}
           rowsNb={data.length}

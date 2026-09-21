@@ -224,6 +224,13 @@
     "@capacity": "Capacity",
     "@modulation": "Market bid modulation"
   },
+  "me": {
+    "@storage": "Storage",
+    "@reservoir_levels": "Reservoir levels",
+    "@water_values": "Water values",
+    "@efficiency": "Efficiency",
+    "@constraints": "Constraints"
+  },
   "trajectoryViewModal": {
     "@title_area": "Areas",
     "@title_link": "Links",

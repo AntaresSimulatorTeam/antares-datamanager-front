@@ -14,6 +14,7 @@ import {
   DbTrajectory,
   DropdownItemOption,
   HypothesisRowData,
+  isTrajectoryConfigurationType,
   RowStatus,
   StudyDTO,
   TrajectoryViewData,
@@ -21,12 +22,7 @@ import {
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
-import {
-  buildReadOnlyRow,
-  buildTableData,
-  getAreaTrajectoryName,
-  isSettingsParametersType,
-} from '@/shared/utils/trajectoryUtils.ts';
+import { buildReadOnlyRow, buildTableData, getAreaTrajectoryName } from '@/shared/utils/trajectoryUtils.ts';
 import { TrajectoryDataVisualisation } from '@common/modal/TrajectoryDataVisualisation.tsx';
 import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
@@ -199,7 +195,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
             isStudyGenerated={isStudyGenerated}
             readOnly={readOnly}
             isReadOnlyEnable={true}
-            progress={isSettingsParametersType(selectedTrajectoryType) ? 0 : progress}
+            progress={isTrajectoryConfigurationType(selectedTrajectoryType) ? 0 : progress}
             idSelected={String(rowIdSelected)}
             handleSearch={async (fileNameContains: string, rowId: string) => await handleSelectionChange(fileNameContains, rowId, TRAJECTORY_TYPE.AREA)}
             updateData={(rowId: string, value: unknown, status: RowStatus) => {
@@ -222,7 +218,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
             isStudyGenerated={isStudyGenerated}
             readOnly={readOnlySettings}
             isReadOnlyEnable={true}
-            progress={isSettingsParametersType(selectedTrajectoryType) ? progress : 0}
+            progress={isTrajectoryConfigurationType(selectedTrajectoryType) ? progress : 0}
             idSelected={String(rowIdSelected)}
             handleSearch={async (fileNameContains: string, rowId: string) => {
               setSelectedTrajectoryType(TRAJECTORY_TYPE.ADEQUACY_PATCH);
@@ -258,7 +254,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
               setSelectedTrajectoryType(typeToUse);
               if(value) {
                 await importTrajectory(
-                  isSettingsParametersType(typeToUse) ? setSettingsData : setData,
+                  isTrajectoryConfigurationType(typeToUse) ? setSettingsData : setData,
                   value,
                   typeToUse,
                   indexArray,
@@ -272,7 +268,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
           tabType={selectedTrajectoryType}
           hypothesis={getAreaTrajectoryName(
             rowIdSelected,
-            isSettingsParametersType(selectedTrajectoryType) ? settingsData : data,
+            isTrajectoryConfigurationType(selectedTrajectoryType) ? settingsData : data,
           )}
           indexArray={rowIdSelected?.split('.').map(Number)}
           rowsNb={data.length}

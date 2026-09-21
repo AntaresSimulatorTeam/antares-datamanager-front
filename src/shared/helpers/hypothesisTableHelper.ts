@@ -2,6 +2,7 @@ import {
   DbTrajectory,
   FetchResult,
   HypothesisRowData,
+  isTrajectoryConfigurationType,
   isTrajectoryHydroType,
   isTrajectoryNuclearType,
   isTrajectoryP2GType,
@@ -31,7 +32,12 @@ import { TFunction } from 'i18next';
 import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
 import { getResTechnologyList, isParamModulationRequired } from '@/shared/services/trajectoryService.ts';
 import { HypothesisType } from '@/shared/types/HypothesisTable.ts';
-import { getNuclearTrajectoryType } from '@/shared/utils/formFormatter.ts';
+import {
+  getConfigurationTypeToUse,
+  getHydroTypeToUse,
+  getMETypeToUse,
+  getNuclearTypeToUse,
+} from '@/shared/utils/formFormatter.ts';
 
 /**
  * Retrieve read only row of a study generated
@@ -335,6 +341,7 @@ export const getRowHypothesisLabel = (type: TRAJECTORY_TYPE, t: TFunction) => {
     case TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION:
       return t('thermal.@modulation');
     case TRAJECTORY_TYPE.NUCLEAR_FR_TS_SERIES:
+    case TRAJECTORY_TYPE.HYDRO_TIME_SERIES_ME:
       return t('thermal.@time_series');
     case TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP:
       return t('thermal.@epr');
@@ -342,12 +349,31 @@ export const getRowHypothesisLabel = (type: TRAJECTORY_TYPE, t: TFunction) => {
       return t('thermal.@long_term');
     case TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR:
       return t('thermal.@smr');
+    case TRAJECTORY_TYPE.NUCLEAR_FR_TALON:
+      return t('thermal.@talon');
     case TRAJECTORY_TYPE.P2G_CAPACITY_COST:
+    case TRAJECTORY_TYPE.HYDRO_CAPACITY_ME:
       return t('p2g.@capacity');
     case TRAJECTORY_TYPE.P2G_MARKET_MODULATION:
       return t('p2g.@modulation');
+    case TRAJECTORY_TYPE.AREA_ME:
+      return t('studyDetails.@areas');
+    case TRAJECTORY_TYPE.LINK_ME:
+      return t('studyDetails.@links');
+    case TRAJECTORY_TYPE.LOAD_ME:
+      return t('studyDetails.@load');
+    case TRAJECTORY_TYPE.STS_ME:
+      return `${t('me.@storage')} (${t('studyDetails.@sts')})`;
+    case TRAJECTORY_TYPE.HYDRO_ME:
+      return t('studyDetails.@hydro');
+    case TRAJECTORY_TYPE.HYDRO_PARAMETERS_ME:
+      return t('page.@parameters');
+    case TRAJECTORY_TYPE.HYDRO_RESERVOIR_LEVELS_ME:
+      return t('me.@reservoir_levels');
+    case TRAJECTORY_TYPE.HYDRO_WATER_VALUES_ME:
+      return t('me.@water_values');
     default:
-      return t('thermal.@talon');
+      return '';
   }
 }
 
@@ -661,12 +687,8 @@ export const getParamForFetchFSTrajectory = (
     typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK;
     areaToUse = '';
   }
-  if (type === TRAJECTORY_TYPE.ADEQUACY_PATCH) {
-    if (indexArray.length > 1) {
-      typeToUse = indexArray[1] === 0 ? TRAJECTORY_TYPE.SETTINGS : TRAJECTORY_TYPE.SCENARIO_BUILDER;
-    } else {
-      typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.ADEQUACY_PATCH : TRAJECTORY_TYPE.FLOWBASED;
-    }
+  if (isTrajectoryConfigurationType(type)) {
+    typeToUse = getConfigurationTypeToUse(indexArray);
     areaToUse = '';
   }
   if (type === TRAJECTORY_TYPE.DSR) {
@@ -693,20 +715,20 @@ export const getParamForFetchFSTrajectory = (
     }
     areaToUse = '';
   }
-  if (type === TRAJECTORY_TYPE.HYDRO_SERIES) {
-    typeToUse = indexArray[1] === 0 ? TRAJECTORY_TYPE.HYDRO_SERIES : TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS;
-    areaToUse = '';
-  }
-  if (type === TRAJECTORY_TYPE.HYDRO_PSP_SERIES) {
-    typeToUse = indexArray[1] === 0 ? TRAJECTORY_TYPE.HYDRO_PSP_SERIES : TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS;
+  if (isTrajectoryHydroType(type)) {
+    typeToUse = getHydroTypeToUse(indexArray, type);
     areaToUse = '';
   }
   if (type === TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION) {
-    typeToUse = getNuclearTrajectoryType(indexArray);
+    typeToUse = getNuclearTypeToUse(indexArray);
     areaToUse = '';
   }
   if (type === TRAJECTORY_TYPE.P2G) {
     typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.P2G_CAPACITY_COST : TRAJECTORY_TYPE.P2G_MARKET_MODULATION;
+    areaToUse = '';
+  }
+  if (type === TRAJECTORY_TYPE.ME) {
+    typeToUse = getMETypeToUse(indexArray);
     areaToUse = '';
   }
   return { typeToUse, areaToUse, isDefaultArea };

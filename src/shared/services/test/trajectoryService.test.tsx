@@ -520,7 +520,7 @@ describe('uploadTrajectory', () => {
     await waitFor(() => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
       expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
-        `https://mockapi.com/v1/trajectory/load?area=FR&trajectoryToUse=area_BP_23_v6&horizon=2025-2026&studyId=2`,
+        `https://mockapi.com/v1/trajectory/load?area=FR&trajectoryToUse=area_BP_23_v6&horizon=2025-2026&studyId=2&isCivilYear=false`,
         requestOptions,
         onProgress,
       );
@@ -533,7 +533,7 @@ describe('uploadTrajectory', () => {
     await waitFor(() => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
       expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
-        `https://mockapi.com/v1/trajectory/thermal-capacity?area=FR&trajectoryToUse=area_BP_23_v6&horizon=2025-2026&studyId=2&isCivilYear=true&technology=`,
+        `https://mockapi.com/v1/trajectory/thermal-capacity?area=FR&trajectoryToUse=area_BP_23_v6&horizon=2025-2026&studyId=2&isCivilYear=true`,
         requestOptions,
         onProgress,
       );
@@ -555,7 +555,7 @@ describe('uploadTrajectory', () => {
     await waitFor(() => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
       expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
-        `https://mockapi.com/v1/trajectory/thermal-capacity?area=FR&trajectoryToUse=area_BP_23_v6&horizon=2025-2026&studyId=2&isCivilYear=true&technology=Nuclear`,
+        `https://mockapi.com/v1/trajectory/thermal-capacity?area=FR&technology=Nuclear&trajectoryToUse=area_BP_23_v6&horizon=2025-2026&studyId=2&isCivilYear=true`,
         requestOptions,
         onProgress,
       );
@@ -568,14 +568,14 @@ describe('uploadTrajectory', () => {
       2,
       TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER,
       'common_param_BP_23_v6',
-      'FR',
+      '',
       onProgress,
     );
 
     await waitFor(() => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
       expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
-        `https://mockapi.com/v1/trajectory/thermal-common-parameter?trajectoryToUse=common_param_BP_23_v6&horizon=2025-2026&studyId=2`,
+        `https://mockapi.com/v1/trajectory/thermal-common-parameter?trajectoryToUse=common_param_BP_23_v6&horizon=2025-2026&studyId=2&isCivilYear=false`,
         requestOptions,
         onProgress,
       );
@@ -588,16 +588,16 @@ describe('uploadTrajectory', () => {
       25,
       TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
       'specific_param_BP_23',
-      'Specific',
+      'FR',
       onProgress,
       false,
-      'FR',
+      '',
     );
 
     await waitFor(() => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
       expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
-        `https://mockapi.com/v1/trajectory/thermal-specific-parameter?area=FR&trajectoryToUse=specific_param_BP_23&horizon=2030-2031&studyId=25`,
+        `https://mockapi.com/v1/trajectory/thermal-specific-parameter?area=FR&trajectoryToUse=specific_param_BP_23&horizon=2030-2031&studyId=25&isCivilYear=false`,
         requestOptions,
         onProgress,
       );
@@ -610,16 +610,16 @@ describe('uploadTrajectory', () => {
       25,
       TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER,
       'param',
-      'Specific',
+      '',
       onProgress,
       false,
-      'FR',
+      '',
     );
 
     await waitFor(() => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
       expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
-        `https://mockapi.com/v1/trajectory/thermal-modulation-parameter?area=FR&trajectoryToUse=param&horizon=2030-2031&studyId=25`,
+        `https://mockapi.com/v1/trajectory/thermal-modulation-parameter?trajectoryToUse=param&horizon=2030-2031&studyId=25&isCivilYear=false`,
         requestOptions,
         onProgress,
       );
@@ -639,7 +639,7 @@ describe('uploadTrajectory', () => {
     await waitFor(() => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
       expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
-        `https://mockapi.com/v1/trajectory/thermal-economic-costs?trajectoryToUse=costs&horizon=2030-2031&studyId=25`,
+        `https://mockapi.com/v1/trajectory/thermal-economic-costs?trajectoryToUse=costs&horizon=2030-2031&studyId=25&isCivilYear=false`,
         requestOptions,
         onProgress,
       );
@@ -659,7 +659,7 @@ describe('uploadTrajectory', () => {
     await waitFor(() => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
       expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
-        `https://mockapi.com/v1/trajectory/thermal-economic-parameter?trajectoryToUse=economic&horizon=2030-2031&studyId=30`,
+        `https://mockapi.com/v1/trajectory/thermal-economic-parameter?trajectoryToUse=economic&horizon=2030-2031&studyId=30&isCivilYear=false`,
         requestOptions,
         onProgress,
       );
@@ -685,7 +685,7 @@ describe('uploadTrajectory', () => {
     await waitFor(() => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
       expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
-        `https://mockapi.com/v1/trajectory/dsr-capacity-modulation?trajectoryToUse=param&horizon=2030-2031&studyId=25`,
+        `https://mockapi.com/v1/trajectory/dsr-capacity-modulation?trajectoryToUse=param&horizon=2030-2031&studyId=25&isCivilYear=false`,
         requestOptions,
         onProgress,
       );
@@ -750,7 +750,7 @@ describe('uploadTrajectory', () => {
     await waitFor(() => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
       expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
-        'https://mockapi.com/v1/trajectory/load-factor-misc?area=AT&trajectoryToUse=cluster_battery_PEMMEDB25&horizon=2030-2031&studyId=87',
+        'https://mockapi.com/v1/trajectory/load-factor-misc?area=AT&trajectoryToUse=cluster_battery_PEMMEDB25&horizon=2030-2031&studyId=87&isCivilYear=false',
         requestOptions,
         onProgress,
       );
@@ -763,7 +763,7 @@ describe('uploadTrajectory', () => {
     await waitFor(() => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
       expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
-        'https://mockapi.com/v1/trajectory/installed-power-res?area=AT&technology=&trajectoryToUse=installedRES_PEMMEDB25&horizon=2030-2031&studyId=87&isCivilYear=false',
+        'https://mockapi.com/v1/trajectory/installed-power-res?area=AT&trajectoryToUse=installedRES_PEMMEDB25&horizon=2030-2031&studyId=87',
         requestOptions,
         onProgress,
       );
@@ -785,7 +785,7 @@ describe('uploadTrajectory', () => {
     await waitFor(() => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
       expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
-        'https://mockapi.com/v1/trajectory/installed-power-res?area=AT&technology=wind_offshore&trajectoryToUse=installedRES_PEMMEDB25&horizon=2030-2031&studyId=87&isCivilYear=false',
+        'https://mockapi.com/v1/trajectory/installed-power-res?area=AT&technology=wind_offshore&trajectoryToUse=installedRES_PEMMEDB25&horizon=2030-2031&studyId=87',
         requestOptions,
         onProgress,
       );
@@ -806,7 +806,7 @@ describe('uploadTrajectory', () => {
     await waitFor(() => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
       expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
-        'https://mockapi.com/v1/trajectory/load-factor-res?area=AT&technology=&trajectoryToUse=PEMMEDB25&horizon=2030-2031&studyId=87',
+        'https://mockapi.com/v1/trajectory/load-factor-res?area=AT&trajectoryToUse=PEMMEDB25&horizon=2030-2031&studyId=87',
         requestOptions,
         onProgress,
       );
@@ -828,7 +828,7 @@ describe('uploadTrajectory', () => {
     await waitFor(() => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
       expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
-        'https://mockapi.com/v1/trajectory/load-factor-res?area=AT&technology=wind%20offshore&trajectoryToUse=PEMMEDB25&horizon=2030-2031&studyId=87',
+        'https://mockapi.com/v1/trajectory/load-factor-res?area=AT&technology=wind_offshore&trajectoryToUse=PEMMEDB25&horizon=2030-2031&studyId=87',
         requestOptions,
         onProgress,
       );
@@ -849,7 +849,7 @@ describe('uploadTrajectory', () => {
     await waitFor(() => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
       expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
-        'https://mockapi.com/v1/trajectory/zonal-distribution-res?area=AT&technology=&trajectoryToUse=repartition_zonal_PEMMEDB25&horizon=2030-2031&studyId=87&isCivilYear=false',
+        'https://mockapi.com/v1/trajectory/zonal-distribution-res?area=AT&trajectoryToUse=repartition_zonal_PEMMEDB25&horizon=2030-2031&studyId=87&isCivilYear=false',
         requestOptions,
         onProgress,
       );
@@ -1108,7 +1108,7 @@ describe('uploadTrajectory', () => {
     await waitFor(() => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
       expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
-        'https://mockapi.com/v1/trajectory/flowbased?trajectoryToUse=porygon%23%23%232021&horizon=2030-2031&studyId=87',
+        'https://mockapi.com/v1/trajectory/flowbased?trajectoryToUse=porygon%23%23%232021&horizon=2030-2031&studyId=87&isCivilYear=false',
         requestOptions,
         onProgress,
       );
