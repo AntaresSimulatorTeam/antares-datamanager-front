@@ -4,6 +4,7 @@ import {
   HypothesisRowData,
   isTrajectoryConfigurationType,
   isTrajectoryHydroType,
+  isTrajectoryMEType,
   isTrajectoryNuclearType,
   isTrajectoryP2GType,
   isTrajectoryResType,
@@ -336,42 +337,68 @@ export const buildHypothesisRows = ({
   return rows;
 };
 
-export const getRowHypothesisLabel = (type: TRAJECTORY_TYPE, t: TFunction) => {
+export const getNuclearRowHypothesisKey = (type: TRAJECTORY_TYPE) => {
+
   switch (type) {
     case TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION:
-      return t('thermal.@modulation');
+      return 'thermal.@modulation';
     case TRAJECTORY_TYPE.NUCLEAR_FR_TS_SERIES:
-    case TRAJECTORY_TYPE.HYDRO_TIME_SERIES_ME:
-      return t('thermal.@time_series');
+      return 'thermal.@time_series';
     case TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP:
-      return t('thermal.@epr');
+      return 'thermal.@epr';
     case TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM:
-      return t('thermal.@long_term');
+      return 'thermal.@long_term';
     case TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR:
-      return t('thermal.@smr');
+      return 'thermal.@smr';
     case TRAJECTORY_TYPE.NUCLEAR_FR_TALON:
-      return t('thermal.@talon');
-    case TRAJECTORY_TYPE.P2G_CAPACITY_COST:
-    case TRAJECTORY_TYPE.HYDRO_CAPACITY_ME:
-      return t('p2g.@capacity');
-    case TRAJECTORY_TYPE.P2G_MARKET_MODULATION:
-      return t('p2g.@modulation');
+      return 'thermal.@talon';
+  }
+}
+
+export const getMERowHypothesisKey = (type: TRAJECTORY_TYPE) => {
+
+  switch (type) {
     case TRAJECTORY_TYPE.AREA_ME:
-      return t('studyDetails.@areas');
+      return 'studyDetails.@areas';
     case TRAJECTORY_TYPE.LINK_ME:
-      return t('studyDetails.@links');
+      return 'studyDetails.@links';
     case TRAJECTORY_TYPE.LOAD_ME:
-      return t('studyDetails.@load');
+      return 'studyDetails.@load';
     case TRAJECTORY_TYPE.STS_ME:
-      return `${t('me.@storage')} (${t('studyDetails.@sts')})`;
+      return 'me.@storage';
     case TRAJECTORY_TYPE.HYDRO_ME:
-      return t('studyDetails.@hydro');
+      return 'studyDetails.@hydro';
     case TRAJECTORY_TYPE.HYDRO_PARAMETERS_ME:
-      return t('page.@parameters');
+      return 'page.@parameters';
     case TRAJECTORY_TYPE.HYDRO_RESERVOIR_LEVELS_ME:
-      return t('me.@reservoir_levels');
+      return 'me.@reservoir_levels';
     case TRAJECTORY_TYPE.HYDRO_WATER_VALUES_ME:
-      return t('me.@water_values');
+      return 'me.@water_values';
+    case TRAJECTORY_TYPE.HYDRO_TIME_SERIES_ME:
+      return 'thermal.@time_series';
+    case TRAJECTORY_TYPE.HYDRO_CAPACITY_ME:
+      return 'p2g.@capacity';
+  }
+}
+
+export const getP2GRowHypothesisKey = (type: TRAJECTORY_TYPE) => {
+
+  switch (type) {
+    case TRAJECTORY_TYPE.P2G_CAPACITY_COST:
+      return 'p2g.@capacity';
+    case TRAJECTORY_TYPE.P2G_MARKET_MODULATION:
+      return 'p2g.@modulation';
+  }
+}
+
+export const getRowHypothesisLabel = (type: TRAJECTORY_TYPE, t: TFunction) => {
+  switch (true) {
+    case isTrajectoryNuclearType(type) || type === TRAJECTORY_TYPE.NUCLEAR_FR_TS_SERIES:
+      return t(`${getNuclearRowHypothesisKey(type)}`);
+    case isTrajectoryMEType(type):
+      return t(`${getMERowHypothesisKey(type)}`);
+    case isTrajectoryP2GType(type):
+      return t(`${getP2GRowHypothesisKey(type)}`);
     default:
       return '';
   }

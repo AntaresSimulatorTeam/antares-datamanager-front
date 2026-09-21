@@ -225,7 +225,7 @@
     "@modulation": "Market bid modulation"
   },
   "me": {
-    "@storage": "Storage",
+    "@storage": "Storage (STS)",
     "@reservoir_levels": "Reservoir levels",
     "@water_values": "Water values",
     "@efficiency": "Efficiency",

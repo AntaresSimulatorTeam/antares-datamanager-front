@@ -68,9 +68,6 @@ export const getHydroTypeToUse = (indexArray: number[], type: TRAJECTORY_TYPE): 
 
 const getMEHydroTypeToUse = (index: number) => {
   switch (index) {
-    case 0:
-    default:
-      return TRAJECTORY_TYPE.HYDRO_CAPACITY_ME;
     case 1:
       return TRAJECTORY_TYPE.HYDRO_PARAMETERS_ME;
     case 2:
@@ -79,14 +76,14 @@ const getMEHydroTypeToUse = (index: number) => {
       return TRAJECTORY_TYPE.HYDRO_TIME_SERIES_ME;
     case 4:
       return TRAJECTORY_TYPE.HYDRO_WATER_VALUES_ME;
+    case 0:
+    default:
+      return TRAJECTORY_TYPE.HYDRO_CAPACITY_ME;
   }
 }
 
 export const getMETypeToUse = (indexArray: number[]): TRAJECTORY_TYPE => {
   switch (indexArray[0]) {
-    case 0:
-    default:
-      return TRAJECTORY_TYPE.AREA_ME;
     case 1:
       return TRAJECTORY_TYPE.LINK_ME;
     case 2:
@@ -101,6 +98,9 @@ export const getMETypeToUse = (indexArray: number[]): TRAJECTORY_TYPE => {
       return TRAJECTORY_TYPE.EFFICIENCY_ME;
     case 7:
       return TRAJECTORY_TYPE.CONSTRAINT_ME;
+    case 0:
+    default:
+      return TRAJECTORY_TYPE.AREA_ME;
   }
 }
 

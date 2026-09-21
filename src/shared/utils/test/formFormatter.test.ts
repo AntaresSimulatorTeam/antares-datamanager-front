@@ -1,6 +1,7 @@
 import {
   convertToFSSelectionOptionType,
   convertToSelectionOptionType,
+  getMETypeToUse,
   isRepositoryTrajectory,
 } from '@/shared/utils/formFormatter.ts';
 import {
@@ -94,5 +95,44 @@ describe('isRepositoryTrajectory', () => {
   });
   it('should return false for TRAJECTORY_TYPE THERMAL_TECHNICAL_MODULATION_PARAMETER', () => {
     expect(isRepositoryTrajectory(TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER)).toBeTruthy();
+  });
+});
+
+describe('getMETypeToUse', () => {
+  it('should return AREA_ME for 0', () => {
+    expect(getMETypeToUse([0])).toBe(TRAJECTORY_TYPE.AREA_ME);
+  });
+  it('should return LINK_ME for 1', () => {
+    expect(getMETypeToUse([1])).toBe(TRAJECTORY_TYPE.LINK_ME);
+  });
+  it('should return LOAD_ME for 2', () => {
+    expect(getMETypeToUse([2])).toBe(TRAJECTORY_TYPE.LOAD_ME);
+  });
+  it('should return STS_ME for 3', () => {
+    expect(getMETypeToUse([3])).toBe(TRAJECTORY_TYPE.STS_ME);
+  });
+  it('should return HYDRO_CAPACITY_ME for 4.0', () => {
+    expect(getMETypeToUse([4, 0])).toBe(TRAJECTORY_TYPE.HYDRO_CAPACITY_ME);
+  });
+  it('should return HYDRO_PARAMETERS_ME for 4.1', () => {
+    expect(getMETypeToUse([4, 1])).toBe(TRAJECTORY_TYPE.HYDRO_PARAMETERS_ME);
+  });
+  it('should return HYDRO_RESERVOIR_LEVELS_ME for 4.2', () => {
+    expect(getMETypeToUse([4, 2])).toBe(TRAJECTORY_TYPE.HYDRO_RESERVOIR_LEVELS_ME);
+  });
+  it('should return HYDRO_TIME_SERIES_ME for 4.3', () => {
+    expect(getMETypeToUse([4, 3])).toBe(TRAJECTORY_TYPE.HYDRO_TIME_SERIES_ME);
+  });
+  it('should return HYDRO_WATER_VALUES_ME for 4.4', () => {
+    expect(getMETypeToUse([4, 4])).toBe(TRAJECTORY_TYPE.HYDRO_WATER_VALUES_ME);
+  });
+  it('should return THERMAL_CAPACITY_ME for 5', () => {
+    expect(getMETypeToUse([5])).toBe(TRAJECTORY_TYPE.THERMAL_CAPACITY_ME);
+  });
+  it('should return EFFICIENCY_ME for 6', () => {
+    expect(getMETypeToUse([6])).toBe(TRAJECTORY_TYPE.EFFICIENCY_ME);
+  });
+  it('should return CONSTRAINT_ME for 7', () => {
+    expect(getMETypeToUse([7])).toBe(TRAJECTORY_TYPE.CONSTRAINT_ME);
   });
 });
