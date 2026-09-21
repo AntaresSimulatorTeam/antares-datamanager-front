@@ -787,5 +787,9 @@ export const getTypeToUse = (type: TRAJECTORY_TYPE, indexArray: number[], nbRows
       typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.P2G_CAPACITY_COST : TRAJECTORY_TYPE.P2G_MARKET_MODULATION;
   }
 
+  if (type === TRAJECTORY_TYPE.ME) {
+    typeToUse = getMETypeToUse(indexArray);
+  }
+
   return typeToUse;
 }
