@@ -102,6 +102,7 @@ export const getDefaultLabel = (areaName: string): string => (areaName === OTHER
  * @param {string} trajectoryLabel
  * @param {string | null} userName
  * @param {string | null} area
+ * @param {string | undefined} technology
  */
 export const buildErrorTrajectory = (
   type: TRAJECTORY_TYPE,
@@ -109,10 +110,11 @@ export const buildErrorTrajectory = (
   trajectoryLabel: string,
   userName: string | null,
   area: string,
+  technology?: string
 ): DbTrajectory => ({
   id: trajectoryId,
   trajectoryName: trajectoryLabel,
-  technology: '',
+  technology: technology ?? '',
   type,
   version: 0,
   userName: userName ?? 'unknown_user',
@@ -1404,6 +1406,7 @@ export const getColumnHeader = (t: TFunction, type?: TRAJECTORY_TYPE) => {
   switch (type) {
     case TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION:
     case TRAJECTORY_TYPE.P2G:
+    case TRAJECTORY_TYPE.ME:
       return t('studyDetails.@hypothesis');
     default:
       return t('studyDetails.@areas');

@@ -39,16 +39,17 @@ export const handleTrajectoryError = (
   type: TRAJECTORY_TYPE,
   rowIndex: number[],
   trajectory: { id?: number; label: string },
-  hypothesis: string,
+  area: string,
   userName: string,
   setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
   alert: { message: string; content: string },
+  technology?: string
 ) => {
   const trajectoryId = trajectory?.id;
   if (trajectoryId != null) {
     setData((prev) =>
       setNestedData(prev, rowIndex, {
-        trajectory: buildErrorTrajectory(type, trajectoryId, trajectory.label, userName, hypothesis),
+        trajectory: buildErrorTrajectory(type, trajectoryId, trajectory.label, userName, area, technology),
         status: TRAJECTORY_SELECTION_STATUS.ERROR,
       }),
     );

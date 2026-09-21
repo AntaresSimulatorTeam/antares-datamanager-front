@@ -70,6 +70,7 @@ describe('useTrajectoryAttach', () => {
     trajectoryName: 'Traj A',
     area: 'Zone A',
     type: TRAJECTORY_TYPE.LOAD,
+    technology: ''
   } as DbTrajectory;
 
   const newTrajectory = {
@@ -179,6 +180,7 @@ describe('useTrajectoryAttach', () => {
         message: 'studyDetails.@notificationAlert',
         content: 'link failed',
       }),
+      ''
     );
   });
 
@@ -211,6 +213,7 @@ describe('useTrajectoryAttach', () => {
         message: 'studyDetails.@notificationAlert',
         content: 'link failed',
       }),
+      ''
     );
   });
 

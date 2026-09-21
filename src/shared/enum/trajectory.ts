@@ -46,6 +46,7 @@ export enum TRAJECTORY_TYPE {
   AREA_ME = 'AREA_ME',
   LINK_ME = 'LINK_ME',
   LOAD_ME = 'LOAD_ME',
+  STS_ME = 'STS_ME',
   OTHER_VECTOR = 'OTHER_VECTOR'
 }
 

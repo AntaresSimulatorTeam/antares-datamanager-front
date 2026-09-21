@@ -8,6 +8,7 @@ import {
   isTrajectoryHydroType,
   isTrajectoryNuclearType,
   isTrajectoryOtherVectorType,
+  isTrajectoryP2GType,
   TechnologyType,
   TrajectoryAreaData,
 } from '@/shared/types';
@@ -154,7 +155,7 @@ export const useFetchHypothesisTrajectories = (
               return [];
             }
           });
-        } else if (isTrajectoryOtherVectorType(trajTypes[0])) {
+        } else if (isTrajectoryP2GType(trajTypes[0])) {
           const otherVectorRows = buildRowsByType({
             trajectoriesByType: rawResults,
             t,
