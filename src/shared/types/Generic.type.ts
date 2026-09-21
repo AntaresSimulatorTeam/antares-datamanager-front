@@ -14,6 +14,7 @@ import { StudyDTO } from '@/shared/types/Study.type.ts';
 import {
   HYDRO_PSP_TYPES,
   HYDRO_TYPES,
+  ME_TYPES,
   NUCLEAR_FR_MODULATION_TYPES,
   NUCLEAR_FR_TIME_SERIES_TYPES,
   OTHER_VECTOR_TYPES,
@@ -132,6 +133,8 @@ export const isTrajectoryNuclearTSType = (value: TRAJECTORY_TYPE) => NUCLEAR_FR_
 export const isTrajectoryOtherVectorType = (value: TRAJECTORY_TYPE) => OTHER_VECTOR_TYPES.includes(value);
 
 export const isTrajectoryP2GType = (value: TRAJECTORY_TYPE) => P2G_TYPES.includes(value);
+
+export const isTrajectoryMEType = (value: TRAJECTORY_TYPE) => ME_TYPES.includes(value);
 
 export type TableOperationRow = 'empty' | 'remove';
 

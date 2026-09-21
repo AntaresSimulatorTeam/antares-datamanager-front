@@ -150,6 +150,7 @@ export const useTrajectoryDetach = (
             user?.profile?.sub ?? '',
             setData,
             { message, content: (error as Error)?.message },
+            trajectoryToDelete?.technology
           );
         }
       }
