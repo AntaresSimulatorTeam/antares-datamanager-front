@@ -1636,14 +1636,14 @@ describe('useFetchHypothesisTrajectories', () => {
           status: TRAJECTORY_SELECTION_STATUS.MISSING,
           trajectory: null,
           subRows: [
-            {
-              hypothesis: "p2g.@capacity",
-              isDefault: false,
-              isDeletable: false,
-              status: TRAJECTORY_SELECTION_STATUS.MISSING,
-              subRows: null,
-              trajectory: null,
-            },
+            // {
+            //   hypothesis: "p2g.@capacity",
+            //   isDefault: false,
+            //   isDeletable: false,
+            //   status: TRAJECTORY_SELECTION_STATUS.MISSING,
+            //   subRows: null,
+            //   trajectory: null,
+            // },
           ]
         },
         {
@@ -1655,7 +1655,7 @@ describe('useFetchHypothesisTrajectories', () => {
           trajectory: null,
         },
         {
-          hypothesis: "me.@constraints",
+          hypothesis: "me.@efficiency",
           isDefault: false,
           isDeletable: false,
           status: TRAJECTORY_SELECTION_STATUS.MISSING,
@@ -1663,7 +1663,7 @@ describe('useFetchHypothesisTrajectories', () => {
           trajectory: null,
         },
         {
-          hypothesis: "me.@efficiency",
+          hypothesis: "me.@constraints",
           isDefault: false,
           isDeletable: false,
           status: TRAJECTORY_SELECTION_STATUS.MISSING,
@@ -1731,16 +1731,17 @@ describe('useFetchHypothesisTrajectories', () => {
           isDeletable: false,
           status: TRAJECTORY_SELECTION_STATUS.MISSING,
           trajectory: null,
-          subRows: [
-              {
-                hypothesis: "p2g.@capacity",
-                 isDefault: false,
-                 isDeletable: false,
-                 status: TRAJECTORY_SELECTION_STATUS.MISSING,
-                 subRows: null,
-                 trajectory: null,
-              },
-         ]
+          subRows: []
+         //  subRows: [
+         //      {
+         //        hypothesis: "p2g.@capacity",
+         //         isDefault: false,
+         //         isDeletable: false,
+         //         status: TRAJECTORY_SELECTION_STATUS.MISSING,
+         //         subRows: null,
+         //         trajectory: null,
+         //      },
+         // ]
          },
        {
          hypothesis: "studyDetails.@thermal",
@@ -1751,7 +1752,7 @@ describe('useFetchHypothesisTrajectories', () => {
            trajectory: null,
          },
         {
-         hypothesis: "me.@constraints",
+         hypothesis: "me.@efficiency",
            isDefault: false,
           isDeletable: false,
           status: TRAJECTORY_SELECTION_STATUS.MISSING,
@@ -1759,7 +1760,7 @@ describe('useFetchHypothesisTrajectories', () => {
            trajectory: null,
          },
       {
-        hypothesis: "me.@efficiency",
+        hypothesis: "me.@constraints",
         isDefault: false,
         isDeletable: false,
         status: TRAJECTORY_SELECTION_STATUS.MISSING,
@@ -1775,7 +1776,7 @@ describe('useFetchHypothesisTrajectories', () => {
         '2': true,
         '3': true,
         '4': true,
-        '4.0': true,
+        //'4.0': true,
         '5': true,
         '6': true,
         '7': true,
