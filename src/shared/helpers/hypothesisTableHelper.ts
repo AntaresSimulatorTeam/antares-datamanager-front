@@ -248,7 +248,7 @@ export const fetchAndNormalizeTrajectories = async ({
   }
 
   // Other types
-  if (trajType !== TRAJECTORY_TYPE.THERMAL_CAPACITY_ME) { // TODO: to remove when thermal_me is ok
+  if (trajType !== TRAJECTORY_TYPE.THERMAL_CAPACITY_ME && trajType !== TRAJECTORY_TYPE.HYDRO_CAPACITY_ME) { // TODO: to remove when thermal_me is ok
     result = await getStudyTrajectories(id, trajType);
   }
 
