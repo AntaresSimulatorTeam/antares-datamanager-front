@@ -10,12 +10,12 @@ import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/traj
 import { CellWithStatus } from '@common/data/CellWithStatus.tsx';
 import { LabelWithButtonPreview } from '@common/data/LabelWithButtonPreview.tsx';
 import { LabelWithDeleteButton } from '@common/data/LabelWithDeleteButton.tsx';
-import { SelectInputWithButton } from '@common/data/SelectInputWithButton.tsx';
 import { ProgressBar } from '@/components/input/ProgressBar.tsx';
 import { getAlignment, hasLabelDefault } from '@/shared/utils/hypothesisTableUtils.ts';
 import { getColumnHeader, getSubRowListWithArea, getSubRowsList, isEmptyRow } from '@/shared/utils/trajectoryUtils.ts';
 import { getInformationMessage } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { Button, Icon, IconButton, SegmentedControl, Tag, Tooltip } from '@design-system-rte/react';
+import { SelectInputWithButton } from '@common/data/SelectInputWithButton.tsx';
 
 const columnHelper = createColumnHelper<HypothesisRowData>();
 const getExpandableHypothesisTableHeaders = ({
@@ -106,7 +106,7 @@ const getExpandableHypothesisTableHeaders = ({
           />
         </div>
       ) : (
-        <div className="flex w-full items-center justify-start gap-2 py-0.5">
+        <div className="flex w-full items-center justify-start py-0.5">
           <SelectInputWithButton
             onSelect={(value: DropdownItemOption) => {
               setErrorInfo({ index: row.index, message: '' });
