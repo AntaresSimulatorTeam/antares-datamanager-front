@@ -5,26 +5,69 @@
  */
 
 import { UserSettingsContext } from '@/store/contexts/UserSettingsContext.tsx';
-import { THEME_COLOR } from '@/shared/types';
+import { THEME_COLOR, THEME_MODE } from '@/shared/types';
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';
-import { Switch } from '@design-system-rte/react';
+import { RadioButtonGroup, SegmentedControl, Switch } from '@design-system-rte/react';
 
 const Settings = () => {
-  const themeColor = UserSettingsContext.useStore((store) => store.theme);
+  const theme = UserSettingsContext.useStore((store) => store.theme);
+  const mode = UserSettingsContext.useStore((store) => store.mode);
   const setContext = UserSettingsContext.useSetStore();
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
   const changeLanguageHandler = (lang: string) => {
     void i18n.changeLanguage(lang);
   };
   return (
-    <div className="flex gap-3 p-6">
-        <Switch
+    <div className="flex flex-col gap-3 px-6 pt-6 justify-start items-start">
+      <div className="flex flex-col gap-1 justify-start items-start">
+        <h2>{t('settingsUser.@mode')}</h2>
+        <SegmentedControl
           appearance="brand"
-          label="Select Theme"
-          defaultChecked={THEME_COLOR.LIGHT === themeColor}
-          onChange={(event) => setContext({ theme: event.target.checked ? THEME_COLOR.LIGHT : THEME_COLOR.DARK })}
+          options={[
+            {
+              id: THEME_MODE.LIGHT,
+              label: t('settingsUser.@mode_light'),
+            },
+            {
+              id: THEME_MODE.DARK,
+              label: t('settingsUser.@mode_dark'),
+            },
+          ]}
+          defaultValue={mode}
+          selectedSegment={mode}
+          onChange={(value) => setContext({ mode: value as THEME_MODE })}
+          compactSpacing={true}
         />
+      </div>
+      <div className="flex flex-col gap-1 justify-start items-start">
+      <h2>{t('settingsUser.@theme')}</h2>
+        <RadioButtonGroup
+          direction="horizontal"
+          groupName="radio-group"
+          defaultValue={theme}
+          value={theme}
+          onValueChange={(value) => setContext({ theme: value as THEME_COLOR })}
+          items={[
+            {
+              label: t('settingsUser.@vert_foret'),
+              value: THEME_COLOR.VERT_FORET
+            },
+            {
+              label: t('settingsUser.@blue_iceberg'),
+              value: THEME_COLOR.BLUE_ICEBERG
+            },
+            {
+              label: t('settingsUser.@violet'),
+              value: THEME_COLOR.VIOLET
+            }
+          ]}
+          showGroupTitle
+          showHelpText
+          showItemsLabel
+        />
+      </div>
+      <h2>{t('settingsUser.@language')}</h2>
         <Switch
           appearance="brand"
           label={`Current "${i18next.language}"`}

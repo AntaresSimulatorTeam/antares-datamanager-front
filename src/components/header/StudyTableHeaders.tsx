@@ -5,13 +5,13 @@
  */
 
 import { StudyDTO } from '@/shared/types/Study.type.ts';
-import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter';
+import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter.ts';
 import { createColumnHelper } from '@tanstack/react-table';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { sentenceCase } from '@/shared/utils/textUtils.ts';
 import { Icon, RadioButton } from '@design-system-rte/react';
 import StdTagList from '@common/base/StdTagList/StdTagList.tsx';
-import UserDisplayCell from '@/components/common/layout/UserDisplayCell';
+import UserDisplayCell from '@common/layout/UserDisplayCell.tsx';
 
 const columnHelper = createColumnHelper<StudyDTO>();
 

@@ -5,35 +5,32 @@
  */
 
 import { render } from '@testing-library/react';
-import { describe, expect, it, Mock, vi } from 'vitest';
-import { THEME_COLOR } from '@/shared/types';
+import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
+import { THEME_COLOR, THEME_MODE } from '@/shared/types';
 import ThemeHandler from '../ThemeHandler';
 import { UserSettingsContext } from '@/store/contexts/UserSettingsContext.tsx';
-import usePrevious from '@/hooks/common/usePrevious';
 
-// Mocking the UserSettingsContext and usePrevious hook
+// Mocking the UserSettingsContext
 vi.mock('@/store/contexts/UserSettingsContext', () => ({
   UserSettingsContext: {
     useStore: vi.fn(),
   },
 }));
 
-vi.mock('@/hooks/common/usePrevious', () => ({
-  default: vi.fn(),
-}));
-
 describe('ThemeHandler', () => {
   const mockUseStore = UserSettingsContext.useStore as Mock;
-  const mockUsePrevious = usePrevious as Mock;
 
   beforeEach(() => {
     mockUseStore.mockReset();
-    mockUsePrevious.mockReset();
+    document.documentElement.removeAttribute('data-theme');
+    document.documentElement.removeAttribute('data-mode');
+    document.documentElement.classList.remove(THEME_MODE.DARK);
+    document.body.removeAttribute('data-theme');
+    document.body.removeAttribute('data-mode');
   });
 
-  it('should add the dark theme class if prefers-color-scheme is dark and no theme is set', () => {
-    mockUseStore.mockReturnValue(undefined);
-    mockUsePrevious.mockReturnValue(undefined);
+  it('should set dark mode and default theme if prefers-color-scheme is dark and no mode is set', () => {
+    mockUseStore.mockImplementation((selector: (store: { theme?: THEME_COLOR; mode?: THEME_MODE }) => unknown) => selector({}));
     window.matchMedia = vi.fn().mockImplementation((query) => ({
       matches: query === '(prefers-color-scheme: dark)',
       addListener: vi.fn(),
@@ -42,12 +39,13 @@ describe('ThemeHandler', () => {
 
     render(<ThemeHandler />);
 
-    expect(document.documentElement.classList.contains(THEME_COLOR.DARK)).toBe(true);
+    expect(document.documentElement.getAttribute('data-mode')).toBe(THEME_MODE.DARK);
+    expect(document.documentElement.getAttribute('data-theme')).toBe(THEME_COLOR.BLUE_ICEBERG);
+    expect(document.documentElement.classList.contains(THEME_MODE.DARK)).toBe(true);
   });
 
-  it('should add the light theme class if prefers-color-scheme is not dark and no theme is set', () => {
-    mockUseStore.mockReturnValue(undefined);
-    mockUsePrevious.mockReturnValue(undefined);
+  it('should set light mode and default theme if prefers-color-scheme is not dark and no mode is set', () => {
+    mockUseStore.mockImplementation((selector: (store: { theme?: THEME_COLOR; mode?: THEME_MODE }) => unknown) => selector({}));
     window.matchMedia = vi.fn().mockImplementation((query) => ({
       matches: query === '(prefers-color-scheme: light)',
       addListener: vi.fn(),
@@ -56,42 +54,32 @@ describe('ThemeHandler', () => {
 
     render(<ThemeHandler />);
 
-    expect(document.documentElement.classList.contains(THEME_COLOR.LIGHT)).toBe(true);
+    expect(document.documentElement.getAttribute('data-mode')).toBe(THEME_MODE.LIGHT);
+    expect(document.documentElement.getAttribute('data-theme')).toBe(THEME_COLOR.BLUE_ICEBERG);
+    expect(document.documentElement.classList.contains(THEME_MODE.DARK)).toBe(false);
   });
 
-  it('should add the theme class from the context', () => {
-    const theme = THEME_COLOR.DARK;
-    mockUseStore.mockReturnValue(theme);
-    mockUsePrevious.mockReturnValue(undefined);
+  it('should set data-theme and data-mode attributes from context', () => {
+    mockUseStore.mockImplementation((selector: (store: { theme?: THEME_COLOR; mode?: THEME_MODE }) => unknown) => selector({ theme: THEME_COLOR.VERT_FORET, mode: THEME_MODE.LIGHT }));
 
     render(<ThemeHandler />);
 
-    expect(document.documentElement.classList.contains(theme)).toBe(true);
+    expect(document.documentElement.getAttribute('data-theme')).toBe(THEME_COLOR.VERT_FORET);
+    expect(document.documentElement.getAttribute('data-mode')).toBe(THEME_MODE.LIGHT);
+    expect(document.body.getAttribute('data-theme')).toBe(THEME_COLOR.VERT_FORET);
+    expect(document.body.getAttribute('data-mode')).toBe(THEME_MODE.LIGHT);
+    expect(document.documentElement.classList.contains(THEME_MODE.DARK)).toBe(false);
   });
 
-  it('should add the theme class from the context overide default browser', () => {
-    const theme = THEME_COLOR.DARK;
-    mockUseStore.mockReturnValue(theme);
-    mockUsePrevious.mockReturnValue(undefined);
-    window.matchMedia = vi.fn().mockImplementation((query) => ({
-      matches: query === '(prefers-color-scheme: light)',
-      addListener: vi.fn(),
-      removeListener: vi.fn(),
-    }));
+  it('should update attributes when theme changes to violet and mode to dark', () => {
+    mockUseStore.mockImplementation((selector: (store: { theme?: THEME_COLOR; mode?: THEME_MODE }) => unknown) => selector({ theme: THEME_COLOR.VIOLET, mode: THEME_MODE.DARK }));
 
     render(<ThemeHandler />);
 
-    expect(document.documentElement.classList.contains(theme)).toBe(true);
-  });
-
-  it('should remove the previous theme class and add the new one', () => {
-    const previousTheme = THEME_COLOR.LIGHT;
-    const newTheme = THEME_COLOR.DARK;
-    mockUseStore.mockReturnValue(newTheme);
-    mockUsePrevious.mockReturnValue(previousTheme);
-    render(<ThemeHandler />);
-
-    expect(document.documentElement.classList.contains(previousTheme)).toBe(false);
-    expect(document.documentElement.classList.contains(newTheme)).toBe(true);
+    expect(document.documentElement.getAttribute('data-theme')).toBe(THEME_COLOR.VIOLET);
+    expect(document.documentElement.getAttribute('data-mode')).toBe(THEME_MODE.DARK);
+    expect(document.body.getAttribute('data-theme')).toBe(THEME_COLOR.VIOLET);
+    expect(document.body.getAttribute('data-mode')).toBe(THEME_MODE.DARK);
+    expect(document.documentElement.classList.contains(THEME_MODE.DARK)).toBe(true);
   });
 });
