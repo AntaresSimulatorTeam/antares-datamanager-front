@@ -16,9 +16,43 @@ const ThemeHandler = () => {
   useEffect(() => {
     let currentMode = mode;
     if (!currentMode) {
-      currentMode = darkThemeMq.matches ? THEME_MODE.DARK : THEME_MODE.LIGHT;
+      try {
+        const savedMode = localStorage.getItem('mode') as THEME_MODE | null;
+        if (savedMode && Object.values(THEME_MODE).includes(savedMode)) {
+          currentMode = savedMode;
+        }
+      } catch {
+        // ignore storage errors
+      }
+      if (!currentMode) {
+        currentMode = darkThemeMq.matches ? THEME_MODE.DARK : THEME_MODE.LIGHT;
+      }
     }
-    const currentTheme = theme || THEME_COLOR.BLUE_ICEBERG;
+
+    let currentTheme = theme;
+    if (!currentTheme) {
+      try {
+        const savedTheme = localStorage.getItem('theme') as THEME_COLOR | null;
+        if (savedTheme && Object.values(THEME_COLOR).includes(savedTheme)) {
+          currentTheme = savedTheme;
+        }
+      } catch {
+        // ignore storage errors
+      }
+      if (!currentTheme) {
+        const domTheme = (document.body?.getAttribute('data-theme') ||
+          document.documentElement?.getAttribute('data-theme')) as THEME_COLOR | null;
+        currentTheme =
+          domTheme && Object.values(THEME_COLOR).includes(domTheme) ? domTheme : THEME_COLOR.BLUE_ICEBERG;
+      }
+    }
+
+    try {
+      localStorage.setItem('theme', currentTheme);
+      localStorage.setItem('mode', currentMode);
+    } catch {
+      // ignore storage errors
+    }
 
     document.documentElement.setAttribute('data-theme', currentTheme);
     document.documentElement.setAttribute('data-mode', currentMode);
