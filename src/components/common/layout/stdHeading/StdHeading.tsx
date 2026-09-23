@@ -21,7 +21,7 @@ const StdHeading = ({ title, level = 'h2', size = 'l', weight = 'semibold', id: 
   return (
     <div className="header" id={id}>
       <HeadingComponent className={headingClasses}>{title}</HeadingComponent>
-      <hr className="w-9 border-t-2 border-primary-600" role="separator" />
+      <hr className="w-9 border-t-2 border-border-brand-default" role="separator" />
     </div>
   );
 };

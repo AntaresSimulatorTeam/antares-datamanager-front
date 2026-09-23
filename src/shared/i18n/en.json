@@ -278,6 +278,16 @@
     "@backend": "Backend",
     "@generator": "Generator"
   },
+  "settingsUser": {
+    "@mode": "Select mode",
+    "@theme": "Select a theme",
+    "@language": "Select a language",
+    "@mode_light": "Light",
+    "@mode_dark": "Dark",
+    "@vert_foret": "Vert foret",
+    "@blue_iceberg": "Blue iceberg",
+    "@violet": "Violet"
+  },
   "horizonInput": {
     "@validYearError": "Horizon must be between 2000 and 9999",
     "@horizonPlaceholder": "Enter a year",

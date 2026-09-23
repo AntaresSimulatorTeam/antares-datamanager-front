@@ -106,7 +106,7 @@ const SelectAndSearchableInput = ({
 
   return (
     <div
-      className="relative w-full text-body-m"
+      className="relative w-full text-body-l"
       style={{ width: containerWidthStyle}}
     >
       <Dropdown

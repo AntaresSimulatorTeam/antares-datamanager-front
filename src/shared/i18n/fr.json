@@ -267,6 +267,16 @@
     "@backend": "Backend",
     "@generator": "Générateur"
   },
+  "settingsUser": {
+    "@mode": "Sélectionner un mode",
+    "@theme": "Sélectionner un thème",
+    "@language": "Sélectionner une langue",
+    "@mode_light": "Light",
+    "@mode_dark": "Dark",
+    "@vert_foret": "Vert foret",
+    "@blue_iceberg": "Blue iceberg",
+    "@violet": "Violet"
+  },
   "horizonInput": {
     "@validYearError": "Horizon doit être un numéro entre 2000 et 99999",
     "@horizon_placeholder": "Horizon",
