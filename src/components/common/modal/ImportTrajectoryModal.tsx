@@ -81,7 +81,7 @@ export const ImportTrajectoryModal = ({
             }}
             resetField={() => setTrajectorySelected(null)}
             isInputDisabled={!options?.length}
-            dropdownWidth={30}
+            dropdownWidth={35}
           />
           {tabType === TRAJECTORY_TYPE.STS && (
             <div className="mt-1 flex items-center gap-1 text-body-s text-gray-600">

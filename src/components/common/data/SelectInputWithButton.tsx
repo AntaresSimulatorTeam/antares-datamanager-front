@@ -28,7 +28,7 @@ export const SelectInputWithButton = ({
           defaultPlaceHolder={isDisabled ? '' : placeHolder || t('studyDetails.@select_trajectory')}
           isSearchable={true}
           isInputDisabled={isDisabled}
-          dropdownWidth={30}
+          dropdownWidth={35}
         />
       <span>{t('studyDetails.@or')}</span>
       <Button
