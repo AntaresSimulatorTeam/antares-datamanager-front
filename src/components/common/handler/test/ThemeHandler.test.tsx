@@ -21,6 +21,7 @@ describe('ThemeHandler', () => {
   const mockUseStore = UserSettingsContext.useStore as Mock;
 
   beforeEach(() => {
+    localStorage.clear();
     mockUseStore.mockReset();
     document.documentElement.removeAttribute('data-theme');
     document.documentElement.removeAttribute('data-mode');
@@ -79,6 +80,23 @@ describe('ThemeHandler', () => {
     expect(document.documentElement.getAttribute('data-theme')).toBe(THEME_COLOR.VIOLET);
     expect(document.documentElement.getAttribute('data-mode')).toBe(THEME_MODE.DARK);
     expect(document.body.getAttribute('data-theme')).toBe(THEME_COLOR.VIOLET);
+    expect(document.body.getAttribute('data-mode')).toBe(THEME_MODE.DARK);
+    expect(document.documentElement.classList.contains(THEME_MODE.DARK)).toBe(true);
+    expect(localStorage.getItem('theme')).toBe(THEME_COLOR.VIOLET);
+    expect(localStorage.getItem('mode')).toBe(THEME_MODE.DARK);
+  });
+
+  it('should restore theme and mode from localStorage if not set in context', () => {
+    localStorage.setItem('theme', THEME_COLOR.VERT_FORET);
+    localStorage.setItem('mode', THEME_MODE.DARK);
+
+    mockUseStore.mockImplementation((selector: (store: { theme?: THEME_COLOR; mode?: THEME_MODE }) => unknown) => selector({}));
+
+    render(<ThemeHandler />);
+
+    expect(document.documentElement.getAttribute('data-theme')).toBe(THEME_COLOR.VERT_FORET);
+    expect(document.documentElement.getAttribute('data-mode')).toBe(THEME_MODE.DARK);
+    expect(document.body.getAttribute('data-theme')).toBe(THEME_COLOR.VERT_FORET);
     expect(document.body.getAttribute('data-mode')).toBe(THEME_MODE.DARK);
     expect(document.documentElement.classList.contains(THEME_MODE.DARK)).toBe(true);
   });

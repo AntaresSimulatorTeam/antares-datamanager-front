@@ -28,10 +28,12 @@ const Settings = () => {
             {
               id: THEME_MODE.LIGHT,
               label: t('settingsUser.@mode_light'),
+              icon: 'mode-light'
             },
             {
               id: THEME_MODE.DARK,
               label: t('settingsUser.@mode_dark'),
+              icon: 'mode-dark'
             },
           ]}
           defaultValue={mode}
@@ -45,7 +47,7 @@ const Settings = () => {
         <RadioButtonGroup
           direction="horizontal"
           groupName="radio-group"
-          defaultValue={theme}
+          selectedValue={theme}
           value={theme}
           onValueChange={(value) => setContext({ theme: value as THEME_COLOR })}
           items={[

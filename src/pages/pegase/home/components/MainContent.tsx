@@ -10,8 +10,7 @@ import PegaseStar from '@/components/pegase/star/PegaseStar';
 import ProjectDetails from '@/pages/pegase/projects/projectDetails/ProjectDetails';
 import StudyDetails from '@/pages/pegase/studies/studyDetails/StudyDetails';
 import { footerRoutes, mainRoutes } from '@/routes';
-import { UserSettingsContext } from '@/store/contexts/UserSettingsContext';
-import { THEME_COLOR, THEME_MODE } from '@/shared/types';
+import { getInitialUserSettings, UserSettingsContext } from '@/store/contexts/UserSettingsContext';
 import ThemeHandler from '@common/handler/ThemeHandler';
 import { PegaseAlertContainer, PegaseToastContainer } from '@/shared/notification/containers';
 import { footerMenuItems, mainMenuItems, navBarConfig } from '@/shared/const/navBarConfig';
@@ -29,7 +28,7 @@ const MainContent = () => {
   const { t } = useTranslation();
   return (
     <div className="flex h-screen w-screen dark:bg-gray-900 dark:text-gray-200">
-      <UserSettingsContext.Provider initialState={{ theme: THEME_COLOR.BLUE_ICEBERG, mode: THEME_MODE.LIGHT }}>
+      <UserSettingsContext.Provider initialState={getInitialUserSettings()}>
         <ThemeHandler />
         <div className="z-50">
         <PegaseToastContainer />

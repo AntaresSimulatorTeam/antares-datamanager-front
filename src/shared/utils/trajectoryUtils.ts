@@ -75,7 +75,7 @@ export const getStatus = (status?: RowStatus) => {
 export const getBgColor = (status?: RowStatus) => {
   switch (status) {
     case 'loading':
-      return 'bg-primary-600';
+      return 'bg-background-brand-default';
     case 'success':
     case 'error':
       return `bg-${status}-600`;
