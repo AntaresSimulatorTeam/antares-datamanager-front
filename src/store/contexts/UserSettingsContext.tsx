@@ -4,11 +4,12 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { THEME_COLOR } from '@/shared/types';
+import { THEME_COLOR, THEME_MODE } from '@/shared/types';
 import createFastContext from './createFastContext';
 
 export type UserSettingsContextStore = {
-  theme: THEME_COLOR;
+  theme?: THEME_COLOR;
+  mode?: THEME_MODE;
 };
 
 export const UserSettingsContext = createFastContext<UserSettingsContextStore>();

@@ -8,7 +8,7 @@ type TableHeaderProps<TData> = {
   columnSize: ColumnSizeType;
 };
 
-const COMMON_HEADER_CLASSES = 'px-1 py-0.5 text-left font-semibold bg-primary-600 text-gray-w';
+const COMMON_HEADER_CLASSES = 'px-1 py-0.5 text-left font-semibold bg-background-brand-default text-content-primary-inverse';
 
 export const headerClassBuilder = <TData>({ table, header }: TableHeaderProps<TData>) => {
   const ROUNDED_TR_CLASS = header.index === table.getHeaderGroups()[0]?.headers.length - 1 ? 'rounded-tr' : '';
