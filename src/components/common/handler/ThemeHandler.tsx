@@ -53,6 +53,12 @@ const ThemeHandler = () => {
     } catch {
       // ignore storage errors
     }
+    const currentTheme = theme || THEME_COLOR.BLUE_ICEBERG;
+
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    document.documentElement.setAttribute('data-mode', currentMode);
+    document.body.setAttribute('data-theme', currentTheme);
+    document.body.setAttribute('data-mode', currentMode);
 
     document.documentElement.setAttribute('data-theme', currentTheme);
     document.documentElement.setAttribute('data-mode', currentMode);
