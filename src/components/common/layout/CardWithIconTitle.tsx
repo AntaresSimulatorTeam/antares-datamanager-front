@@ -64,7 +64,7 @@ export const CardWithIconTitle = ({ data, size, transform }: CardWithIconTitlePr
       {data?.content && (
         <div className="h-[calc(theme(lineHeight.4)*2)] overflow-hidden text-gray-600 aspect-medium:h-[calc(theme(lineHeight.4)*2.2)] aspect-wide:h-[calc(theme(lineHeight.4)*2.4)]">
           <Tooltip label={data?.content} position="right">
-            <div className="leading-2 line-clamp-2 text-ellipsis text-start text-body-xs">{data.content}</div>
+            <div className="leading-2 line-clamp-2 text-ellipsis text-start text-body-s">{data.content}</div>
           </Tooltip>
         </div>
       )}
@@ -72,12 +72,12 @@ export const CardWithIconTitle = ({ data, size, transform }: CardWithIconTitlePr
         <div className="flex gap-2 text-gray-600">
           <div className="flex items-center gap-1">
             <Icon name="user" />
-            {data?.generatedBy && <span className="text-body-xs">{data.generatedBy}</span>}
+            {data?.generatedBy && <span className="text-body-s">{data.generatedBy}</span>}
           </div>
           {'|'}
           <div className="flex items-center gap-1">
             <Icon name="history" />
-            {data?.generatedAt && <span className="text-body-xs">{formatDateToDDMMYYYY(data.generatedAt, true)}</span>}
+            {data?.generatedAt && <span className="text-body-s">{formatDateToDDMMYYYY(data.generatedAt, true)}</span>}
           </div>
         </div>
       </div>
