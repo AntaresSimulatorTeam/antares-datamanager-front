@@ -25,7 +25,6 @@ import {
   getTrajectoryTypeByIndex,
   isEmptyRow,
   isMatchingTrajectoryType,
-  isTechnicalParametersType,
   isTrajectoryLinked,
   isUniqueTrajectoryType,
   removeDuplicate,
@@ -47,7 +46,7 @@ import {
   mockRowDataTrajectoryC,
 } from '@/mocks/data/tests/trajectory.mock.ts';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
-import { DbTrajectory, HypothesisRowData } from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, isTrajectoryThermalTechnicalParametersType } from '@/shared/types';
 import { Row } from '@tanstack/react-table';
 import { ThermalOptions } from '@/mocks/data/list/names.ts';
 import { TFunction } from 'i18next';
@@ -757,7 +756,7 @@ describe('getPathFromTrajectoryType', () => {
   });
 
   it('should return technical path for unknown type', () => {
-    expect(getPathFromTrajectoryType('UNKNOWN_TYPE' as TRAJECTORY_TYPE)).toBeNull();
+    expect(getPathFromTrajectoryType('UNKNOWN_TYPE' as TRAJECTORY_TYPE)).toBe('');
   });
 });
 
@@ -1002,21 +1001,21 @@ describe('isUniqueTrajectoryType', () => {
   });
 });
 
-describe('isTechnicalParametersType', () => {
-  it('returns false for LOAD', () => {
-    expect(isTechnicalParametersType(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER)).toBe(true);
+describe('isTrajectoryThermalTechnicalParametersType', () => {
+  it('returns true for THERMAL_TECHNICAL_SPECIFIC_PARAMETER', () => {
+    expect(isTrajectoryThermalTechnicalParametersType(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER)).toBe(true);
   });
 
   it('returns true for THERMAL_TECHNICAL_MODULATION_PARAMETER', () => {
-    expect(isTechnicalParametersType(TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER)).toBe(true);
+    expect(isTrajectoryThermalTechnicalParametersType(TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER)).toBe(true);
   });
 
   it('returns true for THERMAL_ECONOMIC_PARAMETER', () => {
-    expect(isTechnicalParametersType(TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER)).toBe(true);
+    expect(isTrajectoryThermalTechnicalParametersType(TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER)).toBe(true);
   });
 
   it('returns false for LINK', () => {
-    expect(isTechnicalParametersType(TRAJECTORY_TYPE.LINK)).toBe(false);
+    expect(isTrajectoryThermalTechnicalParametersType(TRAJECTORY_TYPE.LINK)).toBe(false);
   });
 });
 

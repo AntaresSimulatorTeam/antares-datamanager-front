@@ -65,6 +65,12 @@ export const TRAJECTORY_SETTINGS = `${BACK_END_BASE_URL}/v1/trajectory/settings`
 export const TRAJECTORY_SCENARIO_BUILDER = `${BACK_END_BASE_URL}/v1/trajectory/scenarioBuilder`;
 export const TRAJECTORY_P2G_CAPACITY_COST = `${BACK_END_BASE_URL}/v1/trajectory/capacity-cost-p2g`;
 export const TRAJECTORY_P2G_MARKET_MODULATION = `${BACK_END_BASE_URL}/v1/trajectory/modulation-p2g`;
+export const TRAJECTORY_LOAD_ME = `${BACK_END_BASE_URL}/v1/trajectory/load-me`;
+export const TRAJECTORY_STS_ME = `${BACK_END_BASE_URL}/v1/trajectory/st-storage-me`;
+export const TRAJECTORY_EFFICIENCY_ME = `${BACK_END_BASE_URL}/v1/trajectory/efficiency-me`;
+export const TRAJECTORY_CONSTRAINT_ME = `${BACK_END_BASE_URL}/v1/trajectory/constraint-me`;
+export const TRAJECTORY_HYDRO_CAPACITY_ME = `${BACK_END_BASE_URL}/v1/trajectory/hydro-capacity-me`;
+export const TRAJECTORY_THERMAL_CAPACITY_ME = `${BACK_END_BASE_URL}/v1/trajectory/thermal-me`;
 
 //ABOUT
 export const BACK_END_ACTUATOR_ENDPOINT = `${BACK_END_BASE_URL}/actuator/info`;

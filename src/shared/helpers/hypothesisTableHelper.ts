@@ -2,7 +2,9 @@ import {
   DbTrajectory,
   FetchResult,
   HypothesisRowData,
+  isTrajectoryConfigurationType,
   isTrajectoryHydroType,
+  isTrajectoryMEType,
   isTrajectoryNuclearType,
   isTrajectoryP2GType,
   isTrajectoryResType,
@@ -31,7 +33,12 @@ import { TFunction } from 'i18next';
 import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
 import { getResTechnologyList, isParamModulationRequired } from '@/shared/services/trajectoryService.ts';
 import { HypothesisType } from '@/shared/types/HypothesisTable.ts';
-import { getNuclearTrajectoryType } from '@/shared/utils/formFormatter.ts';
+import {
+  getConfigurationTypeToUse,
+  getHydroTypeToUse,
+  getMETypeToUse,
+  getNuclearTypeToUse,
+} from '@/shared/utils/formFormatter.ts';
 
 /**
  * Retrieve read only row of a study generated
@@ -241,7 +248,7 @@ export const fetchAndNormalizeTrajectories = async ({
   }
 
   // Other types
-  result = await getStudyTrajectories(id, trajType);
+    result = await getStudyTrajectories(id, trajType);
 
   if (trajType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
     technologies = await getThermalTechnologyList();
@@ -330,24 +337,74 @@ export const buildHypothesisRows = ({
   return rows;
 };
 
-export const getRowHypothesisLabel = (type: TRAJECTORY_TYPE, t: TFunction) => {
+export const getNuclearRowHypothesisKey = (type: TRAJECTORY_TYPE) => {
+
   switch (type) {
     case TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION:
-      return t('thermal.@modulation');
+      return 'thermal.@modulation';
     case TRAJECTORY_TYPE.NUCLEAR_FR_TS_SERIES:
-      return t('thermal.@time_series');
+      return 'thermal.@time_series';
     case TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP:
-      return t('thermal.@epr');
+      return 'thermal.@epr';
     case TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM:
-      return t('thermal.@long_term');
+      return 'thermal.@long_term';
     case TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR:
-      return t('thermal.@smr');
+      return 'thermal.@smr';
+    case TRAJECTORY_TYPE.NUCLEAR_FR_TALON:
+      return 'thermal.@talon';
+  }
+}
+
+export const getMERowHypothesisKey = (type: TRAJECTORY_TYPE) => {
+  switch (type) {
+    case TRAJECTORY_TYPE.AREA_ME:
+      return 'studyDetails.@areas';
+    case TRAJECTORY_TYPE.LINK_ME:
+      return 'studyDetails.@links';
+    case TRAJECTORY_TYPE.LOAD_ME:
+      return 'studyDetails.@load';
+    case TRAJECTORY_TYPE.STS_ME:
+      return 'me.@storage';
+    case TRAJECTORY_TYPE.HYDRO_ME:
+      return 'studyDetails.@hydro';
+    case TRAJECTORY_TYPE.HYDRO_PARAMETERS_ME:
+      return 'page.@parameters';
+    case TRAJECTORY_TYPE.HYDRO_RESERVOIR_LEVELS_ME:
+      return 'me.@reservoir_levels';
+    case TRAJECTORY_TYPE.HYDRO_WATER_VALUES_ME:
+      return 'me.@water_values';
+    case TRAJECTORY_TYPE.HYDRO_TIME_SERIES_ME:
+      return 'thermal.@time_series';
+    case TRAJECTORY_TYPE.HYDRO_CAPACITY_ME:
+      return 'p2g.@capacity';
+    case TRAJECTORY_TYPE.THERMAL_CAPACITY_ME:
+      return 'studyDetails.@thermal';
+    case TRAJECTORY_TYPE.EFFICIENCY_ME:
+      return 'me.@efficiency';
+    case TRAJECTORY_TYPE.CONSTRAINT_ME:
+      return 'me.@constraints';
+  }
+}
+
+export const getP2GRowHypothesisKey = (type: TRAJECTORY_TYPE) => {
+  switch (type) {
     case TRAJECTORY_TYPE.P2G_CAPACITY_COST:
-      return t('p2g.@capacity');
+      return 'p2g.@capacity';
     case TRAJECTORY_TYPE.P2G_MARKET_MODULATION:
-      return t('p2g.@modulation');
+      return 'p2g.@modulation';
+  }
+}
+
+export const getRowHypothesisLabel = (type: TRAJECTORY_TYPE, t: TFunction) => {
+  switch (true) {
+    case isTrajectoryNuclearType(type) || type === TRAJECTORY_TYPE.NUCLEAR_FR_TS_SERIES:
+      return t(`${getNuclearRowHypothesisKey(type)}`);
+    case isTrajectoryMEType(type) || type === TRAJECTORY_TYPE.HYDRO_ME:
+      return t(`${getMERowHypothesisKey(type)}`);
+    case isTrajectoryP2GType(type):
+      return t(`${getP2GRowHypothesisKey(type)}`);
     default:
-      return t('thermal.@talon');
+      return '';
   }
 }
 
@@ -362,6 +419,7 @@ export const buildRowsByType = ({
 }): HypothesisRowData[] => rowTypes.flatMap(item => item?.types?.map((type) => {
     const trajectory =
       trajectoriesByType?.find((trajectoryByType) => trajectoryByType.trajType === type)?.trajectories?.[0] ?? null;
+
     return {
       hypothesis: getRowHypothesisLabel(type, t),
       trajectory: item.isEmpty ? null : trajectory,
@@ -661,12 +719,8 @@ export const getParamForFetchFSTrajectory = (
     typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK;
     areaToUse = '';
   }
-  if (type === TRAJECTORY_TYPE.ADEQUACY_PATCH) {
-    if (indexArray.length > 1) {
-      typeToUse = indexArray[1] === 0 ? TRAJECTORY_TYPE.SETTINGS : TRAJECTORY_TYPE.SCENARIO_BUILDER;
-    } else {
-      typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.ADEQUACY_PATCH : TRAJECTORY_TYPE.FLOWBASED;
-    }
+  if (isTrajectoryConfigurationType(type)) {
+    typeToUse = getConfigurationTypeToUse(indexArray);
     areaToUse = '';
   }
   if (type === TRAJECTORY_TYPE.DSR) {
@@ -693,20 +747,20 @@ export const getParamForFetchFSTrajectory = (
     }
     areaToUse = '';
   }
-  if (type === TRAJECTORY_TYPE.HYDRO_SERIES) {
-    typeToUse = indexArray[1] === 0 ? TRAJECTORY_TYPE.HYDRO_SERIES : TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS;
-    areaToUse = '';
-  }
-  if (type === TRAJECTORY_TYPE.HYDRO_PSP_SERIES) {
-    typeToUse = indexArray[1] === 0 ? TRAJECTORY_TYPE.HYDRO_PSP_SERIES : TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS;
+  if (isTrajectoryHydroType(type)) {
+    typeToUse = getHydroTypeToUse(indexArray, type);
     areaToUse = '';
   }
   if (type === TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION) {
-    typeToUse = getNuclearTrajectoryType(indexArray);
+    typeToUse = getNuclearTypeToUse(indexArray);
     areaToUse = '';
   }
   if (type === TRAJECTORY_TYPE.P2G) {
     typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.P2G_CAPACITY_COST : TRAJECTORY_TYPE.P2G_MARKET_MODULATION;
+    areaToUse = '';
+  }
+  if (type === TRAJECTORY_TYPE.ME) {
+    typeToUse = getMETypeToUse(indexArray);
     areaToUse = '';
   }
   return { typeToUse, areaToUse, isDefaultArea };
@@ -736,6 +790,10 @@ export const getTypeToUse = (type: TRAJECTORY_TYPE, indexArray: number[], nbRows
 
   if (type === TRAJECTORY_TYPE.P2G) {
       typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.P2G_CAPACITY_COST : TRAJECTORY_TYPE.P2G_MARKET_MODULATION;
+  }
+
+  if (type === TRAJECTORY_TYPE.ME) {
+    typeToUse = getMETypeToUse(indexArray);
   }
 
   return typeToUse;

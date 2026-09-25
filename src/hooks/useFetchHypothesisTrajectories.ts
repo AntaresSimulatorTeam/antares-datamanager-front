@@ -6,6 +6,7 @@ import {
   HypothesisTableResults,
   isTrajectoryHydroPSPType,
   isTrajectoryHydroType,
+  isTrajectoryMEType,
   isTrajectoryNuclearType,
   isTrajectoryOtherVectorType,
   isTrajectoryP2GType,
@@ -31,11 +32,13 @@ import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { filterRow, mergeRows } from '@/shared/utils/trajectoryUtils.ts';
 import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
 import {
+  AREA_LINK_ME_TYPES,
   HYDRO_PSP_TYPES,
   HYDRO_TYPES,
   NUCLEAR_FR_TIME_NON_SERIES_TYPES,
   NUCLEAR_FR_TIME_SERIES_TYPES,
   P2G_TYPES,
+  THERMAL_ME_TYPES,
 } from '@/shared/const/trajectoryTypes.ts';
 import { HydroSubRows } from '@/mocks/data/list/names.ts';
 import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
@@ -174,6 +177,29 @@ export const useFetchHypothesisTrajectories = (
             rows: otherVectorRows,
             readOnlyMap: otherVectorReadOnlyMap,
             trajType: TRAJECTORY_TYPE.P2G,
+          }];
+
+        } else if (isTrajectoryMEType(trajTypes[0])) {
+          const meRows = buildRowsByType({
+            trajectoriesByType: rawResults,
+            t,
+            rowTypes: [{types: [...AREA_LINK_ME_TYPES, TRAJECTORY_TYPE.LOAD_ME, TRAJECTORY_TYPE.STS_ME], isEmpty: false},
+            {types: [TRAJECTORY_TYPE.HYDRO_ME], isEmpty: true, subRowTypes: [TRAJECTORY_TYPE.HYDRO_CAPACITY_ME]},
+            {types: THERMAL_ME_TYPES, isEmpty: false}]
+          });
+
+          const meReadOnlyMap = buildReadOnlyMap({
+            rows: meRows,
+            trajType: trajectoryTypes[0],
+            isStudyGenerated,
+            defaultAreaListNotInList,
+          });
+
+          results = [{
+            trajectories: rawResults.flatMap(result => result.trajectories?.filter(traj => !traj.area)),
+            rows: meRows,
+            readOnlyMap: meReadOnlyMap,
+            trajType: TRAJECTORY_TYPE.ME,
           }];
 
         } else if (isTrajectoryHydroType(trajTypes[0])) {
