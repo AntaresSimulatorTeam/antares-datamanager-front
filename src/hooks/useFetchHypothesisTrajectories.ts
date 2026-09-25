@@ -184,7 +184,7 @@ export const useFetchHypothesisTrajectories = (
             trajectoriesByType: rawResults,
             t,
             rowTypes: [{types: [...AREA_LINK_ME_TYPES, TRAJECTORY_TYPE.LOAD_ME, TRAJECTORY_TYPE.STS_ME], isEmpty: false},
-            {types: [TRAJECTORY_TYPE.HYDRO_ME], isEmpty: true}, //subRowTypes: [TRAJECTORY_TYPE.HYDRO_CAPACITY_ME]},
+            {types: [TRAJECTORY_TYPE.HYDRO_ME], isEmpty: true, subRowTypes: [TRAJECTORY_TYPE.HYDRO_CAPACITY_ME]},
             {types: THERMAL_ME_TYPES, isEmpty: false}]
           });
 
