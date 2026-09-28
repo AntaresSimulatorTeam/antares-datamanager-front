@@ -29,7 +29,7 @@ import * as trajectoryService from '@/shared/services/trajectoryService';
 import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { HydroSubRows, STSTechnology, ThermalOptionsResults } from '@/mocks/data/list/names.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
-import { NUCLEAR_FR_MODULATION_TYPES, P2G_TYPES } from '@/shared/const/trajectoryTypes.ts';
+import { ME_TYPES, NUCLEAR_FR_MODULATION_TYPES, P2G_TYPES } from '@/shared/const/trajectoryTypes.ts';
 
 vi.mock('@/shared/services/trajectoryService', async (importOriginal) => {
   const actual: Mock = await importOriginal();
@@ -1510,6 +1510,569 @@ describe('useFetchHypothesisTrajectories', () => {
         '0': true,
         '1': true,
       });
+    });
+  });
+
+  it('should build hypothesis trajectories for ME types when isTrajectoryMEType is true', async () => {
+    const areaMeTrajectory: DbTrajectory = {
+      id: 301,
+      trajectoryName: 'area_me_traj',
+      type: TRAJECTORY_TYPE.AREA_ME,
+      area: '',
+      technology: '',
+      version: 1,
+      userName: 'user1',
+      creationDate: '2024-01-01' as unknown as Date,
+      hasTimeSeries: false,
+    };
+
+    const linkMeTrajectory: DbTrajectory = {
+      id: 302,
+      trajectoryName: 'link_me_traj',
+      type: TRAJECTORY_TYPE.LINK_ME,
+      area: '',
+      technology: '',
+      version: 1,
+      userName: 'user1',
+      creationDate: '2024-01-01' as unknown as Date,
+      hasTimeSeries: false,
+    };
+
+    const loadMeTrajectory: DbTrajectory = {
+      id: 303,
+      trajectoryName: 'load_me_traj',
+      type: TRAJECTORY_TYPE.LOAD_ME,
+      area: '',
+      technology: '',
+      version: 1,
+      userName: 'user1',
+      creationDate: '2024-01-01' as unknown as Date,
+      hasTimeSeries: false,
+    };
+
+    const stsMeTrajectory: DbTrajectory = {
+      id: 304,
+      trajectoryName: 'sts_me_traj',
+      type: TRAJECTORY_TYPE.STS_ME,
+      area: '',
+      technology: '',
+      version: 1,
+      userName: 'user1',
+      creationDate: '2024-01-01' as unknown as Date,
+      hasTimeSeries: false,
+    };
+
+    mockUseStudy.mockReturnValue({
+      [TRAJECTORY_TYPE.AREA_ME]: { trajectories: [], warningMessages: [] },
+      [TRAJECTORY_TYPE.LINK_ME]: { trajectories: [], warningMessages: [] },
+      [TRAJECTORY_TYPE.LOAD_ME]: { trajectories: [], warningMessages: [] },
+      [TRAJECTORY_TYPE.STS_ME]: { trajectories: [], warningMessages: [] },
+    } as Partial<StudyState>);
+
+    vi.mocked(studyService.getStudyTrajectories).mockImplementation((_, type) => {
+      if (type === TRAJECTORY_TYPE.AREA_ME) return Promise.resolve([areaMeTrajectory]);
+      if (type === TRAJECTORY_TYPE.LINK_ME) return Promise.resolve([linkMeTrajectory]);
+      if (type === TRAJECTORY_TYPE.LOAD_ME) return Promise.resolve([loadMeTrajectory]);
+      if (type === TRAJECTORY_TYPE.STS_ME) return Promise.resolve([stsMeTrajectory]);
+      return Promise.resolve([]);
+    });
+
+    const { result } = renderHook(() =>
+      useFetchHypothesisTrajectories(ME_TYPES, 5, StudyStatus.IN_PROGRESS),
+    );
+
+    await waitFor(() => {
+      expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.AREA_ME);
+      expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.LINK_ME);
+      expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.LOAD_ME);
+      expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(5, TRAJECTORY_TYPE.STS_ME);
+
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: STUDY_ACTION.ADD_TRAJECTORIES,
+        payload: {
+          [TRAJECTORY_TYPE.ME]: {
+            trajectories: [areaMeTrajectory, linkMeTrajectory, loadMeTrajectory, stsMeTrajectory],
+          },
+        },
+      });
+
+      expect(result.current.hypothesisTrajectories?.[TRAJECTORY_TYPE.ME]).toEqual([
+        {
+          hypothesis: 'studyDetails.@areas',
+          trajectory: areaMeTrajectory,
+          status: TRAJECTORY_SELECTION_STATUS.OK,
+          isDefault: false,
+          isDeletable: false,
+          subRows: [],
+        },
+        {
+          hypothesis: 'studyDetails.@links',
+          trajectory: linkMeTrajectory,
+          status: TRAJECTORY_SELECTION_STATUS.OK,
+          isDefault: false,
+          isDeletable: false,
+          subRows: [],
+        },
+        {
+          hypothesis: 'studyDetails.@load',
+          trajectory: loadMeTrajectory,
+          status: TRAJECTORY_SELECTION_STATUS.OK,
+          isDefault: false,
+          isDeletable: false,
+          subRows: [],
+        },
+        {
+          hypothesis: 'me.@storage',
+          trajectory: stsMeTrajectory,
+          status: TRAJECTORY_SELECTION_STATUS.OK,
+          isDefault: false,
+          isDeletable: false,
+          subRows: [],
+        },
+        {
+          hypothesis: "studyDetails.@hydro",
+          isDefault: false,
+          isDeletable: false,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          trajectory: null,
+          subRows: [
+            {
+              hypothesis: "p2g.@capacity",
+              isDefault: false,
+              isDeletable: false,
+              status: TRAJECTORY_SELECTION_STATUS.MISSING,
+              subRows: null,
+              trajectory: null,
+            },
+            {
+              hypothesis: "page.@parameters",
+              isDefault: false,
+              isDeletable: false,
+              status: TRAJECTORY_SELECTION_STATUS.MISSING,
+              subRows: null,
+              trajectory: null,
+            },
+            {
+              hypothesis: "me.@reservoir_levels",
+              isDefault: false,
+              isDeletable: false,
+              status: TRAJECTORY_SELECTION_STATUS.MISSING,
+              subRows: null,
+              trajectory: null,
+            },
+            {
+              hypothesis: "thermal.@time_series",
+              isDefault: false,
+              isDeletable: false,
+              status: TRAJECTORY_SELECTION_STATUS.MISSING,
+              subRows: null,
+              trajectory: null,
+            },
+            {
+              hypothesis: "me.@water_values",
+              isDefault: false,
+              isDeletable: false,
+              status: TRAJECTORY_SELECTION_STATUS.MISSING,
+              subRows: null,
+              trajectory: null,
+            },
+          ]
+        },
+        {
+          hypothesis: "studyDetails.@thermal",
+          isDefault: false,
+          isDeletable: false,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          subRows: [],
+          trajectory: null,
+        },
+        {
+          hypothesis: "me.@efficiency",
+          isDefault: false,
+          isDeletable: false,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          subRows: [],
+          trajectory: null,
+        },
+        {
+          hypothesis: "me.@constraints",
+          isDefault: false,
+          isDeletable: false,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          subRows: [],
+          trajectory: null
+        },
+      ]);
+
+      expect(result.current.readOnlyRow?.[TRAJECTORY_TYPE.ME]).toEqual({});
+      expect(result.current.areasTrajectoryOptions).toBeUndefined();
+      expect(result.current.dropDownListOptions).toBeUndefined();
+    });
+  });
+
+  it('should build hypothesis trajectories for ME types with missing trajectories and generated status', async () => {
+    mockUseStudy.mockReturnValue({} as StudyState);
+    vi.mocked(studyService.getStudyTrajectories).mockResolvedValue([]);
+
+    const { result } = renderHook(() =>
+      useFetchHypothesisTrajectories(
+        ME_TYPES,
+        5,
+        StudyStatus.GENERATED,
+        StudyStatus.GENERATED,
+      ),
+    );
+
+    await waitFor(() => {
+      expect(result.current.hypothesisTrajectories?.[TRAJECTORY_TYPE.ME]).toEqual([
+        {
+          hypothesis: 'studyDetails.@areas',
+          trajectory: null,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          isDefault: false,
+          isDeletable: false,
+          subRows: [],
+        },
+        {
+          hypothesis: 'studyDetails.@links',
+          trajectory: null,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          isDefault: false,
+          isDeletable: false,
+          subRows: [],
+        },
+        {
+          hypothesis: 'studyDetails.@load',
+          trajectory: null,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          isDefault: false,
+          isDeletable: false,
+          subRows: [],
+        },
+        {
+          hypothesis: 'me.@storage',
+          trajectory: null,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          isDefault: false,
+          isDeletable: false,
+          subRows: [],
+        },
+        {
+          hypothesis: "studyDetails.@hydro",
+          isDefault: false,
+          isDeletable: false,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          trajectory: null,
+          subRows: [
+            {
+              hypothesis: "p2g.@capacity",
+              isDefault: false,
+              isDeletable: false,
+              status: TRAJECTORY_SELECTION_STATUS.MISSING,
+              subRows: null,
+              trajectory: null,
+            },
+            {
+              hypothesis: "page.@parameters",
+              isDefault: false,
+              isDeletable: false,
+              status: TRAJECTORY_SELECTION_STATUS.MISSING,
+              subRows: null,
+              trajectory: null,
+            },
+            {
+              hypothesis: "me.@reservoir_levels",
+              isDefault: false,
+              isDeletable: false,
+              status: TRAJECTORY_SELECTION_STATUS.MISSING,
+              subRows: null,
+              trajectory: null,
+            },
+            {
+              hypothesis: "thermal.@time_series",
+              isDefault: false,
+              isDeletable: false,
+              status: TRAJECTORY_SELECTION_STATUS.MISSING,
+              subRows: null,
+              trajectory: null,
+            },
+            {
+              hypothesis: "me.@water_values",
+              isDefault: false,
+              isDeletable: false,
+              status: TRAJECTORY_SELECTION_STATUS.MISSING,
+              subRows: null,
+              trajectory: null,
+            },
+          ]
+        },
+        {
+          hypothesis: "studyDetails.@thermal",
+          isDefault: false,
+          isDeletable: false,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          subRows: [],
+          trajectory: null,
+        },
+        {
+          hypothesis: "me.@efficiency",
+          isDefault: false,
+          isDeletable: false,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          subRows: [],
+          trajectory: null,
+        },
+        {
+          hypothesis: "me.@constraints",
+          isDefault: false,
+          isDeletable: false,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          subRows: [],
+          trajectory: null
+        },
+      ]);
+
+      expect(result.current.readOnlyRow?.[TRAJECTORY_TYPE.ME]).toEqual({
+        '0': true,
+        '1': true,
+        '2': true,
+        '3': true,
+        '4': true,
+        '4.0': true,
+        '4.1': true,
+        '4.2': true,
+        '4.3': true,
+        '4.4': true,
+        '5': true,
+        '6': true,
+        '7': true,
+      });
+    });
+  });
+
+  it('should build hypothesis trajectories for ME types including all hydro subrows when trajectories are present', async () => {
+    const hydroCapacityMeTrajectory: DbTrajectory = {
+      id: 401,
+      trajectoryName: 'hydro_cap_traj',
+      type: TRAJECTORY_TYPE.HYDRO_CAPACITY_ME,
+      area: '',
+      technology: '',
+      version: 1,
+      userName: 'user1',
+      creationDate: '2024-01-01' as unknown as Date,
+      hasTimeSeries: false,
+    };
+
+    const hydroParamMeTrajectory: DbTrajectory = {
+      id: 402,
+      trajectoryName: 'hydro_param_traj',
+      type: TRAJECTORY_TYPE.HYDRO_PARAMETERS_ME,
+      area: '',
+      technology: '',
+      version: 1,
+      userName: 'user1',
+      creationDate: '2024-01-01' as unknown as Date,
+      hasTimeSeries: false,
+    };
+
+    const hydroReservoirMeTrajectory: DbTrajectory = {
+      id: 403,
+      trajectoryName: 'hydro_reservoir_traj',
+      type: TRAJECTORY_TYPE.HYDRO_RESERVOIR_LEVELS_ME,
+      area: '',
+      technology: '',
+      version: 1,
+      userName: 'user1',
+      creationDate: '2024-01-01' as unknown as Date,
+      hasTimeSeries: false,
+    };
+
+    const hydroTsMeTrajectory: DbTrajectory = {
+      id: 404,
+      trajectoryName: 'hydro_ts_traj',
+      type: TRAJECTORY_TYPE.HYDRO_TIME_SERIES_ME,
+      area: '',
+      technology: '',
+      version: 1,
+      userName: 'user1',
+      creationDate: '2024-01-01' as unknown as Date,
+      hasTimeSeries: false,
+    };
+
+    const hydroWaterValuesMeTrajectory: DbTrajectory = {
+      id: 405,
+      trajectoryName: 'hydro_water_traj',
+      type: TRAJECTORY_TYPE.HYDRO_WATER_VALUES_ME,
+      area: '',
+      technology: '',
+      version: 1,
+      userName: 'user1',
+      creationDate: '2024-01-01' as unknown as Date,
+      hasTimeSeries: false,
+    };
+
+    const thermalCapacityMeTrajectory: DbTrajectory = {
+      id: 406,
+      trajectoryName: 'thermal_cap_traj',
+      type: TRAJECTORY_TYPE.THERMAL_CAPACITY_ME,
+      area: '',
+      technology: '',
+      version: 1,
+      userName: 'user1',
+      creationDate: '2024-01-01' as unknown as Date,
+      hasTimeSeries: false,
+    };
+
+    const efficiencyMeTrajectory: DbTrajectory = {
+      id: 407,
+      trajectoryName: 'efficiency_traj',
+      type: TRAJECTORY_TYPE.EFFICIENCY_ME,
+      area: '',
+      technology: '',
+      version: 1,
+      userName: 'user1',
+      creationDate: '2024-01-01' as unknown as Date,
+      hasTimeSeries: false,
+    };
+
+    const constraintMeTrajectory: DbTrajectory = {
+      id: 408,
+      trajectoryName: 'constraint_traj',
+      type: TRAJECTORY_TYPE.CONSTRAINT_ME,
+      area: '',
+      technology: '',
+      version: 1,
+      userName: 'user1',
+      creationDate: '2024-01-01' as unknown as Date,
+      hasTimeSeries: false,
+    };
+
+    mockUseStudy.mockReturnValue({} as Partial<StudyState>);
+
+    vi.mocked(studyService.getStudyTrajectories).mockImplementation((_, type) => {
+      if (type === TRAJECTORY_TYPE.HYDRO_CAPACITY_ME) return Promise.resolve([hydroCapacityMeTrajectory]);
+      if (type === TRAJECTORY_TYPE.HYDRO_PARAMETERS_ME) return Promise.resolve([hydroParamMeTrajectory]);
+      if (type === TRAJECTORY_TYPE.HYDRO_RESERVOIR_LEVELS_ME) return Promise.resolve([hydroReservoirMeTrajectory]);
+      if (type === TRAJECTORY_TYPE.HYDRO_TIME_SERIES_ME) return Promise.resolve([hydroTsMeTrajectory]);
+      if (type === TRAJECTORY_TYPE.HYDRO_WATER_VALUES_ME) return Promise.resolve([hydroWaterValuesMeTrajectory]);
+      if (type === TRAJECTORY_TYPE.THERMAL_CAPACITY_ME) return Promise.resolve([thermalCapacityMeTrajectory]);
+      if (type === TRAJECTORY_TYPE.EFFICIENCY_ME) return Promise.resolve([efficiencyMeTrajectory]);
+      if (type === TRAJECTORY_TYPE.CONSTRAINT_ME) return Promise.resolve([constraintMeTrajectory]);
+      return Promise.resolve([]);
+    });
+
+    const { result } = renderHook(() =>
+      useFetchHypothesisTrajectories(ME_TYPES, 5, StudyStatus.IN_PROGRESS),
+    );
+
+    await waitFor(() => {
+      expect(result.current.hypothesisTrajectories?.[TRAJECTORY_TYPE.ME]).toEqual([
+        {
+          hypothesis: 'studyDetails.@areas',
+          trajectory: null,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          isDefault: false,
+          isDeletable: false,
+          subRows: [],
+        },
+        {
+          hypothesis: 'studyDetails.@links',
+          trajectory: null,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          isDefault: false,
+          isDeletable: false,
+          subRows: [],
+        },
+        {
+          hypothesis: 'studyDetails.@load',
+          trajectory: null,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          isDefault: false,
+          isDeletable: false,
+          subRows: [],
+        },
+        {
+          hypothesis: 'me.@storage',
+          trajectory: null,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          isDefault: false,
+          isDeletable: false,
+          subRows: [],
+        },
+        {
+          hypothesis: 'studyDetails.@hydro',
+          isDefault: false,
+          isDeletable: false,
+          status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          trajectory: null,
+          subRows: [
+            {
+              hypothesis: 'p2g.@capacity',
+              isDefault: false,
+              isDeletable: false,
+              status: TRAJECTORY_SELECTION_STATUS.OK,
+              subRows: null,
+              trajectory: hydroCapacityMeTrajectory,
+            },
+            {
+              hypothesis: 'page.@parameters',
+              isDefault: false,
+              isDeletable: false,
+              status: TRAJECTORY_SELECTION_STATUS.OK,
+              subRows: null,
+              trajectory: hydroParamMeTrajectory,
+            },
+            {
+              hypothesis: 'me.@reservoir_levels',
+              isDefault: false,
+              isDeletable: false,
+              status: TRAJECTORY_SELECTION_STATUS.OK,
+              subRows: null,
+              trajectory: hydroReservoirMeTrajectory,
+            },
+            {
+              hypothesis: 'thermal.@time_series',
+              isDefault: false,
+              isDeletable: false,
+              status: TRAJECTORY_SELECTION_STATUS.OK,
+              subRows: null,
+              trajectory: hydroTsMeTrajectory,
+            },
+            {
+              hypothesis: 'me.@water_values',
+              isDefault: false,
+              isDeletable: false,
+              status: TRAJECTORY_SELECTION_STATUS.OK,
+              subRows: null,
+              trajectory: hydroWaterValuesMeTrajectory,
+            },
+          ],
+        },
+        {
+          hypothesis: 'studyDetails.@thermal',
+          isDefault: false,
+          isDeletable: false,
+          status: TRAJECTORY_SELECTION_STATUS.OK,
+          subRows: [],
+          trajectory: thermalCapacityMeTrajectory,
+        },
+        {
+          hypothesis: 'me.@efficiency',
+          isDefault: false,
+          isDeletable: false,
+          status: TRAJECTORY_SELECTION_STATUS.OK,
+          subRows: [],
+          trajectory: efficiencyMeTrajectory,
+        },
+        {
+          hypothesis: 'me.@constraints',
+          isDefault: false,
+          isDeletable: false,
+          status: TRAJECTORY_SELECTION_STATUS.OK,
+          subRows: [],
+          trajectory: constraintMeTrajectory,
+        },
+      ]);
     });
   });
 });

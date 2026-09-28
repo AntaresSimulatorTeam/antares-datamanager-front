@@ -119,6 +119,7 @@
     "@links": "Liens",
     "@link": "Lien",
     "@areas_links": "Zones & Liens",
+    "@perimeter_configuration": "Périmètre & configuration",
     "@configuration": "Configuration",
     "@load": "Consommation",
     "@thermal": "Central thermique",
@@ -212,6 +213,13 @@
   "p2g": {
     "@capacity": "Capacity",
     "@modulation": "Market bid modulation"
+  },
+  "me": {
+    "@storage": "Storage (STS)",
+    "@reservoir_levels": "Reservoir levels",
+    "@water_values": "Water values",
+    "@efficiency": "Efficiency",
+    "@constraints": "Constraints"
   },
   "trajectoryViewModal": {
     "@title_area": "Zones",
