@@ -336,7 +336,7 @@ describe('getStudyMenu', () => {
     expect(result[0]).toEqual({
       id: TRAJECTORY_TYPE.AREA,
       panelId: TRAJECTORY_TYPE.AREA,
-      label: 'translated:studyDetails.@areas_links',
+      label: 'translated:studyDetails.@perimeter_configuration',
       icon: 'linked-services',
       disabled: false,
       badgeContent: 'number',

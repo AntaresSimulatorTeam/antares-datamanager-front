@@ -1198,6 +1198,174 @@ describe('uploadTrajectory', () => {
       );
     });
   });
+
+  it('should import HYDRO_TIME_SERIES_ME trajectory without technology into data base', async () => {
+    await uploadTrajectory(
+      '2030-2031',
+      87,
+      TRAJECTORY_TYPE.HYDRO_TIME_SERIES_ME,
+      'hydro_ts_me_traj',
+      '',
+      onProgress,
+      false,
+    );
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/trajectory/hydro-ts-me?trajectoryToUse=hydro_ts_me_traj&horizon=2030-2031&studyId=87&isCivilYear=false',
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
+
+  it('should import HYDRO_PARAMETERS_ME trajectory without technology into data base', async () => {
+    await uploadTrajectory(
+      '2030-2031',
+      87,
+      TRAJECTORY_TYPE.HYDRO_PARAMETERS_ME,
+      'hydro_params_me_traj',
+      '',
+      onProgress,
+      false,
+    );
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/trajectory/hydro-parameters-me?trajectoryToUse=hydro_params_me_traj&horizon=2030-2031&studyId=87&isCivilYear=false',
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
+
+  it('should import HYDRO_CAPACITY_ME trajectory without technology into data base', async () => {
+    await uploadTrajectory(
+      '2030-2031',
+      87,
+      TRAJECTORY_TYPE.HYDRO_CAPACITY_ME,
+      'hydro_cap_me_traj',
+      '',
+      onProgress,
+      false,
+    );
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/trajectory/hydro-capacity-me?trajectoryToUse=hydro_cap_me_traj&horizon=2030-2031&studyId=87&isCivilYear=false',
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
+
+  it('should import LOAD_ME trajectory without technology into data base', async () => {
+    await uploadTrajectory(
+      '2030-2031',
+      87,
+      TRAJECTORY_TYPE.LOAD_ME,
+      'load_me_traj',
+      '',
+      onProgress,
+      false,
+    );
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/trajectory/load-me?trajectoryToUse=load_me_traj&horizon=2030-2031&studyId=87&isCivilYear=false',
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
+
+  it('should import STS_ME trajectory without technology into data base', async () => {
+    await uploadTrajectory(
+      '2030-2031',
+      87,
+      TRAJECTORY_TYPE.STS_ME,
+      'sts_me_traj',
+      '',
+      onProgress,
+      false,
+    );
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/trajectory/st-storage-me?trajectoryToUse=sts_me_traj&horizon=2030-2031&studyId=87&isCivilYear=false',
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
+
+  it('should import THERMAL_CAPACITY_ME trajectory without technology into data base', async () => {
+    await uploadTrajectory(
+      '2030-2031',
+      87,
+      TRAJECTORY_TYPE.THERMAL_CAPACITY_ME,
+      'thermal_cap_me_traj',
+      '',
+      onProgress,
+      false,
+    );
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/trajectory/thermal-me?trajectoryToUse=thermal_cap_me_traj&horizon=2030-2031&studyId=87&isCivilYear=false',
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
+
+  it('should import EFFICIENCY_ME trajectory without technology into data base', async () => {
+    await uploadTrajectory(
+      '2030-2031',
+      87,
+      TRAJECTORY_TYPE.EFFICIENCY_ME,
+      'efficiency_me_traj',
+      '',
+      onProgress,
+      false,
+    );
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/trajectory/efficiency-me?trajectoryToUse=efficiency_me_traj&horizon=2030-2031&studyId=87&isCivilYear=false',
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
+
+  it('should import CONSTRAINT_ME trajectory without technology into data base', async () => {
+    await uploadTrajectory(
+      '2030-2031',
+      87,
+      TRAJECTORY_TYPE.CONSTRAINT_ME,
+      'constraint_me_traj',
+      '',
+      onProgress,
+      false,
+    );
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/trajectory/constraint-me?trajectoryToUse=constraint_me_traj&horizon=2030-2031&studyId=87&isCivilYear=false',
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
 });
 
 describe('isParamModulationRequired', () => {

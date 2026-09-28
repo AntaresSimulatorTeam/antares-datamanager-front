@@ -120,6 +120,7 @@
     "@links": "Links",
     "@link": "Link",
     "@areas_links": "Areas & Links",
+    "@perimeter_configuration": "Perimeter & Configuration",
     "@configuration": "Configuration",
     "@load": "Load",
     "@thermal": "Thermal",

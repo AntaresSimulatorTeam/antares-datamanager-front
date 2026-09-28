@@ -37,8 +37,10 @@ import {
   TRAJECTORY_ENDPOINT,
   TRAJECTORY_FLOWBASED,
   TRAJECTORY_HYDRO_CAPACITY_ME,
+  TRAJECTORY_HYDRO_PARAMETERS_ME,
   TRAJECTORY_HYDRO_SERIES,
   TRAJECTORY_HYDRO_TECHNICAL_PARAMETERS,
+  TRAJECTORY_HYDRO_TS_ME,
   TRAJECTORY_LOAD_ME,
   TRAJECTORY_MISC_INSTALLED_POWER,
   TRAJECTORY_MISC_LOAD_FACTOR,
@@ -626,7 +628,7 @@ export const getStudyMenu = (t: (value: string) => string, isTrajectoryAreaLinke
   {
     id: TRAJECTORY_TYPE.AREA,
     panelId: TRAJECTORY_TYPE.AREA,
-    label: t('studyDetails.@areas_links'),
+    label: t('studyDetails.@perimeter_configuration'),
     icon: 'linked-services',
     disabled: false,
     badgeType: 'brand',
@@ -1417,6 +1419,10 @@ const getOtherMEEndPointType = (type: TRAJECTORY_TYPE) => {
       return TRAJECTORY_STS_ME;
     case TRAJECTORY_TYPE.HYDRO_CAPACITY_ME:
       return TRAJECTORY_HYDRO_CAPACITY_ME;
+    case TRAJECTORY_TYPE.HYDRO_TIME_SERIES_ME:
+      return TRAJECTORY_HYDRO_TS_ME;
+    case TRAJECTORY_TYPE.HYDRO_PARAMETERS_ME:
+      return TRAJECTORY_HYDRO_PARAMETERS_ME;
     case TRAJECTORY_TYPE.EFFICIENCY_ME:
       return TRAJECTORY_EFFICIENCY_ME;
     case TRAJECTORY_TYPE.CONSTRAINT_ME:
@@ -1474,7 +1480,7 @@ export const isEmptyRow = (
   t: TFunction<'translation', undefined>,
 ) =>
   hypothesis === t('thermal.@specific') ||
-  hypothesis === t('thermal.@time_series') ||
+  hypothesis === t('thermal.@time_series') && rowDepth === 0 ||
   hypothesis === t('settings.@title') ||
   hypothesis === t('studyDetails.@hydro') ||
   type === TRAJECTORY_TYPE.HYDRO_ME ||

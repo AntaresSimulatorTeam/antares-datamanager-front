@@ -33,6 +33,7 @@ import { filterRow, mergeRows } from '@/shared/utils/trajectoryUtils.ts';
 import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
 import {
   AREA_LINK_ME_TYPES,
+  HYDRO_ME_TYPES,
   HYDRO_PSP_TYPES,
   HYDRO_TYPES,
   NUCLEAR_FR_TIME_NON_SERIES_TYPES,
@@ -184,7 +185,7 @@ export const useFetchHypothesisTrajectories = (
             trajectoriesByType: rawResults,
             t,
             rowTypes: [{types: [...AREA_LINK_ME_TYPES, TRAJECTORY_TYPE.LOAD_ME, TRAJECTORY_TYPE.STS_ME], isEmpty: false},
-            {types: [TRAJECTORY_TYPE.HYDRO_ME], isEmpty: true, subRowTypes: [TRAJECTORY_TYPE.HYDRO_CAPACITY_ME]},
+            {types: [TRAJECTORY_TYPE.HYDRO_ME], isEmpty: true, subRowTypes: HYDRO_ME_TYPES},
             {types: THERMAL_ME_TYPES, isEmpty: false}]
           });
 

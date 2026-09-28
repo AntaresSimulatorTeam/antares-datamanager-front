@@ -119,6 +119,7 @@
     "@links": "Liens",
     "@link": "Lien",
     "@areas_links": "Zones & Liens",
+    "@perimeter_configuration": "Périmètre & configuration",
     "@configuration": "Configuration",
     "@load": "Consommation",
     "@thermal": "Central thermique",
