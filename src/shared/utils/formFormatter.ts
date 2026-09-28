@@ -27,7 +27,11 @@ export const isRepositoryTrajectory = (type: TRAJECTORY_TYPE, isDefaultArea = fa
   type === TRAJECTORY_TYPE.ADEQUACY_PATCH ||
   type === TRAJECTORY_TYPE.FLOWBASED ||
   type === TRAJECTORY_TYPE.P2G_CAPACITY_COST ||
-  type === TRAJECTORY_TYPE.P2G_MARKET_MODULATION;
+  type === TRAJECTORY_TYPE.P2G_MARKET_MODULATION ||
+  type === TRAJECTORY_TYPE.HYDRO_RESERVOIR_LEVELS_ME ||
+  type === TRAJECTORY_TYPE.HYDRO_PARAMETERS_ME ||
+  type === TRAJECTORY_TYPE.HYDRO_TIME_SERIES_ME ||
+  type === TRAJECTORY_TYPE.HYDRO_WATER_VALUES_ME;
 
 export const convertToFSSelectionOptionType = (options: FsTrajectory[], isDefaultArea = false): DropdownItemOption[] =>
   options.map((option, indexTrajectory) => {

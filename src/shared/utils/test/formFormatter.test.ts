@@ -96,6 +96,15 @@ describe('isRepositoryTrajectory', () => {
   it('should return false for TRAJECTORY_TYPE THERMAL_TECHNICAL_MODULATION_PARAMETER', () => {
     expect(isRepositoryTrajectory(TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER)).toBeTruthy();
   });
+  it('should return false for TRAJECTORY_TYPE THERMAL_TECHNICAL_MODULATION_PARAMETER', () => {
+    expect(isRepositoryTrajectory(TRAJECTORY_TYPE.MISC_LOAD)).toBeTruthy();
+  });
+  it('should return false for TRAJECTORY_TYPE THERMAL_TECHNICAL_MODULATION_PARAMETER', () => {
+    expect(isRepositoryTrajectory(TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION)).toBeTruthy();
+  });
+  it('should return false for TRAJECTORY_TYPE THERMAL_TECHNICAL_MODULATION_PARAMETER', () => {
+    expect(isRepositoryTrajectory(TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM)).toBeTruthy();
+  });
 });
 
 describe('getMETypeToUse', () => {
