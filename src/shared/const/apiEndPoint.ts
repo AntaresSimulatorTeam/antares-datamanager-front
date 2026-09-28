@@ -62,7 +62,7 @@ export const TRAJECTORY_NUCLEAR_TS_SMR = `${BACK_END_BASE_URL}/v1/trajectory/nuc
 export const TRAJECTORY_ADEQUACY_PATCH = `${BACK_END_BASE_URL}/v1/trajectory/adequacy-patch`;
 export const TRAJECTORY_FLOWBASED = `${BACK_END_BASE_URL}/v1/trajectory/flowbased`;
 export const TRAJECTORY_SETTINGS = `${BACK_END_BASE_URL}/v1/trajectory/settings`;
-export const TRAJECTORY_SCENARIO_BUILDER = `${BACK_END_BASE_URL}/v1/trajectory/scenarioBuilder`;
+export const TRAJECTORY_SCENARIO_BUILDER = `${BACK_END_BASE_URL}/v1/trajectory/scenario-builder`;
 export const TRAJECTORY_P2G_CAPACITY_COST = `${BACK_END_BASE_URL}/v1/trajectory/capacity-cost-p2g`;
 export const TRAJECTORY_P2G_MARKET_MODULATION = `${BACK_END_BASE_URL}/v1/trajectory/modulation-p2g`;
 export const TRAJECTORY_LOAD_ME = `${BACK_END_BASE_URL}/v1/trajectory/load-me`;
@@ -72,6 +72,8 @@ export const TRAJECTORY_CONSTRAINT_ME = `${BACK_END_BASE_URL}/v1/trajectory/cons
 export const TRAJECTORY_HYDRO_CAPACITY_ME = `${BACK_END_BASE_URL}/v1/trajectory/hydro-capacity-me`;
 export const TRAJECTORY_HYDRO_TS_ME = `${BACK_END_BASE_URL}/v1/trajectory/hydro-ts-me`;
 export const TRAJECTORY_HYDRO_PARAMETERS_ME = `${BACK_END_BASE_URL}/v1/trajectory/hydro-parameters-me`;
+export const TRAJECTORY_HYDRO_RESERVOIR_LEVELS_ME = `${BACK_END_BASE_URL}/v1/trajectory/hydro-reservoir-levels-me`;
+export const TRAJECTORY_HYDRO_WATER_VALUES_ME = `${BACK_END_BASE_URL}/v1/trajectory/hydro-water-values-me`;
 export const TRAJECTORY_THERMAL_CAPACITY_ME = `${BACK_END_BASE_URL}/v1/trajectory/thermal-me`;
 
 //ABOUT
