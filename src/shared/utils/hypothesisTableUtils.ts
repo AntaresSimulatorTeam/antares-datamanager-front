@@ -8,7 +8,7 @@ import {
   TrajectorySTSDataScheme,
 } from '@/shared/types';
 import { Row } from '@tanstack/react-table';
-import { OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
+import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 
 /**
@@ -112,7 +112,7 @@ export const simulateProgress = async (duration: number, onProgress?: (value: nu
  * @returns {CheckBoxData[]} An array of objects representing the combined area options. Each object contains the area's name and an `isDefault` property indicating its default status.
  */
 export const buildAreaOptions = (
-  trajectoryAreas: TrajectoryAreaData[],
+  trajectoryAreas?: TrajectoryAreaData[],
   defaultAreas?: { name: string }[],
 ): CheckBoxData[] => {
   const newArea: CheckBoxData[] = (trajectoryAreas || [])
@@ -138,11 +138,11 @@ export const buildAreaOptions = (
  *     and excluding duplicates from the trajectory areas.
  */
 export const buildCheckValuesList = (
-  areaWithTrajectory: DbTrajectory[],
+  areaWithTrajectory?: DbTrajectory[],
   defaultAreas?: { name: string }[],
 ): string[] => {
   const areasValuesChecked: string[] = (areaWithTrajectory ?? [])
-    .filter((trajectoryArea) => !defaultAreas?.some((item) => item.name === trajectoryArea.area))
+    .filter((trajectoryArea) => ![...(defaultAreas) ?? [], {name: OTHER_AREAS}]?.some((item) => item.name === trajectoryArea.area))
     .map((trajectory) => trajectory.area);
   const defaultCheckedValues = (defaultAreas ?? []).map((item) => item.name);
 
@@ -168,8 +168,8 @@ export const buildCheckValuesList = (
  * - `checkedValues`: A list of names representing the pre-selected areas in the checklist configuration.
  */
 export const buildCheckListBox = (
-  areaWithTrajectory: DbTrajectory[],
-  trajectoryAreas: TrajectoryAreaData[],
+  areaWithTrajectory?: DbTrajectory[],
+  trajectoryAreas?: TrajectoryAreaData[],
   defaultAreas?: { name: string }[],
 ): { areaOptions: CheckBoxData[]; checkedValues: string[] } => {
   const areaOptions: CheckBoxData[] = buildAreaOptions(trajectoryAreas, defaultAreas);

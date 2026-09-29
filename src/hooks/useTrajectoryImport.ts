@@ -67,10 +67,11 @@ export const useTrajectoryImport = (
             type,
             indexArray,
             { id: Number(value?.id), label: value?.label ?? '' },
-            hypothesis?.technology ?? hypothesis?.area ?? '',
+            hypothesis?.area ?? '',
             user?.profile?.sub ?? '',
             setData,
             { message, content: error.antaresErrorMessage },
+            hypothesis?.technology ?? ''
           );
         }
       }

@@ -595,6 +595,18 @@ export const mockEmptyDbTrajectoryLoadOthers: DbTrajectory = {
   hasTimeSeries: false,
 };
 
+export const mockEmptyDbTrajectorySTSOthers: DbTrajectory = {
+  id: 1,
+  trajectoryName: '',
+  type: TRAJECTORY_TYPE.STS,
+  version: 0,
+  userName: 'mouad',
+  creationDate: '2024-07-22 15:13:56.860045' as unknown as Date,
+  area: 'OTHERS',
+  technology: 'Battery',
+  hasTimeSeries: false,
+};
+
 export const mockEmptyDbTrajectoryLoadFR: DbTrajectory = {
   id: 1,
   trajectoryName: '',

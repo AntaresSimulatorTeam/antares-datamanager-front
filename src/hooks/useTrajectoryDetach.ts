@@ -59,7 +59,7 @@ export const useTrajectoryDetach = (
         }
 
         // 3. Mise à jour du store
-        if (trajectoryToDelete) {
+        if (trajectoryToDelete && status !== 'emptyError') {
           if (trajectoryToDelete.type === TRAJECTORY_TYPE.AREA) {
             dispatch?.({
               type: STUDY_ACTION.CLEAR_TRAJECTORY_BY_TYPE,
@@ -150,6 +150,7 @@ export const useTrajectoryDetach = (
             user?.profile?.sub ?? '',
             setData,
             { message, content: (error as Error)?.message },
+            trajectoryToDelete?.technology
           );
         }
       }

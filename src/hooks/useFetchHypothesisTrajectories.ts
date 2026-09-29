@@ -6,7 +6,10 @@ import {
   HypothesisTableResults,
   isTrajectoryHydroPSPType,
   isTrajectoryHydroType,
+  isTrajectoryMEType,
   isTrajectoryNuclearType,
+  isTrajectoryOtherVectorType,
+  isTrajectoryP2GType,
   TechnologyType,
   TrajectoryAreaData,
 } from '@/shared/types';
@@ -29,21 +32,25 @@ import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { filterRow, mergeRows } from '@/shared/utils/trajectoryUtils.ts';
 import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
 import {
+  AREA_LINK_ME_TYPES,
+  HYDRO_ME_TYPES,
   HYDRO_PSP_TYPES,
   HYDRO_TYPES,
   NUCLEAR_FR_TIME_NON_SERIES_TYPES,
   NUCLEAR_FR_TIME_SERIES_TYPES,
+  P2G_TYPES,
+  THERMAL_ME_TYPES,
 } from '@/shared/const/trajectoryTypes.ts';
 import { HydroSubRows } from '@/mocks/data/list/names.ts';
 import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
 
 export const useFetchHypothesisTrajectories = (
   trajectoryTypes: TRAJECTORY_TYPE[],
-  areas: TrajectoryAreaData[],
-  defaultAreas: { name: string }[],
   studyId: number,
   studyStatus: StudyStatus,
   studyContextStatus?: StudyStatus,
+  defaultAreas?: { name: string }[],
+  areas?: TrajectoryAreaData[],
 ) => {
   const [hypothesisTrajectories, setHypothesisTrajectories] = useState<
     Record<TRAJECTORY_TYPE, HypothesisRowData[] | undefined> | undefined
@@ -79,7 +86,7 @@ export const useFetchHypothesisTrajectories = (
     return trajectoryTypes.reduce<Record<TRAJECTORY_TYPE, DbTrajectory[]>>(
       (acc, type) => {
         const trajectories = studyStateRef.current?.[type]?.trajectories ?? [];
-        acc[type] = trajectories.filter((trajectory) => (trajectory?.trajectoryName?.length ?? 0) < 1);
+        acc[type] = trajectories.filter((trajectory: DbTrajectory) => (trajectory?.trajectoryName?.length ?? 0) < 1);
         return acc;
       },
       {} as Record<TRAJECTORY_TYPE, DbTrajectory[]>,
@@ -129,10 +136,9 @@ export const useFetchHypothesisTrajectories = (
         let results: HypothesisTableResults[] = [];
         if (isTrajectoryNuclearType(trajTypes[0])) {
           const nuclearRows = buildRowsByType({
-            rowTypes: NUCLEAR_FR_TIME_NON_SERIES_TYPES,
-            subRowTypes: NUCLEAR_FR_TIME_SERIES_TYPES,
             trajectoriesByType: rawResults,
             t,
+            rowTypes: [{types: NUCLEAR_FR_TIME_NON_SERIES_TYPES, isEmpty: false}, {types: [TRAJECTORY_TYPE.NUCLEAR_FR_TS_SERIES], isEmpty: true, subRowTypes: NUCLEAR_FR_TIME_SERIES_TYPES}]
           });
 
           const nuclearReadOnlyMap = buildReadOnlyMap({
@@ -153,13 +159,57 @@ export const useFetchHypothesisTrajectories = (
               return [];
             }
           });
+        } else if (isTrajectoryP2GType(trajTypes[0])) {
+          const otherVectorRows = buildRowsByType({
+            trajectoriesByType: rawResults,
+            t,
+            rowTypes: [{types: P2G_TYPES, isEmpty: false}],
+          });
+
+          const otherVectorReadOnlyMap = buildReadOnlyMap({
+            rows: otherVectorRows,
+            trajType: trajectoryTypes[0],
+            isStudyGenerated,
+            defaultAreaListNotInList,
+          });
+
+          results = [{
+            trajectories: rawResults.flatMap(result => result.trajectories?.filter(traj => !traj.area)),
+            rows: otherVectorRows,
+            readOnlyMap: otherVectorReadOnlyMap,
+            trajType: TRAJECTORY_TYPE.P2G,
+          }];
+
+        } else if (isTrajectoryMEType(trajTypes[0])) {
+          const meRows = buildRowsByType({
+            trajectoriesByType: rawResults,
+            t,
+            rowTypes: [{types: [...AREA_LINK_ME_TYPES, TRAJECTORY_TYPE.LOAD_ME, TRAJECTORY_TYPE.STS_ME], isEmpty: false},
+            {types: [TRAJECTORY_TYPE.HYDRO_ME], isEmpty: true, subRowTypes: HYDRO_ME_TYPES},
+            {types: THERMAL_ME_TYPES, isEmpty: false}]
+          });
+
+          const meReadOnlyMap = buildReadOnlyMap({
+            rows: meRows,
+            trajType: trajectoryTypes[0],
+            isStudyGenerated,
+            defaultAreaListNotInList,
+          });
+
+          results = [{
+            trajectories: rawResults.flatMap(result => result.trajectories?.filter(traj => !traj.area)),
+            rows: meRows,
+            readOnlyMap: meReadOnlyMap,
+            trajType: TRAJECTORY_TYPE.ME,
+          }];
+
         } else if (isTrajectoryHydroType(trajTypes[0])) {
           const effectiveTrajectories = rawResults.flatMap((result) =>
             result.shouldSkipFetch ? result.contextTrajectories : result.trajectories,
           );
 
-          const allowedAreas = [...areas.map(area => area.areaName), ...defaultAreas.map(area => area.name), OTHER_AREAS];
-          const areasWithTrajectory = effectiveTrajectories.flatMap((traj) => (traj.area?.length > 0 && allowedAreas.includes(traj.area) ? traj : []));
+          const allowedAreas = new Set([...(areas ?? []).map(area => area.areaName), ...(defaultAreas ?? []).map(area => area.name), OTHER_AREAS]);
+          const areasWithTrajectory = effectiveTrajectories.flatMap((traj) => (traj?.area?.length && allowedAreas.has(traj?.area) ? traj : []));
           const hydroTypes = hydroTypeToSet === TRAJECTORY_TYPE.HYDRO_SERIES ? HYDRO_TYPES : HYDRO_PSP_TYPES;
 
           const allHydroRows = hydroTypes.flatMap((type) =>
@@ -181,8 +231,8 @@ export const useFetchHypothesisTrajectories = (
             isStudyGenerated,
             defaultAreaListNotInList,
           });
-          const areasWithTrajectoryOK = areasWithTrajectory.filter(trajectory => trajectory.trajectoryName?.length > 0);
-          const { areaOptions, checkedValues } = buildCheckListBox(areasWithTrajectoryOK, areas, defaultAreas);
+
+          const { areaOptions, checkedValues } = buildCheckListBox(areasWithTrajectory, areas, defaultAreas);
 
           results = rawResults.flatMap((result) => {
             if (result.trajType === hydroTypeToSet) {
@@ -205,13 +255,12 @@ export const useFetchHypothesisTrajectories = (
             const { trajType, trajectories, dsrCmResult, technologies, shouldSkipFetch, contextTrajectories } = res;
 
             const effectiveTrajectories = shouldSkipFetch ? contextTrajectories : trajectories;
-            const areasWithTrajectory = effectiveTrajectories.flatMap((traj) => (traj.area?.length > 0 ? traj : []));
-            const areasWithTrajectoryOK = areasWithTrajectory.filter(trajectory => trajectory.trajectoryName?.length > 0);
-            const list = buildCheckListBox(areasWithTrajectoryOK, areas, defaultAreas);
+            const areasWithTrajectory = effectiveTrajectories?.flatMap((traj) => (traj.area?.length > 0 ? traj : []));
+            const list = buildCheckListBox(areasWithTrajectory, areas, defaultAreas);
 
             const rows = buildHypothesisRows({
               trajType,
-              trajectories: effectiveTrajectories,
+              trajectories: effectiveTrajectories ?? [],
               defaultAreas,
               areas,
               technologies: technologies?.map((technology) => technology.label) ?? [],
@@ -279,7 +328,7 @@ export const useFetchHypothesisTrajectories = (
           return next as Record<TRAJECTORY_TYPE, TechnologyType[]>;
         });
 
-        if (!isTrajectoryNuclearType(trajTypes[0])) {
+        if (!isTrajectoryNuclearType(trajTypes[0]) && !isTrajectoryOtherVectorType(trajTypes[0])) {
           setAreasTrajectoryOptions(
             results.reduce<Record<TRAJECTORY_TYPE, CheckBoxData[]>>(
               (acc, r) => {

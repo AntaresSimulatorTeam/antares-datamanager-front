@@ -11,27 +11,27 @@ import { getItemsMenu } from '@/shared/utils/trajectoryUtils.ts';
 
 export const TabMenu = ({ studyData, defaultAreas, type, areas }: MenuProps) => {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState<TRAJECTORY_TYPE>(type);
+  const [activeTab, setActiveTab] = useState<TRAJECTORY_TYPE>(type === TRAJECTORY_TYPE.OTHER_VECTOR ? TRAJECTORY_TYPE.P2G : type);
   const tabs = useMemo(() => getItemsMenu(type, t, defaultAreas), [type, t, defaultAreas]);
 
   const renderActiveComponent = useCallback(
-    (tab: TRAJECTORY_TYPE) => {
-      if (tab === TRAJECTORY_TYPE.THERMAL_PARAMETER)
+    (trajectoryType: TRAJECTORY_TYPE) => {
+      if (trajectoryType === TRAJECTORY_TYPE.THERMAL_PARAMETER)
         return (
           <ParametersTab
-            key={`${tab}-parameters-tab`}
+            key={`${trajectoryType}-parameters-tab`}
             studyData={studyData}
             defaultAreas={defaultAreas}
             areas={areas}
           />
         );
 
-      if (tab === TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION)
+      if (trajectoryType === TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION)
         return (
           <ResDistributionTab
-            key={`${tab}-distribution-tab`}
+            key={`${trajectoryType}-distribution-tab`}
             studyData={studyData}
-            types={EXPANDABLE_TYPES_MAP[tab] ?? [tab]}
+            types={EXPANDABLE_TYPES_MAP[trajectoryType] ?? [trajectoryType]}
             defaultAreas={defaultAreas}
             areas={areas}
           />
@@ -39,16 +39,16 @@ export const TabMenu = ({ studyData, defaultAreas, type, areas }: MenuProps) => 
 
       return (
         <ExpandableTab
-          key={`${tab}-expandable-tab`}
-          tabType={tab}
+          key={`${trajectoryType}-expandable-tab`}
+          tabType={trajectoryType}
           studyData={studyData}
-          types={EXPANDABLE_TYPES_MAP[tab] ?? [tab]}
+          types={EXPANDABLE_TYPES_MAP[trajectoryType] ?? [trajectoryType]}
           defaultAreas={defaultAreas}
           areas={areas}
         />
       );
     },
-    [studyData],
+    [areas, defaultAreas, studyData],
   );
 
   return (

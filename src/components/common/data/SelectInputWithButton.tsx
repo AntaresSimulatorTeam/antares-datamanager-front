@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
-import { Button } from '@design-system-rte/react';
 import SelectAndSearchableInput from '@/components/input/SelectAndSearchableInput.tsx';
 import { DropdownItemOption } from '@/shared/types';
+import { Button } from '@design-system-rte/react';
 
 interface SelectInputWithButtonProps {
   onSelect: (value: DropdownItemOption) => void;
@@ -21,15 +21,15 @@ export const SelectInputWithButton = ({
   const { t } = useTranslation();
 
   return (
-    <div className="flex w-[400px] items-center justify-start gap-2">
-      <SelectAndSearchableInput
-        onSelect={(value: DropdownItemOption) => void onSelect(value)}
-        setSearchTerm={async (value?: string) => await onSearch(value)}
-        defaultPlaceHolder={isDisabled ? '' : placeHolder || t('studyDetails.@select_trajectory')}
-        isSearchable={true}
-        isInputDisabled={isDisabled}
-        dropdownWidth={250}
-      />
+    <div className="flex items-center justify-start gap-2">
+        <SelectAndSearchableInput
+          onSelect={(value: DropdownItemOption) => void onSelect(value)}
+          setSearchTerm={async (value?: string) => await onSearch(value)}
+          defaultPlaceHolder={isDisabled ? '' : placeHolder || t('studyDetails.@select_trajectory')}
+          isSearchable={true}
+          isInputDisabled={isDisabled}
+          dropdownWidth={35}
+        />
       <span>{t('studyDetails.@or')}</span>
       <Button
         label={t('studyDetails.@import_file')}

@@ -5,7 +5,5 @@ type TableDataCellProps<TData> = {
 };
 
 export const TableDataCell = <TData,>({ cell }: TableDataCellProps<TData>) => (
-  <td className="text-left">
-    <div className="px-1">{flexRender(cell.column.columnDef.cell, cell.getContext())}</div>
-  </td>
+  <td className="text-left">{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
 );

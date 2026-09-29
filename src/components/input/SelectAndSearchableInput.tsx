@@ -102,16 +102,20 @@ const SelectAndSearchableInput = ({
     [isDropdownOpen, setSearchTerm],
   );
 
+  const containerWidthStyle = dropdownWidth != null ? `${dropdownWidth}ch` : '100%';
+
   return (
-    <div className="relative w-full">
+    <div
+      className="relative w-full text-body-m"
+      style={{ width: containerWidthStyle}}
+    >
       <Dropdown
         dropdownId="card-options"
         onClose={() => setIsDropdownOpen(false)}
-        style={{width: dropdownWidth != null ? `${dropdownWidth}px` : '250px'}}
-        hasMaxWidth={!dropdownWidth}
+        style={{minWidth: containerWidthStyle, textAlign: 'left' }}
         maxHeight={400}
         trigger={
-          <div className="flex">
+          <>
             <TextInput
               id="text-input-select"
               label={label ?? ''}
@@ -140,12 +144,18 @@ const SelectAndSearchableInput = ({
                 />
               )}
             </div>
-          </div>
+          </>
         }
         isOpen={isDropdownOpen}
         autofocus={false}
       >
-        {optionsSelection?.map(option => (<DropdownItem key={option.label} {...option} onClick={() => handleSelectOption(option)}/>))}
+        {optionsSelection?.map((option) => (
+          <DropdownItem
+            key={option.label}
+            {...option}
+            onClick={() => handleSelectOption(option)}
+          />
+        ))}
       </Dropdown>
       {errorMessage && <div className="text-red-500 mt-2">{errorMessage}</div>}
     </div>

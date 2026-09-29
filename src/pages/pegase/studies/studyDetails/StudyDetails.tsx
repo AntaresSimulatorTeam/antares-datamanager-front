@@ -86,7 +86,6 @@ const StudyDetails = () => {
                   appearance="brand"
                   label={t('studyDetails.@generating')}
                   labelPosition="right"
-                  showLabel
                   size="medium"
                 />
               ) : (

@@ -67,24 +67,22 @@ export const ImportTrajectoryModal = ({
         <span className="mb-1 flex text-body-s text-gray-600">{t('studyDetails.@select_from', { path })}</span>
       )}
       <div className="flex h-full flex-col">
-          <div className="w-[400px]">
-            <SelectAndSearchableInput
-              options={optionsFS}
-              defaultPlaceHolder={
-                options?.length ? t('studyDetails.@select_trajectory') : t('studyDetails.@select_no_trajectory')
-              }
-              onSelect={setTrajectorySelected}
-              isSearchable={true}
-              setSearchTerm={async (value?: string) => {
-                const results = await handleFetchFromFS({ typeToUse, areaToUse, isDefaultArea, searchTerm: value });
-                setOptionsFS(results);
-                return results;
-              }}
-              resetField={() => setTrajectorySelected(null)}
-              isInputDisabled={!options?.length}
-              dropdownWidth={400}
-            />
-          </div>
+          <SelectAndSearchableInput
+            options={optionsFS}
+            defaultPlaceHolder={
+              options?.length ? t('studyDetails.@select_trajectory') : t('studyDetails.@select_no_trajectory')
+            }
+            onSelect={setTrajectorySelected}
+            isSearchable={true}
+            setSearchTerm={async (value?: string) => {
+              const results = await handleFetchFromFS({ typeToUse, areaToUse, isDefaultArea, searchTerm: value });
+              setOptionsFS(results);
+              return results;
+            }}
+            resetField={() => setTrajectorySelected(null)}
+            isInputDisabled={!options?.length}
+            dropdownWidth={35}
+          />
           {tabType === TRAJECTORY_TYPE.STS && (
             <div className="mt-1 flex items-center gap-1 text-body-s text-gray-600">
               <Icon name="info" size={15} />

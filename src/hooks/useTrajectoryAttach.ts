@@ -87,6 +87,7 @@ export const useTrajectoryAttach = (
               message,
               content: (error as Error).message,
             },
+            trajectory?.technology
           );
         }
       }

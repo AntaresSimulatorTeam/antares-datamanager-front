@@ -12,10 +12,25 @@ import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { TFunction } from 'i18next';
 import { StudyDTO } from '@/shared/types/Study.type.ts';
 import {
+  AREA_LINK_ME_TYPES,
+  CONFIGURATION_TYPES,
+  DSR_TYPES,
+  HYDRO_ME_TYPES,
   HYDRO_PSP_TYPES,
   HYDRO_TYPES,
+  ME_TYPES,
+  MISC_TYPES,
+  NO_AREA_TYPES,
   NUCLEAR_FR_MODULATION_TYPES,
   NUCLEAR_FR_TIME_SERIES_TYPES,
+  OTHER_ME_TYPES,
+  OTHER_VECTOR_TYPES,
+  P2G_TYPES,
+  RES_CAPACITY_TYPES,
+  RES_DISTRIBUTION_TYPES,
+  RES_TYPES,
+  THERMAL_TECHNICAL_PARAMETERS_TYPES,
+  THERMAL_TYPES,
 } from '@/shared/const/trajectoryTypes.ts';
 import { DropdownItemProps } from '@design-system-rte/core/components/dropdown/dropdown.interface';
 
@@ -76,8 +91,8 @@ export type ExpandedState = true | Record<string, boolean>;
 
 export interface TabProps {
   studyData: StudyDTO;
-  defaultAreas: { name: string }[];
-  areas: TrajectoryAreaData[];
+  defaultAreas?: { name: string }[];
+  areas?: TrajectoryAreaData[];
 }
 
 export type TableHeadersProps = {
@@ -107,19 +122,38 @@ export const isTrajectorySubrowsType = (value: unknown): value is TrajectoryWith
     TRAJECTORY_TYPE.HYDRO_PSP_SERIES,
   ].includes(value as TrajectoryWithSubRowsType);
 
-export const isTrajectoryResType = (value: unknown): value is TrajectoryWithSubRowsType =>
-  [
-    TRAJECTORY_TYPE.RES_CAPACITY,
-    TRAJECTORY_TYPE.RES_LOAD,
-    TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION,
-    TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION,
-  ].includes(value as TrajectoryWithSubRowsType);
+/**
+ * Determines if the provided type is classified as a technical parameter type
+ * within the thermal trajectory category.
+ *
+ * @returns {boolean} Returns true if the type matches any of the defined
+ * thermal technical parameter categories; otherwise, returns false.
+ * @param value
+ */
+export const isTrajectoryThermalTechnicalParametersType = (value: TRAJECTORY_TYPE): boolean => THERMAL_TECHNICAL_PARAMETERS_TYPES.includes(value);
+
+export const isTrajectoryThermalType = (value: TRAJECTORY_TYPE): boolean => THERMAL_TYPES.includes(value);
+
+export const isTrajectoryDSRType = (value: TRAJECTORY_TYPE): boolean => DSR_TYPES.includes(value);
+
+export const isTrajectoryMiscType = (value: TRAJECTORY_TYPE): boolean => MISC_TYPES.includes(value);
+
+export const isTrajectoryResCapacityType = (value: TRAJECTORY_TYPE): boolean => RES_CAPACITY_TYPES.includes(value);
+
+export const isTrajectoryResDistributionType =  (value: TRAJECTORY_TYPE): boolean => RES_DISTRIBUTION_TYPES.includes(value);
+
+export const isTrajectoryResType = (value: unknown): value is TrajectoryWithSubRowsType => RES_TYPES.includes(value as TrajectoryWithSubRowsType);
 
 export const isTrajectoryHydroType = (value: unknown): value is TrajectoryWithSubRowsType =>
   [...HYDRO_TYPES, ...HYDRO_PSP_TYPES].includes(value as TrajectoryWithSubRowsType);
 
+export const isTrajectoryHydroNonPSPType = (value: unknown): value is TrajectoryWithSubRowsType =>
+  HYDRO_TYPES.includes(
+    value as TrajectoryWithSubRowsType,
+  );
+
 export const isTrajectoryHydroPSPType = (value: unknown): value is TrajectoryWithSubRowsType =>
-  [TRAJECTORY_TYPE.HYDRO_PSP_SERIES, TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS].includes(
+  HYDRO_PSP_TYPES.includes(
     value as TrajectoryWithSubRowsType,
   );
 
@@ -127,22 +161,40 @@ export const isTrajectoryNuclearType = (value: TRAJECTORY_TYPE) => NUCLEAR_FR_MO
 
 export const isTrajectoryNuclearTSType = (value: TRAJECTORY_TYPE) => NUCLEAR_FR_TIME_SERIES_TYPES.includes(value);
 
+export const isTrajectoryOtherVectorType = (value: TRAJECTORY_TYPE) => OTHER_VECTOR_TYPES.includes(value);
+
+export const isTrajectoryP2GType = (value: TRAJECTORY_TYPE) => P2G_TYPES.includes(value);
+
+export const isTrajectoryAreaLinkMEType = (value: TRAJECTORY_TYPE) => AREA_LINK_ME_TYPES.includes(value);
+
+export const isTrajectoryOtherMEType = (value: TRAJECTORY_TYPE) => OTHER_ME_TYPES.includes(value);
+
+export const isTrajectoryMEType = (value: TRAJECTORY_TYPE) => ME_TYPES.includes(value);
+
+export const isTrajectoryMEHydroType = (value: TRAJECTORY_TYPE) => HYDRO_ME_TYPES.includes(value);
+
+export const isTrajectoryConfigurationType = (value: TRAJECTORY_TYPE) => CONFIGURATION_TYPES.includes(value);
+
+export const hasNoAreaType = (value?: TRAJECTORY_TYPE) => value ? NO_AREA_TYPES.includes(value) : false;
+
 export type TableOperationRow = 'empty' | 'remove';
 
 export interface MenuProps {
-  defaultAreas: { name: string }[];
+  defaultAreas?: { name: string }[];
   studyData: StudyDTO;
   type: TRAJECTORY_TYPE;
-  areas: TrajectoryAreaData[];
+  areas?: TrajectoryAreaData[];
 }
 
+export type TrajectoryType = TRAJECTORY_TYPE;
+
 export interface FetchResult {
-  trajType: TRAJECTORY_TYPE;
+  trajType: TrajectoryType;
   trajectories: DbTrajectory[];
-  dsrCmResult: DbTrajectory[] | null;
+  dsrCmResult?: DbTrajectory[] | null;
   technologies?: TechnologyType[] | null;
-  shouldSkipFetch: boolean;
-  contextTrajectories: DbTrajectory[];
+  shouldSkipFetch?: boolean;
+  contextTrajectories?: DbTrajectory[];
 }
 
 export interface HypothesisTableResults extends FetchResult {

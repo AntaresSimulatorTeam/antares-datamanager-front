@@ -30,7 +30,7 @@ import { fetchTrajectoriesFromTypes } from '@/shared/services/hypothesisTableSer
 import { isParamModulationRequired } from '@/shared/services/trajectoryService.ts';
 
 export const useFetchHypothesisParametersTrajectories = (
-  areas: TrajectoryAreaData[],
+  areas?: TrajectoryAreaData[],
   studyData?: StudyDTO,
   defaultAreas?: { name: string }[],
   isStudyGenerated?: boolean,

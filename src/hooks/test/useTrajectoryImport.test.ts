@@ -269,13 +269,14 @@ describe('useTrajectoryImport', () => {
       TRAJECTORY_TYPE.LOAD,
       [0],
       { id: 12, label: 'Trajectory A' },
-      'battery',
+      'FR',
       'user-123',
       mockSetData,
       {
         message: 'studyDetails.@notificationAlert',
         content: 'upload failed',
       },
+      'battery'
     );
   });
   it('should handle error and call handleTrajectoryError with no user name', async () => {
@@ -302,13 +303,14 @@ describe('useTrajectoryImport', () => {
       TRAJECTORY_TYPE.LOAD,
       [0],
       { id: 12, label: 'Trajectory A' },
-      'battery',
+      'FR',
       '',
       mockSetData,
       {
         message: 'studyDetails.@notificationAlert',
         content: 'upload failed',
       },
+      'battery'
     );
   });
 

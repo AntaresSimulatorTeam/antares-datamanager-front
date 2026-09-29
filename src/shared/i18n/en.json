@@ -120,6 +120,7 @@
     "@links": "Links",
     "@link": "Link",
     "@areas_links": "Areas & Links",
+    "@perimeter_configuration": "Perimeter & Configuration",
     "@configuration": "Configuration",
     "@load": "Load",
     "@thermal": "Thermal",
@@ -127,6 +128,7 @@
     "@misc": "Misc",
     "@sts": "STS",
     "@dsr": "DSR",
+    "@other_vector": "Other vector",
     "@trajectory": "Trajectory to use",
     "@select_trajectory": "Select a trajectory",
     "@select_no_trajectory": "No trajectory in the file system",
@@ -214,6 +216,21 @@
     "@scenarioBuilder": "Scenario builder",
     "@recalculate": "Recalculate",
     "@read": "Read"
+  },
+  "otherVector": {
+    "@p2g": "Power to Gas (P2G)",
+    "@me": "Multi Energy (ME)"
+  },
+  "p2g": {
+    "@capacity": "Capacity",
+    "@modulation": "Market bid modulation"
+  },
+  "me": {
+    "@storage": "Storage (STS)",
+    "@reservoir_levels": "Reservoir levels",
+    "@water_values": "Water values",
+    "@efficiency": "Efficiency",
+    "@constraints": "Constraints"
   },
   "trajectoryViewModal": {
     "@title_area": "Areas",

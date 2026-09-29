@@ -1,10 +1,23 @@
 import {
   DbTrajectory,
+  hasNoAreaType,
   HypothesisRowData,
+  isTrajectoryConfigurationType,
+  isTrajectoryDSRType,
+  isTrajectoryHydroNonPSPType,
+  isTrajectoryHydroPSPType,
   isTrajectoryHydroType,
+  isTrajectoryMEHydroType,
+  isTrajectoryMEType,
+  isTrajectoryMiscType,
   isTrajectoryNuclearTSType,
   isTrajectoryNuclearType,
+  isTrajectoryOtherMEType,
+  isTrajectoryP2GType,
+  isTrajectoryResCapacityType,
+  isTrajectoryResDistributionType,
   isTrajectoryResType,
+  isTrajectoryThermalType,
   RowStatus,
   TechnologyType,
 } from '@/shared/types';
@@ -14,15 +27,21 @@ import { FLOWBASED_MANDATORY_AREAS, OTHER_AREAS, OTHER_AREAS_LABEL } from '@/sha
 import { generateId } from '@/shared/utils/defaultUtils.ts';
 import { Row } from '@tanstack/react-table';
 import { TFunction } from 'i18next';
-import { normalizeTechnology, sentenceCase, snakeCase, snakeCaseUnderscore } from '@/shared/utils/textUtils.ts';
+import { normalizeTechnology, sentenceCase, snakeCaseUnderscore } from '@/shared/utils/textUtils.ts';
 import {
   TRAJECTORY_ADEQUACY_PATCH,
+  TRAJECTORY_CONSTRAINT_ME,
   TRAJECTORY_DSR_CAPACITY_MODULATION,
   TRAJECTORY_DSR_CLUSTER,
+  TRAJECTORY_EFFICIENCY_ME,
   TRAJECTORY_ENDPOINT,
   TRAJECTORY_FLOWBASED,
+  TRAJECTORY_HYDRO_CAPACITY_ME,
+  TRAJECTORY_HYDRO_PARAMETERS_ME,
   TRAJECTORY_HYDRO_SERIES,
   TRAJECTORY_HYDRO_TECHNICAL_PARAMETERS,
+  TRAJECTORY_HYDRO_TS_ME,
+  TRAJECTORY_LOAD_ME,
   TRAJECTORY_MISC_INSTALLED_POWER,
   TRAJECTORY_MISC_LOAD_FACTOR,
   TRAJECTORY_NUCLEAR_FR_MODULATION,
@@ -30,6 +49,8 @@ import {
   TRAJECTORY_NUCLEAR_TS_EPR,
   TRAJECTORY_NUCLEAR_TS_LT,
   TRAJECTORY_NUCLEAR_TS_SMR,
+  TRAJECTORY_P2G_CAPACITY_COST,
+  TRAJECTORY_P2G_MARKET_MODULATION,
   TRAJECTORY_RES_INSTALLED_POWER,
   TRAJECTORY_RES_LOAD_FACTOR,
   TRAJECTORY_RES_TECHNOLOGY_DISTRIBUTION,
@@ -37,6 +58,8 @@ import {
   TRAJECTORY_SCENARIO_BUILDER,
   TRAJECTORY_SETTINGS,
   TRAJECTORY_STS,
+  TRAJECTORY_STS_ME,
+  TRAJECTORY_THERMAL_CAPACITY_ME,
   TRAJECTORY_THERMAL_COMMON_PARAMETER_IMPORT,
   TRAJECTORY_THERMAL_COSTS_PARAMETER_IMPORT,
   TRAJECTORY_THERMAL_ECONOMIC_PARAMETER_IMPORT,
@@ -46,7 +69,12 @@ import {
 } from '@/shared/const/apiEndPoint.ts';
 import { HypothesisConfig, HypothesisType, SearchParams } from '@/shared/types/HypothesisTable.ts';
 import { TabItemProps } from '@design-system-rte/core/components/tab/tab.interface';
-import { getNuclearTrajectoryType } from '@/shared/utils/formFormatter.ts';
+import {
+  getConfigurationTypeToUse,
+  getHydroTypeToUse,
+  getMETypeToUse,
+  getNuclearTypeToUse,
+} from '@/shared/utils/formFormatter.ts';
 
 /**
  * Get trajectory status from row status
@@ -100,6 +128,7 @@ export const getDefaultLabel = (areaName: string): string => (areaName === OTHER
  * @param {string} trajectoryLabel
  * @param {string | null} userName
  * @param {string | null} area
+ * @param {string | undefined} technology
  */
 export const buildErrorTrajectory = (
   type: TRAJECTORY_TYPE,
@@ -107,10 +136,11 @@ export const buildErrorTrajectory = (
   trajectoryLabel: string,
   userName: string | null,
   area: string,
+  technology?: string
 ): DbTrajectory => ({
   id: trajectoryId,
   trajectoryName: trajectoryLabel,
-  technology: '',
+  technology: technology ?? '',
   type,
   version: 0,
   userName: userName ?? 'unknown_user',
@@ -411,10 +441,10 @@ export const convertIntoHypothesisRowWithTechnologies = (
  * @param {DbTrajectory[]} trajectories - An array of trajectory objects to be checked against the area.
  * @returns {boolean} Returns true if the area is linked to at least one trajectory with a matching area name and an empty technology field; otherwise, false.
  */
-export const isTrajectoryLinked = (area: { name: string }, trajectories: DbTrajectory[]): boolean =>
-  trajectories.some(
+export const isTrajectoryLinked = (area: { name: string }, trajectories?: DbTrajectory[]): boolean =>
+  trajectories?.some(
     (trajectory) => area.name === trajectory.area && (trajectory.technology === '' || trajectory.technology == null),
-  );
+  ) ?? false;
 
 /**
  * Function to build a default list of empty trajectories based on the provided trajectory type,
@@ -427,7 +457,7 @@ export const isTrajectoryLinked = (area: { name: string }, trajectories: DbTraje
  */
 export const buildDefaultEmptyTrajectoryList = (
   type: TRAJECTORY_TYPE,
-  trajectories: DbTrajectory[],
+  trajectories?: DbTrajectory[],
   defaultAreas?: { name: string }[],
 ): DbTrajectory[] => {
   const areaDefault = [...(Array.isArray(defaultAreas) && defaultAreas.length > 0 ? defaultAreas : [])];
@@ -437,7 +467,7 @@ export const buildDefaultEmptyTrajectoryList = (
 
   // Check if default areas (without technology) are not already linked to a trajectory
   const defaultAreasNotLinkedToTrajectory =
-    trajectories.length === 0 ? areaDefault : areaDefault.filter((area) => !isTrajectoryLinked(area, trajectories));
+    trajectories?.length === 0 ? areaDefault : areaDefault.filter((area) => !isTrajectoryLinked(area, trajectories));
   // Then build default empty areas
   return (defaultAreasNotLinkedToTrajectory || []).map((defaultArea) => buildEmptyTrajectory(defaultArea.name, type));
 };
@@ -598,7 +628,7 @@ export const getStudyMenu = (t: (value: string) => string, isTrajectoryAreaLinke
   {
     id: TRAJECTORY_TYPE.AREA,
     panelId: TRAJECTORY_TYPE.AREA,
-    label: t('studyDetails.@areas_links'),
+    label: t('studyDetails.@perimeter_configuration'),
     icon: 'linked-services',
     disabled: false,
     badgeType: 'brand',
@@ -675,7 +705,79 @@ export const getStudyMenu = (t: (value: string) => string, isTrajectoryAreaLinke
     badgeContent: 'number',
     showBadge: true,
   },
+  {
+    id: TRAJECTORY_TYPE.OTHER_VECTOR,
+    panelId: TRAJECTORY_TYPE.OTHER_VECTOR,
+    label: t('studyDetails.@other_vector'),
+    icon: 'bolt-alt-circle',
+    disabled: true,
+    badgeType: 'brand',
+    badgeContent: 'number',
+    showBadge: true,
+  },
 ];
+
+export const getItemsMenu = (
+  trajectoryType: TRAJECTORY_TYPE,
+  t: TFunction<'translation', undefined>,
+  defaultAreas?: { name: string }[],
+) => {
+  if (trajectoryType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
+    return [
+      {
+        id: TRAJECTORY_TYPE.THERMAL_CAPACITY,
+        panelId: TRAJECTORY_TYPE.THERMAL_CAPACITY,
+        label: t('misc.@installedPower'),
+      },
+      {
+        id: TRAJECTORY_TYPE.THERMAL_PARAMETER,
+        panelId: TRAJECTORY_TYPE.THERMAL_PARAMETER,
+        label: t('thermal.@parameters'),
+      },
+      {
+        id: TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION,
+        panelId: TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION,
+        label: t('thermal.@nuclearFR'),
+      },
+    ];
+  } else if (trajectoryType === TRAJECTORY_TYPE.HYDRO_SERIES) {
+    return [
+      { id: TRAJECTORY_TYPE.HYDRO_SERIES, panelId: TRAJECTORY_TYPE.HYDRO_SERIES, label: t('hydro.@capacity') },
+      {
+        id: TRAJECTORY_TYPE.HYDRO_PSP_SERIES,
+        panelId: TRAJECTORY_TYPE.HYDRO_PSP_SERIES,
+        label: t('hydro.@psp_virtual'),
+      },
+    ];
+  } else if (trajectoryType === TRAJECTORY_TYPE.OTHER_VECTOR) {
+    return [
+      { id: TRAJECTORY_TYPE.P2G, panelId: TRAJECTORY_TYPE.OTHER_VECTOR, label: t('otherVector.@p2g') },
+      {
+        id: TRAJECTORY_TYPE.ME,
+        panelId: TRAJECTORY_TYPE.OTHER_VECTOR,
+        label: t('otherVector.@me'),
+      },
+    ];
+  } else {
+    const itemsTab = [
+      { id: trajectoryType, panelId: trajectoryType, label: t('misc.@installedPower') },
+      {
+        id: trajectoryType === TRAJECTORY_TYPE.RES_CAPACITY ? TRAJECTORY_TYPE.RES_LOAD : TRAJECTORY_TYPE.MISC_LOAD,
+        panelId: trajectoryType === TRAJECTORY_TYPE.RES_CAPACITY ? TRAJECTORY_TYPE.RES_LOAD : TRAJECTORY_TYPE.MISC_LOAD,
+        label: t('misc.@loadFactor'),
+      },
+    ];
+    if (trajectoryType === TRAJECTORY_TYPE.RES_CAPACITY) {
+      !!defaultAreas?.length &&
+      itemsTab.push({
+        id: TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION,
+        panelId: TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION,
+        label: t('res.@distribution'),
+      });
+    }
+    return itemsTab;
+  }
+};
 
 /**
  * A higher-order function that checks if a given trajectory type matches a specified trajectory key.
@@ -716,7 +818,7 @@ export const getAreaTrajectoryName = (
   const mainRow = data[mainIndex];
   if (!mainRow?.hypothesis) return;
   if (mainRow.hypothesis) {
-    hypothesisInfo.area = mainRow.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : mainRow.hypothesis;
+    hypothesisInfo.area = mainRow.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : hasNoAreaType(mainRow?.trajectory?.type) ? '' : mainRow.hypothesis;
     hypothesisInfo.isDefault = (mainRow.isDefault && mainRow.hypothesis !== OTHER_AREAS_LABEL) ?? false;
   }
 
@@ -749,14 +851,14 @@ export const getAreaTrajectoryName = (
 export const getHypothesis = (
   data: HypothesisRowData[],
   rowId: string,
-): { hypothesis: string | undefined; technology: string | undefined } => {
+): { hypothesis: string; technology: string | undefined } => {
   const indexArray = rowId.split('.').map((item) => parseInt(item));
   const dataRowSelected = getRowDataSelected(data, indexArray);
   if (indexArray.length === 2) {
     return { hypothesis: data[indexArray[0]]?.hypothesis, technology: dataRowSelected?.hypothesis };
   } else {
     return {
-      hypothesis: dataRowSelected?.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : dataRowSelected?.hypothesis,
+      hypothesis: dataRowSelected?.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : dataRowSelected?.hypothesis ?? '',
       technology: undefined,
     };
   }
@@ -858,6 +960,7 @@ export const getSubRowListWithArea = (
     type === TRAJECTORY_TYPE.STS ||
     type === TRAJECTORY_TYPE.ADEQUACY_PATCH ||
     type === TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION ||
+    type === TRAJECTORY_TYPE.ME ||
     isTrajectoryResType(type)
   ) {
     const prefix = getMessageFromType(type, t);
@@ -893,64 +996,48 @@ export const getTrajectoryTypeByIndex = (index: number): TRAJECTORY_TYPE => {
   }
 };
 
-/**
- * Determines if the provided type is classified as a technical parameter type
- * within the thermal trajectory category.
- *
- * @param {TRAJECTORY_TYPE} type - The type to evaluate.
- * @returns {boolean} Returns true if the type matches any of the defined
- * thermal technical parameter categories; otherwise, returns false.
- */
-export const isTechnicalParametersType = (type: TRAJECTORY_TYPE): boolean =>
-  type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER ||
-  type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER ||
-  type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER;
-
-/**
- * Determines if the provided type is classified as a technical parameter type
- * within the thermal trajectory category.
- *
- * @param {TRAJECTORY_TYPE} type - The type to evaluate.
- * @returns {boolean} Returns true if the type matches any of the defined
- * thermal technical parameter categories; otherwise, returns false.
- */
-export const isSettingsParametersType = (type: TRAJECTORY_TYPE): boolean =>
-  type === TRAJECTORY_TYPE.ADEQUACY_PATCH || type === TRAJECTORY_TYPE.FLOWBASED || type === TRAJECTORY_TYPE.SETTINGS || type === TRAJECTORY_TYPE.SCENARIO_BUILDER;
-
-/**
- * Determines the file path based on the trajectory type.
- *
- * @param {TRAJECTORY_TYPE} type - The trajectory type used to select the corresponding file path.
- * @param { area: string; technology: string; isDefault: boolean } hypothesis
- * @returns {string | null} The file path associated with the given trajectory type.
- */
-export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE, hypothesis?: HypothesisType): string | null => {
+const getPathFromMEHydroTrajectoryType = (type: TRAJECTORY_TYPE): string => {
   switch (type) {
-    case TRAJECTORY_TYPE.AREA:
-      return String.raw`\\area`;
-    case TRAJECTORY_TYPE.LINK:
-      return String.raw`\\link`;
-    case TRAJECTORY_TYPE.LOAD:
-      return String.raw`\\load`;
-    case TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER:
-      return String.raw`\\thermal\\economic parameters\\economic`;
-    case TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER:
-      return String.raw`\\thermal\\economic parameters\\costs`;
-    case TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER:
-      return String.raw`\\thermal\\technical parameters\\param_modulation`;
-    case TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER:
-    case TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER:
-      return String.raw`\\thermal\\technical parameters`;
-    case TRAJECTORY_TYPE.STS:
-      return hypothesis?.technology ? String.raw`\\STS\\${hypothesis?.technology}\\clusters` : String.raw`\\STS\\clusters`;
-    case TRAJECTORY_TYPE.DSR:
-      return String.raw`\\DSR\\cluster`;
-    case TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION:
-      return String.raw`\\DSR\\capacity modulation`;
-    case TRAJECTORY_TYPE.MISC_CAPACITY:
-      return String.raw`\\MISC\\installed power`;
-    case TRAJECTORY_TYPE.MISC_LOAD:
-      return String.raw`\\MISC\\load factor`;
+    case TRAJECTORY_TYPE.HYDRO_CAPACITY_ME:
+      return String.raw`\\capa_storage`;
+    case TRAJECTORY_TYPE.HYDRO_PARAMETERS_ME:
+      return String.raw`\\parameters`;
+    case TRAJECTORY_TYPE.HYDRO_RESERVOIR_LEVELS_ME:
+      return String.raw`\\reservoir_levels`;
+    case TRAJECTORY_TYPE.HYDRO_TIME_SERIES_ME:
+      return String.raw`\\timeseries`;
+    case TRAJECTORY_TYPE.HYDRO_WATER_VALUES_ME:
+      return String.raw`\\water_values`;
+    default:
+      return '';
+  }
+}
+
+const getPathFromMETrajectoryType = (type: TRAJECTORY_TYPE): string => {
+  switch (true) {
+    case type === TRAJECTORY_TYPE.AREA_ME:
+      return String.raw`\\areas_ME`;
+    case type === TRAJECTORY_TYPE.LINK_ME:
+      return String.raw`\\links_ME`;
+    case type === TRAJECTORY_TYPE.LOAD_ME:
+      return String.raw`\\load_ME`;
+    case type === TRAJECTORY_TYPE.STS_ME:
+      return String.raw`\\st_storage_ME`;
+    case isTrajectoryMEHydroType(type):
+      return String.raw`\\hydro_ME\\${getPathFromMEHydroTrajectoryType(type)}`;
+    case type === TRAJECTORY_TYPE.THERMAL_CAPACITY_ME:
+      return String.raw`\\thermal_ME`;
+    case type === TRAJECTORY_TYPE.EFFICIENCY_ME:
+      return String.raw`\\efficiency_ME`;
+    case type === TRAJECTORY_TYPE.CONSTRAINT_ME:
+      return String.raw`\\constraints_ME`;
+    default:
+      return '';
+  }
+}
+
+const getPathFromRESTrajectoryType = (type: TRAJECTORY_TYPE, hypothesis?: HypothesisType): string => {
+  switch (type) {
     case TRAJECTORY_TYPE.RES_CAPACITY:
       return String.raw`\\RES\\installed power${
         hypothesis?.isDefault && hypothesis?.area !== OTHER_AREAS_LABEL
@@ -963,6 +1050,13 @@ export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE, hypothesis?: Hy
       return String.raw`\\RES\\technicalParameters`;
     case TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION:
       return String.raw`\\RES\\technicalParameters`;
+    default:
+      return '';
+  }
+}
+
+const getPathFromHydroTrajectoryType = (type: TRAJECTORY_TYPE): string => {
+  switch (type) {
     case TRAJECTORY_TYPE.HYDRO_SERIES:
       return String.raw`\\hydro\\series`;
     case TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS:
@@ -971,6 +1065,13 @@ export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE, hypothesis?: Hy
       return String.raw`\\PSP_virtual\\series`;
     case TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS:
       return String.raw`\\PSP_virtual\\technical_parameters`;
+    default:
+      return '';
+  }
+}
+
+const getPathFromNuclearFRTrajectoryType = (type: TRAJECTORY_TYPE): string => {
+  switch (type) {
     case TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION:
       return String.raw`\\specific_nuclear\\Modulation`;
     case TRAJECTORY_TYPE.NUCLEAR_FR_TALON:
@@ -981,6 +1082,24 @@ export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE, hypothesis?: Hy
       return String.raw`\\specific_nuclear\\TS_dispo`;
     case TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR:
       return String.raw`\\specific_nuclear\\TS_dispo\\SMR`;
+    default:
+      return '';
+  }
+}
+
+const getPathFromP2GTrajectoryType = (type: TRAJECTORY_TYPE): string => {
+  switch (type) {
+    case TRAJECTORY_TYPE.P2G_CAPACITY_COST:
+      return String.raw`\\P2G`;
+    case TRAJECTORY_TYPE.P2G_MARKET_MODULATION:
+      return String.raw`\\thermal\\economic parameters\\market_bid_marg_cost_modulation`;
+    default:
+      return '';
+  }
+}
+
+const getPathFromConfigurationTrajectoryType = (type: TRAJECTORY_TYPE): string => {
+  switch (type) {
     case TRAJECTORY_TYPE.ADEQUACY_PATCH:
       return String.raw`\\adequacy_patch`;
     case TRAJECTORY_TYPE.FLOWBASED:
@@ -990,7 +1109,96 @@ export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE, hypothesis?: Hy
     case TRAJECTORY_TYPE.SCENARIO_BUILDER:
       return String.raw`\\settings\\scenario_builder`;
     default:
-      return null;
+      return '';
+  }
+}
+
+const getPathFromThermalTrajectoryType = (type: TRAJECTORY_TYPE): string => {
+  switch (type) {
+    case TRAJECTORY_TYPE.THERMAL_CAPACITY:
+      return String.raw`\\thermal\\installed power`;
+    case TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER:
+      return String.raw`\\thermal\\economic parameters\\economic`;
+    case TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER:
+      return String.raw`\\thermal\\economic parameters\\costs`;
+    case TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER:
+      return String.raw`\\thermal\\technical parameters\\param_modulation`;
+    case TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER:
+    case TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER:
+      return String.raw`\\thermal\\technical parameters`;
+    default:
+      return '';
+  }
+}
+
+const getPathFromMiscTrajectoryType = (type: TRAJECTORY_TYPE): string => {
+  switch (type) {
+    case TRAJECTORY_TYPE.MISC_CAPACITY:
+      return String.raw`\\MISC\\installed power`;
+    case TRAJECTORY_TYPE.MISC_LOAD:
+      return String.raw`\\MISC\\load factor`;
+    default:
+      return '';
+  }
+}
+
+const getPathFromDSRTrajectoryType = (type: TRAJECTORY_TYPE): string => {
+  switch (type) {
+    case TRAJECTORY_TYPE.DSR:
+      return String.raw`\\DSR\\cluster`;
+    case TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION:
+      return String.raw`\\DSR\\capacity modulation`;
+    default:
+      return '';
+  }
+}
+
+const getPathFromSTSTrajectoryType = (hypothesis?: HypothesisType): string => {
+  switch (true) {
+    case !!hypothesis?.technology:
+      return  String.raw`\\STS\\${hypothesis?.technology}\\clusters`;
+    default:
+      return String.raw`\\STS\\clusters`;
+  }
+}
+
+/**
+ * Determines the file path based on the trajectory type.
+ *
+ * @param {TRAJECTORY_TYPE} type - The trajectory type used to select the corresponding file path.
+ * @param { area: string; technology: string; isDefault: boolean } hypothesis
+ * @returns {string | null} The file path associated with the given trajectory type.
+ */
+export const getPathFromTrajectoryType = (type: TRAJECTORY_TYPE, hypothesis?: HypothesisType): string | null => {
+  switch (true) {
+    case type === TRAJECTORY_TYPE.AREA:
+      return String.raw`\\area`;
+    case type === TRAJECTORY_TYPE.LINK:
+      return String.raw`\\link`;
+    case type === TRAJECTORY_TYPE.LOAD:
+      return String.raw`\\load`;
+    case isTrajectoryThermalType(type):
+      return getPathFromThermalTrajectoryType(type);
+    case type === TRAJECTORY_TYPE.STS:
+      return getPathFromSTSTrajectoryType(hypothesis);
+    case isTrajectoryDSRType(type):
+      return getPathFromDSRTrajectoryType(type);
+    case isTrajectoryMiscType(type):
+      return getPathFromMiscTrajectoryType(type);
+    case isTrajectoryResType(type):
+      return getPathFromRESTrajectoryType(type, hypothesis);
+    case isTrajectoryHydroType(type):
+      return getPathFromHydroTrajectoryType(type);
+    case isTrajectoryNuclearType(type):
+      return getPathFromNuclearFRTrajectoryType(type);
+    case isTrajectoryConfigurationType(type):
+      return getPathFromConfigurationTrajectoryType(type);
+    case isTrajectoryP2GType(type):
+      return getPathFromP2GTrajectoryType(type);
+    case isTrajectoryMEType(type):
+      return String.raw`\\ME${getPathFromMETrajectoryType(type)}`;
+    default:
+      return '';
   }
 };
 
@@ -1095,6 +1303,135 @@ export const isUniqueTrajectoryType = (type: TRAJECTORY_TYPE): boolean =>
  */
 export const normalize = (value: string | null): string => (value === null || value === '' ? '' : value);
 
+const getThermalEndPointByType = (type: TRAJECTORY_TYPE) => {
+  switch (type) {
+    case TRAJECTORY_TYPE.THERMAL_CAPACITY:
+      return TRAJECTORY_THERMAL_INSTALLED_POWER_IMPORT;
+    case TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER:
+      return TRAJECTORY_THERMAL_COMMON_PARAMETER_IMPORT;
+    case TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER:
+      return TRAJECTORY_THERMAL_SPECIFIC_PARAMETER_IMPORT;
+    case TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER:
+      return TRAJECTORY_THERMAL_MODULATION_PARAMETER_IMPORT;
+    case TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER:
+      return TRAJECTORY_THERMAL_COSTS_PARAMETER_IMPORT;
+    case TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER:
+      return TRAJECTORY_THERMAL_ECONOMIC_PARAMETER_IMPORT;
+  }
+}
+
+const getDSREndPointByType = (type: TRAJECTORY_TYPE) => {
+  switch (type) {
+    case TRAJECTORY_TYPE.DSR:
+      return TRAJECTORY_DSR_CLUSTER;
+    case TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION:
+      return TRAJECTORY_DSR_CAPACITY_MODULATION;
+  }
+}
+
+const getMiscEndPointByType = (type: TRAJECTORY_TYPE) => {
+  switch (type) {
+    case TRAJECTORY_TYPE.MISC_CAPACITY:
+      return TRAJECTORY_MISC_INSTALLED_POWER;
+    case TRAJECTORY_TYPE.MISC_LOAD:
+      return TRAJECTORY_MISC_LOAD_FACTOR;
+  }
+}
+
+const getResCapacityEndPointByType = (type: TRAJECTORY_TYPE) => {
+  switch (type) {
+    case TRAJECTORY_TYPE.RES_CAPACITY:
+      return TRAJECTORY_RES_INSTALLED_POWER;
+    case TRAJECTORY_TYPE.RES_LOAD:
+      return TRAJECTORY_RES_LOAD_FACTOR;
+  }
+}
+
+const getResDistributionEndPointByType = (type: TRAJECTORY_TYPE) => {
+  switch (type) {
+    case TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION:
+      return TRAJECTORY_RES_TECHNOLOGY_DISTRIBUTION;
+    case TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION:
+      return TRAJECTORY_RES_ZONAL_DISTRIBUTION;
+  }
+}
+
+const getHydroEndPointByType = (type: TRAJECTORY_TYPE) => {
+  switch (type) {
+    case TRAJECTORY_TYPE.HYDRO_SERIES:
+      return TRAJECTORY_HYDRO_SERIES;
+    case TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS:
+      return TRAJECTORY_HYDRO_TECHNICAL_PARAMETERS;
+  }
+}
+
+const getHydroPSPEndPointByType = (type: TRAJECTORY_TYPE) => {
+  switch (type) {
+    case TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS:
+      return TRAJECTORY_HYDRO_TECHNICAL_PARAMETERS;
+    case TRAJECTORY_TYPE.HYDRO_PSP_SERIES:
+      return TRAJECTORY_HYDRO_SERIES;
+  }
+}
+
+const getNuclearFrEndPointType = (type: TRAJECTORY_TYPE) => {
+    switch (type) {
+      case TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION:
+        return TRAJECTORY_NUCLEAR_FR_MODULATION;
+      case TRAJECTORY_TYPE.NUCLEAR_FR_TALON:
+        return TRAJECTORY_NUCLEAR_FR_TALON;
+      case TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP:
+        return TRAJECTORY_NUCLEAR_TS_EPR;
+      case TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM:
+        return TRAJECTORY_NUCLEAR_TS_LT;
+      case TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR:
+        return TRAJECTORY_NUCLEAR_TS_SMR;
+    }
+  }
+
+const getConfigurationEndPointType = (type: TRAJECTORY_TYPE) => {
+    switch (type) {
+      case TRAJECTORY_TYPE.ADEQUACY_PATCH:
+        return TRAJECTORY_ADEQUACY_PATCH;
+      case TRAJECTORY_TYPE.FLOWBASED:
+        return TRAJECTORY_FLOWBASED;
+      case TRAJECTORY_TYPE.SETTINGS:
+        return TRAJECTORY_SETTINGS;
+      case TRAJECTORY_TYPE.SCENARIO_BUILDER:
+        return TRAJECTORY_SCENARIO_BUILDER;
+    }
+  }
+
+const getP2GEndPointType = (type: TRAJECTORY_TYPE) => {
+    switch (type) {
+      case TRAJECTORY_TYPE.P2G_CAPACITY_COST:
+        return TRAJECTORY_P2G_CAPACITY_COST;
+      case TRAJECTORY_TYPE.P2G_MARKET_MODULATION:
+        return TRAJECTORY_P2G_MARKET_MODULATION;
+    }
+  }
+
+const getOtherMEEndPointType = (type: TRAJECTORY_TYPE) => {
+  switch (type) {
+    case TRAJECTORY_TYPE.LOAD_ME:
+      return TRAJECTORY_LOAD_ME;
+    case TRAJECTORY_TYPE.STS_ME:
+      return TRAJECTORY_STS_ME;
+    case TRAJECTORY_TYPE.HYDRO_CAPACITY_ME:
+      return TRAJECTORY_HYDRO_CAPACITY_ME;
+    case TRAJECTORY_TYPE.HYDRO_TIME_SERIES_ME:
+      return TRAJECTORY_HYDRO_TS_ME;
+    case TRAJECTORY_TYPE.HYDRO_PARAMETERS_ME:
+      return TRAJECTORY_HYDRO_PARAMETERS_ME;
+    case TRAJECTORY_TYPE.EFFICIENCY_ME:
+      return TRAJECTORY_EFFICIENCY_ME;
+    case TRAJECTORY_TYPE.CONSTRAINT_ME:
+      return TRAJECTORY_CONSTRAINT_ME;
+    case TRAJECTORY_TYPE.THERMAL_CAPACITY_ME:
+      return TRAJECTORY_THERMAL_CAPACITY_ME;
+  }
+}
+
 export const getUrlApiUploadTrajectory = (
   trajectoryType: TRAJECTORY_TYPE,
   studyId: number,
@@ -1104,65 +1441,33 @@ export const getUrlApiUploadTrajectory = (
   isCivilYear?: boolean,
   subArea?: string,
 ) => {
-  switch (trajectoryType) {
-    case TRAJECTORY_TYPE.LOAD:
-      return `${TRAJECTORY_ENDPOINT}/load?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
-    case TRAJECTORY_TYPE.THERMAL_CAPACITY:
-      return `${TRAJECTORY_THERMAL_INSTALLED_POWER_IMPORT}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}&technology=${subArea ?? ''}`;
-    case TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER:
-      return `${TRAJECTORY_THERMAL_COMMON_PARAMETER_IMPORT}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
-    case TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER:
-      return `${TRAJECTORY_THERMAL_SPECIFIC_PARAMETER_IMPORT}?area=${subArea ?? ''}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
-    case TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER:
-      return `${TRAJECTORY_THERMAL_MODULATION_PARAMETER_IMPORT}?area=${subArea ?? ''}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
-    case TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER:
-      return `${TRAJECTORY_THERMAL_COSTS_PARAMETER_IMPORT}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
-    case TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER:
-      return `${TRAJECTORY_THERMAL_ECONOMIC_PARAMETER_IMPORT}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
-    case TRAJECTORY_TYPE.STS:
+  switch (true) {
+    case trajectoryType === TRAJECTORY_TYPE.LOAD:
+      return `${TRAJECTORY_ENDPOINT}/load?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
+    case isTrajectoryThermalType(trajectoryType):
+      return `${getThermalEndPointByType(trajectoryType)}?${area ? `area=${area}&` : ''}${subArea ? `technology=${subArea}&` : ''}trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
+    case trajectoryType === TRAJECTORY_TYPE.STS:
       return `${TRAJECTORY_STS}?area=${area}&technology=${subArea}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
-    case TRAJECTORY_TYPE.DSR:
-      return `${TRAJECTORY_DSR_CLUSTER}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
-    case TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION:
-      return `${TRAJECTORY_DSR_CAPACITY_MODULATION}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
-    case TRAJECTORY_TYPE.MISC_CAPACITY:
-      return `${TRAJECTORY_MISC_INSTALLED_POWER}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
-    case TRAJECTORY_TYPE.MISC_LOAD:
-      return `${TRAJECTORY_MISC_LOAD_FACTOR}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
-    case TRAJECTORY_TYPE.RES_CAPACITY:
-      return `${TRAJECTORY_RES_INSTALLED_POWER}?area=${area}&technology=${subArea ?? ''}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
-    case TRAJECTORY_TYPE.RES_LOAD:
-      return `${TRAJECTORY_RES_LOAD_FACTOR}?area=${area}&technology=${subArea ? encodeURIComponent(snakeCase(subArea)) : ''}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
-    case TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION:
-      return `${TRAJECTORY_RES_TECHNOLOGY_DISTRIBUTION}?area=${area}${subArea ? `&technology=${encodeURIComponent(snakeCaseUnderscore(subArea))}` : ''}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
-    case TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION:
-      return `${TRAJECTORY_RES_ZONAL_DISTRIBUTION}?area=${area}&technology=${subArea ?? ''}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
-    case TRAJECTORY_TYPE.HYDRO_SERIES:
-      return `${TRAJECTORY_HYDRO_SERIES}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
-    case TRAJECTORY_TYPE.HYDRO_PSP_SERIES:
-      return `${TRAJECTORY_HYDRO_SERIES}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}&isPsp=true`;
-    case TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS:
-      return `${TRAJECTORY_HYDRO_TECHNICAL_PARAMETERS}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
-    case TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS:
-      return `${TRAJECTORY_HYDRO_TECHNICAL_PARAMETERS}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}&isPsp=true`;
-    case TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION:
-      return `${TRAJECTORY_NUCLEAR_FR_MODULATION}?area=FR&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
-    case TRAJECTORY_TYPE.NUCLEAR_FR_TALON:
-      return `${TRAJECTORY_NUCLEAR_FR_TALON}?area=FR&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
-    case TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP:
-      return `${TRAJECTORY_NUCLEAR_TS_EPR}?area=FR&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
-    case TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM:
-      return `${TRAJECTORY_NUCLEAR_TS_LT}?area=FR&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
-    case TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR:
-      return `${TRAJECTORY_NUCLEAR_TS_SMR}?area=FR&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
-    case TRAJECTORY_TYPE.ADEQUACY_PATCH:
-      return `${TRAJECTORY_ADEQUACY_PATCH}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
-    case TRAJECTORY_TYPE.FLOWBASED:
-      return `${TRAJECTORY_FLOWBASED}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
-    case TRAJECTORY_TYPE.SETTINGS:
-      return `${TRAJECTORY_SETTINGS}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
-    case TRAJECTORY_TYPE.SCENARIO_BUILDER:
-      return `${TRAJECTORY_SCENARIO_BUILDER}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
+    case isTrajectoryDSRType(trajectoryType):
+      return `${getDSREndPointByType(trajectoryType)}?${area ? `area=${area}&` : ''}${subArea ? `$technology=${subArea}&` : ''}trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
+    case isTrajectoryMiscType(trajectoryType):
+      return `${getMiscEndPointByType(trajectoryType)}?${area ? `area=${area}&` : ''}${subArea ? `$technology=${subArea}&` : ''}trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
+    case isTrajectoryResCapacityType(trajectoryType):
+      return  `${getResCapacityEndPointByType(trajectoryType)}?area=${area}${subArea ? `&technology=${encodeURIComponent(snakeCaseUnderscore(subArea))}` : ''}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
+    case isTrajectoryResDistributionType(trajectoryType):
+      return  `${getResDistributionEndPointByType(trajectoryType)}?area=${area}${subArea ? `&technology=${encodeURIComponent(snakeCaseUnderscore(subArea))}` : ''}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
+    case isTrajectoryHydroNonPSPType(trajectoryType):
+      return `${getHydroEndPointByType(trajectoryType)}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
+    case isTrajectoryHydroPSPType(trajectoryType):
+      return `${getHydroPSPEndPointByType(trajectoryType)}?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}&isPsp=true`;
+    case isTrajectoryNuclearType(trajectoryType):
+      return `${getNuclearFrEndPointType(trajectoryType)}?area=FR&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
+    case isTrajectoryConfigurationType(trajectoryType):
+      return `${getConfigurationEndPointType(trajectoryType)}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
+    case isTrajectoryP2GType(trajectoryType):
+      return `${getP2GEndPointType(trajectoryType)}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
+    case isTrajectoryOtherMEType(trajectoryType):
+      return `${getOtherMEEndPointType(trajectoryType)}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
     default:
       return `${TRAJECTORY_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
   }
@@ -1175,65 +1480,14 @@ export const isEmptyRow = (
   t: TFunction<'translation', undefined>,
 ) =>
   hypothesis === t('thermal.@specific') ||
-  hypothesis === t('thermal.@time_series') ||
+  hypothesis === t('thermal.@time_series') && rowDepth === 0 ||
   hypothesis === t('settings.@title') ||
+  hypothesis === t('studyDetails.@hydro') ||
+  type === TRAJECTORY_TYPE.HYDRO_ME ||
   ((type === TRAJECTORY_TYPE.STS ||
     type === TRAJECTORY_TYPE.HYDRO_SERIES ||
     type === TRAJECTORY_TYPE.HYDRO_PSP_SERIES) &&
     rowDepth === 0);
-
-export const getItemsMenu = (
-  trajectoryType: TRAJECTORY_TYPE,
-  t: TFunction<'translation', undefined>,
-  defaultAreas: { name: string }[],
-) => {
-  if (trajectoryType === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
-    return [
-      {
-        id: TRAJECTORY_TYPE.THERMAL_CAPACITY,
-        panelId: TRAJECTORY_TYPE.THERMAL_CAPACITY,
-        label: t('misc.@installedPower'),
-      },
-      {
-        id: TRAJECTORY_TYPE.THERMAL_PARAMETER,
-        panelId: TRAJECTORY_TYPE.THERMAL_PARAMETER,
-        label: t('thermal.@parameters'),
-      },
-      {
-        id: TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION,
-        panelId: TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION,
-        label: t('thermal.@nuclearFR'),
-      },
-    ];
-  } else if (trajectoryType === TRAJECTORY_TYPE.HYDRO_SERIES) {
-    return [
-      { id: TRAJECTORY_TYPE.HYDRO_SERIES, panelId: TRAJECTORY_TYPE.HYDRO_SERIES, label: t('hydro.@capacity') },
-      {
-        id: TRAJECTORY_TYPE.HYDRO_PSP_SERIES,
-        panelId: TRAJECTORY_TYPE.HYDRO_PSP_SERIES,
-        label: t('hydro.@psp_virtual'),
-      },
-    ];
-  } else {
-    const itemsTab = [
-      { id: trajectoryType, panelId: trajectoryType, label: t('misc.@installedPower') },
-      {
-        id: trajectoryType === TRAJECTORY_TYPE.RES_CAPACITY ? TRAJECTORY_TYPE.RES_LOAD : TRAJECTORY_TYPE.MISC_LOAD,
-        panelId: trajectoryType === TRAJECTORY_TYPE.RES_CAPACITY ? TRAJECTORY_TYPE.RES_LOAD : TRAJECTORY_TYPE.MISC_LOAD,
-        label: t('misc.@loadFactor'),
-      },
-    ];
-    if (trajectoryType === TRAJECTORY_TYPE.RES_CAPACITY) {
-      defaultAreas.length > 0 &&
-        itemsTab.push({
-          id: TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION,
-          panelId: TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION,
-          label: t('res.@distribution'),
-        });
-    }
-    return itemsTab;
-  }
-};
 
 export const getModalTile = (tabType: TRAJECTORY_TYPE, hypothesis?: HypothesisType) => {
   const technology =
@@ -1259,12 +1513,8 @@ export const getFetchFromDbParams = (
     typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK;
     areaToUse = '';
   }
-  if (type === TRAJECTORY_TYPE.ADEQUACY_PATCH) {
-    if (indexArray.length > 1) {
-      typeToUse = indexArray[1] === 0 ? TRAJECTORY_TYPE.SETTINGS : TRAJECTORY_TYPE.SCENARIO_BUILDER;
-    } else {
-      typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.ADEQUACY_PATCH : TRAJECTORY_TYPE.FLOWBASED;
-    }
+  if (isTrajectoryConfigurationType(type)) {
+    typeToUse = getConfigurationTypeToUse(indexArray);
     areaToUse = '';
   }
   if (type === TRAJECTORY_TYPE.DSR) {
@@ -1289,18 +1539,25 @@ export const getFetchFromDbParams = (
     }
   }
   if (type === TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION) {
-    typeToUse = getNuclearTrajectoryType(indexArray);
+    typeToUse = getNuclearTypeToUse(indexArray);
     technology = '';
     areaToUse = '';
   }
-  if (type === TRAJECTORY_TYPE.HYDRO_SERIES) {
-    typeToUse = indexArray[1] === 0 ? TRAJECTORY_TYPE.HYDRO_SERIES : TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS;
+  if (isTrajectoryHydroType(type)) {
+    typeToUse = getHydroTypeToUse(indexArray, type);
     technology = '';
   }
-  if (type === TRAJECTORY_TYPE.HYDRO_PSP_SERIES) {
-    typeToUse = indexArray[1] === 0 ? TRAJECTORY_TYPE.HYDRO_PSP_SERIES : TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS;
+  if (type === TRAJECTORY_TYPE.P2G) {
+    typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.P2G_CAPACITY_COST : TRAJECTORY_TYPE.P2G_MARKET_MODULATION;
     technology = '';
+    areaToUse = '';
   }
+  if (type === TRAJECTORY_TYPE.ME) {
+    typeToUse = getMETypeToUse(indexArray);
+    technology = '';
+    areaToUse = '';
+  }
+
   return { typeToUse, areaToUse, technology };
 };
 
@@ -1365,3 +1622,14 @@ export const areAllFlowbasedAreasPresent = (areasName: string[]): boolean => {
     normalizedAreas.has(mandatoryArea.toUpperCase())
   );
 };
+
+export const getColumnHeader = (t: TFunction, type?: TRAJECTORY_TYPE) => {
+  switch (type) {
+    case TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION:
+    case TRAJECTORY_TYPE.P2G:
+    case TRAJECTORY_TYPE.ME:
+      return t('studyDetails.@hypothesis');
+    default:
+      return t('studyDetails.@areas');
+  }
+}
