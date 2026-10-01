@@ -1453,7 +1453,7 @@ export const getUrlApiUploadTrajectory = (
     case isTrajectoryMiscType(trajectoryType):
       return `${getMiscEndPointByType(trajectoryType)}?${area ? `area=${area}&` : ''}${subArea ? `$technology=${subArea}&` : ''}trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
     case isTrajectoryResCapacityType(trajectoryType):
-      return  `${getResCapacityEndPointByType(trajectoryType)}?area=${area}${subArea ? `&technology=${encodeURIComponent(snakeCaseUnderscore(subArea))}` : ''}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}`;
+      return  `${getResCapacityEndPointByType(trajectoryType)}?area=${area}${subArea ? `&technology=${encodeURIComponent(snakeCaseUnderscore(subArea))}` : ''}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
     case isTrajectoryResDistributionType(trajectoryType):
       return  `${getResDistributionEndPointByType(trajectoryType)}?area=${area}${subArea ? `&technology=${encodeURIComponent(snakeCaseUnderscore(subArea))}` : ''}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
     case isTrajectoryHydroNonPSPType(trajectoryType):
