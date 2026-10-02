@@ -115,7 +115,6 @@ const getEditableHypothesisTableHeaders = ({
                 defaultChecked={hvdc}
                 checked={hvdc}
                 showIcon
-                showLabel
                 disabled={
                   status === TRAJECTORY_SELECTION_STATUS.ERROR ||
                   isStudyGenerated ||
