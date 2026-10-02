@@ -5,13 +5,13 @@
  */
 
 import { StudyDTO } from '@/shared/types/Study.type.ts';
-import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter';
+import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter.ts';
 import { createColumnHelper } from '@tanstack/react-table';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { sentenceCase } from '@/shared/utils/textUtils.ts';
 import { Icon, RadioButton } from '@design-system-rte/react';
 import StdTagList from '@common/base/StdTagList/StdTagList.tsx';
-import UserDisplayCell from '@/components/common/layout/UserDisplayCell';
+import UserDisplayCell from '@common/layout/UserDisplayCell.tsx';
 
 const columnHelper = createColumnHelper<StudyDTO>();
 
@@ -36,7 +36,7 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
       };
       return (
         <div
-          className={`[&_[class*='radioButtonLabel']]:![font-size:inherit] [&_[class*='radioButtonLabel']]:![font-family:inherit] ${
+          className={`px-1 [&_[class*='radioButtonLabel']]:![font-size:inherit] [&_[class*='radioButtonLabel']]:![font-family:inherit] ${
             isSelected
               ? "[&_[class*='radioButtonBackground']]:opacity-100"
               : "[&_[class*='radioButtonBackground']]:opacity-0 group-hover:[&_[class*='radioButtonBackground']]:opacity-100"
@@ -55,7 +55,7 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
                 row.toggleSelected(!isSelected);
               }
             }}
-            className={`transition-colors ![font-size:inherit] ![font-family:inherit] ${status === StudyStatus.GENERATED ? '!text-primary-600 group-hover:!text-primary-600' : '!text-gray-800 group-hover:!text-gray-800'}`}
+            className={`${status === StudyStatus.GENERATED ? '!text-primary-600 group-hover:!text-primary-600' : '!text-gray-800 group-hover:!text-gray-800'}`}
           />
         </div>
       );
