@@ -17,6 +17,7 @@ import {
   isTrajectoryResCapacityType,
   isTrajectoryResDistributionType,
   isTrajectoryResType,
+  isTrajectoryThermalNoAReaType,
   isTrajectoryThermalType,
   RowStatus,
   TechnologyType,
@@ -806,12 +807,14 @@ export const getRowDataSelected = (data: HypothesisRowData[], indexArray: number
  * Get a name composed of an area name and a technology name
  * @param {string} rowIdSelected
  * @param {HypothesisRowData[]} data
+ * @param {TRAJECTORY_TYPE} type
  * @param options
  * @return {{area: string, technology?: string, isDefault: boolean} | undefined}
  */
 export const getAreaTrajectoryName = (
   rowIdSelected: string,
   data: HypothesisRowData[],
+  type?: TRAJECTORY_TYPE,
   options?: TechnologyType[],
 ): HypothesisType | undefined => {
   const [mainIndex, subIndex] = rowIdSelected.split('.').map(Number);
@@ -820,7 +823,7 @@ export const getAreaTrajectoryName = (
   const mainRow = data[mainIndex];
   if (!mainRow?.hypothesis) return;
   if (mainRow.hypothesis) {
-    hypothesisInfo.area = mainRow.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : hasNoAreaType(mainRow?.trajectory?.type) ? '' : mainRow.hypothesis;
+    hypothesisInfo.area = mainRow.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : type && hasNoAreaType(type) ? '' : mainRow.hypothesis;
     hypothesisInfo.isDefault = (mainRow.isDefault && mainRow.hypothesis !== OTHER_AREAS_LABEL) ?? false;
   }
 
@@ -828,11 +831,15 @@ export const getAreaTrajectoryName = (
 
   if (subRow?.hypothesis) {
     const subRowHypothesis = subRow.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : subRow.hypothesis;
-    const option = options ? options.find((opt) => opt.label === subRowHypothesis) : null;
-    if (option) {
-      hypothesisInfo.technology = option.code;
+    if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
+      hypothesisInfo.area = subRowHypothesis;
     } else {
-      hypothesisInfo.technology = subRowHypothesis;
+      const option = options ? options.find((opt) => opt.label === subRowHypothesis) : null;
+      if (option) {
+        hypothesisInfo.technology = option.code;
+      } else {
+        hypothesisInfo.technology = subRowHypothesis;
+      }
     }
     hypothesisInfo.isDefault =
       ((mainRow.isDefault && mainRow.hypothesis !== OTHER_AREAS_LABEL) || subRow.isDefault) ?? false;
@@ -1450,11 +1457,15 @@ export const getUrlApiUploadTrajectory = (
   switch (true) {
     case trajectoryType === TRAJECTORY_TYPE.LOAD:
       return `${TRAJECTORY_ENDPOINT}/load?area=${area}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
-    case isTrajectoryThermalType(trajectoryType):
+    case trajectoryType ===  TRAJECTORY_TYPE.THERMAL_CAPACITY || trajectoryType ===  TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER:
       return `${getThermalEndPointByType(trajectoryType)}?${area ? `area=${area}&` : ''}${subArea ? `technology=${subArea}&` : ''}trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
+    case isTrajectoryThermalNoAReaType(trajectoryType):
+      return `${getThermalEndPointByType(trajectoryType)}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
     case trajectoryType === TRAJECTORY_TYPE.STS:
       return `${TRAJECTORY_STS}?area=${area}&technology=${subArea}&trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
-    case isTrajectoryDSRType(trajectoryType):
+    case trajectoryType === TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION:
+      return `${getDSREndPointByType(trajectoryType)}?trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
+    case trajectoryType === TRAJECTORY_TYPE.DSR:
       return `${getDSREndPointByType(trajectoryType)}?${area ? `area=${area}&` : ''}${subArea ? `$technology=${subArea}&` : ''}trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;
     case isTrajectoryMiscType(trajectoryType):
       return `${getMiscEndPointByType(trajectoryType)}?${area ? `area=${area}&` : ''}${subArea ? `$technology=${subArea}&` : ''}trajectoryToUse=${trajectoryName}&horizon=${horizon}&studyId=${studyId}&isCivilYear=${isCivilYear}`;

@@ -9,7 +9,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
-import { getAreaTrajectoryName, getRowDataSelected } from '@/shared/utils/trajectoryUtils.ts';
+import { getRowDataSelected } from '@/shared/utils/trajectoryUtils.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
@@ -89,12 +89,10 @@ const ResDistributionTab = ({ studyData, types, defaultAreas, areas }: TabProps 
 
   const handleFetchTrajectoriesFromFS = useCallback(
     async (rowId: string, tableData: HypothesisRowData[], tableType: TRAJECTORY_TYPE) => {
-      const hypothesis = getAreaTrajectoryName(rowId, tableData);
       const { typeToUse, areaToUse, isDefaultArea } = getParamForFetchFSTrajectory(
         tableType,
-        rowId.split('.').map(Number),
-        data.length,
-        hypothesis,
+        rowId,
+        tableData,
       );
       const results = await handleFetchFromFS({ typeToUse, areaToUse, isDefaultArea });
       setSelectedType(tableType);
@@ -102,7 +100,7 @@ const ResDistributionTab = ({ studyData, types, defaultAreas, areas }: TabProps 
       setRowIdSelected(rowId);
       toggleModal();
     },
-    [data.length, handleFetchFromFS, toggleModal],
+    [handleFetchFromFS, toggleModal],
   );
 
   const handleUpdateTableData = useCallback(
@@ -198,12 +196,8 @@ const ResDistributionTab = ({ studyData, types, defaultAreas, areas }: TabProps 
             }
           }}
           tabType={selectedType}
-          hypothesis={getAreaTrajectoryName(
-            rowIdSelected,
-            selectedType === TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION ? data : technologyData,
-          )}
-          indexArray={rowIdSelected?.split('.').map(Number)}
-          rowsNb={data.length}
+          data={selectedType === TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION ? data : technologyData}
+          rowIdSelected={rowIdSelected}
           isOpen={isModalOpen}
         />
     </div>

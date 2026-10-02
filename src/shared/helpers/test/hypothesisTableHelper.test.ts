@@ -1603,292 +1603,266 @@ describe('getParamForFetchFSTrajectory', () => {
   });
 
   it('return AREA type when index table is not the last one', () => {
-    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.AREA, [0], 2, {
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
       area: 'H2',
       isDefault: false,
     });
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.AREA, '0', [{}, {}] as HypothesisRowData[]);
     expect(typeToUse).toEqual(TRAJECTORY_TYPE.AREA);
     expect(areaToUse).toEqual('');
   });
 
   it('return LINK type when index table is the last one', () => {
-    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.AREA, [1], 2, {
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
       area: 'H2',
       isDefault: false,
     });
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.AREA, '1', [{}, {}] as HypothesisRowData[]);
     expect(typeToUse).toEqual(TRAJECTORY_TYPE.LINK);
     expect(areaToUse).toEqual('');
   });
 
   it('return LOAD type when LOAD is called', () => {
-    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.LOAD, [1], 2, {
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
       area: 'H2',
       isDefault: false,
     });
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.LOAD, '1', [{}, {}] as HypothesisRowData[]);
     expect(typeToUse).toEqual(TRAJECTORY_TYPE.LOAD);
     expect(areaToUse).toEqual('H2');
   });
 
   it('return THERMAL_CAPACITY type when THERMAL_CAPACITY is called', () => {
-    const { typeToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.THERMAL_CAPACITY, [1], 2, {
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
       area: 'H2',
       technology: 'CCGT',
       isDefault: false,
     });
+    const { typeToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.THERMAL_CAPACITY, '1', [{}, {}] as HypothesisRowData[]);
     expect(typeToUse).toEqual(TRAJECTORY_TYPE.THERMAL_CAPACITY);
   });
 
   it('return THERMAL_TECHNICAL_SPECIFIC_PARAMETER type when THERMAL_TECHNICAL_SPECIFIC_PARAMETER is called', () => {
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
+      area: 'H2',
+      technology: 'CCGT',
+      isDefault: false,
+    });
     const { typeToUse } = getParamForFetchFSTrajectory(
       TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
-      [0, 1],
-      2,
-      {
-        area: 'H2',
-        technology: 'CCGT',
-        isDefault: false,
-      },
+      '0.1',
+      [{}, {}] as HypothesisRowData[],
     );
     expect(typeToUse).toEqual(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER);
   });
 
   it('return THERMAL_TECHNICAL_MODULATION_PARAMETER type when THERMAL_TECHNICAL_SPECIFIC_PARAMETER is called for the second line', () => {
-    getParamForFetchFSTrajectory(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, [1], 3, {
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
       area: 'H2',
       technology: 'CCGT',
       isDefault: false,
     });
+    getParamForFetchFSTrajectory(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, '1', [{}, {}, {}] as HypothesisRowData[]);
     expect(trajectoryUtils.getTrajectoryTypeByIndex).toHaveBeenCalledWith(1);
   });
 
   it('return THERMAL_TECHNICAL_COMMON_PARAMETER type when THERMAL_TECHNICAL_COMMON_PARAMETER is called', () => {
-    getParamForFetchFSTrajectory(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, [2], 3, {
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
       area: 'H2',
       technology: 'CCGT',
       isDefault: false,
     });
+    getParamForFetchFSTrajectory(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, '2', [{}, {}, {}] as HypothesisRowData[]);
     expect(trajectoryUtils.getTrajectoryTypeByIndex).toHaveBeenCalledWith(2);
   });
 
   it('return THERMAL_ECONOMIC_COST_PARAMETER type when THERMAL_ECONOMIC_COST_PARAMETER is called', () => {
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
+      area: 'H2',
+      technology: 'CCGT',
+      isDefault: false,
+    });
     const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(
       TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER,
-      [0],
-      2,
-      {
-        area: 'H2',
-        technology: 'CCGT',
-        isDefault: false,
-      },
+      '0',
+      [{}, {}] as HypothesisRowData[],
     );
     expect(typeToUse).toEqual(TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER);
     expect(areaToUse).toEqual('');
   });
 
   it('return THERMAL_ECONOMIC_PARAMETER type when THERMAL_ECONOMIC_PARAMETER is called', () => {
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
+      area: 'H2',
+      technology: 'CCGT',
+      isDefault: false,
+    });
     const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(
       TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER,
-      [1],
-      2,
-      {
-        area: 'H2',
-        technology: 'CCGT',
-        isDefault: false,
-      },
+      '1',
+      [{}, {}] as HypothesisRowData[],
     );
     expect(typeToUse).toEqual(TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER);
     expect(areaToUse).toEqual('');
   });
 
   it('return DSR type when index table is not the last one', () => {
-    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.DSR, [1], 3, {
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
       area: 'H2',
       isDefault: false,
     });
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.DSR, '1', [{}, {}, {}] as HypothesisRowData[]);
     expect(typeToUse).toEqual(TRAJECTORY_TYPE.DSR);
     expect(areaToUse).toEqual('');
   });
 
   it('return DSR_CAPACITY_MODULATION type when index table is the last one', () => {
-    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.DSR, [2], 3, {
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
       area: 'H2',
       isDefault: false,
     });
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.DSR, '2', [{}, {}, {}] as HypothesisRowData[]);
     expect(typeToUse).toEqual(TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION);
     expect(areaToUse).toEqual('');
   });
 
   it('return HYDRO_TECHNICAL_PARAMETERS type when index table is the last one', () => {
-    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.HYDRO_SERIES, [0, 1], 2, {
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
       area: 'H2',
       isDefault: false,
     });
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.HYDRO_SERIES, '0.1', [{}, {}] as HypothesisRowData[]);
     expect(typeToUse).toEqual(TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS);
     expect(areaToUse).toEqual('');
   });
 
   it('return HYDRO_PSP_TECHNICAL_PARAMETERS type when index table is the last one', () => {
-    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.HYDRO_PSP_SERIES, [0, 1], 2, {
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
       area: 'H2',
       isDefault: false,
     });
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.HYDRO_PSP_SERIES, '0.1', [{}, {}] as HypothesisRowData[]);
     expect(typeToUse).toEqual(TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS);
     expect(areaToUse).toEqual('');
   });
 
   it('return NUCLEAR_FR_MODULATION type when index table is the last one', () => {
-    vi.mocked(trajectoryUtils.getFetchFromDbParams).mockReturnValue({
-      typeToUse: TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION,
-      areaToUse: '',
-    });
-    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION, [0], 3, {
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
       area: 'H2',
       isDefault: false,
     });
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION, '0', [{}, {}, {}] as HypothesisRowData[]);
     expect(typeToUse).toEqual(TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION);
     expect(areaToUse).toEqual('');
   });
 
   it('return NUCLEAR_FR_TALON type when index table is the last one', () => {
-    vi.mocked(trajectoryUtils.getFetchFromDbParams).mockReturnValue({
-      typeToUse: TRAJECTORY_TYPE.NUCLEAR_FR_TALON,
-      areaToUse: '',
-    });
-    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION, [1], 3, {
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
       area: 'H2',
       isDefault: false,
     });
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION, '1', [{}, {}, {}] as HypothesisRowData[]);
     expect(typeToUse).toEqual(TRAJECTORY_TYPE.NUCLEAR_FR_TALON);
     expect(areaToUse).toEqual('');
   });
 
   it('return NUCLEAR_FR_TS_ERP type when index table is the last one', () => {
-    vi.mocked(trajectoryUtils.getFetchFromDbParams).mockReturnValue({
-      typeToUse: TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP,
-      areaToUse: '',
-    });
-    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION, [2, 0], 3, {
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
       area: 'H2',
       isDefault: false,
     });
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION, '2.0', [{}, {}, {}] as HypothesisRowData[]);
     expect(typeToUse).toEqual(TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP);
     expect(areaToUse).toEqual('');
   });
 
   it('return NUCLEAR_FR_TS_LONG_TERM type when index table is the last one', () => {
-    vi.mocked(trajectoryUtils.getFetchFromDbParams).mockReturnValue({
-      typeToUse: TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM,
-      areaToUse: '',
-    });
-    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION, [2, 1], 3, {
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
       area: 'H2',
       isDefault: false,
     });
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION, '2.1', [{}, {}, {}] as HypothesisRowData[]);
     expect(typeToUse).toEqual(TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM);
     expect(areaToUse).toEqual('');
   });
 
   it('return NUCLEAR_FR_TS_SMR type when index table is the last one', () => {
-    vi.mocked(trajectoryUtils.getFetchFromDbParams).mockReturnValue({
-      typeToUse: TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR,
-      areaToUse: '',
-    });
-    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION, [2, 2], 3, {
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
       area: 'H2',
       isDefault: false,
     });
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION, '2.2', [{}, {}, {}] as HypothesisRowData[]);
     expect(typeToUse).toEqual(TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR);
     expect(areaToUse).toEqual('');
   });
 
   it('return ADEQUACY_PATCH type when index table is the first one', () => {
-    vi.mocked(trajectoryUtils.getFetchFromDbParams).mockReturnValue({
-      typeToUse: TRAJECTORY_TYPE.ADEQUACY_PATCH,
-      areaToUse: '',
-    });
-    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.ADEQUACY_PATCH, [0], 3, {
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
       area: 'H2',
       isDefault: false,
     });
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.ADEQUACY_PATCH, '0', [{}, {}, {}] as HypothesisRowData[]);
     expect(typeToUse).toEqual(TRAJECTORY_TYPE.ADEQUACY_PATCH);
     expect(areaToUse).toEqual('');
   });
 
   it('return FLOWBASED type when index table is the second one', () => {
-    vi.mocked(trajectoryUtils.getFetchFromDbParams).mockReturnValue({
-      typeToUse: TRAJECTORY_TYPE.ADEQUACY_PATCH,
-      areaToUse: '',
-    });
-    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.ADEQUACY_PATCH, [1], 3, {
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
       area: 'H2',
       isDefault: false,
     });
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.ADEQUACY_PATCH, '1', [{}, {}, {}] as HypothesisRowData[]);
     expect(typeToUse).toEqual(TRAJECTORY_TYPE.FLOWBASED);
     expect(areaToUse).toEqual('');
   });
 
   it('return SETTINGS_SCENARIO_BUILDER type when index table is the first one of subrows', () => {
-    vi.mocked(trajectoryUtils.getFetchFromDbParams).mockReturnValue({
-      typeToUse: TRAJECTORY_TYPE.ADEQUACY_PATCH,
-      areaToUse: '',
-    });
-    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.ADEQUACY_PATCH, [2, 0], 3, {
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
       area: 'H2',
       isDefault: false,
     });
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.ADEQUACY_PATCH, '2.0', [{}, {}, {}] as HypothesisRowData[]);
     expect(typeToUse).toEqual(TRAJECTORY_TYPE.SETTINGS);
     expect(areaToUse).toEqual('');
   });
 
   it('return SCENARIO_BUILDER type when index table is the last one of subrows', () => {
-    vi.mocked(trajectoryUtils.getFetchFromDbParams).mockReturnValue({
-      typeToUse: TRAJECTORY_TYPE.ADEQUACY_PATCH,
-      areaToUse: '',
-    });
-    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.ADEQUACY_PATCH, [2, 2], 3, {
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
       area: 'H2',
       isDefault: false,
     });
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.ADEQUACY_PATCH, '2.2', [{}, {}, {}] as HypothesisRowData[]);
     expect(typeToUse).toEqual(TRAJECTORY_TYPE.SCENARIO_BUILDER);
     expect(areaToUse).toEqual('');
   });
 
   it('return STS and area as technology type when technology is provided for STS type', () => {
-    vi.mocked(trajectoryUtils.getFetchFromDbParams).mockReturnValue({
-      typeToUse: TRAJECTORY_TYPE.STS,
-      areaToUse: '',
-    });
-    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.STS, [2, 0], 3, {
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
       area: 'H2',
       technology: 'battery',
       isDefault: false,
     });
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.STS, '2.0', [{}, {}, {}] as HypothesisRowData[]);
     expect(typeToUse).toEqual(TRAJECTORY_TYPE.STS);
     expect(areaToUse).toEqual('battery');
   });
 
   it('return HYDRO_SERIES and no area type when for HYDRO_SERIES type', () => {
-    vi.mocked(trajectoryUtils.getFetchFromDbParams).mockReturnValue({
-      typeToUse: TRAJECTORY_TYPE.HYDRO_SERIES,
-      areaToUse: '',
-    });
-    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.HYDRO_SERIES, [2, 0], 3, {
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
       area: 'H2',
       isDefault: false,
     });
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.HYDRO_SERIES, '2.0', [{}, {}, {}] as HypothesisRowData[]);
     expect(typeToUse).toEqual(TRAJECTORY_TYPE.HYDRO_SERIES);
     expect(areaToUse).toEqual('');
   });
 
   it('return HYDRO_PSP_SERIES and no area type when for HYDRO_PSP_SERIES type', () => {
-    vi.mocked(trajectoryUtils.getFetchFromDbParams).mockReturnValue({
-      typeToUse: TRAJECTORY_TYPE.HYDRO_PSP_SERIES,
-      areaToUse: '',
-    });
-    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.HYDRO_PSP_SERIES, [2, 0], 3, {
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
       area: 'H2',
       isDefault: false,
     });
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(TRAJECTORY_TYPE.HYDRO_PSP_SERIES, '2.0', [{}, {}, {}] as HypothesisRowData[]);
     expect(typeToUse).toEqual(TRAJECTORY_TYPE.HYDRO_PSP_SERIES);
     expect(areaToUse).toEqual('');
   });
