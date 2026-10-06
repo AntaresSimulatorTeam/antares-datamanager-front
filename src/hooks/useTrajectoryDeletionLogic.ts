@@ -82,6 +82,18 @@ export const useTrajectoryDeletionLogic = (study: StudyDTO) => {
           }
         }
       }
+      // --- Cas ME ---
+      else if (type === TRAJECTORY_TYPE.AREA_ME) {
+        const allTrajectories = data.flatMap(row => collectTrajectoriesRecursively(row));
+        trajectoryIds = allTrajectories.map((t) => t.id);
+        const rowIndex = indexRow ?? indexArray?.[0];
+        if (rowIndex == null) {
+          throw new Error('computeDeletion: indexRow and indexArray are both null. One must be provided.');
+        }
+        const row = (data[rowIndex]?.subRows && indexArray?.length == 2) ? data[rowIndex].subRows[indexArray[1]] : data[rowIndex];
+        trajectoryToDelete = row?.trajectory;
+      }
+
       // --- Cas générique ---
       else {
         const rowIndex = indexRow ?? indexArray?.[0];
