@@ -172,15 +172,15 @@ const getExpandableHypothesisTableHeaders = ({
                   options={[
                     {
                       id: 'option1',
-                      label: t('settings.@read'),
+                      labelText: t('settings.@read'),
                     },
                     {
                       id: 'option2',
-                      label: t('settings.@recalculate'),
+                      labelText: t('settings.@recalculate'),
                     },
                   ]}
                   selectedSegment={recalculate ? 'option2' : 'option1'}
-                  compactSpacing={true}
+                  isCompact={true}
                 />
               </div>
             );

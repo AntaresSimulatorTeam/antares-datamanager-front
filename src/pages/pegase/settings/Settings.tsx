@@ -27,19 +27,19 @@ const Settings = () => {
           options={[
             {
               id: THEME_MODE.LIGHT,
-              label: t('settingsUser.@mode_light'),
+              labelText: t('settingsUser.@mode_light'),
               icon: 'mode-light'
             },
             {
               id: THEME_MODE.DARK,
-              label: t('settingsUser.@mode_dark'),
+              labelText: t('settingsUser.@mode_dark'),
               icon: 'mode-dark'
             },
           ]}
           defaultValue={mode}
           selectedSegment={mode}
           onChange={(value) => setContext({ mode: value as THEME_MODE })}
-          compactSpacing={true}
+          isCompact={true}
         />
       </div>
       <div className="flex flex-col gap-1 justify-start items-start">
@@ -64,8 +64,6 @@ const Settings = () => {
               value: THEME_COLOR.VIOLET
             }
           ]}
-          showGroupTitle
-          showHelpText
           showItemsLabel
         />
       </div>

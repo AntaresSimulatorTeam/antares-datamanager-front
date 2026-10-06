@@ -55,7 +55,7 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
                 row.toggleSelected(!isSelected);
               }
             }}
-            className={`${status === StudyStatus.GENERATED ? '!brand-default group-hover:!brand-default' : '!text-gray-800 group-hover:!text-gray-800'}`}
+            className={`${status === StudyStatus.GENERATED ? '!text-content-brand-default group-hover:!text-content-brand-default' : '!text-gray-800 group-hover:!text-gray-800'}`}
           />
         </div>
       );
