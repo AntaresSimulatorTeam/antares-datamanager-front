@@ -48,6 +48,7 @@ const MainContent = () => {
             footerItems={translateMenuItemLabel(footerMenuItems, t)}
             collapsible
             onCollapsedChange={(collapsed) => setIsCollapsed(collapsed)}
+            size="s"
             />
         </NavigationProvider>
         </div>
