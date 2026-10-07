@@ -165,7 +165,7 @@ const getExpandableHypothesisTableHeaders = ({
             return (<Tag iconName="check" compactSpacing={true} color="neutral" tagType="decorative" label={recalculate ? t('settings.@recalculate') : t('settings.@read')}/>);
           } else {
             return (
-              <div className="w-1/2 [&_span[class*='segment-selected-indicator']]:!transition-none">
+              <div className="[&_span[class*='segment-selected-indicator']]:!transition-none">
                 <SegmentedControl
                   appearance="brand"
                   onChange={(value: string) => void options?.meta?.activate?.(value === 'option2')}
