@@ -63,9 +63,6 @@ const createTestTable = (initialReadOnly: Record<string, boolean> = {}) => {
       getExpandedRowModel: getExpandedRowModel(),
       getRowId: (row) => row.id,
       getSubRows: (row) => row.subRows,
-      initialState: {
-        readOnly: initialReadOnly,
-      },
       state: {
         readOnly: initialReadOnly,
       },

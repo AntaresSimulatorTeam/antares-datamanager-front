@@ -6,7 +6,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, render, renderHook, screen } from '@testing-library/react';
-import React, { FC, PropsWithChildren } from 'react';
+import { FC, PropsWithChildren } from 'react';
 import { THEME_COLOR, THEME_MODE } from '@/shared/types';
 import { getInitialUserSettings, UserSettingsContext, UserSettingsContextStore } from '../UserSettingsContext';
 
