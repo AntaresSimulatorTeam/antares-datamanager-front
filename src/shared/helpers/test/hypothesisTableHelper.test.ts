@@ -997,6 +997,47 @@ describe('buildReadOnlyMap', () => {
       1: true, // verrouillé car aucun OK
     });
   });
+
+  describe('AREA_ME in buildReadOnlyMap', () => {
+    it('should set itemsToReadOnly to hypothesis of rows.slice(1) when first row status is not OK', () => {
+      const meRows: HypothesisRowData[] = [
+        { hypothesis: 'Areas', status: TRAJECTORY_SELECTION_STATUS.MISSING, trajectory: null },
+        { hypothesis: 'Links', status: TRAJECTORY_SELECTION_STATUS.MISSING, trajectory: null },
+        { hypothesis: 'Load', status: TRAJECTORY_SELECTION_STATUS.MISSING, trajectory: null },
+      ];
+
+      vi.mocked(trajectoryUtils.retrieveReadOnlyArea).mockReturnValue({ 0: false, 1: true, 2: true });
+
+      const result = buildReadOnlyMap({
+        rows: meRows,
+        trajType: TRAJECTORY_TYPE.AREA_ME,
+        isStudyGenerated: false,
+        defaultAreaListNotInList: ['someArea'],
+      });
+
+      expect(trajectoryUtils.retrieveReadOnlyArea).toHaveBeenCalledWith(meRows, ['Links', 'Load']);
+      expect(result).toEqual({ 0: false, 1: true, 2: true });
+    });
+
+    it('should keep defaultAreaListNotInList when first row status is OK', () => {
+      const meRows: HypothesisRowData[] = [
+        { hypothesis: 'Areas', status: TRAJECTORY_SELECTION_STATUS.OK, trajectory: { id: 1 } as DbTrajectory },
+        { hypothesis: 'Links', status: TRAJECTORY_SELECTION_STATUS.MISSING, trajectory: null },
+      ];
+
+      vi.mocked(trajectoryUtils.retrieveReadOnlyArea).mockReturnValue({ 0: false, 1: false });
+
+      const result = buildReadOnlyMap({
+        rows: meRows,
+        trajType: TRAJECTORY_TYPE.AREA_ME,
+        isStudyGenerated: false,
+        defaultAreaListNotInList: ['someArea'],
+      });
+
+      expect(trajectoryUtils.retrieveReadOnlyArea).toHaveBeenCalledWith(meRows, ['someArea']);
+      expect(result).toEqual({ 0: false, 1: false });
+    });
+  });
 });
 
 describe('buildHypothesisRows', () => {
@@ -1559,6 +1600,68 @@ describe('updateTableAfterCellDetach', () => {
           { hypothesis: 'H2', status: TRAJECTORY_SELECTION_STATUS.MISSING, trajectory: null },
         ],
         newReadOnly: { '0': false, '1': true },
+      });
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // AREA_ME
+  // ---------------------------------------------------------------------------
+  describe('AREA_ME', () => {
+    it('réinitialise toutes les lignes et sous-lignes à MISSING/null et met en lecture seule les indices !== 0', async () => {
+      const data: HypothesisRowData[] = [
+        {
+          hypothesis: 'Areas',
+          trajectory: { id: 1, trajectoryName: 'Area Traj' } as DbTrajectory,
+          status: TRAJECTORY_SELECTION_STATUS.OK,
+          subRows: [
+            {
+              hypothesis: 'SubArea',
+              trajectory: { id: 2, trajectoryName: 'Sub Traj' } as DbTrajectory,
+              status: TRAJECTORY_SELECTION_STATUS.OK,
+            },
+          ],
+        },
+        {
+          hypothesis: 'Links',
+          trajectory: { id: 3, trajectoryName: 'Link Traj' } as DbTrajectory,
+          status: TRAJECTORY_SELECTION_STATUS.OK,
+        },
+      ];
+
+      const result = await updateTableAfterCellDetach({
+        type: TRAJECTORY_TYPE.AREA_ME,
+        data,
+        additionalTrajectory: null,
+        indexArray: [0],
+        studyId: 42,
+        horizon: '2030',
+      });
+
+      expect(result).toEqual({
+        newData: [
+          {
+            hypothesis: 'Areas',
+            trajectory: null,
+            status: TRAJECTORY_SELECTION_STATUS.MISSING,
+            subRows: [
+              {
+                hypothesis: 'SubArea',
+                trajectory: null,
+                status: TRAJECTORY_SELECTION_STATUS.MISSING,
+              },
+            ],
+          },
+          {
+            hypothesis: 'Links',
+            trajectory: null,
+            status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          },
+        ],
+        newReadOnly: {
+          '0': false,
+          '1': true,
+        },
       });
     });
   });

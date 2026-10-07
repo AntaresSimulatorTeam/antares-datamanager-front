@@ -501,8 +501,15 @@ export const buildReadOnlyMap = ({
     return generateReadOnlyIndexMap(rows);
   }
 
+  let itemsToReadOnly = defaultAreaListNotInList;
+
+  if (trajType === TRAJECTORY_TYPE.AREA_ME && rows.length > 0 && rows[0]?.status !== TRAJECTORY_SELECTION_STATUS.OK) {
+    const rowsToIterate = rows.slice(1);
+    itemsToReadOnly = rowsToIterate?.map((data) => data.hypothesis);
+  }
+
   // Appel correct avec les deux arguments
-  const readOnlySubRows = retrieveReadOnlyArea(rows, defaultAreaListNotInList);
+  const readOnlySubRows = retrieveReadOnlyArea(rows, itemsToReadOnly);
 
   if (trajType !== TRAJECTORY_TYPE.DSR) {
     return readOnlySubRows;
@@ -698,6 +705,22 @@ export const updateTableAfterCellDetach = async ({
         : item,
     );
     return { newData };
+  }
+
+  if (type === TRAJECTORY_TYPE.AREA_ME) {
+    const newData = data.map((row) =>({
+      ...row,
+      trajectory: null,
+      status: TRAJECTORY_SELECTION_STATUS.MISSING,
+      ...(row?.subRows?.length && {subRows: row.subRows.map((subRow) => ({ ...subRow,
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.MISSING}))})
+    }));
+
+    const newReadOnly: Record<string, boolean> = Object.fromEntries(
+      newData.map((_itemData, index) => [String(index), index !== 0])
+    );
+    return {newData, newReadOnly};
   }
 
   // Cas générique nested
