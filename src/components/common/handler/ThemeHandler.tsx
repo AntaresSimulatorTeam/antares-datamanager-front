@@ -54,11 +54,6 @@ const ThemeHandler = () => {
       // ignore storage errors
     }
 
-    document.documentElement.setAttribute('data-theme', currentTheme);
-    document.documentElement.setAttribute('data-mode', currentMode);
-    document.body.setAttribute('data-theme', currentTheme);
-    document.body.setAttribute('data-mode', currentMode);
-
     document.documentElement.dataset.theme = currentTheme;
     document.documentElement.dataset.mode = currentMode;
     document.body.dataset.theme = currentTheme;
