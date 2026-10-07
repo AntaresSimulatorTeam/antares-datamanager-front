@@ -19,6 +19,6 @@ export const LogoHeader = ({version, isCollapsed}: {version: string, isCollapsed
   }, [mode, isCollapsed]);
 
     return (
-      <div className="flex flex-col items-start gap-1"><img alt="logo-antares" src={imgSrc}/><span className="text-body-xs self-end">{version}</span></div>
+      <div className="flex flex-col items-start gap-1 px-2"><img alt="logo-antares" src={imgSrc}/><span className="text-body-xs self-end">{version}</span></div>
     );
 }

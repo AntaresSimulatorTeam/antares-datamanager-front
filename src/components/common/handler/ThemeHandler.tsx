@@ -54,15 +54,10 @@ const ThemeHandler = () => {
       // ignore storage errors
     }
 
-    document.documentElement.setAttribute('data-theme', currentTheme);
-    document.documentElement.setAttribute('data-mode', currentMode);
-    document.body.setAttribute('data-theme', currentTheme);
-    document.body.setAttribute('data-mode', currentMode);
-
-    document.documentElement.setAttribute('data-theme', currentTheme);
-    document.documentElement.setAttribute('data-mode', currentMode);
-    document.body.setAttribute('data-theme', currentTheme);
-    document.body.setAttribute('data-mode', currentMode);
+    document.documentElement.dataset.theme = currentTheme;
+    document.documentElement.dataset.mode = currentMode;
+    document.body.dataset.theme = currentTheme;
+    document.body.dataset.mode = currentMode;
 
     if (currentMode === THEME_MODE.DARK) {
       document.documentElement.classList.add(THEME_MODE.DARK);
