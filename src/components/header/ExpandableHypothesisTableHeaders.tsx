@@ -200,7 +200,7 @@ const getExpandableHypothesisTableHeaders = ({
           (type === TRAJECTORY_TYPE.STS ||
             type === TRAJECTORY_TYPE.HYDRO_SERIES ||
             type === TRAJECTORY_TYPE.HYDRO_PSP_SERIES) &&
-          row.depth === 0) ||
+          row.depth === 0) || (type === TRAJECTORY_TYPE.ME && row.id === '4') ||
         (type === TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION && row.id === '2');
       if (
         hypothesis === t('thermal.@specific') ||
