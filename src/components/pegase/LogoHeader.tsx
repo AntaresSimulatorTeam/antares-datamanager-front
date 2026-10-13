@@ -1,29 +1,20 @@
 import { UserSettingsContext } from '@/store/contexts/UserSettingsContext.tsx';
 import { THEME_MODE } from '@/shared/types';
-import { useEffect, useState } from 'react';
 
-export const LogoHeader = ({version, isCollapsed}: {version: string, isCollapsed: boolean}) => {
+export const LogoHeader = ({ version, isCollapsed }: { version: string; isCollapsed: boolean }) => {
   const mode = UserSettingsContext.useStore((store) => store.mode);
-  const [imgSrc, setImgSrc] = useState<string>("brand/logo_antares_pegase_dark_expand.svg");
-  const [paddingX, setPaddingX] = useState<string>("px-2");
 
-  useEffect(() => {
-    if (mode === THEME_MODE.DARK && isCollapsed) {
-      setImgSrc("brand/logo_antares_pegase_light_collapse.svg");
-      setPaddingX("px-0");
-    } else if (mode === THEME_MODE.DARK && !isCollapsed) {
-      setImgSrc("brand/logo_antares_pegase_light_expand.svg");
-      setPaddingX("px-2");
-    } else if (mode === THEME_MODE.LIGHT && isCollapsed) {
-      setImgSrc("brand/logo_antares_pegase_dark_collapse.svg");
-      setPaddingX("px-0");
-    } else if (mode === THEME_MODE.LIGHT && !isCollapsed) {
-      setImgSrc("brand/logo_antares_pegase_dark_expand.svg");
-      setPaddingX("px-2");
-    }
-  }, [mode, isCollapsed]);
+  const isDark = mode === THEME_MODE.DARK;
+  const variant = isDark ? 'light' : 'dark';
+  const state = isCollapsed ? 'collapse' : 'expand';
 
-    return (
-      <div className={`flex flex-col items-start gap-1 ${paddingX}`}><img alt="logo-antares" src={imgSrc}/><span className="text-body-xs self-end">{version}</span></div>
-    );
-}
+  const imgSrc = `/brand/logo_antares_pegase_${variant}_${state}.svg`;
+  const paddingX = isCollapsed ? 'px-0' : 'px-2';
+
+  return (
+    <div className={`flex flex-col items-start gap-1 ${paddingX}`}>
+      <img alt="logo-antares" src={imgSrc} />
+      <span className="text-body-xs self-end">{version}</span>
+    </div>
+  );
+};
