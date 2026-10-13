@@ -46,6 +46,8 @@ const MainContent = () => {
             header={<LogoHeader version={`v${packageJson.version}`} isCollapsed={isCollapsed}/>}
             items={translateMenuItemLabel(mainMenuItems, t)}
             footerItems={translateMenuItemLabel(footerMenuItems, t)}
+            closeCollapseText={t('components.navbar.@minimize')}
+            openCollapseText={t('components.navbar.@expand')}
             collapsible
             onCollapsedChange={(collapsed) => setIsCollapsed(collapsed)}
             size="s"

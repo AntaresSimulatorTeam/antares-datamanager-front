@@ -24,7 +24,7 @@ export const mainMenuItems: NavItemProps [] = [
     icon: 'home',
   },
   {
-    label: 'page.@project',
+    label: 'page.@projects',
     link: '/projects',
     icon: 'folder',
   },
