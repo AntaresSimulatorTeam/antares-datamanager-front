@@ -867,7 +867,7 @@ export const getHypothesis = (
     return { hypothesis: data[indexArray[0]]?.hypothesis, technology: dataRowSelected?.hypothesis };
   } else {
     return {
-      hypothesis: dataRowSelected?.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : dataRowSelected?.hypothesis ?? '',
+      hypothesis: dataRowSelected?.hypothesis ?? '',
       technology: undefined,
     };
   }

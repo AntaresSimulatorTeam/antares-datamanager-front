@@ -461,7 +461,7 @@ describe('getHypothesis', () => {
   it('should return OTHER_AREAS when hypothesis is OTHER_AREAS_LABEL', () => {
     const result = getHypothesis(mockData, '1');
     expect(result).toEqual({
-      hypothesis: OTHER_AREAS,
+      hypothesis: OTHER_AREAS_LABEL,
       technology: undefined,
     });
   });
