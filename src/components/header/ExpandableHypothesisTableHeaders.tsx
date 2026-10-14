@@ -165,22 +165,22 @@ const getExpandableHypothesisTableHeaders = ({
             return (<Tag iconName="check" compactSpacing={true} color="neutral" tagType="decorative" label={recalculate ? t('settings.@recalculate') : t('settings.@read')}/>);
           } else {
             return (
-              <div className="w-1/2 [&_span[class*='segment-selected-indicator']]:!transition-none">
+              <div className="[&_span[class*='segment-selected-indicator']]:!transition-none">
                 <SegmentedControl
                   appearance="brand"
                   onChange={(value: string) => void options?.meta?.activate?.(value === 'option2')}
                   options={[
                     {
                       id: 'option1',
-                      label: t('settings.@read'),
+                      labelText: t('settings.@read'),
                     },
                     {
                       id: 'option2',
-                      label: t('settings.@recalculate'),
+                      labelText: t('settings.@recalculate'),
                     },
                   ]}
                   selectedSegment={recalculate ? 'option2' : 'option1'}
-                  compactSpacing={true}
+                  isCompact={true}
                 />
               </div>
             );
@@ -200,7 +200,7 @@ const getExpandableHypothesisTableHeaders = ({
           (type === TRAJECTORY_TYPE.STS ||
             type === TRAJECTORY_TYPE.HYDRO_SERIES ||
             type === TRAJECTORY_TYPE.HYDRO_PSP_SERIES) &&
-          row.depth === 0) ||
+          row.depth === 0) || (type === TRAJECTORY_TYPE.ME && row.id === '4') ||
         (type === TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION && row.id === '2');
       if (
         hypothesis === t('thermal.@specific') ||

@@ -29,6 +29,14 @@ export const ReadOnlyFeature: TableFeature = {
   },
 
   createRow: <TData extends RowData>(row: Row<TData>, table: Table<TData>): void => {
-    row.getReadOnly = () => table.getState().readOnly[row.id];
+    row.getReadOnly = () => {
+      // 1. Vérifie si la ligne courante est explicitement en readOnly
+      const isSelfReadOnly = Boolean(table.getState().readOnly[row.id]);
+
+      // 2. Vérifie si le parent direct (ou un ancêtre) est en readOnly
+      const isParentReadOnly = Boolean(row.getParentRow()?.getReadOnly());
+
+      return isSelfReadOnly || isParentReadOnly;
+    };
   },
 };

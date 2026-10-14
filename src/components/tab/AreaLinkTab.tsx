@@ -22,7 +22,7 @@ import {
 import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
-import { buildReadOnlyRow, buildTableData, getAreaTrajectoryName } from '@/shared/utils/trajectoryUtils.ts';
+import { buildReadOnlyRow, buildTableData } from '@/shared/utils/trajectoryUtils.ts';
 import { TrajectoryDataVisualisation } from '@common/modal/TrajectoryDataVisualisation.tsx';
 import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
@@ -124,19 +124,18 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
   );
 
   const handleFetchTrajectoryFromFs = useCallback(async (rowId: string, type: TRAJECTORY_TYPE) => {
-    const hypothesis = getAreaTrajectoryName(rowId, data);
+    const dataToUse = isTrajectoryConfigurationType(type) ? settingsData : data;
     const { typeToUse, areaToUse, isDefaultArea } = getParamForFetchFSTrajectory(
       type,
-      rowId.split('.').map(Number),
-      data.length,
-      hypothesis,
+      rowId,
+      dataToUse,
     );
     setSelectedTrajectoryType(typeToUse);
     const results = await handleFetchFromFS({ typeToUse, areaToUse, isDefaultArea });
     setOptionsFS(results);
     setRowIdSelected(rowId);
     toggleModal();
-  }, [data, handleFetchFromFS, toggleModal]);
+  }, [data, handleFetchFromFS, settingsData, toggleModal]);
 
   const handleViewTrajectoryData = useCallback(
     (rowId: string) => {
@@ -252,7 +251,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
             toggleModal();
             if (typeToUse) {
               setSelectedTrajectoryType(typeToUse);
-              if(value) {
+              if (value) {
                 await importTrajectory(
                   isTrajectoryConfigurationType(typeToUse) ? setSettingsData : setData,
                   value,
@@ -266,12 +265,8 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
             }
           }}
           tabType={selectedTrajectoryType}
-          hypothesis={getAreaTrajectoryName(
-            rowIdSelected,
-            isTrajectoryConfigurationType(selectedTrajectoryType) ? settingsData : data,
-          )}
-          indexArray={rowIdSelected?.split('.').map(Number)}
-          rowsNb={data.length}
+          data={isTrajectoryConfigurationType(selectedTrajectoryType) ? settingsData : data}
+          rowIdSelected={rowIdSelected}
         />
       {trajectoryData && (
         <TrajectoryDataVisualisation trajectoryData={trajectoryData} onClose={() => setIsViewModalOpen(false)} isOpen={isViewModalOpen}/>

@@ -4,7 +4,13 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-export enum THEME_COLOR {
+export enum THEME_MODE {
   LIGHT = 'light',
   DARK = 'dark',
+}
+
+export enum THEME_COLOR {
+  VERT_FORET = 'vert_foret',
+  BLUE_ICEBERG = 'bleu_iceberg',
+  VIOLET = 'violet',
 }

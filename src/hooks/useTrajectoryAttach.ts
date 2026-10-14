@@ -67,6 +67,13 @@ export const useTrajectoryAttach = (
             if (type === TRAJECTORY_TYPE.DSR) {
               setReadOnly?.((prevReadOnly) => ({ ...prevReadOnly, [lastIndex]: !newDbTrajectory.hasTimeSeries }));
             }
+            if (type === TRAJECTORY_TYPE.AREA_ME) {
+              setReadOnly?.((prevReadOnly: ReadOnlyObject) =>
+                Object.fromEntries(
+                  Object.keys(prevReadOnly).map(key => [key, false])
+                ) as ReadOnlyObject
+              );
+            }
           }
         }
       } catch (error) {

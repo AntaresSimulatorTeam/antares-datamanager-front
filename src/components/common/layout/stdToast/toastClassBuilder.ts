@@ -3,7 +3,7 @@ import { clsx } from 'clsx';
 
 export const COMMON_CONTAINER_CLASSES = 'flex items-center rounded px-2 py-1 shadow-4 text-left';
 const PROGRESS_BAR_CLASSES = 'border-b-4';
-export const COMMON_TEXT_CLASSES = 'grow text-body-xs line-clamp-2 pr-2 font-semibold';
+export const COMMON_TEXT_CLASSES = 'grow text-body-s line-clamp-2 pr-2 font-semibold';
 
 export const STATUS_CONTAINER_CLASSES = {
   success: 'bg-success-200',

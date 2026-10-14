@@ -21,7 +21,6 @@ import { ImportTrajectoryModal } from '@common/modal/ImportTrajectoryModal.tsx';
 import {
   filterRow,
   generateReadOnlyIndexMap,
-  getAreaTrajectoryName,
   getTrajectoryTypeByIndex,
   shouldDeleteParamModulation,
 } from '@/shared/utils/trajectoryUtils.ts';
@@ -187,12 +186,10 @@ export const ParametersTab = ({ studyData, defaultAreas, areas }: TabProps) => {
 
   const handleFetchTrajectoriesFromFS = useCallback(
     async (rowId: string, tableData: HypothesisRowData[], type: TRAJECTORY_TYPE) => {
-      const hypothesis = getAreaTrajectoryName(rowId, tableData);
       const { typeToUse, areaToUse, isDefaultArea } = getParamForFetchFSTrajectory(
         type,
-        rowId.split('.').map(Number),
-        data.length,
-        hypothesis,
+        rowId,
+        tableData,
       );
       const results = await handleFetchFromFS({ typeToUse, areaToUse, isDefaultArea });
       setOptionsFS(results);
@@ -200,7 +197,7 @@ export const ParametersTab = ({ studyData, defaultAreas, areas }: TabProps) => {
       setRowIdSelected(rowId);
       toggleModal();
     },
-    [data.length, handleFetchFromFS, toggleModal],
+    [handleFetchFromFS, toggleModal],
   );
 
   const getParameterType = useCallback((tableType: TRAJECTORY_TYPE, topIndex: number): TRAJECTORY_TYPE => {
@@ -346,12 +343,8 @@ export const ParametersTab = ({ studyData, defaultAreas, areas }: TabProps) => {
             }
           }}
           tabType={selectedTrajectoryType ?? getTrajectoryTypeByIndex(Number(rowIdSelected))}
-          hypothesis={getAreaTrajectoryName(
-            rowIdSelected,
-            isTrajectoryThermalTechnicalParametersType(selectedTrajectoryType) ? technicalData : data,
-          )}
-          indexArray={rowIdSelected?.split('.').map(Number)}
-          rowsNb={data.length}
+          data={isTrajectoryThermalTechnicalParametersType(selectedTrajectoryType) ? technicalData : data}
+          rowIdSelected={rowIdSelected}
         />
         <AreaDeletionConfirmationModal
           isOpen={isDeletionModalOpen}

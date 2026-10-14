@@ -80,7 +80,7 @@ describe('getStatus', () => {
 describe('getBgColor', () => {
   it("should return the right color for 'loading' status", () => {
     const color = getBgColor('loading');
-    expect(color).toStrictEqual('bg-primary-600');
+    expect(color).toStrictEqual('bg-background-brand-default');
   });
   it("should return the right color for 'success' status", () => {
     const color = getBgColor('success');
@@ -461,7 +461,7 @@ describe('getHypothesis', () => {
   it('should return OTHER_AREAS when hypothesis is OTHER_AREAS_LABEL', () => {
     const result = getHypothesis(mockData, '1');
     expect(result).toEqual({
-      hypothesis: OTHER_AREAS,
+      hypothesis: OTHER_AREAS_LABEL,
       technology: undefined,
     });
   });

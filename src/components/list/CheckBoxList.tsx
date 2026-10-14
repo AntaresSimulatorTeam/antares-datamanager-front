@@ -31,7 +31,7 @@ export const CheckBoxList = ({ disabled, checkedValues, handleSelectionChange, o
       ))}
       <span className="ml-3 text-body-xs text-gray-400">{t('studyDetails.@checkBoxDefault')}</span>
       <Divider />
-      <div className="[&_label]::text-body-s relative min-h-0 overflow-y-auto">
+      <div className=" relative min-h-0 overflow-y-auto">
         {optionsNotDefault?.map((area, index) => (
           <Checkbox
             key={`${index}-${area.name}`}

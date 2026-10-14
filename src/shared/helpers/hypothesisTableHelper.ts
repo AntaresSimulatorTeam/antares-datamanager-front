@@ -9,6 +9,7 @@ import {
   isTrajectoryP2GType,
   isTrajectoryResType,
   isTrajectorySubrowsType,
+  TechnologyType,
   TrajectoryAreaData,
 } from '@/shared/types';
 import {
@@ -16,6 +17,7 @@ import {
   convertIntoHypothesisRowWithTechnologies,
   filterRow,
   generateReadOnlyIndexMap,
+  getAreaTrajectoryName,
   getTrajectoryTypeByIndex,
   removeDuplicate,
   removeDuplicateByTechnology,
@@ -32,7 +34,6 @@ import { HydroSubRows, STSTechnology } from '@/mocks/data/list/names.ts';
 import { TFunction } from 'i18next';
 import { sortWithFixedPosition } from '@/shared/utils/sortUtils.ts';
 import { getResTechnologyList, isParamModulationRequired } from '@/shared/services/trajectoryService.ts';
-import { HypothesisType } from '@/shared/types/HypothesisTable.ts';
 import {
   getConfigurationTypeToUse,
   getHydroTypeToUse,
@@ -500,8 +501,15 @@ export const buildReadOnlyMap = ({
     return generateReadOnlyIndexMap(rows);
   }
 
+  let itemsToReadOnly = defaultAreaListNotInList;
+
+  if (trajType === TRAJECTORY_TYPE.AREA_ME && rows.length > 0 && rows[0]?.status !== TRAJECTORY_SELECTION_STATUS.OK) {
+    const rowsToIterate = rows.slice(1);
+    itemsToReadOnly = rowsToIterate?.map((data) => data.hypothesis);
+  }
+
   // Appel correct avec les deux arguments
-  const readOnlySubRows = retrieveReadOnlyArea(rows, defaultAreaListNotInList);
+  const readOnlySubRows = retrieveReadOnlyArea(rows, itemsToReadOnly);
 
   if (trajType !== TRAJECTORY_TYPE.DSR) {
     return readOnlySubRows;
@@ -699,6 +707,22 @@ export const updateTableAfterCellDetach = async ({
     return { newData };
   }
 
+  if (type === TRAJECTORY_TYPE.AREA_ME) {
+    const newData = data.map((row) =>({
+      ...row,
+      trajectory: null,
+      status: TRAJECTORY_SELECTION_STATUS.MISSING,
+      ...(row?.subRows?.length && {subRows: row.subRows.map((subRow) => ({ ...subRow,
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.MISSING}))})
+    }));
+
+    const newReadOnly: Record<string, boolean> = Object.fromEntries(
+      newData.map((_itemData, index) => [String(index), index !== 0])
+    );
+    return {newData, newReadOnly};
+  }
+
   // Cas générique nested
   const newData = setNestedData(data, indexArray, empty);
   return { newData };
@@ -706,10 +730,14 @@ export const updateTableAfterCellDetach = async ({
 
 export const getParamForFetchFSTrajectory = (
   type: TRAJECTORY_TYPE,
-  indexArray: number[],
-  rowsNb: number,
-  hypothesis?: HypothesisType,
+  rowId: string,
+  data: HypothesisRowData[],
+  options?: TechnologyType[],
 ) => {
+  const indexArray = rowId.split('.').map(Number);
+  const rowsNb = data.length;
+  const hypothesis = getAreaTrajectoryName(rowId, data, type, options);
+
   let typeToUse = type;
   let areaToUse = hypothesis?.area;
   let isDefaultArea = hypothesis?.isDefault ?? false;
@@ -763,7 +791,7 @@ export const getParamForFetchFSTrajectory = (
     typeToUse = getMETypeToUse(indexArray);
     areaToUse = '';
   }
-  return { typeToUse, areaToUse, isDefaultArea };
+  return { typeToUse, areaToUse, isDefaultArea, hypothesis };
 };
 
 export const getTypeToUse = (type: TRAJECTORY_TYPE, indexArray: number[], nbRows: number) => {

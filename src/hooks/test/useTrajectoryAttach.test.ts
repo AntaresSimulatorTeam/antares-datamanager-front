@@ -477,4 +477,50 @@ describe('useTrajectoryAttach', () => {
     // hasTimeSeries = false → readOnly[lastIndex] = true
     expect(updated).toEqual({ 0: true });
   });
+
+  it('met à jour readOnly pour AREA_ME en mettant toutes les clés existantes à false', async () => {
+    const studyME = { id: 1 } as StudyDTO;
+    const dispatch = vi.fn();
+    const setData: Dispatch<SetStateAction<HypothesisRowData[]>> = vi.fn((fn: SetStateAction<HypothesisRowData[]>) => {
+      const prev = [
+        { status: TRAJECTORY_SELECTION_STATUS.MISSING },
+        { status: TRAJECTORY_SELECTION_STATUS.MISSING },
+      ] as HypothesisRowData[];
+      if (typeof fn === 'function') {
+        return (fn as (prev: HypothesisRowData[]) => HypothesisRowData[])(prev);
+      }
+      return fn;
+    });
+
+    const newTrajectoryME = {
+      id: 10,
+      type: TRAJECTORY_TYPE.AREA_ME,
+      trajectoryName: 'Area ME Traj',
+    } as DbTrajectory;
+
+    vi.mocked(trajectoryService.linkTrajectoryToStudy).mockResolvedValue(newTrajectoryME);
+    vi.mocked(trajectoryUtils.setNestedData).mockReturnValue([
+      { status: TRAJECTORY_SELECTION_STATUS.OK, trajectory: newTrajectoryME },
+    ] as HypothesisRowData[]);
+
+    const { result } = renderHook(() => useTrajectoryAttach(studyME, dispatch));
+
+    await act(async () => {
+      await result.current.attachTrajectory(
+        TRAJECTORY_TYPE.AREA_ME,
+        [0],
+        'success',
+        newTrajectoryME,
+        setData,
+        mockSetReadOnly,
+      );
+    });
+
+    expect(mockSetReadOnly).toHaveBeenCalledWith(expect.any(Function));
+
+    const updater = mockSetReadOnly.mock.calls[0][0] as (prev: ReadOnlyObject) => ReadOnlyObject;
+    const updated = updater({ '0': false, '1': true, '2': true });
+
+    expect(updated).toEqual({ '0': false, '1': false, '2': false });
+  });
 });

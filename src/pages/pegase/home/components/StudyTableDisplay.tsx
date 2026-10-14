@@ -7,7 +7,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ProjectInfo } from '@/shared/types';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type';
-import getStudyTableHeaders from './StudyTableHeaders';
+import getStudyTableHeaders from '../../../../components/header/StudyTableHeaders.tsx';
 import { addSortColumn } from './StudyTableUtils';
 import { RowSelectionState } from '@tanstack/react-table';
 import { deleteStudy } from '@/shared/services/studyService';

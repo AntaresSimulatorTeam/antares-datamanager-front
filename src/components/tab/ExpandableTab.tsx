@@ -18,7 +18,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
-import { getAreaTrajectoryName, getDeletionModalMessage } from '@/shared/utils/trajectoryUtils.ts';
+import { getDeletionModalMessage } from '@/shared/utils/trajectoryUtils.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
@@ -180,19 +180,18 @@ const ExpandableTab = ({
     });
   }, [data, handleSearch, tabType, technologies]);
 
-  const handleTrajectoryFetchFromFS = useCallback(async (rowId: string) => {
-    const hypothesis = getAreaTrajectoryName(rowId, data, technologies);
+  const handleTrajectoryFetchFromFS = useCallback(async (rowId: string, type: TRAJECTORY_TYPE) => {
     const { typeToUse, areaToUse, isDefaultArea } = getParamForFetchFSTrajectory(
-      tabType,
-      rowId.split('.').map(Number),
-      data.length,
-      hypothesis,
+      type,
+      rowId,
+      data,
+      technologies,
     );
     const results = await handleFetchFromFS({ typeToUse, areaToUse, isDefaultArea });
     setOptionsFS(results);
     setRowIdSelected(rowId);
     toggleModal();
-  }, [data, handleFetchFromFS, tabType, technologies, toggleModal]);
+  }, [data, handleFetchFromFS, technologies, toggleModal]);
 
   return (
     <div className="flex h-fit w-full gap-6 pb-4 xl:gap-7 2xl:gap-8">
@@ -219,7 +218,7 @@ const ExpandableTab = ({
         type={tabType}
         list={technologiesLabel}
         handleSearch={handleTrajectorySearch}
-        handleImport={handleTrajectoryFetchFromFS}
+        handleImport={async (rowId: string) => await handleTrajectoryFetchFromFS(rowId, tabType)}
         isReadOnlyEnable={true}
         updateData={(rowId: string, value: unknown, status: RowStatus) => {
           void handleHypothesisTableUpdate(rowId, value, status, tabType, data, setData, setReadOnly);
@@ -242,9 +241,9 @@ const ExpandableTab = ({
             }
           }}
           tabType={tabType}
-          hypothesis={getAreaTrajectoryName(rowIdSelected, data, technologies)}
-          indexArray={rowIdSelected?.split('.').map(Number)}
-          rowsNb={data.length}
+          data={data}
+          technologies={technologies}
+          rowIdSelected={rowIdSelected}
         />
       {trajectoryData && (
         <TrajectoryDataVisualisation trajectoryData={trajectoryData} onClose={() => setIsViewModalOpen(false)} isOpen={isViewModalOpen}/>

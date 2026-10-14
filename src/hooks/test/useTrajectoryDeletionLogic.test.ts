@@ -138,6 +138,81 @@ describe('computeDeletion - DSR', () => {
   });
 });
 
+describe('computeDeletion - AREA_ME', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('collecte toutes les trajectoires récursivement pour toutes les lignes et cible la ligne indexRow', () => {
+    const study = { id: 1 } as StudyDTO;
+    const { result } = renderHook(() => useTrajectoryDeletionLogic(study));
+    const computeDeletion = result.current.computeDeletion;
+
+    const row0 = {
+      trajectory: { id: 101 },
+      subRows: [{ trajectory: { id: 102 } }],
+    } as unknown as HypothesisRowData;
+    const row1 = {
+      trajectory: { id: 201 },
+    } as unknown as HypothesisRowData;
+
+    const data = [row0, row1];
+
+    vi.mocked(collectTrajectoriesRecursively)
+      .mockReturnValueOnce([{ id: 101 }, { id: 102 }] as DbTrajectory[])
+      .mockReturnValueOnce([{ id: 201 }] as DbTrajectory[]);
+
+    const resultDeletion = computeDeletion(TRAJECTORY_TYPE.AREA_ME, data, 0, null, 'HYP');
+
+    expect(resultDeletion).toEqual({
+      trajectoryIds: [101, 102, 201],
+      trajectoryToDelete: { id: 101 },
+      additionalTrajectory: null,
+    });
+  });
+
+  it('cible une sous-ligne quand indexArray de taille 2 est fourni', () => {
+    const study = { id: 1 } as StudyDTO;
+    const { result } = renderHook(() => useTrajectoryDeletionLogic(study));
+    const computeDeletion = result.current.computeDeletion;
+
+    const subRow = { trajectory: { id: 102 } } as HypothesisRowData;
+    const row0 = {
+      trajectory: { id: 101 },
+      subRows: [{ trajectory: { id: 100 } }, subRow],
+    } as unknown as HypothesisRowData;
+
+    const data = [row0];
+
+    vi.mocked(collectTrajectoriesRecursively).mockReturnValueOnce([
+      { id: 101 },
+      { id: 100 },
+      { id: 102 },
+    ] as DbTrajectory[]);
+
+    const resultDeletion = computeDeletion(TRAJECTORY_TYPE.AREA_ME, data, null, [0, 1], 'HYP');
+
+    expect(resultDeletion).toEqual({
+      trajectoryIds: [101, 100, 102],
+      trajectoryToDelete: { id: 102 },
+      additionalTrajectory: null,
+    });
+  });
+
+  it('lève une erreur si indexRow et indexArray sont tous les deux null', () => {
+    const study = { id: 1 } as StudyDTO;
+    const { result } = renderHook(() => useTrajectoryDeletionLogic(study));
+    const computeDeletion = result.current.computeDeletion;
+
+    const data = [{ trajectory: { id: 101 } }] as HypothesisRowData[];
+    vi.mocked(collectTrajectoriesRecursively).mockReturnValue([{ id: 101 }] as DbTrajectory[]);
+
+    expect(() => {
+      computeDeletion(TRAJECTORY_TYPE.AREA_ME, data, null, null, 'HYP');
+    }).toThrow('computeDeletion: indexRow and indexArray are both null. One must be provided.');
+  });
+});
+
 describe('computeDeletion - générique', () => {
   beforeEach(() => {
     vi.clearAllMocks();

@@ -4,17 +4,16 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { Suspense } from 'react';
+import { Suspense, useState } from 'react';
 import { NavLink, Route, Routes } from 'react-router-dom';
 import PegaseStar from '@/components/pegase/star/PegaseStar';
 import ProjectDetails from '@/pages/pegase/projects/projectDetails/ProjectDetails';
-import StudyDetails from '@/pages/pegase/studies/studyDetails/StudyDetails';
+import StudyDetails from '@/pages/pegase/studies/StudyDetails.tsx';
 import { footerRoutes, mainRoutes } from '@/routes';
-import { UserSettingsContext } from '@/store/contexts/UserSettingsContext';
-import { THEME_COLOR } from '@/shared/types';
+import { getInitialUserSettings, UserSettingsContext } from '@/store/contexts/UserSettingsContext';
 import ThemeHandler from '@common/handler/ThemeHandler';
 import { PegaseAlertContainer, PegaseToastContainer } from '@/shared/notification/containers';
-import { footerMenuItems, mainMenuItems, navBarConfig } from '@/shared/const/navBarConfig';
+import { footerMenuItems, mainMenuItems } from '@/shared/const/navBarConfig';
 import { StudyProvider } from '@/store/contexts/StudyProvider';
 import { useTranslation } from 'react-i18next';
 import { NavigationProvider, SideNav } from '@design-system-rte/react';
@@ -24,12 +23,16 @@ import {
   PEGASE_CONTEXT_SECONDARY_NAV_BAR_ID,
   PEGASE_NAVBAR_ID,
 } from '@/shared/constants.ts';
+import packageJson from '../../../../../package.json';
+import { LogoHeader } from '@/components/pegase/LogoHeader.tsx';
 
 const MainContent = () => {
   const { t } = useTranslation();
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
   return (
     <div className="flex h-screen w-screen dark:bg-gray-900 dark:text-gray-200">
-      <UserSettingsContext.Provider initialState={{ theme: THEME_COLOR.LIGHT }}>
+      <UserSettingsContext.Provider initialState={getInitialUserSettings()}>
         <ThemeHandler />
         <div className="z-50">
         <PegaseToastContainer />
@@ -40,10 +43,14 @@ const MainContent = () => {
         >
           <SideNav
             id={PEGASE_NAVBAR_ID}
-            headerConfig={navBarConfig}
+            header={<LogoHeader version={`v${packageJson.version}`} isCollapsed={isCollapsed}/>}
             items={translateMenuItemLabel(mainMenuItems, t)}
             footerItems={translateMenuItemLabel(footerMenuItems, t)}
+            closeCollapseText={t('components.navbar.@minimize')}
+            openCollapseText={t('components.navbar.@expand')}
             collapsible
+            onCollapsedChange={(collapsed) => setIsCollapsed(collapsed)}
+            size="s"
             />
         </NavigationProvider>
         </div>

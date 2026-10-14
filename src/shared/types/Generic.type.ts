@@ -31,6 +31,7 @@ import {
   RES_TYPES,
   THERMAL_TECHNICAL_PARAMETERS_TYPES,
   THERMAL_TYPES,
+  THERMAL_TYPES_NO_AREA,
 } from '@/shared/const/trajectoryTypes.ts';
 import { DropdownItemProps } from '@design-system-rte/core/components/dropdown/dropdown.interface';
 
@@ -133,6 +134,8 @@ export const isTrajectorySubrowsType = (value: unknown): value is TrajectoryWith
 export const isTrajectoryThermalTechnicalParametersType = (value: TRAJECTORY_TYPE): boolean => THERMAL_TECHNICAL_PARAMETERS_TYPES.includes(value);
 
 export const isTrajectoryThermalType = (value: TRAJECTORY_TYPE): boolean => THERMAL_TYPES.includes(value);
+
+export const isTrajectoryThermalNoAReaType = (value: TRAJECTORY_TYPE): boolean => THERMAL_TYPES_NO_AREA.includes(value);
 
 export const isTrajectoryDSRType = (value: TRAJECTORY_TYPE): boolean => DSR_TYPES.includes(value);
 

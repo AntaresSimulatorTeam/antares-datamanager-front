@@ -1150,7 +1150,7 @@ describe('uploadTrajectory', () => {
     await waitFor(() => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
       expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
-        'https://mockapi.com/v1/trajectory/scenarioBuilder?trajectoryToUse=general_data_BP_23&horizon=2030-2031&studyId=87&isCivilYear=false',
+        'https://mockapi.com/v1/trajectory/scenario-builder?trajectoryToUse=general_data_BP_23&horizon=2030-2031&studyId=87&isCivilYear=false',
         requestOptions,
         onProgress,
       );
@@ -1256,6 +1256,48 @@ describe('uploadTrajectory', () => {
       expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
       expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
         'https://mockapi.com/v1/trajectory/hydro-capacity-me?trajectoryToUse=hydro_cap_me_traj&horizon=2030-2031&studyId=87&isCivilYear=false',
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
+
+  it('should import HYDRO_RESERVOIR_LEVELS_ME trajectory without technology into data base', async () => {
+    await uploadTrajectory(
+      '2030-2031',
+      87,
+      TRAJECTORY_TYPE.HYDRO_RESERVOIR_LEVELS_ME,
+      'hydro_rs_me_traj',
+      '',
+      onProgress,
+      false,
+    );
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/trajectory/hydro-reservoir-levels-me?trajectoryToUse=hydro_rs_me_traj&horizon=2030-2031&studyId=87&isCivilYear=false',
+        requestOptions,
+        onProgress,
+      );
+    });
+  });
+
+  it('should import HYDRO_WATER_VALUES_ME trajectory without technology into data base', async () => {
+    await uploadTrajectory(
+      '2030-2031',
+      87,
+      TRAJECTORY_TYPE.HYDRO_WATER_VALUES_ME,
+      'hydro_rs_me_traj',
+      '',
+      onProgress,
+      false,
+    );
+
+    await waitFor(() => {
+      expect(progressService.fetchWithProgress).toHaveBeenCalledTimes(1);
+      expect(progressService.fetchWithProgress).toHaveBeenCalledWith(
+        'https://mockapi.com/v1/trajectory/hydro-water-values-me?trajectoryToUse=hydro_rs_me_traj&horizon=2030-2031&studyId=87&isCivilYear=false',
         requestOptions,
         onProgress,
       );

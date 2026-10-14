@@ -6,7 +6,7 @@
 
 import { ReactElement, useState } from 'react';
 import cardTitleClassBuilder from './cardTitleClassBuilder';
-import { Button, Dropdown, DropdownItem, IconButton } from '@design-system-rte/react';
+import { Dropdown, DropdownItem, IconButton } from '@design-system-rte/react';
 import { DropdownItemOption } from '@/shared/types';
 
 export type PegaseCardTitleProps = {
@@ -26,18 +26,9 @@ const PegaseCardTitle = ({ title, dropdownOptions, icons, lineClamp, onClick, id
     <header className="flex items-start justify-between gap-1">
       <div className="flex justify-start min-w-0 items-center gap-1">
         {icons && <span className="flex shrink items-center">{icons}</span>}
-        {onClick ? (
-          <Button
-            label={title}
-            onClick={onClick}
-            variant="neutral"
-            size="s"
-          />
-        ) : (
           <span className={titleClasses} id={`title-${id}`}>
             {title}
           </span>
-        )}
       </div>
       <div role="presentation" onClick={(e) => e.stopPropagation()}>
           <Dropdown
