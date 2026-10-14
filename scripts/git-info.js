@@ -2,7 +2,7 @@ import { execSync } from 'child_process';
 import { writeFileSync } from 'fs';
 
 try {
-  let branch = process.env.BUILD_VERSION || '';
+  let branch = process.env.BUILD_SOURCE || '';
 
   if (!branch) {
     try {
