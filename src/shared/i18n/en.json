@@ -231,7 +231,8 @@
     "@reservoir_levels": "Reservoir levels",
     "@water_values": "Water values",
     "@efficiency": "Efficiency",
-    "@constraints": "Constraints"
+    "@constraints": "Constraints",
+    "@capacity": "Capacity"
   },
   "trajectoryViewModal": {
     "@title_area": "Areas",
