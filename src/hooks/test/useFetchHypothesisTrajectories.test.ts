@@ -1637,7 +1637,7 @@ describe('useFetchHypothesisTrajectories', () => {
           trajectory: null,
           subRows: [
             {
-              hypothesis: "p2g.@capacity",
+              hypothesis: "me.@capacity",
               isDefault: false,
               isDeletable: false,
               status: TRAJECTORY_SELECTION_STATUS.MISSING,
@@ -1765,7 +1765,7 @@ describe('useFetchHypothesisTrajectories', () => {
           trajectory: null,
           subRows: [
             {
-              hypothesis: "p2g.@capacity",
+              hypothesis: "me.@capacity",
               isDefault: false,
               isDeletable: false,
               status: TRAJECTORY_SELECTION_STATUS.MISSING,
@@ -2007,7 +2007,7 @@ describe('useFetchHypothesisTrajectories', () => {
           trajectory: null,
           subRows: [
             {
-              hypothesis: 'p2g.@capacity',
+              hypothesis: 'me.@capacity',
               isDefault: false,
               isDeletable: false,
               status: TRAJECTORY_SELECTION_STATUS.OK,

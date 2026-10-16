@@ -74,14 +74,7 @@ const ProjectContent = () => {
           <Chip id="chip-project-page" label={t('home.@my_projects')} onClick={handleChipClick} selected={activeChip} />
         </div>
       </div>
-      <div
-        className="grid w-full gap-3"
-        style={{
-          gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-          margin: 0,
-          padding: 0,
-        }}
-      >
+      <div className="grid grid-cols-3 gap-3">
         {(projects.length > intervalSize ? projects.splice(0, 9) : projects || []).map((project) => {
           const dropdownItems: DropdownItemOption[] = [
             pinOption(false, () => void handlePinProject(project.id), pinnedProjects?.length >= 3),

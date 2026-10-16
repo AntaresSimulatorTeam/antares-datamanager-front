@@ -223,7 +223,7 @@
     "@me": "Multi Energy (ME)"
   },
   "p2g": {
-    "@capacity": "Capacity",
+    "@capacity": "P2G",
     "@modulation": "Market bid modulation"
   },
   "me": {
@@ -231,7 +231,8 @@
     "@reservoir_levels": "Reservoir levels",
     "@water_values": "Water values",
     "@efficiency": "Efficiency",
-    "@constraints": "Constraints"
+    "@constraints": "Constraints",
+    "@capacity": "Capacity"
   },
   "trajectoryViewModal": {
     "@title_area": "Areas",

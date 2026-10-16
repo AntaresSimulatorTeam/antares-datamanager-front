@@ -377,7 +377,7 @@ export const getMERowHypothesisKey = (type: TRAJECTORY_TYPE) => {
     case TRAJECTORY_TYPE.HYDRO_TIME_SERIES_ME:
       return 'thermal.@time_series';
     case TRAJECTORY_TYPE.HYDRO_CAPACITY_ME:
-      return 'p2g.@capacity';
+      return 'me.@capacity';
     case TRAJECTORY_TYPE.THERMAL_CAPACITY_ME:
       return 'studyDetails.@thermal';
     case TRAJECTORY_TYPE.EFFICIENCY_ME:
