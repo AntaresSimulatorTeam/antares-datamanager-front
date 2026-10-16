@@ -104,12 +104,12 @@ export const useFetchFixHypothesisTrajectories = (
         },
       });
 
-      let firstData: HypothesisRowData[] = [];
+     let firstData: HypothesisRowData[] = [];
       if (firstConfig) {
         firstData = buildTableData(firstConfig, t, firstResults, { hvdc });
         if (firstData.length > 0) setFirstTableData(firstData);
       }
-
+      
       let secondData: HypothesisRowData[] = [];
       if (secondConfig) {
         secondData = buildTableData(secondConfig, t, secondResults, { recalculate });

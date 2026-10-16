@@ -192,16 +192,34 @@ export const useTrajectoryAttach = (
           });
         }
       } catch (error) {
-        notifyTrajectoryError({
-          type,
-          indexArray,
-          trajectory,
-          study,
-          userSub: user?.profile?.sub,
-          error,
-          t,
-          setData,
-        });
+        if (indexArray?.length) {
+          const message = t('studyDetails.@notificationAlert', {
+            studyName: study?.name,
+            trajectoryName: trajectory?.trajectoryName,
+            trajectoryType: trajectory?.area,
+          });
+          if (type === TRAJECTORY_TYPE.FLOWBASED) {
+            notifyAlert({
+              message,
+              content: error instanceof Error ? error.message : String(error),
+              type: 'error',
+            });
+            return;
+          }
+          handleTrajectoryError(
+            type,
+            indexArray,
+            { id: trajectory?.id, label: trajectory?.trajectoryName },
+            trajectory?.area ?? '',
+            user?.profile?.sub ?? '',
+            setData,
+            {
+              message,
+              content: (error as Error).message,
+            },
+            trajectory?.technology
+          );
+        }
       }
     },
     [study, dispatch, user?.profile?.sub, t],
