@@ -1,5 +1,5 @@
 import { getStudyById, getStudyTrajectories } from '@/shared/services/studyService.ts';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { DbTrajectory, HypothesisRowData } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
@@ -7,8 +7,7 @@ import { useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { HypothesisConfig, HypothesisTableOptions } from '@/shared/types/HypothesisTable.ts';
 import { buildDispatchPayload, buildReadOnlyRow, buildTableData } from '@/shared/utils/trajectoryUtils.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
-import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { useFetchAreas } from '@/hooks/useFetchAreas.ts';
+import { notifyAlert } from '@/shared/notification/notification.tsx';
 
 const fetchTrajectoriesForConfig = (studyId: number, config: HypothesisConfig[]) =>
   Promise.all(config.map(({ type }) => getStudyTrajectories(studyId, type)));
@@ -32,21 +31,17 @@ const fetchStudyOptions = async (
 interface ReadOnlyParams {
   isStudyGenerated: boolean;
   firstResults?: DbTrajectory[][];
-  firstConfig?: HypothesisConfig[];
   secondConfig?: HypothesisConfig[];
-  isFlowbasedAllowed: (id: number) => Promise<boolean | undefined>;
 }
 
-const computeReadOnlyRows = async ({
+const computeReadOnlyRows = ({
   isStudyGenerated,
   firstResults,
-  firstConfig,
   secondConfig,
-  isFlowbasedAllowed,
-}: ReadOnlyParams): Promise<{
+}: ReadOnlyParams): {
   firstReadOnly: ReadOnlyObject;
   secondReadOnly: ReadOnlyObject;
-}> => {
+} => {
   if (isStudyGenerated) {
     return {
       firstReadOnly: buildReadOnlyRow(['0', '1']),
@@ -55,13 +50,6 @@ const computeReadOnlyRows = async ({
   }
 
   const hasFirstResult = Boolean(firstResults?.[0]?.length);
-  let isFlowbasedDisabled = !hasFirstResult;
-
-  const firstTrajectoryId = firstResults?.[0]?.[0]?.id;
-  if (hasFirstResult && firstConfig?.[0]?.type === TRAJECTORY_TYPE.AREA && firstTrajectoryId != null) {
-    const allMandatoryAreasInStudy = await isFlowbasedAllowed(firstTrajectoryId);
-    isFlowbasedDisabled = !allMandatoryAreasInStudy;
-  }
 
   return {
     firstReadOnly: {
@@ -71,7 +59,7 @@ const computeReadOnlyRows = async ({
     secondReadOnly: secondConfig
       ? {
           '0': !hasFirstResult,
-          '1': isFlowbasedDisabled,
+          '1': !hasFirstResult,
           '2.0': !hasFirstResult,
           '2.1': !hasFirstResult,
         }
@@ -92,19 +80,19 @@ export const useFetchFixHypothesisTrajectories = (
 
   const dispatch = useStudyDispatch();
   const { t } = useTranslation();
-  const { isFlowbasedAllowed } = useFetchAreas();
 
-  const getTrajectories = async (id: number) => {
-    try {
+  const refreshTrajectories = useCallback(async () => {
+    if (studyId == null) return { firstTableData: [], secondTableData: [] };
+
       const firstConfig = configs?.[0];
       const secondConfig = configs?.[1];
 
-      const { hvdc, recalculate } = await fetchStudyOptions(id, firstConfig, secondConfig);
+      const { hvdc, recalculate } = await fetchStudyOptions(studyId, firstConfig, secondConfig);
       const secondConfigData = extractSecondConfigData(secondConfig);
 
       const promises = [firstConfig, secondConfigData]
         .filter(Boolean)
-        .map((config) => fetchTrajectoriesForConfig(id, config));
+        .map((config) => fetchTrajectoriesForConfig(studyId, config));
 
       const [firstResults, secondResults] = await Promise.all(promises);
 
@@ -116,42 +104,42 @@ export const useFetchFixHypothesisTrajectories = (
         },
       });
 
+      let firstData: HypothesisRowData[] = [];
       if (firstConfig) {
-        const firstData = buildTableData(firstConfig, t, firstResults, { hvdc });
+        firstData = buildTableData(firstConfig, t, firstResults, { hvdc });
         if (firstData.length > 0) setFirstTableData(firstData);
       }
 
+      let secondData: HypothesisRowData[] = [];
       if (secondConfig) {
-        const secondData = buildTableData(secondConfig, t, secondResults, { recalculate });
+        secondData = buildTableData(secondConfig, t, secondResults, { recalculate });
         if (secondData.length > 0) setSecondTableData(secondData);
       }
 
-      if (options.withReadOnlyRow || isStudyGenerated) {
-        const { firstReadOnly, secondReadOnly } = await computeReadOnlyRows({
+        const { firstReadOnly, secondReadOnly } = computeReadOnlyRows({
           isStudyGenerated,
           firstResults,
-          firstConfig,
           secondConfig,
-          isFlowbasedAllowed,
         });
 
         setFirstTableReadOnlyRow(firstReadOnly);
         if (secondConfig) {
           setSecondTableReadOnlyRow(secondReadOnly);
         }
-      }
-    } catch (error) {
-      console.log('================= error', error);
-    }
-  };
+    return { firstTableData: firstData, secondTableData: secondData };
+  }, [configs, dispatch, isStudyGenerated, studyId, t]);
 
   useEffect(() => {
-    if (studyId != null) {
-      void getTrajectories(studyId);
-    }
-  }, [studyId, isStudyGenerated, configs]);
+    void refreshTrajectories().catch((error: unknown) => {
+      notifyAlert({
+        message: t('flowbased.@associationsReloadError'),
+        content: error instanceof Error ? error.message : String(error),
+        type: 'error',
+      });
+    });
+  }, [refreshTrajectories, t]);
 
   return options.withReadOnlyRow
-    ? { firstTableData, firstTableReadOnlyRow, secondTableData, secondTableReadOnlyRow }
-    : { firstTableData, secondTableData };
+    ? { firstTableData, firstTableReadOnlyRow, secondTableData, secondTableReadOnlyRow, refreshTrajectories }
+    : { firstTableData, secondTableData, refreshTrajectories };
 };

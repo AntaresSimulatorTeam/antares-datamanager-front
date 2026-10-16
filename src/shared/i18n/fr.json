@@ -195,7 +195,13 @@
     "@informationMessage": "If a \"mod\" file is included in a \"series\" folder, the \"technical parameters\" folder is required."
   },
   "flowbased": {
-    "@informationMessage": "Mandatory areas : AT, BE, CH, DE, FR, ITN, and NL. Mandatory TS : LOAD, RES (Wind and Solar) and RoR"
+    "@informationMessage": "Une trajectoire de lien avec l’option HVDC activée doit être définie avant de soumettre une trajectoire Flowbased.",
+    "@hvdcLinkRequired": "Sélectionnez une trajectoire LINK contenant un lien avec deux capacités HVDC non nulles et différentes de zéro.",
+    "@linkDataError": "Impossible de vérifier les capacités HVDC de la trajectoire LINK.",
+    "@associationsReloadError": "Impossible de recharger les associations de trajectoires de l’étude.",
+    "@studyOptionsUpdateError": "Les paramètres HVDC de l’étude n’ont pas pu être réinitialisés après le changement de trajectoire LINK.",
+    "@linkChangeConfirmationTitle": "Confirmer le changement de trajectoire LINK",
+    "@linkChangeConfirmation": "Supprimer ou remplacer la trajectoire LINK retirera également la trajectoire Flowbased de cette étude. Les données resteront disponibles en base."
   },
   "settings": {
     "@title": "Settings",

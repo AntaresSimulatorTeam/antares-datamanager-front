@@ -8,17 +8,14 @@ import { setNestedData } from '@/shared/utils/trajectoryUtils.ts';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { useTranslation } from 'react-i18next';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
-import { useFetchAreas } from '@/hooks/useFetchAreas.ts';
+import { notifyAlert } from '@/shared/notification/notification.tsx';
 
-const handleAreaReadOnly = async (
-  trajectoryId: number | undefined,
-  isFlowbasedAllowed: (id: number) => Promise<boolean | undefined>,
+const handleAreaReadOnly = (
   setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
   setSecondTableReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
 ) => {
-  const allMandatoryAreasInStudy = trajectoryId != null ? await isFlowbasedAllowed(trajectoryId) : false;
   setReadOnly?.({ '0': false, '1': false });
-  setSecondTableReadOnly?.({ '0': false, '1': !allMandatoryAreasInStudy, '2.0': false, '2.1': false });
+  setSecondTableReadOnly?.({ '0': false, '1': false, '2.0': false, '2.1': false });
 };
 
 const handleThermalReadOnly = async (
@@ -52,7 +49,6 @@ interface UpdateReadOnlyParams {
   study: StudyDTO;
   newDbTrajectory: DbTrajectory;
   lastIndex: number;
-  isFlowbasedAllowed: (id: number) => Promise<boolean | undefined>;
   setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>;
   setSecondTableReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>;
 }
@@ -62,12 +58,11 @@ const updateReadOnlyState = async ({
   study,
   newDbTrajectory,
   lastIndex,
-  isFlowbasedAllowed,
   setReadOnly,
   setSecondTableReadOnly,
 }: UpdateReadOnlyParams) => {
   if (type === TRAJECTORY_TYPE.AREA) {
-    await handleAreaReadOnly(newDbTrajectory?.id, isFlowbasedAllowed, setReadOnly, setSecondTableReadOnly);
+    handleAreaReadOnly(setReadOnly, setSecondTableReadOnly);
   } else if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
     await handleThermalReadOnly(study.id, study?.horizon, setReadOnly);
   } else {
@@ -123,6 +118,15 @@ const notifyTrajectoryError = ({
     trajectoryType: trajectory?.area,
   });
 
+  if (type === TRAJECTORY_TYPE.FLOWBASED) {
+    notifyAlert({
+      message,
+      content: error instanceof Error ? error.message : String(error),
+      type: 'error',
+    });
+    return;
+  }
+
   handleTrajectoryError(
     type,
     indexArray,
@@ -144,7 +148,6 @@ export const useTrajectoryAttach = (
 ) => {
   const { user } = useUser();
   const { t } = useTranslation();
-  const { isFlowbasedAllowed } = useFetchAreas();
 
   const attachTrajectory = useCallback(
     async (
@@ -175,7 +178,6 @@ export const useTrajectoryAttach = (
             study,
             newDbTrajectory,
             lastIndex,
-            isFlowbasedAllowed,
             setReadOnly,
             setSecondTableReadOnly,
           });
@@ -193,7 +195,7 @@ export const useTrajectoryAttach = (
         });
       }
     },
-    [study.id, study?.horizon, study?.name, dispatch, isFlowbasedAllowed, t, user?.profile?.sub],
+    [study, dispatch, user?.profile?.sub, t],
   );
 
   return { attachTrajectory };

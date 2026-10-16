@@ -24,6 +24,8 @@ import {
   getSubRowListWithArea,
   getSubRowsList,
   getTrajectoryTypeByIndex,
+  hasFlowbasedPrerequisites,
+  hasLinkWithHvdcCapacities,
   isEmptyRow,
   isMatchingTrajectoryType,
   isTrajectoryLinked,
@@ -47,7 +49,12 @@ import {
   mockRowDataTrajectoryC,
 } from '@/mocks/data/tests/trajectory.mock.ts';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
-import { DbTrajectory, HypothesisRowData, isTrajectoryThermalTechnicalParametersType } from '@/shared/types';
+import {
+  DbTrajectory,
+  HypothesisRowData,
+  isTrajectoryThermalTechnicalParametersType,
+  TrajectoryLinkData,
+} from '@/shared/types';
 import { Row } from '@tanstack/react-table';
 import { ThermalOptions } from '@/mocks/data/list/names.ts';
 import { TFunction } from 'i18next';
@@ -75,6 +82,73 @@ describe('getStatus', () => {
   it('should return a MISSING selection status when no status', () => {
     const status = getStatus();
     expect(status).toStrictEqual(TRAJECTORY_SELECTION_STATUS.MISSING);
+  });
+});
+
+describe('hasFlowbasedPrerequisites', () => {
+  const linkRow: HypothesisRowData = {
+    hypothesis: 'Link',
+    trajectory: { ...mockDbTrajectory, type: TRAJECTORY_TYPE.LINK },
+    status: TRAJECTORY_SELECTION_STATUS.OK,
+    hvdc: true,
+  };
+
+  it('returns true when a Link trajectory is selected and HVDC is enabled', () => {
+    expect(hasFlowbasedPrerequisites(linkRow)).toBe(true);
+    expect(hasFlowbasedPrerequisites({ ...linkRow, status: TRAJECTORY_SELECTION_STATUS.WARNING })).toBe(true);
+  });
+
+  it('returns false when the Link trajectory is missing or not valid', () => {
+    expect(hasFlowbasedPrerequisites(undefined)).toBe(false);
+    expect(hasFlowbasedPrerequisites({ ...linkRow, trajectory: null })).toBe(false);
+    expect(hasFlowbasedPrerequisites({ ...linkRow, status: TRAJECTORY_SELECTION_STATUS.ERROR })).toBe(false);
+  });
+
+  it('returns false when HVDC is disabled or the selected trajectory is not a Link trajectory', () => {
+    expect(hasFlowbasedPrerequisites({ ...linkRow, hvdc: false })).toBe(false);
+    expect(
+      hasFlowbasedPrerequisites({
+        ...linkRow,
+        trajectory: { ...linkRow.trajectory!, type: TRAJECTORY_TYPE.AREA },
+      }),
+    ).toBe(false);
+  });
+});
+
+describe('hasLinkWithHvdcCapacities', () => {
+  const validLink: TrajectoryLinkData = {
+    name: 'FR-ES',
+    winterHpDirectMw: null,
+    winterHpIndirectMw: null,
+    winterHcDirectMw: null,
+    winterHcIndirectMw: null,
+    summerHpDirectMw: null,
+    summerHpIndirectMw: null,
+    summerHcDirectMw: null,
+    summerHcIndirectMw: null,
+    flowbasedPerimeter: null,
+    hvdcMwDirect: 1,
+    hvdcMwIndirect: 2,
+    hvdcNbDirect: null,
+    hvdcNbIndirect: null,
+    hvdcFoRateDirect: null,
+    hvdcFoRateIndirect: null,
+    hvdc: null,
+    hurdleCost: null,
+  };
+
+  it('requires both HVDC capacities to be non-null and non-zero on the same link', () => {
+    expect(hasLinkWithHvdcCapacities([validLink])).toBe(true);
+    expect(hasLinkWithHvdcCapacities([{ ...validLink, hvdcMwDirect: null }])).toBe(false);
+    expect(hasLinkWithHvdcCapacities([{ ...validLink, hvdcMwDirect: 0 }])).toBe(false);
+    expect(hasLinkWithHvdcCapacities([{ ...validLink, hvdcMwIndirect: null }])).toBe(false);
+    expect(hasLinkWithHvdcCapacities([{ ...validLink, hvdcMwIndirect: 0 }])).toBe(false);
+    expect(
+      hasLinkWithHvdcCapacities([
+        { ...validLink, hvdcMwDirect: null, hvdcMwIndirect: 3 },
+        { ...validLink, hvdcMwDirect: 4, hvdcMwIndirect: 0 },
+      ]),
+    ).toBe(false);
   });
 });
 
