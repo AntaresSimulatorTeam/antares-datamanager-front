@@ -10,12 +10,14 @@ import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { ReadOnlyObject } from '@/shared/types/HypothesisTable.ts';
 import { Dispatch, SetStateAction } from 'react';
+import { notifyAlert } from '@/shared/notification/notification.tsx';
 
 vi.mock('@/shared/services/trajectoryService', async (importOriginal) => {
   const actual: Mock = await importOriginal();
   return {
     ...actual,
     getStudyTrajectoriesWithWarnings: vi.fn(),
+    getTrajectoryDataByTypeAndId: vi.fn(),
     linkTrajectoryToStudy: vi.fn(),
     isParamModulationRequired: vi.fn(),
   };
@@ -42,6 +44,10 @@ vi.mock('@/shared/services/hypothesisTableService', () => ({
   handleTrajectoryError: vi.fn(),
 }));
 
+vi.mock('@/shared/notification/notification.tsx', () => ({
+  notifyAlert: vi.fn(),
+}));
+
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: vi.fn().mockImplementation((key: string) => key),
@@ -62,6 +68,7 @@ describe('useTrajectoryAttach', () => {
   const mockDispatch = vi.fn();
   const mockSetData = vi.fn();
   const mockSetReadOnly = vi.fn();
+  const mockSetSecondTableReadOnly = vi.fn();
 
   const study: StudyDTO = { id: 'study-001', name: 'Demo Study' } as unknown as StudyDTO;
 
@@ -182,6 +189,32 @@ describe('useTrajectoryAttach', () => {
       }),
       ''
     );
+  });
+
+  it('shows Flowbased backend rejection without saving a local selection', async () => {
+    vi.mocked(trajectoryService.linkTrajectoryToStudy).mockRejectedValue(new Error('Incompatible LINK pair'));
+    const flowbasedTrajectory = { ...trajectory, type: TRAJECTORY_TYPE.FLOWBASED };
+
+    const { result } = renderHook(() => useTrajectoryAttach(study, mockDispatch));
+
+    await result.current.attachTrajectory(
+      TRAJECTORY_TYPE.FLOWBASED,
+      [1],
+      'success',
+      flowbasedTrajectory,
+      mockSetData,
+      mockSetReadOnly,
+    );
+
+    expect(notifyAlert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        content: 'Incompatible LINK pair',
+        type: 'error',
+      }),
+    );
+    expect(mockSetData).not.toHaveBeenCalled();
+    expect(mockDispatch).not.toHaveBeenCalled();
+    expect(handleTrajectoryError).not.toHaveBeenCalled();
   });
 
   it('should handle error and call handleTrajectoryError with no user name', async () => {
@@ -366,7 +399,15 @@ describe('useTrajectoryAttach', () => {
     const { result } = renderHook(() => useTrajectoryAttach(studyArea, dispatch));
 
     await act(async () => {
-      await result.current.attachTrajectory(TRAJECTORY_TYPE.AREA, [0], 'success', newTrajectoryArea, setData, mockSetReadOnly);
+      await result.current.attachTrajectory(
+        TRAJECTORY_TYPE.AREA,
+        [0],
+        'success',
+        newTrajectoryArea,
+        setData,
+        mockSetReadOnly,
+        mockSetSecondTableReadOnly,
+      );
     });
 
     // Vérifie la mise à jour des données
@@ -374,6 +415,13 @@ describe('useTrajectoryAttach', () => {
 
     // Vérifie setReadOnly
     expect(mockSetReadOnly).toHaveBeenCalledWith({ '0': false, '1': false });
+    expect(mockSetSecondTableReadOnly).toHaveBeenCalledWith({
+      '0': false,
+      '1': false,
+      '2.0': false,
+      '2.1': false,
+    });
+    expect(trajectoryService.getTrajectoryDataByTypeAndId).not.toHaveBeenCalled();
 
     // Vérifie le dispatch ADD
     expect(dispatch).toHaveBeenCalledWith({

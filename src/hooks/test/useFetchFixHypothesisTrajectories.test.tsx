@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import * as studyService from '@/shared/services/studyService';
+import * as trajectoryService from '@/shared/services/trajectoryService';
 import * as trajectoryUtils from '@/shared/utils/trajectoryUtils';
 import { useStudyDispatch } from '@/store/contexts/StudyContext';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory';
@@ -175,6 +176,26 @@ describe('useFetchFixHypothesisTrajectories', () => {
         expect(result.current.firstTableReadOnlyRow).toEqual({
           '0': false,
           '1': false,
+        });
+        expect(result.current.secondTableReadOnlyRow).toEqual({
+          '0': false,
+          '1': false,
+          '2.0': false,
+          '2.1': false,
+        });
+      });
+      expect(trajectoryService.getTrajectoryDataByTypeAndId).not.toHaveBeenCalled();
+    });
+
+    it('should keep Adequacy Patch enabled while Flowbased is disabled without an area trajectory', async () => {
+      mockGetStudyTrajectories.mockResolvedValue([]);
+
+      const { result } = renderHook(() => useFetchFixHypothesisTrajectories(configs, options, false, 1));
+
+      await waitFor(() => {
+        expect(result.current.secondTableReadOnlyRow).toMatchObject({
+          '0': false,
+          '1': true,
         });
       });
     });

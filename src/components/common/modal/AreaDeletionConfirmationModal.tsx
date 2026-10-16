@@ -7,6 +7,9 @@ interface AreaDeletionConfirmationModalProps {
   onClose: () => void;
   onConfirm: () => Promise<void>;
   message?: string;
+  title?: string;
+  isBusy?: boolean;
+  id?: string;
 }
 
 export const AreaDeletionConfirmationModal: React.FC<AreaDeletionConfirmationModalProps> = ({
@@ -14,18 +17,32 @@ export const AreaDeletionConfirmationModal: React.FC<AreaDeletionConfirmationMod
   onClose,
   onConfirm,
   message,
+  title,
+  isBusy = false,
+  id = 'area-deletion-modal',
 }) => {
   const { t } = useTranslation();
 
   return (
     <Modal
       isOpen={isOpen}
-      id="area-deletion-modal"
-      onClose={onClose}
-      primaryButton={<Button label={t('trajectoryDeletionModal.@confirm')} variant="secondary" onClick={() => void onConfirm()} />}
-      secondaryButton={<Button label={t('trajectoryDeletionModal.@cancel')} variant="text" onClick={onClose} />}
+      id={id}
+      onClose={() => {
+        if (!isBusy) onClose();
+      }}
+      primaryButton={
+        <Button
+          label={t('trajectoryDeletionModal.@confirm')}
+          variant="secondary"
+          onClick={() => void onConfirm()}
+          disabled={isBusy}
+        />
+      }
+      secondaryButton={
+        <Button label={t('trajectoryDeletionModal.@cancel')} variant="text" onClick={onClose} disabled={isBusy} />
+      }
       size="s"
-      title={t('trajectoryDeletionModal.@confirmDeleteTitle')}
+      title={title ?? t('trajectoryDeletionModal.@confirmDeleteTitle')}
       className="[&_h2]:!text-left"
       closeOnOverlayClick={false}
     >
