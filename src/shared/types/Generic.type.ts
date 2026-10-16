@@ -104,6 +104,9 @@ export type TableHeadersProps = {
   columnHeader?: string;
   type?: TRAJECTORY_TYPE;
   list?: string[];
+  isFlowbasedPrerequisiteMet?: boolean;
+  flowbasedTooltipMessage?: string;
+  isActionsDisabled?: boolean;
 };
 
 export interface TableHeadersGetterProps extends TableHeadersProps {

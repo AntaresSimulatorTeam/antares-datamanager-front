@@ -337,6 +337,25 @@ describe('unlinkAllTrajectoriesFromStudy', () => {
     });
   });
 
+  it('sends a single LINK id through the batch detach endpoint', async () => {
+    vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({ ok: true });
+
+    await unlinkMultipleTrajectoriesFromStudy(studyId, [7]);
+
+    expect(AuthService.authFetch).toHaveBeenCalledWith(
+      `https://mockapi.com/v1/trajectory/detach/batch?studyId=${studyId}`,
+      { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '[7]' },
+    );
+  });
+
+  it('surfaces a useful error when the batch detach request fails technically', async () => {
+    vi.mocked(AuthService.authFetch).mockRejectedValueOnce(new Error('network unavailable'));
+
+    await expect(unlinkMultipleTrajectoriesFromStudy(studyId, [7])).rejects.toThrow(
+      'Failed to detach trajectories [7] from study 42',
+    );
+  });
+
   it('should handle exception during unlink all', async () => {
     vi.mocked(AuthService.authFetch).mockRejectedValueOnce({
       antaresErrorMessage: 'Failed to unlink all trajectories',

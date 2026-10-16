@@ -8,7 +8,7 @@ import { setNestedData } from '@/shared/utils/trajectoryUtils.ts';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { useTranslation } from 'react-i18next';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
-import { useFetchAreas } from '@/hooks/useFetchAreas.ts';
+import { notifyAlert } from '@/shared/notification/notification.tsx';
 
 export const useTrajectoryAttach = (
   study: StudyDTO,
@@ -16,7 +16,6 @@ export const useTrajectoryAttach = (
 ) => {
   const { user } = useUser();
   const { t } = useTranslation();
-  const {isFlowbasedAllowed} = useFetchAreas();
 
   const attachTrajectory = useCallback(
     async (
@@ -46,12 +45,9 @@ export const useTrajectoryAttach = (
           };
 
           if (type === TRAJECTORY_TYPE.AREA) {
-            const allMandatoryAreasInStudy =
-              newDbTrajectory?.id != null ? await isFlowbasedAllowed(newDbTrajectory.id) : false;
-
             setData((prev) => setNestedData(prev, indexArray, newTrajectory));
             setReadOnly?.({ '0': false, '1': false });
-            setSecondTableReadOnly?.({ '0': false, '1': !allMandatoryAreasInStudy, '2.0': false, '2.1': false });
+            setSecondTableReadOnly?.({ '0': false, '1': false, '2.0': false, '2.1': false });
           } else if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
             const isRequired = await isParamModulationRequired(study.id, study?.horizon);
 
@@ -83,6 +79,14 @@ export const useTrajectoryAttach = (
             trajectoryName: trajectory?.trajectoryName,
             trajectoryType: trajectory?.area,
           });
+          if (type === TRAJECTORY_TYPE.FLOWBASED) {
+            notifyAlert({
+              message,
+              content: error instanceof Error ? error.message : String(error),
+              type: 'error',
+            });
+            return;
+          }
           handleTrajectoryError(
             type,
             indexArray,
@@ -99,7 +103,7 @@ export const useTrajectoryAttach = (
         }
       }
     },
-    [study.id, study?.horizon, study?.name, dispatch, isFlowbasedAllowed, t, user?.profile?.sub],
+    [study.id, study?.horizon, study?.name, dispatch, t, user?.profile?.sub],
   );
 
   return { attachTrajectory };

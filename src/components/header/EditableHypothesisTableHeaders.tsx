@@ -23,6 +23,7 @@ const getEditableHypothesisTableHeaders = ({
   errorInfo,
   setErrorInfo,
   isStudyGenerated,
+  isActionsDisabled,
   progress,
   fileStatus,
   idSelected,
@@ -53,12 +54,13 @@ const getEditableHypothesisTableHeaders = ({
     size: type === TRAJECTORY_TYPE.STS ? 520 : 623,
     cell: ({ row, table }) => {
       const { trajectory, status } = row.original;
+      const isLinkRow = type === TRAJECTORY_TYPE.AREA && row.index === 1;
 
       return trajectory?.trajectoryName && status !== TRAJECTORY_SELECTION_STATUS.MISSING ? (
         <div className="flex w-full items-center justify-start gap-2 py-1">
           <LabelWithDeleteButton
             label={trajectory.trajectoryName}
-            isDeletable={!isStudyGenerated}
+            isDeletable={!isStudyGenerated && !(isActionsDisabled && isLinkRow)}
             onClick={() => {
               setErrorInfo({ index: row.index, message: '' });
               void table.options?.meta?.updateData?.(
@@ -81,7 +83,7 @@ const getEditableHypothesisTableHeaders = ({
               setErrorInfo({ index: row.index, message: '' });
               await table.options?.meta?.importData?.(row.id);
             }}
-            isDisabled={row.getReadOnly()}
+            isDisabled={row.getReadOnly() || Boolean(isActionsDisabled && isLinkRow)}
             placeHolder={
               table.getSortedRowModel().rows?.[0]?.original?.status === TRAJECTORY_SELECTION_STATUS.MISSING &&
               table.getSortedRowModel().rows?.[0]?.original?.trajectory?.type === TRAJECTORY_TYPE.AREA &&
@@ -118,6 +120,7 @@ const getEditableHypothesisTableHeaders = ({
                 disabled={
                   status === TRAJECTORY_SELECTION_STATUS.ERROR ||
                   isStudyGenerated ||
+                  (isActionsDisabled && row.index === 1) ||
                   (!trajectory?.trajectoryName && status === TRAJECTORY_SELECTION_STATUS.MISSING)
                 }
                 readOnly={isStudyGenerated}
