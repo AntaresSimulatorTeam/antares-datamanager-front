@@ -11,7 +11,7 @@ import { CellWithStatus } from '@common/data/CellWithStatus.tsx';
 import { LabelWithButtonPreview } from '@common/data/LabelWithButtonPreview.tsx';
 import { LabelWithDeleteButton } from '@common/data/LabelWithDeleteButton.tsx';
 import { ProgressBar } from '@/components/input/ProgressBar.tsx';
-import { getAlignment, hasLabelDefault } from '@/shared/utils/hypothesisTableUtils.ts';
+import { getAlignment, hasLabelDefault, noInput } from '@/shared/utils/hypothesisTableUtils.ts';
 import { getColumnHeader, getSubRowListWithArea, getSubRowsList, isEmptyRow } from '@/shared/utils/trajectoryUtils.ts';
 import { getInformationMessage } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { Button, Icon, IconButton, SegmentedControl, Tag, Tooltip } from '@design-system-rte/react';
@@ -97,7 +97,7 @@ const getExpandableHypothesisTableHeaders = ({
             isDeletable={!isStudyGenerated}
             onClick={() => {
               setErrorInfo({ index: row.index, message: '' });
-              void options?.meta?.updateData?.(
+              options?.meta?.updateData?.(
                 row.id,
                 trajectory?.id,
                 status === TRAJECTORY_SELECTION_STATUS.ERROR ? 'emptyError' : 'empty',
@@ -110,12 +110,12 @@ const getExpandableHypothesisTableHeaders = ({
           <SelectInputWithButton
             onSelect={(value: DropdownItemOption) => {
               setErrorInfo({ index: row.index, message: '' });
-              void options?.meta?.updateData?.(row.id, value.id, 'success');
+              options?.meta?.updateData?.(row.id, value.id, 'success');
             }}
             onSearch={async (value?: string) => options?.meta?.search?.(value ?? '', row.id)}
             onClickButton={() => {
               setErrorInfo({ index: row.index, message: '' });
-              void options?.meta?.importData?.(row.id);
+              options?.meta?.importData?.(row.id);
             }}
             isDisabled={row.getReadOnly()}
           />
@@ -195,13 +195,8 @@ const getExpandableHypothesisTableHeaders = ({
     size: type === TRAJECTORY_TYPE.STS ? 200 : 233,
     cell: ({ row, table: { options } }) => {
       const { status, isDefault, hypothesis, isDeletable } = row.original;
-      const hasNoInput =
-        (type &&
-          (type === TRAJECTORY_TYPE.STS ||
-            type === TRAJECTORY_TYPE.HYDRO_SERIES ||
-            type === TRAJECTORY_TYPE.HYDRO_PSP_SERIES) &&
-          row.depth === 0) || (type === TRAJECTORY_TYPE.ME && row.id === '4') ||
-        (type === TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION && row.id === '2');
+      const hasNoInput = noInput(row, type);
+
       if (
         hypothesis === t('thermal.@specific') ||
         hypothesis === t('settings.@title') ||

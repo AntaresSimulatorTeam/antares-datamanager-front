@@ -30,7 +30,7 @@ const PegaseCardTitle = ({ title, dropdownOptions, icons, lineClamp, onClick, id
             {title}
           </span>
       </div>
-      <div role="presentation" onClick={(e) => e.stopPropagation()}>
+      <div role="list" onClick={(e) => e.stopPropagation()}>
           <Dropdown
             dropdownId="card-options"
             onClose={() => setOpen(false)}

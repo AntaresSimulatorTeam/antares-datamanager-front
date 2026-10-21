@@ -7,10 +7,10 @@
 import clsx from 'clsx';
 
 export const STRIPED_CLASSES = 'even:bg-primary-200';
-export const SELECTED_ROW_CLASSES = 'bg-gray-100';
+export const SELECTED_ROW_CLASSES = 'bg-background-hover';
 export const EXPANDABLE_ROW_CLASSES = 'shadow-[inset_2px_0_0_0_gray]';
-export const READONLY_ROW_CLASSES = 'disabled bg-gray-w';
-export const READONLY_SELECTED_ROW_CLASSES = 'hover:bg-gray-100';
+export const READONLY_ROW_CLASSES = 'disabled bg-background-hover';
+export const READONLY_SELECTED_ROW_CLASSES = 'hover:bg-background-hover';
 
 export const tableCoreRowClassBuilder = (
   isStriped?: boolean,

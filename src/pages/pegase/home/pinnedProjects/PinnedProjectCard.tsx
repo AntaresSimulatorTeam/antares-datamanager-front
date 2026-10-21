@@ -41,7 +41,7 @@ const PinnedProjectCards = () => {
             title={project.name}
             dropdownOptions={[
               pinOption(project.pinned ?? false, () => void handleUnpinProject(project.id)),
-              editOption(() => void openModalProject(project), t('project.@edit')),
+              editOption(() => openModalProject(project), t('project.@edit')),
               deleteOption(() => void deleteProject(project.id), t('project.@delete'), project.studies?.length > 0),
             ]}
             id={project.id}

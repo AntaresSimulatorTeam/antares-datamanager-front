@@ -76,7 +76,7 @@ const StudyDetails = () => {
         <DetailsContent content={studyData} onClickButton={toggleModal} tagsList={studyData?.keywords} />
         <div className="flex flex-1 flex-col overflow-hidden">
           <StudyNavigationMenu studyData={studyData} />
-          <div className="fixed bottom-0 right-0 w-full border-t bg-gray-w px-1 py-1.5">
+          <div className="fixed bottom-0 right-0 w-full border-t bg-background-neutral-navigation-default px-1 py-1.5">
             <div className="flex h-fit w-full items-center justify-end">
               {!studyState.AREA?.trajectories?.length && (
                 <div className="mr-1 text-error-600">{t('studyDetails.@add_trajectories_message')}</div>

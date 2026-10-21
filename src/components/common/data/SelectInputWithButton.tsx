@@ -23,7 +23,7 @@ export const SelectInputWithButton = ({
   return (
     <div className="flex items-center justify-start gap-2">
         <SelectAndSearchableInput
-          onSelect={(value: DropdownItemOption) => void onSelect(value)}
+          onSelect={(value: DropdownItemOption) => onSelect(value)}
           setSearchTerm={async (value?: string) => await onSearch(value)}
           defaultPlaceHolder={isDisabled ? '' : placeHolder || t('studyDetails.@select_trajectory')}
           isSearchable={true}

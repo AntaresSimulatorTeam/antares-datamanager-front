@@ -18,6 +18,98 @@ export interface DeletionResult {
   additionalTrajectory: DbTrajectory | null;
 }
 
+const resolveTargetRow = (
+  data: HypothesisRowData[],
+  indexRow: number | null,
+  indexArray: number[] | null,
+): HypothesisRowData => {
+  const rowIndex = indexRow ?? indexArray?.[0];
+  if (rowIndex == null) {
+    throw new Error('computeDeletion: indexRow and indexArray are both null. One must be provided.');
+  }
+  return data[rowIndex]?.subRows && indexArray?.length === 2
+    ? data[rowIndex].subRows[indexArray[1]]
+    : data[rowIndex];
+};
+
+const computeThermalDeletion = (data: HypothesisRowData[], hypothesis: string): DeletionResult => {
+  const specific = findSpecificTrajectoryToDelete(data[0]?.subRows, hypothesis);
+  if (!specific) {
+    return { trajectoryIds: [], trajectoryToDelete: null, additionalTrajectory: null };
+  }
+
+  const allSpecific = getSpecificTrajectories(data[0]?.subRows);
+  const isLastSpecific = allSpecific?.length === 1;
+  const modulation =
+    isLastSpecific && data[1]?.status === TRAJECTORY_SELECTION_STATUS.OK ? data[1]?.trajectory : null;
+
+  return {
+    trajectoryToDelete: specific,
+    additionalTrajectory: modulation,
+    trajectoryIds: modulation ? [modulation.id, specific.id] : [specific.id],
+  };
+};
+
+const computeDsrDeletion = (
+  data: HypothesisRowData[],
+  indexArray: number[] | null,
+  hypothesis: string,
+): DeletionResult => {
+  const specific = findSpecificTrajectoryToDelete(data, hypothesis);
+  if (!specific) {
+    return { trajectoryIds: [], trajectoryToDelete: null, additionalTrajectory: null };
+  }
+
+  const lastIndex = data?.length - 1;
+  const shouldDeleteModulation = Boolean(indexArray && shouldDeleteCapacityModulation(data, indexArray[0]));
+  const modulation =
+    shouldDeleteModulation && data[lastIndex]?.status === TRAJECTORY_SELECTION_STATUS.OK
+      ? data[lastIndex]?.trajectory
+      : null;
+
+  return {
+    trajectoryToDelete: specific,
+    additionalTrajectory: modulation,
+    trajectoryIds: modulation ? [modulation.id, specific.id] : [specific.id],
+  };
+};
+
+const computeAreaMeDeletion = (
+  data: HypothesisRowData[],
+  indexRow: number | null,
+  indexArray: number[] | null,
+): DeletionResult => {
+  const allTrajectories = data.flatMap((row) => collectTrajectoriesRecursively(row));
+  const row = resolveTargetRow(data, indexRow, indexArray);
+
+  return {
+    trajectoryIds: allTrajectories.map((t) => t.id),
+    trajectoryToDelete: row?.trajectory ?? null,
+    additionalTrajectory: null,
+  };
+};
+
+const computeGenericDeletion = (
+  data: HypothesisRowData[],
+  indexRow: number | null,
+  indexArray: number[] | null,
+  status?: RowStatus,
+): DeletionResult => {
+  const row = resolveTargetRow(data, indexRow, indexArray);
+  const trajectoryIds =
+    status === 'empty'
+      ? row?.trajectory?.id
+        ? [row.trajectory.id]
+        : []
+      : collectTrajectoriesRecursively(row).map((t) => t.id);
+
+  return {
+    trajectoryIds,
+    trajectoryToDelete: row?.trajectory ?? null,
+    additionalTrajectory: null,
+  };
+};
+
 /**
  * Hook factorisant toute la logique de suppression/détachement de trajectoires
  */
@@ -37,81 +129,16 @@ export const useTrajectoryDeletionLogic = (study: StudyDTO) => {
       hypothesis: string,
       status?: RowStatus,
     ): DeletionResult => {
-      let trajectoryIds: number[] = [];
-      let trajectoryToDelete: DbTrajectory | null = null;
-      let additionalTrajectory: DbTrajectory | null = null;
-
-      // --- Cas THERMAL SPECIFIC ---
-      if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
-        const specific = findSpecificTrajectoryToDelete(data[0]?.subRows, hypothesis);
-        trajectoryToDelete = specific;
-
-        const allSpecific = getSpecificTrajectories(data[0]?.subRows);
-        const isLastSpecific = allSpecific?.length === 1;
-
-        if (specific) {
-          if (isLastSpecific) {
-            const modulation = data[1]?.status === TRAJECTORY_SELECTION_STATUS.OK ? data[1]?.trajectory : null;
-
-            additionalTrajectory = modulation;
-
-            trajectoryIds = [...(modulation ? [modulation.id] : []), specific.id];
-          } else {
-            trajectoryIds = [specific.id];
-          }
-        }
+      switch (type) {
+        case TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER:
+          return computeThermalDeletion(data, hypothesis);
+        case TRAJECTORY_TYPE.DSR:
+          return computeDsrDeletion(data, indexArray, hypothesis);
+        case TRAJECTORY_TYPE.AREA_ME:
+          return computeAreaMeDeletion(data, indexRow, indexArray);
+        default:
+          return computeGenericDeletion(data, indexRow, indexArray, status);
       }
-
-      // --- Cas DSR ---
-      else if (type === TRAJECTORY_TYPE.DSR) {
-        const specific = findSpecificTrajectoryToDelete(data, hypothesis);
-        trajectoryToDelete = specific;
-
-        const lastIndex = data?.length - 1;
-
-        if (specific) {
-          if (indexArray && shouldDeleteCapacityModulation(data, indexArray[0])) {
-            const modulation =
-              data[lastIndex]?.status === TRAJECTORY_SELECTION_STATUS.OK ? data[lastIndex]?.trajectory : null;
-
-            additionalTrajectory = modulation;
-
-            trajectoryIds = [...(modulation ? [modulation.id] : []), specific.id];
-          } else {
-            trajectoryIds = [specific.id];
-          }
-        }
-      }
-      // --- Cas ME ---
-      else if (type === TRAJECTORY_TYPE.AREA_ME) {
-        const allTrajectories = data.flatMap(row => collectTrajectoriesRecursively(row));
-        trajectoryIds = allTrajectories.map((t) => t.id);
-        const rowIndex = indexRow ?? indexArray?.[0];
-        if (rowIndex == null) {
-          throw new Error('computeDeletion: indexRow and indexArray are both null. One must be provided.');
-        }
-        const row = (data[rowIndex]?.subRows && indexArray?.length == 2) ? data[rowIndex].subRows[indexArray[1]] : data[rowIndex];
-        trajectoryToDelete = row?.trajectory;
-      }
-
-      // --- Cas générique ---
-      else {
-        const rowIndex = indexRow ?? indexArray?.[0];
-
-        if (rowIndex == null) {
-          throw new Error('computeDeletion: indexRow and indexArray are both null. One must be provided.');
-        }
-        const row =
-          data[rowIndex]?.subRows && indexArray?.length == 2 ? data[rowIndex].subRows[indexArray[1]] : data[rowIndex];
-        if (status === 'empty') {
-          trajectoryIds = row?.trajectory?.id ? [row.trajectory.id] : [];
-        } else {
-          const allTrajectories = collectTrajectoriesRecursively(row);
-          trajectoryIds = allTrajectories.map((t) => t.id);
-        }
-        trajectoryToDelete = row?.trajectory;
-      }
-      return { trajectoryIds, trajectoryToDelete, additionalTrajectory };
     },
     [],
   );

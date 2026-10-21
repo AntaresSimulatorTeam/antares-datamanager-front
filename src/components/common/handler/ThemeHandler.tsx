@@ -14,8 +14,9 @@ const ThemeHandler = () => {
   const mode = UserSettingsContext.useStore((store) => store.mode);
 
   useEffect(() => {
-    let currentMode = mode;
-    if (!currentMode) {
+
+    const getMode = () => {
+      let currentMode;
       try {
         const savedMode = localStorage.getItem('mode') as THEME_MODE | null;
         if (savedMode && Object.values(THEME_MODE).includes(savedMode)) {
@@ -27,10 +28,11 @@ const ThemeHandler = () => {
       if (!currentMode) {
         currentMode = darkThemeMq.matches ? THEME_MODE.DARK : THEME_MODE.LIGHT;
       }
+      return currentMode;
     }
 
-    let currentTheme = theme;
-    if (!currentTheme) {
+    const getTheme = () => {
+      let currentTheme;
       try {
         const savedTheme = localStorage.getItem('theme') as THEME_COLOR | null;
         if (savedTheme && Object.values(THEME_COLOR).includes(savedTheme)) {
@@ -40,12 +42,24 @@ const ThemeHandler = () => {
         // ignore storage errors
       }
       if (!currentTheme) {
-        const domTheme = (document.body?.getAttribute('data-theme') ||
-          document.documentElement?.getAttribute('data-theme')) as THEME_COLOR | null;
+        const domTheme = (document.body?.dataset.theme ||
+          document.documentElement?.dataset.theme) as THEME_COLOR | undefined;
         currentTheme =
           domTheme && Object.values(THEME_COLOR).includes(domTheme) ? domTheme : THEME_COLOR.BLUE_ICEBERG;
       }
+      return currentTheme;
     }
+
+    const changeMode = (currentMode: THEME_MODE) => {
+      if (currentMode === THEME_MODE.DARK) {
+        document.documentElement.classList.add(THEME_MODE.DARK);
+      } else {
+        document.documentElement.classList.remove(THEME_MODE.DARK);
+      }
+    }
+
+    const currentMode = mode ?? getMode();
+    const currentTheme = theme ?? getTheme();
 
     try {
       localStorage.setItem('theme', currentTheme);
@@ -59,11 +73,7 @@ const ThemeHandler = () => {
     document.body.dataset.theme = currentTheme;
     document.body.dataset.mode = currentMode;
 
-    if (currentMode === THEME_MODE.DARK) {
-      document.documentElement.classList.add(THEME_MODE.DARK);
-    } else {
-      document.documentElement.classList.remove(THEME_MODE.DARK);
-    }
+    changeMode(currentMode);
   }, [theme, mode, darkThemeMq.matches]);
 
   return <></>;

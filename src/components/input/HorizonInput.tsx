@@ -46,7 +46,7 @@ const HorizonInput: React.FC<YearInputProps> = ({
 
     const numeric = Number(trimmedValue);
 
-    if (isNaN(numeric) || numeric < 2000 || numeric > 9999) {
+    if (Number.isNaN(numeric) || numeric < 2000 || numeric > 9999) {
       setErrorMessage(t('horizonInput.@validYearError'));
       onValidChange?.(false);
       return false;

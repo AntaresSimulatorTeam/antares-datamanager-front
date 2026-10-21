@@ -17,7 +17,7 @@ export const StdNotificationAction = ({ action, toastId, dismissNotification }: 
     };
     return (
       <Button
-        onClick={() => void handleClickDismiss}
+        onClick={() => void handleClickDismiss()}
         variant="transparent"
         size="s"
         color="secondary"
@@ -36,7 +36,7 @@ export const StdNotificationAction = ({ action, toastId, dismissNotification }: 
     return action.actionButtonWrapper({
       renderButton: (renderProps) => (
         <Button
-          onClick={() => void handleClickDismiss(renderProps.onClick)}
+          onClick={() => handleClickDismiss(renderProps.onClick)}
           variant="transparent"
           size="s"
           color="secondary"

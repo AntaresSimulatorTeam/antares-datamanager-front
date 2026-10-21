@@ -35,8 +35,8 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
         }
       };
       return (
-        <div
-          className={`px-1 [&_[class*='radioButtonLabel']]:![font-size:inherit] [&_[class*='radioButtonLabel']]:![font-family:inherit] ${
+        <button
+          className={`px-1 [&_[class*='radioButtonLabel']]:!font-body [&_[class*='radioButtonLabel']]:!text-text-m ${
             isSelected
               ? "[&_[class*='radioButtonBackground']]:opacity-100"
               : "[&_[class*='radioButtonBackground']]:opacity-0 group-hover:[&_[class*='radioButtonBackground']]:opacity-100"
@@ -55,9 +55,9 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
                 row.toggleSelected(!isSelected);
               }
             }}
-            className={`${status === StudyStatus.GENERATED ? '!text-content-brand-default group-hover:!text-content-brand-default' : '!text-gray-800 group-hover:!text-gray-800'}`}
+            className={`${status === StudyStatus.GENERATED ? '!text-content-brand-default group-hover:!text-content-brand-default' : '!text-content-primary group-hover:!text-content-primary'}`}
           />
-        </div>
+        </button>
       );
     },
   }),

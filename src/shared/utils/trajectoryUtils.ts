@@ -803,6 +803,37 @@ export const isMatchingTrajectoryType =
 export const getRowDataSelected = (data: HypothesisRowData[], indexArray: number[]): HypothesisRowData | null =>
   indexArray.length === 2 ? (data[indexArray[0]].subRows?.[indexArray[1]] ?? null) : (data[indexArray[0]] ?? null);
 
+const resolveMainArea = (hypothesis: string, type?: TRAJECTORY_TYPE): string => {
+  if (hypothesis === OTHER_AREAS_LABEL) {
+    return OTHER_AREAS;
+  }
+  return type && hasNoAreaType(type) ? '' : hypothesis;
+};
+
+const resolveTechnology = (subHypothesis: string, options?: TechnologyType[]): string =>
+  options?.find((opt) => opt.label === subHypothesis)?.code ?? subHypothesis;
+
+const resolveSubRowHypothesisInfo = (
+  subRow: HypothesisRowData,
+  initialArea: string,
+  type?: TRAJECTORY_TYPE,
+  options?: TechnologyType[],
+): { area: string; technology?: string } => {
+  const subHypothesis = subRow.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : subRow.hypothesis;
+  if (!subHypothesis) {
+    return { area: initialArea };
+  }
+
+  if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
+    return { area: subHypothesis };
+  }
+
+  return {
+    area: initialArea,
+    technology: resolveTechnology(subHypothesis, options),
+  };
+};
+
 /**
  * Get a name composed of an area name and a technology name
  * @param {string} rowIdSelected
@@ -818,33 +849,27 @@ export const getAreaTrajectoryName = (
   options?: TechnologyType[],
 ): HypothesisType | undefined => {
   const [mainIndex, subIndex] = rowIdSelected.split('.').map(Number);
-  const hypothesisInfo = {} as { area: string; technology?: string; isDefault: boolean };
-
   const mainRow = data[mainIndex];
-  if (!mainRow?.hypothesis) return;
-  if (mainRow.hypothesis) {
-    hypothesisInfo.area = mainRow.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : type && hasNoAreaType(type) ? '' : mainRow.hypothesis;
-    hypothesisInfo.isDefault = (mainRow.isDefault && mainRow.hypothesis !== OTHER_AREAS_LABEL) ?? false;
+
+  if (!mainRow?.hypothesis) {
+    return undefined;
   }
 
+  const initialArea = resolveMainArea(mainRow.hypothesis, type);
   const subRow = mainRow.subRows?.[subIndex];
 
-  if (subRow?.hypothesis) {
-    const subRowHypothesis = subRow.hypothesis === OTHER_AREAS_LABEL ? OTHER_AREAS : subRow.hypothesis;
-    if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
-      hypothesisInfo.area = subRowHypothesis;
-    } else {
-      const option = options ? options.find((opt) => opt.label === subRowHypothesis) : null;
-      if (option) {
-        hypothesisInfo.technology = option.code;
-      } else {
-        hypothesisInfo.technology = subRowHypothesis;
-      }
-    }
-    hypothesisInfo.isDefault =
-      ((mainRow.isDefault && mainRow.hypothesis !== OTHER_AREAS_LABEL) || subRow.isDefault) ?? false;
-  }
-  return hypothesisInfo;
+  const { area, technology } = subRow?.hypothesis
+    ? resolveSubRowHypothesisInfo(subRow, initialArea, type, options)
+    : { area: initialArea, technology: undefined };
+
+  const isMainDefault = Boolean(mainRow.isDefault && mainRow.hypothesis !== OTHER_AREAS_LABEL);
+  const isDefault = subRow?.hypothesis ? Boolean(isMainDefault || subRow.isDefault) : isMainDefault;
+
+  return {
+    area,
+    ...(technology !== undefined ? { technology } : {}),
+    isDefault,
+  };
 };
 
 /**
@@ -861,7 +886,7 @@ export const getHypothesis = (
   data: HypothesisRowData[],
   rowId: string,
 ): { hypothesis: string; technology: string | undefined } => {
-  const indexArray = rowId.split('.').map((item) => parseInt(item));
+  const indexArray = rowId.split('.').map((item) => Number.parseInt(item));
   const dataRowSelected = getRowDataSelected(data, indexArray);
   if (indexArray.length === 2) {
     return { hypothesis: data[indexArray[0]]?.hypothesis, technology: dataRowSelected?.hypothesis };
@@ -1515,68 +1540,116 @@ export const getModalTile = (tabType: TRAJECTORY_TYPE, hypothesis?: HypothesisTy
   return `${area ?? tabType}${technology ? ' - ' : ''}${technology ?? ''}${isTrajectoryNuclearType(tabType) ? ' - FR' : ''}`;
 };
 
-export const getFetchFromDbParams = (
+interface FetchFromDbParamsResult {
+  typeToUse: TRAJECTORY_TYPE;
+  areaToUse: string;
+  technology?: string;
+}
+
+const resolveTechnologyParam = (options?: SearchParams): string =>
+  (options?.technologies || []).find((opt) => opt.label === options?.technology)?.code ??
+  (options?.technology as string);
+
+const resolveDbParamsByType = (
   type: TRAJECTORY_TYPE,
   indexArray: number[],
   options?: SearchParams,
-): { typeToUse: TRAJECTORY_TYPE; areaToUse: string; technology?: string } => {
-  let typeToUse = type;
-  let areaToUse = options?.area ?? '';
-  let technology: string =
-    (options?.technologies || []).find((opt) => opt.label === options?.technology)?.code ??
-    (options?.technology as string);
+): FetchFromDbParamsResult => {
+  const initialArea = options?.area ?? '';
+  const initialTechnology = resolveTechnologyParam(options);
 
   if (type === TRAJECTORY_TYPE.AREA) {
-    typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK;
-    areaToUse = '';
+    return {
+      typeToUse: indexArray[0] === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
+      areaToUse: '',
+      technology: initialTechnology,
+    };
   }
+
   if (isTrajectoryConfigurationType(type)) {
-    typeToUse = getConfigurationTypeToUse(indexArray);
-    areaToUse = '';
+    return {
+      typeToUse: getConfigurationTypeToUse(indexArray),
+      areaToUse: '',
+      technology: initialTechnology,
+    };
   }
+
   if (type === TRAJECTORY_TYPE.DSR) {
-    if (options?.isLastIndex) {
-      typeToUse = TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION;
-      areaToUse = '';
-    } else {
-      areaToUse = options?.area ?? '';
-    }
+    return {
+      typeToUse: options?.isLastIndex ? TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION : TRAJECTORY_TYPE.DSR,
+      areaToUse: options?.isLastIndex ? '' : initialArea,
+      technology: initialTechnology,
+    };
   }
 
   if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
     if (indexArray[0] === 0 && options?.technology) {
-      areaToUse = options?.technology;
-    } else {
-      typeToUse = getTrajectoryTypeByIndex(indexArray[0]);
+      return {
+        typeToUse: type,
+        areaToUse: options.technology,
+        technology: initialTechnology,
+      };
     }
-  }
-  if (type === TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER) {
-    if (indexArray[0] === 1) {
-      typeToUse = TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER;
-    }
-  }
-  if (type === TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION) {
-    typeToUse = getNuclearTypeToUse(indexArray);
-    technology = '';
-    areaToUse = '';
-  }
-  if (isTrajectoryHydroType(type)) {
-    typeToUse = getHydroTypeToUse(indexArray, type);
-    technology = '';
-  }
-  if (type === TRAJECTORY_TYPE.P2G) {
-    typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.P2G_CAPACITY_COST : TRAJECTORY_TYPE.P2G_MARKET_MODULATION;
-    technology = '';
-    areaToUse = '';
-  }
-  if (type === TRAJECTORY_TYPE.ME) {
-    typeToUse = getMETypeToUse(indexArray);
-    technology = '';
-    areaToUse = '';
+    return {
+      typeToUse: getTrajectoryTypeByIndex(indexArray[0]),
+      areaToUse: initialArea,
+      technology: initialTechnology,
+    };
   }
 
-  return { typeToUse, areaToUse, technology };
+  if (type === TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER) {
+    return {
+      typeToUse: indexArray[0] === 1 ? TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER : type,
+      areaToUse: initialArea,
+      technology: initialTechnology,
+    };
+  }
+
+  if (type === TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION) {
+    return {
+      typeToUse: getNuclearTypeToUse(indexArray),
+      areaToUse: '',
+      technology: '',
+    };
+  }
+
+  if (isTrajectoryHydroType(type)) {
+    return {
+      typeToUse: getHydroTypeToUse(indexArray, type),
+      areaToUse: initialArea,
+      technology: '',
+    };
+  }
+
+  if (type === TRAJECTORY_TYPE.P2G) {
+    return {
+      typeToUse: indexArray[0] === 0 ? TRAJECTORY_TYPE.P2G_CAPACITY_COST : TRAJECTORY_TYPE.P2G_MARKET_MODULATION,
+      areaToUse: '',
+      technology: '',
+    };
+  }
+
+  if (type === TRAJECTORY_TYPE.ME) {
+    return {
+      typeToUse: getMETypeToUse(indexArray),
+      areaToUse: '',
+      technology: '',
+    };
+  }
+
+  return {
+    typeToUse: type,
+    areaToUse: initialArea,
+    technology: initialTechnology,
+  };
 };
+
+export const getFetchFromDbParams = (
+  type: TRAJECTORY_TYPE,
+  indexArray: number[],
+  options?: SearchParams,
+): { typeToUse: TRAJECTORY_TYPE; areaToUse: string; technology?: string } =>
+  resolveDbParamsByType(type, indexArray, options);
 
 export const buildDispatchPayload = (
   config: HypothesisConfig[],

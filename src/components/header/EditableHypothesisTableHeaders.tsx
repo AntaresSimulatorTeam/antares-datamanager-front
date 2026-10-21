@@ -61,7 +61,7 @@ const getEditableHypothesisTableHeaders = ({
             isDeletable={!isStudyGenerated}
             onClick={() => {
               setErrorInfo({ index: row.index, message: '' });
-              void table.options?.meta?.updateData?.(
+              table.options?.meta?.updateData?.(
                 row.id,
                 trajectory?.id,
                 status === TRAJECTORY_SELECTION_STATUS.ERROR ? 'emptyError' : 'empty',
@@ -74,7 +74,7 @@ const getEditableHypothesisTableHeaders = ({
           <SelectInputWithButton
             onSelect={(value: DropdownItemOption) => {
               setErrorInfo({ index: row.index, message: '' });
-              void table.options?.meta?.updateData?.(row.id, value.id, 'success');
+              table.options?.meta?.updateData?.(row.id, value.id, 'success');
             }}
             onSearch={async (value?: string) => await table.options?.meta?.search?.(value ?? '', row.id)}
             onClickButton={async () => {

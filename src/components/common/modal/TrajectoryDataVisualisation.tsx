@@ -2,8 +2,8 @@
 import { useTranslation } from 'react-i18next';
 import StdSimpleTable from '@common/data/stdSimpleTable/StdSimpleTable.tsx';
 import { TrajectoryViewData } from '@/shared/types';
-import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { Button, Modal } from '@design-system-rte/react';
+import { getDataVizModalIcon, getDataVizModalTitle } from '@/shared/utils/textUtils.ts';
 
 interface TrajectoryDataVisualisationProps {
   trajectoryData: TrajectoryViewData;
@@ -14,16 +14,8 @@ interface TrajectoryDataVisualisationProps {
 export const TrajectoryDataVisualisation = ({ trajectoryData, onClose, isOpen }: TrajectoryDataVisualisationProps) => {
   const { data, columns, trajectory } = trajectoryData;
   const { t } = useTranslation();
-  const title =
-    trajectory.type === TRAJECTORY_TYPE.AREA
-      ? t('trajectoryViewModal.@title_area')
-      : trajectory.type === TRAJECTORY_TYPE.LINK
-        ? t('trajectoryViewModal.@title_link')
-        : t('trajectoryViewModal.@title_sts');
-  const icon =
-    trajectory.type === TRAJECTORY_TYPE.AREA || trajectory.type === TRAJECTORY_TYPE.LINK
-      ? 'linked-services'
-      : 'battery-charging-full';
+  const title = t(getDataVizModalTitle(trajectory.type));
+  const icon = getDataVizModalIcon(trajectory.type);
 
   return (
     <Modal
@@ -36,7 +28,6 @@ export const TrajectoryDataVisualisation = ({ trajectoryData, onClose, isOpen }:
       primaryButton={<Button label={t('project.@close')} onClick={onClose} variant="primary" />}
       size="xl"
       title={`${title}: ${trajectory.trajectoryName}`}
-      className="[&_h2]:!text-left"
       >
     <div className="w-full">
       <StdSimpleTable

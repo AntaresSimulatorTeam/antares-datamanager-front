@@ -1,9 +1,8 @@
 import { flexRender, Header, Table } from '@tanstack/react-table';
 import { ColumnSizeType } from '@common/data/stdTable/TableCore.tsx';
 import { headerDivStyleBuilder } from '@common/data/stdTable/headerDivStyleBuilder.ts';
-import { headerClassBuilder } from '@common/data/stdTable/headerClassBuilder.ts';
+import { headerClassBuilder, headerStyleBuilder } from '@common/data/stdTable/headerClassBuilder.ts';
 import { headerDivClassBuilder } from '@common/data/stdTable/headerDivClassBuilder.ts';
-import { toRem } from '@/shared/utils/arrayUtils.ts';
 
 export type TableHeaderProps<TData> = {
   table: Table<TData>;
@@ -12,23 +11,20 @@ export type TableHeaderProps<TData> = {
 };
 
 export const TableHeader = <TData,>(props: TableHeaderProps<TData>) => {
-  const { table, header, columnSize } = props;
+  const { table, header } = props;
   return (
     <th
       className={headerClassBuilder(props)}
-      style={
-        columnSize === 'rem'
-          ? { width: header.getSize() != null ? `${toRem(header.getSize())}` : '100vw' }
-          : header.getSize() != null && columnSize === 'pixels'
-            ? { width: header.getSize() }
-            : { width: header.getSize() ?? '100%' }
-      }
+      style={headerStyleBuilder(props)}
     >
       <span>{header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}</span>
       {table.options.columnResizeMode && (
         <div
+          role="tab"
+          tabIndex={header.index}
           onDoubleClick={header.column.resetSize}
           onMouseDown={header.getResizeHandler()}
+          onKeyDown={header.getResizeHandler()}
           onTouchStart={header.getResizeHandler()}
           className={headerDivClassBuilder(props)}
           style={headerDivStyleBuilder(props)}
