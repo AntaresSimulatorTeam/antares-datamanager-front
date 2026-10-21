@@ -1,7 +1,7 @@
 {
   "name": "antares-datamanager-front",
   "private": true,
-  "version": "1.4.0-SNAPSHOT",
+  "version": "1.14.0",
   "description": "Pegase web app",
   "type": "module",
   "scripts": {
