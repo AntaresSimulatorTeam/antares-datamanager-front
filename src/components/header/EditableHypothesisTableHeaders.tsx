@@ -35,7 +35,7 @@ const getEditableHypothesisTableHeaders = ({
     cell: ({ getValue, row, table: { options } }) => {
       const { trajectory, status, isDefault } = row.original;
       return (
-        <div className="w-4/5">
+        <div className="w-4/5 pl-1">
           <LabelWithButtonPreview
             value={getValue()}
             extraValue={isDefault && getValue() !== OTHER_AREAS_LABEL ? `(${t('studyDetails.@default')})` : ''}
