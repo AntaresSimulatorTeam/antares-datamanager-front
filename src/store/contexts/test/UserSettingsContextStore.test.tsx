@@ -84,8 +84,8 @@ describe('UserSettingsContextStore', () => {
     });
 
     it('récupère le thème et le mode depuis document.documentElement si absents de body et localStorage', () => {
-      document.body.setAttribute('data-theme', THEME_COLOR.VERT_FORET);
-      document.body.setAttribute('data-mode', THEME_MODE.DARK);
+      document.documentElement.setAttribute('data-theme', THEME_COLOR.VERT_FORET);
+      document.documentElement.setAttribute('data-mode', THEME_MODE.DARK);
 
       const initialSettings = getInitialUserSettings();
       expect(initialSettings).toEqual({

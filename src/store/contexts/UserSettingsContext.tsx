@@ -30,14 +30,14 @@ export const getInitialUserSettings = (): UserSettingsContextStore => {
   }
 
   if (!theme && typeof document !== 'undefined') {
-    const domTheme = (document.body?.dataset.theme || document.body?.dataset.theme) as THEME_COLOR | null;
+    const domTheme = (document.body?.dataset.theme || document.documentElement?.dataset.theme) as THEME_COLOR | null;
     if (domTheme && Object.values(THEME_COLOR).includes(domTheme)) {
       theme = domTheme;
     }
   }
 
   if (!mode && typeof document !== 'undefined') {
-    const domMode = (document.body.dataset.mode || document.body.dataset.mode) as THEME_MODE | null;
+    const domMode = (document.body.dataset.mode || document.documentElement.dataset.mode) as THEME_MODE | null;
     if (domMode && Object.values(THEME_MODE).includes(domMode)) {
       mode = domMode;
     }

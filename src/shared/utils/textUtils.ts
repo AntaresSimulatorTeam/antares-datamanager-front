@@ -38,11 +38,15 @@ export const formatLabel = (option: FsTrajectory, isDefaultArea = false) => opti
   ? option.trajectoryName.substring(0, option.trajectoryName.lastIndexOf('.'))
   : option.trajectoryName;
 
-export const getDataVizModalTitle = (type: TRAJECTORY_TYPE) => type === TRAJECTORY_TYPE.AREA
-    ? 'trajectoryViewModal.@title_area'
-    : type === TRAJECTORY_TYPE.LINK
-      ? 'trajectoryViewModal.@title_link'
-      : 'trajectoryViewModal.@title_sts'
+export const getDataVizModalTitle = (type: TRAJECTORY_TYPE) => {
+  if (type === TRAJECTORY_TYPE.AREA) {
+    return 'trajectoryViewModal.@title_area';
+  } else if (type === TRAJECTORY_TYPE.LINK) {
+    return 'trajectoryViewModal.@title_link';
+  } else {
+    return 'trajectoryViewModal.@title_sts';
+  }
+};
 
 export const getDataVizModalIcon = (trajectoryType: TRAJECTORY_TYPE): string => trajectoryType === TRAJECTORY_TYPE.AREA || trajectoryType === TRAJECTORY_TYPE.LINK
     ? 'linked-services'

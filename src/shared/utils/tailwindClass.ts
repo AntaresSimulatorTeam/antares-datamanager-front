@@ -1,6 +1,19 @@
 import { CardDataType } from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS } from '@/shared/enum/trajectory.ts';
+import clsx from 'clsx';
 
-export const buildLabelColorClass = (isReadOnly: boolean, status: TRAJECTORY_SELECTION_STATUS): string => `${isReadOnly ? 'text-chart-neutral' : status === TRAJECTORY_SELECTION_STATUS.OK ? 'text-content-brand-default' : status === TRAJECTORY_SELECTION_STATUS.ERROR ? 'text-error-800' : 'text-content-primary'}`;
+export const buildLabelColorClass = (isReadOnly: boolean, status: TRAJECTORY_SELECTION_STATUS): string => {
+  if (isReadOnly && status !== TRAJECTORY_SELECTION_STATUS.OK) {
+    return 'text-content-primary';
+  } else if (status === TRAJECTORY_SELECTION_STATUS.OK) {
+    return 'text-content-brand-default';
+  } else if (status === TRAJECTORY_SELECTION_STATUS.ERROR) {
+    return 'text-error-800';
+  } else {
+    return 'text-content';
+  }
+};
 
-export const buildCardClass = (data: CardDataType) => `absolute text-gray-600 left-0 flex h-fit flex-col justify-start gap-2 rounded-lg border-b-4 bg-gray-100 shadow-2 ${!data.isAck || data.onClickItem == null ? 'border-transparent' : 'border-b-gray-600'} ${!data.isAck ? data.colorBorder : data.onClickItem == null ? 'border-transparent' : 'hover:border-b-gray-600'} p-2`;
+const COMMON_CARD_CLASSES = "absolute text-gray-600 left-0 flex h-fit flex-col justify-start gap-2 rounded-lg border-b-4 bg-gray-100 shadow-2 p-2";
+
+export const buildCardClass = (data: CardDataType) => clsx(COMMON_CARD_CLASSES, !data.isAck || data.onClickItem == null ? 'border-transparent' : 'border-b-gray-600', !data.isAck ? data.colorBorder : data.onClickItem == null ? 'border-transparent' : 'hover:border-b-gray-600')

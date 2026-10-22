@@ -20,6 +20,4 @@ export const headerClassBuilder = <TData>({ table, header }: TableHeaderProps<TD
 
 export const headerStyleBuilder = <TData>({ header, columnSize }: TableHeaderProps<TData>) => columnSize === 'rem'
     ? { width: header.getSize() != null ? `${toRem(header.getSize())}` : '100vw' }
-    : header.getSize() != null && columnSize === 'pixels'
-      ? { width: header.getSize() }
-      : { width: header.getSize() ?? '100%' };
+    : { width: header.getSize() ?? '100%' };

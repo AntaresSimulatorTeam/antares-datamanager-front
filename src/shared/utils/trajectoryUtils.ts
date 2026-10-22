@@ -19,6 +19,7 @@ import {
   isTrajectoryResType,
   isTrajectoryThermalNoAReaType,
   isTrajectoryThermalType,
+  ResolvedFSTrajectoryParam,
   RowStatus,
   TechnologyType,
 } from '@/shared/types';
@@ -1030,6 +1031,26 @@ export const getTrajectoryTypeByIndex = (index: number): TRAJECTORY_TYPE => {
   }
 };
 
+export const getThermalTypeToUse = (type: TRAJECTORY_TYPE, index: number, hypothesis?: { area?: string; isDefault?: boolean; technology?: string } | null): ResolvedFSTrajectoryParam => {
+  if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
+    if (index === 0 && hypothesis?.technology) {
+      return {
+        typeToUse: type,
+        areaToUse: hypothesis.technology,
+      };
+    }
+    return {
+      typeToUse: getTrajectoryTypeByIndex(index),
+      areaToUse: '',
+    };
+  } else {
+    return {
+      typeToUse: index === 1 ? TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER : type,
+      areaToUse: '',
+    };
+  }
+}
+
 const getPathFromMEHydroTrajectoryType = (type: TRAJECTORY_TYPE): string => {
   switch (type) {
     case TRAJECTORY_TYPE.HYDRO_CAPACITY_ME:
@@ -1550,6 +1571,29 @@ const resolveTechnologyParam = (options?: SearchParams): string =>
   (options?.technologies || []).find((opt) => opt.label === options?.technology)?.code ??
   (options?.technology as string);
 
+const getThermalTypeAndTechnologyToUse = (type: TRAJECTORY_TYPE, index: number, initialArea: string, initialTechnology: string, options?: SearchParams): FetchFromDbParamsResult => {
+  if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
+    if (index === 0 && options?.technology) {
+      return {
+        typeToUse: type,
+        areaToUse: options.technology,
+        technology: initialTechnology,
+      };
+    }
+    return {
+      typeToUse: getTrajectoryTypeByIndex(index),
+      areaToUse: initialArea,
+      technology: initialTechnology,
+    };
+  } else {
+    return {
+      typeToUse: index === 1 ? TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER : type,
+      areaToUse: initialArea,
+      technology: initialTechnology,
+    };
+  }
+}
+
 const resolveDbParamsByType = (
   type: TRAJECTORY_TYPE,
   indexArray: number[],
@@ -1582,27 +1626,8 @@ const resolveDbParamsByType = (
     };
   }
 
-  if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
-    if (indexArray[0] === 0 && options?.technology) {
-      return {
-        typeToUse: type,
-        areaToUse: options.technology,
-        technology: initialTechnology,
-      };
-    }
-    return {
-      typeToUse: getTrajectoryTypeByIndex(indexArray[0]),
-      areaToUse: initialArea,
-      technology: initialTechnology,
-    };
-  }
-
-  if (type === TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER) {
-    return {
-      typeToUse: indexArray[0] === 1 ? TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER : type,
-      areaToUse: initialArea,
-      technology: initialTechnology,
-    };
+  if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER || type === TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER) {
+    return getThermalTypeAndTechnologyToUse(type, indexArray[0], initialArea, initialTechnology, options);
   }
 
   if (type === TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION) {

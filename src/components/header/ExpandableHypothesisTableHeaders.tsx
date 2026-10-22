@@ -115,7 +115,7 @@ const getExpandableHypothesisTableHeaders = ({
             onSearch={async (value?: string) => options?.meta?.search?.(value ?? '', row.id)}
             onClickButton={() => {
               setErrorInfo({ index: row.index, message: '' });
-              options?.meta?.importData?.(row.id);
+              void options?.meta?.importData?.(row.id);
             }}
             isDisabled={row.getReadOnly()}
           />

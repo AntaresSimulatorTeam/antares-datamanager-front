@@ -96,12 +96,12 @@ const computeGenericDeletion = (
   status?: RowStatus,
 ): DeletionResult => {
   const row = resolveTargetRow(data, indexRow, indexArray);
-  const trajectoryIds =
-    status === 'empty'
-      ? row?.trajectory?.id
-        ? [row.trajectory.id]
-        : []
-      : collectTrajectoriesRecursively(row).map((t) => t.id);
+  let trajectoryIds = [];
+  if (status === 'empty') {
+    trajectoryIds = row?.trajectory?.id ? [row.trajectory.id] : [];
+  } else {
+    trajectoryIds = collectTrajectoriesRecursively(row).map((t) => t.id);
+  }
 
   return {
     trajectoryIds,

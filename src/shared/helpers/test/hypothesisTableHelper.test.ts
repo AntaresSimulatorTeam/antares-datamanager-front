@@ -1747,64 +1747,125 @@ describe('getParamForFetchFSTrajectory', () => {
   });
 
   it('return THERMAL_TECHNICAL_SPECIFIC_PARAMETER type when THERMAL_TECHNICAL_SPECIFIC_PARAMETER is called', () => {
-    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
+    const mockHypothesis = {
       area: 'H2',
       technology: 'CCGT',
       isDefault: false,
+    };
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue(mockHypothesis);
+    vi.mocked(trajectoryUtils.getThermalTypeToUse).mockReturnValue({
+      typeToUse: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+      areaToUse: 'CCGT',
     });
-    const { typeToUse } = getParamForFetchFSTrajectory(
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(
       TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
       '0.1',
       [{}, {}] as HypothesisRowData[],
     );
+    expect(trajectoryUtils.getThermalTypeToUse).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+      0,
+      mockHypothesis,
+    );
     expect(typeToUse).toEqual(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER);
+    expect(areaToUse).toEqual('CCGT');
   });
 
   it('return THERMAL_TECHNICAL_MODULATION_PARAMETER type when THERMAL_TECHNICAL_SPECIFIC_PARAMETER is called for the second line', () => {
-    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
+    const mockHypothesis = {
       area: 'H2',
       technology: 'CCGT',
       isDefault: false,
+    };
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue(mockHypothesis);
+    vi.mocked(trajectoryUtils.getThermalTypeToUse).mockReturnValue({
+      typeToUse: TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER,
+      areaToUse: '',
     });
-    getParamForFetchFSTrajectory(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, '1', [{}, {}, {}] as HypothesisRowData[]);
-    expect(trajectoryUtils.getTrajectoryTypeByIndex).toHaveBeenCalledWith(1);
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+      '1',
+      [{}, {}, {}] as HypothesisRowData[],
+    );
+    expect(trajectoryUtils.getThermalTypeToUse).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+      1,
+      mockHypothesis,
+    );
+    expect(typeToUse).toEqual(TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER);
+    expect(areaToUse).toEqual('');
   });
 
   it('return THERMAL_TECHNICAL_COMMON_PARAMETER type when THERMAL_TECHNICAL_COMMON_PARAMETER is called', () => {
-    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
+    const mockHypothesis = {
       area: 'H2',
       technology: 'CCGT',
       isDefault: false,
+    };
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue(mockHypothesis);
+    vi.mocked(trajectoryUtils.getThermalTypeToUse).mockReturnValue({
+      typeToUse: TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER,
+      areaToUse: '',
     });
-    getParamForFetchFSTrajectory(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, '2', [{}, {}, {}] as HypothesisRowData[]);
-    expect(trajectoryUtils.getTrajectoryTypeByIndex).toHaveBeenCalledWith(2);
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+      '2',
+      [{}, {}, {}] as HypothesisRowData[],
+    );
+    expect(trajectoryUtils.getThermalTypeToUse).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+      2,
+      mockHypothesis,
+    );
+    expect(typeToUse).toEqual(TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER);
+    expect(areaToUse).toEqual('');
   });
 
   it('return THERMAL_ECONOMIC_COST_PARAMETER type when THERMAL_ECONOMIC_COST_PARAMETER is called', () => {
-    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
+    const mockHypothesis = {
       area: 'H2',
       technology: 'CCGT',
       isDefault: false,
+    };
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue(mockHypothesis);
+    vi.mocked(trajectoryUtils.getThermalTypeToUse).mockReturnValue({
+      typeToUse: TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER,
+      areaToUse: '',
     });
     const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(
       TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER,
       '0',
       [{}, {}] as HypothesisRowData[],
     );
+    expect(trajectoryUtils.getThermalTypeToUse).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER,
+      0,
+      mockHypothesis,
+    );
     expect(typeToUse).toEqual(TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER);
     expect(areaToUse).toEqual('');
   });
 
   it('return THERMAL_ECONOMIC_PARAMETER type when THERMAL_ECONOMIC_PARAMETER is called', () => {
-    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
+    const mockHypothesis = {
       area: 'H2',
       technology: 'CCGT',
       isDefault: false,
+    };
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue(mockHypothesis);
+    vi.mocked(trajectoryUtils.getThermalTypeToUse).mockReturnValue({
+      typeToUse: TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER,
+      areaToUse: '',
     });
     const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(
       TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER,
       '1',
       [{}, {}] as HypothesisRowData[],
+    );
+    expect(trajectoryUtils.getThermalTypeToUse).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER,
+      1,
+      mockHypothesis,
     );
     expect(typeToUse).toEqual(TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER);
     expect(areaToUse).toEqual('');

@@ -9,6 +9,7 @@ import {
   isTrajectoryP2GType,
   isTrajectoryResType,
   isTrajectorySubrowsType,
+  ResolvedFSTrajectoryParam,
   TechnologyType,
   TrajectoryAreaData,
 } from '@/shared/types';
@@ -18,7 +19,7 @@ import {
   filterRow,
   generateReadOnlyIndexMap,
   getAreaTrajectoryName,
-  getTrajectoryTypeByIndex,
+  getThermalTypeToUse,
   removeDuplicate,
   removeDuplicateByTechnology,
   retrieveReadOnlyArea,
@@ -735,12 +736,6 @@ interface FetchFSTrajectoryParams {
   isLastIndex: boolean;
 }
 
-interface ResolvedFSTrajectoryParam {
-  typeToUse: TRAJECTORY_TYPE;
-  areaToUse?: string;
-  isDefaultArea?: boolean;
-}
-
 const resolveFSTrajectoryTypeAndArea = ({
   type,
   indexArray,
@@ -776,24 +771,8 @@ const resolveFSTrajectoryTypeAndArea = ({
     };
   }
 
-  if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
-    if (indexArray[0] === 0 && hypothesis?.technology) {
-      return {
-        typeToUse: type,
-        areaToUse: hypothesis.technology,
-      };
-    }
-    return {
-      typeToUse: getTrajectoryTypeByIndex(indexArray[0]),
-      areaToUse: '',
-    };
-  }
-
-  if (type === TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER) {
-    return {
-      typeToUse: indexArray[0] === 1 ? TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER : type,
-      areaToUse: '',
-    };
+  if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER || type === TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER) {
+    return getThermalTypeToUse(type, indexArray[0], hypothesis);
   }
 
   if (isTrajectoryHydroType(type)) {
@@ -850,8 +829,8 @@ export const getParamForFetchFSTrajectory = (
 
   return {
     typeToUse: resolved.typeToUse,
-    areaToUse: resolved.areaToUse !== undefined ? resolved.areaToUse : hypothesis?.area,
-    isDefaultArea: resolved.isDefaultArea !== undefined ? resolved.isDefaultArea : (hypothesis?.isDefault ?? false),
+    areaToUse: resolved.areaToUse ?? hypothesis?.area,
+    isDefaultArea: resolved.isDefaultArea ?? (hypothesis?.isDefault ?? false),
     hypothesis,
   };
 };
