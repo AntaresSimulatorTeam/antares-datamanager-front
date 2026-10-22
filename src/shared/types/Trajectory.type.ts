@@ -148,3 +148,9 @@ export type FetchTrajectoriesParams = {
   area?: string;
   searchTerm?: string;
 };
+
+export interface ResolvedFSTrajectoryParam {
+  typeToUse: TRAJECTORY_TYPE;
+  areaToUse?: string;
+  isDefaultArea?: boolean;
+}

@@ -7,10 +7,10 @@
 import clsx from 'clsx';
 
 export const STRIPED_CLASSES = 'even:bg-primary-200';
-export const SELECTED_ROW_CLASSES = 'bg-gray-100';
+export const SELECTED_ROW_CLASSES = 'bg-background-hover';
 export const EXPANDABLE_ROW_CLASSES = 'shadow-[inset_2px_0_0_0_gray]';
-export const READONLY_ROW_CLASSES = 'disabled bg-gray-w';
-export const READONLY_SELECTED_ROW_CLASSES = 'hover:bg-gray-100';
+export const READONLY_ROW_CLASSES = 'disabled';
+export const READONLY_EXPANDABLE_ROW_CLASSES = 'hover:disabled';
 
 export const tableCoreRowClassBuilder = (
   isStriped?: boolean,
@@ -24,10 +24,10 @@ export const tableCoreRowClassBuilder = (
     {
       group: true,
       [STRIPED_CLASSES]: isStriped,
-      [SELECTED_ROW_CLASSES]: isSelected || (!isExpandable && parentRowCanExpand),
+      [SELECTED_ROW_CLASSES]: isSelected || (!isReadOnly && !isExpandable && parentRowCanExpand),
       [EXPANDABLE_ROW_CLASSES]: isExpandable,
       [READONLY_ROW_CLASSES]: isReadOnly,
-      [READONLY_SELECTED_ROW_CLASSES]: !isReadOnly && !isSelected,
+      [READONLY_EXPANDABLE_ROW_CLASSES]: !isReadOnly && !isSelected && isExpandable,
     },
     trClassNames,
   );

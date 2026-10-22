@@ -20,6 +20,7 @@ import {
   getReadOnlyForGeneratedStudy,
   getRowHypothesisLabel,
   getSpecificTrajectories,
+  getTypeToUse,
   shouldOpenDeletionModal,
   updateTableAfterCellDetach,
   updateTableAfterRowDeletion,
@@ -1746,64 +1747,125 @@ describe('getParamForFetchFSTrajectory', () => {
   });
 
   it('return THERMAL_TECHNICAL_SPECIFIC_PARAMETER type when THERMAL_TECHNICAL_SPECIFIC_PARAMETER is called', () => {
-    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
+    const mockHypothesis = {
       area: 'H2',
       technology: 'CCGT',
       isDefault: false,
+    };
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue(mockHypothesis);
+    vi.mocked(trajectoryUtils.getThermalTypeToUse).mockReturnValue({
+      typeToUse: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+      areaToUse: 'CCGT',
     });
-    const { typeToUse } = getParamForFetchFSTrajectory(
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(
       TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
       '0.1',
       [{}, {}] as HypothesisRowData[],
     );
+    expect(trajectoryUtils.getThermalTypeToUse).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+      0,
+      mockHypothesis,
+    );
     expect(typeToUse).toEqual(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER);
+    expect(areaToUse).toEqual('CCGT');
   });
 
   it('return THERMAL_TECHNICAL_MODULATION_PARAMETER type when THERMAL_TECHNICAL_SPECIFIC_PARAMETER is called for the second line', () => {
-    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
+    const mockHypothesis = {
       area: 'H2',
       technology: 'CCGT',
       isDefault: false,
+    };
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue(mockHypothesis);
+    vi.mocked(trajectoryUtils.getThermalTypeToUse).mockReturnValue({
+      typeToUse: TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER,
+      areaToUse: '',
     });
-    getParamForFetchFSTrajectory(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, '1', [{}, {}, {}] as HypothesisRowData[]);
-    expect(trajectoryUtils.getTrajectoryTypeByIndex).toHaveBeenCalledWith(1);
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+      '1',
+      [{}, {}, {}] as HypothesisRowData[],
+    );
+    expect(trajectoryUtils.getThermalTypeToUse).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+      1,
+      mockHypothesis,
+    );
+    expect(typeToUse).toEqual(TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER);
+    expect(areaToUse).toEqual('');
   });
 
   it('return THERMAL_TECHNICAL_COMMON_PARAMETER type when THERMAL_TECHNICAL_COMMON_PARAMETER is called', () => {
-    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
+    const mockHypothesis = {
       area: 'H2',
       technology: 'CCGT',
       isDefault: false,
+    };
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue(mockHypothesis);
+    vi.mocked(trajectoryUtils.getThermalTypeToUse).mockReturnValue({
+      typeToUse: TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER,
+      areaToUse: '',
     });
-    getParamForFetchFSTrajectory(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, '2', [{}, {}, {}] as HypothesisRowData[]);
-    expect(trajectoryUtils.getTrajectoryTypeByIndex).toHaveBeenCalledWith(2);
+    const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+      '2',
+      [{}, {}, {}] as HypothesisRowData[],
+    );
+    expect(trajectoryUtils.getThermalTypeToUse).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+      2,
+      mockHypothesis,
+    );
+    expect(typeToUse).toEqual(TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER);
+    expect(areaToUse).toEqual('');
   });
 
   it('return THERMAL_ECONOMIC_COST_PARAMETER type when THERMAL_ECONOMIC_COST_PARAMETER is called', () => {
-    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
+    const mockHypothesis = {
       area: 'H2',
       technology: 'CCGT',
       isDefault: false,
+    };
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue(mockHypothesis);
+    vi.mocked(trajectoryUtils.getThermalTypeToUse).mockReturnValue({
+      typeToUse: TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER,
+      areaToUse: '',
     });
     const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(
       TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER,
       '0',
       [{}, {}] as HypothesisRowData[],
     );
+    expect(trajectoryUtils.getThermalTypeToUse).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER,
+      0,
+      mockHypothesis,
+    );
     expect(typeToUse).toEqual(TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER);
     expect(areaToUse).toEqual('');
   });
 
   it('return THERMAL_ECONOMIC_PARAMETER type when THERMAL_ECONOMIC_PARAMETER is called', () => {
-    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
+    const mockHypothesis = {
       area: 'H2',
       technology: 'CCGT',
       isDefault: false,
+    };
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue(mockHypothesis);
+    vi.mocked(trajectoryUtils.getThermalTypeToUse).mockReturnValue({
+      typeToUse: TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER,
+      areaToUse: '',
     });
     const { typeToUse, areaToUse } = getParamForFetchFSTrajectory(
       TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER,
       '1',
       [{}, {}] as HypothesisRowData[],
+    );
+    expect(trajectoryUtils.getThermalTypeToUse).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER,
+      1,
+      mockHypothesis,
     );
     expect(typeToUse).toEqual(TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER);
     expect(areaToUse).toEqual('');
@@ -2294,5 +2356,49 @@ describe('buildRowsByType', () => {
     expect(lastRow.trajectory).toBeNull();
     expect(lastRow.status).toBe(TRAJECTORY_SELECTION_STATUS.MISSING);
     expect(lastRow.subRows).toEqual([]);
+  });
+});
+
+describe('getTypeToUse', () => {
+  it('handles AREA trajectory type', () => {
+    expect(getTypeToUse(TRAJECTORY_TYPE.AREA, [0], 5)).toBe(TRAJECTORY_TYPE.AREA);
+    expect(getTypeToUse(TRAJECTORY_TYPE.AREA, [1], 5)).toBe(TRAJECTORY_TYPE.LINK);
+  });
+
+  it('handles ADEQUACY_PATCH trajectory type with indexArray.length > 1', () => {
+    expect(getTypeToUse(TRAJECTORY_TYPE.ADEQUACY_PATCH, [0, 0], 5)).toBe(TRAJECTORY_TYPE.SETTINGS);
+    expect(getTypeToUse(TRAJECTORY_TYPE.ADEQUACY_PATCH, [0, 1], 5)).toBe(TRAJECTORY_TYPE.SCENARIO_BUILDER);
+  });
+
+  it('handles ADEQUACY_PATCH trajectory type with single index', () => {
+    expect(getTypeToUse(TRAJECTORY_TYPE.ADEQUACY_PATCH, [0], 5)).toBe(TRAJECTORY_TYPE.ADEQUACY_PATCH);
+    expect(getTypeToUse(TRAJECTORY_TYPE.ADEQUACY_PATCH, [1], 5)).toBe(TRAJECTORY_TYPE.FLOWBASED);
+  });
+
+  it('handles DSR trajectory type', () => {
+    expect(getTypeToUse(TRAJECTORY_TYPE.DSR, [2], 3)).toBe(TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION);
+    expect(getTypeToUse(TRAJECTORY_TYPE.DSR, [0], 3)).toBe(TRAJECTORY_TYPE.DSR);
+    expect(getTypeToUse(TRAJECTORY_TYPE.DSR, [0], 0)).toBe(TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION);
+  });
+
+  it('handles HYDRO_SERIES trajectory type', () => {
+    expect(getTypeToUse(TRAJECTORY_TYPE.HYDRO_SERIES, [0, 1], 5)).toBe(TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS);
+    expect(getTypeToUse(TRAJECTORY_TYPE.HYDRO_SERIES, [0, 0], 5)).toBe(TRAJECTORY_TYPE.HYDRO_SERIES);
+    expect(getTypeToUse(TRAJECTORY_TYPE.HYDRO_SERIES, [0], 5)).toBe(TRAJECTORY_TYPE.HYDRO_SERIES);
+  });
+
+  it('handles P2G trajectory type', () => {
+    expect(getTypeToUse(TRAJECTORY_TYPE.P2G, [0], 5)).toBe(TRAJECTORY_TYPE.P2G_CAPACITY_COST);
+    expect(getTypeToUse(TRAJECTORY_TYPE.P2G, [1], 5)).toBe(TRAJECTORY_TYPE.P2G_MARKET_MODULATION);
+  });
+
+  it('handles ME trajectory type', () => {
+    expect(getTypeToUse(TRAJECTORY_TYPE.ME, [0], 5)).toBe(TRAJECTORY_TYPE.AREA_ME);
+    expect(getTypeToUse(TRAJECTORY_TYPE.ME, [1], 5)).toBe(TRAJECTORY_TYPE.LINK_ME);
+  });
+
+  it('returns original type for other types', () => {
+    expect(getTypeToUse(TRAJECTORY_TYPE.LOAD, [0], 5)).toBe(TRAJECTORY_TYPE.LOAD);
+    expect(getTypeToUse(TRAJECTORY_TYPE.RES_LOAD, [2], 5)).toBe(TRAJECTORY_TYPE.RES_LOAD);
   });
 });

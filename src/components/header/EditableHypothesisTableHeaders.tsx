@@ -35,12 +35,11 @@ const getEditableHypothesisTableHeaders = ({
     cell: ({ getValue, row, table: { options } }) => {
       const { trajectory, status, isDefault } = row.original;
       return (
-        <div className="w-4/5">
+        <div className="w-4/5 pl-1">
           <LabelWithButtonPreview
             value={getValue()}
             extraValue={isDefault && getValue() !== OTHER_AREAS_LABEL ? `(${t('studyDetails.@default')})` : ''}
             status={status}
-            isReadOnly={row.getReadOnly()}
             hasPreview={!!options?.meta?.viewData && !!trajectory && status === TRAJECTORY_SELECTION_STATUS.OK}
             onClick={() => void options?.meta?.viewData?.(row.id)}
           />
@@ -61,7 +60,7 @@ const getEditableHypothesisTableHeaders = ({
             isDeletable={!isStudyGenerated}
             onClick={() => {
               setErrorInfo({ index: row.index, message: '' });
-              void table.options?.meta?.updateData?.(
+              table.options?.meta?.updateData?.(
                 row.id,
                 trajectory?.id,
                 status === TRAJECTORY_SELECTION_STATUS.ERROR ? 'emptyError' : 'empty',
@@ -74,7 +73,7 @@ const getEditableHypothesisTableHeaders = ({
           <SelectInputWithButton
             onSelect={(value: DropdownItemOption) => {
               setErrorInfo({ index: row.index, message: '' });
-              void table.options?.meta?.updateData?.(row.id, value.id, 'success');
+              table.options?.meta?.updateData?.(row.id, value.id, 'success');
             }}
             onSearch={async (value?: string) => await table.options?.meta?.search?.(value ?? '', row.id)}
             onClickButton={async () => {

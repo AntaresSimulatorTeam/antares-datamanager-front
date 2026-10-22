@@ -5,8 +5,8 @@
  */
 
 import {
+  READONLY_EXPANDABLE_ROW_CLASSES,
   READONLY_ROW_CLASSES,
-  READONLY_SELECTED_ROW_CLASSES,
   SELECTED_ROW_CLASSES,
   STRIPED_CLASSES,
   tableCoreRowClassBuilder,
@@ -27,8 +27,8 @@ describe('tableCoreRowClassBuilder function', () => {
 
   it('should have the expected additional "tr" classes', () => {
     expect(
-      tableCoreRowClassBuilder(false, false, false, false, false, READONLY_SELECTED_ROW_CLASSES).includes(
-        READONLY_SELECTED_ROW_CLASSES,
+      tableCoreRowClassBuilder(false, false, false, false, false, READONLY_EXPANDABLE_ROW_CLASSES).includes(
+        READONLY_EXPANDABLE_ROW_CLASSES,
       ),
     ).toBe(true);
   });

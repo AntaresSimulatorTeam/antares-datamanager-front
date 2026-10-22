@@ -114,7 +114,7 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
           onRowSelectionChange={setRowSelection}
         />
       </div>
-      <div className="sticky bottom-0 flex h-8 items-center justify-between bg-gray-200 px-4">
+      <div className="sticky bottom-0 flex h-8 items-center justify-between bg-background-neutral-navigation-default px-4">
         <div className="flex gap-2">
           {selectedStudy ? (
             <>
@@ -122,9 +122,11 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
                 label={t('study.@open')}
                 onClick={() => void navigateToStudy(selectedStudy)}
                 variant="secondary"
+                size="s"
               />
-              <Button label={t('study.@duplicate')} onClick={handleDuplicate} variant="secondary" />
+              <Button size="s" label={t('study.@duplicate')} onClick={handleDuplicate} variant="secondary" />
               <Button
+                size="s"
                 label={t('study.@delete')}
                 onClick={() => void handleDeleteClick()}
                 variant="secondary"

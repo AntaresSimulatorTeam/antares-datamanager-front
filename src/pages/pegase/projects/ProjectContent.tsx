@@ -78,7 +78,7 @@ const ProjectContent = () => {
         {(projects.length > intervalSize ? projects.splice(0, 9) : projects || []).map((project) => {
           const dropdownItems: DropdownItemOption[] = [
             pinOption(false, () => void handlePinProject(project.id), pinnedProjects?.length >= 3),
-            editOption(() => void openModalProject(project), t('project.@edit')),
+            editOption(() => openModalProject(project), t('project.@edit')),
             deleteOption(() => void handleDeleteProject(project.id), t('project.@delete'), project.studies?.length > 0),
           ];
           return (

@@ -358,9 +358,8 @@ export default {
     },
     fontFamily: {
       nunito: ['Nunito', 'Nunito Sans Variable', 'sans-serif'],
-      arial: ['Arial', 'sans-serif'],
-      body: ['Nunito Sans Variable', 'Nunito', 'Arial', 'sans-serif'],
-      sans: ['Nunito Sans Variable', 'Nunito', 'Arial', 'sans-serif'],
+      body: ['Nunito Sans Variable', 'Nunito', 'sans-serif'],
+      sans: ['Nunito Sans Variable', 'Nunito', 'sans-serif'],
     },
     spacing: {
       0: '0px',

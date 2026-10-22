@@ -1,6 +1,7 @@
 import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter.ts';
 import { CardDataType } from '@/shared/types';
 import { Button, Icon, Tooltip } from '@design-system-rte/react';
+import { buildCardClass } from '@/shared/utils/tailwindClass.ts';
 
 interface CardWithIconTitleProps {
   data: CardDataType;
@@ -53,7 +54,7 @@ export const CardWithIconTitle = ({ data, size, transform }: CardWithIconTitlePr
   return (
     <div
       style={{ width: size, transform }}
-      className={`absolute left-0 flex h-fit flex-col justify-start gap-2 rounded-lg border-b-4 bg-gray-100 shadow-2 ${!data.isAck || data.onClickItem == null ? 'border-transparent' : 'border-b-gray-600'} ${!data.isAck ? data.colorBorder : data.onClickItem == null ? 'border-transparent' : 'hover:border-b-gray-600'} p-2`}
+      className={buildCardClass(data)}
     >
       <div className="flex items-start justify-between gap-1">
         <Tooltip label={data.title} position="top">
@@ -62,14 +63,14 @@ export const CardWithIconTitle = ({ data, size, transform }: CardWithIconTitlePr
         {data.onClickItem != null && getButton()}
       </div>
       {data?.content && (
-        <div className="h-[calc(theme(lineHeight.4)*2)] overflow-hidden text-gray-600 aspect-medium:h-[calc(theme(lineHeight.4)*2.2)] aspect-wide:h-[calc(theme(lineHeight.4)*2.4)]">
+        <div className="h-[calc(theme(lineHeight.4)*2)] overflow-hidden aspect-medium:h-[calc(theme(lineHeight.4)*2.2)] aspect-wide:h-[calc(theme(lineHeight.4)*2.4)]">
           <Tooltip label={data?.content} position="right">
             <div className="leading-2 line-clamp-2 text-ellipsis text-start text-body-s">{data.content}</div>
           </Tooltip>
         </div>
       )}
       <div className="flex flex-col justify-end">
-        <div className="flex gap-2 text-gray-600">
+        <div className="flex gap-2">
           <div className="flex items-center gap-1">
             <Icon name="user" />
             {data?.generatedBy && <span className="text-body-s">{data.generatedBy}</span>}

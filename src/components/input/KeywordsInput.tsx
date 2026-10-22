@@ -5,11 +5,11 @@
  */
 
 import { Dispatch, SetStateAction, useState } from 'react';
-import { fetchSuggestedKeywords } from '@/shared/services/studyService.ts';
 import { clsx } from 'clsx';
 import { useTranslation } from 'react-i18next';
 import { validateMaxLength } from '@/shared/utils/validateMaxTextLength.ts';
 import { Button, IconButton, TextInput } from '@design-system-rte/react';
+import { fetchSuggestedKeywords } from '@/shared/services/studyService.ts';
 
 interface KeywordsInputProps {
   keywords: string[];
@@ -101,12 +101,10 @@ const KeywordsInput = ({
   const shouldAddKeywordButton = (input: string): boolean => {
     if (!input || errorMessage) {
       return false;
-    } else {
-      if (minNbCharacters && !maxNbCharacters) {
-        return input.length >= minNbCharacters;
-      } else if (minNbCharacters && maxNbCharacters) {
-        return input.length >= minNbCharacters && input.length <= maxNbCharacters;
-      }
+    } else if (minNbCharacters && !maxNbCharacters) {
+      return input.length >= minNbCharacters;
+    } else if (minNbCharacters && maxNbCharacters) {
+      return input.length >= minNbCharacters && input.length <= maxNbCharacters;
     }
     return false;
   };
@@ -133,20 +131,26 @@ const KeywordsInput = ({
           />
           {/* Suggested Keywords Dropdown */}
           {keywordInput && !errorMessage && suggestedKeywords.length > 0 && (
-            <div
+            <menu
+              key="list-keywords"
+              role="listbox"
+              aria-selected={!!keywordInput}
               className="absolute left-0 top-7 z-50 max-h-14 w-full overflow-y-auto rounded border border-gray-300 bg-gray-w shadow-2 outline-none"
-              onMouseDown={(e) => e.preventDefault()} // Prevent closing when interacting with dropdown
+              onMouseDown={(e) => e.preventDefault()}
+              onKeyDown={(e) => e.preventDefault()}
             >
               {suggestedKeywords.map((suggestedKeyword, index) => (
-                <div
-                  key={index}
+                <option
+                  key={`${suggestedKeyword}-${index}`}
                   className="cursor-pointer px-2 py-1 hover:bg-gray-200"
                   onClick={() => handleAddKeyword(suggestedKeyword)}
+                  onMouseDown={() => handleAddKeyword(suggestedKeyword)}
+                  onKeyDown={() => handleAddKeyword(suggestedKeyword)}
                 >
                   {suggestedKeyword}
-                </div>
+                </option>
               ))}
-            </div>
+            </menu>
           )}
         </div>
         <div className="mb-0.5">
@@ -160,7 +164,7 @@ const KeywordsInput = ({
       <div className="flex flex-col items-start justify-start gap-1">
         <div className="flex flex-wrap gap-2">
           {keywords.map((keyword, index) => (
-            <div key={index} className="flex items-center gap-2 rounded bg-gray-200 px-1">
+            <div key={`${keyword}-${index}`} className="flex items-center gap-2 rounded bg-gray-200 px-1">
               <span>{keyword}</span>
               <IconButton name="close" onClick={() => handleRemoveKeyword(index)} size="s" variant="text" />
             </div>

@@ -26,7 +26,6 @@ export const AreaDeletionConfirmationModal: React.FC<AreaDeletionConfirmationMod
       secondaryButton={<Button label={t('trajectoryDeletionModal.@cancel')} variant="text" onClick={onClose} />}
       size="s"
       title={t('trajectoryDeletionModal.@confirmDeleteTitle')}
-      className="[&_h2]:!text-left"
       closeOnOverlayClick={false}
     >
       <p>{message ?? t('trajectoryDeletionModal.@confirmDeleteMessage')}</p>

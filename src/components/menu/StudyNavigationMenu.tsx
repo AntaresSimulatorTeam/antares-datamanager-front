@@ -19,6 +19,7 @@ import { getNbMessagesFromTrajectoryType } from '@/shared/services/trajectorySer
 import { Tab } from '@design-system-rte/react';
 import { TabItemProps } from '@design-system-rte/core/components/tab/tab.interface';
 import { useFetchAreas } from '@/hooks/useFetchAreas.ts';
+import { getNbWarningMessages } from '@/shared/utils/warningUtils.ts';
 
 type StudyNavigationMenuProps = {
   studyData: StudyDTO;
@@ -55,25 +56,21 @@ const StudyNavigationMenu = ({ studyData }: StudyNavigationMenuProps) => {
   }, [studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0]]);
 
   useEffect(() => {
+    const setTabItems = (prev: TabItemProps[], result: { [key in keyof typeof TRAJECTORY_TYPE]: number }): TabItemProps[] => prev.map((tab) => {
+        if (activeTab.id === tab.id) {
+          const { badgeCount: _removed, ...rest } = tab;
+          return rest;
+        }
+        const nbWarnings= getNbWarningMessages(tab, result);
+        if (nbWarnings > 0) {
+          return { ...tab, badgeCount: nbWarnings };
+        }
+        return tab;
+      })
     const countNbWarningMessages = async (id: number) => {
       try {
         const result = await getNbMessagesFromTrajectoryType(id);
-        setTabs((prev) =>
-          prev.map((tab) => {
-            if (activeTab.id === tab.id) {
-              const { badgeCount: _removed, ...rest } = tab;
-              return rest;
-            }
-            const nbWarnings =
-              tab.id === (TRAJECTORY_TYPE.AREA as string)
-                ? [TRAJECTORY_TYPE.AREA, TRAJECTORY_TYPE.LINK].reduce((acc, type) => acc + result[type], 0)
-                : result[tab.id as TRAJECTORY_TYPE];
-            if (nbWarnings > 0) {
-              return { ...tab, badgeCount: nbWarnings };
-            }
-            return tab;
-          }),
-        );
+        setTabs((prev: TabItemProps[]) => setTabItems(prev, result));
       } catch {
         // silent handler;
       }
