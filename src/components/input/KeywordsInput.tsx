@@ -131,17 +131,16 @@ const KeywordsInput = ({
           />
           {/* Suggested Keywords Dropdown */}
           {keywordInput && !errorMessage && suggestedKeywords.length > 0 && (
-            <div
-              role="menu"
+            <menu
               key="list-keywords"
+              role="listbox"
               aria-selected={!!keywordInput}
               className="absolute left-0 top-7 z-50 max-h-14 w-full overflow-y-auto rounded border border-gray-300 bg-gray-w shadow-2 outline-none"
-              onMouseDown={(e) => e.preventDefault()} // Prevent closing when interacting with dropdown
+              onMouseDown={(e) => e.preventDefault()}
               onKeyDown={(e) => e.preventDefault()}
             >
               {suggestedKeywords.map((suggestedKeyword, index) => (
                 <option
-                  role="option"
                   key={`${suggestedKeyword}-${index}`}
                   className="cursor-pointer px-2 py-1 hover:bg-gray-200"
                   onClick={() => handleAddKeyword(suggestedKeyword)}
@@ -151,7 +150,7 @@ const KeywordsInput = ({
                   {suggestedKeyword}
                 </option>
               ))}
-            </div>
+            </menu>
           )}
         </div>
         <div className="mb-0.5">

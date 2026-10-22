@@ -55,7 +55,6 @@ const getExpandableHypothesisTableHeaders = ({
           <LabelWithButtonPreview
             value={getValue() as string}
             status={status}
-            isReadOnly={row.getReadOnly()}
             hasPreview={false}
             alignment={getAlignment(row)}
             extraValue={

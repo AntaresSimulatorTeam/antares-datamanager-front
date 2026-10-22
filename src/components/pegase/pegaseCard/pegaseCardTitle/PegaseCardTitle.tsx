@@ -30,31 +30,29 @@ const PegaseCardTitle = ({ title, dropdownOptions, icons, lineClamp, onClick, id
             {title}
           </span>
       </div>
-      <div role="menu" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
-          <Dropdown
-            dropdownId="card-options"
-            onClose={() => setOpen(false)}
-            style={{width: '20px'}}
-            trigger={
-              <IconButton
-                id={`${id}-button`}
-                data-testid="project-card-menu"
-                aria-label="more-vert"
-                variant="text"
-                size="m"
-                name="more-vert"
-                disabled={dropdownOptions.length === 0}
-                onClick={(e) => {
-                  setOpen(true);
-                  e.stopPropagation();
-                }}
-              />
-            }
-            isOpen={open}
-          >
-            {dropdownOptions.map(option => (<DropdownItem key={option.label} {...option} />))}
-          </Dropdown>
-      </div>
+        <Dropdown
+          dropdownId="card-options"
+          onClose={() => setOpen(false)}
+          style={{width: '20px'}}
+          trigger={
+            <IconButton
+              id={`${id}-button`}
+              data-testid="project-card-menu"
+              aria-label="more-vert"
+              variant="text"
+              size="m"
+              name="more-vert"
+              disabled={dropdownOptions.length === 0}
+              onClick={(e) => {
+                setOpen(true);
+                e.stopPropagation();
+              }}
+            />
+          }
+          isOpen={open}
+        >
+          {dropdownOptions.map(option => (<DropdownItem key={option.label} {...option} />))}
+        </Dropdown>
     </header>
   );
 };

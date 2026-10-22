@@ -729,6 +729,8 @@ export const updateTableAfterCellDetach = async ({
   return { newData };
 };
 
+export const getP2GType = (index: number): TRAJECTORY_TYPE => index === 0 ? TRAJECTORY_TYPE.P2G_CAPACITY_COST : TRAJECTORY_TYPE.P2G_MARKET_MODULATION
+
 interface FetchFSTrajectoryParams {
   type: TRAJECTORY_TYPE;
   indexArray: number[];
@@ -791,7 +793,7 @@ const resolveFSTrajectoryTypeAndArea = ({
 
   if (type === TRAJECTORY_TYPE.P2G) {
     return {
-      typeToUse: indexArray[0] === 0 ? TRAJECTORY_TYPE.P2G_CAPACITY_COST : TRAJECTORY_TYPE.P2G_MARKET_MODULATION,
+      typeToUse: getP2GType(indexArray[0]),
       areaToUse: '',
     };
   }

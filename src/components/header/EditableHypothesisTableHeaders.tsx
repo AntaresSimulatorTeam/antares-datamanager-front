@@ -40,7 +40,6 @@ const getEditableHypothesisTableHeaders = ({
             value={getValue()}
             extraValue={isDefault && getValue() !== OTHER_AREAS_LABEL ? `(${t('studyDetails.@default')})` : ''}
             status={status}
-            isReadOnly={row.getReadOnly()}
             hasPreview={!!options?.meta?.viewData && !!trajectory && status === TRAJECTORY_SELECTION_STATUS.OK}
             onClick={() => void options?.meta?.viewData?.(row.id)}
           />

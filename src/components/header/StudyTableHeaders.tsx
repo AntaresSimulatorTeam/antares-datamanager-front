@@ -36,7 +36,7 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
       };
       return (
         <button
-          className={`px-1 [&_[class*='radioButtonLabel']]:!font-body [&_[class*='radioButtonLabel']]:!text-text-m ${
+          className={`px-1 [&_[class*='radioButtonLabel']]:!font-body [&_[class*='radioButtonLabel']]:!text-text-m [&_[class*='radioButtonLabel']]:!align-bottom [&_[class*='radioButtonLabel']]:!leading-none ${
             isSelected
               ? "[&_[class*='radioButtonBackground']]:opacity-100"
               : "[&_[class*='radioButtonBackground']]:opacity-0 group-hover:[&_[class*='radioButtonBackground']]:opacity-100"

@@ -6,7 +6,6 @@ import { buildLabelColorClass } from '@/shared/utils/tailwindClass.ts';
 interface LabelWithButtonPreviewProps {
   value: string;
   status: TRAJECTORY_SELECTION_STATUS;
-  isReadOnly: boolean;
   extraValue?: string;
   onClick?: () => void;
   hasPreview?: boolean;
@@ -22,11 +21,10 @@ export const LabelWithButtonPreview = ({
   hasPreview = true,
   alignment = '',
   disabled = false,
-  isReadOnly,
 }: LabelWithButtonPreviewProps) => {
   const { t } = useTranslation();
 
-  const colorLabel = buildLabelColorClass(isReadOnly, status);
+  const colorLabel = buildLabelColorClass(status);
 
   return (
     <div className={`${alignment ?? undefined} flex items-center justify-between gap-2`}>

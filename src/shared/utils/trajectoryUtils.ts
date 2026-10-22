@@ -79,6 +79,7 @@ import {
   getMETypeToUse,
   getNuclearTypeToUse,
 } from '@/shared/utils/formFormatter.ts';
+import { getP2GType } from '@/shared/helpers/hypothesisTableHelper.ts';
 
 /**
  * Get trajectory status from row status
@@ -1648,7 +1649,7 @@ const resolveDbParamsByType = (
 
   if (type === TRAJECTORY_TYPE.P2G) {
     return {
-      typeToUse: indexArray[0] === 0 ? TRAJECTORY_TYPE.P2G_CAPACITY_COST : TRAJECTORY_TYPE.P2G_MARKET_MODULATION,
+      typeToUse: getP2GType(indexArray[0]),
       areaToUse: '',
       technology: '',
     };
