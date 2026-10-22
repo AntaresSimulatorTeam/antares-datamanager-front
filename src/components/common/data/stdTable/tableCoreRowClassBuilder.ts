@@ -24,7 +24,7 @@ export const tableCoreRowClassBuilder = (
     {
       group: true,
       [STRIPED_CLASSES]: isStriped,
-      [SELECTED_ROW_CLASSES]: isSelected || (!isExpandable && parentRowCanExpand),
+      [SELECTED_ROW_CLASSES]: isSelected || (!isReadOnly && !isExpandable && parentRowCanExpand),
       [EXPANDABLE_ROW_CLASSES]: isExpandable,
       [READONLY_ROW_CLASSES]: isReadOnly,
       [READONLY_EXPANDABLE_ROW_CLASSES]: !isReadOnly && !isSelected && isExpandable,
