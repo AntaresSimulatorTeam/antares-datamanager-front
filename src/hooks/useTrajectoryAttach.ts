@@ -49,6 +49,15 @@ interface UpdateReadOnlyParams {
   study: StudyDTO;
   newDbTrajectory: DbTrajectory;
   lastIndex: number;
+  isFlowbasedAllowed: (id: number) => Promise<boolean | undefined>;
+  setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>;
+  setSecondTableReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>;
+}
+interface UpdateReadOnlyParams {
+  type: TRAJECTORY_TYPE;
+  study: StudyDTO;
+  newDbTrajectory: DbTrajectory;
+  lastIndex: number;
   setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>;
   setSecondTableReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>;
 }
