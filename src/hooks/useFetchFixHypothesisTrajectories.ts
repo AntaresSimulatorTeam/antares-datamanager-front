@@ -122,10 +122,10 @@ export const useFetchFixHypothesisTrajectories = (
           secondConfig,
         });
 
-        setFirstTableReadOnlyRow(firstReadOnly);
-        if (secondConfig) {
-          setSecondTableReadOnlyRow(secondReadOnly);
-        }
+      setFirstTableReadOnlyRow(firstReadOnly);
+      if (secondConfig) {
+        setSecondTableReadOnlyRow(secondReadOnly);
+      }
     return { firstTableData: firstData, secondTableData: secondData };
   }, [configs, dispatch, isStudyGenerated, studyId, t]);
 
