@@ -49,7 +49,6 @@ interface UpdateReadOnlyParams {
   study: StudyDTO;
   newDbTrajectory: DbTrajectory;
   lastIndex: number;
-  isFlowbasedAllowed: (id: number) => Promise<boolean | undefined>;
   setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>;
   setSecondTableReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>;
 }
@@ -192,34 +191,16 @@ export const useTrajectoryAttach = (
           });
         }
       } catch (error) {
-        if (indexArray?.length) {
-          const message = t('studyDetails.@notificationAlert', {
-            studyName: study?.name,
-            trajectoryName: trajectory?.trajectoryName,
-            trajectoryType: trajectory?.area,
-          });
-          if (type === TRAJECTORY_TYPE.FLOWBASED) {
-            notifyAlert({
-              message,
-              content: error instanceof Error ? error.message : String(error),
-              type: 'error',
-            });
-            return;
-          }
-          handleTrajectoryError(
-            type,
-            indexArray,
-            { id: trajectory?.id, label: trajectory?.trajectoryName },
-            trajectory?.area ?? '',
-            user?.profile?.sub ?? '',
-            setData,
-            {
-              message,
-              content: (error as Error).message,
-            },
-            trajectory?.technology
-          );
-        }
+        notifyTrajectoryError({
+          type,
+          indexArray,
+          trajectory,
+          study,
+          userSub: user?.profile?.sub,
+          error,
+          t,
+          setData,
+        });
       }
     },
     [study, dispatch, user?.profile?.sub, t],

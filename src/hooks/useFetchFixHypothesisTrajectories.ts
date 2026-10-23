@@ -109,7 +109,7 @@ export const useFetchFixHypothesisTrajectories = (
         firstData = buildTableData(firstConfig, t, firstResults, { hvdc });
         if (firstData.length > 0) setFirstTableData(firstData);
       }
-      
+
       let secondData: HypothesisRowData[] = [];
       if (secondConfig) {
         secondData = buildTableData(secondConfig, t, secondResults, { recalculate });
