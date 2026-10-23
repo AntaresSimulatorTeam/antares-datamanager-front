@@ -206,7 +206,13 @@
     "@informationMessage": "If a \"mod\" file is included in a \"series\" folder, the \"technical parameters\" folder is required."
   },
   "flowbased": {
-    "@informationMessage": "Mandatory areas: AT, BE, CH, DE, FR, ITN, and NL. Mandatory TS: LOAD, RES (Wind and Solar) and RoR"
+    "@informationMessage": "A Link trajectory with HVDC activated must be defined before submitting a Flowbased trajectory.",
+    "@hvdcLinkRequired": "Select a LINK trajectory containing a link with two HVDC capacities that are non-null and non-zero.",
+    "@linkDataError": "Unable to validate HVDC capacities in the LINK trajectory.",
+    "@associationsReloadError": "Unable to reload the study's trajectory associations.",
+    "@studyOptionsUpdateError": "The study's HVDC settings could not be reset after changing the LINK trajectory.",
+    "@linkChangeConfirmationTitle": "Confirm LINK trajectory change",
+    "@linkChangeConfirmation": "Deleting or replacing the LINK trajectory will also remove the Flowbased trajectory from this study. The data will remain available in the database."
   },
   "settings": {
     "@title": "Settings",
@@ -296,7 +302,9 @@
     "@mode_dark": "Dark",
     "@vert_foret": "Vert foret",
     "@blue_iceberg": "Blue iceberg",
-    "@violet": "Violet"
+    "@violet": "Violet",
+    "@language_fr": "French",
+    "@language_en": "English"
   },
   "horizonInput": {
     "@validYearError": "Horizon must be between 2000 and 9999",
