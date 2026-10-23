@@ -302,7 +302,9 @@
     "@mode_dark": "Dark",
     "@vert_foret": "Vert foret",
     "@blue_iceberg": "Blue iceberg",
-    "@violet": "Violet"
+    "@violet": "Violet",
+    "@language_fr": "French",
+    "@language_en": "English"
   },
   "horizonInput": {
     "@validYearError": "Horizon must be between 2000 and 9999",

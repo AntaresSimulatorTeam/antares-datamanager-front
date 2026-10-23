@@ -37,7 +37,7 @@
     "@about": "À propos"
   },
   "home": {
-    "@label": "Home",
+    "@label": "Accueil",
     "@buttonNewProject": "Nouveau Projet",
     "@search_placeholder": "Rechercher",
     "@search_placeholder_stuty": "Rechercher une étude",
@@ -291,7 +291,9 @@
     "@mode_dark": "Dark",
     "@vert_foret": "Vert foret",
     "@blue_iceberg": "Blue iceberg",
-    "@violet": "Violet"
+    "@violet": "Violet",
+    "@language_fr": "Français",
+    "@language_en": "Anglais"
   },
   "horizonInput": {
     "@validYearError": "Horizon doit être un numéro entre 2000 et 99999",
