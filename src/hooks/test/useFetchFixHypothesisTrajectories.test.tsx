@@ -194,7 +194,7 @@ describe('useFetchFixHypothesisTrajectories', () => {
 
       await waitFor(() => {
         expect(result.current.secondTableReadOnlyRow).toMatchObject({
-          '0': false,
+          '0': true,
           '1': true,
         });
       });

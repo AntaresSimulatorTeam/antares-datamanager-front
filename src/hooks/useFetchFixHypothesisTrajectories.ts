@@ -116,11 +116,11 @@ export const useFetchFixHypothesisTrajectories = (
         if (secondData.length > 0) setSecondTableData(secondData);
       }
 
-        const { firstReadOnly, secondReadOnly } = computeReadOnlyRows({
-          isStudyGenerated,
-          firstResults,
-          secondConfig,
-        });
+      const { firstReadOnly, secondReadOnly } = computeReadOnlyRows({
+        isStudyGenerated,
+        firstResults,
+        secondConfig,
+      });
 
       setFirstTableReadOnlyRow(firstReadOnly);
       if (secondConfig) {
