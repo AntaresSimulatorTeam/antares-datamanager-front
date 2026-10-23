@@ -95,7 +95,7 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
       setIsModalStudyCreation(false);
     }
     setIsDuplicateMode(false);
-  }, [isModalOpen]);
+  }, [isModalOpen, toggleModal]);
 
   const sortedHeaders = addSortColumn(headers, handleSort, sortBy, sortedColumn, setIsHeaderHovered, isHeaderHovered);
 
