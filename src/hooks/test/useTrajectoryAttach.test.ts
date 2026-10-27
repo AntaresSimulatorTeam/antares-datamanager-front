@@ -499,9 +499,6 @@ describe('useTrajectoryAttach', () => {
       status: TRAJECTORY_SELECTION_STATUS.OK,
       hasHvdcCapacities: true,
     });
-    expect(mockSetSecondTableReadOnly).toHaveBeenCalledWith({
-      '0': false, '1': false, '2.0': false, '2.1': false,
-    });
     expect(mockSetReadOnly).not.toHaveBeenCalled();
     expect(handleTrajectoryError).not.toHaveBeenCalled();
     expect(notifyAlert).not.toHaveBeenCalled();

@@ -210,7 +210,7 @@ describe('useHypothesisTableUpdateHandler', () => {
 
     expect(mockAttach).toHaveBeenCalledTimes(1);
     expect(mockAttach).toHaveBeenCalledWith(
-      TRAJECTORY_TYPE.LOAD, [0], 'success', selectedTrajectory, setData, setReadOnly, setSecondTableReadOnly,
+      TRAJECTORY_TYPE.LOAD, [0], 'success', selectedTrajectory, setData, setReadOnly, setSecondTableReadOnly, undefined
     );
     expect(mockDetach).not.toHaveBeenCalled();
   });
@@ -222,7 +222,7 @@ describe('useHypothesisTableUpdateHandler', () => {
 
     expect(mockAttach).toHaveBeenCalledTimes(1);
     expect(mockAttach).toHaveBeenCalledWith(
-      TRAJECTORY_TYPE.LOAD, [0], 'success', trajectory, setData, setReadOnly, undefined,
+      TRAJECTORY_TYPE.LOAD, [0], 'success', trajectory, setData, setReadOnly, undefined, undefined
     );
   });
 
@@ -331,7 +331,7 @@ describe('useHypothesisTableUpdateHandler', () => {
 
       expect(mockAttach).toHaveBeenCalledTimes(1);
       expect(mockAttach).toHaveBeenCalledWith(
-        expectedType, rowId.split('.').map(Number), 'success', trajectory, setData, setReadOnly, undefined,
+        expectedType, rowId.split('.').map(Number), 'success', trajectory, setData, setReadOnly, undefined, undefined
       );
     });
   });

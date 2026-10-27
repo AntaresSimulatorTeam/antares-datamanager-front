@@ -216,7 +216,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
             setSecondTableReadOnly: setReadOnlySettings,
             secondData: settingsData,
             setSecondData: setSettingsData,
-            shouldUpdateHvdc: studyData.hvdc
+            shouldUpdateHvdc: data?.[1]?.hvdc
           }
         );
       }
@@ -255,7 +255,8 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
                     data,
                     setData,
                     setReadOnly,
-                    setSecondTableReadOnly: setReadOnlySettings
+                    setSecondTableReadOnly: setReadOnlySettings,
+                    shouldUpdateHvdc: data?.[1].hvdc
                   }
                 )
                }
