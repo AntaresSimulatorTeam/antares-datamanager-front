@@ -47,6 +47,9 @@ export const PegaseHypothesisTable = ({
   type,
   list,
   activate,
+  isFlowbasedPrerequisiteMet,
+  flowbasedTooltipMessage,
+  isActionsDisabled,
 }: PegaseHypothesisTableProps) => {
   const { t } = useTranslation();
   const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
@@ -69,8 +72,25 @@ export const PegaseHypothesisTable = ({
         columnHeader,
         type,
         list,
+        isFlowbasedPrerequisiteMet,
+        flowbasedTooltipMessage,
+        isActionsDisabled,
       }),
-    [getTableHeaders, t, errorInfo, isStudyGenerated, progress, fileStatus, idSelected, columnHeader, type, list],
+    [
+      getTableHeaders,
+      t,
+      errorInfo,
+      isStudyGenerated,
+      progress,
+      fileStatus,
+      idSelected,
+      columnHeader,
+      type,
+      list,
+      isFlowbasedPrerequisiteMet,
+      flowbasedTooltipMessage,
+      isActionsDisabled,
+    ],
   );
 
   const onHandleImport = useCallback(

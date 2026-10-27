@@ -24,6 +24,7 @@ import {
   TechnologyType,
   TRAJECTORY_DATA_TYPE,
   TrajectoryBackendError,
+  TrajectoryLinkData,
   TrajectoryStateWithWarningMessages,
   Types,
   WarningMessage,
@@ -189,7 +190,13 @@ export const linkTrajectoryToStudy = async (
 
     return (await (response as Response).json()) as unknown as DbTrajectory;
   } catch (error) {
-    throw new Error((error as BackendError)?.antaresErrorMessage);
+    if (isBusinessError(error)) {
+      throw new TrajectoryBackendError(error.antaresErrorMessage, error);
+    }
+    throw new TrajectoryBackendError(
+      `Failed to link ${type} trajectory ${trajectoryId} to study ${studyId}`,
+      error,
+    );
   }
 };
 
@@ -255,7 +262,13 @@ export const unlinkMultipleTrajectoriesFromStudy = async (studyId: number, traje
       body: JSON.stringify(trajectoryIds),
     });
   } catch (error) {
-    throw new Error((error as BackendError)?.antaresErrorMessage);
+    if (isBusinessError(error)) {
+      throw new TrajectoryBackendError(error.antaresErrorMessage, error);
+    }
+    throw new TrajectoryBackendError(
+      `Failed to detach trajectories [${trajectoryIds.join(', ')}] from study ${studyId}`,
+      error,
+    );
   }
 };
 
@@ -267,16 +280,30 @@ export const unlinkMultipleTrajectoriesFromStudy = async (studyId: number, traje
  * @return {Promise<Types<TRAJECTORY_DATA_TYPE>[]>}
  * @throws {Error}
  */
-export const getTrajectoryDataByTypeAndId = async (
+export function getTrajectoryDataByTypeAndId(
+  trajectoryType: TRAJECTORY_TYPE.LINK,
+  trajectoryId: number,
+): Promise<TrajectoryLinkData[]>;
+export function getTrajectoryDataByTypeAndId(
   trajectoryType: TRAJECTORY_TYPE,
   trajectoryId: number,
-): Promise<Types<TRAJECTORY_DATA_TYPE>[]> => {
+): Promise<Types<TRAJECTORY_DATA_TYPE>[]>;
+export async function getTrajectoryDataByTypeAndId(
+  trajectoryType: TRAJECTORY_TYPE,
+  trajectoryId: number,
+): Promise<Types<TRAJECTORY_DATA_TYPE>[] | TrajectoryLinkData[]> {
   const urlApi = `${TRAJECTORY_DATA_FILE_ENDPOINT}?trajectoryType=${trajectoryType}&trajectoryId=${trajectoryId}`;
   try {
     const response = await AuthService.authFetch(urlApi);
     return (await (response as Response).json()) as Types<TRAJECTORY_DATA_TYPE>[];
   } catch (error) {
-    throw new Error((error as BackendError).antaresErrorMessage);
+    if (isBusinessError(error)) {
+      throw new TrajectoryBackendError(error.antaresErrorMessage, error);
+    }
+    throw new TrajectoryBackendError(
+      `Failed to fetch ${trajectoryType} trajectory data for trajectory ${trajectoryId}`,
+      error,
+    );
   }
 };
 

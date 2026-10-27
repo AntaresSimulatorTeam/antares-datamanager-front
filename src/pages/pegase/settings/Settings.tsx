@@ -70,7 +70,7 @@ const Settings = () => {
       <h2>{t('settingsUser.@language')}</h2>
         <Switch
           appearance="brand"
-          label={`Current "${i18next.language}"`}
+          label={`${i18next.language === 'fr' ? t('settingsUser.@language_fr') : t('settingsUser.@language_en')}`}
           defaultChecked={i18next.language === 'fr'}
           onChange={(event) => changeLanguageHandler(event.target.checked ? 'fr' : 'en')}
         />

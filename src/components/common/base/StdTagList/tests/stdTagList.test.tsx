@@ -134,7 +134,7 @@ describe('StdTagList', () => {
     render(<StdTagList tags={TEST_TAGS_LIST} singleLine={true} startReady={true} />);
 
     // The container should have the single line class
-    const container = screen.getByRole('list');
+    const container = screen.getByRole('menu');
     expect(container).toHaveClass('h-3');
     expect(container).toHaveClass('overflow-y-hidden');
   });

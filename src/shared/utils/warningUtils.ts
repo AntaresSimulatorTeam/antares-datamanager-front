@@ -1,6 +1,7 @@
 import { WARNING_MESSAGE_LEVEL } from '@/shared/enum/warning.ts';
 import { CardDataType, DataWarningMessage, WarningMessage, WarningTrajectoryType } from '@/shared/types';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { TabItemProps } from '@design-system-rte/core/components/tab/tab.interface';
 
 /**
  * Sort the messages list according to the warning level (typeof WARNING_MESSAGE_LEVEL)
@@ -107,7 +108,7 @@ export const convertDataToItem = <T>(data: T, t: (value: string) => string): Car
 export const countWarning = (warning: WarningTrajectoryType, tabName: TRAJECTORY_TYPE): number => {
   const safeNumber = (value: unknown): number => {
     const num = Number(value);
-    return isNaN(num) ? 0 : num;
+    return Number.isNaN(num) ? 0 : num;
   };
 
   if (tabName === TRAJECTORY_TYPE.AREA) {
@@ -122,3 +123,7 @@ export const countWarning = (warning: WarningTrajectoryType, tabName: TRAJECTORY
     return safeNumber(warning[tabName]);
   }
 };
+
+export const getNbWarningMessages = (tab: TabItemProps, result: { [key in keyof typeof TRAJECTORY_TYPE]: number }) => tab.id === (TRAJECTORY_TYPE.AREA as string)
+      ? [TRAJECTORY_TYPE.AREA, TRAJECTORY_TYPE.LINK].reduce((acc, type) => acc + result[type], 0)
+      : result[tab.id as TRAJECTORY_TYPE]

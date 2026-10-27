@@ -13,6 +13,7 @@ import {
   getBgColor,
   getDefaultLabel,
   getDeletionModalMessage,
+  getFetchFromDbParams,
   getHypothesis,
   getItemsMenu,
   getModalTile,
@@ -23,6 +24,8 @@ import {
   getSubRowListWithArea,
   getSubRowsList,
   getTrajectoryTypeByIndex,
+  hasFlowbasedPrerequisites,
+  hasLinkWithHvdcCapacities,
   isEmptyRow,
   isMatchingTrajectoryType,
   isTrajectoryLinked,
@@ -46,7 +49,12 @@ import {
   mockRowDataTrajectoryC,
 } from '@/mocks/data/tests/trajectory.mock.ts';
 import { OTHER_AREAS, OTHER_AREAS_LABEL } from '@/shared/const/studyConfig.ts';
-import { DbTrajectory, HypothesisRowData, isTrajectoryThermalTechnicalParametersType } from '@/shared/types';
+import {
+  DbTrajectory,
+  HypothesisRowData,
+  isTrajectoryThermalTechnicalParametersType,
+  TrajectoryLinkData,
+} from '@/shared/types';
 import { Row } from '@tanstack/react-table';
 import { ThermalOptions } from '@/mocks/data/list/names.ts';
 import { TFunction } from 'i18next';
@@ -74,6 +82,73 @@ describe('getStatus', () => {
   it('should return a MISSING selection status when no status', () => {
     const status = getStatus();
     expect(status).toStrictEqual(TRAJECTORY_SELECTION_STATUS.MISSING);
+  });
+});
+
+describe('hasFlowbasedPrerequisites', () => {
+  const linkRow: HypothesisRowData = {
+    hypothesis: 'Link',
+    trajectory: { ...mockDbTrajectory, type: TRAJECTORY_TYPE.LINK },
+    status: TRAJECTORY_SELECTION_STATUS.OK,
+    hvdc: true,
+  };
+
+  it('returns true when a Link trajectory is selected and HVDC is enabled', () => {
+    expect(hasFlowbasedPrerequisites(linkRow)).toBe(true);
+    expect(hasFlowbasedPrerequisites({ ...linkRow, status: TRAJECTORY_SELECTION_STATUS.WARNING })).toBe(true);
+  });
+
+  it('returns false when the Link trajectory is missing or not valid', () => {
+    expect(hasFlowbasedPrerequisites(undefined)).toBe(false);
+    expect(hasFlowbasedPrerequisites({ ...linkRow, trajectory: null })).toBe(false);
+    expect(hasFlowbasedPrerequisites({ ...linkRow, status: TRAJECTORY_SELECTION_STATUS.ERROR })).toBe(false);
+  });
+
+  it('returns false when HVDC is disabled or the selected trajectory is not a Link trajectory', () => {
+    expect(hasFlowbasedPrerequisites({ ...linkRow, hvdc: false })).toBe(false);
+    expect(
+      hasFlowbasedPrerequisites({
+        ...linkRow,
+        trajectory: { ...linkRow.trajectory!, type: TRAJECTORY_TYPE.AREA },
+      }),
+    ).toBe(false);
+  });
+});
+
+describe('hasLinkWithHvdcCapacities', () => {
+  const validLink: TrajectoryLinkData = {
+    name: 'FR-ES',
+    winterHpDirectMw: null,
+    winterHpIndirectMw: null,
+    winterHcDirectMw: null,
+    winterHcIndirectMw: null,
+    summerHpDirectMw: null,
+    summerHpIndirectMw: null,
+    summerHcDirectMw: null,
+    summerHcIndirectMw: null,
+    flowbasedPerimeter: null,
+    hvdcMwDirect: 1,
+    hvdcMwIndirect: 2,
+    hvdcNbDirect: null,
+    hvdcNbIndirect: null,
+    hvdcFoRateDirect: null,
+    hvdcFoRateIndirect: null,
+    hvdc: null,
+    hurdleCost: null,
+  };
+
+  it('requires both HVDC capacities to be non-null and non-zero on the same link', () => {
+    expect(hasLinkWithHvdcCapacities([validLink])).toBe(true);
+    expect(hasLinkWithHvdcCapacities([{ ...validLink, hvdcMwDirect: null }])).toBe(false);
+    expect(hasLinkWithHvdcCapacities([{ ...validLink, hvdcMwDirect: 0 }])).toBe(false);
+    expect(hasLinkWithHvdcCapacities([{ ...validLink, hvdcMwIndirect: null }])).toBe(false);
+    expect(hasLinkWithHvdcCapacities([{ ...validLink, hvdcMwIndirect: 0 }])).toBe(false);
+    expect(
+      hasLinkWithHvdcCapacities([
+        { ...validLink, hvdcMwDirect: null, hvdcMwIndirect: 3 },
+        { ...validLink, hvdcMwDirect: 4, hvdcMwIndirect: 0 },
+      ]),
+    ).toBe(false);
   });
 });
 
@@ -562,6 +637,64 @@ describe('getAreaTrajectoryName', () => {
   it('should return empty string if both hypotheses are missing', () => {
     const emptyData: HypothesisRowData[] = [{}, {}] as HypothesisRowData[];
     expect(getAreaTrajectoryName('0.0', emptyData)).toBeUndefined();
+  });
+
+  it('should map OTHER_AREAS_LABEL to OTHER_AREAS for mainRow and subRow', () => {
+    const dataWithOtherAreas = [
+      {
+        hypothesis: OTHER_AREAS_LABEL,
+        isDefault: true,
+        subRows: [{ hypothesis: OTHER_AREAS_LABEL, isDefault: true } as HypothesisRowData],
+      },
+    ] as HypothesisRowData[];
+
+    expect(getAreaTrajectoryName('0.0', dataWithOtherAreas)).toStrictEqual({
+      area: OTHER_AREAS,
+      technology: OTHER_AREAS,
+      isDefault: true,
+    });
+  });
+
+  it('should handle type with hasNoAreaType returning empty area', () => {
+    const data = [
+      {
+        hypothesis: 'Area1',
+        isDefault: true,
+      },
+    ] as HypothesisRowData[];
+
+    expect(getAreaTrajectoryName('0', data, TRAJECTORY_TYPE.AREA)).toStrictEqual({
+      area: '',
+      isDefault: true,
+    });
+  });
+
+  it('should handle THERMAL_TECHNICAL_SPECIFIC_PARAMETER by setting subRow hypothesis as area', () => {
+    const data = [
+      {
+        hypothesis: 'Area1',
+        isDefault: true,
+        subRows: [{ hypothesis: 'SubArea', isDefault: false } as HypothesisRowData],
+      },
+    ] as HypothesisRowData[];
+
+    expect(getAreaTrajectoryName('0.0', data, TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER)).toStrictEqual({
+      area: 'SubArea',
+      isDefault: true,
+    });
+  });
+
+  it('should resolve technology using options if provided', () => {
+    const options = [
+      { id: 1, label: 'Wind', code: 'WND' },
+      { id: 2, label: 'Solar', code: 'SOL' },
+    ];
+
+    expect(getAreaTrajectoryName('0.1', mockData, undefined, options)).toStrictEqual({
+      area: 'Energy',
+      technology: 'WND',
+      isDefault: false,
+    });
   });
 });
 
@@ -1991,5 +2124,133 @@ describe('buildTableData', () => {
     const result = buildTableData(config, t, [], { recalculate: true });
     expect('recalculate' in result[0]).toBe(false);
     expect('recalculate' in result[1]).toBe(false);
+  });
+});
+
+describe('getFetchFromDbParams', () => {
+  it('handles AREA trajectory type', () => {
+    expect(getFetchFromDbParams(TRAJECTORY_TYPE.AREA, [0])).toEqual({
+      typeToUse: TRAJECTORY_TYPE.AREA,
+      areaToUse: '',
+      technology: undefined,
+    });
+    expect(getFetchFromDbParams(TRAJECTORY_TYPE.AREA, [1])).toEqual({
+      typeToUse: TRAJECTORY_TYPE.LINK,
+      areaToUse: '',
+      technology: undefined,
+    });
+  });
+
+  it('handles trajectory configuration types', () => {
+    expect(getFetchFromDbParams(TRAJECTORY_TYPE.SETTINGS, [0])).toEqual({
+      typeToUse: TRAJECTORY_TYPE.ADEQUACY_PATCH,
+      areaToUse: '',
+      technology: undefined,
+    });
+  });
+
+  it('handles DSR trajectory type', () => {
+    expect(getFetchFromDbParams(TRAJECTORY_TYPE.DSR, [0], { isLastIndex: true, area: 'FR' })).toEqual({
+      typeToUse: TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION,
+      areaToUse: '',
+      technology: undefined,
+    });
+    expect(getFetchFromDbParams(TRAJECTORY_TYPE.DSR, [0], { isLastIndex: false, area: 'FR' })).toEqual({
+      typeToUse: TRAJECTORY_TYPE.DSR,
+      areaToUse: 'FR',
+      technology: undefined,
+    });
+  });
+
+  it('handles THERMAL_TECHNICAL_SPECIFIC_PARAMETER trajectory type', () => {
+    expect(
+      getFetchFromDbParams(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, [0], {
+        technology: 'Gaz',
+        area: 'FR',
+      }),
+    ).toEqual({
+      typeToUse: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+      areaToUse: 'Gaz',
+      technology: 'Gaz',
+    });
+
+    expect(
+      getFetchFromDbParams(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, [1], {
+        technology: 'Gaz',
+        area: 'FR',
+      }),
+    ).toEqual({
+      typeToUse: TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER,
+      areaToUse: 'FR',
+      technology: 'Gaz',
+    });
+  });
+
+  it('handles THERMAL_ECONOMIC_COST_PARAMETER trajectory type', () => {
+    expect(getFetchFromDbParams(TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER, [1], { area: 'FR' })).toEqual({
+      typeToUse: TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER,
+      areaToUse: 'FR',
+      technology: undefined,
+    });
+    expect(getFetchFromDbParams(TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER, [0], { area: 'FR' })).toEqual({
+      typeToUse: TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER,
+      areaToUse: 'FR',
+      technology: undefined,
+    });
+  });
+
+  it('handles NUCLEAR_FR_MODULATION trajectory type', () => {
+    expect(getFetchFromDbParams(TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION, [0])).toEqual({
+      typeToUse: TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION,
+      areaToUse: '',
+      technology: '',
+    });
+  });
+
+  it('handles Hydro trajectory types', () => {
+    expect(getFetchFromDbParams(TRAJECTORY_TYPE.HYDRO_SERIES, [0, 0], { area: 'FR' })).toEqual({
+      typeToUse: TRAJECTORY_TYPE.HYDRO_SERIES,
+      areaToUse: 'FR',
+      technology: '',
+    });
+  });
+
+  it('handles P2G trajectory type', () => {
+    expect(getFetchFromDbParams(TRAJECTORY_TYPE.P2G, [0])).toEqual({
+      typeToUse: TRAJECTORY_TYPE.P2G_CAPACITY_COST,
+      areaToUse: '',
+      technology: '',
+    });
+    expect(getFetchFromDbParams(TRAJECTORY_TYPE.P2G, [1])).toEqual({
+      typeToUse: TRAJECTORY_TYPE.P2G_MARKET_MODULATION,
+      areaToUse: '',
+      technology: '',
+    });
+  });
+
+  it('handles ME trajectory type', () => {
+    expect(getFetchFromDbParams(TRAJECTORY_TYPE.ME, [0])).toEqual({
+      typeToUse: TRAJECTORY_TYPE.AREA_ME,
+      areaToUse: '',
+      technology: '',
+    });
+    expect(getFetchFromDbParams(TRAJECTORY_TYPE.ME, [1])).toEqual({
+      typeToUse: TRAJECTORY_TYPE.LINK_ME,
+      areaToUse: '',
+      technology: '',
+    });
+  });
+
+  it('handles technology label mapping via technologies list', () => {
+    const options = {
+      technologies: [{ id: 1, label: 'Wind Offshore', code: 'WND_OFF' }],
+      technology: 'Wind Offshore',
+      area: 'FR',
+    };
+    expect(getFetchFromDbParams(TRAJECTORY_TYPE.LOAD, [0], options)).toEqual({
+      typeToUse: TRAJECTORY_TYPE.LOAD,
+      areaToUse: 'FR',
+      technology: 'WND_OFF',
+    });
   });
 });

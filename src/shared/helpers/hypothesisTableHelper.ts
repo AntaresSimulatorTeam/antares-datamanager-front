@@ -9,6 +9,7 @@ import {
   isTrajectoryP2GType,
   isTrajectoryResType,
   isTrajectorySubrowsType,
+  ResolvedFSTrajectoryParam,
   TechnologyType,
   TrajectoryAreaData,
 } from '@/shared/types';
@@ -18,7 +19,7 @@ import {
   filterRow,
   generateReadOnlyIndexMap,
   getAreaTrajectoryName,
-  getTrajectoryTypeByIndex,
+  getThermalTypeToUse,
   removeDuplicate,
   removeDuplicateByTechnology,
   retrieveReadOnlyArea,
@@ -728,6 +729,88 @@ export const updateTableAfterCellDetach = async ({
   return { newData };
 };
 
+export const getP2GType = (index: number): TRAJECTORY_TYPE => index === 0 ? TRAJECTORY_TYPE.P2G_CAPACITY_COST : TRAJECTORY_TYPE.P2G_MARKET_MODULATION
+
+interface FetchFSTrajectoryParams {
+  type: TRAJECTORY_TYPE;
+  indexArray: number[];
+  hypothesis?: { area?: string; isDefault?: boolean; technology?: string } | null;
+  isLastIndex: boolean;
+}
+
+const resolveFSTrajectoryTypeAndArea = ({
+  type,
+  indexArray,
+  hypothesis,
+  isLastIndex,
+}: FetchFSTrajectoryParams): ResolvedFSTrajectoryParam => {
+  if (type === TRAJECTORY_TYPE.AREA || type === TRAJECTORY_TYPE.LINK) {
+    return {
+      typeToUse: indexArray[0] === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK,
+      areaToUse: '',
+    };
+  }
+
+  if (isTrajectoryConfigurationType(type)) {
+    return {
+      typeToUse: getConfigurationTypeToUse(indexArray),
+      areaToUse: '',
+    };
+  }
+
+  if (type === TRAJECTORY_TYPE.DSR) {
+    return {
+      typeToUse: isLastIndex ? TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION : type,
+      areaToUse: '',
+      isDefaultArea: false,
+    };
+  }
+
+  if (type === TRAJECTORY_TYPE.STS && hypothesis?.technology) {
+    return {
+      typeToUse: type,
+      areaToUse: hypothesis.technology,
+    };
+  }
+
+  if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER || type === TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER) {
+    return getThermalTypeToUse(type, indexArray[0], hypothesis);
+  }
+
+  if (isTrajectoryHydroType(type)) {
+    return {
+      typeToUse: getHydroTypeToUse(indexArray, type),
+      areaToUse: '',
+    };
+  }
+
+  if (type === TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION) {
+    return {
+      typeToUse: getNuclearTypeToUse(indexArray),
+      areaToUse: '',
+    };
+  }
+
+  if (type === TRAJECTORY_TYPE.P2G) {
+    return {
+      typeToUse: getP2GType(indexArray[0]),
+      areaToUse: '',
+    };
+  }
+
+  if (type === TRAJECTORY_TYPE.ME) {
+    return {
+      typeToUse: getMETypeToUse(indexArray),
+      areaToUse: '',
+    };
+  }
+
+  return {
+    typeToUse: type,
+    areaToUse: hypothesis?.area,
+  };
+};
+
 export const getParamForFetchFSTrajectory = (
   type: TRAJECTORY_TYPE,
   rowId: string,
@@ -737,92 +820,49 @@ export const getParamForFetchFSTrajectory = (
   const indexArray = rowId.split('.').map(Number);
   const rowsNb = data.length;
   const hypothesis = getAreaTrajectoryName(rowId, data, type, options);
-
-  let typeToUse = type;
-  let areaToUse = hypothesis?.area;
-  let isDefaultArea = hypothesis?.isDefault ?? false;
   const isLastIndex = indexArray[0] === Math.max(rowsNb - 1, 0);
 
-  if (type === TRAJECTORY_TYPE.AREA || type === TRAJECTORY_TYPE.LINK) {
-    typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK;
-    areaToUse = '';
-  }
-  if (isTrajectoryConfigurationType(type)) {
-    typeToUse = getConfigurationTypeToUse(indexArray);
-    areaToUse = '';
-  }
-  if (type === TRAJECTORY_TYPE.DSR) {
-    if (isLastIndex) {
-      typeToUse = TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION;
-    }
-    areaToUse = '';
-    isDefaultArea = false;
-  }
-  if (type === TRAJECTORY_TYPE.STS && hypothesis?.technology) {
-    areaToUse = hypothesis?.technology;
-  }
-  if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
-    if (indexArray[0] === 0 && hypothesis?.technology) {
-      areaToUse = hypothesis?.technology;
-    } else {
-      typeToUse = getTrajectoryTypeByIndex(indexArray[0]);
-      areaToUse = '';
-    }
-  }
-  if (type === TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER) {
-    if (indexArray[0] === 1) {
-      typeToUse = TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER;
-    }
-    areaToUse = '';
-  }
-  if (isTrajectoryHydroType(type)) {
-    typeToUse = getHydroTypeToUse(indexArray, type);
-    areaToUse = '';
-  }
-  if (type === TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION) {
-    typeToUse = getNuclearTypeToUse(indexArray);
-    areaToUse = '';
-  }
-  if (type === TRAJECTORY_TYPE.P2G) {
-    typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.P2G_CAPACITY_COST : TRAJECTORY_TYPE.P2G_MARKET_MODULATION;
-    areaToUse = '';
-  }
-  if (type === TRAJECTORY_TYPE.ME) {
-    typeToUse = getMETypeToUse(indexArray);
-    areaToUse = '';
-  }
-  return { typeToUse, areaToUse, isDefaultArea, hypothesis };
+  const resolved = resolveFSTrajectoryTypeAndArea({
+    type,
+    indexArray,
+    hypothesis,
+    isLastIndex,
+  });
+
+  return {
+    typeToUse: resolved.typeToUse,
+    areaToUse: resolved.areaToUse ?? hypothesis?.area,
+    isDefaultArea: resolved.isDefaultArea ?? (hypothesis?.isDefault ?? false),
+    hypothesis,
+  };
 };
 
-export const getTypeToUse = (type: TRAJECTORY_TYPE, indexArray: number[], nbRows: number) => {
-  let typeToUse = type;
-  if (type === TRAJECTORY_TYPE.AREA) {
-    typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK;
+const getAdequacyPatchType = (indexArray: number[]): TRAJECTORY_TYPE => {
+  if (indexArray.length > 1) {
+    return indexArray[1] === 0 ? TRAJECTORY_TYPE.SETTINGS : TRAJECTORY_TYPE.SCENARIO_BUILDER;
   }
-  if (type === TRAJECTORY_TYPE.ADEQUACY_PATCH) {
-    if (indexArray.length > 1) {
-      typeToUse = indexArray[1] === 0 ? TRAJECTORY_TYPE.SETTINGS : TRAJECTORY_TYPE.SCENARIO_BUILDER;
-    } else {
-      typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.ADEQUACY_PATCH : TRAJECTORY_TYPE.FLOWBASED;
-    }
-  }
-  if (type === TRAJECTORY_TYPE.DSR) {
-    const isLastIndex = indexArray[0] === Math.max(nbRows - 1, 0);
-    if (isLastIndex) {
-      typeToUse = TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION;
-    }
-  }
-  if (type === TRAJECTORY_TYPE.HYDRO_SERIES && indexArray.length === 2 && indexArray[1] === 1) {
-    typeToUse = TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS;
-  }
+  return indexArray[0] === 0 ? TRAJECTORY_TYPE.ADEQUACY_PATCH : TRAJECTORY_TYPE.FLOWBASED;
+};
 
-  if (type === TRAJECTORY_TYPE.P2G) {
-      typeToUse = indexArray[0] === 0 ? TRAJECTORY_TYPE.P2G_CAPACITY_COST : TRAJECTORY_TYPE.P2G_MARKET_MODULATION;
+export const getTypeToUse = (type: TRAJECTORY_TYPE, indexArray: number[], nbRows: number): TRAJECTORY_TYPE => {
+  switch (type) {
+    case TRAJECTORY_TYPE.AREA:
+      return indexArray[0] === 0 ? TRAJECTORY_TYPE.AREA : TRAJECTORY_TYPE.LINK;
+    case TRAJECTORY_TYPE.ADEQUACY_PATCH:
+      return getAdequacyPatchType(indexArray);
+    case TRAJECTORY_TYPE.DSR:
+      return indexArray[0] === Math.max(nbRows - 1, 0)
+        ? TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION
+        : TRAJECTORY_TYPE.DSR;
+    case TRAJECTORY_TYPE.HYDRO_SERIES:
+      return indexArray.length === 2 && indexArray[1] === 1
+        ? TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS
+        : TRAJECTORY_TYPE.HYDRO_SERIES;
+    case TRAJECTORY_TYPE.P2G:
+      return indexArray[0] === 0 ? TRAJECTORY_TYPE.P2G_CAPACITY_COST : TRAJECTORY_TYPE.P2G_MARKET_MODULATION;
+    case TRAJECTORY_TYPE.ME:
+      return getMETypeToUse(indexArray);
+    default:
+      return type;
   }
-
-  if (type === TRAJECTORY_TYPE.ME) {
-    typeToUse = getMETypeToUse(indexArray);
-  }
-
-  return typeToUse;
-}
+};

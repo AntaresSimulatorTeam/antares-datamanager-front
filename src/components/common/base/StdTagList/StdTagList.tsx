@@ -56,10 +56,10 @@ const StdTagList = ({
     <div id={id} className={clsx(TAG_LIST_CLASSES, { 'items-center': singleLine })}>
       {icon && (
         <Tooltip label={tooltipText ?? t('components.tags.@tags')}>
-          <Icon name={icon} size={ICON_SIZE} color="#3b434a" />
+          <Icon name={icon} size={ICON_SIZE} />
         </Tooltip>
       )}
-      <div className={tagListClasses} ref={containerRef} role="list">
+      <div className={tagListClasses} ref={containerRef} role="menu">
         {tags.map((tag, idx) => (
           <span
             ref={(r) => {
@@ -68,7 +68,7 @@ const StdTagList = ({
             className={idx >= (tagsNumber ?? 0) ? 'hidden' : ''}
             key={tag.toLowerCase()}
           >
-            <Tag label={tags[idx]} tagType="decorative" color="neutral" compactSpacing={true} />
+            <Tag label={tag} tagType="decorative" color="neutral" compactSpacing={true} />
           </span>
         ))}
         {plusTagsVisible && (

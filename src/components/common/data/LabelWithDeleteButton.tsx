@@ -8,7 +8,7 @@ interface LabelWithDeleteButtonProps {
 
 export const LabelWithDeleteButton = ({ label, isDeletable, onClick }: LabelWithDeleteButtonProps) => (
   <div className="flex h-full w-auto justify-start gap-2">
-    <span className="text-gray-900">{label}</span>
-    {isDeletable && <IconButton variant="text" name="close" size="s" onClick={() => void onClick?.()} />}
+    <span>{label}</span>
+    {isDeletable && <IconButton variant="text" name="close" size="s" onClick={() => onClick?.()} />}
   </div>
 );

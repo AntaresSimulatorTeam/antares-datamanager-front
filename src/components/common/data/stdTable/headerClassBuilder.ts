@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { Header, Table } from '@tanstack/react-table';
 import { ColumnSizeType } from '@common/data/stdTable/TableCore.tsx';
+import { toRem } from '@/shared/utils/arrayUtils.ts';
 
 type TableHeaderProps<TData> = {
   table: Table<TData>;
@@ -16,3 +17,7 @@ export const headerClassBuilder = <TData>({ table, header }: TableHeaderProps<TD
 
   return clsx(COMMON_HEADER_CLASSES, table.options.columnResizeMode ? 'group relative' : '', ROUNDED_CLASS);
 };
+
+export const headerStyleBuilder = <TData>({ header, columnSize }: TableHeaderProps<TData>) => columnSize === 'rem'
+    ? { width: header.getSize() != null ? `${toRem(header.getSize())}` : '100vw' }
+    : { width: header.getSize() ?? '100%' };

@@ -23,6 +23,7 @@ const getEditableHypothesisTableHeaders = ({
   errorInfo,
   setErrorInfo,
   isStudyGenerated,
+  isActionsDisabled,
   progress,
   fileStatus,
   idSelected,
@@ -35,12 +36,11 @@ const getEditableHypothesisTableHeaders = ({
     cell: ({ getValue, row, table: { options } }) => {
       const { trajectory, status, isDefault } = row.original;
       return (
-        <div className="w-4/5">
+        <div className="w-4/5 pl-1">
           <LabelWithButtonPreview
             value={getValue()}
             extraValue={isDefault && getValue() !== OTHER_AREAS_LABEL ? `(${t('studyDetails.@default')})` : ''}
             status={status}
-            isReadOnly={row.getReadOnly()}
             hasPreview={!!options?.meta?.viewData && !!trajectory && status === TRAJECTORY_SELECTION_STATUS.OK}
             onClick={() => void options?.meta?.viewData?.(row.id)}
           />
@@ -53,15 +53,16 @@ const getEditableHypothesisTableHeaders = ({
     size: type === TRAJECTORY_TYPE.STS ? 520 : 623,
     cell: ({ row, table }) => {
       const { trajectory, status } = row.original;
+      const isLinkRow = type === TRAJECTORY_TYPE.AREA && row.index === 1;
 
       return trajectory?.trajectoryName && status !== TRAJECTORY_SELECTION_STATUS.MISSING ? (
         <div className="flex w-full items-center justify-start gap-2 py-1">
           <LabelWithDeleteButton
             label={trajectory.trajectoryName}
-            isDeletable={!isStudyGenerated}
+            isDeletable={!isStudyGenerated && !(isActionsDisabled && isLinkRow)}
             onClick={() => {
               setErrorInfo({ index: row.index, message: '' });
-              void table.options?.meta?.updateData?.(
+              table.options?.meta?.updateData?.(
                 row.id,
                 trajectory?.id,
                 status === TRAJECTORY_SELECTION_STATUS.ERROR ? 'emptyError' : 'empty',
@@ -74,14 +75,14 @@ const getEditableHypothesisTableHeaders = ({
           <SelectInputWithButton
             onSelect={(value: DropdownItemOption) => {
               setErrorInfo({ index: row.index, message: '' });
-              void table.options?.meta?.updateData?.(row.id, value.id, 'success');
+              table.options?.meta?.updateData?.(row.id, value.id, 'success');
             }}
             onSearch={async (value?: string) => await table.options?.meta?.search?.(value ?? '', row.id)}
             onClickButton={async () => {
               setErrorInfo({ index: row.index, message: '' });
               await table.options?.meta?.importData?.(row.id);
             }}
-            isDisabled={row.getReadOnly()}
+            isDisabled={row.getReadOnly() || Boolean(isActionsDisabled && isLinkRow)}
             placeHolder={
               table.getSortedRowModel().rows?.[0]?.original?.status === TRAJECTORY_SELECTION_STATUS.MISSING &&
               table.getSortedRowModel().rows?.[0]?.original?.trajectory?.type === TRAJECTORY_TYPE.AREA &&
@@ -118,6 +119,7 @@ const getEditableHypothesisTableHeaders = ({
                 disabled={
                   status === TRAJECTORY_SELECTION_STATUS.ERROR ||
                   isStudyGenerated ||
+                  (isActionsDisabled && row.index === 1) ||
                   (!trajectory?.trajectoryName && status === TRAJECTORY_SELECTION_STATUS.MISSING)
                 }
                 readOnly={isStudyGenerated}
