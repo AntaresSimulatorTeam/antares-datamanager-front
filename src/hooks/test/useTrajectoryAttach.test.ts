@@ -433,6 +433,80 @@ describe('useTrajectoryAttach', () => {
     });
   });
 
+  it('attache un LINK avec capacités HVDC et déverrouille le second tableau', async () => {
+    const linkTrajectory = { ...trajectory, type: TRAJECTORY_TYPE.LINK };
+    const linkedTrajectory = { ...linkTrajectory, id: 100 };
+    const linkData = [{
+      name: 'FR-DE',
+      winterHpDirectMw: null,
+      winterHpIndirectMw: null,
+      winterHcDirectMw: null,
+      winterHcIndirectMw: null,
+      summerHpDirectMw: null,
+      summerHpIndirectMw: null,
+      summerHcDirectMw: null,
+      summerHcIndirectMw: null,
+      flowbasedPerimeter: null,
+      hvdcMwDirect: 100,
+      hvdcMwIndirect: 200,
+      hvdcNbDirect: null,
+      hvdcNbIndirect: null,
+      hvdcFoRateDirect: null,
+      hvdcFoRateIndirect: null,
+      hvdc: null,
+      hurdleCost: null,
+      areaName: 'FR',
+      spilledEnergyCost: null,
+      unsuppliedEnergyCost: null,
+    }];
+    const setData = vi.fn<Dispatch<SetStateAction<HypothesisRowData[]>>>();
+    const previousData: HypothesisRowData[] = [
+      { hypothesis: 'Areas', trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING },
+      { hypothesis: 'Links', trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING },
+    ];
+    vi.mocked(trajectoryService.linkTrajectoryToStudy).mockResolvedValueOnce(linkedTrajectory);
+    vi.mocked(trajectoryService.getTrajectoryDataByTypeAndId).mockResolvedValueOnce(linkData);
+    const { result } = renderHook(() => useTrajectoryAttach(study, mockDispatch));
+
+    await act(async () => {
+      await result.current.attachTrajectory(
+        TRAJECTORY_TYPE.LINK,
+        [1],
+        'success',
+        linkTrajectory,
+        setData,
+        mockSetReadOnly,
+        mockSetSecondTableReadOnly,
+      );
+    });
+
+    expect(trajectoryService.linkTrajectoryToStudy).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.LINK, linkTrajectory.id, study.id,
+    );
+    expect(trajectoryService.getTrajectoryDataByTypeAndId).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.LINK, linkedTrajectory.id,
+    );
+    expect(mockDispatch).toHaveBeenCalledWith({
+      type: STUDY_ACTION.UPDATE_TRAJECTORY,
+      payload: { trajectory: linkedTrajectory, status: 'success' },
+    });
+    expect(setData).toHaveBeenCalledTimes(1);
+    const updateData = setData.mock.calls[0][0];
+    if (typeof updateData !== 'function') throw new Error('Expected a state updater');
+    updateData(previousData);
+    expect(trajectoryUtils.setNestedData).toHaveBeenCalledWith(previousData, [1], {
+      trajectory: linkedTrajectory,
+      status: TRAJECTORY_SELECTION_STATUS.OK,
+      hasHvdcCapacities: true,
+    });
+    expect(mockSetSecondTableReadOnly).toHaveBeenCalledWith({
+      '0': false, '1': false, '2.0': false, '2.1': false,
+    });
+    expect(mockSetReadOnly).not.toHaveBeenCalled();
+    expect(handleTrajectoryError).not.toHaveBeenCalled();
+    expect(notifyAlert).not.toHaveBeenCalled();
+  });
+
   it('met à jour readOnly pour DSR selon hasTimeSeries = true', async () => {
     const studyDSR = { id: 1 } as StudyDTO;
 
