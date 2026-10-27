@@ -212,7 +212,9 @@
     "@associationsReloadError": "Unable to reload the study's trajectory associations.",
     "@studyOptionsUpdateError": "The study's HVDC settings could not be reset after changing the LINK trajectory.",
     "@linkChangeConfirmationTitle": "Confirm LINK trajectory change",
-    "@linkChangeConfirmation": "Deleting or replacing the LINK trajectory will also remove the Flowbased trajectory from this study. The data will remain available in the database."
+    "@linkChangeConfirmation": "Deleting or replacing the LINK trajectory will also remove the Flowbased trajectory from this study. The data will remain available in the database.",
+    "@hvdcChangeConfirmationTitle": "Confirm HVDC change",
+    "@hvdcChangeConfirmation": "This action will delete the associated trajectory. Please confirm you wish to proceed."
   },
   "settings": {
     "@title": "Settings",

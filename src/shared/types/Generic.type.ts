@@ -102,11 +102,10 @@ export type TableHeadersProps = {
   fileStatus: FileInputStatus;
   idSelected: string;
   columnHeader?: string;
-  type?: TRAJECTORY_TYPE;
+  type: TRAJECTORY_TYPE;
   list?: string[];
-  isFlowbasedPrerequisiteMet?: boolean;
-  flowbasedTooltipMessage?: string;
-  isActionsDisabled?: boolean;
+  hasLinkTrajectory?: boolean;
+  isHvdcActivated?: boolean;
 };
 
 export interface TableHeadersGetterProps extends TableHeadersProps {

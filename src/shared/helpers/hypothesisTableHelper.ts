@@ -155,6 +155,8 @@ export const getInformationMessage = (
   type: TRAJECTORY_TYPE,
   rowId: string,
   trajectory: DbTrajectory | null,
+  hasLinkTrajectory?: boolean,
+  isHvdcActivated?: boolean
 ): { messageKey: string; id: string } | null => {
   switch (type) {
     case TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER:
@@ -169,7 +171,7 @@ export const getInformationMessage = (
         ? { messageKey: 'hydro.@informationMessage', id: rowId }
         : null;
     case TRAJECTORY_TYPE.ADEQUACY_PATCH:
-      return { messageKey: 'flowbased.@informationMessage', id: '1' };
+      return hasLinkTrajectory && isHvdcActivated ? { messageKey: 'flowbased.@informationMessage', id: '1' } : { messageKey: 'flowbased.@hvdcLinkRequired', id: '1' };
     default:
       return null;
   }
@@ -688,6 +690,7 @@ export const updateTableAfterCellDetach = async ({
         }
         : item,
     );
+    // utiliser hvdc
 
     return {
       newData,

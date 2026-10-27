@@ -9,7 +9,6 @@ import { useTrajectoryAttach } from '@/hooks/useTrajectoryAttach.ts';
 import { isBusinessError } from '@/shared/utils/errorUtils.ts';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
 import { HypothesisType } from '@/shared/types/HypothesisTable.ts';
-import { notifyAlert } from '@/shared/notification/notification.tsx';
 
 export const useTrajectoryImport = (
   study: StudyDTO,
@@ -57,23 +56,6 @@ export const useTrajectoryImport = (
         }
       } catch (error) {
         setFileStatus('error');
-        if (type === TRAJECTORY_TYPE.FLOWBASED && !!indexArray?.length) {
-          const message = t('studyDetails.@notificationAlert', {
-            studyName: study?.name,
-            trajectoryName: value?.label ?? '',
-            trajectoryType: hypothesis?.technology ?? hypothesis?.area,
-          });
-          notifyAlert({
-            message,
-            content: isBusinessError(error)
-              ? error.antaresErrorMessage
-              : error instanceof Error
-                ? error.message
-                : String(error),
-            type: 'error',
-          });
-          return;
-        }
         if (isBusinessError(error) && type && !!indexArray?.length) {
           const message = t('studyDetails.@notificationAlert', {
             studyName: study?.name,

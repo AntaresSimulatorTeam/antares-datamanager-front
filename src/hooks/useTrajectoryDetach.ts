@@ -24,6 +24,7 @@ interface BackendDeletionParams {
   status: RowStatus;
   studyId: number;
   performBackendDeletion: (ids: number[]) => Promise<void>;
+  shouldUpdateHvdc?: boolean;
 }
 
 const executeBackendDeletion = async ({
@@ -32,6 +33,7 @@ const executeBackendDeletion = async ({
   status,
   studyId,
   performBackendDeletion,
+  shouldUpdateHvdc
 }: BackendDeletionParams): Promise<{ hvdcValue?: boolean; recalculateValue?: boolean }> => {
   if (!trajectoryToDelete || !trajectoryIds?.length || status !== 'empty') {
     return {};
@@ -39,19 +41,19 @@ const executeBackendDeletion = async ({
 
   await performBackendDeletion(trajectoryIds);
 
-  let hvdcValue: boolean | undefined;
-  let recalculateValue: boolean | undefined;
+  let updatedStudy: StudyDTO = { } as StudyDTO;
 
   if (trajectoryToDelete.type === TRAJECTORY_TYPE.LINK) {
-    await updateStudy({ hvdc: false }, studyId);
-    hvdcValue = false;
-  }
-  if (trajectoryToDelete.type === TRAJECTORY_TYPE.FLOWBASED) {
-    await updateStudy({ recalculate: false }, studyId);
-    recalculateValue = false;
+    if (shouldUpdateHvdc) {
+      updatedStudy = await updateStudy({ hvdc: false }, studyId);
+    }
   }
 
-  return { hvdcValue, recalculateValue };
+  if (trajectoryToDelete.type === TRAJECTORY_TYPE.FLOWBASED) {
+    updatedStudy = await updateStudy({ recalculate: false, ...(shouldUpdateHvdc && { hvdc: false }) }, studyId);
+  }
+
+  return { hvdcValue: updatedStudy?.hvdc, recalculateValue: updatedStudy?.recalculate };
 };
 
 const updateStoreAfterDetach = (
@@ -85,6 +87,8 @@ interface ApplyTableUpdateParams {
   setData: Dispatch<SetStateAction<HypothesisRowData[]>>;
   setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>;
   setSecondTableReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>;
+  setSecondData?: Dispatch<SetStateAction<HypothesisRowData[]>>;
+  shouldUpdateHvdc?: boolean;
 }
 
 const applyTableDetachUpdate = async ({
@@ -98,6 +102,7 @@ const applyTableDetachUpdate = async ({
   setData,
   setReadOnly,
   setSecondTableReadOnly,
+  setSecondData,
 }: ApplyTableUpdateParams) => {
   const { newData, newReadOnly } = await updateTableAfterCellDetach({
     type,
@@ -110,10 +115,28 @@ const applyTableDetachUpdate = async ({
   });
 
   setData(newData);
+  if (trajectoryToDelete?.type === TRAJECTORY_TYPE.LINK && additionalTrajectory) {
+    setSecondData?.(prev => prev.map((item) => {
+        if (item?.trajectory?.type === TRAJECTORY_TYPE.FLOWBASED) {
+          return {
+            ...item,
+            trajectory: null,
+            status: TRAJECTORY_SELECTION_STATUS.MISSING,
+          };
+        } else {
+          return item;
+        }
+      }));
+  }
+
   if (newReadOnly) {
     setReadOnly?.((prev) => ({ ...prev, ...newReadOnly }));
     if (trajectoryToDelete?.type === TRAJECTORY_TYPE.AREA) {
       setSecondTableReadOnly?.(buildReadOnlyRow(['0', '1', '2.0', '2.1']));
+    }
+
+    if ((trajectoryToDelete?.type === TRAJECTORY_TYPE.LINK && !options?.hvdcValue) || (trajectoryToDelete?.type === TRAJECTORY_TYPE.FLOWBASED && !options?.hvdcValue)) {
+      setSecondTableReadOnly?.({ '0': false, '1': !options?.hvdcValue, '2.0': false, '2.1': false });
     }
   }
 };
@@ -256,6 +279,20 @@ const handleDetachError = async ({
   );
 };
 
+interface UseTrajectoryDetachArgs {
+  type: TRAJECTORY_TYPE,
+  indexArray: number[],
+  setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
+  data: HypothesisRowData[],
+  status: RowStatus,
+  hypothesis: string,
+  setReadOnly: Dispatch<SetStateAction<ReadOnlyObject>>,
+  setSecondTableReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
+  secondData?: HypothesisRowData[],
+  setSecondData?: Dispatch<SetStateAction<HypothesisRowData[]>>,
+  shouldUpdateHvdc?: boolean,
+}
+
 export const useTrajectoryDetach = (
   study: StudyDTO,
   dispatch: Dispatch<StudyActionType> | null,
@@ -268,14 +305,19 @@ export const useTrajectoryDetach = (
 
   const detachTrajectory = useCallback(
     async (
-      type: TRAJECTORY_TYPE,
-      indexArray: number[],
-      setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
-      data: HypothesisRowData[],
-      status: RowStatus,
-      hypothesis: string,
-      setReadOnly: Dispatch<SetStateAction<ReadOnlyObject>>,
-      setSecondTableReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
+      {
+        type,
+        indexArray,
+        setData,
+        data,
+        status,
+        hypothesis,
+        setReadOnly,
+        setSecondTableReadOnly,
+        secondData,
+        setSecondData,
+        shouldUpdateHvdc
+      }: UseTrajectoryDetachArgs
     ): Promise<void> => {
       const { trajectoryIds, trajectoryToDelete, additionalTrajectory } = computeDeletion(
         type,
@@ -284,6 +326,7 @@ export const useTrajectoryDetach = (
         indexArray,
         hypothesis,
         status,
+        secondData
       );
 
       try {
@@ -293,6 +336,7 @@ export const useTrajectoryDetach = (
           status,
           studyId: study.id,
           performBackendDeletion,
+          shouldUpdateHvdc
         });
 
         updateStoreAfterDetach(trajectoryToDelete, status, dispatch);
@@ -308,6 +352,7 @@ export const useTrajectoryDetach = (
           setData,
           setReadOnly,
           setSecondTableReadOnly,
+          setSecondData,
         });
       } catch (error) {
         await handleDetachError({

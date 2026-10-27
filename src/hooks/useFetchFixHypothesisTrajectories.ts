@@ -1,13 +1,20 @@
 import { getStudyById, getStudyTrajectories } from '@/shared/services/studyService.ts';
 import { useCallback, useEffect, useState } from 'react';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
-import { DbTrajectory, HypothesisRowData } from '@/shared/types';
+import { DbTrajectory, HypothesisRowData, TrajectoryLinkData } from '@/shared/types';
 import { useTranslation } from 'react-i18next';
 import { useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { HypothesisConfig, HypothesisTableOptions } from '@/shared/types/HypothesisTable.ts';
-import { buildDispatchPayload, buildReadOnlyRow, buildTableData } from '@/shared/utils/trajectoryUtils.ts';
+import {
+  buildDispatchPayload,
+  buildReadOnlyRow,
+  buildTableData,
+  hasLinkWithHvdcCapacities,
+} from '@/shared/utils/trajectoryUtils.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { notifyAlert } from '@/shared/notification/notification.tsx';
+import { getTrajectoryDataByTypeAndId } from '@/shared/services/trajectoryService.ts';
+import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 
 const fetchTrajectoriesForConfig = (studyId: number, config: HypothesisConfig[]) =>
   Promise.all(config.map(({ type }) => getStudyTrajectories(studyId, type)));
@@ -19,11 +26,17 @@ const fetchStudyOptions = async (
   studyId: number,
   firstConfig?: HypothesisConfig[],
   secondConfig?: HypothesisConfig[],
-) => {
+  newDbTrajectoryLinkId?: number,
+): Promise<{ hvdc?: boolean; recalculate?: boolean; hasHvdcCapacities?: boolean }> => {
   const studyOptions = firstConfig?.[1]?.options || secondConfig?.[1]?.options || {};
   if (Object.keys(studyOptions).length > 0) {
     const studyData = await getStudyById(studyId);
-    return { hvdc: studyData.hvdc, recalculate: studyData.recalculate };
+    let hasHvdcCapacities = undefined;
+    if (studyOptions.hasHvdcOption && newDbTrajectoryLinkId != null) {
+        const linkData: TrajectoryLinkData[] = await getTrajectoryDataByTypeAndId(TRAJECTORY_TYPE.LINK, newDbTrajectoryLinkId);
+        hasHvdcCapacities = hasLinkWithHvdcCapacities(linkData);
+    }
+    return { hvdc: studyData.hvdc, recalculate: studyData.recalculate, hasHvdcCapacities };
   }
   return {};
 };
@@ -32,12 +45,14 @@ interface ReadOnlyParams {
   isStudyGenerated: boolean;
   firstResults?: DbTrajectory[][];
   secondConfig?: HypothesisConfig[];
+  hvdc?: boolean;
 }
 
 const computeReadOnlyRows = ({
   isStudyGenerated,
   firstResults,
   secondConfig,
+  hvdc
 }: ReadOnlyParams): {
   firstReadOnly: ReadOnlyObject;
   secondReadOnly: ReadOnlyObject;
@@ -50,6 +65,7 @@ const computeReadOnlyRows = ({
   }
 
   const hasFirstResult = Boolean(firstResults?.[0]?.length);
+  const hasSecondResult = Boolean(firstResults?.[1]?.length);
 
   return {
     firstReadOnly: {
@@ -59,7 +75,7 @@ const computeReadOnlyRows = ({
     secondReadOnly: secondConfig
       ? {
           '0': !hasFirstResult,
-          '1': !hasFirstResult,
+          '1': !hasSecondResult || !hvdc,
           '2.0': !hasFirstResult,
           '2.1': !hasFirstResult,
         }
@@ -84,17 +100,17 @@ export const useFetchFixHypothesisTrajectories = (
   const refreshTrajectories = useCallback(async () => {
     if (studyId == null) return { firstTableData: [], secondTableData: [] };
 
-      const firstConfig = configs?.[0];
-      const secondConfig = configs?.[1];
+      const firstConfig: HypothesisConfig[] = configs?.[0];
+      const secondConfig: HypothesisConfig[] = configs?.[1];
 
-      const { hvdc, recalculate } = await fetchStudyOptions(studyId, firstConfig, secondConfig);
       const secondConfigData = extractSecondConfigData(secondConfig);
-
       const promises = [firstConfig, secondConfigData]
         .filter(Boolean)
         .map((config) => fetchTrajectoriesForConfig(studyId, config));
 
       const [firstResults, secondResults] = await Promise.all(promises);
+
+      const { hvdc, recalculate, hasHvdcCapacities } = await fetchStudyOptions(studyId, firstConfig, secondConfig, firstResults?.[1]?.[0]?.id);
 
       dispatch?.({
         type: STUDY_ACTION.ADD_TRAJECTORIES,
@@ -106,7 +122,7 @@ export const useFetchFixHypothesisTrajectories = (
 
      let firstData: HypothesisRowData[] = [];
       if (firstConfig) {
-        firstData = buildTableData(firstConfig, t, firstResults, { hvdc });
+        firstData = buildTableData(firstConfig, t, firstResults, { hvdc, hasHvdcCapacities });
         if (firstData.length > 0) setFirstTableData(firstData);
       }
 
@@ -120,6 +136,7 @@ export const useFetchFixHypothesisTrajectories = (
         isStudyGenerated,
         firstResults,
         secondConfig,
+        hvdc
       });
 
       setFirstTableReadOnlyRow(firstReadOnly);

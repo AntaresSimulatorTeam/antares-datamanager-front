@@ -8,7 +8,6 @@ import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.
 import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
-import { notifyAlert } from '@/shared/notification/notification.tsx';
 
 vi.mock('@/shared/services/trajectoryService', () => ({
   uploadTrajectory: vi.fn(),
@@ -16,10 +15,6 @@ vi.mock('@/shared/services/trajectoryService', () => ({
 
 vi.mock('@/shared/services/hypothesisTableService', () => ({
   handleTrajectoryError: vi.fn(),
-}));
-
-vi.mock('@/shared/notification/notification.tsx', () => ({
-  notifyAlert: vi.fn(),
 }));
 
 vi.mock('react-i18next', () => ({
@@ -283,30 +278,6 @@ describe('useTrajectoryImport', () => {
       },
       'battery'
     );
-  });
-
-  it('shows Flowbased upload rejection without saving a local selection', async () => {
-    (uploadTrajectory as Mock).mockRejectedValue({
-      antaresErrorMessage: 'Incompatible LINK pair',
-      errorMessageArguments: [],
-      date: new Date(),
-      type: ERROR_MESSAGE_TYPE.BUSINESS,
-    });
-    const flowbasedValue = { ...value, label: 'Flowbased' };
-    const { result } = renderHook(() => useTrajectoryImport(study, mockDispatch));
-
-    await act(async () => {
-      await result.current.importTrajectory(mockSetData, flowbasedValue, TRAJECTORY_TYPE.FLOWBASED, [1]);
-    });
-
-    expect(notifyAlert).toHaveBeenCalledWith(
-      expect.objectContaining({
-        content: 'Incompatible LINK pair',
-        type: 'error',
-      }),
-    );
-    expect(mockSetData).not.toHaveBeenCalled();
-    expect(handleTrajectoryError).not.toHaveBeenCalled();
   });
 
   it('should handle error and call handleTrajectoryError with no user name', async () => {

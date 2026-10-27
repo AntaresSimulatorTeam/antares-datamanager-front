@@ -235,15 +235,15 @@ export const ParametersTab = ({ studyData, defaultAreas, areas }: TabProps) => {
         } else {
           const hypothesis = tableType === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER ? technicalData[topIndex]?.subRows?.[subIndex]?.hypothesis : data[topIndex]?.hypothesis;
 
-          await detachTrajectory(
-            typeToUse,
-            [topIndex, subIndex].filter((n) => n !== undefined),
-            dataSetterToUse,
-            dataToUse,
+          await detachTrajectory({
+            type: typeToUse,
+            indexArray: [topIndex, subIndex].filter((n) => n !== undefined),
+            setData: dataSetterToUse,
+            data: dataToUse,
             status,
-            hypothesis ?? '',
-            readOnlySetterToUse
-          );
+            hypothesis: hypothesis ?? '',
+            setReadOnly: readOnlySetterToUse
+          });
         }
       }
 
@@ -323,6 +323,7 @@ export const ParametersTab = ({ studyData, defaultAreas, areas }: TabProps) => {
           updateData={async (rowId: string, value: unknown, status: RowStatus) =>
             await handleHypothesisTableUpdate(TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER, rowId, value, status)
           }
+          type={TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER}
         />
       </div>
         <ImportTrajectoryModal
@@ -361,15 +362,15 @@ export const ParametersTab = ({ studyData, defaultAreas, areas }: TabProps) => {
                 const row = subIndex == null ? technicalData[index] : technicalData[index]?.subRows?.[subIndex];
                 const current = row?.trajectory ?? null;
                 if (current && subIndex != null) {
-                  await detachTrajectory(
-                    TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
-                    [index, subIndex],
-                    setTechnicalData,
-                    technicalData,
-                    'empty',
-                    value,
-                    setTechnicalReadOnly
-                  );
+                  await detachTrajectory({
+                      type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+                      indexArray: [index, subIndex],
+                      setData: setTechnicalData,
+                      data: technicalData,
+                      status: 'empty',
+                      hypothesis: value,
+                      setReadOnly: setTechnicalReadOnly
+                    });
                 }
               } else {
                 await removeRow(

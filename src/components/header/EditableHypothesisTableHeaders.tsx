@@ -23,7 +23,6 @@ const getEditableHypothesisTableHeaders = ({
   errorInfo,
   setErrorInfo,
   isStudyGenerated,
-  isActionsDisabled,
   progress,
   fileStatus,
   idSelected,
@@ -53,13 +52,12 @@ const getEditableHypothesisTableHeaders = ({
     size: type === TRAJECTORY_TYPE.STS ? 520 : 623,
     cell: ({ row, table }) => {
       const { trajectory, status } = row.original;
-      const isLinkRow = type === TRAJECTORY_TYPE.AREA && row.index === 1;
 
       return trajectory?.trajectoryName && status !== TRAJECTORY_SELECTION_STATUS.MISSING ? (
         <div className="flex w-full items-center justify-start gap-2 py-1">
           <LabelWithDeleteButton
             label={trajectory.trajectoryName}
-            isDeletable={!isStudyGenerated && !(isActionsDisabled && isLinkRow)}
+            isDeletable={!isStudyGenerated}
             onClick={() => {
               setErrorInfo({ index: row.index, message: '' });
               table.options?.meta?.updateData?.(
@@ -82,7 +80,7 @@ const getEditableHypothesisTableHeaders = ({
               setErrorInfo({ index: row.index, message: '' });
               await table.options?.meta?.importData?.(row.id);
             }}
-            isDisabled={row.getReadOnly() || Boolean(isActionsDisabled && isLinkRow)}
+            isDisabled={row.getReadOnly()}
             placeHolder={
               table.getSortedRowModel().rows?.[0]?.original?.status === TRAJECTORY_SELECTION_STATUS.MISSING &&
               table.getSortedRowModel().rows?.[0]?.original?.trajectory?.type === TRAJECTORY_TYPE.AREA &&
@@ -118,8 +116,8 @@ const getEditableHypothesisTableHeaders = ({
                 showIcon
                 disabled={
                   status === TRAJECTORY_SELECTION_STATUS.ERROR ||
+                  !row.original.hasHvdcCapacities ||
                   isStudyGenerated ||
-                  (isActionsDisabled && row.index === 1) ||
                   (!trajectory?.trajectoryName && status === TRAJECTORY_SELECTION_STATUS.MISSING)
                 }
                 readOnly={isStudyGenerated}

@@ -1,41 +1,24 @@
-import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
-import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import * as trajectoryUtils from '@/shared/utils/trajectoryUtils.ts';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { renderHook } from '@testing-library/react';
+import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useHypothesisTableUpdateHandler } from '@/hooks/useHypothesisTableUpdateHandler.ts';
 import { DbTrajectory, HypothesisRowData, StudyDTO } from '@/shared/types';
-import { renderHook } from '@testing-library/react';
+import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 
-// Mocks des hooks internes
-vi.mock('@/hooks/useStudy', () => ({
-  useStudy: () => ({}),
+vi.mock('@/store/contexts/StudyContext.tsx', () => ({
   useStudyDispatch: () => vi.fn(),
 }));
 
-// Mock attach/detach
 const mockAttach = vi.fn();
 const mockDetach = vi.fn();
 
-vi.mock('@/hooks/useTrajectoryAttach', () => ({
-  useTrajectoryAttach: () => ({
-    attachTrajectory: mockAttach,
-  }),
+vi.mock('@/hooks/useTrajectoryAttach.ts', () => ({
+  useTrajectoryAttach: () => ({ attachTrajectory: mockAttach }),
 }));
 
-vi.mock('@/hooks/useTrajectoryDetach', () => ({
-  useTrajectoryDetach: () => ({
-    detachTrajectory: mockDetach,
-  }),
+vi.mock('@/hooks/useTrajectoryDetach.ts', () => ({
+  useTrajectoryDetach: () => ({ detachTrajectory: mockDetach }),
 }));
-
-// Mock utilitaires
-vi.mock('@/shared/utils/trajectoryUtils', async (importOriginal) => {
-  const actual: Mock = await importOriginal();
-  return {
-    ...actual,
-    getRowDataSelected: vi.fn(),
-    shouldDeleteCapacityModulation: vi.fn(),
-  };
-});
 
 describe('useHypothesisTableUpdateHandler', () => {
   const setData = vi.fn();
@@ -43,265 +26,313 @@ describe('useHypothesisTableUpdateHandler', () => {
   const setIsDeletionModalOpen = vi.fn();
   const setRowIdSelected = vi.fn();
   const setReadOnly = vi.fn();
+  const setSecondTableReadOnly = vi.fn();
+  const setSecondData = vi.fn();
 
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+  const studyData: StudyDTO = {
+    id: 1,
+    name: 'Study',
+    createdBy: undefined,
+    creationDate: new Date('2026-01-01'),
+    keywords: [],
+    project: 'Project',
+    projectId: '1',
+    status: StudyStatus.IN_PROGRESS,
+    horizon: '2030',
+    trajectoryIds: [],
+    hvdc: false,
+    recalculate: false,
+  };
+  const trajectory: DbTrajectory = {
+    id: 42,
+    trajectoryName: 'Trajectory A',
+    type: TRAJECTORY_TYPE.LOAD,
+    version: 1,
+    userName: 'user',
+    creationDate: new Date('2026-01-01'),
+    area: 'Area A',
+    technology: '',
+    hasTimeSeries: true,
+  };
+  const data: HypothesisRowData[] = [
+    { hypothesis: 'Area A', trajectory, status: TRAJECTORY_SELECTION_STATUS.OK },
+  ];
+  const updateArgs = {
+    rowId: '0',
+    type: TRAJECTORY_TYPE.LOAD,
+    data,
+    setData,
+    setReadOnly,
+  };
 
-  const studyData = { horizon: 2030 } as unknown as StudyDTO;
-
-  it('should detach trajectory when status is empty', async () => {
-    const data = [{ hypothesis: 'Area A', trajectory: { id: 1 } }] as HypothesisRowData[];
-
-    vi.mocked(trajectoryUtils.getRowDataSelected).mockReturnValue(data[0]);
-    vi.mocked(trajectoryUtils.shouldDeleteCapacityModulation).mockReturnValue(false);
-
-    const { result } = renderHook(() =>
+  const renderUpdateHandler = (dbTrajectories: DbTrajectory[] = [], withRowToDelete = true) =>
+    renderHook(() =>
       useHypothesisTableUpdateHandler({
         studyData,
-        setRowToDelete,
-        setIsDeletionModalOpen,
-        dbTrajectories: [],
-        setRowIdSelected
-      }),
-    );
-
-    await result.current.handleHypothesisTableUpdate('0', null, 'empty', TRAJECTORY_TYPE.LOAD, data, setData, setReadOnly);
-
-    expect(mockDetach).toHaveBeenCalledWith(TRAJECTORY_TYPE.LOAD, [0], setData, data, 'empty', 'Area A', setReadOnly, undefined);
-  });
-
-  it('should open deletion modal for DSR capacity modulation', async () => {
-    const data = [{ hypothesis: 'Area A' }, { hypothesis: 'Area B' }] as HypothesisRowData[];
-
-    vi.mocked(trajectoryUtils.getRowDataSelected).mockReturnValue(data[1]);
-    vi.mocked(trajectoryUtils.shouldDeleteCapacityModulation).mockReturnValue(true);
-
-    const { result } = renderHook(() =>
-      useHypothesisTableUpdateHandler({
-        studyData,
-        setRowToDelete,
-        setIsDeletionModalOpen,
-        dbTrajectories: [],
-        setRowIdSelected
-      }),
-    );
-
-    await result.current.handleHypothesisTableUpdate('1', null, 'empty', TRAJECTORY_TYPE.DSR, data, setData, setReadOnly);
-
-    expect(setRowToDelete).toHaveBeenCalledWith({
-      index: 1,
-      value: 'Area B',
-      operation: 'empty',
-    });
-
-    expect(setIsDeletionModalOpen).toHaveBeenCalledWith(true);
-    expect(mockDetach).not.toHaveBeenCalled();
-  });
-
-  it('should attach trajectory when status is success', async () => {
-    const data = [{ hypothesis: 'Area A', trajectory: { id: 1 } }] as HypothesisRowData[];
-
-    const dbTrajectories = [{ id: 42, trajectoryName: 'Trajectory X' }] as DbTrajectory[];
-
-    vi.mocked(trajectoryUtils.getRowDataSelected).mockReturnValue(data[0]);
-
-    const { result } = renderHook(() =>
-      useHypothesisTableUpdateHandler({
-        studyData,
-        setRowToDelete,
+        setRowToDelete: withRowToDelete ? setRowToDelete : undefined,
         setIsDeletionModalOpen,
         dbTrajectories,
         setRowIdSelected,
       }),
     );
 
-    await result.current.handleHypothesisTableUpdate('0', 42, 'success', TRAJECTORY_TYPE.LOAD, data, setData, setReadOnly);
-
-    expect(mockAttach).toHaveBeenCalledWith(TRAJECTORY_TYPE.LOAD, [0], 'success', dbTrajectories[0], setData, setReadOnly, undefined);
+  beforeEach(() => {
+    vi.resetAllMocks();
   });
 
-  describe('type AREA', () => {
-    it('should use AREA type when first index is 0', async () => {
-      const data = [{ hypothesis: 'Area A' }, { hypothesis: 'Link B' }] as HypothesisRowData[];
+  it.each(['empty', 'emptyError'] as const)('should detach trajectory when status is %s', async (status) => {
+    const { result } = renderUpdateHandler();
 
-      vi.mocked(trajectoryUtils.getRowDataSelected).mockReturnValue(data[0]);
-      vi.mocked(trajectoryUtils.shouldDeleteCapacityModulation).mockReturnValue(false);
+    await result.current.handleHypothesisTableUpdate({ ...updateArgs, status });
 
-      const { result } = renderHook(() =>
-        useHypothesisTableUpdateHandler({
-          studyData,
-          setRowToDelete,
-          setIsDeletionModalOpen,
-          dbTrajectories: [],
-          setRowIdSelected
-        }),
-      );
+    expect(mockDetach).toHaveBeenCalledTimes(1);
+    expect(mockDetach).toHaveBeenCalledWith({
+      type: TRAJECTORY_TYPE.LOAD,
+      indexArray: [0],
+      setData,
+      data,
+      status,
+      hypothesis: 'Area A',
+      setReadOnly,
+      setSecondTableReadOnly: undefined,
+      secondData: undefined,
+      setSecondData: undefined,
+      shouldUpdateHvdc: undefined,
+    });
+    expect(mockAttach).not.toHaveBeenCalled();
+    expect(setIsDeletionModalOpen).not.toHaveBeenCalled();
+  });
 
-      await result.current.handleHypothesisTableUpdate('0', null, 'empty', TRAJECTORY_TYPE.AREA, data, setData, setReadOnly);
+  it.each([true, false])('should forward second table options and shouldUpdateHvdc=%s when detaching', async (shouldUpdateHvdc) => {
+    const secondData: HypothesisRowData[] = [
+      { hypothesis: 'HVDC', trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING },
+    ];
+    const { result } = renderUpdateHandler();
 
-      expect(mockDetach).toHaveBeenCalledWith(TRAJECTORY_TYPE.AREA, [0], setData, data, 'empty', 'Area A', setReadOnly, undefined);
+    await result.current.handleHypothesisTableUpdate({
+      ...updateArgs,
+      status: 'empty',
+      setSecondTableReadOnly,
+      secondData,
+      setSecondData,
+      shouldUpdateHvdc,
     });
 
-    it('should use AREA type when status is success and first index is 0', async () => {
-      const data = [{ hypothesis: 'Area A', trajectory: { id: 10 } }, { hypothesis: 'Link B' }] as HypothesisRowData[];
-      const dbTrajectories = [{ id: 10, trajectoryName: 'Trajectory Area' }] as DbTrajectory[];
-
-      const { result } = renderHook(() =>
-        useHypothesisTableUpdateHandler({
-          studyData,
-          setRowToDelete,
-          setIsDeletionModalOpen,
-          dbTrajectories,
-          setRowIdSelected
-        }),
-      );
-
-      await result.current.handleHypothesisTableUpdate('0', 10, 'success', TRAJECTORY_TYPE.AREA, data, setData, setReadOnly);
-
-      expect(mockAttach).toHaveBeenCalledWith(TRAJECTORY_TYPE.AREA, [0], 'success', dbTrajectories[0], setData, setReadOnly, undefined);
-    });
-
-    it('should use LINK type when first index is not 0', async () => {
-      const data = [{ hypothesis: 'Area A' }, { hypothesis: 'Link B' }] as HypothesisRowData[];
-
-      vi.mocked(trajectoryUtils.getRowDataSelected).mockReturnValue(data[1]);
-      vi.mocked(trajectoryUtils.shouldDeleteCapacityModulation).mockReturnValue(false);
-
-      const { result } = renderHook(() =>
-        useHypothesisTableUpdateHandler({
-          studyData,
-          setRowToDelete,
-          setIsDeletionModalOpen,
-          dbTrajectories: [],
-          setRowIdSelected
-        }),
-      );
-
-      await result.current.handleHypothesisTableUpdate('1', null, 'empty', TRAJECTORY_TYPE.AREA, data, setData, setReadOnly);
-
-      expect(mockDetach).toHaveBeenCalledWith(TRAJECTORY_TYPE.LINK, [1], setData, data, 'empty', 'Link B', setReadOnly, undefined);
-    });
-
-    it('should use LINK type when status is success and first index is not 0', async () => {
-      const data = [{ hypothesis: 'Area A' }, { hypothesis: 'Link B', trajectory: { id: 20 } }] as HypothesisRowData[];
-      const dbTrajectories = [{ id: 20, trajectoryName: 'Trajectory Link' }] as DbTrajectory[];
-
-      const { result } = renderHook(() =>
-        useHypothesisTableUpdateHandler({
-          studyData,
-          setRowToDelete,
-          setIsDeletionModalOpen,
-          dbTrajectories,
-          setRowIdSelected
-        }),
-      );
-
-      await result.current.handleHypothesisTableUpdate('1', 20, 'success', TRAJECTORY_TYPE.AREA, data, setData, setReadOnly);
-
-      expect(mockAttach).toHaveBeenCalledWith(TRAJECTORY_TYPE.LINK, [1], 'success', dbTrajectories[0], setData, setReadOnly, undefined);
+    expect(mockDetach).toHaveBeenCalledTimes(1);
+    expect(mockDetach).toHaveBeenCalledWith({
+      type: TRAJECTORY_TYPE.LOAD,
+      indexArray: [0],
+      setData,
+      data,
+      status: 'empty',
+      hypothesis: 'Area A',
+      setReadOnly,
+      setSecondTableReadOnly,
+      secondData,
+      setSecondData,
+      shouldUpdateHvdc,
     });
   });
 
-  describe('type HYDRO_SERIES with second index equal to 1', () => {
-    it('should use HYDRO_TECHNICAL_PARAMETERS type when status is empty', async () => {
-      const data = [{ hypothesis: 'Hydro A' }] as HypothesisRowData[];
+  it.each(['empty', 'emptyError'] as const)('should open the DSR capacity modulation deletion modal for %s', async (status) => {
+    const dsrData: HypothesisRowData[] = [
+      ...data,
+      { hypothesis: 'Capacity modulation', trajectory, status: TRAJECTORY_SELECTION_STATUS.OK },
+    ];
+    const { result } = renderUpdateHandler();
 
-      vi.mocked(trajectoryUtils.getRowDataSelected).mockReturnValue(data[0]);
-      vi.mocked(trajectoryUtils.shouldDeleteCapacityModulation).mockReturnValue(false);
-
-      const { result } = renderHook(() =>
-        useHypothesisTableUpdateHandler({
-          studyData,
-          setRowToDelete,
-          setIsDeletionModalOpen,
-          dbTrajectories: [],
-          setRowIdSelected
-        }),
-      );
-
-      await result.current.handleHypothesisTableUpdate(
-        '0.1',
-        null,
-        'empty',
-        TRAJECTORY_TYPE.HYDRO_SERIES,
-        data,
-        setData,
-        setReadOnly
-      );
-
-      expect(mockDetach).toHaveBeenCalledWith(
-        TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS,
-        [0, 1],
-        setData,
-        data,
-        'empty',
-        'Hydro A',
-        setReadOnly, undefined
-      );
+    await result.current.handleHypothesisTableUpdate({
+      ...updateArgs,
+      status,
+      type: TRAJECTORY_TYPE.DSR,
+      data: dsrData,
     });
 
-    it('should use HYDRO_TECHNICAL_PARAMETERS type when status is success', async () => {
-      const data = [{ hypothesis: 'Hydro A' }] as HypothesisRowData[];
-      const dbTrajectories = [{ id: 30, trajectoryName: 'Trajectory Hydro' }] as DbTrajectory[];
+    expect(setRowToDelete).toHaveBeenCalledTimes(1);
+    expect(setRowToDelete).toHaveBeenCalledWith({
+      index: 0,
+      value: 'Area A',
+      operation: 'empty',
+    });
+    expect(setIsDeletionModalOpen).toHaveBeenCalledTimes(1);
+    expect(setIsDeletionModalOpen).toHaveBeenCalledWith(true);
+    expect(mockDetach).not.toHaveBeenCalled();
+    expect(mockAttach).not.toHaveBeenCalled();
+  });
 
-      const { result } = renderHook(() =>
-        useHypothesisTableUpdateHandler({
-          studyData,
-          setRowToDelete,
-          setIsDeletionModalOpen,
-          dbTrajectories,
-          setRowIdSelected
-        }),
-      );
+  it('should open the DSR deletion modal without an optional setRowToDelete callback', async () => {
+    const { result } = renderUpdateHandler([], false);
 
-      await result.current.handleHypothesisTableUpdate(
-        '0.1',
-        30,
-        'success',
-        TRAJECTORY_TYPE.HYDRO_SERIES,
-        data,
+    await result.current.handleHypothesisTableUpdate({
+      ...updateArgs,
+      status: 'empty',
+      type: TRAJECTORY_TYPE.DSR,
+      data: [
+        ...data,
+        { hypothesis: 'Capacity modulation', trajectory, status: TRAJECTORY_SELECTION_STATUS.OK },
+      ],
+    });
+
+    expect(setIsDeletionModalOpen).toHaveBeenCalledTimes(1);
+    expect(setIsDeletionModalOpen).toHaveBeenCalledWith(true);
+    expect(setRowToDelete).not.toHaveBeenCalled();
+    expect(mockDetach).not.toHaveBeenCalled();
+  });
+
+  it('should detach DSR without opening the modal when capacity modulation is missing', async () => {
+    const { result } = renderUpdateHandler();
+
+    await result.current.handleHypothesisTableUpdate({
+      ...updateArgs,
+      status: 'empty',
+      type: TRAJECTORY_TYPE.DSR,
+      data: [
+        ...data,
+        { hypothesis: 'Capacity modulation', trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING },
+      ],
+    });
+
+    expect(mockDetach).toHaveBeenCalledWith(expect.objectContaining({ type: TRAJECTORY_TYPE.DSR }));
+    expect(setRowToDelete).not.toHaveBeenCalled();
+    expect(setIsDeletionModalOpen).not.toHaveBeenCalled();
+  });
+
+  it('should attach the selected database trajectory with the second table read-only setter', async () => {
+    const selectedTrajectory = { ...trajectory, id: 43 };
+    const { result } = renderUpdateHandler([trajectory, selectedTrajectory]);
+
+    await result.current.handleHypothesisTableUpdate({
+      ...updateArgs,
+      value: '43',
+      status: 'success',
+      setSecondTableReadOnly,
+    });
+
+    expect(mockAttach).toHaveBeenCalledTimes(1);
+    expect(mockAttach).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.LOAD, [0], 'success', selectedTrajectory, setData, setReadOnly, setSecondTableReadOnly,
+    );
+    expect(mockDetach).not.toHaveBeenCalled();
+  });
+
+  it('should attach the row trajectory when database trajectories are empty and value is omitted', async () => {
+    const { result } = renderUpdateHandler();
+
+    await result.current.handleHypothesisTableUpdate({ ...updateArgs, status: 'success' });
+
+    expect(mockAttach).toHaveBeenCalledTimes(1);
+    expect(mockAttach).toHaveBeenCalledWith(
+      TRAJECTORY_TYPE.LOAD, [0], 'success', trajectory, setData, setReadOnly, undefined,
+    );
+  });
+
+  it('should not fall back to the row trajectory when no database trajectory matches', async () => {
+    const { result } = renderUpdateHandler([trajectory]);
+
+    await result.current.handleHypothesisTableUpdate({ ...updateArgs, value: 999, status: 'success' });
+
+    expect(mockAttach).not.toHaveBeenCalled();
+    expect(mockDetach).not.toHaveBeenCalled();
+  });
+
+  it('should not attach when the selected row has no trajectory', async () => {
+    const { result } = renderUpdateHandler();
+
+    await result.current.handleHypothesisTableUpdate({
+      ...updateArgs,
+      status: 'success',
+      data: [{ ...data[0], trajectory: null }],
+    });
+
+    expect(mockAttach).not.toHaveBeenCalled();
+  });
+
+  it.each(['empty', 'emptyError', 'success'] as const)('should ignore a missing row for status %s', async (status) => {
+    const { result } = renderUpdateHandler();
+
+    await result.current.handleHypothesisTableUpdate({ ...updateArgs, rowId: '5', status });
+
+    expect(mockAttach).not.toHaveBeenCalled();
+    expect(mockDetach).not.toHaveBeenCalled();
+    expect(setIsDeletionModalOpen).not.toHaveBeenCalled();
+  });
+
+  it.each(['empty', 'emptyError', 'success'] as const)('should handle an omitted rowId for status %s', async (status) => {
+    const { rowId: _rowId, ...argsWithoutRowId } = updateArgs;
+    const { result } = renderUpdateHandler();
+
+    await result.current.handleHypothesisTableUpdate({ ...argsWithoutRowId, status });
+
+    expect(mockAttach).not.toHaveBeenCalled();
+    expect(mockDetach).not.toHaveBeenCalled();
+    expect(setIsDeletionModalOpen).not.toHaveBeenCalled();
+  });
+
+  it.each(['warning', 'error', 'loading', undefined] as const)('should ignore status %s', async (status) => {
+    const { result } = renderUpdateHandler([trajectory]);
+
+    await result.current.handleHypothesisTableUpdate({ ...updateArgs, value: trajectory.id, status });
+
+    expect(mockAttach).not.toHaveBeenCalled();
+    expect(mockDetach).not.toHaveBeenCalled();
+    expect(setIsDeletionModalOpen).not.toHaveBeenCalled();
+  });
+
+  describe.each([
+    { type: TRAJECTORY_TYPE.AREA, rowId: '0', expectedType: TRAJECTORY_TYPE.AREA, hypothesis: 'Area A' },
+    { type: TRAJECTORY_TYPE.AREA, rowId: '1', expectedType: TRAJECTORY_TYPE.LINK, hypothesis: 'Link B' },
+    { type: TRAJECTORY_TYPE.HYDRO_SERIES, rowId: '0.1', expectedType: TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS, hypothesis: 'Area A' },
+    { type: TRAJECTORY_TYPE.HYDRO_SERIES, rowId: '0.0', expectedType: TRAJECTORY_TYPE.HYDRO_SERIES, hypothesis: 'Area A' },
+    { type: TRAJECTORY_TYPE.DSR, rowId: '1', expectedType: TRAJECTORY_TYPE.DSR_CAPACITY_MODULATION, hypothesis: 'Link B' },
+  ])('$type at row $rowId', ({ type, rowId, expectedType, hypothesis }) => {
+    const nestedData: HypothesisRowData[] = [
+      { ...data[0], subRows: [{ ...data[0], hypothesis: 'Series' }, { ...data[0], hypothesis: 'Parameters' }] },
+      { ...data[0], hypothesis: 'Link B' },
+    ];
+
+    it('should detach using the resolved type and parent hypothesis', async () => {
+      const { result } = renderUpdateHandler();
+
+      await result.current.handleHypothesisTableUpdate({
+        ...updateArgs,
+        rowId,
+        type,
+        status: 'empty',
+        data: nestedData,
+      });
+
+      expect(mockDetach).toHaveBeenCalledTimes(1);
+      expect(mockDetach).toHaveBeenCalledWith({
+        type: expectedType,
+        indexArray: rowId.split('.').map(Number),
         setData,
-        setReadOnly
-      );
+        data: nestedData,
+        status: 'empty',
+        hypothesis,
+        setReadOnly,
+        setSecondTableReadOnly: undefined,
+        secondData: undefined,
+        setSecondData: undefined,
+        shouldUpdateHvdc: undefined,
+      });
+    });
 
+    it('should attach using the resolved type', async () => {
+      const { result } = renderUpdateHandler([trajectory]);
+
+      await result.current.handleHypothesisTableUpdate({
+        ...updateArgs,
+        rowId,
+        type,
+        status: 'success',
+        value: trajectory.id,
+        data: nestedData,
+      });
+
+      expect(mockAttach).toHaveBeenCalledTimes(1);
       expect(mockAttach).toHaveBeenCalledWith(
-        TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS,
-        [0, 1],
-        'success',
-        dbTrajectories[0],
-        setData,
-        setReadOnly, undefined
+        expectedType, rowId.split('.').map(Number), 'success', trajectory, setData, setReadOnly, undefined,
       );
-    });
-
-    it('should use HYDRO_SERIES type when second index is not 1', async () => {
-      const data = [{ hypothesis: 'Hydro A' }] as HypothesisRowData[];
-
-      vi.mocked(trajectoryUtils.getRowDataSelected).mockReturnValue(data[0]);
-      vi.mocked(trajectoryUtils.shouldDeleteCapacityModulation).mockReturnValue(false);
-
-      const { result } = renderHook(() =>
-        useHypothesisTableUpdateHandler({
-          studyData,
-          setRowToDelete,
-          setIsDeletionModalOpen,
-          dbTrajectories: [],
-          setRowIdSelected
-        }),
-      );
-
-      await result.current.handleHypothesisTableUpdate(
-        '0.0',
-        null,
-        'empty',
-        TRAJECTORY_TYPE.HYDRO_SERIES,
-        data,
-        setData,
-        setReadOnly
-      );
-
-      expect(mockDetach).toHaveBeenCalledWith(TRAJECTORY_TYPE.HYDRO_SERIES, [0, 0], setData, data, 'empty', 'Hydro A', setReadOnly, undefined);
     });
   });
 });

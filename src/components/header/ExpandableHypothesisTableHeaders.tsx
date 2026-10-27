@@ -29,9 +29,8 @@ const getExpandableHypothesisTableHeaders = ({
   columnHeader,
   type,
   list,
-  isFlowbasedPrerequisiteMet,
-  flowbasedTooltipMessage,
-  isActionsDisabled,
+  hasLinkTrajectory,
+  isHvdcActivated
 }: TableHeadersGetterProps): TableOptions<HypothesisRowData>['columns'] => [
   columnHelper.accessor('hypothesis', {
     header: columnHeader || getColumnHeader(t, type),
@@ -41,14 +40,7 @@ const getExpandableHypothesisTableHeaders = ({
       const subRowListName = getSubRowsList(row);
       const subRowListWithArea = getSubRowListWithArea(subRowListName, t, type);
       const isTechnology = list?.length ? list?.includes(hypothesis) : false;
-      const isFlowbasedRow = type === TRAJECTORY_TYPE.ADEQUACY_PATCH && row.id === '1';
-      const informationMessage = type
-        ? isFlowbasedRow
-          ? isFlowbasedPrerequisiteMet
-            ? null
-            : { messageKey: '', id: row.id }
-          : getInformationMessage(table.getRowCount(), type, row.id, trajectory)
-        : null;
+      const informationMessage = getInformationMessage(table.getRowCount(), type, row.id, trajectory, hasLinkTrajectory, isHvdcActivated);
 
       return (
         <div className="flex items-center gap-1 py-1">
@@ -80,11 +72,7 @@ const getExpandableHypothesisTableHeaders = ({
           )}
           {row.id === informationMessage?.id && informationMessage && (
             <Tooltip
-              label={
-                informationMessage.messageKey
-                  ? t(informationMessage.messageKey)
-                  : flowbasedTooltipMessage
-              }
+              label={t(informationMessage.messageKey)}
               position="right"
             >
               <Icon
@@ -105,13 +93,12 @@ const getExpandableHypothesisTableHeaders = ({
     size: type === TRAJECTORY_TYPE.STS ? 520 : 623,
     cell: ({ row, table: { options } }) => {
       const { trajectory, status, hypothesis } = row.original;
-      const isFlowbasedTrajectoryRow = type === TRAJECTORY_TYPE.ADEQUACY_PATCH && row.id === '1';
       if (type && isEmptyRow(type, hypothesis, row.depth, t)) return null;
       return trajectory?.trajectoryName && status !== TRAJECTORY_SELECTION_STATUS.MISSING ? (
         <div className="flex w-full items-center gap-2 py-1">
           <LabelWithDeleteButton
             label={trajectory.trajectoryName}
-            isDeletable={!isStudyGenerated && !(isActionsDisabled && isFlowbasedTrajectoryRow)}
+            isDeletable={!isStudyGenerated}
             onClick={() => {
               setErrorInfo({ index: row.index, message: '' });
               options?.meta?.updateData?.(
@@ -134,7 +121,7 @@ const getExpandableHypothesisTableHeaders = ({
               setErrorInfo({ index: row.index, message: '' });
               void options?.meta?.importData?.(row.id);
             }}
-            isDisabled={row.getReadOnly() || Boolean(isActionsDisabled && isFlowbasedTrajectoryRow)}
+            isDisabled={row.getReadOnly()}
           />
           {errorInfo.message && row.index === errorInfo.index && (
             <div className="text-error-700">{errorInfo.message}</div>
@@ -245,7 +232,7 @@ const getExpandableHypothesisTableHeaders = ({
             {options?.meta?.removeRow &&
               !isDefault &&
               !isStudyGenerated &&
-              !(isActionsDisabled && type === TRAJECTORY_TYPE.ADEQUACY_PATCH && row.id === '1') && (
+              !(type === TRAJECTORY_TYPE.ADEQUACY_PATCH && row.id === '1') && (
               <div className={`${isDeletable ? 'pointer-events-auto visible' : 'pointer-events-none invisible'}`}>
                 <IconButton
                   appearance="outlined"

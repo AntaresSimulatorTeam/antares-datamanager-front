@@ -201,11 +201,13 @@
     "@associationsReloadError": "Impossible de recharger les associations de trajectoires de l’étude.",
     "@studyOptionsUpdateError": "Les paramètres HVDC de l’étude n’ont pas pu être réinitialisés après le changement de trajectoire LINK.",
     "@linkChangeConfirmationTitle": "Confirmer le changement de trajectoire LINK",
-    "@linkChangeConfirmation": "Supprimer ou remplacer la trajectoire LINK retirera également la trajectoire Flowbased de cette étude. Les données resteront disponibles en base."
+    "@linkChangeConfirmation": "Supprimer ou remplacer la trajectoire LINK retirera également la trajectoire Flowbased de cette étude. Les données resteront disponibles en base.",
+    "@hvdcChangeConfirmationTitle": "Confirmer le changement HVDC",
+    "@hvdcChangeConfirmation": "Cette action supprimera la trajectoire associée. Veuillez confirmer que vous souhaitez continuer."
   },
   "settings": {
-    "@title": "Settings",
-    "@settingsInformation": "Settings filled in",
+    "@title": "Paramètres",
+    "@settingsInformation": "Paramètres renseignés",
     "@adequacyPatch": "Adequacy Patch",
     "@flowBased": "Flowbased",
     "@generalData": "General data",

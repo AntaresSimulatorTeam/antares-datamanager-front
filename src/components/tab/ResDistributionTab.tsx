@@ -111,7 +111,7 @@ const ResDistributionTab = ({ studyData, types, defaultAreas, areas }: TabProps 
       if (status === 'empty' || status === 'emptyError') {
         const row = getRowDataSelected(dataToUse, indexArray) ?? null;
         if (row) {
-          await detachTrajectory(tableType, indexArray, setterToUse, dataToUse, status, row?.hypothesis, setReadOnly);
+          await detachTrajectory({type: tableType, indexArray, setData: setterToUse, data: dataToUse, status, hypothesis: row?.hypothesis, setReadOnly});
         }
       } else if (status === 'success') {
         const dbTrajectory =
@@ -150,6 +150,7 @@ const ResDistributionTab = ({ studyData, types, defaultAreas, areas }: TabProps 
         updateData={async (rowId: string, value: unknown, status: RowStatus) =>
           await handleUpdateTableData(TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION, rowId, value, status)
         }
+        type={TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION}
       />
       <PegaseHypothesisTable
         id="technology-distribution-table"

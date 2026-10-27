@@ -179,7 +179,7 @@ describe('useFetchFixHypothesisTrajectories', () => {
         });
         expect(result.current.secondTableReadOnlyRow).toEqual({
           '0': false,
-          '1': false,
+          '1': true,
           '2.0': false,
           '2.1': false,
         });
