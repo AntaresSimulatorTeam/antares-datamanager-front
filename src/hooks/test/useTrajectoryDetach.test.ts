@@ -637,26 +637,47 @@ describe('useTrajectoryDetach', () => {
       expect(hypothesisTableService.handleTrajectoryError).not.toHaveBeenCalled();
     });
 
-    it.each([TRAJECTORY_TYPE.LINK, TRAJECTORY_TYPE.FLOWBASED])('recharge l’étude sans suppression ni mise à jour backend pour %s en statut emptyError', async (type) => {
+    it('TRAJECTORY_TYPE.LINK recharge l’étude sans suppression ni mise à jour backend pour %s en statut emptyError', async () => {
       mockComputeDeletion.mockReturnValue({
         trajectoryIds: [10],
-        trajectoryToDelete: type === TRAJECTORY_TYPE.LINK ? linkTrajectory : flowbasedTrajectory,
+        trajectoryToDelete: linkTrajectory,
         additionalTrajectory: null,
       });
       const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch));
 
       await act(async () => {
-        await result.current.detachTrajectory({ ...detachArgs, type, status: 'emptyError', shouldUpdateHvdc: true });
+        await result.current.detachTrajectory({ ...detachArgs, type: TRAJECTORY_TYPE.LINK, status: 'emptyError', shouldUpdateHvdc: true });
       });
 
       expect(mockPerformBackendDeletion).not.toHaveBeenCalled();
       expect(studyService.updateStudy).not.toHaveBeenCalled();
-      expect(studyService.getStudyById).toHaveBeenCalledTimes(1);
-      expect(studyService.getStudyById).toHaveBeenCalledWith(study.id);
       expect(mockDispatch).not.toHaveBeenCalled();
       expect(hypothesisTableHelper.updateTableAfterCellDetach).toHaveBeenCalledWith(
         expect.objectContaining({
-          options: { hvdcValue: reloadedStudy.hvdc, recalculateValue: reloadedStudy.recalculate },
+          options: { hvdcValue: study.hvdc, recalculateValue: study.recalculate },
+        }),
+      );
+      expect(mockSetData).toHaveBeenCalledTimes(1);
+    });
+
+    it('TRAJECTORY_TYPE.FLOWBASED recharge l’étude avec mise à jour backend pour %s en statut emptyError', async () => {
+      mockComputeDeletion.mockReturnValue({
+        trajectoryIds: [10],
+        trajectoryToDelete: flowbasedTrajectory,
+        additionalTrajectory: null,
+      });
+      const { result } = renderHook(() => useTrajectoryDetach(study, mockDispatch));
+
+      await act(async () => {
+        await result.current.detachTrajectory({ ...detachArgs, type: TRAJECTORY_TYPE.FLOWBASED, status: 'emptyError', shouldUpdateHvdc: true });
+      });
+
+      expect(mockPerformBackendDeletion).not.toHaveBeenCalled();
+      expect(studyService.updateStudy).not.toHaveBeenCalled();
+      expect(mockDispatch).not.toHaveBeenCalled();
+      expect(hypothesisTableHelper.updateTableAfterCellDetach).toHaveBeenCalledWith(
+        expect.objectContaining({
+          options: { hvdcValue: false, recalculateValue: false },
         }),
       );
       expect(mockSetData).toHaveBeenCalledTimes(1);
@@ -676,11 +697,9 @@ describe('useTrajectoryDetach', () => {
 
       expect(mockPerformBackendDeletion).not.toHaveBeenCalled();
       expect(studyService.updateStudy).not.toHaveBeenCalled();
-      expect(studyService.getStudyById).toHaveBeenCalledTimes(1);
-      expect(studyService.getStudyById).toHaveBeenCalledWith(study.id);
       expect(hypothesisTableHelper.updateTableAfterCellDetach).toHaveBeenCalledWith(
         expect.objectContaining({
-          options: { hvdcValue: reloadedStudy.hvdc, recalculateValue: reloadedStudy.recalculate },
+          options: { hvdcValue: study.hvdc, recalculateValue: study.recalculate },
         }),
       );
       expect(mockSetData).toHaveBeenCalledTimes(1);
@@ -700,12 +719,10 @@ describe('useTrajectoryDetach', () => {
 
       expect(mockPerformBackendDeletion).not.toHaveBeenCalled();
       expect(studyService.updateStudy).not.toHaveBeenCalled();
-      expect(studyService.getStudyById).toHaveBeenCalledTimes(1);
-      expect(studyService.getStudyById).toHaveBeenCalledWith(study.id);
       expect(mockDispatch).not.toHaveBeenCalled();
       expect(hypothesisTableHelper.updateTableAfterCellDetach).toHaveBeenCalledWith(
         expect.objectContaining({
-          options: { hvdcValue: reloadedStudy.hvdc, recalculateValue: reloadedStudy.recalculate },
+          options: { hvdcValue: study.hvdc, recalculateValue: study.recalculate },
         }),
       );
       expect(mockSetData).toHaveBeenCalledTimes(1);

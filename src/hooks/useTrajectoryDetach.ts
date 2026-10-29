@@ -22,7 +22,7 @@ interface BackendDeletionParams {
   trajectoryToDelete: DbTrajectory | null;
   trajectoryIds: number[];
   status: RowStatus;
-  studyId: number;
+  studyData: StudyDTO;
   performBackendDeletion: (ids: number[]) => Promise<void>;
   shouldUpdateHvdc?: boolean;
 }
@@ -31,12 +31,15 @@ const executeBackendDeletion = async ({
   trajectoryToDelete,
   trajectoryIds,
   status,
-  studyId,
+  studyData,
   performBackendDeletion,
   shouldUpdateHvdc
 }: BackendDeletionParams): Promise<{ hvdcValue?: boolean; recalculateValue?: boolean }> => {
-  if (!trajectoryToDelete || !trajectoryIds?.length || status === 'emptyError') {
-    const study = await getStudyById(studyId);
+  if (!trajectoryToDelete || !trajectoryIds?.length || (status === 'emptyError')) {
+    let study = studyData;
+    if (trajectoryToDelete?.type === TRAJECTORY_TYPE.FLOWBASED) {
+      study = await getStudyById(studyData.id);
+    }
     return { hvdcValue: study.hvdc, recalculateValue: study.recalculate };
   }
 
@@ -44,14 +47,14 @@ const executeBackendDeletion = async ({
 
   let updatedStudy: StudyDTO = { } as StudyDTO;
 
-  if (trajectoryToDelete.type === TRAJECTORY_TYPE.LINK) {
+  if (trajectoryToDelete?.type === TRAJECTORY_TYPE.LINK) {
     if (shouldUpdateHvdc) {
-      updatedStudy = await updateStudy({ hvdc: false }, studyId);
+      updatedStudy = await updateStudy({ hvdc: false }, studyData?.id);
     }
   }
 
   if (trajectoryToDelete.type === TRAJECTORY_TYPE.FLOWBASED) {
-    updatedStudy = await updateStudy({ recalculate: false, ...(shouldUpdateHvdc && { hvdc: false }) }, studyId);
+    updatedStudy = await updateStudy({ recalculate: false, ...(shouldUpdateHvdc && { hvdc: false }) }, studyData?.id);
   }
 
   return { hvdcValue: updatedStudy?.hvdc, recalculateValue: updatedStudy?.recalculate };
@@ -335,7 +338,7 @@ export const useTrajectoryDetach = (
           trajectoryToDelete,
           trajectoryIds,
           status,
-          studyId: study.id,
+          studyData: study,
           performBackendDeletion,
           shouldUpdateHvdc
         });
