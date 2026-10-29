@@ -249,14 +249,7 @@ export const ParametersTab = ({ studyData, defaultAreas, areas }: TabProps) => {
 
       const dbTrajectory = dbTrajectories.find((traj) => traj.id == value) ?? null;
       if (status === 'success' && dbTrajectory) {
-          await attachTrajectory(
-            typeToUse,
-            [topIndex, subIndex].filter((n) => n !== undefined),
-            status,
-            dbTrajectory,
-            dataSetterToUse,
-            readOnlySetterToUse
-          );
+          await attachTrajectory({ type: typeToUse, indexArray: [topIndex, subIndex].filter((n) => n !== undefined), status, trajectory: dbTrajectory, setData: dataSetterToUse, setReadOnly: readOnlySetterToUse});
       }
     },
     [attachTrajectory, data, dbTrajectories, detachTrajectory, getParameterType, technicalData],

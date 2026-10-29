@@ -209,9 +209,16 @@ describe('useHypothesisTableUpdateHandler', () => {
     });
 
     expect(mockAttach).toHaveBeenCalledTimes(1);
-    expect(mockAttach).toHaveBeenCalledWith(
-      TRAJECTORY_TYPE.LOAD, [0], 'success', selectedTrajectory, setData, setReadOnly, setSecondTableReadOnly, undefined
-    );
+    expect(mockAttach).toHaveBeenCalledWith({
+      type: TRAJECTORY_TYPE.LOAD,
+      indexArray: [0],
+      status: 'success',
+      trajectory: selectedTrajectory,
+      setData,
+      setReadOnly,
+      setSecondTableReadOnly,
+      isFlowbasedRedOnly: undefined,
+    });
     expect(mockDetach).not.toHaveBeenCalled();
   });
 
@@ -221,9 +228,40 @@ describe('useHypothesisTableUpdateHandler', () => {
     await result.current.handleHypothesisTableUpdate({ ...updateArgs, status: 'success' });
 
     expect(mockAttach).toHaveBeenCalledTimes(1);
-    expect(mockAttach).toHaveBeenCalledWith(
-      TRAJECTORY_TYPE.LOAD, [0], 'success', trajectory, setData, setReadOnly, undefined, undefined
-    );
+    expect(mockAttach).toHaveBeenCalledWith({
+      type: TRAJECTORY_TYPE.LOAD,
+      indexArray: [0],
+      status: 'success',
+      trajectory,
+      setData,
+      setReadOnly,
+      setSecondTableReadOnly: undefined,
+      isFlowbasedRedOnly: undefined,
+    });
+  });
+
+  it.each([true, false])('should forward isFlowbasedRedOnly=%s when attaching', async (hvdc) => {
+    const { result } = renderUpdateHandler([trajectory]);
+
+    await result.current.handleHypothesisTableUpdate({
+      ...updateArgs,
+      type: TRAJECTORY_TYPE.LINK,
+      value: trajectory.id,
+      status: 'success',
+      data: [...data, { ...data[0], hvdc }],
+      setSecondTableReadOnly,
+    });
+
+    expect(mockAttach).toHaveBeenCalledWith({
+      type: TRAJECTORY_TYPE.LINK,
+      indexArray: [0],
+      status: 'success',
+      trajectory,
+      setData,
+      setReadOnly,
+      setSecondTableReadOnly,
+      isFlowbasedRedOnly: hvdc,
+    });
   });
 
   it('should not fall back to the row trajectory when no database trajectory matches', async () => {
@@ -330,9 +368,16 @@ describe('useHypothesisTableUpdateHandler', () => {
       });
 
       expect(mockAttach).toHaveBeenCalledTimes(1);
-      expect(mockAttach).toHaveBeenCalledWith(
-        expectedType, rowId.split('.').map(Number), 'success', trajectory, setData, setReadOnly, undefined, undefined
-      );
+      expect(mockAttach).toHaveBeenCalledWith({
+        type: expectedType,
+        indexArray: rowId.split('.').map(Number),
+        status: 'success',
+        trajectory,
+        setData,
+        setReadOnly,
+        setSecondTableReadOnly: undefined,
+        isFlowbasedRedOnly: undefined,
+      });
     });
   });
 });

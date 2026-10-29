@@ -100,7 +100,7 @@ describe('useTrajectoryAttach', () => {
 
     const { result } = renderHook(() => useTrajectoryAttach(study, mockDispatch));
 
-    await result.current.attachTrajectory(TRAJECTORY_TYPE.LOAD, [0], 'success', trajectory, mockSetData, mockSetReadOnly);
+    await result.current.attachTrajectory({ type: TRAJECTORY_TYPE.LOAD, indexArray: [0], status: 'success', trajectory, setData: mockSetData, setReadOnly: mockSetReadOnly });
 
     expect(trajectoryService.linkTrajectoryToStudy).toHaveBeenCalledWith(TRAJECTORY_TYPE.LOAD, 42, 'study-001');
     expect(mockDispatch).toHaveBeenCalledWith({
@@ -119,7 +119,7 @@ describe('useTrajectoryAttach', () => {
 
     const { result } = renderHook(() => useTrajectoryAttach(study, mockDispatch));
 
-    await result.current.attachTrajectory(TRAJECTORY_TYPE.LOAD, [1], 'success', trajectory, mockSetData, mockSetReadOnly);
+    await result.current.attachTrajectory({ type: TRAJECTORY_TYPE.LOAD, indexArray: [1], status: 'success', trajectory, setData: mockSetData, setReadOnly: mockSetReadOnly });
 
     expect(mockDispatch).toHaveBeenCalledWith({
       type: STUDY_ACTION.UPDATE_TRAJECTORY,
@@ -150,14 +150,14 @@ describe('useTrajectoryAttach', () => {
 
     const { result } = renderHook(() => useTrajectoryAttach(study, mockDispatch));
 
-    await result.current.attachTrajectory(
-      TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER,
-      [0],
-      'success',
-      newTrajectory2,
-      mockSetData,
-      mockSetReadOnly
-    );
+    await result.current.attachTrajectory({
+      type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER,
+      indexArray: [0],
+      status: 'success',
+      trajectory: newTrajectory2,
+      setData: mockSetData,
+      setReadOnly: mockSetReadOnly,
+    });
 
     expect(mockDispatch).toHaveBeenCalledWith({
       type: STUDY_ACTION.UPDATE_TRAJECTORY,
@@ -174,7 +174,7 @@ describe('useTrajectoryAttach', () => {
 
     const { result } = renderHook(() => useTrajectoryAttach(study, mockDispatch));
 
-    await result.current.attachTrajectory(TRAJECTORY_TYPE.LOAD, [0], 'success', trajectory, mockSetData, mockSetReadOnly);
+    await result.current.attachTrajectory({ type: TRAJECTORY_TYPE.LOAD, indexArray: [0], status: 'success', trajectory, setData: mockSetData, setReadOnly: mockSetReadOnly });
 
     expect(handleTrajectoryError).toHaveBeenCalledWith(
       TRAJECTORY_TYPE.LOAD,
@@ -197,14 +197,14 @@ describe('useTrajectoryAttach', () => {
 
     const { result } = renderHook(() => useTrajectoryAttach(study, mockDispatch));
 
-    await result.current.attachTrajectory(
-      TRAJECTORY_TYPE.FLOWBASED,
-      [1],
-      'success',
-      flowbasedTrajectory,
-      mockSetData,
-      mockSetReadOnly,
-    );
+    await result.current.attachTrajectory({
+      type: TRAJECTORY_TYPE.FLOWBASED,
+      indexArray: [1],
+      status: 'success',
+      trajectory: flowbasedTrajectory,
+      setData: mockSetData,
+      setReadOnly: mockSetReadOnly,
+    });
 
     expect(notifyAlert).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -233,7 +233,7 @@ describe('useTrajectoryAttach', () => {
       creationDate: '2025-08-07T14:17:09.895028' as unknown as Date,
     } as DbTrajectory;
 
-    await result.current.attachTrajectory(TRAJECTORY_TYPE.AREA, [0], 'success', trajectoryArea, mockSetData, mockSetReadOnly);
+    await result.current.attachTrajectory({ type: TRAJECTORY_TYPE.AREA, indexArray: [0], status: 'success', trajectory: trajectoryArea, setData: mockSetData, setReadOnly: mockSetReadOnly });
 
     expect(handleTrajectoryError).toHaveBeenCalledWith(
       TRAJECTORY_TYPE.AREA,
@@ -281,14 +281,14 @@ describe('useTrajectoryAttach', () => {
     const { result } = renderHook(() => useTrajectoryAttach(studyThermal, dispatch));
 
     await act(async () => {
-      await result.current.attachTrajectory(
-        TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
-        [0, 1],
-        'success',
-        newTrajectoryThermal,
+      await result.current.attachTrajectory({
+        type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+        indexArray: [0, 1],
+        status: 'success',
+        trajectory: newTrajectoryThermal,
         setData,
-        mockSetReadOnly
-      );
+        setReadOnly: mockSetReadOnly,
+      });
     });
 
     // Vérifie l'appel backend
@@ -349,14 +349,14 @@ describe('useTrajectoryAttach', () => {
     const { result } = renderHook(() => useTrajectoryAttach(studySpecific, dispatch));
 
     await act(async () => {
-      await result.current.attachTrajectory(
-        TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
-        [0],
-        'success',
-        newTrajectorySpecific,
+      await result.current.attachTrajectory({
+        type: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+        indexArray: [0],
+        status: 'success',
+        trajectory: newTrajectorySpecific,
         setData,
-        mockSetReadOnly
-      );
+        setReadOnly: mockSetReadOnly,
+      });
     });
 
     // Vérifie que UPDATE est appelé
@@ -399,15 +399,15 @@ describe('useTrajectoryAttach', () => {
     const { result } = renderHook(() => useTrajectoryAttach(studyArea, dispatch));
 
     await act(async () => {
-      await result.current.attachTrajectory(
-        TRAJECTORY_TYPE.AREA,
-        [0],
-        'success',
-        newTrajectoryArea,
+      await result.current.attachTrajectory({
+        type: TRAJECTORY_TYPE.AREA,
+        indexArray: [0],
+        status: 'success',
+        trajectory: newTrajectoryArea,
         setData,
-        mockSetReadOnly,
-        mockSetSecondTableReadOnly,
-      );
+        setReadOnly: mockSetReadOnly,
+        setSecondTableReadOnly: mockSetSecondTableReadOnly,
+      });
     });
 
     // Vérifie la mise à jour des données
@@ -433,7 +433,7 @@ describe('useTrajectoryAttach', () => {
     });
   });
 
-  it('attache un LINK avec capacités HVDC et déverrouille le second tableau', async () => {
+  it.each([true, false, undefined])('attache un LINK avec capacités HVDC et isFlowbasedRedOnly=%s', async (isFlowbasedRedOnly) => {
     const linkTrajectory = { ...trajectory, type: TRAJECTORY_TYPE.LINK };
     const linkedTrajectory = { ...linkTrajectory, id: 100 };
     const linkData = [{
@@ -469,15 +469,16 @@ describe('useTrajectoryAttach', () => {
     const { result } = renderHook(() => useTrajectoryAttach(study, mockDispatch));
 
     await act(async () => {
-      await result.current.attachTrajectory(
-        TRAJECTORY_TYPE.LINK,
-        [1],
-        'success',
-        linkTrajectory,
+      await result.current.attachTrajectory({
+        type: TRAJECTORY_TYPE.LINK,
+        indexArray: [1],
+        status: 'success',
+        trajectory: linkTrajectory,
         setData,
-        mockSetReadOnly,
-        mockSetSecondTableReadOnly,
-      );
+        setReadOnly: mockSetReadOnly,
+        setSecondTableReadOnly: mockSetSecondTableReadOnly,
+        isFlowbasedRedOnly,
+      });
     });
 
     expect(trajectoryService.linkTrajectoryToStudy).toHaveBeenCalledWith(
@@ -500,6 +501,13 @@ describe('useTrajectoryAttach', () => {
       hasHvdcCapacities: true,
     });
     expect(mockSetReadOnly).not.toHaveBeenCalled();
+    if (isFlowbasedRedOnly) {
+      expect(mockSetSecondTableReadOnly).toHaveBeenCalledWith({
+        '0': false, '1': false, '2.0': false, '2.1': false,
+      });
+    } else {
+      expect(mockSetSecondTableReadOnly).not.toHaveBeenCalled();
+    }
     expect(handleTrajectoryError).not.toHaveBeenCalled();
     expect(notifyAlert).not.toHaveBeenCalled();
   });
@@ -537,7 +545,7 @@ describe('useTrajectoryAttach', () => {
     const { result } = renderHook(() => useTrajectoryAttach(studyDSR, dispatch));
 
     await act(async () => {
-      await result.current.attachTrajectory(TRAJECTORY_TYPE.DSR, [1], 'success', newTrajectoryDsr, setData, mockSetReadOnly);
+      await result.current.attachTrajectory({ type: TRAJECTORY_TYPE.DSR, indexArray: [1], status: 'success', trajectory: newTrajectoryDsr, setData, setReadOnly: mockSetReadOnly });
     });
 
     // Vérifie setNestedData
@@ -585,7 +593,7 @@ describe('useTrajectoryAttach', () => {
     const { result } = renderHook(() => useTrajectoryAttach(studyDSR2, dispatch));
 
     await act(async () => {
-      await result.current.attachTrajectory(TRAJECTORY_TYPE.DSR, [0], 'success', newTrajectoryDSR2, setData, mockSetReadOnly);
+      await result.current.attachTrajectory({ type: TRAJECTORY_TYPE.DSR, indexArray: [0], status: 'success', trajectory: newTrajectoryDSR2, setData, setReadOnly: mockSetReadOnly });
     });
 
     expect(mockSetReadOnly).toHaveBeenCalledWith(expect.any(Function));
@@ -625,14 +633,14 @@ describe('useTrajectoryAttach', () => {
     const { result } = renderHook(() => useTrajectoryAttach(studyME, dispatch));
 
     await act(async () => {
-      await result.current.attachTrajectory(
-        TRAJECTORY_TYPE.AREA_ME,
-        [0],
-        'success',
-        newTrajectoryME,
+      await result.current.attachTrajectory({
+        type: TRAJECTORY_TYPE.AREA_ME,
+        indexArray: [0],
+        status: 'success',
+        trajectory: newTrajectoryME,
         setData,
-        mockSetReadOnly,
-      );
+        setReadOnly: mockSetReadOnly,
+      });
     });
 
     expect(mockSetReadOnly).toHaveBeenCalledWith(expect.any(Function));

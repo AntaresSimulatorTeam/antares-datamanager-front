@@ -98,51 +98,53 @@ export const useFetchFixHypothesisTrajectories = (
   const { t } = useTranslation();
 
   const refreshTrajectories = useCallback(async () => {
-    if (studyId == null) return { firstTableData: [], secondTableData: [] };
+    if (studyId == null) {
+      return { firstTableData: [], secondTableData: [] };
+    }
 
-      const firstConfig: HypothesisConfig[] = configs?.[0];
-      const secondConfig: HypothesisConfig[] = configs?.[1];
+    const firstConfig: HypothesisConfig[] = configs?.[0];
+    const secondConfig: HypothesisConfig[] = configs?.[1];
 
-      const secondConfigData = extractSecondConfigData(secondConfig);
-      const promises = [firstConfig, secondConfigData]
-        .filter(Boolean)
-        .map((config) => fetchTrajectoriesForConfig(studyId, config));
+    const secondConfigData = extractSecondConfigData(secondConfig);
+    const promises = [firstConfig, secondConfigData]
+      .filter(Boolean)
+      .map((config) => fetchTrajectoriesForConfig(studyId, config));
 
-      const [firstResults, secondResults] = await Promise.all(promises);
+    const [firstResults, secondResults] = await Promise.all(promises);
 
-      const { hvdc, recalculate, hasHvdcCapacities } = await fetchStudyOptions(studyId, firstConfig, secondConfig, firstResults?.[1]?.[0]?.id);
+    const { hvdc, recalculate, hasHvdcCapacities } = await fetchStudyOptions(studyId, firstConfig, secondConfig, firstResults?.[1]?.[0]?.id);
 
-      dispatch?.({
-        type: STUDY_ACTION.ADD_TRAJECTORIES,
-        payload: {
-          ...(firstConfig && buildDispatchPayload(firstConfig, firstResults)),
-          ...(secondConfig && buildDispatchPayload(secondConfig, secondResults)),
-        },
-      });
+    dispatch?.({
+      type: STUDY_ACTION.ADD_TRAJECTORIES,
+      payload: {
+        ...(firstConfig && buildDispatchPayload(firstConfig, firstResults)),
+        ...(secondConfig && buildDispatchPayload(secondConfig, secondResults)),
+      },
+    });
 
-     let firstData: HypothesisRowData[] = [];
-      if (firstConfig) {
-        firstData = buildTableData(firstConfig, t, firstResults, { hvdc, hasHvdcCapacities });
-        if (firstData.length > 0) setFirstTableData(firstData);
-      }
+    let firstData: HypothesisRowData[] = [];
+    if (firstConfig) {
+      firstData = buildTableData(firstConfig, t, firstResults, { hvdc, hasHvdcCapacities });
+      if (firstData.length > 0) setFirstTableData(firstData);
+    }
 
-      let secondData: HypothesisRowData[] = [];
-      if (secondConfig) {
-        secondData = buildTableData(secondConfig, t, secondResults, { recalculate });
-        if (secondData.length > 0) setSecondTableData(secondData);
-      }
+    let secondData: HypothesisRowData[] = [];
+    if (secondConfig) {
+      secondData = buildTableData(secondConfig, t, secondResults, { recalculate });
+      if (secondData.length > 0) setSecondTableData(secondData);
+    }
 
-      const { firstReadOnly, secondReadOnly } = computeReadOnlyRows({
-        isStudyGenerated,
-        firstResults,
-        secondConfig,
-        hvdc
-      });
+    const { firstReadOnly, secondReadOnly } = computeReadOnlyRows({
+      isStudyGenerated,
+      firstResults,
+      secondConfig,
+      hvdc
+    });
 
-      setFirstTableReadOnlyRow(firstReadOnly);
-      if (secondConfig) {
-        setSecondTableReadOnlyRow(secondReadOnly);
-      }
+    setFirstTableReadOnlyRow(firstReadOnly);
+    if (secondConfig) {
+      setSecondTableReadOnlyRow(secondReadOnly);
+    }
     return { firstTableData: firstData, secondTableData: secondData };
   }, [configs, dispatch, isStudyGenerated, studyId, t]);
 

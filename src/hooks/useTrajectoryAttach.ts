@@ -169,6 +169,17 @@ const notifyTrajectoryError = ({
   );
 };
 
+interface AttachTrajectoryParams {
+  type: TRAJECTORY_TYPE,
+  indexArray: number[],
+  status: RowStatus,
+  trajectory: DbTrajectory,
+  setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
+  setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
+  setSecondTableReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
+  isFlowbasedRedOnly?: boolean
+}
+
 export const useTrajectoryAttach = (
   study: StudyDTO,
   dispatch?: Dispatch<StudyActionType> | null,
@@ -177,16 +188,16 @@ export const useTrajectoryAttach = (
   const { t } = useTranslation();
 
   const attachTrajectory = useCallback(
-    async (
-      type: TRAJECTORY_TYPE,
-      indexArray: number[],
-      status: RowStatus,
-      trajectory: DbTrajectory,
-      setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
-      setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
-      setSecondTableReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
-      isFlowbasedRedOnly?: boolean
-    ) => {
+    async ({
+      type,
+      indexArray,
+      status,
+      trajectory,
+      setData,
+      setReadOnly,
+      setSecondTableReadOnly,
+      isFlowbasedRedOnly
+    }: AttachTrajectoryParams ) => {
       try {
         const newDbTrajectory = await linkTrajectoryToStudy(type, trajectory.id, study?.id);
         let hasHvdcCapacities = false;

@@ -51,7 +51,7 @@ export const useTrajectoryImport = (
           setFileStatus('success');
 
           if (newTrajectory.id != null && !!indexArray?.length) {
-            await attachTrajectory(type, indexArray, 'success', newTrajectory, setData, setReadOnly, setSecondTableReadOnly);
+            await attachTrajectory({type, indexArray, status: 'success', trajectory: newTrajectory, setData, setReadOnly, setSecondTableReadOnly});
           }
         }
       } catch (error) {

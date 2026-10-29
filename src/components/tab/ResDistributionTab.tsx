@@ -114,12 +114,12 @@ const ResDistributionTab = ({ studyData, types, defaultAreas, areas }: TabProps 
           await detachTrajectory({type: tableType, indexArray, setData: setterToUse, data: dataToUse, status, hypothesis: row?.hypothesis, setReadOnly});
         }
       } else if (status === 'success') {
-        const dbTrajectory =
+        const trajectory =
           dbTrajectories.length > 0
             ? dbTrajectories.find((item) => item.id == value)
             : getRowDataSelected(dataToUse, indexArray)?.trajectory;
-        if (dbTrajectory) {
-          await attachTrajectory(tableType, indexArray, status, dbTrajectory, setterToUse, setReadOnly);
+        if (trajectory) {
+          await attachTrajectory({type: tableType, indexArray, status, trajectory, setData: setterToUse, setReadOnly});
         }
       }
     },
