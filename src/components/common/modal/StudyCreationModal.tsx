@@ -118,10 +118,10 @@ const StudyCreationModal: React.FC<StudyCreationModalProps> = ({
           };
           void confirmCreation(studyData);
         }}
-        variant="primary"
+        hierarchy="primary"
         disabled={!isFormValid}
       />}
-      secondaryButton={<Button label={t('components.quickAccess.@cancel')} onClick={handleClose} variant="text" />}
+      secondaryButton={<Button label={t('components.quickAccess.@cancel')} onClick={handleClose} hierarchy="text" />}
       size="s"
       title={t('studyModal.@new_study')}
     >

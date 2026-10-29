@@ -69,7 +69,7 @@ const StdAlert = ({
         />
         {action && (
           <Button
-            variant="text"
+            hierarchy="text"
             onClick={action.onClick}
             size="s"
             color={status === 'error' ? 'danger' : 'secondary'}

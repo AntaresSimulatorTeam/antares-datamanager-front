@@ -32,12 +32,12 @@ export const AreaDeletionConfirmationModal: React.FC<AreaDeletionConfirmationMod
       primaryButton={
         <Button
           label={t('trajectoryDeletionModal.@confirm')}
-          variant="secondary"
+          hierarchy="secondary"
           onClick={() => void onConfirm()}
         />
       }
       secondaryButton={
-        <Button label={t('trajectoryDeletionModal.@cancel')} variant="text" onClick={onClose} />
+        <Button label={t('trajectoryDeletionModal.@cancel')} hierarchy="text" onClick={onClose} />
       }
       size="s"
       title={getModalTile}

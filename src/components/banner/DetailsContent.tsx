@@ -61,7 +61,7 @@ export const DetailsContent = ({ content, onClickButton, tagsList }: DetailsCont
           )}
         </div>
         {(('status' in content && content?.status !== StudyStatus.GENERATED) || 'studies' in content) && (
-          <Button size="s" icon="edit" label={t('project.@edit')} onClick={onClickButton} variant="text"></Button>
+          <Button size="s" icon="edit" label={t('project.@edit')} onClick={onClickButton} hierarchy="text"></Button>
         )}
       </div>
     </header>

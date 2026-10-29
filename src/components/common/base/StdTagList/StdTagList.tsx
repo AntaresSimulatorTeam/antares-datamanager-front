@@ -80,7 +80,7 @@ const StdTagList = ({
               trigger={
                 <Button
                   color="primary"
-                  variant="primary"
+                  hierarchy="primary"
                   size="s"
                   label={`+ ${isReady ? tags.length - (tagsNumber ?? 0) : '00'}`}
                   id={`${id}-popover-trigger`}
@@ -108,7 +108,7 @@ const StdTagList = ({
                   <Button
                     label={t('components.popover.@close')}
                     size="s"
-                    variant="primary"
+                    hierarchy="primary"
                     onClick={(e) => {
                       setIsModalOpen(false);
                       e.stopPropagation();

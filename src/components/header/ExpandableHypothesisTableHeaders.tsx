@@ -145,7 +145,7 @@ const getExpandableHypothesisTableHeaders = ({
               <Button
                 label={t('studyDetails.@preview')}
                 onClick={() => void options?.meta?.viewData?.(row.id)}
-                variant="primary"
+                hierarchy="primary"
                 disabled={(row.getReadOnly() && !hasTrajectory) || (!isStudyGenerated && !hasTrajectory)}
                 icon="visibility-show"
                 iconAppearance="filled"

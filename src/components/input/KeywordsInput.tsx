@@ -173,7 +173,7 @@ const KeywordsInput = ({
 
         {/* Clear All Keywords Button */}
         {keywords?.length > 0 && (
-          <Button label={t('projectModal.@keyword_button_clear')} onClick={clearAllKeywords} variant="text" />
+          <Button label={t('projectModal.@keyword_button_clear')} onClick={clearAllKeywords} hierarchy="text" />
         )}
       </div>
     </div>
