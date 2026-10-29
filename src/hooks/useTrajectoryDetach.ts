@@ -16,13 +16,13 @@ import { useTranslation } from 'react-i18next';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { updateTableAfterCellDetach } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { buildErrorTrajectory, buildReadOnlyRow } from '@/shared/utils/trajectoryUtils.ts';
-import { updateStudy } from '@/shared/services/studyService.ts';
+import { getStudyById, updateStudy } from '@/shared/services/studyService.ts';
 
 interface BackendDeletionParams {
   trajectoryToDelete: DbTrajectory | null;
   trajectoryIds: number[];
   status: RowStatus;
-  study: StudyDTO;
+  studyId: number;
   performBackendDeletion: (ids: number[]) => Promise<void>;
   shouldUpdateHvdc?: boolean;
 }
@@ -31,12 +31,13 @@ const executeBackendDeletion = async ({
   trajectoryToDelete,
   trajectoryIds,
   status,
-  study,
+  studyId,
   performBackendDeletion,
   shouldUpdateHvdc
 }: BackendDeletionParams): Promise<{ hvdcValue?: boolean; recalculateValue?: boolean }> => {
   if (!trajectoryToDelete || !trajectoryIds?.length || status === 'emptyError') {
-    return { hvdcValue: study?.hvdc, recalculateValue: study?.recalculate };
+    const study = await getStudyById(studyId);
+    return { hvdcValue: study.hvdc, recalculateValue: study.recalculate };
   }
 
   await performBackendDeletion(trajectoryIds);
@@ -45,12 +46,12 @@ const executeBackendDeletion = async ({
 
   if (trajectoryToDelete.type === TRAJECTORY_TYPE.LINK) {
     if (shouldUpdateHvdc) {
-      updatedStudy = await updateStudy({ hvdc: false }, study?.id);
+      updatedStudy = await updateStudy({ hvdc: false }, studyId);
     }
   }
 
   if (trajectoryToDelete.type === TRAJECTORY_TYPE.FLOWBASED) {
-    updatedStudy = await updateStudy({ recalculate: false, ...(shouldUpdateHvdc && { hvdc: false }) }, study?.id);
+    updatedStudy = await updateStudy({ recalculate: false, ...(shouldUpdateHvdc && { hvdc: false }) }, studyId);
   }
 
   return { hvdcValue: updatedStudy?.hvdc, recalculateValue: updatedStudy?.recalculate };
@@ -334,7 +335,7 @@ export const useTrajectoryDetach = (
           trajectoryToDelete,
           trajectoryIds,
           status,
-          study,
+          studyId: study.id,
           performBackendDeletion,
           shouldUpdateHvdc
         });

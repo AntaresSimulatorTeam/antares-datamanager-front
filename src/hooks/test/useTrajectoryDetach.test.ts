@@ -413,6 +413,7 @@ describe('useTrajectoryDetach', () => {
   });
 
   describe('LINK et FLOWBASED', () => {
+    const reloadedStudy: StudyDTO = { ...study, hvdc: false, recalculate: false };
     const linkTrajectory: DbTrajectory = {
       id: 10,
       trajectoryName: 'Links',
@@ -451,6 +452,7 @@ describe('useTrajectoryDetach', () => {
     const mockPerformBackendDeletion = vi.fn<ReturnType<typeof useTrajectoryDeletionLogic>['performBackendDeletion']>();
 
     beforeEach(() => {
+      vi.mocked(studyService.getStudyById).mockResolvedValue(reloadedStudy);
       mockComputeDeletion.mockReturnValue({
         trajectoryIds: [linkTrajectory.id, flowbasedTrajectory.id],
         trajectoryToDelete: linkTrajectory,
@@ -635,7 +637,7 @@ describe('useTrajectoryDetach', () => {
       expect(hypothesisTableService.handleTrajectoryError).not.toHaveBeenCalled();
     });
 
-    it.each([TRAJECTORY_TYPE.LINK, TRAJECTORY_TYPE.FLOWBASED])('ne contacte pas le backend pour %s en statut emptyError', async (type) => {
+    it.each([TRAJECTORY_TYPE.LINK, TRAJECTORY_TYPE.FLOWBASED])('recharge l’étude sans suppression ni mise à jour backend pour %s en statut emptyError', async (type) => {
       mockComputeDeletion.mockReturnValue({
         trajectoryIds: [10],
         trajectoryToDelete: type === TRAJECTORY_TYPE.LINK ? linkTrajectory : flowbasedTrajectory,
@@ -649,14 +651,18 @@ describe('useTrajectoryDetach', () => {
 
       expect(mockPerformBackendDeletion).not.toHaveBeenCalled();
       expect(studyService.updateStudy).not.toHaveBeenCalled();
+      expect(studyService.getStudyById).toHaveBeenCalledTimes(1);
+      expect(studyService.getStudyById).toHaveBeenCalledWith(study.id);
       expect(mockDispatch).not.toHaveBeenCalled();
       expect(hypothesisTableHelper.updateTableAfterCellDetach).toHaveBeenCalledWith(
-        expect.objectContaining({ options: { hvdcValue: true, recalculateValue: true } }),
+        expect.objectContaining({
+          options: { hvdcValue: reloadedStudy.hvdc, recalculateValue: reloadedStudy.recalculate },
+        }),
       );
       expect(mockSetData).toHaveBeenCalledTimes(1);
     });
 
-    it('ne contacte pas le backend sans identifiant de trajectoire', async () => {
+    it('recharge l’étude sans suppression ni mise à jour backend sans identifiant de trajectoire', async () => {
       mockComputeDeletion.mockReturnValue({
         trajectoryIds: [],
         trajectoryToDelete: linkTrajectory,
@@ -670,10 +676,17 @@ describe('useTrajectoryDetach', () => {
 
       expect(mockPerformBackendDeletion).not.toHaveBeenCalled();
       expect(studyService.updateStudy).not.toHaveBeenCalled();
+      expect(studyService.getStudyById).toHaveBeenCalledTimes(1);
+      expect(studyService.getStudyById).toHaveBeenCalledWith(study.id);
+      expect(hypothesisTableHelper.updateTableAfterCellDetach).toHaveBeenCalledWith(
+        expect.objectContaining({
+          options: { hvdcValue: reloadedStudy.hvdc, recalculateValue: reloadedStudy.recalculate },
+        }),
+      );
       expect(mockSetData).toHaveBeenCalledTimes(1);
     });
 
-    it('ne contacte pas le backend sans trajectoire à détacher', async () => {
+    it('recharge l’étude sans suppression ni mise à jour backend sans trajectoire à détacher', async () => {
       mockComputeDeletion.mockReturnValue({
         trajectoryIds: [],
         trajectoryToDelete: null,
@@ -687,7 +700,14 @@ describe('useTrajectoryDetach', () => {
 
       expect(mockPerformBackendDeletion).not.toHaveBeenCalled();
       expect(studyService.updateStudy).not.toHaveBeenCalled();
+      expect(studyService.getStudyById).toHaveBeenCalledTimes(1);
+      expect(studyService.getStudyById).toHaveBeenCalledWith(study.id);
       expect(mockDispatch).not.toHaveBeenCalled();
+      expect(hypothesisTableHelper.updateTableAfterCellDetach).toHaveBeenCalledWith(
+        expect.objectContaining({
+          options: { hvdcValue: reloadedStudy.hvdc, recalculateValue: reloadedStudy.recalculate },
+        }),
+      );
       expect(mockSetData).toHaveBeenCalledTimes(1);
     });
 

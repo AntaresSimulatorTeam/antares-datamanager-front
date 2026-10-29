@@ -699,7 +699,6 @@ export const updateTableAfterCellDetach = async ({
         }
         : item,
     );
-    // utiliser hvdc
 
     return {
       newData,
