@@ -28,6 +28,7 @@ interface PegaseHypothesisTableProps extends TableHeadersProps {
   list?: string[];
   hasLinkTrajectory?: boolean;
   isHvdcActivated?: boolean;
+  hasHvdcCapacities?: boolean;
 }
 
 export const PegaseHypothesisTable = ({
@@ -50,7 +51,8 @@ export const PegaseHypothesisTable = ({
   list,
   activate,
   hasLinkTrajectory,
-  isHvdcActivated
+  isHvdcActivated,
+  hasHvdcCapacities
 }: PegaseHypothesisTableProps) => {
   const { t } = useTranslation();
   const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
@@ -74,7 +76,8 @@ export const PegaseHypothesisTable = ({
         type,
         list,
         hasLinkTrajectory,
-        isHvdcActivated
+        isHvdcActivated,
+        hasHvdcCapacities
       }),
     [
       getTableHeaders,
@@ -88,7 +91,8 @@ export const PegaseHypothesisTable = ({
       type,
       list,
       hasLinkTrajectory,
-      isHvdcActivated
+      isHvdcActivated,
+      hasHvdcCapacities
     ],
   );
 

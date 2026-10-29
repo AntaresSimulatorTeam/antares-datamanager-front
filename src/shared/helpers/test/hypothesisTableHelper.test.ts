@@ -34,7 +34,6 @@ import * as sortUtils from '@/shared/utils/sortUtils.ts';
 import { TFunction } from 'i18next';
 import { isParamModulationRequired } from '@/shared/services/trajectoryService.ts';
 import { ThermalOptionsResults } from '@/mocks/data/list/names.ts';
-import { Row } from '@tanstack/react-table';
 
 vi.mock('@/shared/services/trajectoryService');
 vi.mock('@/shared/services/hypothesisTableService');
@@ -506,11 +505,11 @@ describe('findSpecificTrajectoryToDelete', () => {
 
 describe('getInformationMessage', () => {
   it('retourne null si le type est undefined', () => {
-    expect(getInformationMessage(3, undefined as unknown as TRAJECTORY_TYPE,  {id: '0'} as Row<HypothesisRowData>, null)).toBeNull();
+    expect(getInformationMessage(3, undefined as unknown as TRAJECTORY_TYPE, '0', null)).toBeNull();
   });
 
   it('retourne le message thermal avec index = 1', () => {
-    const result = getInformationMessage(5, TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,  {id: '0'} as Row<HypothesisRowData>, null);
+    const result = getInformationMessage(5, TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, '0', null);
 
     expect(result).toEqual({
       messageKey: 'thermal.@informationMessage',
@@ -519,7 +518,7 @@ describe('getInformationMessage', () => {
   });
 
   it('retourne le message DSR avec index = nbRows - 1', () => {
-    const result = getInformationMessage(4, TRAJECTORY_TYPE.DSR, {id: '0'} as Row<HypothesisRowData>, null);
+    const result = getInformationMessage(4, TRAJECTORY_TYPE.DSR, '0', null);
 
     expect(result).toEqual({
       messageKey: 'dsr.@informationMessage',
@@ -528,31 +527,31 @@ describe('getInformationMessage', () => {
   });
 
   it('retourne un index minimum de 0 pour DSR si nbRows <= 1', () => {
-    expect(getInformationMessage(1, TRAJECTORY_TYPE.DSR,  {id: '0'} as Row<HypothesisRowData>, null)).toEqual({
+    expect(getInformationMessage(1, TRAJECTORY_TYPE.DSR, '0', null)).toEqual({
       messageKey: 'dsr.@informationMessage',
       id: '0',
     });
 
-    expect(getInformationMessage(0, TRAJECTORY_TYPE.DSR,  {id: '0'} as Row<HypothesisRowData>, null)).toEqual({
+    expect(getInformationMessage(0, TRAJECTORY_TYPE.DSR, '0', null)).toEqual({
       messageKey: 'dsr.@informationMessage',
       id: '0',
     });
   });
 
   it('retourne le message HYDRO_SERIES avec id "1"', () => {
-    const result = getInformationMessage(4, TRAJECTORY_TYPE.HYDRO_SERIES,  {id: '1'} as Row<HypothesisRowData>, null);
+    const result = getInformationMessage(4, TRAJECTORY_TYPE.HYDRO_SERIES, '1', null);
 
     expect(result).toBeNull();
   });
 
   it('retourne le message HYDRO_SERIES avec id "1.0"', () => {
-    const result = getInformationMessage(4, TRAJECTORY_TYPE.HYDRO_SERIES,  {id: '1.0'} as Row<HypothesisRowData>, null);
+    const result = getInformationMessage(4, TRAJECTORY_TYPE.HYDRO_SERIES, '1.0', null);
 
     expect(result).toBeNull();
   });
 
   it('retourne le message HYDRO_SERIES avec id "1.1"', () => {
-    const result = getInformationMessage(4, TRAJECTORY_TYPE.HYDRO_SERIES,  {id: '1.1'} as Row<HypothesisRowData>, null);
+    const result = getInformationMessage(4, TRAJECTORY_TYPE.HYDRO_SERIES, '1.1', null);
 
     expect(result).toEqual({
       messageKey: 'hydro.@informationMessage',
@@ -565,7 +564,7 @@ describe('getInformationMessage', () => {
       type: TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS,
       trajectoryName: 'BP_23',
     } as DbTrajectory;
-    const result = getInformationMessage(4, TRAJECTORY_TYPE.HYDRO_SERIES, {id: '0.1'} as Row<HypothesisRowData>, technicalParametersTrajectory);
+    const result = getInformationMessage(4, TRAJECTORY_TYPE.HYDRO_SERIES, '0.1', technicalParametersTrajectory);
 
     expect(result).toEqual({
       messageKey: 'hydro.@informationMessage',

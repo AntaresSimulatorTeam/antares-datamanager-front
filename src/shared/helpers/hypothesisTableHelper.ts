@@ -41,7 +41,6 @@ import {
   getMETypeToUse,
   getNuclearTypeToUse,
 } from '@/shared/utils/formFormatter.ts';
-import { Row } from '@tanstack/react-table';
 
 /**
  * Retrieve read only row of a study generated
@@ -151,36 +150,39 @@ export const findSpecificTrajectoryToDelete = (
   return match?.trajectory ?? null;
 };
 
-export const getFlowbasedInformationMessage = (hasLinkTrajectory?: boolean, isHvdcActivated?: boolean, isReadOnly?: boolean): { messageKey: string; id: string } | null => {
-  if (hasLinkTrajectory && !isReadOnly) {
-    return { messageKey: isHvdcActivated ? 'flowbased.@mandatoryTS' : 'flowbased.@informationMessage', id: '1' };
+export const getFlowbasedInformationMessage = (hasLinkTrajectory?: boolean, isHvdcActivated?: boolean, hasHvdcCapacities?: boolean): { messageKey: string; id: string } | null => {
+  if (hasLinkTrajectory && hasHvdcCapacities && !isHvdcActivated) {
+    return { messageKey: 'flowbased.@informationMessage', id: '1' };
+  } else if (hasLinkTrajectory && hasHvdcCapacities && isHvdcActivated) {
+    return { messageKey: 'flowbased.@mandatoryTS', id: '1' };
+  } else {
+    return { messageKey: 'flowbased.@hvdcLinkRequired', id: '1' };
   }
-  return { messageKey: 'flowbased.@hvdcLinkRequired', id: '1' };
 };
 
 export const getInformationMessage = (
   nbRows: number,
   type: TRAJECTORY_TYPE,
-  row: Row<HypothesisRowData>,
+  rowId: string,
   trajectory: DbTrajectory | null,
   hasLinkTrajectory?: boolean,
-  isHvdcActivated?: boolean
+  isHvdcActivated?: boolean,
+  hasHvdcCapacities?: boolean,
 ): { messageKey: string; id: string } | null => {
-  const rowId = row?.id;
-  switch (type) {
-    case TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER:
+  switch (true) {
+    case type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER:
       return { messageKey: 'thermal.@informationMessage', id: '1' };
-    case TRAJECTORY_TYPE.DSR:
+    case type === TRAJECTORY_TYPE.DSR:
       return { messageKey: 'dsr.@informationMessage', id: String(Math.max(nbRows - 1, 0)) };
-    case TRAJECTORY_TYPE.HYDRO_PSP_SERIES:
-    case TRAJECTORY_TYPE.HYDRO_SERIES:
+    case type === TRAJECTORY_TYPE.HYDRO_PSP_SERIES:
+    case type === TRAJECTORY_TYPE.HYDRO_SERIES:
       return (!trajectory && rowId?.split('.')[1] === '1') ||
         trajectory?.type === TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS ||
         trajectory?.type === TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS
         ? { messageKey: 'hydro.@informationMessage', id: rowId }
         : null;
-    case TRAJECTORY_TYPE.ADEQUACY_PATCH:
-      return getFlowbasedInformationMessage(hasLinkTrajectory, isHvdcActivated, row?.getReadOnly());
+    case type === TRAJECTORY_TYPE.ADEQUACY_PATCH && rowId === '1':
+      return getFlowbasedInformationMessage(hasLinkTrajectory, isHvdcActivated, hasHvdcCapacities);
     default:
       return null;
   }

@@ -277,6 +277,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
             fileStatus={fileStatus}
             hasLinkTrajectory={!!data?.[1]?.trajectory?.trajectoryName?.length && data?.[1]?.status === TRAJECTORY_SELECTION_STATUS.OK}
             isHvdcActivated={data?.[1]?.hvdc}
+            hasHvdcCapacities={data?.[1]?.hasHvdcCapacities}
             isStudyGenerated={isStudyGenerated}
             readOnly={readOnlySettings}
             isReadOnlyEnable={true}

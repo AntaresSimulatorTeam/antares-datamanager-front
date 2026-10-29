@@ -106,6 +106,7 @@ export type TableHeadersProps = {
   list?: string[];
   hasLinkTrajectory?: boolean;
   isHvdcActivated?: boolean;
+  hasHvdcCapacities?: boolean;
 };
 
 export interface TableHeadersGetterProps extends TableHeadersProps {

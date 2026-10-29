@@ -30,7 +30,8 @@ const getExpandableHypothesisTableHeaders = ({
   type,
   list,
   hasLinkTrajectory,
-  isHvdcActivated
+  isHvdcActivated,
+  hasHvdcCapacities,
 }: TableHeadersGetterProps): TableOptions<HypothesisRowData>['columns'] => [
   columnHelper.accessor('hypothesis', {
     header: columnHeader || getColumnHeader(t, type),
@@ -40,7 +41,7 @@ const getExpandableHypothesisTableHeaders = ({
       const subRowListName = getSubRowsList(row);
       const subRowListWithArea = getSubRowListWithArea(subRowListName, t, type);
       const isTechnology = list?.length ? list?.includes(hypothesis) : false;
-      const informationMessage = getInformationMessage(table.getRowCount(), type, row, trajectory, hasLinkTrajectory, isHvdcActivated);
+      const informationMessage = getInformationMessage(table.getRowCount(), type, row.id, trajectory, hasLinkTrajectory, isHvdcActivated, hasHvdcCapacities);
 
       return (
         <div className="flex items-center gap-1 py-1">
