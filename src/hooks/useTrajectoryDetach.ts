@@ -22,7 +22,7 @@ interface BackendDeletionParams {
   trajectoryToDelete: DbTrajectory | null;
   trajectoryIds: number[];
   status: RowStatus;
-  studyId: number;
+  study: StudyDTO;
   performBackendDeletion: (ids: number[]) => Promise<void>;
   shouldUpdateHvdc?: boolean;
 }
@@ -31,12 +31,12 @@ const executeBackendDeletion = async ({
   trajectoryToDelete,
   trajectoryIds,
   status,
-  studyId,
+  study,
   performBackendDeletion,
   shouldUpdateHvdc
 }: BackendDeletionParams): Promise<{ hvdcValue?: boolean; recalculateValue?: boolean }> => {
-  if (!trajectoryToDelete || !trajectoryIds?.length || status !== 'empty') {
-    return {};
+  if (!trajectoryToDelete || !trajectoryIds?.length || status === 'emptyError') {
+    return { hvdcValue: study?.hvdc, recalculateValue: study?.recalculate };
   }
 
   await performBackendDeletion(trajectoryIds);
@@ -45,12 +45,12 @@ const executeBackendDeletion = async ({
 
   if (trajectoryToDelete.type === TRAJECTORY_TYPE.LINK) {
     if (shouldUpdateHvdc) {
-      updatedStudy = await updateStudy({ hvdc: false }, studyId);
+      updatedStudy = await updateStudy({ hvdc: false }, study?.id);
     }
   }
 
   if (trajectoryToDelete.type === TRAJECTORY_TYPE.FLOWBASED) {
-    updatedStudy = await updateStudy({ recalculate: false, ...(shouldUpdateHvdc && { hvdc: false }) }, studyId);
+    updatedStudy = await updateStudy({ recalculate: false, ...(shouldUpdateHvdc && { hvdc: false }) }, study?.id);
   }
 
   return { hvdcValue: updatedStudy?.hvdc, recalculateValue: updatedStudy?.recalculate };
@@ -334,7 +334,7 @@ export const useTrajectoryDetach = (
           trajectoryToDelete,
           trajectoryIds,
           status,
-          studyId: study.id,
+          study,
           performBackendDeletion,
           shouldUpdateHvdc
         });

@@ -40,7 +40,7 @@ const getExpandableHypothesisTableHeaders = ({
       const subRowListName = getSubRowsList(row);
       const subRowListWithArea = getSubRowListWithArea(subRowListName, t, type);
       const isTechnology = list?.length ? list?.includes(hypothesis) : false;
-      const informationMessage = getInformationMessage(table.getRowCount(), type, row.id, trajectory, hasLinkTrajectory, isHvdcActivated);
+      const informationMessage = getInformationMessage(table.getRowCount(), type, row, trajectory, hasLinkTrajectory, isHvdcActivated);
 
       return (
         <div className="flex items-center gap-1 py-1">

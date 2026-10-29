@@ -651,7 +651,7 @@ describe('useTrajectoryDetach', () => {
       expect(studyService.updateStudy).not.toHaveBeenCalled();
       expect(mockDispatch).not.toHaveBeenCalled();
       expect(hypothesisTableHelper.updateTableAfterCellDetach).toHaveBeenCalledWith(
-        expect.objectContaining({ options: {} }),
+        expect.objectContaining({ options: { hvdcValue: true, recalculateValue: true } }),
       );
       expect(mockSetData).toHaveBeenCalledTimes(1);
     });

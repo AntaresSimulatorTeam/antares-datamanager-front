@@ -41,6 +41,7 @@ import {
   getMETypeToUse,
   getNuclearTypeToUse,
 } from '@/shared/utils/formFormatter.ts';
+import { Row } from '@tanstack/react-table';
 
 /**
  * Retrieve read only row of a study generated
@@ -150,14 +151,22 @@ export const findSpecificTrajectoryToDelete = (
   return match?.trajectory ?? null;
 };
 
+export const getFlowbasedInformationMessage = (hasLinkTrajectory?: boolean, isHvdcActivated?: boolean, isReadOnly?: boolean): { messageKey: string; id: string } | null => {
+  if (hasLinkTrajectory && !isReadOnly) {
+    return { messageKey: isHvdcActivated ? 'flowbased.@mandatoryTS' : 'flowbased.@informationMessage', id: '1' };
+  }
+  return { messageKey: 'flowbased.@hvdcLinkRequired', id: '1' };
+};
+
 export const getInformationMessage = (
   nbRows: number,
   type: TRAJECTORY_TYPE,
-  rowId: string,
+  row: Row<HypothesisRowData>,
   trajectory: DbTrajectory | null,
   hasLinkTrajectory?: boolean,
   isHvdcActivated?: boolean
 ): { messageKey: string; id: string } | null => {
+  const rowId = row?.id;
   switch (type) {
     case TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER:
       return { messageKey: 'thermal.@informationMessage', id: '1' };
@@ -171,7 +180,7 @@ export const getInformationMessage = (
         ? { messageKey: 'hydro.@informationMessage', id: rowId }
         : null;
     case TRAJECTORY_TYPE.ADEQUACY_PATCH:
-      return hasLinkTrajectory && isHvdcActivated ? { messageKey: 'flowbased.@informationMessage', id: '1' } : { messageKey: 'flowbased.@hvdcLinkRequired', id: '1' };
+      return getFlowbasedInformationMessage(hasLinkTrajectory, isHvdcActivated, row?.getReadOnly());
     default:
       return null;
   }
