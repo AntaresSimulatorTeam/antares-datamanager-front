@@ -33,7 +33,7 @@ export const LabelWithButtonPreview = ({
         <Button
           label={t('studyDetails.@preview')}
           onClick={() => onClick?.()}
-          variant="secondary"
+          hierarchy="secondary"
           disabled={disabled}
           icon="visibility-show"
           iconAppearance="filled"

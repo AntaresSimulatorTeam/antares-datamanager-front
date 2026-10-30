@@ -3,12 +3,11 @@ import { act, renderHook } from '@testing-library/react';
 import { uploadTrajectory } from '@/shared/services/trajectoryService.ts';
 import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory';
-import { DropdownItemOption, StudyDTO, UserState } from '@/shared/types';
+import { DbTrajectory, DropdownItemOption, StudyDTO, UserState } from '@/shared/types';
 import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.ts';
 import { OTHER_AREAS } from '@/shared/const/studyConfig.ts';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { ERROR_MESSAGE_TYPE } from '@/shared/enum/warning.ts';
-import { notifyAlert } from '@/shared/notification/notification.tsx';
 
 vi.mock('@/shared/services/trajectoryService', () => ({
   uploadTrajectory: vi.fn(),
@@ -16,10 +15,6 @@ vi.mock('@/shared/services/trajectoryService', () => ({
 
 vi.mock('@/shared/services/hypothesisTableService', () => ({
   handleTrajectoryError: vi.fn(),
-}));
-
-vi.mock('@/shared/notification/notification.tsx', () => ({
-  notifyAlert: vi.fn(),
 }));
 
 vi.mock('react-i18next', () => ({
@@ -34,9 +29,11 @@ vi.mock('@/store/contexts/UserContext', () => ({
   })),
 }));
 
+const mockAttach = vi.hoisted(() => vi.fn());
+
 vi.mock('@/hooks/useTrajectoryAttach', () => ({
   useTrajectoryAttach: () => ({
-    attachTrajectory: vi.fn(),
+    attachTrajectory: mockAttach,
   }),
 }));
 
@@ -83,6 +80,48 @@ describe('useTrajectoryImport', () => {
 
     expect(result.current.fileStatus).toBe('success');
     expect(result.current.progress).toBeGreaterThanOrEqual(0);
+  });
+
+  it.each([true, false])('should pass named attachment parameters with optional callbacks present=%s', async (withCallbacks) => {
+    const mockTrajectory: DbTrajectory = {
+      id: 101,
+      trajectoryName: 'Trajectory A',
+      type: TRAJECTORY_TYPE.LOAD,
+      version: 1,
+      userName: 'user',
+      creationDate: new Date('2026-01-01'),
+      area: 'FR',
+      technology: 'Solar',
+      hasTimeSeries: false,
+    };
+    vi.mocked(uploadTrajectory).mockResolvedValue(mockTrajectory);
+    const setSecondTableReadOnly = vi.fn();
+    const setReadOnly = withCallbacks ? mockSetReadOnly : undefined;
+    const secondTableReadOnly = withCallbacks ? setSecondTableReadOnly : undefined;
+    const { result } = renderHook(() => useTrajectoryImport(study, mockDispatch));
+
+    await act(async () => {
+      await result.current.importTrajectory(
+        mockSetData,
+        value,
+        TRAJECTORY_TYPE.LOAD,
+        [0, 0],
+        { area: 'FR', technology: 'Solar' },
+        setReadOnly,
+        secondTableReadOnly,
+      );
+    });
+
+    expect(mockAttach).toHaveBeenCalledTimes(1);
+    expect(mockAttach).toHaveBeenCalledWith({
+      type: TRAJECTORY_TYPE.LOAD,
+      indexArray: [0, 0],
+      status: 'success',
+      trajectory: mockTrajectory,
+      setData: mockSetData,
+      setReadOnly,
+      setSecondTableReadOnly: secondTableReadOnly,
+    });
   });
 
   it('should import LINK trajectory and not call setReadOnly', async () => {
@@ -283,30 +322,6 @@ describe('useTrajectoryImport', () => {
       },
       'battery'
     );
-  });
-
-  it('shows Flowbased upload rejection without saving a local selection', async () => {
-    (uploadTrajectory as Mock).mockRejectedValue({
-      antaresErrorMessage: 'Incompatible LINK pair',
-      errorMessageArguments: [],
-      date: new Date(),
-      type: ERROR_MESSAGE_TYPE.BUSINESS,
-    });
-    const flowbasedValue = { ...value, label: 'Flowbased' };
-    const { result } = renderHook(() => useTrajectoryImport(study, mockDispatch));
-
-    await act(async () => {
-      await result.current.importTrajectory(mockSetData, flowbasedValue, TRAJECTORY_TYPE.FLOWBASED, [1]);
-    });
-
-    expect(notifyAlert).toHaveBeenCalledWith(
-      expect.objectContaining({
-        content: 'Incompatible LINK pair',
-        type: 'error',
-      }),
-    );
-    expect(mockSetData).not.toHaveBeenCalled();
-    expect(handleTrajectoryError).not.toHaveBeenCalled();
   });
 
   it('should handle error and call handleTrajectoryError with no user name', async () => {

@@ -339,6 +339,7 @@ describe('updateStudy', () => {
   it('should update a study', async () => {
     vi.mocked(AuthService.authFetch, { partial: true }).mockResolvedValueOnce({
       ok: true,
+      json: async () => Promise.resolve(mockStudyResponse),
     });
     await updateStudy(mockStudyData, 123);
 

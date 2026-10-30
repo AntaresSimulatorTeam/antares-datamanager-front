@@ -34,7 +34,7 @@ const StdToast = ({
       <span className={textClasses}>{message}</span>
       <div className="flex min-w-fit items-center gap-1">
         <StdNotificationAction action={action} toastId={toastId} dismissNotification={dismissToast} />
-        {onClose && <Button label="" icon="close" onClick={onClose} variant="text" />}
+        {onClose && <Button label="" icon="close" onClick={onClose} hierarchy="text" />}
       </div>
     </div>
   );

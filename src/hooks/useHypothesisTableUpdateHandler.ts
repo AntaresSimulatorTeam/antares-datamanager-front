@@ -36,34 +36,50 @@ export const useHypothesisTableUpdateHandler = ({
     setRowIdSelected,
   );
 
+  interface HandleHypothesisTableUpdateArgs {
+    rowId?: string;
+    value?: unknown;
+    status?: RowStatus;
+    type: TRAJECTORY_TYPE;
+    data: HypothesisRowData[];
+    setData: Dispatch<SetStateAction<HypothesisRowData[]>>;
+    setReadOnly: Dispatch<SetStateAction<ReadOnlyObject>>;
+    setSecondTableReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>;
+    secondData?: HypothesisRowData[];
+    setSecondData?: Dispatch<SetStateAction<HypothesisRowData[]>>;
+    shouldUpdateHvdc?: boolean;
+  }
+
   const handleHypothesisTableUpdate = useCallback(
-    async (
-      rowId: string,
-      value: unknown,
-      status: RowStatus,
-      type: TRAJECTORY_TYPE,
-      data: HypothesisRowData[],
-      setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
-      setReadOnly: Dispatch<SetStateAction<ReadOnlyObject>>,
-      setSecondTableReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>
-    ) => {
-      const indexArray = rowId.split('.').map(Number);
+    async ({ rowId,
+        value,
+        status,
+        type,
+        data,
+        setData,
+        setReadOnly,
+        setSecondTableReadOnly,
+        secondData,
+        setSecondData,
+        shouldUpdateHvdc
+    } : HandleHypothesisTableUpdateArgs) => {
+      const indexArray = rowId?.split('.').map(Number) ?? [];
       const typeToUse = getTypeToUse(type, indexArray, data.length);
       if (status === 'empty' || status === 'emptyError') {
         const row = getRowDataSelected(data, indexArray) ?? null;
-        if (row) {
-          const hypothesisInfo = getHypothesis(data, rowId);
-          if (type === TRAJECTORY_TYPE.DSR && shouldDeleteCapacityModulation(data, indexArray[0])) {
-            setRowToDelete?.({ index: indexArray[0], value: hypothesisInfo.hypothesis, operation: 'empty' });
-            setIsDeletionModalOpen(true);
-          } else {
-            await detachTrajectory(typeToUse, indexArray, setData, data, status, hypothesisInfo.hypothesis, setReadOnly, setSecondTableReadOnly);
-          }
+        if (!row) return;
+
+        const hypothesisInfo = rowId ? getHypothesis(data, rowId) : {hypothesis: '', technology: ''};
+        if (type === TRAJECTORY_TYPE.DSR && shouldDeleteCapacityModulation(data, indexArray?.[0])) {
+          setRowToDelete?.({ index: indexArray?.[0], value: hypothesisInfo?.hypothesis, operation: 'empty' });
+          setIsDeletionModalOpen(true);
+        } else {
+          await detachTrajectory({type: typeToUse, indexArray, setData, data, status, hypothesis: hypothesisInfo?.hypothesis, setReadOnly, setSecondTableReadOnly, secondData, setSecondData, shouldUpdateHvdc});
         }
       } else if (status === 'success') {
-        const dbTrajectory = dbTrajectories.length > 0 ? dbTrajectories.find((item) => item.id == value) : getRowDataSelected(data, indexArray)?.trajectory;
-        if (dbTrajectory) {
-          await attachTrajectory(typeToUse, indexArray, status, dbTrajectory, setData, setReadOnly, setSecondTableReadOnly);
+        const trajectory = dbTrajectories.length > 0 ? dbTrajectories.find((item) => item.id == value) : getRowDataSelected(data, indexArray)?.trajectory;
+        if (trajectory) {
+          await attachTrajectory({type: typeToUse, indexArray, status, trajectory, setData, setReadOnly, setSecondTableReadOnly, isFlowbasedRedOnly: data?.[1]?.hvdc});
         }
       }
     },

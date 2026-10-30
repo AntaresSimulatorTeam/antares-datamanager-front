@@ -22,7 +22,7 @@ export const CardWithIconTitle = ({ data, size, transform }: CardWithIconTitlePr
                   void data.onClickItem?.(data.id);
                 }
               }}
-              variant="secondary"
+              hierarchy="secondary"
               disabled={data.isAck}
               icon="arrow-chevron-right"
               iconAppearance="filled"
@@ -40,7 +40,7 @@ export const CardWithIconTitle = ({ data, size, transform }: CardWithIconTitlePr
               void data.onClickItem?.(data.id);
             }
           }}
-          variant="secondary"
+          hierarchy="secondary"
           disabled={data.isAck}
           icon="arrow-chevron-right"
           iconAppearance="filled"

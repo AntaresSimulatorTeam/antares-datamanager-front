@@ -16,7 +16,7 @@ describe('useStudyModification', () => {
   });
 
   it('updates a study when isDuplicateMode is false, then calls onSuccess', async () => {
-    mockUpdateStudy.mockResolvedValue(undefined);
+    mockUpdateStudy.mockResolvedValue({} as StudyDTO);
 
     const onSuccess = vi.fn();
     const onError = vi.fn();

@@ -26,6 +26,9 @@ interface PegaseHypothesisTableProps extends TableHeadersProps {
   handleViewData?: (rowId: string) => void | Promise<void> | undefined;
   activate?: (value?: string | boolean) => void | Promise<void> | undefined;
   list?: string[];
+  hasLinkTrajectory?: boolean;
+  isHvdcActivated?: boolean;
+  hasHvdcCapacities?: boolean;
 }
 
 export const PegaseHypothesisTable = ({
@@ -47,9 +50,9 @@ export const PegaseHypothesisTable = ({
   type,
   list,
   activate,
-  isFlowbasedPrerequisiteMet,
-  flowbasedTooltipMessage,
-  isActionsDisabled,
+  hasLinkTrajectory,
+  isHvdcActivated,
+  hasHvdcCapacities
 }: PegaseHypothesisTableProps) => {
   const { t } = useTranslation();
   const [errorInfo, setErrorInfo] = useState<ErrorMessageType>({ index: 0, message: '' });
@@ -72,9 +75,9 @@ export const PegaseHypothesisTable = ({
         columnHeader,
         type,
         list,
-        isFlowbasedPrerequisiteMet,
-        flowbasedTooltipMessage,
-        isActionsDisabled,
+        hasLinkTrajectory,
+        isHvdcActivated,
+        hasHvdcCapacities
       }),
     [
       getTableHeaders,
@@ -87,9 +90,9 @@ export const PegaseHypothesisTable = ({
       columnHeader,
       type,
       list,
-      isFlowbasedPrerequisiteMet,
-      flowbasedTooltipMessage,
-      isActionsDisabled,
+      hasLinkTrajectory,
+      isHvdcActivated,
+      hasHvdcCapacities
     ],
   );
 

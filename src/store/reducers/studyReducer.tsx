@@ -129,6 +129,14 @@ export const updateTrajectory = (
           })) ?? [],
       },
     }),
+    ...(trajectoryType === TRAJECTORY_TYPE.LINK && {
+      [TRAJECTORY_TYPE.FLOWBASED]: {
+        trajectories: prevState[TRAJECTORY_TYPE.FLOWBASED]?.trajectories.map((trajectoryDb) => ({
+          ...trajectoryDb,
+          trajectoryName: '',
+        })) ?? [],
+      }
+    })
   };
 };
 

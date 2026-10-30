@@ -61,10 +61,10 @@ export const ImportTrajectoryModal = ({
             void onClose(typeToUse, trajectorySelected, hypothesis, indexArray);
           }
         }}
-        variant="primary"
+        hierarchy="primary"
         disabled={!trajectorySelected}
       />}
-      secondaryButton={<Button label={t('trajectoryDeletionModal.@cancel')} onClick={() => void onClose()} variant="text" />}
+      secondaryButton={<Button label={t('trajectoryDeletionModal.@cancel')} onClick={() => void onClose()} hierarchy="text" />}
       size="s"
       title={`${t('studyDetails.@import_from_file_system')} ${getModalTile(tabType, hypothesis)}`}
     >

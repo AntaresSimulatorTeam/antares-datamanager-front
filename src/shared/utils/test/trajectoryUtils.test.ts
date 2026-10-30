@@ -24,7 +24,6 @@ import {
   getSubRowListWithArea,
   getSubRowsList,
   getTrajectoryTypeByIndex,
-  hasFlowbasedPrerequisites,
   hasLinkWithHvdcCapacities,
   isEmptyRow,
   isMatchingTrajectoryType,
@@ -82,36 +81,6 @@ describe('getStatus', () => {
   it('should return a MISSING selection status when no status', () => {
     const status = getStatus();
     expect(status).toStrictEqual(TRAJECTORY_SELECTION_STATUS.MISSING);
-  });
-});
-
-describe('hasFlowbasedPrerequisites', () => {
-  const linkRow: HypothesisRowData = {
-    hypothesis: 'Link',
-    trajectory: { ...mockDbTrajectory, type: TRAJECTORY_TYPE.LINK },
-    status: TRAJECTORY_SELECTION_STATUS.OK,
-    hvdc: true,
-  };
-
-  it('returns true when a Link trajectory is selected and HVDC is enabled', () => {
-    expect(hasFlowbasedPrerequisites(linkRow)).toBe(true);
-    expect(hasFlowbasedPrerequisites({ ...linkRow, status: TRAJECTORY_SELECTION_STATUS.WARNING })).toBe(true);
-  });
-
-  it('returns false when the Link trajectory is missing or not valid', () => {
-    expect(hasFlowbasedPrerequisites(undefined)).toBe(false);
-    expect(hasFlowbasedPrerequisites({ ...linkRow, trajectory: null })).toBe(false);
-    expect(hasFlowbasedPrerequisites({ ...linkRow, status: TRAJECTORY_SELECTION_STATUS.ERROR })).toBe(false);
-  });
-
-  it('returns false when HVDC is disabled or the selected trajectory is not a Link trajectory', () => {
-    expect(hasFlowbasedPrerequisites({ ...linkRow, hvdc: false })).toBe(false);
-    expect(
-      hasFlowbasedPrerequisites({
-        ...linkRow,
-        trajectory: { ...linkRow.trajectory!, type: TRAJECTORY_TYPE.AREA },
-      }),
-    ).toBe(false);
   });
 });
 

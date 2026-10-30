@@ -1,10 +1,21 @@
 import { Dispatch, SetStateAction, useCallback } from 'react';
-import { DbTrajectory, HypothesisRowData, RowStatus, StudyActionType, StudyDTO } from '@/shared/types';
+import {
+  DbTrajectory,
+  HypothesisRowData,
+  RowStatus,
+  StudyActionType,
+  StudyDTO,
+  TrajectoryLinkData,
+} from '@/shared/types';
 import { TRAJECTORY_SELECTION_STATUS, TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
-import { isParamModulationRequired, linkTrajectoryToStudy } from '@/shared/services/trajectoryService.ts';
+import {
+  getTrajectoryDataByTypeAndId,
+  isParamModulationRequired,
+  linkTrajectoryToStudy,
+} from '@/shared/services/trajectoryService.ts';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { handleTrajectoryError } from '@/shared/services/hypothesisTableService.ts';
-import { setNestedData } from '@/shared/utils/trajectoryUtils.ts';
+import { hasLinkWithHvdcCapacities, setNestedData } from '@/shared/utils/trajectoryUtils.ts';
 import { useUser } from '@/store/contexts/UserContext.tsx';
 import { useTranslation } from 'react-i18next';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
@@ -15,7 +26,7 @@ const handleAreaReadOnly = (
   setSecondTableReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
 ) => {
   setReadOnly?.({ '0': false, '1': false });
-  setSecondTableReadOnly?.({ '0': false, '1': false, '2.0': false, '2.1': false });
+  setSecondTableReadOnly?.({ '0': false, '1': true, '2.0': false, '2.1': false });
 };
 
 const handleThermalReadOnly = async (
@@ -59,6 +70,8 @@ interface UpdateReadOnlyParams {
   lastIndex: number;
   setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>;
   setSecondTableReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>;
+  hasHvdcCapacities?: boolean;
+  isFlowbasedRedOnly?: boolean;
 }
 
 const updateReadOnlyState = async ({
@@ -68,9 +81,13 @@ const updateReadOnlyState = async ({
   lastIndex,
   setReadOnly,
   setSecondTableReadOnly,
+  hasHvdcCapacities = false,
+  isFlowbasedRedOnly = false
 }: UpdateReadOnlyParams) => {
   if (type === TRAJECTORY_TYPE.AREA) {
     handleAreaReadOnly(setReadOnly, setSecondTableReadOnly);
+  } else if (type === TRAJECTORY_TYPE.LINK && hasHvdcCapacities && isFlowbasedRedOnly) {
+    setSecondTableReadOnly?.({ '0': false, '1': false, '2.0': false, '2.1': false });
   } else if (type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER) {
     await handleThermalReadOnly(study.id, study?.horizon, setReadOnly);
   } else {
@@ -82,11 +99,13 @@ const updateTrajectoryData = (
   setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
   indexArray: number[],
   newDbTrajectory: DbTrajectory,
+  hasHvdcCapacities = false
 ) => {
   let lastIndex = 0;
   const newTrajectory = {
     trajectory: newDbTrajectory,
     status: TRAJECTORY_SELECTION_STATUS.OK,
+    hasHvdcCapacities,
   };
 
   setData((prev) => {
@@ -150,6 +169,17 @@ const notifyTrajectoryError = ({
   );
 };
 
+interface AttachTrajectoryParams {
+  type: TRAJECTORY_TYPE,
+  indexArray: number[],
+  status: RowStatus,
+  trajectory: DbTrajectory,
+  setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
+  setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
+  setSecondTableReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
+  isFlowbasedRedOnly?: boolean
+}
+
 export const useTrajectoryAttach = (
   study: StudyDTO,
   dispatch?: Dispatch<StudyActionType> | null,
@@ -158,17 +188,23 @@ export const useTrajectoryAttach = (
   const { t } = useTranslation();
 
   const attachTrajectory = useCallback(
-    async (
-      type: TRAJECTORY_TYPE,
-      indexArray: number[],
-      status: RowStatus,
-      trajectory: DbTrajectory,
-      setData: Dispatch<SetStateAction<HypothesisRowData[]>>,
-      setReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
-      setSecondTableReadOnly?: Dispatch<SetStateAction<ReadOnlyObject>>,
-    ) => {
+    async ({
+      type,
+      indexArray,
+      status,
+      trajectory,
+      setData,
+      setReadOnly,
+      setSecondTableReadOnly,
+      isFlowbasedRedOnly
+    }: AttachTrajectoryParams ) => {
       try {
         const newDbTrajectory = await linkTrajectoryToStudy(type, trajectory.id, study?.id);
+        let hasHvdcCapacities = false;
+        if (type === TRAJECTORY_TYPE.LINK) {
+          const linkData: TrajectoryLinkData[] = await getTrajectoryDataByTypeAndId(type, newDbTrajectory.id);
+          hasHvdcCapacities = hasLinkWithHvdcCapacities(linkData);
+        }
 
         if (newDbTrajectory) {
           dispatch?.({
@@ -179,7 +215,7 @@ export const useTrajectoryAttach = (
             },
           });
 
-          const lastIndex = updateTrajectoryData(setData, indexArray, newDbTrajectory);
+          const lastIndex = updateTrajectoryData(setData, indexArray, newDbTrajectory, hasHvdcCapacities);
 
           await updateReadOnlyState({
             type,
@@ -188,6 +224,8 @@ export const useTrajectoryAttach = (
             lastIndex,
             setReadOnly,
             setSecondTableReadOnly,
+            hasHvdcCapacities,
+            isFlowbasedRedOnly
           });
         }
       } catch (error) {
