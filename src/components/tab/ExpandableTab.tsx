@@ -261,7 +261,7 @@ const ExpandableTab = ({
             if (!rowToDelete?.value) return;
             const { value, index, operation } = rowToDelete;
             if (operation === 'empty') {
-              await detachTrajectory({type: tabType, indexArray: [index], setData, data, status: 'empty', hypothesis: value, setReadOnly});
+              await detachTrajectory({type: tabType === TRAJECTORY_TYPE.ME ? TRAJECTORY_TYPE.AREA_ME : tabType, indexArray: [index], setData, data, status: 'empty', hypothesis: value, setReadOnly});
             } else {
               await removeRow(tabType, index, data, value);
             }

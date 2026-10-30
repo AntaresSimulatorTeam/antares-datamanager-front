@@ -721,7 +721,7 @@ export const updateTableAfterCellDetach = async ({
     return { newData };
   }
 
-  if (type === TRAJECTORY_TYPE.ME) {
+  if (type === TRAJECTORY_TYPE.AREA_ME) {
     const newData = data.map((row) =>({
       ...row,
       trajectory: null,

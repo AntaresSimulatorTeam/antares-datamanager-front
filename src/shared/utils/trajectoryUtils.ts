@@ -1312,8 +1312,9 @@ const hasValidTrajectory = (row?: HypothesisRowData): boolean =>
 const hasValidTrajectoryTechnology = (row?: HypothesisRowData): boolean => row?.subRows?.some((subRow) => !!subRow.trajectory && subRow.status === TRAJECTORY_SELECTION_STATUS.OK) ?? false;
 
 export const shouldDeleteAllMETrajectories = (rows: HypothesisRowData[]): boolean => {
-  const hasTrajectory = rows.some(row => hasValidTrajectory(row));
-  const hasTrajectoryTech = rows[4].subRows?.some(row => hasValidTrajectoryTechnology(row)) ?? false;
+  const rowsToCheck = rows.slice(1);
+  const hasTrajectory = rowsToCheck.some(row => hasValidTrajectory(row));
+  const hasTrajectoryTech = hasValidTrajectoryTechnology(rowsToCheck[3]) ?? false;
   return hasTrajectory || hasTrajectoryTech;
 };
 

@@ -266,7 +266,7 @@ describe('computeDeletion - AREA_ME', () => {
       .mockReturnValueOnce([{ id: 101 }, { id: 102 }] as DbTrajectory[])
       .mockReturnValueOnce([{ id: 201 }] as DbTrajectory[]);
 
-    const resultDeletion = computeDeletion(TRAJECTORY_TYPE.ME, data, 0, null, 'HYP');
+    const resultDeletion = computeDeletion(TRAJECTORY_TYPE.AREA_ME, data, 0, null, 'HYP');
 
     expect(resultDeletion).toEqual({
       trajectoryIds: [101, 102, 201],
