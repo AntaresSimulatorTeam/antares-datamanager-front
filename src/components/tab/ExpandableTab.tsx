@@ -221,7 +221,7 @@ const ExpandableTab = ({
         handleImport={async (rowId: string) => await handleTrajectoryFetchFromFS(rowId, tabType)}
         isReadOnlyEnable={true}
         updateData={(rowId: string, value: unknown, status: RowStatus) => {
-          if (status === 'empty' && rowId === '0' && shouldDeleteAllMETrajectories(data)) {
+          if (tabType === TRAJECTORY_TYPE.ME && status === 'empty' && rowId === '0' && shouldDeleteAllMETrajectories(data)) {
             setRowToDelete({ index: Number(rowId), value: value as string, operation: 'empty' });
             setRowIdSelected(rowId);
             setIsDeletionModalOpen(true);
