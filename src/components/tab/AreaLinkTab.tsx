@@ -134,7 +134,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
       rowId,
       dataToUse,
     );
-    setSelectedTrajectoryType(typeToUse);
+    setSelectedTrajectoryType(typeToUse === TRAJECTORY_TYPE.SCENARIO_BUILDER ? TRAJECTORY_TYPE.SETTINGS : typeToUse);
     const results = await handleFetchFromFS({ typeToUse, areaToUse, isDefaultArea });
     setOptionsFS(results);
     setRowIdSelected(rowId);
@@ -221,7 +221,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
         );
       }
       setIsDeletionModalOpen(false);
-  }, [configs, data, dispatch, handleHypothesisTableUpdate, rowIdSelected, selectedTrajectoryType, settingsData, studyData.hvdc, studyData.id, t]);
+  }, [configs, data, dispatch, handleHypothesisTableUpdate, rowIdSelected, selectedTrajectoryType, settingsData, studyData.id, t]);
 
   return (
     <div className="flex w-full flex-col gap-6 items-start">

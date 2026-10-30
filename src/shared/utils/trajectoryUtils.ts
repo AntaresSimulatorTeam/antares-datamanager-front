@@ -1048,7 +1048,7 @@ export const getThermalTypeToUse = (type: TRAJECTORY_TYPE, index: number, hypoth
   } else {
     return {
       typeToUse: index === 1 ? TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER : type,
-      areaToUse: '',
+      //areaToUse: '',
     };
   }
 }
@@ -1081,7 +1081,7 @@ const getPathFromMETrajectoryType = (type: TRAJECTORY_TYPE): string => {
     case type === TRAJECTORY_TYPE.STS_ME:
       return String.raw`\\st_storage_ME`;
     case isTrajectoryMEHydroType(type):
-      return String.raw`\\hydro_ME\\${getPathFromMEHydroTrajectoryType(type)}`;
+      return String.raw`\\hydro_ME${getPathFromMEHydroTrajectoryType(type)}`;
     case type === TRAJECTORY_TYPE.THERMAL_CAPACITY_ME:
       return String.raw`\\thermal_ME`;
     case type === TRAJECTORY_TYPE.EFFICIENCY_ME:
@@ -1306,11 +1306,17 @@ export const shouldDeleteCapacityModulation = (rows: HypothesisRowData[], index:
   return tsRows.length === 1;
 };
 
-const hasValidTrajectory = (row?: HypothesisRowData) =>
+const hasValidTrajectory = (row?: HypothesisRowData): boolean =>
   !!row?.trajectory && row?.status === TRAJECTORY_SELECTION_STATUS.OK;
 
-const hasValidTrajectoryTechnology = (row?: HypothesisRowData) =>
-  row?.subRows?.some((subRow) => !!subRow.trajectory && subRow.status === TRAJECTORY_SELECTION_STATUS.OK);
+const hasValidTrajectoryTechnology = (row?: HypothesisRowData): boolean => row?.subRows?.some((subRow) => !!subRow.trajectory && subRow.status === TRAJECTORY_SELECTION_STATUS.OK) ?? false;
+
+export const shouldDeleteAllMETrajectories = (rows: HypothesisRowData[]): boolean => {
+  const rowsToCheck = rows.slice(1);
+  const hasTrajectory = rowsToCheck.some(row => hasValidTrajectory(row));
+  const hasTrajectoryTech = hasValidTrajectoryTechnology(rowsToCheck[3]) ?? false;
+  return hasTrajectory || hasTrajectoryTech;
+};
 
 export const getDeletionModalMessage = (type: TRAJECTORY_TYPE, index?: number, data?: HypothesisRowData[]) => {
   const row = index != null ? data?.[index] : null;
@@ -1338,6 +1344,10 @@ export const getDeletionModalMessage = (type: TRAJECTORY_TYPE, index?: number, d
 
   if (type === TRAJECTORY_TYPE.FLOWBASED) {
     return 'flowbased.@hvdcChangeConfirmation';
+  }
+
+  if (type === TRAJECTORY_TYPE.ME) {
+    return 'trajectoryDeletionModal.@confirmMeDeleteMessage';
   }
 
   return 'trajectoryDeletionModal.@confirmDeletionMessage';
