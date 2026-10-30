@@ -85,6 +85,110 @@ describe('useTrajectoryDeletionLogic - THERMAL', () => {
   });
 });
 
+describe('computeDeletion - LINK (computeLinkDeletion)', () => {
+  const study = { id: 42 } as StudyDTO;
+  const link: DbTrajectory = {
+    id: 10,
+    trajectoryName: 'Links',
+    type: TRAJECTORY_TYPE.LINK,
+    version: 1,
+    userName: 'user',
+    creationDate: new Date('2026-01-01'),
+    area: '',
+    technology: '',
+    hasTimeSeries: false,
+  };
+  const flowbased: DbTrajectory = { ...link, id: 20, type: TRAJECTORY_TYPE.FLOWBASED, trajectoryName: 'Flowbased' };
+  const areaRow: HypothesisRowData = {
+    hypothesis: 'Areas',
+    trajectory: { ...link, id: 30, type: TRAJECTORY_TYPE.AREA },
+    status: TRAJECTORY_SELECTION_STATUS.OK,
+  };
+  const linkRow: HypothesisRowData = {
+    hypothesis: 'Links',
+    trajectory: link,
+    status: TRAJECTORY_SELECTION_STATUS.OK,
+  };
+  const hvdcRow: HypothesisRowData = {
+    hypothesis: 'HVDC',
+    trajectory: null,
+    status: TRAJECTORY_SELECTION_STATUS.MISSING,
+  };
+  const flowbasedRow: HypothesisRowData = {
+    hypothesis: 'Flowbased',
+    trajectory: flowbased,
+    status: TRAJECTORY_SELECTION_STATUS.OK,
+  };
+  const data = [areaRow, linkRow];
+  const secondData = [hvdcRow, flowbasedRow];
+  const invalidStatuses = [
+    TRAJECTORY_SELECTION_STATUS.MISSING,
+    TRAJECTORY_SELECTION_STATUS.ERROR,
+    TRAJECTORY_SELECTION_STATUS.WARNING,
+  ];
+
+  it('retourne le lien et la trajectoire FLOWBASED dans cet ordre lorsque les deux sont OK', () => {
+    const { result } = renderHook(() => useTrajectoryDeletionLogic(study));
+
+    const deletion = result.current.computeDeletion(
+      TRAJECTORY_TYPE.LINK, data, null, [1], 'Links', 'empty', secondData,
+    );
+
+    expect(deletion).toEqual({
+      trajectoryIds: [link.id, flowbased.id],
+      trajectoryToDelete: link,
+      additionalTrajectory: flowbased,
+    });
+    expect(deletion.trajectoryToDelete).toBe(link);
+    expect(deletion.additionalTrajectory).toBe(flowbased);
+  });
+
+  it.each([
+    { label: 'absent', rows: undefined },
+    { label: 'vide', rows: [] },
+    { label: 'sans ligne FLOWBASED', rows: [hvdcRow] },
+    { label: 'avec une trajectoire FLOWBASED nulle', rows: [hvdcRow, { ...flowbasedRow, trajectory: null }] },
+    ...invalidStatuses.map((status) => ({
+      label: `avec FLOWBASED en statut ${status}`,
+      rows: [hvdcRow, { ...flowbasedRow, status }],
+    })),
+  ])('retourne uniquement le lien si le second tableau est $label', ({ rows }) => {
+    const { result } = renderHook(() => useTrajectoryDeletionLogic(study));
+
+    const deletion = result.current.computeDeletion(
+      TRAJECTORY_TYPE.LINK, data, null, [1], 'Links', 'empty', rows,
+    );
+
+    expect(deletion).toEqual({
+      trajectoryIds: [link.id],
+      trajectoryToDelete: link,
+      additionalTrajectory: null,
+    });
+  });
+
+  it.each([
+    { label: 'tableau vide', rows: [] },
+    { label: 'ligne LINK absente', rows: [areaRow] },
+    { label: 'trajectoire LINK nulle', rows: [areaRow, { ...linkRow, trajectory: null }] },
+    ...invalidStatuses.map((status) => ({
+      label: `LINK en statut ${status}`,
+      rows: [areaRow, { ...linkRow, status }],
+    })),
+  ])('ne supprime aucune trajectoire, même avec FLOWBASED OK : $label', ({ rows }) => {
+    const { result } = renderHook(() => useTrajectoryDeletionLogic(study));
+
+    const deletion = result.current.computeDeletion(
+      TRAJECTORY_TYPE.LINK, rows, null, [1], 'Links', 'empty', secondData,
+    );
+
+    expect(deletion).toEqual({
+      trajectoryIds: [],
+      trajectoryToDelete: null,
+      additionalTrajectory: null,
+    });
+  });
+});
+
 describe('computeDeletion - DSR', () => {
   beforeEach(() => {
     vi.clearAllMocks();

@@ -23,6 +23,33 @@ import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { mockDataBaseTrajectory, mockPrevStateArea, mockPrevStateLoad } from '@/mocks/data/tests/trajectory.mock.ts';
 
 describe('addTrajectories', () => {
+  it.each([TRAJECTORY_TYPE.AREA, TRAJECTORY_TYPE.LINK])('should replace existing %s trajectories without mutating the previous state', (type) => {
+    const existing = mockDataBaseTrajectory(type, 1, 'FR');
+    const incoming = mockDataBaseTrajectory(type, 2, 'DE');
+    const prevState: Partial<StudyState> = { [type]: { trajectories: [existing] }, hvdc: true };
+
+    const result = addTrajectories(prevState, { [type]: { trajectories: [incoming] } });
+
+    expect(result[type]?.trajectories).toEqual([incoming]);
+    expect(result.hvdc).toBe(true);
+    expect(prevState[type]?.trajectories).toEqual([existing]);
+  });
+
+  it('should deduplicate by area and technology rather than trajectory id', () => {
+    const existing = { ...mockDataBaseTrajectory(TRAJECTORY_TYPE.LOAD, 1, 'FR'), technology: 'Solar' };
+    const duplicate = { ...existing, id: 2 };
+    const otherTechnology = { ...existing, id: 3, technology: 'Wind' };
+    const otherArea = { ...existing, id: 4, area: 'DE' };
+    const prevState = { LOAD: { trajectories: [existing] } };
+    const incoming = { LOAD: { trajectories: [duplicate, otherTechnology, otherArea] } };
+
+    const result = addTrajectories(prevState, incoming);
+
+    expect(result.LOAD?.trajectories).toEqual([existing, otherTechnology, otherArea]);
+    expect(prevState.LOAD.trajectories).toEqual([existing]);
+    expect(incoming.LOAD.trajectories).toEqual([duplicate, otherTechnology, otherArea]);
+  });
+
   it('should add new trajectories to empty state', () => {
     const trajectory = mockDataBaseTrajectory(TRAJECTORY_TYPE.AREA, 67, 'AT');
 
@@ -200,6 +227,41 @@ describe('addTrajectories', () => {
 });
 
 describe('deleteTrajectory', () => {
+  it('should initialize an absent trajectory type without changing unrelated types', () => {
+    const prevState = mockPrevStateArea();
+
+    const result = deleteTrajectory(prevState, { area: 'FR', type: TRAJECTORY_TYPE.LOAD });
+
+    expect(result.LOAD?.trajectories).toEqual([]);
+    expect(result.AREA).toBe(prevState.AREA);
+  });
+
+  it('should clear only matching areas and preserve other technologies and metadata', () => {
+    const first = mockDataBaseTrajectory(TRAJECTORY_TYPE.LOAD, 1, 'FR');
+    const second = { ...first, id: 2, technology: 'Wind' };
+    const retained = { ...first, id: 3, area: 'DE' };
+    const prevState = {
+      LOAD: { trajectories: [first, second, retained], warningMessages: mockWarningMessagesWithTwo },
+    };
+
+    const result = deleteTrajectory(prevState, { area: 'FR', type: TRAJECTORY_TYPE.LOAD });
+
+    expect(result.LOAD).toEqual({
+      trajectories: [retained],
+      warningMessages: mockWarningMessagesWithTwo,
+    });
+  });
+
+  it('should initialize missing modulation trajectories when deleting the last specific trajectory', () => {
+    const type = TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER;
+    const prevState = { [type]: { trajectories: [mockDataBaseTrajectory(type, 1, 'FR')] } };
+
+    const result = deleteTrajectory(prevState, { area: 'FR', type });
+
+    expect(result[type]?.trajectories).toEqual([]);
+    expect(result.THERMAL_TECHNICAL_MODULATION_PARAMETER?.trajectories).toEqual([]);
+  });
+
   const baseTrajectory = {
     id: '1',
     area: 'Zone A',
@@ -327,14 +389,6 @@ describe('deleteTrajectory', () => {
   });
 });
 
-vi.mock(import('@/shared/utils/trajectoryUtils'), async (importOriginal) => {
-  const actual = await importOriginal();
-  return {
-    ...actual,
-    isMatchingTrajectoryType: (type: TRAJECTORY_TYPE) => (check: TRAJECTORY_TYPE) => type === check,
-  };
-});
-
 describe('clearByType', () => {
   const prevState = {
     studyStatus: StudyStatus.IN_PROGRESS,
@@ -384,9 +438,125 @@ describe('clearByType', () => {
     expect(result.studyStatus).toEqual(StudyStatus.IN_PROGRESS);
     expect(result[TRAJECTORY_TYPE.AREA]?.trajectories).toHaveLength(0);
   });
+
+  it('should preserve metadata and leave the previous state unchanged', () => {
+    const state = {
+      ...prevState,
+      LOAD: { ...prevState.LOAD, warningMessages: mockWarningMessagesWithTwo },
+    };
+
+    const result = clearByType(state, [TRAJECTORY_TYPE.LOAD]);
+
+    expect(result.LOAD).toEqual({ trajectories: [], warningMessages: mockWarningMessagesWithTwo });
+    expect(result.LINK).toBe(state.LINK);
+    expect(state.LOAD.trajectories).toHaveLength(1);
+  });
+
+  it('should return the same empty state when there are no keys to clear', () => {
+    const state = {};
+
+    expect(clearByType(state, [TRAJECTORY_TYPE.AREA])).toBe(state);
+  });
 });
 
 describe('updateTrajectory', () => {
+  it.each(['empty', 'success', 'emptyError', 'error'] as const)('should update LINK dependencies for status %s without mutating the previous state', (status) => {
+    const link = mockDataBaseTrajectory(TRAJECTORY_TYPE.LINK, 1, '');
+    const flowbased = mockDataBaseTrajectory(TRAJECTORY_TYPE.FLOWBASED, 2, '');
+    const secondFlowbased = { ...flowbased, id: 3 };
+    const prevState = {
+      hvdc: true,
+      LINK: { trajectories: [link] },
+      FLOWBASED: { trajectories: [flowbased, secondFlowbased] },
+      LOAD: { trajectories: [mockDataBaseTrajectory(TRAJECTORY_TYPE.LOAD, 4, 'FR')] },
+    };
+
+    const result = updateTrajectory(prevState, { trajectory: link, status });
+
+    expect(result.hvdc).toBe(status !== 'empty');
+    expect(result.LINK?.trajectories).toEqual([
+      { ...link, trajectoryName: status === 'success' ? link.trajectoryName : '' },
+    ]);
+    expect(result.FLOWBASED?.trajectories).toEqual([
+      { ...flowbased, trajectoryName: '' },
+      { ...secondFlowbased, trajectoryName: '' },
+    ]);
+    expect(result.LOAD).toBe(prevState.LOAD);
+    expect(prevState.hvdc).toBe(true);
+    expect(prevState.LINK.trajectories).toEqual([link]);
+    expect(prevState.FLOWBASED.trajectories).toEqual([flowbased, secondFlowbased]);
+    expect(flowbased.trajectoryName).not.toBe('');
+  });
+
+  it('should initialize FLOWBASED when updating LINK without existing FLOWBASED data', () => {
+    const link = mockDataBaseTrajectory(TRAJECTORY_TYPE.LINK, 1, '');
+
+    const result = updateTrajectory({}, { trajectory: link, status: 'success' });
+
+    expect(result.LINK?.trajectories).toEqual([link]);
+    expect(result.FLOWBASED?.trajectories).toEqual([]);
+  });
+
+  it.each([true, false])('should preserve hvdc=%s and FLOWBASED when detaching another type', (hvdc) => {
+    const load = mockDataBaseTrajectory(TRAJECTORY_TYPE.LOAD, 1, 'FR');
+    const prevState = {
+      hvdc,
+      LOAD: { trajectories: [load] },
+      FLOWBASED: { trajectories: [mockDataBaseTrajectory(TRAJECTORY_TYPE.FLOWBASED, 2, '')] },
+    };
+
+    const result = updateTrajectory(prevState, { trajectory: load, status: 'empty' });
+
+    expect(result.hvdc).toBe(hvdc);
+    expect(result.FLOWBASED).toBe(prevState.FLOWBASED);
+  });
+
+  it('should replace only the matching area and technology and preserve metadata', () => {
+    const first = { ...mockDataBaseTrajectory(TRAJECTORY_TYPE.LOAD, 1, 'FR'), technology: 'Solar' };
+    const second = { ...first, id: 2, technology: 'Wind' };
+    const third = { ...first, id: 3, area: 'DE' };
+    const replacement = { ...first, id: 4, trajectoryName: 'Replacement' };
+    const prevState = {
+      LOAD: { trajectories: [first, second, third], warningMessages: mockWarningMessagesWithTwo },
+    };
+
+    const result = updateTrajectory(prevState, { trajectory: replacement, status: 'success' });
+
+    expect(result.LOAD).toEqual({
+      trajectories: [replacement, second, third],
+      warningMessages: mockWarningMessagesWithTwo,
+    });
+    expect(prevState.LOAD.trajectories).toEqual([first, second, third]);
+  });
+
+  it('should preserve modulation when another specific trajectory still has a name', () => {
+    const type = TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER;
+    const first = mockDataBaseTrajectory(type, 1, 'FR');
+    const second = mockDataBaseTrajectory(type, 2, 'DE');
+    const modulation = mockDataBaseTrajectory(TRAJECTORY_TYPE.THERMAL_TECHNICAL_MODULATION_PARAMETER, 3, '');
+    const prevState = {
+      [type]: { trajectories: [first, second] },
+      THERMAL_TECHNICAL_MODULATION_PARAMETER: { trajectories: [modulation] },
+    };
+
+    const result = updateTrajectory(prevState, { trajectory: first, status: 'empty' });
+
+    expect(result[type]?.trajectories).toEqual([{ ...first, trajectoryName: '' }, second]);
+    expect(result.THERMAL_TECHNICAL_MODULATION_PARAMETER).toBe(prevState.THERMAL_TECHNICAL_MODULATION_PARAMETER);
+  });
+
+  it('should initialize missing modulation when the last specific trajectory is cleared', () => {
+    const type = TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER;
+    const trajectory = mockDataBaseTrajectory(type, 1, 'FR');
+
+    const result = updateTrajectory(
+      { [type]: { trajectories: [trajectory] } },
+      { trajectory, status: 'empty' },
+    );
+
+    expect(result.THERMAL_TECHNICAL_MODULATION_PARAMETER?.trajectories).toEqual([]);
+  });
+
   const baseTrajectory = {
     id: '1',
     area: 'Zone A',
@@ -576,16 +746,69 @@ describe('updateHvdcOption', () => {
   });
 });
 
-// Mock handlers to isolate reducer logic
-vi.mock('./studyReducer.tsx', () => ({
-  clearByType: vi.fn(() => ({ cleared: true })),
-  addTrajectories: vi.fn(() => ({ added: true })),
-  deleteTrajectory: vi.fn(() => ({ deleted: true })),
-  updateTrajectory: vi.fn(() => ({ updated: true })),
-  updateHvdcOption: vi.fn(() => ({ hvdcOptionUpdated: true })),
-}));
-
 describe('studyReducer', () => {
+  it('should replace study areas and default areas without changing the previous state', () => {
+    const oldArea = { areaName: 'FR', spilledEnergyCost: null, unsuppliedEnergyCost: null };
+    const newArea = { ...oldArea, areaName: 'DE' };
+    const prevState = {
+      ...mockPrevStateArea(),
+      areas: [oldArea],
+      defaultAreas: [{ name: 'FR' }],
+    };
+    const payload = { areas: [newArea], defaultAreas: [{ name: 'DE' }] };
+
+    const result = studyReducer(prevState, { type: STUDY_ACTION.SET_STUDY_AREAS, payload });
+
+    expect(result).toEqual({ ...prevState, ...payload });
+    expect(prevState.areas).toEqual([oldArea]);
+    expect(prevState.defaultAreas).toEqual([{ name: 'FR' }]);
+  });
+
+  it('should clear study areas and default areas with empty lists', () => {
+    const prevState = {
+      ...mockPrevStateArea(),
+      areas: [{ areaName: 'FR', spilledEnergyCost: null, unsuppliedEnergyCost: null }],
+      defaultAreas: [{ name: 'FR' }],
+    };
+
+    const result = studyReducer(prevState, {
+      type: STUDY_ACTION.SET_STUDY_AREAS,
+      payload: { areas: [], defaultAreas: [] },
+    });
+
+    expect(result).toEqual({ ...prevState, areas: [], defaultAreas: [] });
+  });
+
+  it.each([true, false])('should set discardActionTriggered to %s and preserve unrelated data', (discardActionTriggered) => {
+    const prevState = { ...mockPrevStateArea(), discardActionTriggered: !discardActionTriggered, hvdc: true };
+
+    const result = studyReducer(prevState, {
+      type: STUDY_ACTION.SKIP_MESSAGE,
+      payload: { discardActionTriggered },
+    });
+
+    expect(result).toEqual({ ...prevState, discardActionTriggered });
+    expect(prevState.discardActionTriggered).toBe(!discardActionTriggered);
+  });
+
+  it('should reset all study data to the initial status without mutating the previous state', () => {
+    const prevState = {
+      ...mockPrevStateArea(),
+      studyStatus: StudyStatus.GENERATED,
+      hvdc: true,
+      discardActionTriggered: true,
+      areas: [{ areaName: 'FR', spilledEnergyCost: null, unsuppliedEnergyCost: null }],
+      defaultAreas: [{ name: 'FR' }],
+    };
+
+    const result = studyReducer(prevState, { type: STUDY_ACTION.RESET_STUDY_STATE });
+
+    expect(result).toEqual({ studyStatus: StudyStatus.IN_PROGRESS });
+    expect(prevState.studyStatus).toBe(StudyStatus.GENERATED);
+    expect(prevState.AREA.trajectories).toHaveLength(1);
+    expect(prevState.hvdc).toBe(true);
+  });
+
   it('should handle SET_STUDY_STATUS action', () => {
     const action: StudyActionType = {
       type: STUDY_ACTION.SET_STUDY_STATUS,

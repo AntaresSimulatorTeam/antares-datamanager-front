@@ -161,10 +161,10 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
 
           void confirmUpdate(study.id, studyData, isDuplicateMode);
         }}
-        variant="primary"
+        hierarchy="primary"
         disabled={!isFormValid}
       />}
-      secondaryButton={<Button label={t('components.quickAccess.@cancel')} onClick={handleClose} variant="text" />}
+      secondaryButton={<Button label={t('components.quickAccess.@cancel')} onClick={handleClose} hierarchy="text" />}
       size="s"
       title={isDuplicateMode ? t('home.@duplicate_study') : t('studyModal.@update_study')}
     >

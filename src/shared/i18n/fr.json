@@ -195,17 +195,20 @@
     "@informationMessage": "If a \"mod\" file is included in a \"series\" folder, the \"technical parameters\" folder is required."
   },
   "flowbased": {
+    "@mandatoryTS": "Une trajectoire Flowbased avec des séries temporelles renseignées (LOAD, RES (Wind and Solar) et RoR) est obligatoire pour pouvoir renseigner une trajectoire LINK.",
     "@informationMessage": "Une trajectoire de lien avec l’option HVDC activée doit être définie avant de soumettre une trajectoire Flowbased.",
     "@hvdcLinkRequired": "Sélectionnez une trajectoire LINK contenant un lien avec deux capacités HVDC non nulles et différentes de zéro.",
     "@linkDataError": "Impossible de vérifier les capacités HVDC de la trajectoire LINK.",
     "@associationsReloadError": "Impossible de recharger les associations de trajectoires de l’étude.",
     "@studyOptionsUpdateError": "Les paramètres HVDC de l’étude n’ont pas pu être réinitialisés après le changement de trajectoire LINK.",
     "@linkChangeConfirmationTitle": "Confirmer le changement de trajectoire LINK",
-    "@linkChangeConfirmation": "Supprimer ou remplacer la trajectoire LINK retirera également la trajectoire Flowbased de cette étude. Les données resteront disponibles en base."
+    "@linkChangeConfirmation": "Supprimer ou remplacer la trajectoire LINK retirera également la trajectoire Flowbased de cette étude.",
+    "@hvdcChangeConfirmationTitle": "Confirmer le changement HVDC",
+    "@hvdcChangeConfirmation": "Cette action supprimera la trajectoire associée. Veuillez confirmer que vous souhaitez continuer."
   },
   "settings": {
-    "@title": "Settings",
-    "@settingsInformation": "Settings filled in",
+    "@title": "Paramètres",
+    "@settingsInformation": "Paramètres renseignés",
     "@adequacyPatch": "Adequacy Patch",
     "@flowBased": "Flowbased",
     "@generalData": "General data",

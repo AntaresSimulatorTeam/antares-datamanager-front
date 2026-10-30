@@ -87,11 +87,11 @@ export const ProjectCreationModal = ({ onClose, projectInfo, isOpen }: ProjectCr
         };
         void confirmCreation(projectData, projectInfo?.id);
       }}
-      variant="primary"
+      hierarchy="primary"
       color="primary"
       disabled={!isFormValid}
     />}
-    secondaryButton={<Button label={t('components.quickAccess.@cancel')} onClick={handleClose} variant="text" />}
+    secondaryButton={<Button label={t('components.quickAccess.@cancel')} onClick={handleClose} hierarchy="text" />}
     size="s"
     title={projectInfo ? t('home.@update_project') : t('home.@new_project')}
     >

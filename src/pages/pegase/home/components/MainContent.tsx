@@ -31,18 +31,19 @@ const MainContent = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
-    <div className="flex h-screen w-screen dark:bg-gray-900 dark:text-gray-200">
+    <div className="flex h-screen w-screen">
       <UserSettingsContext.Provider initialState={getInitialUserSettings()}>
         <ThemeHandler />
         <div className="z-50">
-        <PegaseToastContainer />
-        <PegaseAlertContainer />
-        <NavigationProvider
-          linkComponent={NavLink}
-          key={PEGASE_CONTEXT_MAIN_NAV_BAR_ID}
-        >
+          <PegaseToastContainer />
+          <PegaseAlertContainer />
+          <NavigationProvider
+            linkComponent={NavLink}
+            key={PEGASE_CONTEXT_MAIN_NAV_BAR_ID}
+          >
           <SideNav
             id={PEGASE_NAVBAR_ID}
+            key={PEGASE_NAVBAR_ID}
             header={<LogoHeader version={`v${packageJson.version}`} isCollapsed={isCollapsed}/>}
             items={translateMenuItemLabel(mainMenuItems, t)}
             footerItems={translateMenuItemLabel(footerMenuItems, t)}
@@ -52,7 +53,7 @@ const MainContent = () => {
             onCollapsedChange={(collapsed) => setIsCollapsed(collapsed)}
             size="s"
             />
-        </NavigationProvider>
+          </NavigationProvider>
         </div>
         <div className="flex h-full w-full min-w-0 flex-col">
           <PegaseStar />

@@ -25,7 +25,7 @@ export const TrajectoryDataVisualisation = ({ trajectoryData, onClose, isOpen }:
       iconAppearance="filled"
       id="data-visualisation-modal"
       onClose={onClose}
-      primaryButton={<Button label={t('project.@close')} onClick={onClose} variant="primary" />}
+      primaryButton={<Button label={t('project.@close')} onClick={onClose} hierarchy="primary" />}
       size="xl"
       title={`${title}: ${trajectory.trajectoryName}`}
       >

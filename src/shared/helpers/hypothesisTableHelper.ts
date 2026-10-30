@@ -150,26 +150,39 @@ export const findSpecificTrajectoryToDelete = (
   return match?.trajectory ?? null;
 };
 
+export const getFlowbasedInformationMessage = (hasLinkTrajectory?: boolean, isHvdcActivated?: boolean, hasHvdcCapacities?: boolean): { messageKey: string; id: string } | null => {
+  if (hasLinkTrajectory && hasHvdcCapacities && !isHvdcActivated) {
+    return { messageKey: 'flowbased.@informationMessage', id: '1' };
+  } else if (hasLinkTrajectory && hasHvdcCapacities && isHvdcActivated) {
+    return { messageKey: 'flowbased.@mandatoryTS', id: '1' };
+  } else {
+    return { messageKey: 'flowbased.@hvdcLinkRequired', id: '1' };
+  }
+};
+
 export const getInformationMessage = (
   nbRows: number,
   type: TRAJECTORY_TYPE,
   rowId: string,
   trajectory: DbTrajectory | null,
+  hasLinkTrajectory?: boolean,
+  isHvdcActivated?: boolean,
+  hasHvdcCapacities?: boolean,
 ): { messageKey: string; id: string } | null => {
-  switch (type) {
-    case TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER:
+  switch (true) {
+    case type === TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER:
       return { messageKey: 'thermal.@informationMessage', id: '1' };
-    case TRAJECTORY_TYPE.DSR:
+    case type === TRAJECTORY_TYPE.DSR:
       return { messageKey: 'dsr.@informationMessage', id: String(Math.max(nbRows - 1, 0)) };
-    case TRAJECTORY_TYPE.HYDRO_PSP_SERIES:
-    case TRAJECTORY_TYPE.HYDRO_SERIES:
+    case type === TRAJECTORY_TYPE.HYDRO_PSP_SERIES:
+    case type === TRAJECTORY_TYPE.HYDRO_SERIES:
       return (!trajectory && rowId?.split('.')[1] === '1') ||
         trajectory?.type === TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS ||
         trajectory?.type === TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS
         ? { messageKey: 'hydro.@informationMessage', id: rowId }
         : null;
-    case TRAJECTORY_TYPE.ADEQUACY_PATCH:
-      return { messageKey: 'flowbased.@informationMessage', id: '1' };
+    case type === TRAJECTORY_TYPE.ADEQUACY_PATCH && rowId === '1':
+      return getFlowbasedInformationMessage(hasLinkTrajectory, isHvdcActivated, hasHvdcCapacities);
     default:
       return null;
   }

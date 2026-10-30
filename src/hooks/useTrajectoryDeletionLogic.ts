@@ -32,6 +32,21 @@ const resolveTargetRow = (
     : data[rowIndex];
 };
 
+const computeLinkDeletion = (data: HypothesisRowData[], secondData?: HypothesisRowData[]): DeletionResult => {
+  const link = data[1]?.status === TRAJECTORY_SELECTION_STATUS.OK ? data[1]?.trajectory : null;
+  if (!link) {
+    return { trajectoryIds: [], trajectoryToDelete: null, additionalTrajectory: null };
+  }
+
+  const flowbased = secondData?.[1]?.status === TRAJECTORY_SELECTION_STATUS.OK ? secondData[1]?.trajectory : null;
+
+  return {
+    trajectoryToDelete: link,
+    additionalTrajectory: flowbased,
+    trajectoryIds: flowbased ? [link.id, flowbased.id] : [link.id],
+  };
+};
+
 const computeThermalDeletion = (data: HypothesisRowData[], hypothesis: string): DeletionResult => {
   const specific = findSpecificTrajectoryToDelete(data[0]?.subRows, hypothesis);
   if (!specific) {
@@ -128,8 +143,11 @@ export const useTrajectoryDeletionLogic = (study: StudyDTO) => {
       indexArray: number[] | null,
       hypothesis: string,
       status?: RowStatus,
+      secondData?: HypothesisRowData[],
     ): DeletionResult => {
       switch (type) {
+        case TRAJECTORY_TYPE.LINK:
+          return computeLinkDeletion(data, secondData);
         case TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER:
           return computeThermalDeletion(data, hypothesis);
         case TRAJECTORY_TYPE.DSR:

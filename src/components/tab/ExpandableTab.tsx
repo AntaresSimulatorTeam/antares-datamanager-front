@@ -221,7 +221,7 @@ const ExpandableTab = ({
         handleImport={async (rowId: string) => await handleTrajectoryFetchFromFS(rowId, tabType)}
         isReadOnlyEnable={true}
         updateData={(rowId: string, value: unknown, status: RowStatus) => {
-          void handleHypothesisTableUpdate(rowId, value, status, tabType, data, setData, setReadOnly);
+          void handleHypothesisTableUpdate({rowId, value, status, type: tabType, data, setData, setReadOnly});
         }}
         removeRow={removeTableRow}
         handleViewData={tabType === TRAJECTORY_TYPE.STS ? handleViewData : undefined}
@@ -255,7 +255,7 @@ const ExpandableTab = ({
             if (!rowToDelete?.value) return;
             const { value, index, operation } = rowToDelete;
             if (operation === 'empty') {
-              await detachTrajectory(tabType, [index], setData, data, 'empty', value, setReadOnly);
+              await detachTrajectory({type: tabType, indexArray: [index], setData, data, status: 'empty', hypothesis: value, setReadOnly});
             } else {
               await removeRow(tabType, index, data, value);
             }

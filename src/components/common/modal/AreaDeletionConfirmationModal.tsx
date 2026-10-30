@@ -1,51 +1,49 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Modal } from '@design-system-rte/react';
+import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
+import { getAreaDeletionModalTitle } from '@/shared/utils/trajectoryUtils.ts';
 
 interface AreaDeletionConfirmationModalProps {
   isOpen?: boolean;
   onClose: () => void;
   onConfirm: () => Promise<void>;
+  type?: TRAJECTORY_TYPE;
   message?: string;
-  title?: string;
-  isBusy?: boolean;
-  id?: string;
 }
 
 export const AreaDeletionConfirmationModal: React.FC<AreaDeletionConfirmationModalProps> = ({
   isOpen = false,
   onClose,
   onConfirm,
-  message,
-  title,
-  isBusy = false,
-  id = 'area-deletion-modal',
+  type,
+  message
 }) => {
   const { t } = useTranslation();
+  const getModalTile = type ? t(getAreaDeletionModalTitle(type)) : t('trajectoryDeletionModal.@confirmDeleteTitle');
 
   return (
     <Modal
       isOpen={isOpen}
-      id={id}
+      id="area-deletion-confirmation-modal"
       onClose={() => {
-        if (!isBusy) onClose();
+        onClose();
       }}
       primaryButton={
         <Button
           label={t('trajectoryDeletionModal.@confirm')}
-          variant="secondary"
+          hierarchy="secondary"
           onClick={() => void onConfirm()}
-          disabled={isBusy}
         />
       }
       secondaryButton={
-        <Button label={t('trajectoryDeletionModal.@cancel')} variant="text" onClick={onClose} disabled={isBusy} />
+        <Button label={t('trajectoryDeletionModal.@cancel')} hierarchy="text" onClick={onClose} />
       }
       size="s"
-      title={title ?? t('trajectoryDeletionModal.@confirmDeleteTitle')}
+      title={getModalTile}
       closeOnOverlayClick={false}
     >
-      <p>{message ?? t('trajectoryDeletionModal.@confirmDeleteMessage')}</p>
+      <p>{message}</p>
     </Modal>
   );
 };

@@ -36,7 +36,7 @@ export const SelectInputWithButton = ({
         icon="upload"
         iconPosition="left"
         onClick={() => void onClickButton?.()}
-        variant="primary"
+        hierarchy="primary"
         disabled={isDisabled}
       />
     </div>

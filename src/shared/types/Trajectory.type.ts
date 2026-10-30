@@ -38,6 +38,7 @@ export type HypothesisRowData = {
   timeSeries?: string;
   hvdc?: boolean;
   recalculate?: boolean;
+  hasHvdcCapacities?: boolean;
 };
 
 export type RowStatus = 'success' | 'warning' | 'emptyError' | 'error' | 'empty' | 'loading';

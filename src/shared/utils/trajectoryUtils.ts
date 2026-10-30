@@ -1312,10 +1312,10 @@ const hasValidTrajectory = (row?: HypothesisRowData) =>
 const hasValidTrajectoryTechnology = (row?: HypothesisRowData) =>
   row?.subRows?.some((subRow) => !!subRow.trajectory && subRow.status === TRAJECTORY_SELECTION_STATUS.OK);
 
-export const getDeletionModalMessage = (type: TRAJECTORY_TYPE, index: number, data: HypothesisRowData[]) => {
-  const row = data[index];
+export const getDeletionModalMessage = (type: TRAJECTORY_TYPE, index?: number, data?: HypothesisRowData[]) => {
+  const row = index != null ? data?.[index] : null;
 
-  if (type === TRAJECTORY_TYPE.DSR && shouldDeleteCapacityModulation(data, index)) {
+  if (type === TRAJECTORY_TYPE.DSR && data && index != null && shouldDeleteCapacityModulation(data, index)) {
     return 'trajectoryDeletionModal.@confirmDeletionCapacityMessage';
   }
 
@@ -1323,7 +1323,7 @@ export const getDeletionModalMessage = (type: TRAJECTORY_TYPE, index: number, da
     return 'trajectoryDeletionModal.@confirmDeleteHydroMessage';
   }
 
-  if (type === TRAJECTORY_TYPE.THERMAL_CAPACITY) {
+  if (type === TRAJECTORY_TYPE.THERMAL_CAPACITY && row) {
     const hasTrajectory = hasValidTrajectory(row);
     const hasTrajectoryTech = hasValidTrajectoryTechnology(row);
 
@@ -1332,8 +1332,26 @@ export const getDeletionModalMessage = (type: TRAJECTORY_TYPE, index: number, da
     }
   }
 
+  if (type === TRAJECTORY_TYPE.LINK) {
+    return 'flowbased.@linkChangeConfirmation';
+  }
+
+  if (type === TRAJECTORY_TYPE.FLOWBASED) {
+    return 'flowbased.@hvdcChangeConfirmation';
+  }
+
   return 'trajectoryDeletionModal.@confirmDeletionMessage';
 };
+
+export const getAreaDeletionModalTitle = (type: TRAJECTORY_TYPE) => {
+  if (type === TRAJECTORY_TYPE.LINK) {
+    return 'flowbased.@linkChangeConfirmationTitle';
+  }
+  if (type === TRAJECTORY_TYPE.FLOWBASED) {
+    return 'flowbased.@hvdcChangeConfirmationTitle';
+  }
+  return 'trajectoryDeletionModal.@confirmDeleteTitle';
+}
 
 /**
  * Determines if the given trajectory type is one of the unique trajectory types.
@@ -1560,7 +1578,7 @@ export const getModalTile = (tabType: TRAJECTORY_TYPE, hypothesis?: HypothesisTy
       ? sentenceCase(hypothesis.technology)
       : hypothesis?.technology;
   const area = hypothesis?.area === OTHER_AREAS ? OTHER_AREAS_LABEL : hypothesis?.area;
-  return `${area ?? tabType}${technology ? ' - ' : ''}${technology ?? ''}${isTrajectoryNuclearType(tabType) ? ' - FR' : ''}`;
+  return `${area?.length ? area : tabType}${technology ? ' - ' : ''}${technology ?? ''}${isTrajectoryNuclearType(tabType) ? ' - FR' : ''}`;
 };
 
 interface FetchFromDbParamsResult {
@@ -1699,7 +1717,7 @@ export const buildTableData = (
   config: HypothesisConfig[],
   t: TFunction,
   results?: DbTrajectory[][],
-  configOptions?: { hvdc?: boolean; recalculate?: boolean },
+  configOptions?: { hvdc?: boolean; recalculate?: boolean, hasHvdcCapacities?: boolean },
 ): HypothesisRowData[] => {
   // Aplatit tous les tableaux de trajectoires pour une recherche directe par type
   const allTrajectories = results?.flat() ?? [];
@@ -1727,16 +1745,12 @@ export const buildTableData = (
       ...(cfg.options?.hasRecalculateOption && {
         recalculate: configOptions?.recalculate,
       }),
+      ...(cfg.options?.hasHvdcOption && {
+        hasHvdcCapacities: configOptions?.hasHvdcCapacities,
+      }),
     };
   });
 };
-
-export const hasFlowbasedPrerequisites = (linkRow?: HypothesisRowData): boolean =>
-  linkRow != null &&
-  (linkRow.status === TRAJECTORY_SELECTION_STATUS.OK ||
-    linkRow.status === TRAJECTORY_SELECTION_STATUS.WARNING) &&
-  linkRow.trajectory?.type === TRAJECTORY_TYPE.LINK &&
-  linkRow.hvdc === true;
 
 export const hasLinkWithHvdcCapacities = (data: TrajectoryLinkData[]): boolean =>
   data.some(

@@ -121,15 +121,15 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
               <Button
                 label={t('study.@open')}
                 onClick={() => void navigateToStudy(selectedStudy)}
-                variant="secondary"
+                hierarchy="secondary"
                 size="s"
               />
-              <Button size="s" label={t('study.@duplicate')} onClick={handleDuplicate} variant="secondary" />
+              <Button size="s" label={t('study.@duplicate')} onClick={handleDuplicate} hierarchy="secondary" />
               <Button
                 size="s"
                 label={t('study.@delete')}
                 onClick={() => void handleDeleteClick()}
-                variant="secondary"
+                hierarchy="secondary"
                 disabled={!isDeleteActive}
               />
             </>
@@ -137,7 +137,7 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
             projectInfo?.id && (
               <Button
                 size="s"
-                variant="text"
+                hierarchy="text"
                 label={t('studyModal.@new_study')}
                 onClick={() => setIsModalStudyCreation(true)}
               />
