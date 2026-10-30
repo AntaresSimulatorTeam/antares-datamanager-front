@@ -18,7 +18,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
-import { getDeletionModalMessage } from '@/shared/utils/trajectoryUtils.ts';
+import { getDeletionModalMessage, shouldDeleteAllMETrajectories } from '@/shared/utils/trajectoryUtils.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
@@ -221,7 +221,13 @@ const ExpandableTab = ({
         handleImport={async (rowId: string) => await handleTrajectoryFetchFromFS(rowId, tabType)}
         isReadOnlyEnable={true}
         updateData={(rowId: string, value: unknown, status: RowStatus) => {
-          void handleHypothesisTableUpdate({rowId, value, status, type: tabType, data, setData, setReadOnly});
+          if (status === 'empty' && rowId === '0' && shouldDeleteAllMETrajectories(data)) {
+            setRowToDelete({ index: Number(rowId), value: value as string, operation: 'empty' });
+            setRowIdSelected(rowId);
+            setIsDeletionModalOpen(true);
+          } else {
+            void handleHypothesisTableUpdate({rowId, value, status, type: tabType, data, setData, setReadOnly});
+          }
         }}
         removeRow={removeTableRow}
         handleViewData={tabType === TRAJECTORY_TYPE.STS ? handleViewData : undefined}

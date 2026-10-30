@@ -152,7 +152,7 @@ export const useTrajectoryDeletionLogic = (study: StudyDTO) => {
           return computeThermalDeletion(data, hypothesis);
         case TRAJECTORY_TYPE.DSR:
           return computeDsrDeletion(data, indexArray, hypothesis);
-        case TRAJECTORY_TYPE.AREA_ME:
+        case TRAJECTORY_TYPE.ME:
           return computeAreaMeDeletion(data, indexRow, indexArray);
         default:
           return computeGenericDeletion(data, indexRow, indexArray, status);

@@ -1606,9 +1606,9 @@ describe('updateTableAfterCellDetach', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // AREA_ME
+  // ME
   // ---------------------------------------------------------------------------
-  describe('AREA_ME', () => {
+  describe('ME', () => {
     it('réinitialise toutes les lignes et sous-lignes à MISSING/null et met en lecture seule les indices !== 0', async () => {
       const data: HypothesisRowData[] = [
         {
@@ -1631,7 +1631,7 @@ describe('updateTableAfterCellDetach', () => {
       ];
 
       const result = await updateTableAfterCellDetach({
-        type: TRAJECTORY_TYPE.AREA_ME,
+        type: TRAJECTORY_TYPE.ME,
         data,
         additionalTrajectory: null,
         indexArray: [0],
