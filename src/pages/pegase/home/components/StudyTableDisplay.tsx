@@ -172,7 +172,7 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
       {
         <DeletionConfirmationModal
           isOpen={isDeletionModalOpen}
-          onClose={handleModalClose}
+          onClose={toggleDeletionModal}
           onConfirm={handleDeleteClick}
           title={t('trajectoryDeletionModal.@titleStudyDeleteMessage')}
           message={t('trajectoryDeletionModal.@confirmStudyDeleteMessage')}
