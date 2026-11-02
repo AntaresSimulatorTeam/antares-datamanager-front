@@ -1,21 +1,26 @@
 import {
   addNestedRow,
   buildDefaultEmptyTrajectoryList,
+  buildDispatchPayload,
   buildEmptyTrajectory,
   buildErrorTrajectory,
+  buildRowWithSubRows,
   buildReadOnlyRow,
   buildTableData,
   convertIntoHypothesisRowWithTechnologies,
   filterRow,
   findTechnologyMatch,
   generateReadOnlyIndexMap,
+  getAreaDeletionModalTitle,
   getAreaTrajectoryName,
   getBgColor,
+  getColumnHeader,
   getDefaultLabel,
   getDeletionModalMessage,
   getFetchFromDbParams,
   getHypothesis,
   getItemsMenu,
+  getMessageFromType,
   getModalTile,
   getPathFromTrajectoryType,
   getRowDataSelected,
@@ -23,15 +28,23 @@ import {
   getStudyMenu,
   getSubRowListWithArea,
   getSubRowsList,
+  getThermalTypeToUse,
   getTrajectoryTypeByIndex,
+  getUrlApiUploadTrajectory,
   hasLinkWithHvdcCapacities,
   isEmptyRow,
   isMatchingTrajectoryType,
   isTrajectoryLinked,
   isUniqueTrajectoryType,
+  mergeRows,
+  mergeSubRows,
+  normalize,
   removeDuplicate,
+  removeDuplicateByTechnology,
   retrieveReadOnlyArea,
   setNestedData,
+  shouldBeDeletable,
+  shouldDeleteAllMETrajectories,
   shouldDeleteCapacityModulation,
   shouldDeleteParamModulation,
   shouldHaveSubRows,
@@ -2109,7 +2122,300 @@ describe('getFetchFromDbParams', () => {
       technology: undefined,
     });
   });
+});
 
+describe('additional trajectoryUtils methods', () => {
+  describe('removeDuplicateByTechnology', () => {
+    it('keeps the first trajectory for each area and technology pair', () => {
+      const first = { area: 'FR', technology: 'solar', id: 1 } as DbTrajectory;
+      const duplicate = { area: 'FR', technology: 'solar', id: 2 } as DbTrajectory;
+      const otherTechnology = { area: 'FR', technology: 'wind', id: 3 } as DbTrajectory;
+      const otherArea = { area: 'DE', technology: 'solar', id: 4 } as DbTrajectory;
+
+      expect(removeDuplicateByTechnology([first, duplicate, otherTechnology, otherArea])).toEqual([
+        first,
+        otherTechnology,
+        otherArea,
+      ]);
+    });
+
+    it('returns an empty array when no trajectories are provided', () => {
+      expect(removeDuplicateByTechnology()).toEqual([]);
+    });
+  });
+
+  describe('shouldBeDeletable', () => {
+    const trajectory = { area: 'FR' } as DbTrajectory;
+
+    it('only allows deleting non-default specific thermal trajectories', () => {
+      expect(shouldBeDeletable(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, [], trajectory)).toBe(true);
+      expect(
+        shouldBeDeletable(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, [{ name: 'FR' }], trajectory),
+      ).toBe(false);
+      expect(shouldBeDeletable(TRAJECTORY_TYPE.LOAD, [], trajectory)).toBe(false);
+      expect(shouldBeDeletable(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, [], null)).toBe(false);
+    });
+
+    it('does not allow deleting the OTHER_AREAS trajectory', () => {
+      expect(
+        shouldBeDeletable(
+          TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+          [],
+          { area: OTHER_AREAS } as DbTrajectory,
+        ),
+      ).toBe(false);
+    });
+  });
+
+  describe('buildRowWithSubRows', () => {
+    it('builds a main row and one subrow for each technology option', () => {
+      const solar = { ...mockDbTrajectory, area: 'FR', technology: 'solar', trajectoryName: 'solar trajectory' };
+      const result = buildRowWithSubRows({
+        hypothesis: 'FR',
+        trajectory: { ...mockDbTrajectory, area: 'FR', technology: '', trajectoryName: 'area trajectory' },
+        techEntries: [solar],
+        options: ['solar', 'wind'],
+        areasNotInTrajectoryArea: [],
+      });
+
+      expect(result.trajectory?.trajectoryName).toBe('area trajectory');
+      expect(result.status).toBe(TRAJECTORY_SELECTION_STATUS.OK);
+      expect(result.subRows).toHaveLength(2);
+      expect(result.subRows?.[0]).toMatchObject({
+        hypothesis: 'solar',
+        trajectory: solar,
+        status: TRAJECTORY_SELECTION_STATUS.OK,
+      });
+      expect(result.subRows?.[1]).toMatchObject({
+        hypothesis: 'wind',
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+      });
+    });
+
+    it('sets the main row as default and omits subrows for distribution trajectories', () => {
+      const result = buildRowWithSubRows({
+        hypothesis: OTHER_AREAS_LABEL,
+        trajectory: { ...mockDbTrajectory, area: OTHER_AREAS, type: TRAJECTORY_TYPE.RES_ZONAL_DISTRIBUTION },
+        options: ['solar'],
+        areasNotInTrajectoryArea: [],
+      });
+
+      expect(result.isDefault).toBe(true);
+      expect(result.subRows).toBeNull();
+    });
+  });
+
+  describe('mergeSubRows and mergeRows', () => {
+    const makeRow = (
+      hypothesis: string,
+      trajectory: DbTrajectory | null = null,
+      subRows: HypothesisRowData[] | null = null,
+    ): HypothesisRowData =>
+      ({
+        hypothesis,
+        trajectory,
+        status: trajectory ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+        isDefault: false,
+        isDeletable: false,
+        subRows,
+      }) as HypothesisRowData;
+
+    it('deduplicates subrows and prefers the row with a trajectory', () => {
+      const missing = makeRow('solar');
+      const populatedTrajectory = { ...mockDbTrajectory, trajectoryName: 'solar trajectory' };
+      const populated = makeRow('solar', populatedTrajectory);
+
+      expect(mergeSubRows([missing, populated, makeRow('wind')])).toEqual([populated, makeRow('wind')]);
+    });
+
+    it('merges duplicate parent rows, trajectories, and unique subrows', () => {
+      const parentTrajectory = { ...mockDbTrajectory, trajectoryName: 'parent trajectory' };
+      const solarTrajectory = { ...mockDbTrajectory, trajectoryName: 'solar trajectory' };
+      const rows = [
+        makeRow('FR', parentTrajectory, [makeRow('solar')]),
+        makeRow('FR', null, [makeRow('solar', solarTrajectory), makeRow('wind')]),
+      ];
+
+      expect(mergeRows(rows)).toEqual([
+        makeRow('FR', parentTrajectory, [makeRow('solar', solarTrajectory), makeRow('wind')]),
+      ]);
+    });
+  });
+
+  describe('shouldDeleteAllMETrajectories', () => {
+    const validTrajectory = { ...mockDbTrajectory, trajectoryName: 'valid trajectory' };
+    const makeRow = (
+      trajectory: DbTrajectory | null = null,
+      subRows: HypothesisRowData[] | null = null,
+      status = trajectory ? TRAJECTORY_SELECTION_STATUS.OK : TRAJECTORY_SELECTION_STATUS.MISSING,
+    ) =>
+      ({
+        hypothesis: 'row',
+        trajectory,
+        status,
+        isDefault: false,
+        isDeletable: false,
+        subRows,
+      }) as HypothesisRowData;
+
+    it('returns false when there are no valid trajectories after the first row', () => {
+      expect(shouldDeleteAllMETrajectories([makeRow(validTrajectory)])).toBe(false);
+      expect(shouldDeleteAllMETrajectories([])).toBe(false);
+    });
+
+    it('returns true when any later row has a valid trajectory', () => {
+      expect(shouldDeleteAllMETrajectories([makeRow(validTrajectory), makeRow(validTrajectory)])).toBe(true);
+    });
+
+    it('checks valid technology trajectories on the fourth row after the first row', () => {
+      const validTechnology = makeRow(validTrajectory);
+      const rows = [makeRow(), makeRow(), makeRow(), makeRow(), makeRow(null, [validTechnology])];
+      expect(shouldDeleteAllMETrajectories(rows)).toBe(true);
+    });
+
+    it('ignores trajectories with a non-OK status', () => {
+      expect(
+        shouldDeleteAllMETrajectories([
+          makeRow(),
+          makeRow(validTrajectory, null, TRAJECTORY_SELECTION_STATUS.ERROR),
+        ]),
+      ).toBe(false);
+    });
+  });
+
+  describe('getDeletionModalMessage and getAreaDeletionModalTitle', () => {
+    it('returns the type-specific deletion messages and titles', () => {
+      expect(getDeletionModalMessage(TRAJECTORY_TYPE.LINK)).toBe('flowbased.@linkChangeConfirmation');
+      expect(getDeletionModalMessage(TRAJECTORY_TYPE.FLOWBASED)).toBe('flowbased.@hvdcChangeConfirmation');
+      expect(getDeletionModalMessage(TRAJECTORY_TYPE.ME)).toBe('trajectoryDeletionModal.@confirmMeDeleteMessage');
+
+      expect(getAreaDeletionModalTitle(TRAJECTORY_TYPE.LINK)).toBe('flowbased.@linkChangeConfirmationTitle');
+      expect(getAreaDeletionModalTitle(TRAJECTORY_TYPE.FLOWBASED)).toBe('flowbased.@hvdcChangeConfirmationTitle');
+      expect(getAreaDeletionModalTitle(TRAJECTORY_TYPE.AREA)).toBe('trajectoryDeletionModal.@confirmDeleteTitle');
+    });
+  });
+
+  describe('normalize', () => {
+    it('normalizes null and empty values to an empty string and preserves other values', () => {
+      expect(normalize(null)).toBe('');
+      expect(normalize('')).toBe('');
+      expect(normalize('FR')).toBe('FR');
+    });
+  });
+
+  describe('getMessageFromType', () => {
+    const t = ((key: string) => `translated:${key}`) as unknown as TFunction;
+
+    it.each([
+      [TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, 'thermal.@specificInformation'],
+      [TRAJECTORY_TYPE.ADEQUACY_PATCH, 'settings.@settingsInformation'],
+      [TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION, 'thermal.@timeSeriesInformation'],
+      [TRAJECTORY_TYPE.LOAD, 'thermal.@technologyFilledIn'],
+    ])('returns the translated message for %s', (type, key) => {
+      expect(getMessageFromType(type, t)).toBe(`translated:${key}`);
+    });
+  });
+
+  describe('getThermalTypeToUse', () => {
+    it('uses the selected technology for the specific thermal trajectory', () => {
+      expect(
+        getThermalTypeToUse(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, 0, {
+          technology: 'Gas',
+        }),
+      ).toEqual({
+        typeToUse: TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+        areaToUse: 'Gas',
+      });
+    });
+
+    it('resolves other thermal tab indexes to their trajectory type', () => {
+      expect(getThermalTypeToUse(TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER, 2)).toEqual({
+        typeToUse: TRAJECTORY_TYPE.THERMAL_TECHNICAL_COMMON_PARAMETER,
+        areaToUse: '',
+      });
+      expect(getThermalTypeToUse(TRAJECTORY_TYPE.THERMAL_ECONOMIC_COST_PARAMETER, 1)).toEqual({
+        typeToUse: TRAJECTORY_TYPE.THERMAL_ECONOMIC_PARAMETER,
+      });
+    });
+  });
+
+  describe('getUrlApiUploadTrajectory', () => {
+    it('builds the LOAD URL with its area and study parameters', () => {
+      const url = getUrlApiUploadTrajectory(TRAJECTORY_TYPE.LOAD, 7, 'trajectory', '2030', 'FR', true);
+      expect(url).toContain('/v1/trajectory/load?area=FR&trajectoryToUse=trajectory&horizon=2030&studyId=7');
+      expect(url).toContain('&isCivilYear=true');
+    });
+
+    it('builds thermal and renewable URLs with their optional technology parameters', () => {
+      const thermalUrl = getUrlApiUploadTrajectory(
+        TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+        7,
+        'trajectory',
+        '2030',
+        'FR',
+        false,
+        'Gas',
+      );
+      expect(thermalUrl).toContain('/v1/trajectory/thermal-specific-parameter?area=FR&technology=Gas');
+
+      const renewableUrl = getUrlApiUploadTrajectory(
+        TRAJECTORY_TYPE.RES_CAPACITY,
+        7,
+        'trajectory',
+        '2030',
+        'FR',
+        false,
+        'Wind Offshore',
+      );
+      expect(renewableUrl).toContain('/v1/trajectory/installed-power-res?area=FR&technology=wind_offshore');
+    });
+
+    it('adds the PSP flag and uses the generic URL for an unrecognized type', () => {
+      const hydroUrl = getUrlApiUploadTrajectory(TRAJECTORY_TYPE.HYDRO_PSP_SERIES, 7, 'trajectory', '2030', 'FR');
+      expect(hydroUrl).toContain('&isPsp=true');
+
+      const genericUrl = getUrlApiUploadTrajectory('unknown' as TRAJECTORY_TYPE, 7, 'trajectory', '2030');
+      expect(genericUrl).toContain('?trajectoryType=unknown&trajectoryToUse=trajectory&horizon=2030&studyId=7');
+      expect(genericUrl).not.toContain('isCivilYear');
+    });
+  });
+
+  describe('buildDispatchPayload', () => {
+    it('maps each configured type to its non-empty trajectory results', () => {
+      const first = { ...mockDbTrajectory, type: TRAJECTORY_TYPE.AREA };
+      const second = { ...mockDbTrajectory, type: TRAJECTORY_TYPE.LOAD };
+      const config: HypothesisConfig[] = [
+        { type: TRAJECTORY_TYPE.AREA, labelKey: 'areas' },
+        { type: TRAJECTORY_TYPE.LOAD, labelKey: 'load' },
+        { type: TRAJECTORY_TYPE.LINK, labelKey: 'links' },
+      ];
+
+      expect(buildDispatchPayload(config, [[first], [second], []])).toEqual({
+        [TRAJECTORY_TYPE.AREA]: { trajectories: [first] },
+        [TRAJECTORY_TYPE.LOAD]: { trajectories: [second] },
+      });
+    });
+  });
+
+  describe('getColumnHeader', () => {
+    const t = ((key: string) => key) as unknown as TFunction;
+
+    it.each([TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION, TRAJECTORY_TYPE.P2G, TRAJECTORY_TYPE.ME])(
+      'uses the hypothesis header for %s',
+      (type) => {
+        expect(getColumnHeader(t, type)).toBe('studyDetails.@hypothesis');
+      },
+    );
+
+    it('uses the areas header for other types and when no type is provided', () => {
+      expect(getColumnHeader(t, TRAJECTORY_TYPE.AREA)).toBe('studyDetails.@areas');
+      expect(getColumnHeader(t)).toBe('studyDetails.@areas');
+    });
+  });
+});
+
+describe('getFetchFromDbParams', () => {
   it('handles trajectory configuration types', () => {
     expect(getFetchFromDbParams(TRAJECTORY_TYPE.SETTINGS, [0])).toEqual({
       typeToUse: TRAJECTORY_TYPE.ADEQUACY_PATCH,

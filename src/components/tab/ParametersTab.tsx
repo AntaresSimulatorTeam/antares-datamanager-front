@@ -36,11 +36,11 @@ import {
   getParamForFetchFSTrajectory,
   shouldOpenDeletionModal,
 } from '@/shared/helpers/hypothesisTableHelper.ts';
-import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
 import { useFetchHypothesisParametersTrajectories } from '@/hooks/useFetchHypothesisParametersTrajectories.ts';
 import { useFetchFixHypothesisTrajectories } from '@/hooks/useFetchFixHypothesisTrajectories.ts';
 import { useTrajectoryFetchFromFSHandler } from '@/hooks/useTrajectoryFetchFromFSHandler.ts';
 import { HypothesisType } from '@/shared/types/HypothesisTable.ts';
+import { DeletionConfirmationModal } from '@common/modal/DeletionConfirmationModal.tsx';
 
 export const ParametersTab = ({ studyData, defaultAreas, areas }: TabProps) => {
   const { t } = useTranslation();
@@ -340,7 +340,7 @@ export const ParametersTab = ({ studyData, defaultAreas, areas }: TabProps) => {
           data={isTrajectoryThermalTechnicalParametersType(selectedTrajectoryType) ? technicalData : data}
           rowIdSelected={rowIdSelected}
         />
-        <AreaDeletionConfirmationModal
+        <DeletionConfirmationModal
           isOpen={isDeletionModalOpen}
           onClose={() => setIsDeletionModalOpen(false)}
           message={

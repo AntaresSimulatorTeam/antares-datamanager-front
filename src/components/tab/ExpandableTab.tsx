@@ -18,7 +18,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext.tsx';
 import { ReadOnlyObject } from '@common/data/stdTable/types/readOnly.type';
-import { getDeletionModalMessage } from '@/shared/utils/trajectoryUtils.ts';
+import { getDeletionModalMessage, shouldDeleteAllMETrajectories } from '@/shared/utils/trajectoryUtils.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import getExpandableHypothesisTableHeaders from '@/components/header/ExpandableHypothesisTableHeaders.tsx';
@@ -30,7 +30,6 @@ import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow.ts';
 import { useTrajectorySearchHandler } from '@/hooks/useTrajectorySearchHandler.ts';
 import { getParamForFetchFSTrajectory, shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
-import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
 import { CheckBoxList } from '@/components/list/CheckBoxList.tsx';
 import { useTranslation } from 'react-i18next';
 import { TrajectoryDataVisualisation } from '@common/modal/TrajectoryDataVisualisation.tsx';
@@ -38,6 +37,7 @@ import { useTrajectoryFetchFromFSHandler } from '@/hooks/useTrajectoryFetchFromF
 import { HypothesisType, RowToDeleteProps } from '@/shared/types/HypothesisTable.ts';
 import { useHypothesisTableUpdateHandler } from '@/hooks/useHypothesisTableUpdateHandler.ts';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
+import { DeletionConfirmationModal } from '@common/modal/DeletionConfirmationModal.tsx';
 
 const ExpandableTab = ({
   studyData,
@@ -221,7 +221,13 @@ const ExpandableTab = ({
         handleImport={async (rowId: string) => await handleTrajectoryFetchFromFS(rowId, tabType)}
         isReadOnlyEnable={true}
         updateData={(rowId: string, value: unknown, status: RowStatus) => {
-          void handleHypothesisTableUpdate({rowId, value, status, type: tabType, data, setData, setReadOnly});
+          if (tabType === TRAJECTORY_TYPE.ME && status === 'empty' && rowId === '0' && shouldDeleteAllMETrajectories(data)) {
+            setRowToDelete({ index: Number(rowId), value: value as string, operation: 'empty' });
+            setRowIdSelected(rowId);
+            setIsDeletionModalOpen(true);
+          } else {
+            void handleHypothesisTableUpdate({rowId, value, status, type: tabType, data, setData, setReadOnly});
+          }
         }}
         removeRow={removeTableRow}
         handleViewData={tabType === TRAJECTORY_TYPE.STS ? handleViewData : undefined}
@@ -248,14 +254,14 @@ const ExpandableTab = ({
       {trajectoryData && (
         <TrajectoryDataVisualisation trajectoryData={trajectoryData} onClose={() => setIsViewModalOpen(false)} isOpen={isViewModalOpen}/>
       )}
-        <AreaDeletionConfirmationModal
+        <DeletionConfirmationModal
           isOpen={isDeletionModalOpen}
           onClose={() => setIsDeletionModalOpen(false)}
           onConfirm={async () => {
             if (!rowToDelete?.value) return;
             const { value, index, operation } = rowToDelete;
             if (operation === 'empty') {
-              await detachTrajectory({type: tabType, indexArray: [index], setData, data, status: 'empty', hypothesis: value, setReadOnly});
+              await detachTrajectory({type: tabType === TRAJECTORY_TYPE.ME ? TRAJECTORY_TYPE.AREA_ME : tabType, indexArray: [index], setData, data, status: 'empty', hypothesis: value, setReadOnly});
             } else {
               await removeRow(tabType, index, data, value);
             }
