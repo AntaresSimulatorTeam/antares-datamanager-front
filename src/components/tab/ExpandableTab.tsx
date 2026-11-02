@@ -30,7 +30,6 @@ import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
 import { useHypothesisTableRemoveRow } from '@/hooks/useHypothesisTableRemoveRow.ts';
 import { useTrajectorySearchHandler } from '@/hooks/useTrajectorySearchHandler.ts';
 import { getParamForFetchFSTrajectory, shouldOpenDeletionModal } from '@/shared/helpers/hypothesisTableHelper.ts';
-import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
 import { CheckBoxList } from '@/components/list/CheckBoxList.tsx';
 import { useTranslation } from 'react-i18next';
 import { TrajectoryDataVisualisation } from '@common/modal/TrajectoryDataVisualisation.tsx';
@@ -38,6 +37,7 @@ import { useTrajectoryFetchFromFSHandler } from '@/hooks/useTrajectoryFetchFromF
 import { HypothesisType, RowToDeleteProps } from '@/shared/types/HypothesisTable.ts';
 import { useHypothesisTableUpdateHandler } from '@/hooks/useHypothesisTableUpdateHandler.ts';
 import { useTrajectoryDetach } from '@/hooks/useTrajectoryDetach.ts';
+import { DeletionConfirmationModal } from '@common/modal/DeletionConfirmationModal.tsx';
 
 const ExpandableTab = ({
   studyData,
@@ -254,7 +254,7 @@ const ExpandableTab = ({
       {trajectoryData && (
         <TrajectoryDataVisualisation trajectoryData={trajectoryData} onClose={() => setIsViewModalOpen(false)} isOpen={isViewModalOpen}/>
       )}
-        <AreaDeletionConfirmationModal
+        <DeletionConfirmationModal
           isOpen={isDeletionModalOpen}
           onClose={() => setIsDeletionModalOpen(false)}
           onConfirm={async () => {

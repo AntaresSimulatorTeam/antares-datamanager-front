@@ -1353,7 +1353,7 @@ export const getDeletionModalMessage = (type: TRAJECTORY_TYPE, index?: number, d
   return 'trajectoryDeletionModal.@confirmDeletionMessage';
 };
 
-export const getAreaDeletionModalTitle = (type: TRAJECTORY_TYPE) => {
+export const getAreaDeletionModalTitle = (type?: TRAJECTORY_TYPE) => {
   if (type === TRAJECTORY_TYPE.LINK) {
     return 'flowbased.@linkChangeConfirmationTitle';
   }

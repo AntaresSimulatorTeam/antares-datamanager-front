@@ -4,28 +4,30 @@ import { Button, Modal } from '@design-system-rte/react';
 import { TRAJECTORY_TYPE } from '@/shared/enum/trajectory.ts';
 import { getAreaDeletionModalTitle } from '@/shared/utils/trajectoryUtils.ts';
 
-interface AreaDeletionConfirmationModalProps {
+interface DeletionConfirmationModalProps {
   isOpen?: boolean;
   onClose: () => void;
   onConfirm: () => Promise<void>;
   type?: TRAJECTORY_TYPE;
   message?: string;
+  title?: string;
 }
 
-export const AreaDeletionConfirmationModal: React.FC<AreaDeletionConfirmationModalProps> = ({
+export const DeletionConfirmationModal: React.FC<DeletionConfirmationModalProps> = ({
   isOpen = false,
   onClose,
   onConfirm,
   type,
-  message
+  message,
+  title
 }) => {
   const { t } = useTranslation();
-  const getModalTile = type ? t(getAreaDeletionModalTitle(type)) : t('trajectoryDeletionModal.@confirmDeleteTitle');
+  const getModalTile = title ? title : t(getAreaDeletionModalTitle(type));
 
   return (
     <Modal
       isOpen={isOpen}
-      id="area-deletion-confirmation-modal"
+      id="deletion-confirmation-modal"
       onClose={() => {
         onClose();
       }}

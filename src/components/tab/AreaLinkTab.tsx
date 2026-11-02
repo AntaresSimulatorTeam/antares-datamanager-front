@@ -24,7 +24,7 @@ import { useStudy, useStudyDispatch } from '@/store/contexts/StudyContext';
 import { STUDY_ACTION } from '@/shared/enum/study.ts';
 import { buildReadOnlyRow, buildTableData, getDeletionModalMessage } from '@/shared/utils/trajectoryUtils.ts';
 import { TrajectoryDataVisualisation } from '@common/modal/TrajectoryDataVisualisation.tsx';
-import { AreaDeletionConfirmationModal } from '@common/modal/AreaDeletionConfirmationModal.tsx';
+import { DeletionConfirmationModal } from '@common/modal/DeletionConfirmationModal.tsx';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
 import { PegaseHypothesisTable } from '@common/layout/PegaseHypothesisTable/PegaseHypothesisTable.tsx';
 import { useTrajectoryImport } from '@/hooks/useTrajectoryImport.ts';
@@ -337,7 +337,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
       {trajectoryData && (
         <TrajectoryDataVisualisation trajectoryData={trajectoryData} onClose={() => setIsViewModalOpen(false)} isOpen={isViewModalOpen}/>
       )}
-      <AreaDeletionConfirmationModal
+      <DeletionConfirmationModal
         isOpen={isDeletionModalOpen}
         onClose={() => setIsDeletionModalOpen(false)}
         onConfirm={handleConfirmedDeletion}
