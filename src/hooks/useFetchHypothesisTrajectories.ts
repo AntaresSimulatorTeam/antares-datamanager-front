@@ -274,7 +274,8 @@ export const useFetchHypothesisTrajectories = (
               defaultAreaListNotInList,
             });
 
-            const allowedAreas = new Set([...(rows ?? []).map(row => row.trajectory?.area), ...(defaultAreas ?? []).map(area => area.name), OTHER_AREAS]);
+            const filterdAreas = isStudyGenerated ? (rows ?? []).filter(row => row.trajectory?.area?.length).map(row => row?.trajectory?.area) : (areas ?? []).map(area => area.areaName);
+            const allowedAreas = new Set([...filterdAreas, ...(defaultAreas ?? []).map(area => area.name), OTHER_AREAS]);
             const areasWithTrajectory = effectiveTrajectories?.flatMap((traj) => (traj?.area?.length && allowedAreas.has(traj?.area) ? traj : []));
             const list = buildCheckListBox(areasWithTrajectory, areas, defaultAreas);
 
