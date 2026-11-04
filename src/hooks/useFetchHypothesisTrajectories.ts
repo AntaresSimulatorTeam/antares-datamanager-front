@@ -24,6 +24,7 @@ import {
   buildReadOnlyMap,
   buildRowsByType,
   fetchAndNormalizeTrajectories,
+  getAreasForChecklist,
 } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { buildCheckListBox, getDefaultAreaNotIncludedInAreaList } from '@/shared/utils/hypothesisTableUtils.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
@@ -274,8 +275,8 @@ export const useFetchHypothesisTrajectories = (
               defaultAreaListNotInList,
             });
 
-            const filterdAreas = isStudyGenerated ? (rows ?? []).filter(row => row.trajectory?.area?.length).map(row => row?.trajectory?.area) : (areas ?? []).map(area => area.areaName);
-            const allowedAreas = new Set([...filterdAreas, ...(defaultAreas ?? []).map(area => area.name), OTHER_AREAS]);
+            const areasForChecklist = getAreasForChecklist(rows, isStudyGenerated, areas);
+            const allowedAreas = new Set([...areasForChecklist, ...(defaultAreas ?? []).map(area => area.name), OTHER_AREAS]);
             const areasWithTrajectory = effectiveTrajectories?.flatMap((traj) => (traj?.area?.length && allowedAreas.has(traj?.area) ? traj : []));
             const list = buildCheckListBox(areasWithTrajectory, areas, defaultAreas);
 
