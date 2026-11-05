@@ -24,6 +24,7 @@ import {
   buildReadOnlyMap,
   buildRowsByType,
   fetchAndNormalizeTrajectories,
+  getAreasForChecklist,
 } from '@/shared/helpers/hypothesisTableHelper.ts';
 import { buildCheckListBox, getDefaultAreaNotIncludedInAreaList } from '@/shared/utils/hypothesisTableUtils.ts';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
@@ -255,8 +256,6 @@ export const useFetchHypothesisTrajectories = (
             const { trajType, trajectories, dsrCmResult, technologies, shouldSkipFetch, contextTrajectories } = res;
 
             const effectiveTrajectories = shouldSkipFetch ? contextTrajectories : trajectories;
-            const areasWithTrajectory = effectiveTrajectories?.flatMap((traj) => (traj.area?.length > 0 ? traj : []));
-            const list = buildCheckListBox(areasWithTrajectory, areas, defaultAreas);
 
             const rows = buildHypothesisRows({
               trajType,
@@ -275,6 +274,11 @@ export const useFetchHypothesisTrajectories = (
               isStudyGenerated,
               defaultAreaListNotInList,
             });
+
+            const areasForChecklist = getAreasForChecklist(rows, isStudyGenerated, areas);
+            const allowedAreas = new Set([...areasForChecklist, ...(defaultAreas ?? []).map(area => area.name), OTHER_AREAS]);
+            const areasWithTrajectory = effectiveTrajectories?.flatMap((traj) => (traj?.area?.length && allowedAreas.has(traj?.area) ? traj : []));
+            const list = buildCheckListBox(areasWithTrajectory, areas, defaultAreas);
 
             return {
               ...res,

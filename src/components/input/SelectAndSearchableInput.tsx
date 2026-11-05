@@ -108,6 +108,7 @@ const SelectAndSearchableInput = ({
     <div
       className="relative w-full text-body-l"
       style={{ width: containerWidthStyle}}
+      data-testid="select-and-searchable-input"
     >
       <Dropdown
         dropdownId="card-options"
