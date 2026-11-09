@@ -879,3 +879,20 @@ export const getTypeToUse = (type: TRAJECTORY_TYPE, indexArray: number[], nbRows
       return type;
   }
 };
+
+export const getAreasForChecklist = (
+  rows: HypothesisRowData[] | undefined,
+  isStudyGenerated: boolean,
+  areas: TrajectoryAreaData[] | undefined,
+) => {
+  if (!isStudyGenerated) {
+    return (areas ?? []).map((area) => area.areaName);
+  }
+
+  return (rows ?? [])
+    .filter((row) => row.subRows?.some((subRow) => !!subRow.trajectory) || !!row.trajectory)
+    .map((row) => {
+      const subRowTrajectory = row.subRows?.find((subRow) => !!subRow.trajectory)?.trajectory;
+      return subRowTrajectory?.area || row.trajectory?.area;
+    });
+};

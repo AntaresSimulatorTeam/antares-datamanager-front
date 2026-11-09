@@ -19,6 +19,7 @@ import { useNewStudyModal } from '@/hooks/useNewStudyModal';
 import StudyCreationModal from '@common/modal/StudyCreationModal';
 import StudyModificationModal from '@common/modal/StudyModificationModal.tsx';
 import { Button, Pagination } from '@design-system-rte/react';
+import { DeletionConfirmationModal } from '@common/modal/DeletionConfirmationModal.tsx';
 
 interface StudyTableDisplayProps {
   searchStudy: string | undefined;
@@ -34,8 +35,9 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
   const [sortBy, setSortBy] = useState<{ [key: string]: 'asc' | 'desc' }>({});
   const [sortedColumn, setSortedColumn] = useState<string | null>('status');
   const [isDuplicateMode, setIsDuplicateMode] = useState(false);
-  const { isModalOpen, toggleModal } = useNewStudyModal();
   const [isModalStudyCreation, setIsModalStudyCreation] = useState(false);
+  const { isModalOpen, toggleModal } = useNewStudyModal();
+  const { isModalOpen: isDeletionModalOpen, toggleModal: toggleDeletionModal } = useNewStudyModal();
   const [page, setPage] = useState<number>(0);
   const { navigateToStudy } = useStudyNavigation();
   const { rows, totalPagesNb } = useStudyTableDisplay({
@@ -81,11 +83,12 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
       if (selectedStudy?.id) {
         await deleteStudy(Number(selectedStudy.id));
         setReloadStudies((prev) => prev + 1);
+        toggleDeletionModal();
       }
     } catch {
       // Silent handler
     }
-  }, [selectedStudy?.id]);
+  }, [selectedStudy?.id, toggleDeletionModal]);
 
   const handleModalClose = useCallback(() => {
     setRowSelection({});
@@ -128,7 +131,7 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
               <Button
                 size="s"
                 label={t('study.@delete')}
-                onClick={() => void handleDeleteClick()}
+                onClick={toggleDeletionModal}
                 hierarchy="secondary"
                 disabled={!isDeleteActive}
               />
@@ -166,6 +169,15 @@ const StudyTableDisplay = ({ searchStudy, projectInfo }: StudyTableDisplayProps)
           isDuplicateMode={isDuplicateMode}
         />
       )}
+      {
+        <DeletionConfirmationModal
+          isOpen={isDeletionModalOpen}
+          onClose={toggleDeletionModal}
+          onConfirm={handleDeleteClick}
+          title={t('trajectoryDeletionModal.@titleStudyDeleteMessage')}
+          message={t('trajectoryDeletionModal.@confirmStudyDeleteMessage')}
+        />
+      }
     </div>
   );
 };
