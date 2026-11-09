@@ -19,7 +19,7 @@ import {
   MIN_KEYWORD_LENGTH,
 } from '@/shared/const/studyConfig';
 import { hasArrayChanged } from '@/shared/utils/arrayUtils.ts';
-import { Button, Modal, Select, TextInput } from '@design-system-rte/react';
+import { Button, Loader, Modal, Select, TextInput } from '@design-system-rte/react';
 import { FieldInFormation } from '@common/base/FieldInFormation.tsx';
 import { convertToOneYearHorizon } from '@/shared/utils/textUtils.ts';
 import { useFetchProjectOptions } from '@/hooks/useFetchProjectOptions.ts';
@@ -89,7 +89,7 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
     onClose();
   }, [onClose]);
 
-  const { confirmUpdate } = useStudyModification(
+  const { confirmUpdate, isDuplicating } = useStudyModification(
     () => {
       setReloadStudies?.((prev) => prev + 1);
       notifyToast({
@@ -145,26 +145,35 @@ const StudyModificationModal: React.FC<StudyCreationModalProps> = ({
       closeOnOverlayClick={false}
       id="study-update-modal"
       onClose={handleClose}
-      primaryButton={<Button
-        icon={isDuplicateMode ? 'copy' : 'edit'}
-        label={isDuplicateMode ? t('study.@duplicate') : t('modal.@button_update')}
-        onClick={() => {
-          const studyData = {
-            ...study,
-            createdBy: user?.profile.sub,
-            name: studyName,
-            keywords,
-            project: project?.label ?? '',
-            projectId: project?.id?.toString() || '',
-            horizon,
-          };
+      primaryButton={
+        isDuplicating && isDuplicateMode ? (
+        <Loader
+          appearance="brand"
+          label={t('studyDetails.@duplicating')}
+          labelPosition="right"
+          size="medium"
+        />) :
+        (<Button
+          icon={isDuplicateMode ? 'copy' : 'edit'}
+          label={isDuplicateMode ? t('study.@duplicate') : t('modal.@button_update')}
+          onClick={() => {
+            const studyData = {
+              ...study,
+              createdBy: user?.profile.sub,
+              name: studyName,
+              keywords,
+              project: project?.label ?? '',
+              projectId: project?.id?.toString() || '',
+              horizon,
+            };
 
-          void confirmUpdate(study.id, studyData, isDuplicateMode);
-        }}
-        hierarchy="primary"
-        disabled={!isFormValid}
-      />}
-      secondaryButton={<Button label={t('components.quickAccess.@cancel')} onClick={handleClose} hierarchy="text" />}
+            void confirmUpdate(study.id, studyData, isDuplicateMode);
+          }}
+          hierarchy="primary"
+          disabled={!isFormValid}
+        />)
+      }
+      secondaryButton={<Button disabled={isDuplicating && isDuplicateMode} label={t('components.quickAccess.@cancel')} onClick={handleClose} hierarchy="text" />}
       size="s"
       title={isDuplicateMode ? t('home.@duplicate_study') : t('studyModal.@update_study')}
     >
