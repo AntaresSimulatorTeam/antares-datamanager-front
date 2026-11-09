@@ -1360,6 +1360,9 @@ export const getAreaDeletionModalTitle = (type?: TRAJECTORY_TYPE) => {
   if (type === TRAJECTORY_TYPE.FLOWBASED) {
     return 'flowbased.@hvdcChangeConfirmationTitle';
   }
+  if (type === TRAJECTORY_TYPE.ME) {
+    return 'trajectoryDeletionModal.@confirmDeleteMETitle';
+  }
   return 'trajectoryDeletionModal.@confirmDeleteTitle';
 }
 

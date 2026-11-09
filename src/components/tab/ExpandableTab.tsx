@@ -272,6 +272,7 @@ const ExpandableTab = ({
               ? t('trajectoryDeletionModal.@confirmDeletionMessage')
               : t(`${getDeletionModalMessage(tabType, rowToDelete.index, data)}`)
           }
+          type={tabType}
         />
     </div>
   );
