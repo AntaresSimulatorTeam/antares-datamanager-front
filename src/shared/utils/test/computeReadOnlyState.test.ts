@@ -39,6 +39,16 @@ describe('computeReadOnlyState', () => {
     expect(readOnly).toEqual({ '0': false, '1': true });
   });
 
+  it('should disable Links if no link trajectory and study is GENERATION_INPROGRESS', () => {
+    const readOnly = computeReadOnlyState(
+      dummyTrajectory,
+      TRAJECTORY_SELECTION_STATUS.OK,
+      StudyStatus.GENERATION_INPROGRESS,
+      false,
+    );
+    expect(readOnly).toEqual({ '0': false, '1': true });
+  });
+
   it('should enable Links if area trajectory exists, no error, study is not GENERATED, and has link trajectory', () => {
     const readOnly = computeReadOnlyState(
       dummyTrajectory,
@@ -49,3 +59,4 @@ describe('computeReadOnlyState', () => {
     expect(readOnly).toEqual({ '0': false, '1': false });
   });
 });
+

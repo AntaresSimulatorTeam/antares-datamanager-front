@@ -200,7 +200,7 @@ const ExpandableTab = ({
           checkedValues={checkedValues}
           options={areasOptions}
           handleSelectionChange={handleSelectionChange}
-          disabled={studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED}
+          disabled={studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED || studyState.studyStatus === StudyStatus.GENERATION_INPROGRESS || studyData.status === StudyStatus.GENERATION_INPROGRESS}
         />
       )}
 
@@ -210,7 +210,7 @@ const ExpandableTab = ({
         getTableHeaders={getExpandableHypothesisTableHeaders}
         fileStatus={fileStatus}
         isStudyGenerated={
-          studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED
+          studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED || studyState.studyStatus === StudyStatus.GENERATION_INPROGRESS || studyData.status === StudyStatus.GENERATION_INPROGRESS
         }
         readOnly={readOnly}
         progress={progress}
