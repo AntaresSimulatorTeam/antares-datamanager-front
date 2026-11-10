@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@design-system-rte/react": "^2.4.0",
+    "@design-system-rte/core": "1.22.0",
     "@floating-ui/react": "^0.26.28",
     "@fontsource-variable/nunito-sans": "^5.2.7",
     "@tanstack/react-table": "^8.20.5",
