@@ -37,6 +37,9 @@
     "uuid": "^11.0.3",
     "vite-plugin-top-level-await": "^1.4.4"
   },
+  "overrides": {
+    "@design-system-rte/core": "1.22.0"
+  },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.4.6",
     "@testing-library/react": "^16.0.0",
