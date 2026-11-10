@@ -13,7 +13,9 @@ import {
   computeDsrDataAndReadOnly,
   fetchAndNormalizeTrajectories,
   findSpecificTrajectoryToDelete,
+  getAreasForChecklist,
   getCheckedValues,
+  getFlowbasedInformationMessage,
   getHypothesisLabel,
   getInformationMessage,
   getParamForFetchFSTrajectory,
@@ -31,8 +33,8 @@ import * as studyService from '@/shared/services/studyService.ts';
 import * as defaultConfigService from '@/shared/services/defaultConfigService.ts';
 import * as sortUtils from '@/shared/utils/sortUtils.ts';
 
-import { TFunction } from 'i18next';
-import { isParamModulationRequired } from '@/shared/services/trajectoryService.ts';
+import { createInstance, TFunction } from 'i18next';
+import { getResTechnologyList, isParamModulationRequired } from '@/shared/services/trajectoryService.ts';
 import { ThermalOptionsResults } from '@/mocks/data/list/names.ts';
 
 vi.mock('@/shared/services/trajectoryService');
@@ -154,6 +156,50 @@ describe('shouldOpenDeletionModal', () => {
     data[3] = baseRow;
     const result = shouldOpenDeletionModal(TRAJECTORY_TYPE.LOAD, 1, data);
     expect(result).toBe(false);
+  });
+
+  it.each([
+    TRAJECTORY_TYPE.THERMAL_TECHNICAL_SPECIFIC_PARAMETER,
+    TRAJECTORY_TYPE.STS,
+    TRAJECTORY_TYPE.RES_CAPACITY,
+    TRAJECTORY_TYPE.RES_LOAD,
+    TRAJECTORY_TYPE.HYDRO_SERIES,
+    TRAJECTORY_TYPE.HYDRO_PSP_SERIES,
+  ])('only considers valid subRows matching the requested hypothesis for %s', (type) => {
+    const data: HypothesisRowData[] = [
+      {
+        ...baseRow,
+        trajectory: null,
+        status: TRAJECTORY_SELECTION_STATUS.MISSING,
+        subRows: [
+          { ...baseRow, hypothesis: 'Selected' },
+          { ...baseRow, hypothesis: 'Missing', trajectory: null },
+          { ...baseRow, hypothesis: 'Invalid', status: TRAJECTORY_SELECTION_STATUS.MISSING },
+        ],
+      },
+    ];
+
+    expect(shouldOpenDeletionModal(type, 0, data, 'Selected')).toBe(true);
+    expect(shouldOpenDeletionModal(type, 0, data, 'Missing')).toBe(false);
+    expect(shouldOpenDeletionModal(type, 0, data, 'Invalid')).toBe(false);
+    expect(shouldOpenDeletionModal(type, 0, data, 'Unknown')).toBe(false);
+  });
+
+  it('does not open thermal capacity deletion when only a subRow is valid', () => {
+    const data: HypothesisRowData[] = [
+      { ...baseRow, status: TRAJECTORY_SELECTION_STATUS.MISSING, subRows: [baseRow] },
+    ];
+
+    expect(shouldOpenDeletionModal(TRAJECTORY_TYPE.THERMAL_CAPACITY, 0, data)).toBe(false);
+  });
+
+  it('handles a row without subRows', () => {
+    const data: HypothesisRowData[] = [
+      { hypothesis: 'Zone A', trajectory: mockDbTrajectory, status: TRAJECTORY_SELECTION_STATUS.OK },
+    ];
+
+    expect(shouldOpenDeletionModal(TRAJECTORY_TYPE.STS, 0, data)).toBe(false);
+    expect(shouldOpenDeletionModal(TRAJECTORY_TYPE.LOAD, 0, data)).toBe(true);
   });
 });
 
@@ -503,7 +549,57 @@ describe('findSpecificTrajectoryToDelete', () => {
   });
 });
 
+describe('getFlowbasedInformationMessage', () => {
+  it.each([
+    [true, false, true, 'flowbased.@informationMessage'],
+    [true, true, true, 'flowbased.@mandatoryTS'],
+    [false, true, true, 'flowbased.@hvdcLinkRequired'],
+    [true, true, false, 'flowbased.@hvdcLinkRequired'],
+    [false, false, false, 'flowbased.@hvdcLinkRequired'],
+    [undefined, undefined, undefined, 'flowbased.@hvdcLinkRequired'],
+  ] as const)(
+    'returns the expected message for link=%s, HVDC=%s and capacities=%s',
+    (hasLinkTrajectory, isHvdcActivated, hasHvdcCapacities, messageKey) => {
+      const expected = { messageKey, id: '1' };
+
+      expect(getFlowbasedInformationMessage(hasLinkTrajectory, isHvdcActivated, hasHvdcCapacities)).toEqual(expected);
+      expect(
+        getInformationMessage(
+          2,
+          TRAJECTORY_TYPE.ADEQUACY_PATCH,
+          '1',
+          null,
+          hasLinkTrajectory,
+          isHvdcActivated,
+          hasHvdcCapacities,
+        ),
+      ).toEqual(expected);
+    },
+  );
+
+  it('does not show the flowbased message on another adequacy patch row', () => {
+    expect(getInformationMessage(2, TRAJECTORY_TYPE.ADEQUACY_PATCH, '0', null, true, true, true)).toBeNull();
+  });
+});
+
 describe('getInformationMessage', () => {
+  it.each([
+    [TRAJECTORY_TYPE.HYDRO_SERIES, TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS],
+    [TRAJECTORY_TYPE.HYDRO_PSP_SERIES, TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS],
+  ])('handles missing and linked technical parameters for %s', (type, technicalType) => {
+    const trajectory = { ...mockDbTrajectory, type: technicalType };
+
+    expect(getInformationMessage(2, type, '0.1', null)).toEqual({
+      messageKey: 'hydro.@informationMessage',
+      id: '0.1',
+    });
+    expect(getInformationMessage(2, type, '0.0', trajectory)).toEqual({
+      messageKey: 'hydro.@informationMessage',
+      id: '0.0',
+    });
+    expect(getInformationMessage(2, type, '0.1', { ...trajectory, type })).toBeNull();
+  });
+
   it('retourne null si le type est undefined', () => {
     expect(getInformationMessage(3, undefined as unknown as TRAJECTORY_TYPE, '0', null)).toBeNull();
   });
@@ -874,6 +970,85 @@ describe('fetchAndNormalizeTrajectories (Vitest)', () => {
       ],
     });
   });
+
+  it.each([TRAJECTORY_TYPE.RES_CAPACITY, TRAJECTORY_TYPE.RES_LOAD])(
+    'fetches RES technologies and deduplicates %s trajectories by technology',
+    async (trajType) => {
+      const trajectories = [{ ...mockDbTrajectory, type: trajType, technology: 'Wind' }];
+      const technologies = [{ id: 1, code: 'Wind', label: 'Wind' }];
+      vi.mocked(studyService.getStudyTrajectories).mockResolvedValueOnce(trajectories);
+      vi.mocked(getResTechnologyList).mockResolvedValueOnce(technologies);
+      vi.mocked(trajectoryUtils.buildDefaultEmptyTrajectoryList).mockReturnValueOnce([]);
+      vi.mocked(trajectoryUtils.removeDuplicateByTechnology).mockReturnValueOnce(trajectories);
+
+      const result = await fetchAndNormalizeTrajectories({
+        id: 10,
+        trajType,
+        defaultAreas,
+        emptyAreaSelected,
+      });
+
+      expect(studyService.getStudyTrajectories).toHaveBeenCalledWith(10, trajType);
+      expect(getResTechnologyList).toHaveBeenCalledTimes(1);
+      expect(trajectoryUtils.buildDefaultEmptyTrajectoryList).toHaveBeenCalledWith(trajType, trajectories, defaultAreas);
+      expect(trajectoryUtils.removeDuplicateByTechnology).toHaveBeenCalledWith([...trajectories, ...emptyAreaSelected]);
+      expect(result).toEqual({ trajectories, dsrCmResult: [], technologies });
+    },
+  );
+
+  it('does not create default empty trajectories for nuclear types', async () => {
+    const trajectories = [{ ...mockDbTrajectory, type: TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION }];
+    vi.mocked(studyService.getStudyTrajectories).mockResolvedValueOnce(trajectories);
+    vi.mocked(trajectoryUtils.removeDuplicate).mockReturnValueOnce(trajectories);
+
+    const result = await fetchAndNormalizeTrajectories({
+      id: 10,
+      trajType: TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION,
+      defaultAreas,
+      emptyAreaSelected: [],
+    });
+
+    expect(trajectoryUtils.buildDefaultEmptyTrajectoryList).not.toHaveBeenCalled();
+    expect(trajectoryUtils.removeDuplicate).toHaveBeenCalledWith(trajectories);
+    expect(result).toEqual({ trajectories, dsrCmResult: [], technologies: undefined });
+  });
+
+  it('uses empty DSR and modulation lists when neither type is returned', async () => {
+    vi.mocked(hypothesisTableService.fetchTrajectoriesFromTypes).mockResolvedValueOnce({});
+    vi.mocked(trajectoryUtils.buildDefaultEmptyTrajectoryList).mockReturnValueOnce([]);
+    vi.mocked(trajectoryUtils.removeDuplicate).mockReturnValueOnce(emptyAreaSelected);
+
+    const result = await fetchAndNormalizeTrajectories({
+      id: 10,
+      trajType: TRAJECTORY_TYPE.DSR,
+      emptyAreaSelected,
+    });
+
+    expect(trajectoryUtils.buildDefaultEmptyTrajectoryList).toHaveBeenCalledWith(TRAJECTORY_TYPE.DSR, [], undefined);
+    expect(trajectoryUtils.removeDuplicate).toHaveBeenCalledWith(emptyAreaSelected);
+    expect(result).toEqual({ trajectories: emptyAreaSelected, dsrCmResult: [], technologies: null });
+  });
+
+  it('propagates study trajectory fetching errors', async () => {
+    const error = new Error('Unable to fetch study trajectories');
+    vi.mocked(studyService.getStudyTrajectories).mockRejectedValueOnce(error);
+
+    await expect(
+      fetchAndNormalizeTrajectories({ id: 10, trajType: TRAJECTORY_TYPE.LOAD, emptyAreaSelected: [] }),
+    ).rejects.toBe(error);
+    expect(trajectoryUtils.buildDefaultEmptyTrajectoryList).not.toHaveBeenCalled();
+  });
+
+  it('propagates RES technology fetching errors', async () => {
+    const error = new Error('Unable to fetch RES technologies');
+    vi.mocked(studyService.getStudyTrajectories).mockResolvedValueOnce([]);
+    vi.mocked(getResTechnologyList).mockRejectedValueOnce(error);
+
+    await expect(
+      fetchAndNormalizeTrajectories({ id: 10, trajType: TRAJECTORY_TYPE.RES_CAPACITY, emptyAreaSelected: [] }),
+    ).rejects.toBe(error);
+    expect(trajectoryUtils.removeDuplicateByTechnology).not.toHaveBeenCalled();
+  });
 });
 
 describe('buildPayload', () => {
@@ -1047,6 +1222,59 @@ describe('buildHypothesisRows', () => {
   });
 
   const t = vi.fn((key: string) => key) as unknown as TFunction<'translation', undefined>;
+
+  it('filters generated study rows before sorting them', () => {
+    const rows: HypothesisRowData[] = [
+      { hypothesis: 'FR', trajectory: mockDbTrajectory, status: TRAJECTORY_SELECTION_STATUS.OK },
+      { hypothesis: 'DE', trajectory: null, status: TRAJECTORY_SELECTION_STATUS.MISSING },
+    ];
+    const filteredRows = [rows[0]];
+    const defaultAreas = [{ name: 'FR' }, { name: 'DE' }];
+    const areas: TrajectoryAreaData[] = [{ areaName: 'FR', spilledEnergyCost: null, unsuppliedEnergyCost: null }];
+    vi.mocked(trajectoryUtils.convertIntoHypothesisRowWithTechnologies).mockReturnValueOnce(rows);
+    vi.mocked(trajectoryUtils.filterRow).mockReturnValueOnce(filteredRows);
+    vi.mocked(sortUtils.sortWithFixedPosition).mockReturnValueOnce(filteredRows);
+
+    const result = buildHypothesisRows({
+      trajType: TRAJECTORY_TYPE.LOAD,
+      trajectories: [mockDbTrajectory],
+      defaultAreas,
+      areas,
+      isStudyGenerated: true,
+      t,
+    });
+
+    expect(trajectoryUtils.convertIntoHypothesisRowWithTechnologies).toHaveBeenCalledWith(
+      [mockDbTrajectory], ['DE'], defaultAreas, [], TRAJECTORY_TYPE.LOAD,
+    );
+    expect(trajectoryUtils.filterRow).toHaveBeenCalledWith(rows);
+    expect(sortUtils.sortWithFixedPosition).toHaveBeenCalledWith(filteredRows);
+    expect(result).toEqual(filteredRows);
+  });
+
+  it.each([undefined, null, []])('adds a missing DSR modulation row when modulation is %s', (dsrCmResult) => {
+    vi.mocked(trajectoryUtils.convertIntoHypothesisRowWithTechnologies).mockReturnValueOnce([]);
+    vi.mocked(sortUtils.sortWithFixedPosition).mockReturnValueOnce([]);
+
+    const result = buildHypothesisRows({
+      trajType: TRAJECTORY_TYPE.DSR,
+      trajectories: [],
+      t,
+      dsrCmResult,
+    });
+
+    expect(trajectoryUtils.convertIntoHypothesisRowWithTechnologies).toHaveBeenCalledWith(
+      [], [], undefined, [], TRAJECTORY_TYPE.DSR,
+    );
+    expect(result).toEqual([{
+      hypothesis: 'dsr.@capacityModulation',
+      trajectory: null,
+      status: TRAJECTORY_SELECTION_STATUS.MISSING,
+      isDefault: false,
+      isDeletable: false,
+      subRows: null,
+    }]);
+  });
 
   it('should build rows for THERMAL_CAPACITY', () => {
     vi.mocked(trajectoryUtils.convertIntoHypothesisRowWithTechnologies).mockReturnValue([
@@ -1706,6 +1934,36 @@ describe('getParamForFetchFSTrajectory', () => {
     vi.resetAllMocks();
   });
 
+  it.each([
+    [TRAJECTORY_TYPE.P2G, '0', TRAJECTORY_TYPE.P2G_CAPACITY_COST],
+    [TRAJECTORY_TYPE.P2G, '1', TRAJECTORY_TYPE.P2G_MARKET_MODULATION],
+    [TRAJECTORY_TYPE.ME, '0', TRAJECTORY_TYPE.AREA_ME],
+    [TRAJECTORY_TYPE.ME, '1', TRAJECTORY_TYPE.LINK_ME],
+    [TRAJECTORY_TYPE.ME, '4.0', TRAJECTORY_TYPE.HYDRO_CAPACITY_ME],
+  ])('resolves %s row %s to %s without an area', (type, rowId, expectedType) => {
+    const hypothesis = { area: 'FR', isDefault: true };
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValueOnce(hypothesis);
+
+    expect(getParamForFetchFSTrajectory(type, rowId, [])).toEqual({
+      typeToUse: expectedType,
+      areaToUse: '',
+      isDefaultArea: true,
+      hypothesis,
+    });
+    expect(trajectoryUtils.getAreaTrajectoryName).toHaveBeenCalledWith(rowId, [], type, undefined);
+  });
+
+  it('defaults the area flag to false when no hypothesis is found', () => {
+    vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValueOnce(undefined);
+
+    expect(getParamForFetchFSTrajectory(TRAJECTORY_TYPE.LOAD, '0', [])).toEqual({
+      typeToUse: TRAJECTORY_TYPE.LOAD,
+      areaToUse: undefined,
+      isDefaultArea: false,
+      hypothesis: undefined,
+    });
+  });
+
   it('return AREA type when index table is not the last one', () => {
     vi.mocked(trajectoryUtils.getAreaTrajectoryName).mockReturnValue({
       area: 'H2',
@@ -2072,6 +2330,47 @@ describe('getSubRowHypothesisLabel', () => {
   });
 });
 
+describe('getRowHypothesisLabel', () => {
+  it.each([
+    [TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION, 'thermal.@modulation'],
+    [TRAJECTORY_TYPE.NUCLEAR_FR_TS_SERIES, 'thermal.@time_series'],
+    [TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP, 'thermal.@epr'],
+    [TRAJECTORY_TYPE.NUCLEAR_FR_TS_LONG_TERM, 'thermal.@long_term'],
+    [TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR, 'thermal.@smr'],
+    [TRAJECTORY_TYPE.NUCLEAR_FR_TALON, 'thermal.@talon'],
+    [TRAJECTORY_TYPE.AREA_ME, 'studyDetails.@areas'],
+    [TRAJECTORY_TYPE.LINK_ME, 'studyDetails.@links'],
+    [TRAJECTORY_TYPE.LOAD_ME, 'studyDetails.@load'],
+    [TRAJECTORY_TYPE.STS_ME, 'me.@storage'],
+    [TRAJECTORY_TYPE.HYDRO_ME, 'studyDetails.@hydro'],
+    [TRAJECTORY_TYPE.HYDRO_PARAMETERS_ME, 'page.@parameters'],
+    [TRAJECTORY_TYPE.HYDRO_RESERVOIR_LEVELS_ME, 'me.@reservoir_levels'],
+    [TRAJECTORY_TYPE.HYDRO_WATER_VALUES_ME, 'me.@water_values'],
+    [TRAJECTORY_TYPE.HYDRO_TIME_SERIES_ME, 'thermal.@time_series'],
+    [TRAJECTORY_TYPE.HYDRO_CAPACITY_ME, 'me.@capacity'],
+    [TRAJECTORY_TYPE.THERMAL_CAPACITY_ME, 'studyDetails.@thermal'],
+    [TRAJECTORY_TYPE.EFFICIENCY_ME, 'me.@efficiency'],
+    [TRAJECTORY_TYPE.CONSTRAINT_ME, 'me.@constraints'],
+    [TRAJECTORY_TYPE.P2G_CAPACITY_COST, 'p2g.@capacity'],
+    [TRAJECTORY_TYPE.P2G_MARKET_MODULATION, 'p2g.@modulation'],
+  ])('translates %s using %s', (type, key) => {
+    const i18n = createInstance();
+    const t = vi.spyOn(i18n, 't').mockReturnValue('Translated hypothesis');
+
+    expect(getRowHypothesisLabel(type, i18n.t)).toBe('Translated hypothesis');
+    expect(t).toHaveBeenCalledTimes(1);
+    expect(t).toHaveBeenCalledWith(key);
+  });
+
+  it('returns an empty label without translating unsupported types', () => {
+    const i18n = createInstance();
+    const t = vi.spyOn(i18n, 't');
+
+    expect(getRowHypothesisLabel(TRAJECTORY_TYPE.LOAD, i18n.t)).toBe('');
+    expect(t).not.toHaveBeenCalled();
+  });
+});
+
 describe('getHypothesisLabel', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -2232,6 +2531,34 @@ vi.mock('@/utils/getNuclearHypothesisLabel', () => ({
 }));
 
 describe('buildRowsByType', () => {
+  it('builds an empty parent with missing subRows when no trajectories match', () => {
+    const i18n = createInstance();
+    vi.spyOn(i18n, 't').mockReturnValue('Translated hypothesis');
+    const trajectoriesByType: FetchResult[] = [
+      { trajType: TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP, trajectories: [] },
+    ];
+
+    const result = buildRowsByType({
+      trajectoriesByType,
+      t: i18n.t,
+      rowTypes: [{
+        types: [TRAJECTORY_TYPE.NUCLEAR_FR_TS_SERIES],
+        isEmpty: true,
+        subRowTypes: [TRAJECTORY_TYPE.NUCLEAR_FR_TS_ERP, TRAJECTORY_TYPE.NUCLEAR_FR_TS_SMR],
+      }],
+    });
+
+    const missingRow: HypothesisRowData = {
+      hypothesis: 'Translated hypothesis',
+      trajectory: null,
+      status: TRAJECTORY_SELECTION_STATUS.MISSING,
+      isDefault: false,
+      isDeletable: false,
+      subRows: null,
+    };
+    expect(result).toEqual([{ ...missingRow, subRows: [missingRow, missingRow] }]);
+  });
+
   it('should build parent rows with correct hypothesis labels', () => {
     const rowTypes = [{types: [TRAJECTORY_TYPE.NUCLEAR_FR_MODULATION, TRAJECTORY_TYPE.NUCLEAR_FR_TALON], isEmpty: false}];
 
@@ -2387,6 +2714,12 @@ describe('getTypeToUse', () => {
     expect(getTypeToUse(TRAJECTORY_TYPE.HYDRO_SERIES, [0], 5)).toBe(TRAJECTORY_TYPE.HYDRO_SERIES);
   });
 
+  it('handles HYDRO_PSP_SERIES parent and subRow trajectory types', () => {
+    expect(getTypeToUse(TRAJECTORY_TYPE.HYDRO_PSP_SERIES, [0, 1], 5)).toBe(TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS);
+    expect(getTypeToUse(TRAJECTORY_TYPE.HYDRO_PSP_SERIES, [0, 0], 5)).toBe(TRAJECTORY_TYPE.HYDRO_PSP_SERIES);
+    expect(getTypeToUse(TRAJECTORY_TYPE.HYDRO_PSP_SERIES, [0], 5)).toBe(TRAJECTORY_TYPE.HYDRO_PSP_SERIES);
+  });
+
   it('handles P2G trajectory type', () => {
     expect(getTypeToUse(TRAJECTORY_TYPE.P2G, [0], 5)).toBe(TRAJECTORY_TYPE.P2G_CAPACITY_COST);
     expect(getTypeToUse(TRAJECTORY_TYPE.P2G, [1], 5)).toBe(TRAJECTORY_TYPE.P2G_MARKET_MODULATION);
@@ -2400,5 +2733,72 @@ describe('getTypeToUse', () => {
   it('returns original type for other types', () => {
     expect(getTypeToUse(TRAJECTORY_TYPE.LOAD, [0], 5)).toBe(TRAJECTORY_TYPE.LOAD);
     expect(getTypeToUse(TRAJECTORY_TYPE.RES_LOAD, [2], 5)).toBe(TRAJECTORY_TYPE.RES_LOAD);
+  });
+});
+
+describe('getAreasForChecklist', () => {
+  const missingRow: HypothesisRowData = {
+    hypothesis: 'Missing',
+    trajectory: null,
+    status: TRAJECTORY_SELECTION_STATUS.MISSING,
+  };
+  const linkedRow: HypothesisRowData = {
+    hypothesis: 'Parent',
+    trajectory: { ...mockDbTrajectory, area: 'FR' },
+    status: TRAJECTORY_SELECTION_STATUS.OK,
+  };
+
+  it('uses the study areas rather than linked rows for a non-generated study', () => {
+    const areas: TrajectoryAreaData[] = [
+      { areaName: 'DE', spilledEnergyCost: null, unsuppliedEnergyCost: null },
+      { areaName: 'BE', spilledEnergyCost: null, unsuppliedEnergyCost: null },
+    ];
+
+    expect(getAreasForChecklist([linkedRow], false, areas)).toEqual(['DE', 'BE']);
+  });
+
+  it('returns an empty list when non-generated study areas are undefined', () => {
+    expect(getAreasForChecklist([linkedRow], false, undefined)).toEqual([]);
+  });
+
+  it.each([undefined, []])('returns an empty list when generated study rows are %s', (rows) => {
+    expect(getAreasForChecklist(rows, true, undefined)).toEqual([]);
+  });
+
+  it('ignores generated study rows without linked trajectories', () => {
+    const rows: HypothesisRowData[] = [
+      missingRow,
+      { ...missingRow, subRows: [] },
+      { ...missingRow, subRows: [missingRow] },
+      linkedRow,
+    ];
+
+    expect(getAreasForChecklist(rows, true, undefined)).toEqual(['FR']);
+  });
+
+  it('prefers the first linked subRow area over the parent area', () => {
+    const rows: HypothesisRowData[] = [{
+      ...linkedRow,
+      subRows: [
+        missingRow,
+        { ...linkedRow, trajectory: { ...mockDbTrajectory, area: 'DE' } },
+        { ...linkedRow, trajectory: { ...mockDbTrajectory, area: 'BE' } },
+      ],
+    }];
+
+    expect(getAreasForChecklist(rows, true, undefined)).toEqual(['DE']);
+  });
+
+  it('includes a subRow trajectory even when its parent has no trajectory', () => {
+    expect(getAreasForChecklist([{ ...missingRow, subRows: [linkedRow] }], true, undefined)).toEqual(['FR']);
+  });
+
+  it('falls back to the parent area when the linked subRow area is empty', () => {
+    const rows: HypothesisRowData[] = [{
+      ...linkedRow,
+      subRows: [{ ...linkedRow, trajectory: { ...mockDbTrajectory, area: '' } }],
+    }];
+
+    expect(getAreasForChecklist(rows, true, undefined)).toEqual(['FR']);
   });
 });
