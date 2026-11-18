@@ -871,6 +871,10 @@ export const getTypeToUse = (type: TRAJECTORY_TYPE, indexArray: number[], nbRows
       return indexArray.length === 2 && indexArray[1] === 1
         ? TRAJECTORY_TYPE.HYDRO_TECHNICAL_PARAMETERS
         : TRAJECTORY_TYPE.HYDRO_SERIES;
+    case TRAJECTORY_TYPE.HYDRO_PSP_SERIES:
+      return indexArray.length === 2 && indexArray[1] === 1
+        ? TRAJECTORY_TYPE.HYDRO_PSP_TECHNICAL_PARAMETERS
+        : TRAJECTORY_TYPE.HYDRO_PSP_SERIES;
     case TRAJECTORY_TYPE.P2G:
       return indexArray[0] === 0 ? TRAJECTORY_TYPE.P2G_CAPACITY_COST : TRAJECTORY_TYPE.P2G_MARKET_MODULATION;
     case TRAJECTORY_TYPE.ME:

@@ -12,5 +12,5 @@ export const computeReadOnlyState = (
     '1':
       !areaTrajectory ||
       areaStatus === TRAJECTORY_SELECTION_STATUS.ERROR ||
-      (!hasLinkTrajectory && studyStatus === StudyStatus.GENERATED),
+      (!hasLinkTrajectory && (studyStatus === StudyStatus.GENERATED || studyStatus === StudyStatus.GENERATION_INPROGRESS)),
   });
