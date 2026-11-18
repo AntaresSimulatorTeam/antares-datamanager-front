@@ -157,7 +157,7 @@ export const uploadTrajectory = async (
     return (await response.json()) as DbTrajectory;
   } catch (error) {
     if (isBusinessError(error)) {
-      throw error;
+      throw new TrajectoryBackendError(error.antaresErrorMessage, error);
     } else {
       throw new TrajectoryBackendError(`Failed to upload trajectory ${trajectoryName}`, error);
     }
