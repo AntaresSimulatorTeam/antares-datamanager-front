@@ -55,13 +55,8 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
-      '@common': path.resolve(__dirname, './src/components/common'),
-    },
-  },
-  esbuild: {
-    supported: {
-      'top-level-await': true,
+      '@': path.resolve(import.meta.url, './src'),
+      '@common': path.resolve(import.meta.url, './src/components/common'),
     },
   },
   define: {
