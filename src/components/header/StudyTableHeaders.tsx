@@ -55,7 +55,7 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
                 row.toggleSelected(!isSelected);
               }
             }}
-            className={`${status === StudyStatus.GENERATED ? '!text-content-brand-default group-hover:!text-content-brand-default' : '!text-content-primary group-hover:!text-content-primary'}`}
+            className={`${status === StudyStatus.GENERATED ? '!text-content-brand-default group-hover:!text-content-brand-default' : status === StudyStatus.ERROR ? '!text-content-critical group-hover:!text-content-critical' : '!text-content-primary group-hover:!text-content-primary'}`}
           />
         </button>
       );
@@ -113,7 +113,14 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
         case StudyStatus.ERROR:
           return (
             <div className="flex gap-2">
-              <Icon name="information" color="#bd0536" />
+              <Icon name="error" color="#bd0536" />
+              <span> {sentenceCase(status)} </span>
+            </div>
+          );
+        case StudyStatus.GENERATION_INPROGRESS:
+          return (
+            <div className="flex gap-2">
+              <Icon name="settings" color="#f39200" />
               <span> {sentenceCase(status)} </span>
             </div>
           );

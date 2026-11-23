@@ -25,7 +25,7 @@ describe('useUserDisplay Hook', () => {
   };
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.mocked(userService.fetchUsersByNni).mockReset();
   });
 
   afterEach(() => {
@@ -35,10 +35,10 @@ describe('useUserDisplay Hook', () => {
   it('should initialize with NNI as fullname', () => {
     vi.mocked(userService.fetchUsersByNni).mockResolvedValueOnce([mockUser]);
 
-    const { result } = renderHook(() => useUserDisplay('R12345'));
+    const { result } = renderHook(() => useUserDisplay('R00001'));
 
     // Initially NNI should be set, but isLoading will be true since fetch starts immediately
-    expect(result.current.fullname).toBe('R12345');
+    expect(result.current.fullname).toBe('R00001');
     expect(result.current.firstName).toBe('');
     expect(result.current.lastName).toBe('');
     // isLoading starts as true when fetch begins
@@ -71,12 +71,12 @@ describe('useUserDisplay Hook', () => {
 
     await waitFor(
       () => {
+        expect(result.current.error).toBe(errorMessage);
         expect(result.current.isLoading).toBe(false);
       },
       { timeout: 3000 }
     );
 
-    expect(result.current.error).toBe(errorMessage);
     // Should keep the initial NNI if fetch fails
     expect(result.current.fullname).toBe(uniqueNni);
   });
@@ -130,7 +130,7 @@ describe('useUserDisplay Hook', () => {
     vi.mocked(userService.fetchUsersByNni).mockResolvedValue([mockUser]);
 
     const { result, rerender } = renderHook(({ nni }) => useUserDisplay(nni), {
-      initialProps: { nni: 'R12345' },
+      initialProps: { nni: 'R33333' },
     });
 
     await waitFor(
@@ -143,7 +143,7 @@ describe('useUserDisplay Hook', () => {
     const callCountAfterFirstFetch = vi.mocked(userService.fetchUsersByNni).mock.calls.length;
 
     // Re-render with same NNI should not trigger additional fetch
-    rerender({ nni: 'R12345' });
+    rerender({ nni: 'R33333' });
 
     const callCountAfterRerender = vi.mocked(userService.fetchUsersByNni).mock.calls.length;
     expect(callCountAfterRerender).toBe(callCountAfterFirstFetch);
