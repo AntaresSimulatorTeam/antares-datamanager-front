@@ -6,11 +6,14 @@ import StdTagList from '../StdTagList';
 const TEST_TAGS_LIST = ['Red', 'Green', 'Blue', 'Yellow', 'Purple', 'Orange', 'Pink'];
 
 // Mock resize observer
-const mockResizeObserver = vi.fn(() => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn(),
-}));
+function createMockResizeObserver() {
+  return {
+    observe: vi.fn(),
+    unobserve: vi.fn(),
+    disconnect: vi.fn(),
+  };
+}
+const mockResizeObserver = vi.fn(createMockResizeObserver);
 global.ResizeObserver = mockResizeObserver;
 
 // Helper to mock getBoundingClientRect
