@@ -80,7 +80,7 @@ export const useFetchHypothesisTrajectories = (
    * Zones vides déjà présentes dans l’étude (si non générée)
    */
   const emptyAreaSelected = useMemo(() => {
-    if (!trajectoryTypes || studyStatus === StudyStatus.GENERATED || studyStatus === StudyStatus.GENERATION_INPROGRESS) {
+    if (!trajectoryTypes || studyStatus === StudyStatus.GENERATED || studyStatus === StudyStatus.GENERATION_IN_PROGRESS) {
       return {} as Record<TRAJECTORY_TYPE, DbTrajectory[]>;
     }
 
@@ -100,7 +100,7 @@ export const useFetchHypothesisTrajectories = (
   const fetchAreas = useCallback(
     async (id: number, trajTypes: TRAJECTORY_TYPE[]) => {
       try {
-        const isStudyGenerated = studyContextStatus === StudyStatus.GENERATED || studyContextStatus === StudyStatus.GENERATION_INPROGRESS || studyStatus === StudyStatus.GENERATED || studyStatus === StudyStatus.GENERATION_INPROGRESS;
+        const isStudyGenerated = studyContextStatus === StudyStatus.GENERATED || studyContextStatus === StudyStatus.GENERATION_IN_PROGRESS || studyStatus === StudyStatus.GENERATED || studyStatus === StudyStatus.GENERATION_IN_PROGRESS;
         const defaultAreaListNotInList = getDefaultAreaNotIncludedInAreaList(defaultAreas ?? [], areas);
 
         // 1) Lancer toutes les requêtes en parallèle
@@ -109,7 +109,7 @@ export const useFetchHypothesisTrajectories = (
           trajTypes.map(async (trajType: TRAJECTORY_TYPE) => {
             const contextTrajectories = studyStateRef.current?.[trajType]?.trajectories ?? [];
 
-            const shouldSkipFetch = (studyStatus === StudyStatus.GENERATED || studyStatus === StudyStatus.GENERATION_INPROGRESS) && contextTrajectories.length > 0;
+            const shouldSkipFetch = (studyStatus === StudyStatus.GENERATED || studyStatus === StudyStatus.GENERATION_IN_PROGRESS) && contextTrajectories.length > 0;
 
             const { trajectories, dsrCmResult, technologies } = await fetchAndNormalizeTrajectories({
               id,
