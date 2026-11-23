@@ -117,7 +117,7 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
               <span> {sentenceCase(status)} </span>
             </div>
           );
-        case StudyStatus.GENERATION_INPROGRESS:
+        case StudyStatus.GENERATION_IN_PROGRESS:
           return (
             <div className="flex gap-2">
               <Icon name="settings" color="#f39200" />

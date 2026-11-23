@@ -92,7 +92,7 @@ const StudyDetails = () => {
                 <Button
                   label={t('studyDetails.@generate')}
                   onClick={() => studyData?.id && void handleGenerateStudy(studyData?.id)}
-                  disabled={!studyState.AREA?.trajectories?.length || studyState.studyStatus === StudyStatus.GENERATED || studyState.studyStatus === StudyStatus.GENERATION_INPROGRESS}
+                  disabled={!studyState.AREA?.trajectories?.length || studyState.studyStatus === StudyStatus.GENERATED || studyState.studyStatus === StudyStatus.GENERATION_IN_PROGRESS}
                   icon="check-circle"
                   iconPosition="right"
                   size="m"
