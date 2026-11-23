@@ -11,20 +11,18 @@
     "build": "node scripts/git-info.js && tsc -b && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "cy:open": "cypress open",
-    "cy:open e2e": "cypress open --e2e",
     "prepare": "husky && husky install",
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@design-system-rte/react": "^2.4.0",
+    "@design-system-rte/react": "2.4.0",
     "@floating-ui/react": "^0.26.28",
     "@fontsource-variable/nunito-sans": "^5.2.7",
     "@tanstack/react-table": "^8.20.5",
     "@tanstack/react-virtual": "3.14.15",
     "@testing-library/user-event": "^14.5.2",
     "clsx": "^2.1.1",
-    "i18next": "^23.14.0",
+    "i18next": "26.3.4",
     "mutative": "^1.0.6",
     "oidc-client-ts": "^3.1.0",
     "postcss": "8.5.23",
@@ -39,14 +37,13 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^6.4.6",
     "@testing-library/react": "^16.0.0",
-    "@types/node": "~20.15.0",
+    "@types/node": "^24.0.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^7.13.1",
     "@typescript-eslint/parser": "^7.13.1",
-    "@vitejs/plugin-react": "^4.3.1",
-    "@vitest/coverage-v8": "^2.1.6",
-    "cypress": "^14.5.1",
+    "@vitejs/plugin-react": "6.3.0",
+    "@vitest/coverage-v8": "5.1.0",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-i18n-json": "^4.0.0",
@@ -61,7 +58,7 @@
     "prettier-plugin-tailwindcss": "^0.6.5",
     "tailwindcss": "^3.4.4",
     "typescript": "^5.2.2",
-    "vite": "^5.4.21",
-    "vitest": "^2.1.6"
+    "vite": "8.3.7",
+    "vitest": "5.1.0"
   }
 }
