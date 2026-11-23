@@ -156,7 +156,7 @@
     "@search_area": "Search area",
     "@or": "or",
     "@viewLog": "View Log",
-    "@notificationAlert": "Error: {{studyName}} - {{trajectoryName}} no parameter cannot be saved for {{trajectoryType}}",
+    "@notificationAlert": "Error: {{studyName}} - {{trajectoryName}} parameter cannot be saved for {{trajectoryType}}",
     "@default": "Default",
     "@hydro": "Hydro",
     "@checkBoxDefault": "Automatic area selection",

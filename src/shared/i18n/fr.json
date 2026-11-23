@@ -153,7 +153,7 @@
     "@search_area": "Search area",
     "@or": "or",
     "@viewLog": "View Log",
-    "@notificationAlert": "Erreur: {{studyName}} - {{trajectoryName}} aucun paramètre n'a pas être enregistré pour {{trajectoryType}}",
+    "@notificationAlert": "Erreur: {{studyName}} - {{trajectoryName}} aucun paramètre ne peut être enregistré pour {{trajectoryType}}",
     "@default": "Par défaut",
     "@hydro": "Hydro",
     "@checkBoxDefault": "Automatic area selection"

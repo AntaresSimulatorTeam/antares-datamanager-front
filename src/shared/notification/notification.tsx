@@ -6,11 +6,11 @@
 
 import { type Id, toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
-import { DisplayStatus } from '@/shared/types';
 
 import { AlertContainerId, ToastContainerId } from './containers';
-import StdAlert, { AlertAction } from '@common/layout/stdAlert/StdAlert.tsx';
 import StdToast from '@common/layout/stdToast/StdToast.tsx';
+import { Banner } from '@design-system-rte/react';
+import { DisplayStatus } from '@/shared/types';
 
 export type NotifyProps = {
   id?: string | number;
@@ -19,6 +19,11 @@ export type NotifyProps = {
   icon?: string;
   filledIcon?: boolean;
 };
+
+export interface AlertAction {
+  label: string;
+  onClick: () => void;
+}
 
 export type NotifyWithActionProps = NotifyProps & {
   action?: AlertAction;
@@ -49,17 +54,18 @@ export const dismissToast = (id?: Id) => toast.dismiss({ containerId: ToastConta
  * Show an alert with a message, a type and an action
  * @returns The id of the alert
  */
-export const notifyAlert = ({ message, content, type, action, id, icon, filledIcon }: NotifyWithActionProps) => {
+export const notifyAlert = ({ message, content, type, action, id }: NotifyWithActionProps) => {
   const toastId = id ?? uuidv4();
   return toast(
-    <StdAlert
-      message={message}
-      content={content}
-      status={type}
-      action={action}
+    <Banner
+      title={message}
+      message={content ?? ''}
+      type={type}
+      actionLabel={"visualiser"}
+      actionCallback={action?.onClick}
       onClose={() => toast.dismiss(toastId)}
-      icon={icon}
-      filledIcon={filledIcon}
+      isCompact
+      closable
     />,
     {
       toastId,
