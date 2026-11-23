@@ -63,7 +63,7 @@ export const ParametersTab = ({ studyData, defaultAreas, areas }: TabProps) => {
   } | null>(null);
   const [isDeletionModalOpen, setIsDeletionModalOpen] = useState(false);
   const [isStudyGenerated, setIsStudyGenerated] = useState(
-    studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED,
+    studyState.studyStatus === StudyStatus.GENERATED || studyState.studyStatus === StudyStatus.GENERATION_INPROGRESS || studyData.status === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATION_INPROGRESS,
   );
   const [dbTrajectories, setDbTrajectories] = useState<DbTrajectory[]>([]);
   const [selectedTrajectoryType, setSelectedTrajectoryType] = useState<TRAJECTORY_TYPE>(
@@ -119,7 +119,7 @@ export const ParametersTab = ({ studyData, defaultAreas, areas }: TabProps) => {
   }, [areasTrajectoryOptions, dropDownListOptions, hypothesisTrajectories, readOnlyRow, firstTableData]);
 
   useEffect(() => {
-    if (studyState.studyStatus === StudyStatus.GENERATED) {
+    if (studyState.studyStatus === StudyStatus.GENERATED || studyState.studyStatus === StudyStatus.GENERATION_INPROGRESS) {
       setIsStudyGenerated(true);
       const newTechnicalData = filterRow(technicalData);
       setTechnicalData(newTechnicalData);

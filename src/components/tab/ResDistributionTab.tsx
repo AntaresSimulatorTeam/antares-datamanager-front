@@ -135,7 +135,7 @@ const ResDistributionTab = ({ studyData, types, defaultAreas, areas }: TabProps 
         getTableHeaders={getEditableHypothesisTableHeaders}
         fileStatus={fileStatus}
         isStudyGenerated={
-          studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED
+          studyState.studyStatus === StudyStatus.GENERATED || studyState.studyStatus === StudyStatus.GENERATION_INPROGRESS || studyData.status === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATION_INPROGRESS
         }
         readOnly={readOnly}
         idSelected={rowIdSelected}
@@ -159,7 +159,7 @@ const ResDistributionTab = ({ studyData, types, defaultAreas, areas }: TabProps 
         getTableHeaders={getExpandableHypothesisTableHeaders}
         fileStatus={fileStatus}
         isStudyGenerated={
-          studyState.studyStatus === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATED
+          studyState.studyStatus === StudyStatus.GENERATED || studyState.studyStatus === StudyStatus.GENERATION_INPROGRESS || studyData.status === StudyStatus.GENERATED || studyData.status === StudyStatus.GENERATION_INPROGRESS
         }
         readOnly={readOnly}
         progress={selectedType === TRAJECTORY_TYPE.RES_TECHNOLOGY_DISTRIBUTION ? progress : 0}

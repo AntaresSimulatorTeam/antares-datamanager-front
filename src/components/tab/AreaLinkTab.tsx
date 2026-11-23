@@ -60,7 +60,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
   const [isDeletionModalOpen, setIsDeletionModalOpen] = useState(false);
   const [selectedTrajectoryType, setSelectedTrajectoryType] = useState<TRAJECTORY_TYPE>(TRAJECTORY_TYPE.AREA);
   const [isStudyGenerated, setIsStudyGenerated] = useState(
-    studyState.studyStatus === StudyStatus.GENERATED || studyData?.status === StudyStatus.GENERATED,
+    studyState.studyStatus === StudyStatus.GENERATED || studyState.studyStatus === StudyStatus.GENERATION_INPROGRESS || studyData?.status === StudyStatus.GENERATED || studyData?.status === StudyStatus.GENERATION_INPROGRESS,
   );
 
   const configs = useMemo(
@@ -110,7 +110,7 @@ export const AreaLinkTab = ({ studyData }: AreaLinkTabProps) => {
   }, [firstTableData, firstTableReadOnlyRow, secondTableReadOnlyRow, studyData.id, secondTableData]);
 
   useEffect(() => {
-    if (studyState.studyStatus === StudyStatus.GENERATED) {
+    if (studyState.studyStatus === StudyStatus.GENERATED || studyState.studyStatus === StudyStatus.GENERATION_INPROGRESS) {
       setIsStudyGenerated(true);
       setReadOnly(buildReadOnlyRow(['0', '1']));
       if (configs[1]) {
