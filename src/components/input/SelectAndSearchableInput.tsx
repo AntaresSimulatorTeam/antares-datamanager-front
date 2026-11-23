@@ -133,6 +133,7 @@ const SelectAndSearchableInput = ({
               disabled={isInputDisabled}
               required={required}
               placeholder={defaultPlaceHolder}
+              rightIconAction="clean"
             />
             <div className="absolute right-1 top-0.5">
               {isSelectEnable && !valueInput && (
