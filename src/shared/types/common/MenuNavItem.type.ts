@@ -5,9 +5,8 @@
  */
 
 import { ComponentType } from 'react';
+import { NavItemProps } from '@design-system-rte/core/components/side-nav/nav-item/nav-item.interface';
 
-export type RouteItem = {
-  id: string;
-  link: string;
+export interface RouteItem extends NavItemProps {
   component: ComponentType;
-};
+}
