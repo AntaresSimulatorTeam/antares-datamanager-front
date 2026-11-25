@@ -28,6 +28,7 @@
     "@title": "Pégase"
   },
   "page": {
+    "@home": "Home",
     "@logs": "Logs",
     "@project": "Project",
     "@projects": "Projects",

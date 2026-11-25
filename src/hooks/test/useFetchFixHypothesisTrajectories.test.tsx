@@ -296,7 +296,7 @@ describe('useFetchFixHypothesisTrajectories', () => {
     });
   });
 
-  describe.skip('Réactivité', () => {
+  describe('Réactivité', () => {
     const configs = [
       [
         { type: TRAJECTORY_TYPE.AREA, labelKey: 'areas' },
