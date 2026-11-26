@@ -39,11 +39,11 @@ describe('computeReadOnlyState', () => {
     expect(readOnly).toEqual({ '0': false, '1': true });
   });
 
-  it('should disable Links if no link trajectory and study is GENERATION_INPROGRESS', () => {
+  it('should disable Links if no link trajectory and study is GENERATION_IN_PROGRESS', () => {
     const readOnly = computeReadOnlyState(
       dummyTrajectory,
       TRAJECTORY_SELECTION_STATUS.OK,
-      StudyStatus.GENERATION_INPROGRESS,
+      StudyStatus.GENERATION_IN_PROGRESS,
       false,
     );
     expect(readOnly).toEqual({ '0': false, '1': true });

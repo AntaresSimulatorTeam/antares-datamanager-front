@@ -31,3 +31,4 @@ package-lock.json
 
 # Coverage couverture
 coverage/
+/AGENTS.md

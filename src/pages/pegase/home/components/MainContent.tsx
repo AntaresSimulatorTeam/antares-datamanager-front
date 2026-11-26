@@ -9,11 +9,10 @@ import { NavLink, Route, Routes } from 'react-router-dom';
 import PegaseStar from '@/components/pegase/star/PegaseStar';
 import ProjectDetails from '@/pages/pegase/projects/projectDetails/ProjectDetails';
 import StudyDetails from '@/pages/pegase/studies/StudyDetails.tsx';
-import { footerRoutes, mainRoutes } from '@/routes';
+import { footerMenuItems, mainMenuItems } from '@/routes';
 import { getInitialUserSettings, UserSettingsContext } from '@/store/contexts/UserSettingsContext';
 import ThemeHandler from '@common/handler/ThemeHandler';
 import { PegaseAlertContainer, PegaseToastContainer } from '@/shared/notification/containers';
-import { footerMenuItems, mainMenuItems } from '@/shared/const/navBarConfig';
 import { StudyProvider } from '@/store/contexts/StudyProvider';
 import { useTranslation } from 'react-i18next';
 import { NavigationProvider, SideNav } from '@design-system-rte/react';
@@ -72,7 +71,7 @@ const MainContent = () => {
                 }
               />
               <Route path="/project/:id" element={<ProjectDetails />} />
-              {Object.entries([...mainRoutes, ...footerRoutes]).map(([key, route]) => (
+              {Object.entries([...mainMenuItems, ...footerMenuItems]).map(([key, route]) => (
                 <Route key={`${key}-${route.link}`} path={route.link} Component={route.component} />
               ))}
             </Routes>
