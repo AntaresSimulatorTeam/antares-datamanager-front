@@ -42,7 +42,7 @@ const StudyNavigationMenu = ({ studyData }: StudyNavigationMenuProps) => {
     studyData.id ? Number(studyData.id) : null,
     activeTab?.id as TRAJECTORY_TYPE,
   );
-
+  // Fetch areas for the active tab
   const { areasDefault, trajectoryAreas } = useFetchAreas(activeTab?.id as TRAJECTORY_TYPE, studyState[`${TRAJECTORY_TYPE.AREA}`]?.trajectories?.[0]);
 
   useEffect(() => {
