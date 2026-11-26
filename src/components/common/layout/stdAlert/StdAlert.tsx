@@ -8,7 +8,7 @@ const DEFAULT_ICON = {
   success: 'check',
   error: 'dangerous',
   warning: 'warning',
-  info: 'error',
+  info: 'info',
 };
 
 export interface AlertAction {
@@ -51,7 +51,7 @@ const StdAlert = ({
     >
       <div className={`flex ${expanded ? 'items-start' : 'items-center'} justify-start gap-2`}>
         <div className={iconClasses}>
-          <Icon name={icon ?? DEFAULT_ICON[status]} size={ICON_SIZE} />
+          <Icon name={icon ?? DEFAULT_ICON[status]} size={ICON_SIZE} appearance="filled" />
         </div>
         <div className="flex flex-col items-start gap-1 text-left">
           <span className={`${textClasses} ${expanded ? 'line-clamp-none' : 'line-clamp-1'}`}>{message}</span>

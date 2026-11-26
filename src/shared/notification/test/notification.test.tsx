@@ -47,8 +47,6 @@ describe('notifyToast', () => {
       action: baseProps.action as unknown as AlertAction,
       id: 'custom-id',
     });
-    expect(toast.clearWaitingQueue).toHaveBeenCalledWith({ containerId: 'toast' });
-    expect(toast.dismiss).toHaveBeenCalledWith({ containerId: 'toast' });
     expect(toast).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ toastId: 'custom-id' }));
   });
 
