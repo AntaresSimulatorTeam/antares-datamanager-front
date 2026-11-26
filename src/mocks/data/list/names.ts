@@ -213,15 +213,15 @@ export const LIST_FIRSTNAME = [
 ];
 
 export const ThermalOptions = [
-  { name: 'Additional power' },
-  { name: 'Biomass' },
-  { name: 'CCGT' },
-  { name: 'CHP' },
-  { name: 'Coal' },
-  { name: 'Nuclear' },
-  { name: 'Other' },
-  { name: 'Reserves' },
-  { name: 'TAC' },
+  { name: 'Additional power', enabled: true },
+  { name: 'Biomass', enabled: true },
+  { name: 'CCGT', enabled: true },
+  { name: 'CHP', enabled: true },
+  { name: 'Coal', enabled: false },
+  { name: 'Nuclear', enabled: true },
+  { name: 'Other', enabled: true },
+  { name: 'Reserves', enabled: true },
+  { name: 'TAC', enabled: false },
 ];
 
 export const ThermalOptionsResults = [
@@ -229,11 +229,9 @@ export const ThermalOptionsResults = [
   { id: 1, label: 'Biomass', code: 'Biomass' },
   { id: 2, label: 'CCGT', code: 'CCGT' },
   { id: 3, label: 'CHP', code: 'CHP' },
-  { id: 4, label: 'Coal', code: 'Coal' },
-  { id: 5, label: 'Nuclear', code: 'Nuclear' },
-  { id: 6, label: 'Other', code: 'Other' },
-  { id: 7, label: 'Reserves', code: 'Reserves' },
-  { id: 8, label: 'TAC', code: 'TAC' },
+  { id: 4, label: 'Nuclear', code: 'Nuclear' },
+  { id: 5, label: 'Other', code: 'Other' },
+  { id: 6, label: 'Reserves', code: 'Reserves' },
 ];
 
 export const STSTechnology: TechnologyType[] = [
