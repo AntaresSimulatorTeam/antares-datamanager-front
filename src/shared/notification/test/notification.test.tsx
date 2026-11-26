@@ -1,7 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { isValidElement } from 'react';
 import { toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
 import { notifyAlert, notifyToast } from '@/shared/notification/notification.tsx';
+import { ToastContainerId } from '@/shared/notification/containers.tsx';
 import { DisplayStatus } from '@/shared/types';
 import { AlertAction } from '@common/layout/stdAlert/StdAlert.tsx';
 
@@ -59,6 +61,28 @@ describe('notifyToast', () => {
     expect(uuidv4).toHaveBeenCalled();
     expect(toast).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ toastId: 'mock-uuid' }));
   });
+
+  it.each([
+    { id: 'custom-id', expectedId: 'custom-id' },
+    { id: 0, expectedId: 0 },
+    { id: undefined, expectedId: 'mock-uuid' },
+  ])('should clear the queue and dismiss the toast on close (id: $expectedId)', ({ id, expectedId }) => {
+    notifyToast({ message: 'Hello world', type: 'success', id });
+
+    const element = vi.mocked(toast).mock.lastCall?.[0];
+    if (!isValidElement<{ onClose?: () => void }>(element)) {
+      throw new Error('Expected a toast component');
+    }
+
+    expect(element.props.onClose).toBeTypeOf('function');
+    element.props.onClose?.();
+
+    expect(toast.clearWaitingQueue).toHaveBeenCalledExactlyOnceWith({ containerId: ToastContainerId });
+    expect(toast.dismiss).toHaveBeenCalledExactlyOnceWith({ containerId: ToastContainerId, id: expectedId });
+    expect(vi.mocked(toast.clearWaitingQueue).mock.invocationCallOrder[0]).toBeLessThan(
+      vi.mocked(toast.dismiss).mock.invocationCallOrder[0],
+    );
+  });
 });
 
 describe('notifyAlert', () => {
@@ -70,6 +94,10 @@ describe('notifyAlert', () => {
     icon: 'alert-icon',
     filledIcon: true,
   };
+
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
 
   it('should use the id provided', () => {
     notifyAlert({ ...mockProps, id: 'custom-id' });
@@ -88,6 +116,25 @@ describe('notifyAlert', () => {
       containerId: 'alert',
       type: 'warning',
     });
+  });
+
+  it.each([
+    { id: 'custom-id', expectedId: 'custom-id' },
+    { id: 0, expectedId: 0 },
+    { id: undefined, expectedId: 'mock-uuid' },
+  ])('should dismiss the alert on close (id: $expectedId)', ({ id, expectedId }) => {
+    notifyAlert({ ...mockProps, id });
+
+    const element = vi.mocked(toast).mock.lastCall?.[0];
+    if (!isValidElement<{ onClose?: () => void }>(element)) {
+      throw new Error('Expected an alert component');
+    }
+
+    expect(element.props.onClose).toBeTypeOf('function');
+    element.props.onClose?.();
+
+    expect(toast.dismiss).toHaveBeenCalledExactlyOnceWith(expectedId);
+    expect(toast.clearWaitingQueue).not.toHaveBeenCalled();
   });
 
   it.skip('should include Alert component with proper props', () => {
