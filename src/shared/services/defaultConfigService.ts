@@ -24,8 +24,9 @@ export const getDefaultAreas = async (): Promise<{ name: string }[]> => {
 export const getThermalTechnologyList = async (): Promise<TechnologyType[]> => {
   try {
     const response = await AuthService.authFetch(DEFAULT_CONFIG_INSTALLED_POWER_TECHNOLOGY);
-    const jsonResponse = (await (response as Response).json()) as { name: string }[];
-    return jsonResponse.map((technology, index) => ({
+    const jsonResponse = (await (response as Response).json()) as { name: string; enabled: boolean }[];
+    const enabledTechnologies = jsonResponse.filter((technology) => technology.enabled);
+    return enabledTechnologies.map((technology, index) => ({
       id: index,
       label: technology.name,
       code: technology.name,
