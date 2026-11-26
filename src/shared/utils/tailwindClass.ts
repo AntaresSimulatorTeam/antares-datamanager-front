@@ -12,7 +12,7 @@ export const buildLabelColorClass = (status: TRAJECTORY_SELECTION_STATUS): strin
   }
 };
 
-const COMMON_CARD_CLASSES = "absolute text-content-tertiary left-0 flex h-fit flex-col justify-start gap-2 rounded-lg border-b-4 bg-background-neutral-regular-default shadow-2 p-2";
+const COMMON_CARD_CLASSES = "absolute text-content-tertiary left-0 flex h-fit flex-col justify-start gap-2 rounded-lg border-b-4 bg-background-neutral-navigation-default shadow-2 p-2";
 
 const getBorderColorClass = (data: CardDataType): string => {
   if (!data.isAck) {
