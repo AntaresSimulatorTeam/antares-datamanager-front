@@ -23,7 +23,7 @@ export const DetailsContent = ({ content, onClickButton, tagsList }: DetailsCont
   const { fullname } = useUserDisplay(content?.createdBy ?? '');
 
   return (
-    <header className="group flex w-full flex-col gap-1 rounded border border-border-divider bg-background-neutral-navigation-default p-2">
+    <header className="group flex w-full flex-col gap-1 rounded border border-border-divider bg-background-disabled p-2">
       {(content as ProjectInfo)?.description && (
         <div className="flex text-left break-words w-full">
           {(content as ProjectInfo).description}
