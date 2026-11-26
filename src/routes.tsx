@@ -19,7 +19,7 @@ export const mainMenuItems: RouteItem[] = [
     id: 'home-link',
     label: 'page.@home',
     link: '/',
-    icon: 'info',
+    icon: 'home',
     component: HomePage,
   },
   {

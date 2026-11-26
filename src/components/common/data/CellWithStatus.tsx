@@ -14,14 +14,14 @@ export const CellWithStatus = ({ status }: CellWithStatusProps) => {
       case TRAJECTORY_SELECTION_STATUS.OK:
         return (
           <>
-            <Icon name="check" color="#058075" />
+            <Icon name="check" color="text-content-success-default" />
             {t('studyDetails.@import_status_done')}
           </>
         );
       case TRAJECTORY_SELECTION_STATUS.ERROR:
         return (
           <>
-            <Icon name="info" color="#de0236" />
+            <Icon name="info" color="text-content-danger-default" />
             <div className="flex items-center gap-2 text-error-700">{t('studyDetails.@import_status_error')}</div>
           </>
         );
@@ -29,7 +29,7 @@ export const CellWithStatus = ({ status }: CellWithStatusProps) => {
       default:
         return (
           <>
-            <Icon name="question-mark" color="#f38a3f" />
+            <Icon name="question-mark" color="chart-category-6" />
             {t('studyDetails.@import_status_missing')}
           </>
         );

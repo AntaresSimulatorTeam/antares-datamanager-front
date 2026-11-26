@@ -81,7 +81,7 @@ export const convertDataToItem = <T>(data: T, t: (value: string) => string): Car
 
   return {
     code: '',
-    colorBorder: 'hover:border-b-warning-500',
+    colorBorder: 'hover:border-border-brand-default',
     icon: 'warning',
     title: `${trajectoryName ?? ''} ${secondTrajectory ? '-' : ''} ${secondTrajectory ?? ''}`,
     buttonLabel: isAck ? t('studyDetails.@skipped') : t('studyDetails.@skip'),
