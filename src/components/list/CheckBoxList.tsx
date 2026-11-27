@@ -16,7 +16,7 @@ export const CheckBoxList = ({ disabled, checkedValues, handleSelectionChange, o
   const optionsNotDefault = useMemo(() => options.filter((option) => !option.isDefault), [options]);
 
   return (
-    <div className="flex max-h-[45vh] w-1/5 flex-none shrink flex-col gap-1 self-start rounded border border-gray-400 p-2 text-left">
+    <div className="flex max-h-[45vh] w-1/5 flex-none shrink flex-col gap-1 self-start rounded border border-border-divider p-2 text-left">
       {optionsDefault?.map((area, index) => (
         <Checkbox
           key={`${index}-${area.name}`}

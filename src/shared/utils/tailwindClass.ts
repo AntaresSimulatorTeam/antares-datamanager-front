@@ -6,13 +6,13 @@ export const buildLabelColorClass = (status: TRAJECTORY_SELECTION_STATUS): strin
   if (status === TRAJECTORY_SELECTION_STATUS.OK) {
     return 'text-content-brand-default';
   } else if (status === TRAJECTORY_SELECTION_STATUS.ERROR) {
-    return 'text-error-800';
+    return 'text-status-busy';
   } else {
     return 'text-content-primary';
   }
 };
 
-const COMMON_CARD_CLASSES = "absolute text-gray-600 left-0 flex h-fit flex-col justify-start gap-2 rounded-lg border-b-4 bg-gray-100 shadow-2 p-2";
+const COMMON_CARD_CLASSES = "absolute text-content-tertiary left-0 flex h-fit flex-col justify-start gap-2 rounded-lg border-b-4 bg-background-disabled shadow-2 p-2";
 
 const getBorderColorClass = (data: CardDataType): string => {
   if (!data.isAck) {
@@ -20,8 +20,8 @@ const getBorderColorClass = (data: CardDataType): string => {
   } else if (data.onClickItem == null) {
     return 'border-transparent';
   } else {
-    return 'hover:border-b-gray-600';
+    return 'hover:border-border-primary';
   }
 }
 
-export const buildCardClass = (data: CardDataType) => clsx(COMMON_CARD_CLASSES, !data.isAck || data.onClickItem == null ? 'border-transparent' : 'border-b-gray-600', getBorderColorClass(data));
+export const buildCardClass = (data: CardDataType) => clsx(COMMON_CARD_CLASSES, !data.isAck || data.onClickItem == null ? 'border-transparent' : 'border-border-primary', getBorderColorClass(data));

@@ -10,7 +10,7 @@ import { DisplayStatus } from '@/shared/types';
 
 import { AlertContainerId, ToastContainerId } from './containers';
 import StdAlert, { AlertAction } from '@common/layout/stdAlert/StdAlert.tsx';
-import StdToast from '@common/layout/stdToast/StdToast.tsx';
+import { Toast } from '@design-system-rte/react';
 
 export type NotifyProps = {
   id?: string | number;
@@ -26,14 +26,26 @@ export type NotifyWithActionProps = NotifyProps & {
 };
 
 /**
- * Show a toast with a message, a type and an action
+ * Show a toast with a message and a type
  * @returns The id of the toast
  */
-export const notifyToast = ({ message, type, action, id }: NotifyWithActionProps) => {
-  toast.clearWaitingQueue({ containerId: ToastContainerId });
-  toast.dismiss({ containerId: ToastContainerId });
+export const notifyToast = ({ message, type, id }: NotifyWithActionProps) => {
   const toastId = id ?? uuidv4();
-  return toast(<StdToast message={message} status={type} action={action} progressBarPlaceholder />, {
+  return toast(
+    <Toast
+      closable={false}
+      duration="short"
+      placement='top-center'
+      autoDismiss={true}
+      message={message}
+      type={type}
+      showActionButton={false}
+      showLeftIcon={false}
+      onClose={() => {
+        toast.clearWaitingQueue({ containerId: ToastContainerId });
+        toast.dismiss({ containerId: ToastContainerId, id: toastId })
+      }}
+    />, {
     toastId,
     containerId: ToastContainerId,
     type,

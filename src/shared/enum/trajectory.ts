@@ -62,6 +62,5 @@ export enum TRAJECTORY_TYPE {
 export enum TRAJECTORY_SELECTION_STATUS {
   MISSING = 'Missing',
   OK = 'OK',
-  ERROR = 'Error',
-  WARNING = 'Warning',
+  ERROR = 'Error'
 }

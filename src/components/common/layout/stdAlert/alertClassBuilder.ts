@@ -3,26 +3,26 @@ import { clsx } from 'clsx';
 
 export const COMMON_CONTAINER_CLASSES = 'flex gap-2 rounded border-b-2 px-2 py-1 shadow-4 text-left';
 
-export const COMMON_TEXT_CLASSES = 'grow text-body-s text-gray-900';
+export const COMMON_TEXT_CLASSES = 'grow text-body-s text-content-primary';
 
 export const STATUS_CONTAINER_CLASSES = {
-  success: 'border-success-600',
-  error: 'border-error-600',
-  warning: 'border-warning-600',
-  info: 'border-info-600',
+  success: 'border-border-success',
+  error: 'border-border-danger',
+  warning: 'border-border-warning',
+  info: 'border-border-info',
 };
 
 export const STATUS_COLOR_CLASSES = {
-  success: 'text-success-800',
-  error: 'text-error-800',
-  warning: 'text-warning-900',
-  info: 'text-info-800',
+  success: 'text-content-success-default',
+  error: 'text-content-danger-default',
+  warning: 'text-border-warning',
+  info: 'text-content-info-default',
 };
 export const STATUS_BG_COLOR_CLASSES = {
-  success: 'bg-primary-600 text-gray-w',
-  error: 'bg-error-800 text-gray-w',
-  warning: 'bg-acc6-600 text-gray-w',
-  info: 'bg-acc3-800 text-gray-w',
+  success: 'bg-background-success-default text-content-primary-inverse',
+  error: 'bg-background-danger-default text-content-primary-inverse',
+  warning: 'bg-background-warning-default text-content-static',
+  info: 'bg-background-info-default text-content-primary-inverse',
 };
 
 const COMMON_ICON_CLASSES = 'my-0.75 rounded-full';

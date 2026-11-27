@@ -152,12 +152,12 @@
     "@add_trajectories_message": "Ajouter une trajectoire avec des zones",
     "@error_link_trajectory_message": "Please select another LINK trajectory or delete it",
     "@search_area": "Search area",
-    "@or": "or",
-    "@viewLog": "View Log",
-    "@notificationAlert": "Erreur: {{studyName}} - {{trajectoryName}} aucun paramètre n'a pas être enregistré pour {{trajectoryType}}",
+    "@or": "ou",
+    "@viewLog": "Voir le journal",
+    "@notificationAlert": "Erreur: {{studyName}} - {{trajectoryName}} les paramètres n'ont pas été enregistrés pour {{trajectoryType}}",
     "@default": "Par défaut",
     "@hydro": "Hydro",
-    "@checkBoxDefault": "Automatic area selection"
+    "@checkBoxDefault": "Sélection automatique des zones"
   },
   "link": {
     "@toggle_hvdc": "HVDC"

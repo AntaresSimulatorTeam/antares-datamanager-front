@@ -25,4 +25,38 @@ describe('alertClassBuilder function', () => {
     expect(alertClassBuilder('error').iconClasses.includes(STATUS_COLOR_CLASSES.error)).toBe(true);
     expect(alertClassBuilder('success').iconClasses.includes(STATUS_COLOR_CLASSES.success)).toBe(true);
   });
+
+  it.each([
+    [
+      'success',
+      'border-border-success',
+      'text-content-success-default',
+      'bg-background-success-default',
+      'text-content-primary-inverse',
+    ],
+    [
+      'error',
+      'border-border-danger',
+      'text-content-danger-default',
+      'bg-background-danger-default',
+      'text-content-primary-inverse',
+    ],
+    ['warning', 'border-border-warning', 'text-border-warning', 'bg-background-warning-default', 'text-content-static'],
+    [
+      'info',
+      'border-border-info',
+      'text-content-info-default',
+      'bg-background-info-default',
+      'text-content-primary-inverse',
+    ],
+  ] as const)('uses design tokens for %s alerts', (status, border, icon, background, foreground) => {
+    const regular = alertClassBuilder(status);
+    const filled = alertClassBuilder(status, true);
+
+    expect(regular.textClasses).toContain('text-content-primary');
+    expect(regular.containerClasses).toContain(border);
+    expect(regular.iconClasses).toContain(icon);
+    expect(filled.iconClasses).toContain(background);
+    expect(filled.iconClasses).toContain(foreground);
+  });
 });

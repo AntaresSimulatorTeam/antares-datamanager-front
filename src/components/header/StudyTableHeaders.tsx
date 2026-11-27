@@ -8,9 +8,9 @@ import { StudyDTO } from '@/shared/types/Study.type.ts';
 import { formatDateToDDMMYYYY } from '@/shared/utils/dateFormatter.ts';
 import { createColumnHelper } from '@tanstack/react-table';
 import { StudyStatus } from '@/shared/types/common/StudyStatus.type.ts';
-import { sentenceCase } from '@/shared/utils/textUtils.ts';
-import { Icon, RadioButton } from '@design-system-rte/react';
+import { RadioButton } from '@design-system-rte/react';
 import StdTagList from '@common/base/StdTagList/StdTagList.tsx';
+import { StudyStatusCell } from '@common/data/StudyStatusCell.tsx';
 import UserDisplayCell from '@common/layout/UserDisplayCell.tsx';
 
 const columnHelper = createColumnHelper<StudyDTO>();
@@ -36,7 +36,7 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
       };
       return (
         <button
-          className={`px-1 [&_[class*='radioButtonLabel']]:!text-left [&_[class*='radioButtonLabel']]:!font-body [&_[class*='radioButtonLabel']]:!text-text-m [&_[class*='radioButtonLabel']]:!align-bottom [&_[class*='radioButtonLabel']]:!leading-none ${
+          className={`px-1 [&_[class*='_radioButtonContainer']]:!items-center [&_[class*='radioButtonLabel']]:!font-body [&_[class*='radioButtonLabel']]:!text-text-m ${
             isSelected
               ? "[&_[class*='radioButtonBackground']]:opacity-100"
               : "[&_[class*='radioButtonBackground']]:opacity-0 group-hover:[&_[class*='radioButtonBackground']]:opacity-100"
@@ -99,41 +99,7 @@ const getStudyTableHeaders = (t: (value: string) => string) => [
   columnHelper.accessor('status', {
     header: t('home.@status'),
     size: 230,
-    cell: ({ getValue }) => {
-      const status = getValue();
-      // TODO : use inconUtils method when iconName type will be importable
-      switch (status) {
-        case StudyStatus.GENERATED:
-          return (
-            <div className="flex gap-2">
-              <Icon name="download-done" color="#0e6d40" />
-              <span> {sentenceCase(status)} </span>
-            </div>
-          );
-        case StudyStatus.ERROR:
-          return (
-            <div className="flex gap-2">
-              <Icon name="error" color="#bd0536" />
-              <span> {sentenceCase(status)} </span>
-            </div>
-          );
-        case StudyStatus.GENERATION_IN_PROGRESS:
-          return (
-            <div className="flex gap-2">
-              <Icon name="settings" color="#f39200" />
-              <span> {sentenceCase(status)} </span>
-            </div>
-          );
-        case StudyStatus.IN_PROGRESS:
-        default:
-          return (
-            <div className="flex gap-2">
-              <Icon name="trending-up" color="#123fbb" />
-              <span> {sentenceCase(status)} </span>
-            </div>
-          );
-      }
-    },
+    cell: ({ getValue }) => <StudyStatusCell status={getValue()} />,
   }),
 
   columnHelper.accessor('generationDate', {

@@ -120,7 +120,7 @@ describe('convertDataToItem', () => {
 
     expect(result).toEqual({
       code: '',
-      colorBorder: 'hover:border-b-warning-500',
+      colorBorder: 'hover:border-border-brand-default',
       icon: 'warning',
       title: 'areas_BP23_A_ref - links_BP23_A_ref',
       buttonLabel: 'studyDetails.@skip',

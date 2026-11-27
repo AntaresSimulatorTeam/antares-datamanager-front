@@ -4,3 +4,43 @@
 @import '@design-system-rte/core/css/bleu_iceberg.css';
 @import '@design-system-rte/core/css/vert_foret.css';
 @import '@design-system-rte/core/css/violet.css';
+
+:root {
+  /* CSS equivalents of @design-system-rte/core/design-tokens/tokens/public/_spacing.scss. */
+  --positive-spacing-0: 0px;
+  --positive-spacing-025: 2px;
+  --positive-spacing-050: 4px;
+  --positive-spacing-075: 6px;
+  --positive-spacing-100: 8px;
+  --positive-spacing-150: 12px;
+  --positive-spacing-200: 16px;
+  --positive-spacing-250: 20px;
+  --positive-spacing-300: 24px;
+  --positive-spacing-400: 32px;
+  --positive-spacing-500: 40px;
+  --positive-spacing-600: 48px;
+  --positive-spacing-800: 64px;
+  --positive-spacing-1000: 80px;
+
+  /* CSS equivalents of @design-system-rte/core/design-tokens/primitives/_typography.scss. */
+  --line-height-s: 14px;
+  --line-height-m: 16px;
+  --line-height-l: 20px;
+  --line-height-xl: 24px;
+  --line-height-2xl: 28px;
+  --line-height-3xl: 32px;
+  --line-height-4xl: 36px;
+  --line-height-5xl: 40px;
+  --line-height-6xl: 48px;
+  --line-height-7xl: 56px;
+  --line-height-8xl: 64px;
+  --line-height-9xl: 80px;
+  --line-height-10xl: 92px;
+  --letter-spacing-none: 0px;
+  --letter-spacing-s: -0.5px;
+  --letter-spacing-xs: -1px;
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+}

@@ -19,9 +19,9 @@ const StdHeading = ({ title, level = 'h2', size = 'l', weight = 'semibold', id: 
   const headingClasses = headingClassBuilder(size, weight);
 
   return (
-    <div className="header" id={id}>
+    <div className="header max-w-fit" id={id}>
       <HeadingComponent className={headingClasses}>{title}</HeadingComponent>
-      <hr className="w-9 border-t-2 border-border-brand-default" />
+      <hr className="border-t-2 border-border-brand-default" />
     </div>
   );
 };

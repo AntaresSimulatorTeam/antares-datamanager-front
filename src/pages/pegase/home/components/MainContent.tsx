@@ -15,7 +15,7 @@ import ThemeHandler from '@common/handler/ThemeHandler';
 import { PegaseAlertContainer, PegaseToastContainer } from '@/shared/notification/containers';
 import { StudyProvider } from '@/store/contexts/StudyProvider';
 import { useTranslation } from 'react-i18next';
-import { NavigationProvider, SideNav } from '@design-system-rte/react';
+import { NavigationProvider, SideNav, ToastQueueProvider } from '@design-system-rte/react';
 import { translateMenuItemLabel } from '@/shared/utils/textUtils.ts';
 import {
   PEGASE_CONTEXT_MAIN_NAV_BAR_ID,
@@ -34,7 +34,9 @@ const MainContent = () => {
       <UserSettingsContext.Provider initialState={getInitialUserSettings()}>
         <ThemeHandler />
         <div className="z-50">
-          <PegaseToastContainer />
+          <ToastQueueProvider>
+            <PegaseToastContainer />
+          </ToastQueueProvider>
           <PegaseAlertContainer />
           <NavigationProvider
             linkComponent={NavLink}

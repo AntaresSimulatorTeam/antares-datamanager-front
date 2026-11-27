@@ -23,13 +23,13 @@ export const DetailsContent = ({ content, onClickButton, tagsList }: DetailsCont
   const { fullname } = useUserDisplay(content?.createdBy ?? '');
 
   return (
-    <header className="group flex w-full flex-col gap-1 rounded border border-gray-500 bg-gray-100 p-2">
+    <header className="group flex w-full flex-col gap-1 rounded border border-border-divider bg-background-disabled p-2">
       {(content as ProjectInfo)?.description && (
-        <div className="whitespace-normal break-words text-left text-gray-900">
+        <div className="flex text-left break-words w-full">
           {(content as ProjectInfo).description}
         </div>
       )}
-      <div className="flex items-center justify-between font-light text-gray-500">
+      <div className="flex w-full items-center justify-between font-light text-content-tertiary">
         <div className="flex flex-[1_0_0] items-center gap-2">
           <div className="flex items-center gap-1">
             <div className="font-normal">{`${t('pinned' in content ? 'projectDetails.@bannerProjectName' : 'studyDetails.@bannerStudyName')}: `}</div>
@@ -56,7 +56,7 @@ export const DetailsContent = ({ content, onClickButton, tagsList }: DetailsCont
           </div>
           {tagsList?.length != null && tagsList.length > 0 && (
             <div className="flex min-w-32 items-center gap-1">
-              <div>|</div> <StdTagList maxVisibleTags={2} tags={tagsList} />
+              <div>|</div> <StdTagList maxVisibleTags={3} tags={tagsList} />
             </div>
           )}
         </div>

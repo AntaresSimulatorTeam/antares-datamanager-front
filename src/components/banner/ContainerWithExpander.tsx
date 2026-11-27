@@ -20,11 +20,11 @@ export const ContainerWithExpander = <T,>({ content, placeholder }: Props<T>) =>
 
   return (
     <div
-      className={`flex w-full shrink-0 rounded border-gray-600 bg-gray-200 px-2 pb-1 pt-0.5 shadow-2 ${
+      className={`flex w-full shrink-0 rounded border-border-divider bg-background-neutral-navigation-default px-2 pb-1 pt-0.5 shadow-2 ${
         isOpen && content?.length > 0 ? 'h-40 aspect-medium:h-1/3 aspect-wide:h-[230px]' : 'h-fit'
       } `}
     >
-      <div className="flex w-full max-w-fit flex-col pt-2 sm:pt-1.5">
+      <div className="flex w-full max-w-fit flex-col pt-1">
         <IconButton
           appearance="outlined"
           aria-label="icon button aria label"
@@ -55,7 +55,7 @@ export const ContainerWithExpander = <T,>({ content, placeholder }: Props<T>) =>
             />
           </div>
         )}
-        {content.length === 0 && isOpen && <div className="mb-2 text-body-s text-gray-600">{placeholder}</div>}
+        {content.length === 0 && isOpen && <div className="mb-2 text-body-s text-content-tertiary">{placeholder}</div>}
       </div>
     </div>
   );
