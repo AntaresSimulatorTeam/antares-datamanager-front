@@ -117,11 +117,13 @@ export const TrajectoryLinkDataScheme = {
 export interface TrajectorySTSData {
   name: string;
   series: string;
+  constraints: string;
 }
 
 export const TrajectorySTSDataScheme = {
   cluster: 'string',
   series: 'string',
+  constraints: 'string',
 } as const;
 
 export interface Tab {

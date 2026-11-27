@@ -6,7 +6,6 @@
 
 import { Suspense, useState } from 'react';
 import { NavLink, Route, Routes } from 'react-router-dom';
-import PegaseStar from '@/components/pegase/star/PegaseStar';
 import ProjectDetails from '@/pages/pegase/projects/projectDetails/ProjectDetails';
 import StudyDetails from '@/pages/pegase/studies/StudyDetails.tsx';
 import { footerMenuItems, mainMenuItems } from '@/routes';
@@ -57,7 +56,6 @@ const MainContent = () => {
           </NavigationProvider>
         </div>
         <div className="flex h-full w-full min-w-0 flex-col">
-          <PegaseStar />
           <Suspense>
             <NavigationProvider
               linkComponent={NavLink}

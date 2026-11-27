@@ -271,7 +271,8 @@
     "@hvdc": "HVDC",
     "@hurdleCost": "Hurdle cost",
     "@cluster": "Area - Technology - Clusters",
-    "@series": "Time Series"
+    "@series": "Time Series",
+    "@constraints": "Constraints"
   },
   "trajectoryDeletionModal": {
     "@confirmDeleteTitle": "Confirm you want to delete this area",
