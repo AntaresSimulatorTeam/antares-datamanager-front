@@ -92,8 +92,6 @@ export const getStatus = (status?: RowStatus) => {
       return TRAJECTORY_SELECTION_STATUS.ERROR;
     case 'success':
       return TRAJECTORY_SELECTION_STATUS.OK;
-    case 'warning':
-      return TRAJECTORY_SELECTION_STATUS.WARNING;
     case 'empty':
     default:
       return TRAJECTORY_SELECTION_STATUS.MISSING;

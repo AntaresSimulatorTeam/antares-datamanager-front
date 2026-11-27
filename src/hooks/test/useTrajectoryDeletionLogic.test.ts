@@ -124,7 +124,6 @@ describe('computeDeletion - LINK (computeLinkDeletion)', () => {
   const invalidStatuses = [
     TRAJECTORY_SELECTION_STATUS.MISSING,
     TRAJECTORY_SELECTION_STATUS.ERROR,
-    TRAJECTORY_SELECTION_STATUS.WARNING,
   ];
 
   it('retourne le lien et la trajectoire FLOWBASED dans cet ordre lorsque les deux sont OK', () => {

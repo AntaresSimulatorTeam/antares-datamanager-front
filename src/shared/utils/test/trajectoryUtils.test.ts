@@ -4,8 +4,8 @@ import {
   buildDispatchPayload,
   buildEmptyTrajectory,
   buildErrorTrajectory,
-  buildRowWithSubRows,
   buildReadOnlyRow,
+  buildRowWithSubRows,
   buildTableData,
   convertIntoHypothesisRowWithTechnologies,
   filterRow,
@@ -82,10 +82,6 @@ describe('getStatus', () => {
   it("should return a OK selection status for 'success' status", () => {
     const status = getStatus('success');
     expect(status).toStrictEqual(TRAJECTORY_SELECTION_STATUS.OK);
-  });
-  it("should return a WARNING selection status for  'warning' status", () => {
-    const status = getStatus('warning');
-    expect(status).toStrictEqual(TRAJECTORY_SELECTION_STATUS.WARNING);
   });
   it("should return a MISSING selection status for 'empty' status", () => {
     const status = getStatus('empty');
