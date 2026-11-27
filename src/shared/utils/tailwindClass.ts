@@ -6,7 +6,7 @@ export const buildLabelColorClass = (status: TRAJECTORY_SELECTION_STATUS): strin
   if (status === TRAJECTORY_SELECTION_STATUS.OK) {
     return 'text-content-brand-default';
   } else if (status === TRAJECTORY_SELECTION_STATUS.ERROR) {
-    return 'text-content-danger-default';
+    return 'text-status-busy';
   } else {
     return 'text-content-primary';
   }
